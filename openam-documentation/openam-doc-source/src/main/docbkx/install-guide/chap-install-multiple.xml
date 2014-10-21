@@ -272,8 +272,8 @@
      is the server that continues to manage that user's session,
      unless the server is no longer available.
      The load balancer should send subsequent requests to that server
-     to avoid crosstalk traffic resulting from the server that gets the request
-     being different from the server that authenticated the user.
+     to avoid overhead resulting from the server that gets the
+     request being different from the server that authenticated the user.
     </para>
 
     <para>
@@ -343,9 +343,9 @@
     on which a user's session resides.
    </para>
    <para>
-    When an OpenAM request arrives at a server that does not hold the
-    user's session, the OpenAM server attempts to locate the session from the
-    Core Token Service session store by default.
+    When an OpenAM request to read a session arrives at a server that does not
+    hold the user's session, the OpenAM server attempts to locate the session
+    from the Core Token Service session store by default.
    </para>
    <para>
     OpenAM servers can also use crosstalk to locate
@@ -353,6 +353,10 @@
     communicate with each other through a back channel to locate remote sessions.
     Because crosstalk generates network traffic, locating sessions from the
     Core Token Service session store is preferred for performance reasons.
+   </para>
+   <para>
+    Requests to log out or set a session attribute always use crosstalk to
+    ensure the integrity of the update requests.
    </para>
    <para>
    See
