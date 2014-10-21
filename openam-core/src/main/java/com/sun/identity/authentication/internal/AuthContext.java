@@ -23,12 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AuthContext.java,v 1.10 2009/01/28 05:34:52 ww203982 Exp $
- *
+ *  
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.authentication.internal;
 
 import java.io.ByteArrayInputStream;
@@ -858,16 +856,19 @@ public final class AuthContext extends Object {
             // Set Host name
             InetAddress address = InetAddress.getLocalHost();
             String ipAddress = address.getHostAddress();
-            String strHostName = address.getHostName();
+
 
             if (authDebug.messageEnabled()) {
                 authDebug.message("Complete Host : " + address.toString());
-                authDebug.message("getSSOToken : HOST Name : " + strHostName);
                 authDebug.message("getSSOToken : IP : " + ipAddress);
             }
 
             if (ipAddress != null) {
                 if (isEnableHostLookUp) {
+                    final String strHostName = address.getHostName();   
+                    if (authDebug.messageEnabled()) {
+                        authDebug.message("getSSOToken : HOST Name : " + strHostName);                    
+                    }
                     if (strHostName != null) {
                         token.setProperty("HostName", strHostName);
                     }
