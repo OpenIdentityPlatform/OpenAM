@@ -104,14 +104,14 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     obj.getEnvironmentConditions = function () {
         return obj.serviceCall({
-            url: "/conditiontypes?_queryID=&_fields=title,logical,config",
+            url: "/conditiontypes?_queryId=&_fields=title,logical,config",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
     obj.getSubjectConditions = function () {
         return obj.serviceCall({
-            url: "/subjecttypes?_queryID=&_fields=title,logical,config",
+            url: "/subjecttypes?_queryId=&_fields=title,logical,config",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
@@ -153,14 +153,14 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     obj.getAllUserAttributes = function () {
         return obj.serviceCall({
-            url: "/subjectattributes?_queryID",
+            url: "/subjectattributes?_queryId",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
     obj.getAllIdentity = function (name) {
         return obj.serviceCall({
-            url: "/" + name,
+            url: "/" + name + "?_queryId",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
