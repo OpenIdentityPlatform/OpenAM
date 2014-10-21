@@ -14,78 +14,6 @@
     .webkit-text-rendering-bugfix;
 }
 
-.filter-sort-grid {
-    position: relative;
-    .rounded-corners(5px);
-
-    td, th {
-        text-align: left;
-        padding: 5px 10px;
-    }
-
-    th:first-child, td:first-child {
-        width: 12px;
-    }
-
-    input[type='text'], select, input.button {
-        padding: 2px 5px;
-    }
-
-    tbody tr:hover{
-        background-color:@active-background-color;
-    }
-
-    // Header
-    .header-titles {
-        th, td {
-            background-color: #5a646d;
-            border: 1px solid #5a646d;
-
-            &:first-child {
-                border-radius: 5px 0 0 0;
-            }
-
-            &:last-child {
-                border-radius: 0 5px 0 0;
-            }
-        }
-
-        th {
-            color:#fff;
-        }
-
-        a {
-            white-space: nowrap;
-        }
-    }
-
-    .header-filter {
-        background-color: #eee;
-        border-bottom: 1px solid #ccc;
-
-        input, select {
-            width: 90%;
-        }
-
-    }
-
-    .header-actions {
-        th {
-            text-align: right;
-            padding-right: 0;
-        }
-    }
-
-// Body
-    tbody {
-        background-color: #fff;
-
-        td {
-            border-bottom: 1px solid #ccc;
-        }
-    }
-}
-
 // Accordion
 .accordion {
     margin: 15px 0 0 0;
@@ -161,23 +89,6 @@
         input {
             margin: 2px 5px 0 0;
         }
-
-        .resource-pattern {
-            input {
-                width: 180px;
-                float: none;
-            }
-        }
-
-        .controls-group {
-            float: left;
-            width: 200px;
-            margin-left: 20px;
-
-            input {
-                clear: left;
-            }
-        }
     }
 
     .prop-val {
@@ -202,7 +113,6 @@
     }
 
     .review-row {
-
         background: #ebebeb;
         padding: 0 8px 13px;
         clear: both;
@@ -255,20 +165,35 @@
 
     }
 
-    .resources-grid, .actions-grid {
-        width: 430px;
-    }
+    #actions {
+        .toggle-all {
+            margin: 0 8px 0 1px;
+        }
 
-    .actions-grid {
-        .group-field-row {
-            margin: 0;
-            label {
-                padding: 0 5px;
-                width: auto;
+        .striped-list {
+            width: 380px;
+
+            .highlight {
+                background: @table-hightlight-bg-color;
+                border-color: rgba(0, 0, 0, 0.2);
+                [class*="icon-checkbox-"] {
+                    color: darken(@table-hightlight-bg-color, 50%);;
+                }
             }
         }
-        th:last-child {
-            width: 130px;
+
+        .action-name {
+            display: inline-block;
+            padding: 0 0 0 8px;
+            width: 200px;
+        }
+
+        .action-permission {
+            margin: 0 8px 0 0;
+        }
+
+        [class^="icon-"], [class*="icon-"] {
+            font-size: 16px;
         }
     }
 }
@@ -278,7 +203,7 @@
     margin: 15px 0 0 0;
 
     .ui-jqgrid-hbox {
-        height: 60px;
+        height: 56px;
     }
 
     .ui-jqgrid-htable .ui-search-toolbar {
@@ -295,7 +220,7 @@
 
             .ui-search-input {
                 & > input {
-                    height: 30px;
+                    height: 26px;
                     margin: 0;
                 }
             }
@@ -411,7 +336,7 @@ th.ui-state-default.ui-th-column {
 [id*='gview_'] .frozen-bdiv {
     overflow: visible !important;
     height: auto !important;
-    top: 61px !important;
+    top: 57px !important;
 }
 
 .ui-multiselect {

@@ -80,7 +80,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                         {name: 'name', width: 230, frozen: true},
                         {name: 'realm', width: 150},
                         {name: 'description', width: 170, sortable: false},
-                        {name: 'resources', width: 240, sortable: false,
+                        {name: 'resources', width: 240, sortable: false, search: false,
                             formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                         {name: 'createdBy', width: 250, hidden: true},
                         {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter,

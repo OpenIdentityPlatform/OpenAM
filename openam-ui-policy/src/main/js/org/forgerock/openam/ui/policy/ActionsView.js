@@ -26,7 +26,7 @@
  * @author Eugenia Sergueeva
  */
 
-/*global window, define, $, form2js, _, js2form, document, console */
+/*global window, define, $, _, document, console */
 
 define("org/forgerock/openam/ui/policy/ActionsView", [
     "org/forgerock/commons/ui/common/main/AbstractView"
@@ -36,19 +36,20 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
         template: "templates/policy/ActionsTemplate.html",
         noBaseTemplate: true,
         events: {
-            'click .toggle-action': 'toggleAction',
-            'click .toggle-all-actions': 'toggleAllActions',
-            'click input[type=radio]': 'changePermission'
+            'click .striped-list li': 'toggleAction',
+            'click span[class*="icon-radio-"]': 'changePermission',
+            'click .striped-list .toggle-all': 'toggleAllActions'
         },
 
         render: function (args, callback) {
             _.extend(this.data, args);
 
             this.init();
+            this.renderParent(callback);
+        },
 
+        renderParent: function (callback) {
             this.parentRender(function () {
-                this.$toggleAll = this.$el.find('.toggle-all-actions');
-
                 if (callback) {
                     callback();
                 }
@@ -56,10 +57,12 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
         },
 
         init: function () {
-            var data = this.data,
+            var self = this,
+                data = this.data,
                 entity = data.entity,
                 availableActions,
-                selectedActions;
+                selectedActions,
+                actionSelected;
 
             if (!entity.actions) {
                 entity.actions = [];
@@ -69,55 +72,73 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
             selectedActions = entity.actions;
 
             if (!_.isEmpty(selectedActions)) {
+                this.data.selectedAll = true;
+
                 _.each(availableActions, function (action) {
-                    if (typeof selectedActions[action.action] !== 'undefined') {
+                    actionSelected = typeof selectedActions[action.action] !== 'undefined';
+                    self.data.selectedAll = self.data.selectedAll && actionSelected;
+                    if (actionSelected) {
                         action.selected = true;
                         action.value = selectedActions[action.action];
                     }
-
                 });
             }
 
             entity.actions = availableActions;
         },
 
-        /**
-         * Toggles action.
-         */
         toggleAction: function (e) {
-            var actionName = e.target.getAttribute('data-action-name');
+            var self = this,
+                $target = $(e.target),
+                $li,
+                actionName;
 
-            _.find(this.data.entity.actions,function (action) {
-                return action.action === actionName;
-            }).selected = e.target.checked;
+            if ($target.is('span[class*="icon-radio-"]')) {
+                return;
+            }
+
+            $li = $target.closest('li');
+            actionName = $li.data('action-name');
+
+            _.each(this.data.entity.actions, function (action) {
+                if (action.action === actionName) {
+                    action.selected = !action.selected;
+                }
+                self.data.selectedAll = self.data.selectedAll && action.selected;
+            });
+
+            this.renderParent();
         },
 
-        /**
-         * Changes action permission.
-         */
         changePermission: function (e) {
-            var value = e.target.value,
-                actionName = e.target.getAttribute('data-action-name');
+            var $target = $(e.target),
+                permitted,
+                actionName;
+
+            if ($target.hasClass('icon-radio-checked')) {
+                return;
+            }
+
+            permitted = $target.data('action-permission');
+            actionName = $target.closest('li').data('action-name');
 
             _.find(this.data.entity.actions,function (action) {
                 return action.action === actionName;
-            }).value = value === 'Allow';
+            }).value = permitted;
+
+            this.renderParent();
         },
 
-        /**
-         * Toggles all actions.
-         */
         toggleAllActions: function (e) {
-            var checked = e.target.checked,
+            var self = this,
                 actions = this.data.entity.actions;
 
             _.each(actions, function (action) {
-                action.selected = checked;
+                action.selected = !self.data.selectedAll;
             });
 
-            this.render();
-
-            this.$toggleAll.attr('checked', checked);
+            this.data.selectedAll = !this.data.selectedAll;
+            this.renderParent();
         }
     });
 

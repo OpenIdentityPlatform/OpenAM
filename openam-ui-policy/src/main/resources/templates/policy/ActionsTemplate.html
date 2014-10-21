@@ -1,28 +1,25 @@
-<thead>
-<tr class="header-titles">
-    <th><input class="toggle-all-actions" type="checkbox"/></th>
-    <th>Action</th>
-    <th>Permission</th>
-</tr>
-</thead>
+<div class="striped-list created-items">
+    <h3><span
+            class='toggle-all {{#if selectedAll}} icon-checkbox-checked {{/if}} {{#unless selectedAll}} icon-checkbox-unchecked {{/unless}}'
+            tabindex='0' data-action-name="{{action}}"></span> Actions</h3>
+    <ul>
+        {{#if entity.actions}}
+        {{#each entity.actions}}
+        <li class="{{#if selected}} highlight {{/if}}" data-action-name="{{action}}" tabindex='0'>
+            <span class='{{#if selected}} icon-checkbox-checked {{/if}} {{#unless selected}} icon-checkbox-unchecked {{/unless}}'
+                  tabindex='0'></span>
+            <span class="action-name">{{action}}</span>
 
-<tbody>
-{{#each entity.actions}}
-<tr>
-    <td><input class="toggle-action" type="checkbox" {{#if selected}} checked {{/if}} data-action-name="{{action}}" />
-    </td>
-    <td class="action-name">{{action}}</td>
-    <td>
-        <div class="group-field-row">
-            <input type="radio" name="action{{@index}}" id="allow{{@index}}" value="Allow" data-action-name="{{action}}"
-            {{#if value}} checked {{/if}} />
-            <label for="allow{{@index}}">Allow</label>
-
-            <input type="radio" name="action{{@index}}" id="deny{{@index}}" value="Deny" data-action-name="{{action}}"
-            {{#unless value}} checked {{/unless}} />
-            <label for="deny{{@index}}">Deny</label>
-        </div>
-    </td>
-</tr>
-{{/each}}
-</tbody>
+            <span class='{{#if value}} icon-radio-checked {{/if}} {{#unless value}} icon-radio-unchecked {{/unless}}'
+                  tabindex='0' data-action-permission="true"></span>
+            <span class="action-permission">Allow</span>
+            <span class='{{#unless value}} icon-radio-checked {{/unless}} {{#if value}} icon-radio-unchecked {{/if}}'
+                  tabindex='0' data-action-permission="false"></span>
+            <span class="action-permission">Deny</span>
+        </li>
+        {{/each}}
+        {{else}}
+        <li class="disabled">There are no actions...</li>
+        {{/if}}
+    </ul>
+</div>
