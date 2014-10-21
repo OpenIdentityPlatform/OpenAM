@@ -61,7 +61,7 @@ public class NotConditionTest {
 
 
     @Test (expectedExceptions = IllegalArgumentException.class)
-    public void testSingleSubject() {
+    public void testSingleSubject() throws Exception {
         //given
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
 
@@ -85,7 +85,7 @@ public class NotConditionTest {
     }
 
     @Test
-    public void testSingleSubjectEnforced() {
+    public void testSingleSubjectEnforced() throws Exception{
         //given
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
         IPCondition ip = new IPCondition();
@@ -103,7 +103,7 @@ public class NotConditionTest {
     }
 
     @Test
-    public void testSingleSubjectEnforcedRetrieval() {
+    public void testSingleSubjectEnforcedRetrieval() throws Exception {
         //given
         IPCondition ip = new IPCondition();
         ip.setStartIp("192.168.0.1");
