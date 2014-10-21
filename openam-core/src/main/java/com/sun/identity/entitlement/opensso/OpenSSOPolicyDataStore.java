@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -21,6 +21,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  *
  * $Id: OpenSSOPolicyDataStore.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  */
@@ -100,6 +102,11 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
                 policy instanceof com.sun.identity.entitlement.xacml3.core.Policy
             ) {
                 String dn = getPolicyDistinguishedName(realm, name);
+
+                if (SMSEntry.checkIfEntryExists(dn, dsameUserToken)) {
+                    throw new EntitlementException(EntitlementException.POLICY_ALREADY_EXISTS, new Object[]{ name });
+                }
+
                 createParentNode(dsameUserToken, realm);
                 SMSEntry s = new SMSEntry(dsameUserToken, dn);
                 Map<String, Set<String>> map = new
