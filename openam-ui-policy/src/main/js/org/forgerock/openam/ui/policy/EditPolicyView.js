@@ -109,7 +109,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 data.options.availableActions = _.sortBy(actions, "action");
                 data.options.resourcePatterns = _.sortBy(app[0].resources);
 
-                data.options.availableEnvironments = .findByValues(allEnvironments[0].result, 'title', app[0].conditions); 
+                data.options.availableEnvironments = _.findByValues(allEnvironments[0].result, 'title', app[0].conditions); 
                 data.options.availableSubjects =     _.findByValues(allSubjects[0].result, 'title', app[0].subjects);
            
                 self.identityFix(data.options.availableSubjects,identitySubjectUsers,identitySubjectGroups);
