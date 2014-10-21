@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global $, define, _ */
+/*global $, define, _, location */
 
 /**
  * @author mbilski
@@ -69,19 +69,22 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
             lastKnownRealm = configuration.globalData.auth.realm;
             if(lastKnownRealm === "/"){
                 lastKnownRealm = "";
-            }
+            }   
             return obj.serviceCall({
                 type: "GET",
                 headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
                 url: "/json" + lastKnownRealm + "/serverinfo/*",
                 errorsHandlers: {
-                    "unauthorized": { status: "401"}
+                    "unauthorized": { status: "401"},
+                    "Bad Request": { 
+                                        status: "400",
+                                        event: constants.EVENT_INVALID_REALM
+                                    }
                 }
-            });
+            });        
         } else {
             return $.Deferred().resolve();
         }
-
     };
     
     return obj;

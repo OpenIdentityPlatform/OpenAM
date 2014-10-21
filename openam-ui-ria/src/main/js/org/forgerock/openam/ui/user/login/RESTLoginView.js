@@ -36,8 +36,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
-    "org/forgerock/commons/ui/common/main/SpinnerManager"
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
 ], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager, restLoginHelper, spinnerManager) {
 
     var LoginView = AbstractView.extend({
@@ -161,6 +160,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                         delete conf.gotoURL;
                                     } else {
                                         _this.renderForm(reqs, urlParams);
+                                        promise.resolve();
                                     }
                                 });
                             }
@@ -175,6 +175,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
                     } else { // we aren't logged in yet, so render a form...
                         this.renderForm(reqs, urlParams);
+                        promise.resolve();
+                        
                     }
                 }, this))
                 .fail(_.bind(function () {

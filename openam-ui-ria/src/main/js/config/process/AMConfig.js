@@ -55,6 +55,27 @@ define("config/process/AMConfig", [
                     eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.login });
                 });
             }
+        },
+        {
+            startEvent: constants.EVENT_INVALID_REALM,
+            override: true,
+            dependencies: [
+                "org/forgerock/commons/ui/common/main/Router",
+                "org/forgerock/commons/ui/common/main/Configuration"
+            ],
+            processDescription: function(event, router, conf) {
+               
+                if (event.error.responseJSON.message.indexOf('Invalid realm') > -1 ) {
+                    if (conf.baseTemplate) {
+                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
+                    }
+                    else {
+                        router.navigate('login', {trigger: true});
+                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
+                    }
+                }
+                             
+            }
         }
     ];
     return obj;
