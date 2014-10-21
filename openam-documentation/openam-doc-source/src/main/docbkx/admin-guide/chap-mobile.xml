@@ -47,20 +47,29 @@
   authorize access for applications rather than share their
   credentials.</para>
 
-  <para>OpenAM supports emerging standards including <link xlink:show="new"
-  xlink:href="admin-guide#chap-oauth2"
-  xlink:role="http://docbook.org/xlink/role/olink">OAuth 2.0</link> and <link
-  xlink:show="new" xlink:href="admin-guide#chap-openid"
-  xlink:role="http://docbook.org/xlink/role/olink">OpenID Connect 1.0</link>.
-  After you register your application as an OAuth or OpenID Connect client
-  with OpenAM, your application can then redirect a user to OpenAM to
-  authenticate and to authorize access to resources that the user owns,
-  such as profile data. Your application gets an access token that can be
-  used later to gain authorized access without requiring the user to
-  authenticate again. OpenID Connect extends OAuth, standardizing how client
-  applications discover and register with identity providers, and also
-  defining how applications can manage user sessions and handle logout when
-  they no longer want to authorize access.</para>
+  <para>
+   OpenAM supports modern web standards including
+   <link
+    xlink:show="new"
+    xlink:href="admin-guide#chap-oauth2"
+    xlink:role="http://docbook.org/xlink/role/olink">OAuth 2.0</link> and
+   <link
+    xlink:show="new"
+    xlink:href="admin-guide#chap-openid"
+    xlink:role="http://docbook.org/xlink/role/olink"
+   >OpenID Connect 1.0</link>.
+   After registering an application with OpenAM as an OAuth/OpenID Connect client,
+   the application can then redirect a user to OpenAM
+   to authenticate and to authorize access to resources that the user owns,
+   such as profile data.
+   The application gets an access token that can be used
+   to gain authorized access without requiring the user to share credentials.
+   OpenID Connect extends OAuth,
+   standardizing how client applications discover
+   and register with identity providers,
+   and also defining how applications can manage user sessions
+   and handle logout when they no longer want to authorize access.
+  </para>
 
   <mediaobject xml:id="figure-mobile-oauth">
    <alt>OAuth 2.0 with a mobile application</alt>
