@@ -94,7 +94,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 });
 
 
-                data.options.realm = app[0].realm;
+                
                 // here we split by type
                 staticAttributes =  _.where(policy.resourceAttributes, {type: responseAttrsStaticView.attrType}); 
                 staticAttributes = responseAttrsStaticView.splitAttrs( staticAttributes);
@@ -105,15 +105,13 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 data.entity.applicationName = appName;
 
                 data.options = {};
+                data.options.realm = app[0].realm;
                 data.options.availableActions = _.sortBy(actions, "action");
                 data.options.resourcePatterns = _.sortBy(app[0].resources);
 
-                // this is a temporary hack... not to be committed, to get round the fact that the default apps have differnt condition types than the endpoints.
-                data.options.availableEnvironments = allEnvironments[0].result; //_.findByValues(allEnvironments[0].result, 'title', app[0].conditions); 
-                data.options.availableSubjects =     allSubjects[0].result; //_.findByValues(allSubjects[0].result, 'title', app[0].subjects);
+                data.options.availableEnvironments = .findByValues(allEnvironments[0].result, 'title', app[0].conditions); 
+                data.options.availableSubjects =     _.findByValues(allSubjects[0].result, 'title', app[0].subjects);
            
-                data.options.availableSubjects = _.union(data.options.availableSubjects, data.options.availableEnvironments);
-
                 self.identityFix(data.options.availableSubjects,identitySubjectUsers,identitySubjectGroups);
 
                 self.parentRender(function () {
