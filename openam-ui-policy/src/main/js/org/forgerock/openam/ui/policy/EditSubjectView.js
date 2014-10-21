@@ -60,7 +60,7 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
 
 
             if (itemData) {
-                // Temporay fix, the name attribute is being added by the server after the policy is created.
+                // Temporay fix: The name attribute is being added by the server after the policy is created.
                 delete itemData.name;
                 this.$el.data('itemData',itemData);
                 this.$el.find('select#selection').val(itemData.type).trigger('change');
@@ -86,32 +86,86 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
             this.$el.data().itemData[label] = e.currentTarget.value;
         },
 
-        initSelectize: function() {
+        initSelectize: function(datasource) {
 
             var self = this,
-                title = '';
+                title = '',
+                initLoadData = false,
+                additionalOptions = {},
+                options = {};
 
+            if(datasource.subjectValues){
+                self.datasource = datasource.subjectValues.dataSources;
+            }
+
+            //TODO: loading class is added to the selectise-input... need to add spinner
             this.$el.find('.selectize').each(function(){
 
-                $(this).selectize({
+                title = '';
+                initLoadData = false;
+                additionalOptions = {};
+                options = {
                     plugins: ['restore_on_backspace'],
                     delimiter: ',',
-                    persist: false,
-                    create: function(input) {
-                        return {
-                            value: input,
-                            text: input
-                        };
-                    },
                     onChange: function(value){
                         title = this.$input.parent().find('label')[0].dataset.title;
                         if(title !== ''){
                              self.$el.data().itemData[title] = value;
                         }
                     }
-                });
+                };
+
+                if(this.dataset.sourceUsers || this.dataset.sourceGroups){
+
+                    additionalOptions = {
+                        preload:true,
+                        persist:true,
+                        load:function(query, callback) {
+                            if(initLoadData){
+                                return callback();
+                            }
+                            initLoadData = true;
+                            var selectize = this;
+
+                            _.each(self.datasource, function(item){
+
+                                if(item.data.length > 0){
+                                    selectize.addOptionGroup(item.name, {
+                                        label: item.name
+                                    });
+
+                                    _.each(item.data, function(value){
+                                        selectize.addOption({value:value, text:value,  optgroup: item.name});
+                                    })
+                                }
+                            });
+                         
+
+                            selectize.refreshOptions(true);
+                              
+                        }
+                    };
+                 
+
+                } else {
+
+                    additionalOptions = {
+                        persist:false,
+                        create:function(input) {
+                            return {
+                                value: input,
+                                text: input
+                            };
+                        }
+                    }; 
+                }
+
+                options = _.merge(options, additionalOptions);
+
+                $(this).selectize(options);
 
             });
+
         },
 
         changeType: function(e) {
@@ -132,7 +186,7 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
                         if (value.type === 'string' ) {
                             returnVal += '\n'+ uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html", {data:itemData[key], title:key, id:count});
                         } else if (value.type === 'array' ) {
-                            returnVal += '\n'+ uiUtils.fillTemplateWithData("templates/policy/ConditionAttrArray.html", {data:itemData[key], title:key, id:count, tempData:self.weekdays});  
+                            returnVal += '\n'+ uiUtils.fillTemplateWithData("templates/policy/ConditionAttrArray.html", {data:itemData[key], title:key, id:count, dataSource:value.dataSources});  
                         } else {
                             console.error('Unexpected data type:',key,value);
                         }
@@ -196,10 +250,8 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
                     });
 
                     if(selectize){
-                        self.initSelectize();
+                        self.initSelectize(schema.config.properties);
                     }  
-
-                    
 
                     setTimeout( function() {
 
@@ -213,11 +265,8 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
 
                     }, 10);
                 }, delay);
-            }
-
-            
+            }    
         }
-
     });
 
     return EditSubjectView;

@@ -68,9 +68,12 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 appPromise = policyDelegate.getApplicationByName(appName),
                 allSubjectsPromise = policyDelegate.getSubjectConditions(), // this possibly should be in the parent. We need a means to check if this exsists, and only make this searxh if it does not
                 allEnvironmentsPromise = policyDelegate.getEnvironmentConditions(),
-                allUserAttributesPromise = policyDelegate.getAllUserAttributes();
+                allUserAttributesPromise = policyDelegate.getAllUserAttributes(),
+                identitySubjectUsersPromise  = policyDelegate.getAllIdentity("users");
+                identitySubjectGroupsPromise = policyDelegate.getAllIdentity("groups");
 
-            $.when(policyPromise, appPromise, allSubjectsPromise, allEnvironmentsPromise, allUserAttributesPromise).done(function (policy, app, allSubjects, allEnvironments, allUserAttributes) {
+            $.when(policyPromise, appPromise, allSubjectsPromise, allEnvironmentsPromise, allUserAttributesPromise, identitySubjectUsersPromise, identitySubjectGroupsPromise)
+                .done(function (policy, app, allSubjects, allEnvironments, allUserAttributes, identitySubjectUsers, identitySubjectGroups) {
                 var actions = [],
                     subjects = [],
                     conditions = [],
@@ -90,13 +93,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     actions.push({action: key, selected: false, value: value});
                 });
 
-                data.options = {};
-                // this is a temporary hack... not to be committed, to get round the fact that the default apps have differnt condition types than the endpoints.
-                data.options.availableSubjects =     allSubjects[0].result; //_.findByValues(allSubjects[0].result, 'title', app[0].subjects);
-                data.options.availableEnvironments = allEnvironments[0].result; //_.findByValues(allEnvironments[0].result, 'title', app[0].conditions); 
 
-                data.options.availableActions =      _.sortBy(actions, "action");
-                data.options.resourcePatterns =      _.sortBy(app[0].resources);
 
                 // here we split by type
                 staticAttributes =  _.where(policy.resourceAttributes, {type: responseAttrsStaticView.attrType}); 
@@ -106,6 +103,18 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 allUserAttributes = _.sortBy(allUserAttributes[0].result);
 
                 data.entity.applicationName = appName;
+
+                data.options = {};
+                data.options.availableActions = _.sortBy(actions, "action");
+                data.options.resourcePatterns = _.sortBy(app[0].resources);
+
+                // this is a temporary hack... not to be committed, to get round the fact that the default apps have differnt condition types than the endpoints.
+                data.options.availableEnvironments = allEnvironments[0].result; //_.findByValues(allEnvironments[0].result, 'title', app[0].conditions); 
+                data.options.availableSubjects =     allSubjects[0].result; //_.findByValues(allSubjects[0].result, 'title', app[0].subjects);
+           
+                data.options.availableSubjects = _.union(data.options.availableSubjects, data.options.availableEnvironments);
+
+                self.identityFix(data.options.availableSubjects,identitySubjectUsers,identitySubjectGroups);
 
                 self.parentRender(function () {
 
@@ -117,7 +126,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     responseAttrsStaticView.render(staticAttributes); 
                     responseAttrsUserView.render([userAttributes, allUserAttributes]);
 
-                   
                     self.prepareInfoReview();
                     reviewInfoView.render(this.data, null, self.$el.find('#reviewPolicyInfo'), "templates/policy/ReviewPolicyStepTemplate.html");
                     self.initAccordion();
@@ -125,7 +133,9 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     if (callback) {
                         callback();
                     }
+
                 });
+
             });
         },
 
@@ -269,9 +279,21 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             } else {
                 console.log(e.responseJSON, e.responseText, e);
             }
+        },
+
+        identityFix: function (availableSubjects,identitySubjectUsers,identitySubjectGroups) {
+            // this is a temporary client-side fix as the endpoint as yet does not return any information about the available lookups
+            var identity = _.find(availableSubjects, function(item){
+                    return item.title === "Identity";
+                });
+            if (identity.config.properties.subjectValues) {
+                identity.config.properties.subjectValues.dataSources = [
+                    {name:"users", data:identitySubjectUsers[0].result},
+                    {name:"groups", data:identitySubjectGroups[0].result},
+                ];
         }
                         
-                    
+        }                
     });
 
     return new EditPolicyView();

@@ -158,6 +158,14 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         });
     };
 
+    obj.getAllIdentity = function (name) {
+        return obj.serviceCall({
+            url: "/" + name,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+        });
+    };
+
+
     obj.importPolicies = function (data) {
         return obj.serviceCall({
             serviceUrl: constants.host + "/openam/",
