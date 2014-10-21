@@ -25,7 +25,6 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.utils.ValidateIPaddress;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,12 +42,13 @@ public class IPCondition extends EntitlementConditionAdaptor {
     private final CoreWrapper coreWrapper;
 
     public static final String IP_VERSION = "ipVersion";
-    public static final String IPV4 = "IPv4";
-    public static final String IPV6 = "IPv6";
     private IPv6Condition iPv6ConditionInstance = null;
     private IPv4Condition iPv4ConditionInstance = null;
-    private boolean ipv4 = false;
-    private boolean ipv6 = false;
+    private IPVersion ipVersion = IPVersion.IPV4;
+    private String endIp;
+    private String startIp;
+    private List<String> dnsName;
+    private List<String> ipRanges;
 
     /**
      * Constructs a new IPCondition instance.
@@ -77,27 +77,19 @@ public class IPCondition extends EntitlementConditionAdaptor {
             JSONObject jo = new JSONObject(state);
             setState(jo);
 
-            checkIpVersion(jo);
-            if (ipv4) {
+            String ipVersion = jo.optString(IP_VERSION);
+            if (ipVersion.isEmpty()) {
+                this.ipVersion = IPVersion.IPV4;
+            } else {
+                this.ipVersion = IPVersion.valueOf(ipVersion.toUpperCase());
+            }
+            if (this.ipVersion == IPVersion.IPV4) {
                 iPv4ConditionInstance.setState(state);
-            } else if (ipv6) {
+            } else {
                 iPv6ConditionInstance.setState(state);
             }
         } catch (JSONException e) {
             debug.message("IPCondition: Failed to set state", e);
-        }
-    }
-
-    private void checkIpVersion(JSONObject jo) throws JSONException {
-        JSONArray ipVersionJson = jo.getJSONArray(IP_VERSION);
-
-        if (ipVersionJson.length() > 0) {
-            String ipVersion = ipVersionJson.getString(0);
-            if (ipVersion.equalsIgnoreCase(IPV4)) {
-                ipv4 = true;
-            } else if (ipVersion.equalsIgnoreCase(IPV6)) {
-                ipv6 = true;
-            }
         }
     }
 
@@ -117,13 +109,13 @@ public class IPCondition extends EntitlementConditionAdaptor {
             throws EntitlementException {
 
         // Determine Request IP address
-        setIPVersion(env);
-        if (ipv4) {
-            return iPv4ConditionInstance.evaluate(realm, subject, resourceName, env);
-        } else if(ipv6) {
-            return iPv6ConditionInstance.evaluate(realm, subject, resourceName, env);
-        } else {
+        IPVersion requestVersion = getRequestedIPVersion(env);
+        if (requestVersion != this.ipVersion) {
             return new ConditionDecision(false, Collections.<String, Set<String>>emptyMap());
+        } else if (this.ipVersion == IPVersion.IPV4) {
+            return iPv4ConditionInstance.evaluate(realm, subject, resourceName, env);
+        } else {
+            return iPv6ConditionInstance.evaluate(realm, subject, resourceName, env);
         }
     }
 
@@ -132,21 +124,17 @@ public class IPCondition extends EntitlementConditionAdaptor {
      *
      * @param env map containing environment description
      */
-    private void setIPVersion(Map<String, Set<String>> env) {
-        String ipVer;
+    private IPVersion getRequestedIPVersion(Map<String, Set<String>> env) {
+        IPVersion version = null;
         if (env.keySet().contains(REQUEST_IP)) {
-            try {
-                // Get IP_Version
-                ipVer = getRequestIp(env);
-                if (ValidateIPaddress.isIPv6(ipVer)) {
-                    ipv6 = true;
-                } else {
-                    ipv4 = true; // treat as IPv4
-                }
-            } catch (Exception e) {
-                debug.error("IPCondition.setIPVersion() : Cannot set IPversion", e);
+            // Get IP_Version
+            if (ValidateIPaddress.isIPv6(getRequestIp(env))) {
+                version = IPVersion.IPV6;
+            } else {
+                version = IPVersion.IPV4;
             }
         }
+        return version;
     }
 
     /**
@@ -185,82 +173,97 @@ public class IPCondition extends EntitlementConditionAdaptor {
      */
     @Override
     public String toString() {
-
-        if (ipv4) {
+        if (this.ipVersion == IPVersion.IPV4) {
             return iPv4ConditionInstance.toString();
-        } else if (ipv6) {
-            return iPv6ConditionInstance.toString();
         } else {
-            PrivilegeManager.debug.error("IPCondition.toString()");
-            return super.toString();
+            return iPv6ConditionInstance.toString();
         }
     }
 
     public List<String> getIpRange() {
-        if (ipv4) {
+        if (this.ipVersion == IPVersion.IPV4) {
             return iPv4ConditionInstance.getIpRange();
-        } else if (ipv6) {
+        } else {
             return iPv6ConditionInstance.getIpRange();
         }
-        return null;
     }
 
     public void setIpRange(List<String> ipRanges) throws EntitlementException {
-        if (ipv4) {
+        this.ipRanges = ipRanges;
+        if (ipRanges.size() > 0) {
+            String firstIP = ipRanges.get(0).split("-")[0];
+            if (ValidateIPaddress.isIPv4(firstIP)) {
+                iPv4ConditionInstance.setIpRange(ipRanges);
+            } else if (this.ipVersion == IPVersion.IPV6) {
+                iPv6ConditionInstance.setIpRange(ipRanges);
+            }
+        } else {
             iPv4ConditionInstance.setIpRange(ipRanges);
-        } else if (ipv6) {
             iPv6ConditionInstance.setIpRange(ipRanges);
         }
     }
 
     public List<String> getDnsName() {
-        if (ipv4) {
+        if (this.ipVersion == IPVersion.IPV4) {
             return iPv4ConditionInstance.getDnsName();
-        } else if (ipv6) {
+        } else {
             return iPv6ConditionInstance.getDnsName();
         }
-        return null;
     }
 
     public void setDnsName(List<String> dnsName) {
-        if (ipv4) {
-            iPv4ConditionInstance.setDnsName(dnsName);
-        } else if (ipv6) {
-            iPv6ConditionInstance.setDnsName(dnsName);
-        }
+        this.dnsName = dnsName;
+        iPv4ConditionInstance.setDnsName(dnsName);
+        iPv6ConditionInstance.setDnsName(dnsName);
     }
 
     public String getStartIp() {
-        if (ipv4) {
+        if (this.ipVersion == IPVersion.IPV4) {
             return iPv4ConditionInstance.getStartIp();
-        } else if (ipv6) {
+        } else {
             return iPv6ConditionInstance.getStartIp();
         }
-        return null;
     }
 
-    public void setStartIp(String startIp) {
-        if (ipv4) {
+    public void setStartIp(String startIp) throws EntitlementException {
+        this.startIp = startIp;
+        if (ValidateIPaddress.isIPv4(startIp)) {
             iPv4ConditionInstance.setStartIp(startIp);
-        } else if (ipv6) {
+        } else {
             iPv6ConditionInstance.setStartIp(startIp);
         }
     }
 
     public String getEndIp() {
-        if (ipv4) {
+        if (this.ipVersion == IPVersion.IPV4) {
             return iPv4ConditionInstance.getEndIp();
-        } else if (ipv6) {
+        } else {
             return iPv6ConditionInstance.getEndIp();
         }
-        return null;
     }
 
-    public void setEndIp(String endIp) {
-        if (ipv4) {
+    public void setEndIp(String endIp) throws EntitlementException {
+        this.endIp = endIp;
+        if (ValidateIPaddress.isIPv4(endIp)) {
             iPv4ConditionInstance.setEndIp(endIp);
-        } else if (ipv6) {
+        } else {
             iPv6ConditionInstance.setEndIp(endIp);
         }
+    }
+
+    public String getIpVersion() {
+        return ipVersion.toString();
+    }
+
+    public void setIpVersion(String ipVersion) throws EntitlementException {
+        if (ipVersion != null && !ipVersion.isEmpty()) {
+            this.ipVersion = IPVersion.valueOf(ipVersion.toUpperCase());
+        } else {
+            this.ipVersion = IPVersion.IPV4;
+        }
+        setStartIp(startIp);
+        setEndIp(endIp);
+        setDnsName(dnsName == null ? Collections.<String>emptyList() : dnsName);
+        setIpRange(ipRanges == null ? Collections.<String>emptyList() : ipRanges);
     }
 }
