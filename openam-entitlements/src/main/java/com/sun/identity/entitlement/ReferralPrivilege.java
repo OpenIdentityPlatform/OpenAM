@@ -62,7 +62,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
     private String createdBy;
     private boolean active = true;
 
-    private ReferralPrivilege() {
+    public ReferralPrivilege() {
     }
 
     /**
@@ -168,6 +168,13 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
         if (map != null) {
             this.mapApplNameToResources.putAll(map);
         }
+    }
+
+    /**
+     * Set this referral privilege's name.
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
