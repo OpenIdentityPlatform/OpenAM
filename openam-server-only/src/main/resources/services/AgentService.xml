@@ -489,6 +489,13 @@
                             <Value>com.sun.identity.common.configuration.MapValueValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="DuplicateKeyMapValueValidator"
+                        type="validator"
+                        syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.common.configuration.DuplicateKeyMapValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>                    
                     <AttributeSchema
                         name="com.sun.identity.agents.config.repository.location"
                         type="single_choice"
@@ -1600,6 +1607,13 @@
                             <Value>com.sun.identity.common.configuration.MapValueValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="DuplicateKeyMapValueValidator"
+                        type="validator"
+                        syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.common.configuration.DuplicateKeyMapValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>                      
                     <AttributeSchema name="GlobalMapValueValidator"
                         type="validator"
                         syntax="string">
