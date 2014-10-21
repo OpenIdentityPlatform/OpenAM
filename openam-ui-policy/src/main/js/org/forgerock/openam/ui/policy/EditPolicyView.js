@@ -289,7 +289,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             if (identity.config.properties.subjectValues) {
                 identity.config.properties.subjectValues.dataSources = [
                     {name:"users", data:identitySubjectUsers[0].result},
-                    {name:"groups", data:identitySubjectGroups[0].result},
+                    {name:"groups", data:identitySubjectGroups[0].result}
                 ];
         }
                         

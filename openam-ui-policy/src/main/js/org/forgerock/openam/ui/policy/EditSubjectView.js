@@ -136,7 +136,7 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
 
                                     _.each(item.data, function(value){
                                         selectize.addOption({value:value, text:value,  optgroup: item.name});
-                                    })
+                                    });
                                 }
                             });
                          
