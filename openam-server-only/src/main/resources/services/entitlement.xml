@@ -480,41 +480,31 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
-                            <Value>Group</Value>
-                            <Value>Role</Value>
-                            <Value>User</Value>
-                            <Value>Attribute</Value>
-                            <Value>OR</Value>
                             <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!--
-                            <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.AttributeViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.OrViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.AndViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
-                            <!--<Value>com.sun.identity.admin.model.ActiveSessionTimeCondition</Value>-->
-                            <Value>Time</Value>
-                            <Value>IP</Value>
-                            <Value>DNSName</Value>
-                            <Value>OR</Value>
                             <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!-- <Value>dateRange</Value>
-                            <Value>daysOfWeek</Value>
-                            <Value>dnsName</Value>
-                            <Value>ipRange</Value>
-                            <Value>timeRange</Value>
-                            <Value>timezone</Value>
-                            <Value>or</Value>
-                            <Value>and</Value>
-                            <Value>not</Value> -->
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IP</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
@@ -534,40 +524,31 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
-                            <Value>Group</Value>
-                            <Value>Role</Value>
-                            <Value>User</Value>
-                            <Value>Attribute</Value>
-                            <Value>OR</Value>
                             <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!--
-                            <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.AttributeViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.OrViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.AndViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
-                            <Value>Time</Value>
-                            <Value>DNSName</Value>
-                            <Value>IP</Value>
-                            <Value>OR</Value>
                             <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!-- <Value>dateRange</Value>
-                            <Value>daysOfWeek</Value>
-                            <Value>dnsName</Value>
-                            <Value>ipRange</Value>
-                            <Value>timeRange</Value>
-                            <Value>timezone</Value>
-                            <Value>or</Value>
-                            <Value>and</Value>
-                            <Value>not</Value> -->
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IP</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
@@ -588,41 +569,31 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
-                            <Value>Group</Value>
-                            <Value>Role</Value>
-                            <Value>User</Value>
-                            <Value>Attribute</Value>
-                            <Value>OR</Value>
                             <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!--
-                            <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.AttributeViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.OrViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.AndViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
-                            <!--<Value>com.sun.identity.admin.model.ActiveSessionTimeCondition</Value>-->
-                            <Value>Time</Value>
-                            <Value>DNSName</Value>
-                            <Value>IP</Value>
-                            <Value>OR</Value>
                             <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!-- <Value>dateRange</Value>
-                            <Value>daysOfWeek</Value>
-                            <Value>dnsName</Value>
-                            <Value>ipRange</Value>
-                            <Value>timeRange</Value>
-                            <Value>timezone</Value>
-                            <Value>or</Value>
-                            <Value>and</Value>
-                            <Value>not</Value> -->
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IP</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
@@ -642,42 +613,31 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
-                            <Value>Group</Value>
-                            <Value>Role</Value>
-                            <Value>User</Value>
-                            <Value>Attribute</Value>
-                            <Value>OR</Value>
                             <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!--
-                            <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.AttributeViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.OrViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.AndViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
-                            <!--<Value>com.sun.identity.admin.model.ActiveSessionTimeCondition</Value>-->
-                            <Value>Time</Value>
-                            <Value>DNSName</Value>
-                            <Value>IP</Value>
-                            <Value>OR</Value>
                             <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!--
-                            <Value>dateRange</Value>
-                            <Value>daysOfWeek</Value>
-                            <Value>dnsName</Value>
-                            <Value>ipRange</Value>
-                            <Value>timeRange</Value>
-                            <Value>timezone</Value>
-                            <Value>or</Value>
-                            <Value>and</Value>
-                            <Value>not</Value> -->
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IP</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
@@ -697,11 +657,11 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
-                            <Value>User</Value>
-                            <Value>Group</Value>
-                            <!--
-                            <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value> -->
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
@@ -739,32 +699,31 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
-                            <Value>Group</Value>
-                            <Value>Role</Value>
-                            <Value>User</Value>
                             <Value>AND</Value>
                             <Value>OR</Value>
-                            <!--
-                            <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.OrViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.AndViewSubject</Value> -->
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
-                            <Value>DNSName</Value>
-                            <Value>IP</Value>
-                            <Value>OR</Value>
                             <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!--
-                            <Value>dnsName</Value>
-                            <Value>ipRange</Value>
-                            <Value>or</Value>
-                            <Value>and</Value>
-                            <Value>not</Value> -->
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IP</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
@@ -787,33 +746,31 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
-                            <Value>Role</Value>
-                            <Value>Group</Value>
-                            <Value>User</Value>
+                            <Value>AND</Value>
                             <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!--
-                            <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.OrViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
-                            <Value>Time</Value>
-                            <Value>OR</Value>
                             <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!--
-                            <Value>dateRange</Value>
-                            <Value>daysOfWeek</Value>
-                            <Value>timeRange</Value>
-                            <Value>timezone</Value>
-                            <Value>or</Value>
-                            <Value>and</Value>
-                            <Value>not</Value> -->
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IP</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
@@ -834,24 +791,31 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
-                            <Value>Group</Value>
-                            <Value>Role</Value>
-                            <Value>User</Value>
-                            <!--
-                            <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.VirtualViewSubject</Value> -->
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
-                            <Value>Time</Value>
-                            <Value>DNSName</Value>
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
                             <Value>IP</Value>
-                            <!--
-                            <Value>daysOfWeek</Value>
-                            <Value>dnsName</Value>
-                            <Value>ipRange</Value> -->
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
@@ -871,31 +835,32 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <Value>com.sun.identity.admin.model.BankingViewSubject</Value>
-                            <!-- <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
                             <Value>NumericAttribute</Value>
-                            <Value>Time</Value>
-                            <Value>IP</Value>
-                            <Value>OR</Value>
                             <Value>AND</Value>
+                            <Value>OR</Value>
                             <Value>NOT</Value>
-                            <!--
-                            <Value>upperTransferLimit</Value>
-                            <Value>lowerTransferLimit</Value>
-                            <Value>anyTransferLimit</Value>
-                            <Value>dateRange</Value>
-                            <Value>daysOfWeek</Value>
-                            <Value>timeRange</Value>
-                            <Value>timezone</Value>
-                            <Value>ipRange</Value>
-                            <Value>or</Value>
-                            <Value>and</Value>
-                            <Value>not</Value> -->
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IP</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
