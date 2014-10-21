@@ -69,7 +69,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 allSubjectsPromise = policyDelegate.getSubjectConditions(), // this possibly should be in the parent. We need a means to check if this exsists, and only make this searxh if it does not
                 allEnvironmentsPromise = policyDelegate.getEnvironmentConditions(),
                 allUserAttributesPromise = policyDelegate.getAllUserAttributes(),
-                identitySubjectUsersPromise  = policyDelegate.getAllIdentity("users");
+                identitySubjectUsersPromise  = policyDelegate.getAllIdentity("users"),
                 identitySubjectGroupsPromise = policyDelegate.getAllIdentity("groups");
 
             $.when(policyPromise, appPromise, allSubjectsPromise, allEnvironmentsPromise, allUserAttributesPromise, identitySubjectUsersPromise, identitySubjectGroupsPromise)
