@@ -11,12 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.auth.shared;
+package org.forgerock.openam.authentication.service;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.service.AuthUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Wrapper class around AuthUtils to facilitate testing.
@@ -33,4 +37,19 @@ public class AuthUtilsWrapper {
     public String getCookieName() {
         return AuthUtils.getCookieName();
     }
+
+    /**
+     * Performs a logout on a given token ensuring the post auth classes are called.
+     *
+     * @param sessionID The token id to logout.
+     * @param request The HTTP request.
+     * @param response The HTTP response.
+     * @return true if the token was still valid before logout was called.
+     * @throws com.iplanet.sso.SSOException If token is null or other SSO exceptions.
+     */
+    public boolean logout(String sessionID, HttpServletRequest request, HttpServletResponse response)
+            throws SSOException {
+        return AuthUtils.logout(sessionID, request, response);
+    }
+
 }

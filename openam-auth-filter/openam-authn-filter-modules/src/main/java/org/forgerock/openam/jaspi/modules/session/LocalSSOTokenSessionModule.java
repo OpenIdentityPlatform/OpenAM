@@ -22,7 +22,7 @@ import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
+import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
 

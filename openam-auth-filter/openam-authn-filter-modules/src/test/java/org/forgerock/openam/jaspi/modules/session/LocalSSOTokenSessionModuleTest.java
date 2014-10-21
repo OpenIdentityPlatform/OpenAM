@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.jaspi.modules.session;
@@ -19,7 +19,7 @@ package org.forgerock.openam.jaspi.modules.session;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
-import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
+import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
 import org.testng.annotations.BeforeMethod;
