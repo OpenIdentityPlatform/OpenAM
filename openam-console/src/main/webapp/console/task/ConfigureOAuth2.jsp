@@ -114,8 +114,8 @@ function getData(){
    var rtl = frm.elements['ConfigureOAuth2.choiceRefreshLifetime'].value;
    var acl = frm.elements['ConfigureOAuth2.choiceCodeLifetime'].value;
    var atl = frm.elements['ConfigureOAuth2.choiceTokenLifetime'].value;
-   var irt = frm.elements['ConfigureOAuth2.choiceRefreshToken'].value;
-   var irtr = frm.elements['ConfigureOAuth2.choiceRefreshTokenOnRefreshing'].value;
+   var irt = (frm.elements['ConfigureOAuth2.choiceRefreshToken'].checked == true) ? "true" : "false";
+   var irtr = (frm.elements['ConfigureOAuth2.choiceRefreshTokenOnRefreshing'].checked == true) ? "true" : "false";
    var sic = frm.elements['ConfigureOAuth2.choiceScopeImpl'].value;
    return "&realm=" + escapeEx(realm) +
            "&rtl=" + escapeEx(rtl) +
