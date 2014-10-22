@@ -91,7 +91,7 @@
                 <AttributeSchema name="sun-am-policy-config-advices-handleable-by-am"
 		    type="list"
                     syntax="string"
-		    i18nKey="a100d">
+		    i18nKey="">
 		    <DefaultValues>
 			<Value>AuthLevelConditionAdvice</Value>
 			<Value>AuthSchemeConditionAdvice</Value>
@@ -120,7 +120,7 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-base-dn"
 		    type="single"
                     syntax="string"
-		    i18nKey="a102">
+		    i18nKey="">
 		    <DefaultValues>
                         <Value>@UM_NORMALIZED_ORGBASE@</Value>
                     </DefaultValues>
@@ -165,7 +165,7 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-organizations-search-scope"
 		    type="single_choice"
                     syntax="string"
-		    i18nKey="a106">
+		    i18nKey="">
 		    <ChoiceValues>
                         <ChoiceValue i18nKey="a126">SCOPE_BASE</ChoiceValue>
                         <ChoiceValue i18nKey="a127">SCOPE_ONE</ChoiceValue>
@@ -178,7 +178,7 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-groups-search-filter"
 		    type="single"
                     syntax="xml"
-		    i18nKey="a107">
+		    i18nKey="">
 		    <DefaultValues>
                         <Value>(objectclass=groupOfUniqueNames)</Value>
                     </DefaultValues>
@@ -186,7 +186,7 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-groups-search-scope"
 		    type="single_choice"
                     syntax="string"
-		    i18nKey="a108">
+		    i18nKey="">
 		    <ChoiceValues>
                         <ChoiceValue i18nKey="a126">SCOPE_BASE</ChoiceValue>
                         <ChoiceValue i18nKey="a127">SCOPE_ONE</ChoiceValue>
@@ -220,7 +220,7 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-roles-search-filter"
 		    type="single"
                     syntax="xml"
-		    i18nKey="a111">
+		    i18nKey="">
 		    <DefaultValues>
                         <Value>(&amp;(objectclass=ldapsubentry)(objectclass=nsroledefinition))</Value>
                     </DefaultValues>
@@ -228,7 +228,7 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-roles-search-scope"
 		    type="single_choice"
                     syntax="string"
-		    i18nKey="a112">
+		    i18nKey="">
 		    <ChoiceValues>
                         <ChoiceValue i18nKey="a126">SCOPE_BASE</ChoiceValue>
                         <ChoiceValue i18nKey="a127">SCOPE_ONE</ChoiceValue>
@@ -254,7 +254,7 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-organizations-search-attribute"
 		    type="single"
                     syntax="string"
-		    i18nKey="a113">
+		    i18nKey="">
 		    <DefaultValues>
                         <Value>@ORG_NAMING_ATTR@</Value>
                     </DefaultValues>
@@ -262,7 +262,7 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-groups-search-attribute"
 		    type="single"
                     syntax="string"
-		    i18nKey="a114">
+		    i18nKey="">
 		    <DefaultValues>
                         <Value>cn</Value>
                     </DefaultValues>
@@ -278,7 +278,7 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-roles-search-attribute"
 		    type="single"
                     syntax="string"
-		    i18nKey="a116">
+		    i18nKey="">
 		    <DefaultValues>
                         <Value>cn</Value>
                     </DefaultValues>
@@ -326,7 +326,7 @@
                 <AttributeSchema name="iplanet-am-policy-selected-subjects"
                     type="multiple_choice"
                     syntax="string"
-                    i18nKey="a122">
+                    i18nKey="">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a144">WebServicesClients</ChoiceValue>
                         <ChoiceValue i18nKey="a129">Organization</ChoiceValue>
@@ -346,7 +346,7 @@
                 <AttributeSchema name="iplanet-am-policy-selected-conditions"
                     type="multiple_choice"
                     syntax="string"
-                    i18nKey="a123">
+                    i18nKey="">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a134">AuthLevelCondition</ChoiceValue>
                         <ChoiceValue i18nKey="a134a">LEAuthLevelCondition</ChoiceValue>
@@ -379,7 +379,7 @@
                 <AttributeSchema name="sun-am-policy-selected-responseproviders"
                     type="multiple_choice"
                     syntax="string"
-                    i18nKey="a200">
+                    i18nKey="">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a201">IDRepoResponseProvider</ChoiceValue>
                     </ChoiceValues>
@@ -390,12 +390,15 @@
                 <AttributeSchema name="sun-am-policy-dynamic-response-attributes"
                     type="list"
                     syntax="string"
-                    i18nKey="a210">
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-selected-referrals"
                     type="multiple_choice"
                     syntax="string"
-                    i18nKey="a124">
+                    i18nKey="">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a138">PeerOrgReferral</ChoiceValue>
                         <ChoiceValue i18nKey="a139">SubOrgReferral</ChoiceValue>

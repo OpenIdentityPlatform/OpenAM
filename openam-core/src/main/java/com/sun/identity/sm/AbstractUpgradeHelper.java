@@ -69,6 +69,9 @@ public abstract class AbstractUpgradeHelper implements UpgradeHelper {
     }
 
     protected static Node updateNode(Document newDefaultValueNode, String element, Node node) {
+        // NB. This method will only replace an existing child element,
+        // it does not create one if one didn't exist before
+
         NodeList childNodes = node.getChildNodes();
         
         for (int i = 0; i < childNodes.getLength(); i++) {
