@@ -633,6 +633,24 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema
+                          name="org.forgerock.openam.agents.config.policy.evaluation.realm"
+                          type="single"
+                          syntax="string"
+                          i18nKey="a488b">
+                      <DefaultValues>
+                          <Value>/</Value>
+                      </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                          name="org.forgerock.openam.agents.config.policy.evaluation.application"
+                          type="single"
+                          syntax="string"
+                          i18nKey="a488c">
+                      <DefaultValues>
+                          <Value>iPlanetAMWebAgentService</Value>
+                      </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
                         name="com.sun.identity.agents.config.userid.param"
                         type="single"
                         syntax="string"
@@ -2206,6 +2224,24 @@
                         i18nKey="a167">
                         <DefaultValues>
                             <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="org.forgerock.openam.agents.config.policy.evaluation.realm"
+                            type="single"
+                            syntax="string"
+                            i18nKey="a167b">
+                        <DefaultValues>
+                            <Value>/</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="org.forgerock.openam.agents.config.policy.evaluation.application"
+                            type="single"
+                            syntax="string"
+                            i18nKey="a167c">
+                        <DefaultValues>
+                            <Value>iPlanetAMWebAgentService</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema
