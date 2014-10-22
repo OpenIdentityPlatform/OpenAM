@@ -74,7 +74,8 @@ public class RestletOAuth2Request extends OAuth2Request {
             return (T) value;
         }
 
-        if (request.getMethod().equals(Method.GET)) {
+        //query param priority over body
+        if (getQueryParameter(request, name) != null) {
             return (T) getQueryParameter(request, name);
         }
 
