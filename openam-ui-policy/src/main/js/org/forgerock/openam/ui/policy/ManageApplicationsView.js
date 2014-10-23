@@ -61,7 +61,8 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
             this.parentRender(function () {
                 var options,
-                    additionalOptions;
+                    additionalOptions,
+                    defaultFilter;
 
                 if (this.data.realm !== "/") {
                     this.subrealm = this.data.realm;
@@ -71,23 +72,20 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
                 this.setGridButtonSet();
 
+                defaultFilter = this.getDefaultFilter();
+
                 options = {
                     url: '/openam/json' + this.subrealm + '/applications',
                     colNames: ['', '', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
                     colModel: [
-                        {name: 'iconChB', width: 40, sortable: false, formatter: self.checkBoxFormatter, frozen: true,
-                            title: false, search: false},
-                        {name: 'actions', width: 65, sortable: false, formatter: actionsFormatter, frozen: true,
-                            title: false, search: false},
-                        {name: 'name', width: 230, frozen: true},
-                        {name: 'description', width: 220, sortable: false},
-                        {name: 'resources', width: 340, sortable: false, search: false,
-                            formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                        {name: 'createdBy', width: 250, hidden: true},
-                        {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter,
-                            hidden: true, search: false},
-                        {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter,
-                            hidden: true, search: false}
+                        {name: 'iconChB',           width: 40,  sortable: false, formatter: self.checkBoxFormatter, frozen: true,title: false, search: false},
+                        {name: 'actions',           width: 65,  sortable: false, formatter: actionsFormatter, frozen: true, title: false, search: false},
+                        {name: 'name',              width: 230, frozen: true},
+                        {name: 'description',       width: 220, sortable: false},
+                        {name: 'resources',         width: 340, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                        {name: 'createdBy',         width: 250, hidden: true},
+                        {name: 'creationDate',      width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false},
+                        {name: 'lastModifiedDate',  width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false}
                     ],
                     beforeSelectRow: function (rowId, e) {
                         var checkBoxCellSelected = self.isCheckBoxCellSelected(e);
@@ -108,6 +106,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
                 additionalOptions = {
                     search: true,
+                    searchFilter: defaultFilter,
                     columnChooserOptions: {
                         width: 501,
                         height: 180
@@ -122,7 +121,6 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 });
 
                 this.grid.jqGrid('setFrozenColumns');
-
                 this.reloadGlobalActionsTemplate();
             });
         },
@@ -137,6 +135,27 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
         getAppName: function (e) {
             return this.grid.getRowData(this.getSelectedRowId(e)).name;
+        },
+
+        getDefaultFilter: function(){
+            var exceptions = '',
+                defaultApplicatons,
+                returnList = [];
+
+            if (conf.globalData.policyEditorConfig) {
+                defaultApplicatons = conf.globalData.policyEditorConfig.defaultApplicatons;
+                 if ( defaultApplicatons.config.hideByDefault ){
+                    exceptions = _.difference(defaultApplicatons.defaultApplicatonList, defaultApplicatons.config.exceptThese);
+                } else {
+                    exceptions = defaultApplicatons.config.exceptThese;
+                }
+            }
+
+            _.each(exceptions, function(string){
+                returnList.push({field: 'name', op: 'eq', val: '^(?!'+string+'$).*'});
+            });
+
+            return returnList;
         },
 
         deleteApplications: function (e) {

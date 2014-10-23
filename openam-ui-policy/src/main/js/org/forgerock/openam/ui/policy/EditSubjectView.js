@@ -139,14 +139,12 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
                                     });
                                 }
                             });
-                         
-
+            
                             selectize.refreshOptions(true);
                               
                         }
                     };
-                 
-
+    
                 } else {
 
                     additionalOptions = {

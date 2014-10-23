@@ -22,27 +22,52 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define */
+/*global define, _ */
 
 define("org/forgerock/openam/ui/policy/SiteConfigurationDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], function(constants, conf, eventManager, uiUtils) {
-    return { 
-        getConfiguration: function(successCallback, errorCallback) {
-            var urlParams = uiUtils.convertCurrentUrlToJSON().params;
-            if (urlParams) {
-                conf.globalData.auth.realm = urlParams.realm;
-            } else {
-                conf.globalData.auth.realm = undefined;
-            }
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/main/AbstractDelegate"
 
-            successCallback({ lang: "en" });
+], function(constants, conf, eventManager, uiUtils, AbstractDelegate) {
+
+
+    var obj = new AbstractDelegate('');
+
+    
+    obj.getConfiguration = function(successCallback, errorCallback) {
+
+        console.info("Getting configuration");
+        var urlParams = uiUtils.convertCurrentUrlToJSON().params;
+        if (urlParams) {
+            conf.globalData.auth.realm = urlParams.realm;
+        } else {
+            conf.globalData.auth.realm = undefined;
         }
-    };
-});
 
+        obj.serviceCall({url: "configuration.json", 
+            success: function (data) {
+                if (successCallback) {
+                    successCallback(_.merge({lang: "en"}, data.configuration));
+                }
+            }, 
+            error: function (data) {
+                if (errorCallback) {
+                    errorCallback({lang: "en"});
+                }
+            }, 
+            headers: {}
+        });
+
+    };
+
+
+    return obj;
+    
+
+
+});
 
 

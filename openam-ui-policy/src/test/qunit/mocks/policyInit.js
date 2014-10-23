@@ -45,7 +45,8 @@ define([
     "text!templates/policy/ResourcesListTemplate.html",
     "text!templates/policy/ReviewApplicationStepTemplate.html",
     "text!templates/policy/ReviewPolicyStepTemplate.html" ,
-    "text!templates/policy/ManageResponseAttrsTemplate.html"
+    "text!templates/policy/ManageResponseAttrsTemplate.html",
+    "text!configuration.json"
 ], function () {
     /* an unfortunate need to duplicate the file names here, but I haven't
      yet found a way to fool requirejs into doing dynamic dependencies */
@@ -71,7 +72,8 @@ define([
             "templates/policy/ResourcesListTemplate.html",
             "templates/policy/ReviewApplicationStepTemplate.html",
             "templates/policy/ReviewPolicyStepTemplate.html",
-            "templates/policy/ManageResponseAttrsTemplate.html"
+            "templates/policy/ManageResponseAttrsTemplate.html",
+            "configuration.json"
         ],
         deps = arguments;
 

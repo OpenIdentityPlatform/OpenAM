@@ -32,8 +32,6 @@
         cursor:pointer;
         font-weight:normal;
         font-size:100%;
-
-
         border-bottom: 1px solid #bebebe;
         text-decoration: none;
 
@@ -41,10 +39,6 @@
             background: #aaa;
             cursor:default;
         }
-
-      
-
-         
 
         &:focus:not(.accordion-step-disabled), &:hover:not(.accordion-step-disabled){
             background-color: #D7E9F8;
@@ -177,7 +171,7 @@
                 background: @table-hightlight-bg-color;
                 border-color: rgba(0, 0, 0, 0.2);
                 [class*="icon-checkbox-"] {
-                    color: darken(@table-hightlight-bg-color, 50%);;
+                    color: darken(@table-hightlight-bg-color, 50%);
                 }
             }
         }
@@ -194,6 +188,14 @@
 
         [class^="icon-"], [class*="icon-"] {
             font-size: 16px;
+            &:not(.toggle-all){
+                &:hover, &:focus{
+                    box-shadow:none;
+                    color: darken(@table-hightlight-bg-color, 50%);
+                    cursor:pointer;
+
+                }
+            }
         }
     }
 }
@@ -244,7 +246,6 @@
 
     tr.ui-widget-content {
         box-shadow: none;
-        transition: background 200ms linear;
         td {
             vertical-align: middle;
         }
@@ -260,19 +261,13 @@
         td[aria-describedby*="_iconChB"] {
             text-align: center;
             color: #A6A6A6;
-
             span {
                 font-size: 16px;
-                    background-color: white;
-                    border: 1px #A6A6A6 solid;
-                    border-radius: 3px;
-                    transition:all 200ms linear;
-
-                    &:hover, &:focus {
-                         color: #777;
-                         border-color: #777;
-                         box-shadow:none;
-                    }
+                background-color: white;
+                &:hover, &:focus {
+                     color: #777;
+                     box-shadow:none;
+                }
             }
         }
 
@@ -295,7 +290,6 @@
             color: inherit;
 
             td[aria-describedby*="_actions"] {
-                transition: all 200ms linear;
                 background-color: darken(@table-rollover-bg-color,5%);
             }
 
@@ -303,16 +297,14 @@
 
        &.ui-state-highlight, &.highlight {
             background: @table-hightlight-bg-color;
-            transition: all 200ms linear;
             border-color: rgba(0, 0, 0, 0.2);
-            color: inherit;
+            color: darken(@table-hightlight-bg-color,50%);
 
             td[aria-describedby*="_iconChB"] span {
                 color: darken(@table-hightlight-bg-color,50%);
-                border-color: darken(@table-hightlight-bg-color,50%);
                 opacity:0.5;
                 &:hover, &:focus {
-                     opacity:1;     
+                     opacity:1;
                 }
             }
 
@@ -324,7 +316,7 @@
                 color:darken(@table-hightlight-bg-color,50%);
             }
         }
-        
+
     }
 }
 
@@ -693,7 +685,6 @@ html .selectize-dropdown .optgroup-header{
     font-weight: normal;
     color: #80b7ab;
     background: #5d6871;
-    transition: background 100ms linear;
 }
 
 .ui-widget-content th.ui-state-hover{

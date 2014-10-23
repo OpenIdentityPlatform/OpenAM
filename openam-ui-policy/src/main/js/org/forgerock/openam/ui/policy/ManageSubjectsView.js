@@ -103,8 +103,6 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                     this.buttons.addOperator.hide();
                 }
 
-
-
                 this.buildList();
                 this.onClear();
                 this.initSorting();

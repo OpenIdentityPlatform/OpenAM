@@ -93,13 +93,11 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     actions.push({action: key, selected: false, value: value});
                 });
 
-
-                
                 // here we split by type
-                staticAttributes =  _.where(policy.resourceAttributes, {type: responseAttrsStaticView.attrType}); 
+                staticAttributes =  _.where(policy.resourceAttributes, {type: responseAttrsStaticView.attrType});
                 staticAttributes = responseAttrsStaticView.splitAttrs( staticAttributes);
-       
-                userAttributes = _.where(policy.resourceAttributes, {type: responseAttrsUserView.attrType}); 
+
+                userAttributes = _.where(policy.resourceAttributes, {type: responseAttrsUserView.attrType});
                 allUserAttributes = _.sortBy(allUserAttributes[0].result);
 
                 data.entity.applicationName = appName;
@@ -109,9 +107,9 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 data.options.availableActions = _.sortBy(actions, "action");
                 data.options.resourcePatterns = _.sortBy(app[0].resources);
 
-                data.options.availableEnvironments = _.findByValues(allEnvironments[0].result, 'title', app[0].conditions); 
+                data.options.availableEnvironments = _.findByValues(allEnvironments[0].result, 'title', app[0].conditions);
                 data.options.availableSubjects =     _.findByValues(allSubjects[0].result, 'title', app[0].subjects);
-           
+
                 self.identityFix(data.options.availableSubjects,identitySubjectUsers,identitySubjectGroups);
 
                 self.parentRender(function () {
@@ -121,7 +119,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     actionsView.render(data);
                     addNewResourceView.render(data);
                     resourcesListView.render(data);
-                    responseAttrsStaticView.render(staticAttributes); 
+                    responseAttrsStaticView.render(staticAttributes);
                     responseAttrsUserView.render([userAttributes, allUserAttributes]);
 
                     self.prepareInfoReview();
@@ -224,8 +222,8 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             });
 
             persistedPolicy.actionValues = persistedPolicy.actions;
-            persistedPolicy.resourceAttributes = _.union( responseAttrsStaticView.getCombinedAttrs(), responseAttrsUserView.getAttrs()); 
-            
+            persistedPolicy.resourceAttributes = _.union( responseAttrsStaticView.getCombinedAttrs(), responseAttrsUserView.getAttrs());
+
             if (this.data.entityName) {
                 policyDelegate.updatePolicy(this.data.entityName, persistedPolicy)
                 .done( function (e) {
@@ -248,9 +246,9 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 });
             }
         },
-        
+
         errorHandler: function (e) {
-            
+
             if( e.status === 500){
 
                 if (uiUtils.responseMessageMatch( e.responseText,"Unable to persist policy")){
@@ -258,12 +256,12 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 } else{
                     console.error(e.responseJSON, e.responseText, e);
                 }
-                
+
             } else if (e.status === 400 || e.status === 404){
 
                 if ( uiUtils.responseMessageMatch( e.responseText,"Invalid Resource") ) {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
-              
+
                     var message = JSON.parse(e.responseText).message;
                     this.data.options.invalidResource = message.substr(17);
                     reviewInfoView.render(this.data, null, this.$el.find('#reviewPolicyInfo'), "templates/policy/ReviewPolicyStepTemplate.html");
@@ -273,7 +271,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 } else {
                     console.log(e.responseJSON, e.responseText, e);
                 }
-                
+
             } else {
                 console.log(e.responseJSON, e.responseText, e);
             }
@@ -284,14 +282,14 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             var identity = _.find(availableSubjects, function(item){
                     return item.title === "Identity";
                 });
-            if (identity.config.properties.subjectValues) {
+             if(identity && identity.config.properties.subjectValues) {
                 identity.config.properties.subjectValues.dataSources = [
                     {name:"users", data:identitySubjectUsers[0].result},
                     {name:"groups", data:identitySubjectGroups[0].result}
                 ];
+            }
+
         }
-                        
-        }                
     });
 
     return new EditPolicyView();
