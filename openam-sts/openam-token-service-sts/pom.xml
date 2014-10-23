@@ -41,6 +41,10 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-client-sts</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>OpenFM</artifactId>
         </dependency>
         <dependency>

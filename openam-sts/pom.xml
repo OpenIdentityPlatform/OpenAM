@@ -26,6 +26,7 @@
     <name>OpenAM STS</name>
 
     <modules>
+        <module>openam-client-sts</module>
         <module>openam-common-sts</module>
         <module>openam-rest-sts</module>
         <module>openam-soap-sts</module>

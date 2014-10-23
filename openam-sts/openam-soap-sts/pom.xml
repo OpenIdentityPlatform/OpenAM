@@ -38,6 +38,10 @@
             <artifactId>openam-common-sts</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-client-sts</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
         </dependency>

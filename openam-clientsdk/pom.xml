@@ -116,6 +116,7 @@
                             <include>org.forgerock.openam:openam-xacml3-schema</include>
                             <include>org.forgerock.openam:openam-federation-library</include>
                             <include>org.forgerock.openam:OpenFM</include>
+                            <include>org.forgerock.openam:openam-client-sts</include>
                             <include>org.json:json</include>
                         </includes>
                     </artifactSet>
@@ -474,6 +475,12 @@
                             </includes>
                         </filter>
                         <filter>
+                            <artifact>org.forgerock.openam:openam-client-sts</artifact>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                        </filter>
+                        <filter>
                             <artifact>org.json:json</artifact>
                             <includes>
                                 <include>**/**</include>
@@ -535,6 +542,10 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-client-sts</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -843,6 +843,11 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-client-sts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-slf4j</artifactId>
                 <version>${project.version}</version>
             </dependency>
