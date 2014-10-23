@@ -229,9 +229,18 @@ public class AMCertStore {
                     certAttribute = 
                                 attrSet.getAttribute("usercertificate;binary");
                     if (certAttribute == null ) {
-                        debug.message("AMCertStore.getCertificate : " +
-                            "Certificate - get usercertificate is null ");
-                        continue;
+                        // an end-entity certificate can be a CA certificate
+                        certAttribute =
+                                attrSet.getAttribute("cacertificate");
+                        if (certAttribute == null) {
+                            certAttribute =
+                                    attrSet.getAttribute("cacertificate;binary");
+                        }
+                        if (certAttribute == null) {
+                            debug.message("AMCertStore.getCertificate : " +
+                                    "Certificate - get usercertificate is null ");
+                            continue;
+                        }
                     }
                 }
 

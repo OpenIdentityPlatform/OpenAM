@@ -111,27 +111,34 @@ public class AMCertPath {
      **/
     public boolean verify(X509Certificate[] certs, boolean crlEnabled,
                           boolean ocspEnabled) {
-        if (debug.messageEnabled()) {
-            debug.message("AMCertPath.verify: invoked !");
-        }
-        try {
-            final List<X509Certificate> certList = Arrays.asList(certs);
-            final CertPath cp= (CertPath) cf.generateCertPath(certList);
-
-            // init PKIXParameters
-            Class<?> trustMgrClass = Class.forName(
-                  "com.sun.identity.security.keystore.AMX509TrustManager");
-            Object trustMgr = (Object) trustMgrClass.newInstance();
-            Method method = trustMgrClass.getMethod("getKeyStore");
-            KeyStore keystore = (KeyStore) method.invoke(trustMgr);
-            PKIXParameters pkixparams= new PKIXParameters(keystore);           
+        /*
+        The entire contents of this method must be synchronized for the following reasons:
+        1. The CertPathValidator#validate method is not thread-safe
+        2. even if a non-static CertPathValidator instance were obtained in this method, each instance references
+        the ocsp-related properties in the Security class. Thus the state set in Security.setProperty("ocsp.enable", true/false)
+        will affect all CertPathValidator instances.
+         */
+        synchronized(AMCertPath.class) {
             if (debug.messageEnabled()) {
-                debug.message("AMCertPath.verify: crlEnabled ---> " + crlEnabled);
-                debug.message("AMCertPath.verify: ocspEnabled ---> " + ocspEnabled);
+                debug.message("AMCertPath.verify: invoked !");
             }
+            try {
+                final List<X509Certificate> certList = Arrays.asList(certs);
+                final CertPath cp = (CertPath) cf.generateCertPath(certList);
 
-            if (ocspEnabled) {
-                synchronized(AMCertPath.class) {
+                // init PKIXParameters
+                Class<?> trustMgrClass = Class.forName(
+                        "com.sun.identity.security.keystore.AMX509TrustManager");
+                Object trustMgr = (Object) trustMgrClass.newInstance();
+                Method method = trustMgrClass.getMethod("getKeyStore");
+                KeyStore keystore = (KeyStore) method.invoke(trustMgr);
+                PKIXParameters pkixparams = new PKIXParameters(keystore);
+                if (debug.messageEnabled()) {
+                    debug.message("AMCertPath.verify: crlEnabled ---> " + crlEnabled);
+                    debug.message("AMCertPath.verify: ocspEnabled ---> " + ocspEnabled);
+                }
+
+                if (ocspEnabled) {
                     if (!OCSPCheck) {
                         Security.setProperty("ocsp.enable", "true");
                         final String responderURLString = getResponderURLString();
@@ -140,43 +147,46 @@ public class AMCertPath {
                         }
                         OCSPCheck = true;
                     }
+                    // If setRevocationEnabled is not set to true,
+                    // OCSP validation is not performed by JCE
+                    pkixparams.setRevocationEnabled(true);
+                    if (debug.messageEnabled()) {
+                        debug.message("AMCertPath.verify: pkixparams.setRevocationEnabled "
+                                + "set to TRUE");
+                    }
+                } else {
+                    pkixparams.setRevocationEnabled(crlEnabled);
                 }
-                // If setRevocationEnabled is not set to true,
-                // OCSP validation is not performed by JCE
-                pkixparams.setRevocationEnabled(true);
-                if (debug.messageEnabled()) {
-                    debug.message("AMCertPath.verify: pkixparams.setRevocationEnabled "
-                            + "set to TRUE");
-                }
-            } else {
-                pkixparams.setRevocationEnabled(crlEnabled);
-            }
 
 
-            synchronized(AMCertPath.class) {
                 if (store != null) {
                     pkixparams.addCertStore(store);
                 }
-            }
-            
-            // validate
-            CertPathValidatorResult cpvResult= cpv.validate(cp, pkixparams);
+                if (debug.messageEnabled()) {
+                    StringBuilder sb = new StringBuilder("The policy-related state in the PKIXParameters passed to the PKIX CertPathValidator: \n");
+                    sb.append("\tgetInitialPolicies: ").append(pkixparams.getInitialPolicies()).append('\n');
+                    sb.append("\tisExplicitPolicyRequired: ").append(pkixparams.isExplicitPolicyRequired()).append('\n');
+                    sb.append("\tisPolicyMappingInhibited: ").append(pkixparams.isPolicyMappingInhibited()).append('\n');
+                    debug.message(sb.toString());
+                }
+                // validate
+                CertPathValidatorResult cpvResult = cpv.validate(cp, pkixparams);
 
-            if (debug.messageEnabled()) {
-                debug.message("AMCertPath.verify: PASS " + cpvResult.toString());
+                if (debug.messageEnabled()) {
+                    debug.message("AMCertPath.verify: PASS " + cpvResult.toString());
+                }
+            } catch (java.security.cert.CertPathValidatorException e) {
+                debug.error("AMCertPath.verify: FAILED - " + e.getMessage());
+                if (debug.messageEnabled()) {
+                    debug.message("AMCertPath.verify: FAILED", e);
+                }
+                return false;
+            } catch (Throwable t) {
+                debug.error("AMCertPath.verify: FAILED", t);
+                return false;
             }
-        } catch (java.security.cert.CertPathValidatorException e) {
-            debug.error("AMCertPath.verify: FAILED - " + e.getMessage());
-            if (debug.messageEnabled()) {
-                debug.message("AMCertPath.verify: FAILED", e);
-            }
-            return false;
-        } catch (Throwable t) {
-            debug.error("AMCertPath.verify: FAILED", t);
-            return false;
+            return true;
         }
-
-	return true;
     }
 
     /*

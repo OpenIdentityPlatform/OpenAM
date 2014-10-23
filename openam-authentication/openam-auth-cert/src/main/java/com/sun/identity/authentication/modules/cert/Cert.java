@@ -397,10 +397,11 @@ public class Cert extends AMLoginModule {
     public int process (Callback[] callbacks, int state) 
         throws AuthLoginException {
         initAuthConfig();
+        X509Certificate[] allCerts = null;
         try {
             HttpServletRequest servletRequest = getHttpServletRequest();
             if (servletRequest != null) { 
-                X509Certificate[] allCerts = (X509Certificate[]) servletRequest.
+                allCerts = (X509Certificate[]) servletRequest.
                    getAttribute("javax.servlet.request.X509Certificate"); 
                 if (allCerts == null || allCerts.length == 0) {
                     debug.message(
@@ -475,7 +476,12 @@ public class Cert extends AMLoginModule {
             }
         }
 
-        int ret = doRevocationValidation(thecert);
+        int ret;
+        if (usingJSSHandler) {
+            ret = doJSSRevocationValidation(thecert);
+        } else {
+            ret = doJCERevocationValidation(allCerts);
+        }
 
         if (ret != ISAuthConstants.LOGIN_SUCCEED) {
             debug.error("X509Certificate:CRL / OCSP verify failed.");
@@ -486,32 +492,9 @@ public class Cert extends AMLoginModule {
         return ISAuthConstants.LOGIN_SUCCEED;
     }
 
-    private int doRevocationValidation(X509Certificate cert) 
-        throws AuthLoginException {
-        boolean validateCA = amAuthCert_validateCA.equalsIgnoreCase("true");
-
-	int ret = ISAuthConstants.LOGIN_IGNORE;
-	
-        if (usingJSSHandler) {
-            ret = doJSSRevocationValidation(cert);
-        } else {
-            ret = doJCERevocationValidation(cert);
-        }
-        
-        if ((ret == ISAuthConstants.LOGIN_SUCCEED) 
-            && (crlEnabled || ocspEnabled)
-            && validateCA
-            && !AMCertStore.isRootCA(cert)) {
-            ret = doRevocationValidation(
-                AMCertStore.getIssuerCertificate(
-                    ldapParam, cert, amAuthCert_chkAttrCertInLDAP));
-        }
-
-        return ret;
-    }
-    
     private int doJSSRevocationValidation(X509Certificate cert) {
         int ret = ISAuthConstants.LOGIN_IGNORE;
+        boolean validateCA = amAuthCert_validateCA.equalsIgnoreCase("true");
 
         X509CRL crl = null;
         
@@ -547,20 +530,35 @@ public class Cert extends AMLoginModule {
                 debug.message("certValidation failed with exception",e);
             }
         }
-
+        if ((ret == ISAuthConstants.LOGIN_SUCCEED)
+                && (crlEnabled || ocspEnabled)
+                && validateCA
+                && !AMCertStore.isRootCA(cert)) {
+            /*
+            The trust anchor is not necessarily a certificate, but a public key (trusted) entry in the trust-store. Don't
+            march up the chain unless the AMCertStore can actually return a non-null issuer certificate. If the issuer
+            certificate is null, then the result of the previous doRevocationValidation invocation is the final answer.
+             */
+            X509Certificate issuerCertificate = AMCertStore.getIssuerCertificate(
+                    ldapParam, cert, amAuthCert_chkAttrCertInLDAP);
+            if (issuerCertificate != null) {
+                ret = doJSSRevocationValidation(issuerCertificate);
+            }
+        }
         return ret;
     }
 
-    private int doJCERevocationValidation(X509Certificate cert) 
+    private int doJCERevocationValidation(X509Certificate[] allCerts)
         throws AuthLoginException {
     	int ret = ISAuthConstants.LOGIN_IGNORE;
 		
     	try {
             Vector crls = new Vector();
-            X509CRL crl = AMCRLStore.getCRL(ldapParam, cert, amAuthCert_chkAttributesCRL);
-
-            if (crl != null) {
-                crls.add(crl);
+            for (X509Certificate cert : allCerts) {
+                X509CRL crl = AMCRLStore.getCRL(ldapParam, cert, amAuthCert_chkAttributesCRL);
+                if (crl != null) {
+                    crls.add(crl);
+                }
             }
             if (debug.messageEnabled()) {
                 debug.message("Cert.doRevocationValidation: crls size = " +
@@ -571,8 +569,7 @@ public class Cert extends AMLoginModule {
             }
 
             AMCertPath certpath = new AMCertPath(crls);
-            X509Certificate certs[] = { cert }; 
-            if (!certpath.verify(certs, crlEnabled, ocspEnabled)) {
+            if (!certpath.verify(allCerts, crlEnabled, ocspEnabled)) {
                 debug.error("CertPath:verify failed.");
                 return ret;
             } else {
