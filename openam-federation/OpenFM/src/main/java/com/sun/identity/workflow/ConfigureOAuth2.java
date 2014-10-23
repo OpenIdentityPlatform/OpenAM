@@ -33,6 +33,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.sm.ServiceConfigManager;
 
 import java.security.AccessController;
+import java.text.MessageFormat;
 import java.util.*;
 
 public class ConfigureOAuth2 extends Task {
@@ -62,6 +63,9 @@ public class ConfigureOAuth2 extends Task {
     private static final String SUBJECT_NAME = "OAuth2ProviderSubject";
     private static final String OAUTH2_AUTHORIZE_ENDPOINT = "/oauth2/authorize?*";
     private static final String ROOT_REALM = "/";
+    public static final String MESSAGE = "oauth2.provider.configured";
+    public static final String POLICY_CREATED = "oauth2.provider.policy.created";
+    public static final String POLICY_EXISTS = "oauth2.provider.policy.exists";
 
     public ConfigureOAuth2(){
 
@@ -169,8 +173,10 @@ public class ConfigureOAuth2 extends Task {
                 throw new WorkflowException("ConfigureOAuth2.execute() : Unable to add policy");
             }
         }
-        return "Sucessfully configured OAuth2 for realm: " + realm +
-                "<br> A policy was created for the authorization end point. The policy" +
-                " name is: " + POLICY_NAME;
+
+        String messageTemplate = getMessage(MESSAGE, locale);
+
+        return MessageFormat.format(messageTemplate, realm,
+                MessageFormat.format(getMessage(createPolicy ? POLICY_CREATED : POLICY_EXISTS, locale), POLICY_NAME));
     }
 }
