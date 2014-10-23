@@ -13,17 +13,13 @@
  *
  * Copyright 2014 ForgeRock AS.
  */
-
 package org.forgerock.openam.upgrade.helpers;
 
 import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.AttributeSchemaImpl;
+import java.util.Arrays;
 import org.forgerock.openam.upgrade.UpgradeException;
-
-import java.util.Set;
-
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 /**
  * Used to upgrade the iPlanetAMLoggingService.
@@ -33,12 +29,15 @@ import static org.forgerock.openam.utils.CollectionUtils.asSet;
 public class LoggingUpgradeHelper extends AbstractUpgradeHelper {
 
     private static final String SUN_AM_LOG_LEVEL_ATTR = "sun-am-log-level";
+    private static final String LOGGING_TYPE = "iplanet-am-logging-type";
+    private static final String SYSLOG_LOGGING_TYPE = "Syslog";
 
     /**
      * Constructs a new LoggingUpgradeHelper instance, add configures the logging attributes that are to updated.
      */
     public LoggingUpgradeHelper() {
         attributes.add(SUN_AM_LOG_LEVEL_ATTR);
+        attributes.add(LOGGING_TYPE);
     }
 
     /**
@@ -47,9 +46,12 @@ public class LoggingUpgradeHelper extends AbstractUpgradeHelper {
     @Override
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
             throws UpgradeException {
-
         if (SUN_AM_LOG_LEVEL_ATTR.equals(newAttr.getName())
                 && !AttributeSchema.ListOrder.INSERTION.equals(oldAttr.getListOrder())) {
+            return newAttr;
+        } else if (LOGGING_TYPE.equals(newAttr.getName())
+                && !Arrays.asList(oldAttr.getChoiceValues()).contains(SYSLOG_LOGGING_TYPE)) {
+            newAttr = updateDefaultValues(newAttr, oldAttr.getDefaultValues());
             return newAttr;
         }
 

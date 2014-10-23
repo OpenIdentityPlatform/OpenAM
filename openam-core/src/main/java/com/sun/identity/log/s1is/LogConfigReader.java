@@ -24,11 +24,9 @@
  *
  * $Id: LogConfigReader.java,v 1.19 2009/11/04 22:33:10 bigfatrat Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2013 Cybernetica AS.
  */
 
 package com.sun.identity.log.s1is;
@@ -67,7 +65,7 @@ import java.util.TreeSet;
  * the configuration.
  */
 public class LogConfigReader implements ServiceListener{
-    
+
     private static Debug debug;
     private static ServiceSchema smsLogSchema           = null;
     private static ServiceSchema smsPlatformSchema      = null;
@@ -75,7 +73,7 @@ public class LogConfigReader implements ServiceListener{
     private static Map logAttributes                    = null;
     private static Map platformAttributes               = null;
     private static Map namingAttributes                 = null;
-    
+
     private String localProtocol = null;
     private String localHost = null;
     private String localPort = null;
@@ -88,7 +86,7 @@ public class LogConfigReader implements ServiceListener{
 
     private static boolean isRegisteredForDSEvents = false;
     private LogManager manager;
-    
+
     /**
      * The constructor loads the configuration from the DS using
      * DSAME SDK. Constructs a String as "key=value CRLF" for each
@@ -96,7 +94,7 @@ public class LogConfigReader implements ServiceListener{
      * has multiple values or a List, it gets converted to a "," seperated
      * String.
      * <p> Example1: iplanet-am-logging-backend=FILE \r\n
-     * <p> Example2: iplanet-am-logging-logfields=TIME, DOMAIN, IPADDR, 
+     * <p> Example2: iplanet-am-logging-logfields=TIME, DOMAIN, IPADDR,
      * HOSTNAME, DATA, LEVEL, LOGINID \r\n
      * <p> The input stream hence constructed is converted into a
      * ByteArrayInputStream and is loaded into LogManager.
@@ -135,12 +133,12 @@ public class LogConfigReader implements ServiceListener{
         }
         String configString = constructInputStream();
         ByteArrayInputStream inputStream = null;
-        try { inputStream = 
+        try { inputStream =
                 new ByteArrayInputStream(configString.getBytes("ISO8859-1"));
         } catch (UnsupportedEncodingException unse) {
             debug.error("LogConfigReader: unsupported Encoding" + unse);
         }
-        manager = 
+        manager =
             (com.sun.identity.log.LogManager) LogManagerUtil.getLogManager();
 
         try {
@@ -151,11 +149,26 @@ public class LogConfigReader implements ServiceListener{
         }
         setLocalFlag();
     }
-    
+
+    private void copyConfigOption(StringBuilder sb, String key, Map attributes,
+                String description) {
+        try {
+            String value = CollectionHelper.getMapAttr(attributes, key);
+            if (value == null || value.isEmpty()) {
+                debug.warning("LogConfigReader: " + description + " is null");
+            } else {
+                sb.append(key).append("=").append(value).append(LogConstants.CRLF);
+            }
+        } catch (Exception e) {
+            debug.error("LogConfigReader: Could not read " + description, e);
+        }
+
+    }
+
     /**
-     * LogManager needs inputStream in the form of " Key = Value \r\n ". 
-     * so to get that we need to get the keys of the default attributs append 
-     * a "=", get the value for that key and append a CRLF. This input stream 
+     * LogManager needs inputStream in the form of " Key = Value \r\n ".
+     * so to get that we need to get the keys of the default attributs append
+     * a "=", get the value for that key and append a CRLF. This input stream
      * will then be loaded into the logmanager via properties API.
      */
     private String constructInputStream() {
@@ -203,45 +216,11 @@ public class LogConfigReader implements ServiceListener{
         } catch (Exception e) {
             debug.error("LogConfigReader: Could not read Backend ", e);
         }
-        // Database Driver
-        try {
-            key = LogConstants.DB_DRIVER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: Driver string is null");
-            } else {
-                sbuffer.append(key).append("=").append(value)
-                       .append(LogConstants.CRLF);
-            }
-        }  catch (Exception e) {
-            debug.error("LogConfigReader: Could not read driver ", e);
-        }
-        // Database Password
-        try {
-            key = LogConstants.DB_PASSWORD;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: Password string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read password ", e);
-        }
-        // Database USER
-        try {
-            key = LogConstants.DB_USER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: DB_USER string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read db user ", e);
-        }
+
+        copyConfigOption(sbuffer, LogConstants.DB_DRIVER, logAttributes, "DB driver");
+        copyConfigOption(sbuffer, LogConstants.DB_PASSWORD, logAttributes, "DB password");
+        copyConfigOption(sbuffer, LogConstants.DB_USER, logAttributes, "DB user");
+
         // all Fields
         try {
             key = LogConstants.ALL_FIELDS;
@@ -299,255 +278,35 @@ public class LogConfigReader implements ServiceListener{
         } catch (Exception e) {
             debug.error("LogConfigReader: Could not read log-field ", e);
         }
-        // Enable log rotation
-        try {
-            key = LogConstants.ENABLE_ROTATION;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: Enable Log Rotation string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read enable log rottion ", e);
-        }
-        // Max file size
-        try {
-            key = LogConstants.MAX_FILE_SIZE;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: Max File Size string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read maxfilesize ", e);
-        }
-        // log filename prefix
-        try {
-            key = LogConstants.LOGFILE_PREFIX;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if (value == null || value.length() == 0) {
-                debug.warning("LogConfigReader: Logfile prefix string is null");
-            } else {
-                sbuffer.append(key).append('=')
-                        .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read logfile prefix ", e);
-        }
-        // log filename suffix
-        try {
-            key = LogConstants.LOGFILE_SUFFIX;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if (value == null || value.length() == 0) {
-                debug.warning("LogConfigReader: Logfile suffix string is null");
-            } else {
-                sbuffer.append(key).append('=')
-                        .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read logfile suffix ", e);
-        }
-        // log filename rotation interval
-        try {
-            key = LogConstants.LOGFILE_ROTATION;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if (value == null || value.length() == 0) {
-                debug.warning("LogConfigReader: Logfile rotation interval is null");
-            } else {
-                sbuffer.append(key).append('=')
-                        .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read logfile rotation interval ", e);
-        }
-        // number of history files
-        try {
-            key = LogConstants.NUM_HISTORY_FILES;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: NUM_HIST_FILES string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read numhistfiles ", e);
-        }
-        // archiver  class
-        try {
-            key = LogConstants.ARCHIVER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: Archiver string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read filehandler ", e);
-        }
-        // file handler class
-        try {
-            key = LogConstants.FILE_HANDLER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning(
-                    "LogConfigReader: FileHandler class string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read filehandler ", e);
-        }
-        // secure File handler class
-        try {
-            key = LogConstants.SECURE_FILE_HANDLER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: Secure FH string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read " + "secure filehandler ", e);
-        }
-        // db handler class
-        try {
-            key = LogConstants.DB_HANDLER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: DBHandler string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read dbhandler ", e);
-        }
-        // remote handler class
-        try {
-            key = LogConstants.REMOTE_HANDLER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: Remote Handler string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read remotehandler ", e);
-        }
-        
-        // elf formatter class
-        try {
-            key = LogConstants.ELF_FORMATTER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader:ELFFormatter string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read elfformatter ", e);
-        }
-        // secure elf formatter class
-        try {
-            key = LogConstants.SECURE_ELF_FORMATTER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: Secure " +
-                    "ELFFormatter string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read secure formatter ", e);
-        }
-        
-        // db formatter class
-        try {
-            key = LogConstants.DB_FORMATTER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            sbuffer.append(key).append("=")
-                   .append(value).append(LogConstants.CRLF);
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read dbformatter ", e);
-        }
-        // db formatter class
-        try {
-            key = LogConstants.REMOTE_FORMATTER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            sbuffer.append(key).append("=")
-                   .append(value).append(LogConstants.CRLF);
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read remoteformatter ", e);
-        }
-        // authz class
-        try {
-            key = LogConstants.AUTHZ;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: AUTHZ string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read authz class", e);
-        }
+
+        copyConfigOption(sbuffer, LogConstants.ENABLE_ROTATION, logAttributes, "Enable Logfile rotation");
+        copyConfigOption(sbuffer, LogConstants.MAX_FILE_SIZE, logAttributes, "Max File Size");
+        copyConfigOption(sbuffer, LogConstants.LOGFILE_PREFIX, logAttributes, "Logfile prefix string");
+        copyConfigOption(sbuffer, LogConstants.LOGFILE_SUFFIX, logAttributes, "Logfile suffix string");
+        copyConfigOption(sbuffer, LogConstants.LOGFILE_ROTATION, logAttributes, "Logfile rotation interval");
+        copyConfigOption(sbuffer, LogConstants.NUM_HISTORY_FILES, logAttributes, "Num history files");
+        copyConfigOption(sbuffer, LogConstants.ARCHIVER, logAttributes, "Archiver class");
+
+        copyConfigOption(sbuffer, LogConstants.FILE_HANDLER, logAttributes, "File handler class");
+        copyConfigOption(sbuffer, LogConstants.SECURE_FILE_HANDLER, logAttributes, "Secure File handler class");
+        copyConfigOption(sbuffer, LogConstants.DB_HANDLER, logAttributes, "DB handler class");
+        copyConfigOption(sbuffer, LogConstants.REMOTE_HANDLER, logAttributes, "Remote handler class");
+        copyConfigOption(sbuffer, LogConstants.SYSLOG_HANDLER, logAttributes, "Syslog handler class");
+
+        copyConfigOption(sbuffer, LogConstants.ELF_FORMATTER, logAttributes, "ELF Formatter class");
+        copyConfigOption(sbuffer, LogConstants.SECURE_ELF_FORMATTER, logAttributes, "Secure ELF Formatter class");
+        copyConfigOption(sbuffer, LogConstants.DB_FORMATTER, logAttributes, "DB Formatter class");
+        copyConfigOption(sbuffer, LogConstants.REMOTE_FORMATTER, logAttributes, "Remote Formatter class");
+        copyConfigOption(sbuffer, LogConstants.SYSLOG_FORMATTER, logAttributes, "Syslog Formatter class");
+
+        copyConfigOption(sbuffer, LogConstants.AUTHZ, logAttributes, "Authz class");
 
         getLoggingDirectory(fileBackend, basedir, famuri, sbuffer);
 
-        // security status (on or off)
-        try {
-            key = LogConstants.SECURITY_STATUS;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning(
-                    "LogConfigReader: Security status string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read security status ", e);
-        }
-
-        // secure log signing algorithm name 
-        // MD2withRSA, MD5withRSA, SHA1withDSA, SHA1withRSA
-        try {
-            key = LogConstants.SECURITY_SIGNING_ALGORITHM;
-            value = CollectionHelper.getMapAttr(logAttributes, key, 
-                LogConstants.DEFAULT_SECURITY_SIGNING_ALGORITHM);
-            sbuffer.append(key).append("=")
-                .append(value).append(LogConstants.CRLF);
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read secure " +
-                "log signing alogorithm ", e);
-        }
-
-        // secure log helper class name 
-        // com.sun.identity.log.secure.impl.SecureLogHelperJSSImpl or 
-        // com.sun.identity.log.secure.impl.SecureLogHelperJCEImpl
-        try {
-            key = LogConstants.SECURE_LOG_HELPER;
-            value = CollectionHelper.getMapAttr(logAttributes, key, 
-                LogConstants.SECURE_DEFAULT_LOG_HELPER);
-            sbuffer.append(key).append("=")
-                   .append(value).append(LogConstants.CRLF);
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read secure " +
-                "log helper class name ", e);
-        }
-        
+        copyConfigOption(sbuffer, LogConstants.SECURITY_STATUS, logAttributes, "Security status"); // On or Off
+        copyConfigOption(sbuffer, LogConstants.SECURITY_SIGNING_ALGORITHM, logAttributes,
+                "Secure log signing algorithm");
+        copyConfigOption(sbuffer, LogConstants.SECURE_LOG_HELPER, logAttributes, "Secure log helper class");
         // secure logger certificate store
         try {
             key = LogConstants.LOGGER_CERT_STORE;
@@ -560,8 +319,8 @@ public class LogConfigReader implements ServiceListener{
                 if (value.contains("%BASE_DIR%") ||
                     value.contains("%SERVER_URI%"))
                 {
-                    value = value.replaceAll("%BASE_DIR%", basedir);
-                    value = value.replaceAll("%SERVER_URI%", famuri);
+                    value = value.replace("%BASE_DIR%", basedir);
+                    value = value.replace("%SERVER_URI%", famuri);
                 }
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
@@ -570,256 +329,33 @@ public class LogConfigReader implements ServiceListener{
             debug.error("LogConfigReader: Could not read secure " +
                 "logger certificate store ", e);
         }
-        // log verification period in seconds
-        try {
-            key = LogConstants.LOGVERIFY_PERIODINSECONDS;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: Verify period string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read logverify period", e);
-        }
-        // log signing period in seconds
-        try {
-            key = LogConstants.LOGSIGN_PERIODINSECONDS;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: sign period string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read sign fieldname ", e);
-        }
-        // file read handler class
-        try {
-            key = LogConstants.FILE_READ_HANDLER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: file readhandler " +
-                    "string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read " + "filehandler class ", e);
-        }
-        // DB read handler class
-        try {
-            key = LogConstants.DB_READ_HANDLER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: DB readhandler string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: could not read DBreadhandler class ", e);
-        }
-        // MAX_RECORDS
-        try {
-            key = LogConstants.MAX_RECORDS;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: Max records string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read max-records ", e);
-        }
-        // FILES_PER_KEYSTORE
-        try {
-            key = LogConstants.FILES_PER_KEYSTORE;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: filesper " +
-                    "keystore string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader:Could not read files per keystore", e);
-        }
-        // Token Generating Class
-        try {
-            key = LogConstants.TOKEN_PROVIDER;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: token provider string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read Token " +
-                "Generation Class name");
-        }
-        // Secure Timestamp generator class
-        try {
-            key = LogConstants.SECURE_TIMESTAMP_GENERATOR;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: timestamp " +
-                    "generator string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read Token " +
-                "Generation Class name");
-        }
-        // Verifier Action Output Class
-        try {
-            key = LogConstants.VERIFIER_ACTION_CLASS;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: verifier " +
-                    "actionclass string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read verifier " +
-                "output Class name");
-        }
-        // filter class name
-        try {
-            key = LogConstants.FILTER_CLASS_NAME;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: filter class " +
-                    "name string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read filter class");
-        }
-        // debug Implementation Class
-        try {
-            key = LogConstants.DEBUG_IMPL_CLASS;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.error("LogConfigReader: debug implclass string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read debug Impl Class name");
-        }
-        
-        // Buffer size
-        try {
-            key = LogConstants.BUFFER_SIZE;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: buffer size string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read buf size");
-        }
 
-        // Max DB Mem Buffer size
-        try {
-            key = LogConstants.DB_MEM_MAX_RECS;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() == 0)) {
-                debug.warning(
-                "LogConfigReader: Max DB mem buffer size string is null");
-            } else {
-                sbuffer.append(key).append("=").append(value).
-                    append(LogConstants.CRLF);
-            }
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read max db mem buf size");
-        }
+        copyConfigOption(sbuffer, LogConstants.LOGVERIFY_PERIODINSECONDS, logAttributes, "Log verify period");
+        copyConfigOption(sbuffer, LogConstants.LOGSIGN_PERIODINSECONDS, logAttributes, "Log sign period");
+        copyConfigOption(sbuffer, LogConstants.FILE_READ_HANDLER, logAttributes, "File read handler");
+        copyConfigOption(sbuffer, LogConstants.DB_READ_HANDLER, logAttributes, "DB read handler");
+        copyConfigOption(sbuffer, LogConstants.MAX_RECORDS, logAttributes, "Max records string");
+        copyConfigOption(sbuffer, LogConstants.FILES_PER_KEYSTORE, logAttributes, "Files per keystore");
+        copyConfigOption(sbuffer, LogConstants.TOKEN_PROVIDER, logAttributes, "Token provider class");
+        copyConfigOption(sbuffer, LogConstants.SECURE_TIMESTAMP_GENERATOR, logAttributes,
+                "Secure timestamp generator class");
+        copyConfigOption(sbuffer, LogConstants.VERIFIER_ACTION_CLASS, logAttributes, "Verifier action class");
+        copyConfigOption(sbuffer, LogConstants.FILTER_CLASS_NAME, logAttributes, "Filter class");
+        copyConfigOption(sbuffer, LogConstants.DEBUG_IMPL_CLASS, logAttributes, "Debug impl class");
+        copyConfigOption(sbuffer, LogConstants.BUFFER_SIZE, logAttributes, "Buffer size");
+        copyConfigOption(sbuffer, LogConstants.DB_MEM_MAX_RECS, logAttributes, "Max DB mem buffer size");
+        copyConfigOption(sbuffer, LogConstants.BUFFER_TIME, logAttributes, "Buffer time");
+        copyConfigOption(sbuffer, LogConstants.TIME_BUFFERING_STATUS, logAttributes, "Time buffering status");
+        copyConfigOption(sbuffer, LogConstants.ORA_DBDATA_FIELDTYPE, logAttributes, "Oracle DB data type");
+        copyConfigOption(sbuffer, LogConstants.MYSQL_DBDATA_FIELDTYPE, logAttributes, "MySQL DB data type");
+        copyConfigOption(sbuffer, LogConstants.ORA_DBDATETIME_FORMAT, logAttributes, "Oracle DB date/time format");
+        copyConfigOption(sbuffer, LogConstants.MYSQL_DBDATETIME_FORMAT, logAttributes, "MySQL DB date/time format");
 
-        // Buffer Time
-        try {
-            key = LogConstants.BUFFER_TIME;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: buffer time string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read buf time");
-        }
-        // Time Buffering Status
-        try {
-            key = LogConstants.TIME_BUFFERING_STATUS;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: time " +
-                    "buffering status string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read time " +
-                "buffering status ");
-        }
-
-        // Oracle DB data type for DATA field
-        try {
-            key = LogConstants.ORA_DBDATA_FIELDTYPE;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            sbuffer.append(key).append("=")
-                .append(value).append(LogConstants.CRLF);
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read ORA DB data type");
-        }
-
-        // MySQL DB data type for DATA field
-        try {
-            key = LogConstants.MYSQL_DBDATA_FIELDTYPE;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            sbuffer.append(key).append("=")
-                .append(value).append(LogConstants.CRLF);
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read MYSQL DB data type");
-        }
-
-        // DB date/time formats (Oracle and MySQL)
-        try {
-            key = LogConstants.ORA_DBDATETIME_FORMAT;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            sbuffer.append(key).append("=")
-                .append(value).append(LogConstants.CRLF);
-        } catch(Exception e) {
-            debug.error(
-                "LogConfigReader:Could not read Oracle DB date/time format");
-        }
-
-        try {
-            key = LogConstants.MYSQL_DBDATETIME_FORMAT;
-            value = CollectionHelper.getMapAttr(logAttributes, key);
-            sbuffer.append(key).append("=")
-                .append(value).append(LogConstants.CRLF);
-        } catch(Exception e) {
-            debug.error(
-                "LogConfigReader:Could not read MySQl DB date/time format");
-        }
+        copyConfigOption(sbuffer, LogConstants.SYSLOG_PROTOCOL, logAttributes, "Syslog protocol");
+        copyConfigOption(sbuffer, LogConstants.SYSLOG_HOST, logAttributes, "Syslog host");
+        copyConfigOption(sbuffer, LogConstants.SYSLOG_PORT, logAttributes, "Syslog port");
+        copyConfigOption(sbuffer, LogConstants.SYSLOG_FACILITY, logAttributes, "Syslog facility");
+        copyConfigOption(sbuffer, LogConstants.SYSLOG_CONNECTION_TIMEOUT, logAttributes, "Syslog connection timeout");
 
         // Log status from the logging config
         try {
@@ -844,46 +380,12 @@ public class LogConfigReader implements ServiceListener{
             debug.error("LogConfigReader:Could not read Log Status attribute");
         }
 
-        // Logging Level attribute
-        try {
-            key = LogConstants.LOGGING_LEVEL;
-            value = CollectionHelper.getMapAttr(logAttributes, key,
-                LogConstants.DEFAULT_LOGGING_LEVEL_STR);
-            sbuffer.append(key).append("=")
-                .append(value).append(LogConstants.CRLF);
-        } catch(Exception e) {
-            debug.error("LogConfigReader:Could not read Logging Level");
-        }
+        copyConfigOption(sbuffer, LogConstants.LOGGING_LEVEL, logAttributes, "Logging level");
 
-        // processing platform attributes
-        try {
-            platformAttributes = smsPlatformSchema.getAttributeDefaults();
-            key = LogConstants.LOCALE;
-            value = CollectionHelper.getMapAttr(platformAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: locale string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: Could not read platform ", e);
-        }
-        // processing naming attributes
-        try {
-            namingAttributes = smsNamingSchema.getAttributeDefaults();
-            key = LogConstants.LOGGING_SERVICE_URL;
-            value = CollectionHelper.getMapAttr(namingAttributes, key);
-            if ((value == null) || (value.length() ==0)) {
-                debug.warning("LogConfigReader: loggins " +
-                    "service url string is null");
-            } else {
-                sbuffer.append(key).append("=")
-                       .append(value).append(LogConstants.CRLF);
-            }
-        } catch (Exception e) {
-            debug.error("LogConfigReader: could not get from DS", e);
-        }
+        copyConfigOption(sbuffer, LogConstants.LOCALE, smsPlatformSchema.getAttributeDefaults(), "Locale string");
+        copyConfigOption(sbuffer, LogConstants.LOGGING_SERVICE_URL, smsNamingSchema.getAttributeDefaults(),
+                "Logging service URL");
+
         // hostname resolution
         try {
             key = LogConstants.LOG_RESOLVE_HOSTNAME_ATTR;
@@ -915,7 +417,7 @@ public class LogConfigReader implements ServiceListener{
     class LogHeaderComparator implements Comparator {
         /**
          * Compares two strings from the Log headers. Names should either be
-         * in the form ##:HeaderName or HeaderName, where ## is a two digit 
+         * in the form ##:HeaderName or HeaderName, where ## is a two digit
          * number. Instances with ##: preceding will go first, in ascending
          * order according to the two digit number. If two of the same number
          * appear they will be ordered according to the order of in which they
@@ -993,8 +495,8 @@ public class LogConfigReader implements ServiceListener{
             if (value.contains("%BASE_DIR%") ||
                     value.contains("%SERVER_URI%"))
             {
-                value = value.replaceAll("%BASE_DIR%", basedir);
-                value = value.replaceAll("%SERVER_URI%", famuri);
+                value = value.replace("%BASE_DIR%", basedir);
+                value = value.replace("%SERVER_URI%", famuri);
             }
             if (fileBackend && !value.endsWith("/")) {
                 value += "/";
@@ -1007,7 +509,7 @@ public class LogConfigReader implements ServiceListener{
                 .append(value).append(LogConstants.CRLF);
         }
     }
-    
+
     /**
      * This method is used to get the global schemas of Logging, Platform
      * and Naming Services. Platform service schema is used to determine the
@@ -1015,7 +517,7 @@ public class LogConfigReader implements ServiceListener{
      */
     private void getDefaultAttributes(SSOToken ssoToken)
     throws SMSException, SSOException {
-        
+
         ServiceSchemaManager schemaManager =
         new ServiceSchemaManager("iPlanetAMLoggingService", ssoToken);
         smsLogSchema = schemaManager.getGlobalSchema();
@@ -1035,14 +537,14 @@ public class LogConfigReader implements ServiceListener{
             isRegisteredForDSEvents = true;
         }
         smsNamingSchema = schemaManager.getGlobalSchema();
-        
+
         // get the default attributes of each service(Logging, Platform and
         // Naming).
         logAttributes           = smsLogSchema.getAttributeDefaults();
         platformAttributes      = smsPlatformSchema.getAttributeDefaults();
         namingAttributes        = smsNamingSchema.getAttributeDefaults();
     }
-    
+
     /**
      * This method is used for gettting the SSOToken from the
      * TokenManager using Principal and defaultOrg. Need to
@@ -1057,16 +559,16 @@ public class LogConfigReader implements ServiceListener{
         return (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
     }
-    
+
     /**
-     * This method checks whether the logging service url is explicitly 
-     * mentioned in the naming service. If yes then validates the URL against 
-     * the platform server list of trusted servers. if the logging service 
+     * This method checks whether the logging service url is explicitly
+     * mentioned in the naming service. If yes then validates the URL against
+     * the platform server list of trusted servers. if the logging service
      * url is not mentioned explicitly it sets the local flag to true.
      */
     private void setLocalFlag() {
         if (debug.messageEnabled()) {
-            debug.message("LogConfigReader: logserviceID is" 
+            debug.message("LogConfigReader: logserviceID is"
                 + localLogServiceID);
         }
         try{
@@ -1074,8 +576,8 @@ public class LogConfigReader implements ServiceListener{
             // dynamically updated.
             // URL url =  WebtopNaming.getServiceURL(LOGGING_SERVICE,
             // protocol, host, port);
-            
-            String urlString = 
+
+            String urlString =
                 manager.getProperty(LogConstants.LOGGING_SERVICE_URL);
             String logHost = null;
             if (urlString.indexOf("%") == -1) {
@@ -1096,10 +598,10 @@ public class LogConfigReader implements ServiceListener{
             debug.error("LogConfigReader: Error setting localFlag: ",e);
         }
     }
-    
+
     // following methods
     // to implement ServiceListener
-    
+
     public void globalConfigChanged(
         String servName,
         String ver,
@@ -1109,7 +611,7 @@ public class LogConfigReader implements ServiceListener{
     ) {
         debug.message("Global config change");
     }
-    
+
     public void organizationConfigChanged(
         String servName,
         String ver,
@@ -1120,9 +622,9 @@ public class LogConfigReader implements ServiceListener{
     ) {
         debug.message("Org config change");
     }
-    
+
     public void schemaChanged(String servName,String ver) {
-        
+
         if (debug.messageEnabled()) {
             debug.message("LogService schemaChanged(): ver = " + ver);
         }
@@ -1137,7 +639,7 @@ public class LogConfigReader implements ServiceListener{
          *  the logging status to inactive, and no more records will
          *  get written out.
          */
-        manager = 
+        manager =
             (com.sun.identity.log.LogManager) LogManagerUtil.getLogManager();
         if (manager.getDidFirstReadConfig() &&
             manager.getLoggingStatusIsActive() &&

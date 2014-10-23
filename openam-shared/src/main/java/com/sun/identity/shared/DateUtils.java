@@ -24,6 +24,8 @@
  *
  * $Id: DateUtils.java,v 1.2 2008/06/25 05:53:00 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2013 Cybernetica AS
  */
 
 package com.sun.identity.shared;
@@ -41,9 +43,8 @@ import java.util.TimeZone;
 public class DateUtils {
 
     private static final String UTC_DATE_Z_FORMAT = "{0}-{1}-{2}T{3}:{4}:{5}Z";
-
     private static final String UTC_DATE_FORMAT = "{0}-{1}-{2}T{3}:{4}:{5}";
-
+    private static final String FULL_DATE_FORMAT = "{0}-{1}-{2}T{3}:{4}:{5}{6}";
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
 
     /**
@@ -51,9 +52,10 @@ public class DateUtils {
      * date.
      * 
      * @param date Date object.
+     * @return The formatted date.
      */
-    public static String dateToString(Date date) {
-        return dateToString(date, UTC_DATE_FORMAT);
+    public static String dateToString(final Date date) {
+        return dateToString(date, UTC_DATE_FORMAT, UTC_TIME_ZONE);
     }
 
     /**
@@ -61,15 +63,30 @@ public class DateUtils {
      * 2004-03-20T05:53:32Z.
      * 
      * @param date Date object.
+     * @return The formatted date.
      */
-    public static String toUTCDateFormat(Date date) {
-        return dateToString(date, UTC_DATE_Z_FORMAT);
+    public static String toUTCDateFormat(final Date date) {
+        return dateToString(date, UTC_DATE_Z_FORMAT, UTC_TIME_ZONE);
     }
 
-    private static String dateToString(Date date, String format) {
-        GregorianCalendar cal = new GregorianCalendar(UTC_TIME_ZONE);
+    /**
+     * Returns ISO-8601 (RFC3339) compatible representation of local date and time and time offset.
+     * For instance, 2004-03-20T07:53:32+02:00.
+     *
+     * @param date Date object.
+     * @return The formatted date.
+     */
+    public static String toFullLocalDateFormat(final Date date) {
+        return dateToString(date, FULL_DATE_FORMAT, null);
+    }
+
+    private static String dateToString(Date date, String format, TimeZone tz) {
+        GregorianCalendar cal = new GregorianCalendar();
+        if (tz != null) {
+            cal.setTimeZone(tz);
+        }
         cal.setTime(date);
-        String[] params = new String[6];
+        String[] params = new String[7];
 
         params[0] = formatInteger(cal.get(Calendar.YEAR), 4);
         params[1] = formatInteger(cal.get(Calendar.MONTH) + 1, 2);
@@ -78,7 +95,16 @@ public class DateUtils {
         params[4] = formatInteger(cal.get(Calendar.MINUTE), 2);
         params[5] = formatInteger(cal.get(Calendar.SECOND), 2);
 
-        return MessageFormat.format(format, (Object[])params);
+        int offset = cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET);
+        if (offset == 0) {
+            params[6] = "Z";
+        } else {
+            params[6] = (offset < 0 ? "-" : "+")
+                + formatInteger(Math.abs(offset) / 3600000, 2)
+                + ":" + formatInteger((Math.abs(offset) / 60000) % 60, 2);
+        }
+
+        return MessageFormat.format(format, (Object[]) params);
     }
 
     private static String formatInteger(int value, int length) {

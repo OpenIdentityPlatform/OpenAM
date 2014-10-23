@@ -24,10 +24,8 @@
  *
  * $Id: LogConstants.java,v 1.16 2008/09/18 22:56:31 veiming Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2013 Cybernetica AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.log;
@@ -107,6 +105,10 @@ public class LogConstants {
      */
     public static final String DB_HANDLER = "iplanet-am-logging-jdbc-handler";
     /**
+     * Attribute defining the Syslog Handler class.
+     */
+    public static final String SYSLOG_HANDLER = "iplanet-am-logging-syslog-handler";
+    /**
      * Attribute defining the number of history files a (flat file)
      * log should have.
      * @supported.api
@@ -149,6 +151,10 @@ public class LogConstants {
      */
     public static final String DB_FORMATTER =
         "iplanet-am-logging-db-formatter";
+    /**
+     * Attribute defining the SyslogFormatter class
+     */
+    public static final String SYSLOG_FORMATTER = "iplanet-am-logging-syslog-formatter";
     /**
      * Attribute defining the Authorization class used to see if a particular
      * user is authorized to perform a particular task.
@@ -379,7 +385,31 @@ public class LogConstants {
      */
     public static final String MYSQL_DBDATETIME_FORMAT =
         "sun-am-logging-mysql-dbdate-format";
+
+    /**
+     * Attribute defining syslog host.
+     */
+    public static final String SYSLOG_HOST = "iplanet-am-logging-syslog-host";
+
+    /**
+     * Attribute defining syslog port.
+     */
+    public static final String SYSLOG_PORT = "iplanet-am-logging-syslog-port";
+    /**
+     * Attribute defining syslog protocol, UDP or TCP.
+     */
+    public static final String SYSLOG_PROTOCOL = "iplanet-am-logging-syslog-protocol";
+
+    /**
+     * Attribute defining syslog facility.
+     */
+    public static final String SYSLOG_FACILITY = "iplanet-am-logging-syslog-facility";
     
+    /**
+     * Attribute defining syslog connection timeout.
+     */
+    public static final String SYSLOG_CONNECTION_TIMEOUT = "iplanet-am-logging-syslog-connection-timeout";
+
     /**
      * Property defining whether logging is enabled
      * @supported.api

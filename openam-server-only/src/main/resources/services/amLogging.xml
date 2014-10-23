@@ -26,9 +26,8 @@
 
     $Id: amLogging.xml,v 1.11 2008/10/10 22:14:25 bigfatrat Exp $
 
--->
-<!--
     Portions Copyrighted 2011-2014 ForgeRock AS
+    Portions Copyrighted 2013 Cybernetica AS
     Portions Copyrighted 2014 Nomura Research Institute, Ltd
 -->
 <!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
@@ -142,6 +141,7 @@
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceFile">File</ChoiceValue>
                         <ChoiceValue i18nKey="choiceDB">DB</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceSyslog">Syslog</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>File</Value>
@@ -195,6 +195,14 @@
                         <Value>com.sun.identity.log.handlers.SecureFileHandler</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-handler"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.log.handlers.syslog.SyslogHandler</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-logging-secure-elf-formatter"
                     type="single"
                     syntax="string"
@@ -233,6 +241,14 @@
                     i18nKey="">
                     <DefaultValues>
                         <Value>com.sun.identity.log.handlers.DBFormatter</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-formatter"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.log.handlers.syslog.SyslogFormatter</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-logging-authz-class"
@@ -523,6 +539,74 @@
                     i18nKey="">
                     <DefaultValues>
                         <Value>%Y-%m-%d %H:%i:%s</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-host"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1101">
+                    <DefaultValues>
+                        <Value>localhost</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-port"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="65535"
+                    i18nKey="a1102">
+                    <DefaultValues>
+                        <Value>514</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-protocol"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a1103">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceUDP">UDP</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceTCP">TCP</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>UDP</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-facility"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a1104">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choicekern">kern</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceuser">user</ChoiceValue>
+                        <ChoiceValue i18nKey="choicemail">mail</ChoiceValue>
+                        <ChoiceValue i18nKey="choicedaemon">daemon</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceauth">auth</ChoiceValue>
+                        <ChoiceValue i18nKey="choicesyslog">syslog</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelpr">lpr</ChoiceValue>
+                        <ChoiceValue i18nKey="choicenews">news</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceuucp">uucp</ChoiceValue>
+                        <ChoiceValue i18nKey="choicecron">cron</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceauthpriv">authpriv</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceftp">ftp</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal0">local0</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal1">local1</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal2">local2</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal3">local3</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal4">local4</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal5">local5</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal6">local6</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal7">local7</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>local5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-connection-timeout"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a1105">
+                    <DefaultValues>
+                        <Value>30</Value>
                     </DefaultValues>
                 </AttributeSchema>
             </Global>

@@ -24,9 +24,8 @@
  *
  * $Id: LogManager.java,v 1.14 2009/12/09 00:34:22 bigfatrat Exp $
  *
- */
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2013 Cybernetica AS
  */
 package com.sun.identity.log;
 
@@ -324,6 +323,9 @@ public class LogManager extends java.util.logging.LogManager {
                         HANDLER = getProperty(LogConstants.DB_HANDLER);
                         FORMATTER = getProperty(LogConstants.DB_FORMATTER);
                         String driver = getProperty(LogConstants.DB_DRIVER);
+                    } else if (getProperty(LogConstants.BACKEND).equals("Syslog")) {
+                        HANDLER = getProperty(LogConstants.SYSLOG_HANDLER);
+                        FORMATTER = getProperty(LogConstants.SYSLOG_FORMATTER);
                     } else if (getProperty(
                         LogConstants.SECURITY_STATUS).equalsIgnoreCase("ON"))
                     {
@@ -408,8 +410,7 @@ public class LogManager extends java.util.logging.LogManager {
                 while (loggerNames.hasMoreElements()) {
                     String curEl = (String) loggerNames.nextElement();
                     /* avoid root logger */
-                    if (curEl.length() != 0 && curEl.length() != 0 &&
-                            !curEl.equals("global")) {
+                    if (!curEl.isEmpty() && !curEl.equals("global")) {
                         if (Debug.messageEnabled()) {
                             Debug.message(
                                     "LogManager:readConfiguration:" +
