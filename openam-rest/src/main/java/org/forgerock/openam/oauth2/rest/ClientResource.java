@@ -24,6 +24,15 @@
 
 package org.forgerock.openam.oauth2.rest;
 
+import javax.inject.Named;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.inject.Inject;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -33,14 +42,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Named;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -293,11 +294,13 @@ public class ClientResource implements CollectionResourceProvider {
         Map<String, String> responseVal = new HashMap<String, String>();
         JsonValue response;
         try {
-            manager.deleteIdentity(resourceId);
+            String realm = request.getAdditionalParameter("realm");
+            manager.deleteIdentity(resourceId, realm);
 
             //delete the tokens associated with that client_id
             Map<CoreTokenField, Object> query = new HashMap<CoreTokenField, Object>();
             query.put(OAuthTokenField.CLIENT_ID.getField(), resourceId);
+            query.put(OAuthTokenField.REALM.getField(), realm);
             try {
                 store.delete(query);
             } catch (CoreTokenException e) {

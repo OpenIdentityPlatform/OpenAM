@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright 2012-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,26 +24,29 @@
 
 package org.forgerock.openam.oauth2.rest;
 
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.idm.*;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.Constants;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.forgerockrest.RestUtils;
 
 import java.security.AccessController;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class ClientResourceManager {
 
     private SSOToken getAdminToken(){
-        return (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        return AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
 
     public void createIdentity(String realm, String id, Map<String, Set<String>> attrs)
@@ -98,10 +101,10 @@ public class ClientResourceManager {
         return RestUtils.getCookieFromServerContext(context);
     }
 
-    public void deleteIdentity(String id) throws SSOException, IdRepoException, InternalServerErrorException{
-        AMIdentityRepository repo = new AMIdentityRepository(getAdminToken() , null);
+    public void deleteIdentity(String id, String realm) throws SSOException, IdRepoException, InternalServerErrorException{
+        AMIdentityRepository repo = new AMIdentityRepository(getAdminToken(), realm);
         Set<AMIdentity> ids = new HashSet<AMIdentity>();
-        ids.add(getIdentity(id, null));
+        ids.add(getIdentity(id, realm));
         repo.deleteIdentities(ids);
     }
 }

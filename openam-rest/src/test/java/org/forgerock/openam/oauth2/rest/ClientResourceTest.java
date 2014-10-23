@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright 2012-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -73,7 +73,7 @@ public class ClientResourceTest {
         ClientResourceManager mockManager = mock(ClientResourceManager.class);
 
         //setup mockManager
-        doNothing().when(mockManager).deleteIdentity(anyString());
+        doNothing().when(mockManager).deleteIdentity(anyString(), anyString());
         doNothing().when(mockManager).createIdentity(anyString(), anyString(),anyMap());
 
         ResultHandler mockHandler = mock(ResultHandler.class);
@@ -106,7 +106,7 @@ public class ClientResourceTest {
         ClientResourceManager mockManager = mock(ClientResourceManager.class);
 
         //setup mockManager
-        doNothing().when(mockManager).deleteIdentity(anyString());
+        doNothing().when(mockManager).deleteIdentity(anyString(), anyString());
         doNothing().when(mockManager).createIdentity(anyString(), anyString(),anyMap());
 
         ResultHandler mockHandler = mock(ResultHandler.class);
