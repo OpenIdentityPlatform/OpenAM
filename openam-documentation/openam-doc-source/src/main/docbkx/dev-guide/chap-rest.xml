@@ -1192,15 +1192,21 @@ string=amlbcookie</computeroutput>
  </section>
 
  <section xml:id="rest-api-tokens">
-  <title>Token Validation</title>
+  <title>Token Validation and Session Information</title>
 
   <indexterm>
    <primary>Token validation</primary>
    <secondary>REST API</secondary>
   </indexterm>
 
+  <indexterm>
+   <primary>Session information</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
+
   <para>
-   OpenAM provides REST APIs for validating SSO tokens.
+   OpenAM provides REST APIs for validating SSO tokens and getting information
+   about active sessions.
   </para>
 
   <itemizedlist>
@@ -1211,7 +1217,8 @@ string=amlbcookie</computeroutput>
     </para>
 
     <para>
-     See <xref linkend="rest-api-token-validation" /> below.
+     See <xref linkend="rest-api-token-validation" />
+     and <xref linkend="rest-api-session-information" /> below.
     </para>
    </listitem>
 
@@ -1258,6 +1265,124 @@ $ <userinput>curl \
  http://openam.example.com:8080/openam/json/sessions/AQIC5...?_action=validate</userinput>
 <computeroutput>{"valid":false}</computeroutput>
    </screen>
+  </section>
+
+  <section xml:id="rest-api-session-information">
+   <title>Session Information</title>
+
+   <para>
+    You can use REST API calls to:
+
+    <itemizedlist>
+     <listitem>
+      <para>
+       Identify whether a session is active
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Check the maximum remaining amount of time a session has left before
+       the user is required to reauthenticate
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Determine the length of time a session has been idle
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Reset a session's idle time to 0
+      </para>
+     </listitem>
+    </itemizedlist>
+   </para>
+
+   <para>
+    For these REST endpoints, specify two SSO tokens. Provide the SSO token for the
+    current authenticated user as the value of a header whose name is the name
+    of the SSO token cookie, by default <literal>iPlanetDirectoryPro</literal>.
+    Specify the SSO token about which you want information as the
+    <literal>tokenId</literal> query string parameter of the REST URL.
+    In the examples in this section, <literal>AQIC5w...NTcy*</literal> is the SSO
+    token for the current authenticated user, while <literal>BXCCq...NX*1*</literal>
+    is the token being queried.
+   </para>
+
+   <para>
+    To determine whether a session is active,
+    perform an HTTP POST to the resource URL,
+    <literal>/json/sessions/</literal>,
+    using the <literal>isActive</literal> action
+    as shown in the following example:
+   </para>
+
+   <screen>
+    $ <userinput>curl \
+    --request POST \
+    --header "Content-Type: application/json" \
+    --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+    http://openam.example.com:8080/openam/json/sessions/
+    _action=isActive&amp;tokenId=BXCCq...NX*1*</userinput>
+    <computeroutput>{"active":true}</computeroutput>
+   </screen>
+
+   <para>
+    To check the maximum remaining time (in seconds) of a session,
+    perform an HTTP POST to the resource URL,
+    <literal>/json/sessions/</literal>,
+    using the <literal>getMaxTime</literal> action
+    as shown in the following example:
+   </para>
+
+   <screen>
+    $ <userinput>curl \
+    --request POST \
+    --header "Content-Type: application/json" \
+    --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+    http://openam.example.com:8080/openam/json/sessions/
+    _action=getMaxTime&amp;tokenId=BXCCq...NX*1*</userinput>
+    <computeroutput>{"maxtime":7022}</computeroutput>
+   </screen>
+
+   <para>
+    To check the amount of time (in seconds) that a session has been idle,
+    perform an HTTP POST to the resource URL,
+    <literal>/json/sessions/</literal>,
+    using the <literal>getIdle</literal> action
+    as shown in the following example:
+   </para>
+
+   <screen>
+    $ <userinput>curl \
+    --request POST \
+    --header "Content-Type: application/json" \
+    --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+    http://openam.example.com:8080/openam/json/sessions/
+    _action=getIdle&amp;tokenId=BXCCq...NX*1*</userinput>
+    <computeroutput>{"idletime":355}</computeroutput>
+   </screen>
+
+   <para>
+    To reset a session's idle time,
+    perform an HTTP POST to the resource URL,
+    <literal>/json/sessions/</literal>,
+    using the <literal>isActive</literal> action with the
+    <literal>refresh=true</literal>
+    option as shown in the following example:
+   </para>
+
+   <screen>
+    $ <userinput>curl \
+    --request POST \
+    --header "Content-Type: application/json" \
+    --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+    http://openam.example.com:8080/openam/json/sessions/
+    _action=isActive&amp;refresh=true&amp;tokenId=BXCCq...NX*1*</userinput>
+    <computeroutput>{"active":true}</computeroutput>
+   </screen>
+
+
   </section>
 
   <section xml:id="rest-api-tokens-legacy">
