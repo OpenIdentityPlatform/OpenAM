@@ -22,6 +22,7 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
@@ -62,11 +63,13 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.rest.RestEndpointServlet;
 import org.forgerock.openam.rest.RestEndpoints;
+import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeDefinition;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
 import org.forgerock.openam.utils.AMKeyProvider;
+import org.forgerock.openam.utils.Config;
 import org.forgerock.util.SignatureUtil;
 
 import javax.inject.Inject;
@@ -225,6 +228,15 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     public CoreTokenResource getCoreTokenResource(JSONSerialisation jsonSerialisation,
             CTSPersistentStoreProxy ctsPersistentStore, @Named("frRest") Debug debug) {
         return new CoreTokenResource(jsonSerialisation, ctsPersistentStore, debug);
+    }
+
+    @Provides
+    @Inject
+    @Singleton
+    public CoreTokenResourceAuthzModule getCoreTokenResourceAuthzModule(
+            Config<SessionService> sessionService, @Named("frRest") Debug debug) {
+        boolean coreTokenResourceEnabled = SystemProperties.getAsBoolean(Constants.CORE_TOKEN_RESOURCE_ENABLED);
+        return new CoreTokenResourceAuthzModule(sessionService, debug, coreTokenResourceEnabled);
     }
 
     @Provides

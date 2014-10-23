@@ -1298,4 +1298,11 @@ public interface Constants {
      * Property to enable/disable autocomplete on password/form fields.
      */
     public static final String AUTOCOMPLETE_ENABLED = "org.forgerock.openam.console.autocomplete.enabled";
+
+    /**
+     * Property to enable/disable access to CoreTokenResource REST endpoint.
+     */
+    public static final String CORE_TOKEN_RESOURCE_ENABLED = "org.forgerock.openam.cts.rest.enabled";
+
+
 }

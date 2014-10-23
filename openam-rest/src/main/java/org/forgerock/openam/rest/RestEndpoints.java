@@ -38,6 +38,7 @@ import org.forgerock.openam.forgerockrest.entitlements.SubjectTypesResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.SessionResourceAuthzModule;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
@@ -184,7 +185,7 @@ public class RestEndpoints {
                 .forVersion("1.0").to(SubjectAttributesResourceV1.class);
 
         rootRealmRouter.route("/tokens")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(CoreTokenResourceAuthzModule.class, CoreTokenResourceAuthzModule.NAME)
                 .forVersion("1.0").to(CoreTokenResource.class);
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
