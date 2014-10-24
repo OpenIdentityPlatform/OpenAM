@@ -49,7 +49,7 @@ openam OBJECT IDENTIFIER ::= { snmp 2 }
 -- SSO Session Monitoring
 --
 
-sessionMonitoring OBJECT IDENTIFIER ::= { openam 777 }
+sessionMonitoring OBJECT IDENTIFIER ::= { openam 1 }
 
 --
 -- internalSessions
