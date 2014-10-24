@@ -108,19 +108,47 @@
 
     .review-row {
         background: #ebebeb;
-        padding: 0 8px 13px;
+        padding: 0 8px;
         clear: both;
         font-size: 13px;
         margin: 0 5px 5px 0;
         border-radius: 3px;
         border:1px solid #bebebe;
-        cursor:pointer;
-        overflow-x:auto;
+        cursor: pointer;
+        overflow-x: auto;
+        position: relative;
+
+        [class*="icon-arrow-"], .advanced-empty-msg {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            opacity: 0.5;
+        }
+
+        [class*="icon-arrow-"] {
+            font-size: 16px;
+        }
+
+        .advanced-empty-msg {
+            font-size: 12px;
+        }
+
+        .advanced-mode {
+            margin: 0 0 13px;
+
+            &.hidden {
+                display: none;
+            }
+        }
 
         &.invalid{
             .invalid-background;
             .invalid {
                 color: red;
+            }
+
+            .advanced-empty-msg {
+                display: none;
             }
         }
 
@@ -129,6 +157,12 @@
             line-height: 20px;
             padding: 8px 10px 8px 0;
             clear:both;
+        }
+
+        h3 {
+            font-size: 13px;
+            line-height: 1em;
+            margin: 0 0 8px;
         }
 
         ul, p, pre {
@@ -149,7 +183,6 @@
             font-family: monospace;
             line-height: 0.9em;
             display: block;
-            float: left;
         }
 
         &:hover, &:focus{

@@ -100,6 +100,7 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
             $li = $target.closest('li');
             actionName = $li.data('action-name');
 
+            this.data.selectedAll = true;
             _.each(this.data.entity.actions, function (action) {
                 if (action.action === actionName) {
                     action.selected = !action.selected;

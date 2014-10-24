@@ -1,85 +1,116 @@
+<p>Switch to <a href="" id="toggleAdvanced">{{#if advancedMode}}non-advanced{{else}}advanced{{/if}}</a> view state.</p>
+
 {{! The IDs are used for testing }}
 <div class="col2">
-    <div class="review-row clearfix{{#equals '' entity.name}} invalid{{/equals}}" tabindex="0" >
-        <h2>Name</h2> 
-        <p id="reviewName">{{entity.name}}</p>
-        {{#if entity.description}}
-        <h2>Description</h2> 
-        <p id="reviewDesc">{{entity.description}}</p>
-        {{/if}}
-    </div>
-
-    <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resources}} invalid{{/unless}}" tabindex="0" >
-        <h2>Resources</h2>
-        {{#if entity.resources}}
-        <ul id="reviewRes">
-            {{#each entity.resources}}
-            <li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>
-            {{/each}}
-        </ul> 
-        {{else}}
-        <pre>There are no resources...</pre>
-        {{/if}}
-    </div>
-
-    <div class="review-row clearfix" tabindex="0" >
-        <h2>Actions</h2>
-        {{#if entity.actions}}
-        <ul id="reviewActions">
-            {{#each entity.actions}}
-            {{#if selected}}
-            <li>{{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}</li>
+    <div class="review-row clearfix{{#equals '' entity.name}} invalid{{/equals}}" tabindex="0">
+        <h2>Name</h2>
+        {{#unless advancedMode}}
+        <span class="icon-arrow-down2"></span>
+        {{/unless}}
+        <div class="advanced-mode">
+            <p id="reviewName">{{entity.name}}</p>
+            {{#if entity.description}}
+            <h2>Description</h2>
+            <p id="reviewDesc">{{entity.description}}</p>
             {{/if}}
-            {{/each}}
-        </ul>
-        {{/if}}
+        </div>
+    </div>
+
+    <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resources}} invalid{{/unless}}" tabindex="0">
+        <h2>Resources</h2>
+        {{#unless advancedMode}}
+        {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if entity.resources}}
+            <ul id="reviewRes">
+                {{#each entity.resources}}<li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>{{/each}}
+            </ul>
+            {{else}}
+            <pre>There are no resources...</pre>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="review-row clearfix" tabindex="0">
+        <h2>Actions</h2>
+        {{#unless advancedMode}}
+        {{#if actionsSelected}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if actionsSelected}}
+            <ul id="reviewActions">
+                {{#each entity.actions}}
+                {{#if selected}}
+                <li>{{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}</li>
+                {{/if}}
+                {{/each}}
+            </ul>
+            {{else}}
+            <pre>There are no actions...</pre>
+            {{/if}}
+        </div>
     </div>
 </div>
 
 <div class="col2">
-
-    <div class="review-row clearfix" tabindex="0" >
+    <div class="review-row clearfix" tabindex="0">
         <h2>Subjects</h2>
-        {{#if subjectString}}
-        <pre>{{subjectString}}</pre>
-        {{/if}}
+        {{#unless advancedMode}}
+        {{#if subjectString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if subjectString}}
+            <pre>{{subjectString}}</pre>
+            {{/if}}
+        </div>
     </div>
 
-    <div class="review-row clearfix" tabindex="0" >
+    <div class="review-row clearfix" tabindex="0">
         <h2>Environments</h2>
-        {{#if environmentString}}
-        <pre>{{environmentString}}</pre>
-        {{else}}
-        <pre>There are no environment conditions...</pre>
-        {{/if}}
+        {{#unless advancedMode}}
+        {{#if environmentString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if environmentString}}
+            <pre>{{environmentString}}</pre>
+            {{else}}
+            <pre>There are no environment conditions...</pre>
+            {{/if}}
+        </div>
     </div>
 
-    <div class="review-row clearfix" tabindex="0" >
+    <div class="review-row clearfix" tabindex="0">
+        <h2>Response attributes</h2>
+        {{#unless advancedMode}}
+        {{#if responseAttrs}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            <h3>Static attributes</h3>
+            {{#if combinedStaticAttrs}}
+            <ul>
+                {{#each combinedStaticAttrs}}
+                <li>
+                    <span>{{propertyName}}:</span> {{#each propertyValues}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+                </li>
+                {{/each}}
+            </ul>
+            {{else}}
+            <pre>There are no static attributes..</pre>
+            {{/if}}
+        </div>
 
-        <h2>Static attributes</h2>
-        {{#if combinedStaticAttrs}} 
-        <ul>
-        {{#each combinedStaticAttrs}}
-            <li>
-                <span>{{propertyName}}:</span>
-                {{#each propertyValues}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
-            </li> 
-        {{/each}}
-        </ul>
-        {{else}}
-        <pre>There are no static attributes..</pre>  
-        {{/if}}
-
-        <h2>Subject attributes</h2>
-        {{#if userAttrs}} 
-        <ul>
-            {{#each userAttrs}}
-            <li>{{propertyName}}</li>
-            {{/each}}
-        </ul>
-        {{else}}
-        <pre>There are no subject attributes..</pre>
-        {{/if}}
-
+        <div class="advanced-mode">
+            <h3>Subject attributes</h3>
+            {{#if userAttrs}}
+            <ul>
+                {{#each userAttrs}}
+                <li>{{propertyName}}</li>
+                {{/each}}
+            </ul>
+            {{else}}
+            <pre>There are no subject attributes..</pre>
+            {{/if}}
+        </div>
     </div>
 </div>

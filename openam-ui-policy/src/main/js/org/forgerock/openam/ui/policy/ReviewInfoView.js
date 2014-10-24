@@ -26,19 +26,60 @@
  * @author Eugenia Sergueeva
  */
 
-/*global window, define, $, form2js, _, js2form, document, console */
+/*global window, define, $, _, document, console, sessionStorage */
 
 define("org/forgerock/openam/ui/policy/ReviewInfoView", [
-    "org/forgerock/commons/ui/common/main/AbstractView"
-], function (AbstractView) {
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/util/Constants"
+], function (AbstractView, constants) {
     var ReviewInfoView = AbstractView.extend({
         noBaseTemplate: true,
-        render: function (args, callback, element, template) {
-            _.extend(this.data, args);
+        events: {
+            'click #toggleAdvanced': 'toggleAdvancedView'
+        },
 
+        render: function (args, callback, element, template) {
             this.element = element;
             this.template = template;
-            this.parentRender(callback);
+
+            _.extend(this.data, args);
+
+            this.data.actionsSelected = _.find(this.data.entity.actions, function (action) {
+                return action.selected === true;
+            });
+
+            this.storageKey = constants.OPENAM_STORAGE_KEY_PREFIX + 'review-advanced-mode';
+            this.data.advancedMode = !!JSON.parse(sessionStorage.getItem(this.storageKey));
+
+            this.renderParent(callback);
+        },
+
+        renderParent: function (callback) {
+            this.parentRender(function () {
+                var reviewItems;
+                if (this.data.advancedMode) {
+                    reviewItems = this.$el.find('.advanced-mode');
+                    reviewItems.removeClass('hidden');
+                } else {
+                    reviewItems = this.$el.find('.advanced-mode').filter(function () {
+                        return !$(this).parent().hasClass('invalid');
+                    });
+                    reviewItems.addClass('hidden');
+                }
+
+                if (callback) {
+                    callback();
+                }
+            });
+
+        },
+
+        toggleAdvancedView: function (e) {
+            e.preventDefault();
+
+            this.data.advancedMode = !this.data.advancedMode;
+            sessionStorage.setItem(this.storageKey, this.data.advancedMode);
+            this.renderParent();
         }
     });
 

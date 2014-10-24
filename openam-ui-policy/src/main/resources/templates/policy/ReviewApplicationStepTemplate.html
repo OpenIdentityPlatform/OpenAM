@@ -1,15 +1,21 @@
+<p>Switch to <a href="" id="toggleAdvanced">{{#if advancedMode}}non-advanced{{else}}advanced{{/if}}</a> view state.</p>
+
 {{! The IDs are used for testing }}
 <div class="col2">
 
     <div class="review-row clearfix{{#equals '' entity.name}} invalid{{/equals}}" tabindex="0" >
         <h2>Name</h2>
-        <p id="reviewName">{{entity.name}}</p>
+        {{#unless advancedMode}}
+        <span class="icon-arrow-down2"></span>
+        {{/unless}}
+        <div class="advanced-mode">
+            <p id="reviewName">{{entity.name}}</p>
 
-        {{#if entity.description}}
-        <h2>Description</h2> 
-        <p id="reviewDesc">{{entity.description}}</p>
-        {{/if}}
-
+            {{#if entity.description}}
+            <h2>Description</h2>
+            <p id="reviewDesc">{{entity.description}}</p>
+            {{/if}}
+        </div>
     </div>
 
 </div>
@@ -17,12 +23,17 @@
 <div class="col2">
     <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resources}} invalid{{/unless}}" tabindex="0" >
         <h2>Application Base</h2>
-        {{#if entity.resources}}
-        <ul id="reviewRes">
-            {{#each entity.resources}}
-            <li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>
-            {{/each}}
-        </ul>
-        {{/if}}
+        {{#unless advancedMode}}
+        {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if entity.resources}}
+            <ul id="reviewRes">
+                {{#each entity.resources}}
+                <li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>
+                {{/each}}
+            </ul>
+            {{/if}}
+        </div>
     </div>
 </div>
