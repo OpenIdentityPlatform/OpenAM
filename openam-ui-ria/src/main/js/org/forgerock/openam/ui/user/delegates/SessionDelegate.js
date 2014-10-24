@@ -45,12 +45,12 @@ define("org/forgerock/openam/ui/user/delegates/SessionDelegate", [
         });
     };
 
-    obj.logout = function () {
+    obj.logout = function (tokenCookie) {
         return obj.serviceCall({
             type: "POST",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
             data: "{}",
-            url: "?_action=logout",
+            url: "/" + tokenCookie + "?_action=logout",
             errorsHandlers: {"Bad Request": {status: 400}}
         });
     };

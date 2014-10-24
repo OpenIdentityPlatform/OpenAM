@@ -167,7 +167,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
             tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
         sessionDelegate.isSessionValid(tokenCookie).then(function(result) {
             if (result.valid) {
-                sessionDelegate.logout().then(function () {
+                sessionDelegate.logout(tokenCookie).then(function () {
                     if (conf.globalData.auth.fullLoginURL) {
                         window.location.hash += obj.filterUrlParams(_this.getLoginUrlParams());
                     }
@@ -190,7 +190,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         var tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
         sessionDelegate.isSessionValid(tokenCookie).then(function(result) {
             if (result.valid) {
-                sessionDelegate.logout().then(function () {
+                sessionDelegate.logout(tokenCookie).then(function () {
                     obj.removeSessionCookie();
                 });
             }

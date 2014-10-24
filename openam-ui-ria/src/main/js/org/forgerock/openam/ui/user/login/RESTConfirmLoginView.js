@@ -29,8 +29,9 @@ define("org/forgerock/openam/ui/user/login/RESTConfirmLoginView", [
     "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
-    "org/forgerock/openam/ui/user/delegates/SessionDelegate"
-], function(AbstractView, authNDelegate, conf, restLoginHelper, sessionDelegate) {
+    "org/forgerock/openam/ui/user/delegates/SessionDelegate",
+    "org/forgerock/commons/ui/common/util/CookieHelper"
+], function(AbstractView, authNDelegate, conf, restLoginHelper, sessionDelegate, cookieHelper) {
     
     var ConfirmLoginView = AbstractView.extend({
         template: "templates/openam/RESTConfirmLoginTemplate.html",
@@ -54,7 +55,8 @@ define("org/forgerock/openam/ui/user/login/RESTConfirmLoginView", [
             return false;
         },
         logout: function(){
-            sessionDelegate.logout().then(function(){
+            var tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
+            sessionDelegate.logout(tokenCookie).then(function(){
                 restLoginHelper.removeSessionCookie();
                 var realm = (conf.globalData.auth.passedInRealm) ? conf.globalData.auth.passedInRealm : conf.globalData.auth.realm;
                 location.href = "#login" + realm + restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
