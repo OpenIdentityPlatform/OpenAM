@@ -61,8 +61,8 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      * @param authModules The list of auth modules used.
      */
     OpenAMAuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
-            long expiryTime, String nonce, String realm, String authModules) {
-        super(code, resourceOwnerId, clientId, redirectUri, scope, expiryTime, nonce, authModules);
+            long expiryTime, String nonce, String realm, String authModules, String acr) {
+        super(code, resourceOwnerId, clientId, redirectUri, scope, expiryTime, nonce, authModules, acr);
         setRealm(realm);
     }
 

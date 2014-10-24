@@ -107,7 +107,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final AuthorizationCode authorizationCode = new OpenAMAuthorizationCode(code, resourceOwnerId, clientId,
                 redirectUri, scope, expiryTime, nonce, realmNormaliser.normalise(request.<String>getParameter("realm")),
-                getAuthModulesFromSSOToken(request));
+                getAuthModulesFromSSOToken(request), getAuthenticationContextClassReferenceFromRequest(request));
 
         // Store in CTS
         try {
@@ -131,6 +131,10 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             logger.warning("Could not get list of auth modules from authentication", e);
         }
         return authModules;
+    }
+
+    private String getAuthenticationContextClassReferenceFromRequest(OAuth2Request request) {
+        return request.getParameter(OAuth2Constants.JWTTokenParams.ACR);
     }
 
     /**
@@ -164,7 +168,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final String atHash = generateAtHash(algorithm, request, accessToken, providerSettings);
 
         // todo support acr/amr, should be 0 or one of the space-seperated values from acr_values in the request
-        final String acr = null;
+        final String acr = getAuthenticationContextClassReference(request);
 
         return new OpenAMOpenIdConnectToken(clientSecret,
                 algorithm, iss, resourceOwnerId, clientId, authorizationParty, exp, iat, ath, nonce, ops,
@@ -197,6 +201,16 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         return amr;
+    }
+
+    private String getAuthenticationContextClassReference(OAuth2Request request) {
+        if (request.getToken(AuthorizationCode.class) != null) {
+            return request.getToken(AuthorizationCode.class).getAuthenticationContextClassReference();
+        } else if (request.getToken(RefreshToken.class) != null) {
+            return request.getToken(RefreshToken.class).getAuthenticationContextClassReference();
+        } else {
+            return getAuthenticationContextClassReferenceFromRequest(request);
+        }
     }
 
     /**
@@ -285,12 +299,14 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final long expiryTime = (providerSettings.getRefreshTokenLifetime() * 1000) + System.currentTimeMillis();
         AuthorizationCode token = request.getToken(AuthorizationCode.class);
         String authModules = null;
+        String acr = null;
         if (token != null) {
             authModules = token.getAuthModules();
+            acr = token.getAuthenticationContextClassReference();
         }
 
         RefreshToken refreshToken = new OpenAMRefreshToken(id, resourceOwnerId, clientId, redirectUri, scope,
-                expiryTime, "Bearer", OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType, realm, authModules);
+                expiryTime, "Bearer", OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType, realm, authModules, acr);
 
         try {
             tokenStore.create(refreshToken);

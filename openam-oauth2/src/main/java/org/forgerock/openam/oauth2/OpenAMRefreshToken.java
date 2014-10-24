@@ -62,9 +62,10 @@ public class OpenAMRefreshToken extends RefreshToken {
      * @param realm The realm.
      */
     public OpenAMRefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
-            long expiryTime, String tokenType, String tokenName, String grantType, String realm, String authModules) {
+            long expiryTime, String tokenType, String tokenName, String grantType, String realm, String authModules,
+            String acr) {
         super(id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, tokenType, tokenName, grantType,
-                authModules);
+                authModules, acr);
         setRealm(realm);
     }
 

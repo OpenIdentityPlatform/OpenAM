@@ -59,7 +59,7 @@ public class RefreshToken extends JsonValue implements Token {
      * @param grantType The grant type.
      */
     public RefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
-            long expiryTime, String tokenType, String tokenName, String grantType, String authModules) {
+            long expiryTime, String tokenType, String tokenName, String grantType, String authModules, String acr) {
         super(new HashMap<String, Object>());
         setTokenId(id);
         setResourceOwnerId(resourceOwnerId);
@@ -71,6 +71,7 @@ public class RefreshToken extends JsonValue implements Token {
         setTokenName(tokenName);
         setGrantType(grantType);
         setAuthModules(authModules);
+        setAuthenticationContextClassReference(acr);
     }
 
     /**
@@ -163,6 +164,15 @@ public class RefreshToken extends JsonValue implements Token {
     }
 
     /**
+     * Sets the authentication context class reference (acr).
+     *
+     * @param acr The acr.
+     */
+    protected void setAuthenticationContextClassReference(String acr) {
+        setStringProperty(OAuth2Constants.JWTTokenParams.ACR, acr);
+    }
+
+    /**
      * Gets the scope.
      *
      * @return The scope.
@@ -214,6 +224,14 @@ public class RefreshToken extends JsonValue implements Token {
      */
     public final String getTokenName() {
         return getStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
+    }
+
+    /**
+     * Get the Authentication Context Class Reference (acr).
+     * @return The acr string matched, if any.
+     */
+    public String getAuthenticationContextClassReference() {
+        return getStringProperty(OAuth2Constants.JWTTokenParams.ACR);
     }
 
     /**

@@ -56,7 +56,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @param nonce The nonce.
      */
     public AuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri,
-            Set<String> scope, long expiryTime, String nonce, String authModules) {
+            Set<String> scope, long expiryTime, String nonce, String authModules, String acr) {
         super(new HashMap<String, Object>());
         setCode(code);
         setResourceOwnerId(resourceOwnerId);
@@ -68,6 +68,7 @@ public class AuthorizationCode extends JsonValue implements Token {
         setTokenName(OAuth2Constants.Token.OAUTH_CODE_TYPE);
         setNonce(nonce);
         setAuthModules(authModules);
+        setAuthenticationContextClassReference(acr);
     }
 
     /**
@@ -139,6 +140,15 @@ public class AuthorizationCode extends JsonValue implements Token {
      */
     protected void setNonce(String nonce) {
         setStringProperty(OAuth2Constants.Custom.NONCE, nonce);
+    }
+
+    /**
+     * Sets the authentication context class reference (acr).
+     *
+     * @param acr The acr.
+     */
+    protected void setAuthenticationContextClassReference(String acr) {
+        setStringProperty(OAuth2Constants.JWTTokenParams.ACR, acr);
     }
 
     /**
@@ -262,6 +272,15 @@ public class AuthorizationCode extends JsonValue implements Token {
     public String getAuthModules() {
         return getStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES);
     }
+
+    /**
+     * Get the Authentication Context Class Reference (acr).
+     * @return The acr string matched, if any.
+     */
+    public String getAuthenticationContextClassReference() {
+        return getStringProperty(OAuth2Constants.JWTTokenParams.ACR);
+    }
+
     /**
      * Sets the authorization code as issued.
      */
