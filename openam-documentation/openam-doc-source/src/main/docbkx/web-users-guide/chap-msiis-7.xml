@@ -342,7 +342,7 @@ Internet services successfully restarted</computeroutput>
   file. Encrypt passwords using <command>cryptit.exe</command>.</para>
   
   <screen>
-C:\web_agents\iis7_agent\bin><userinput>cryptit.exe <replaceable>pwd-file</replaceable> <replaceable>encryption-key</replaceable></userinput>
+C:\web_agents\iis7_agent\bin><userinput>.\cryptit <replaceable>password</replaceable> <replaceable>encryption-key</replaceable></userinput>
   </screen>
 
  </section>
