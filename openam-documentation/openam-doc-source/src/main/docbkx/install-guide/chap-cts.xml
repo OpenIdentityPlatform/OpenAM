@@ -734,6 +734,7 @@ $ <userinput>bin/ldapmodify \
  --port 1389 \
  --bindDN "cn=Directory Manager" \
  --bindPassword pwd \
+ --defaultAdd \
  --fileName cts-container.ldif</userinput>
       </screen>
 
