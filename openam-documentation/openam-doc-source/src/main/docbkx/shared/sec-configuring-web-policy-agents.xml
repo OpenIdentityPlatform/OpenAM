@@ -500,6 +500,12 @@
      <para>No authentication and authorization are required for the requests
       coming from these client IP addresses.</para>
      <para>Property: <literal>com.sun.identity.agents.config.notenforced.ip</literal></para>
+     <note>
+      <para>
+       Loopback addresses are not considered valid IPs on the Not Enforced IP list.
+       If specified, the policy agent ignores the loopback address.
+      </para>
+     </note>
     </listitem>
    </varlistentry>
    <varlistentry>
