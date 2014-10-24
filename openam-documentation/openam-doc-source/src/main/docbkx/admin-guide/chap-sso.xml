@@ -166,7 +166,7 @@
     configured on a third-level domain such as <literal>sso.example.net</literal> will not work with an application on a
     similar domain such as <literal>app.example.net</literal>. Even if the Session ID is valid, the application will not
     receive the SSO Token. The request is then redirected to OpenAM. The client gets what appears as a SSO Token in the
-    diagram, which is actually a valid SSO tracking cookie that redirects immediated, and the cycle continues.
+    diagram, which is actually a valid SSO tracking cookie that redirects immediately, and the cycle continues.
     Other issues that may lead to similar problems are shown here.
 </para>
 

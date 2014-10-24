@@ -247,7 +247,7 @@
          For reference, the default OpenAM keystore file is
          <filename>keystore.jks</filename>, and you can find it in the OpenAM
          configuration directory, as described in the following installation
-         proceedure: <link xlink:show="new"
+         procedure: <link xlink:show="new"
                xlink:role="http://docbook.org/roles/xlink/role/olink"
                xlink:href="install-guide#deploy-openam"><citetitle>
           To Deploy OpenAM</citetitle></link>
@@ -440,13 +440,13 @@
          org.forgerock.openam.sts.token.provider.AuthnContextMapperImpl
          </literal> class, enter the class name of the following
          interface:<literal>
-          org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthnConextMapper
+          org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthnContextMapper
         </literal>.
         </para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>Canonicalization Algrorithm</term>
+       <term>Canonicalization Algorithm</term>
        <listitem>
         <para>
          For more information on the two options shown see the W3C

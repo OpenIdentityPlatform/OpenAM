@@ -1421,7 +1421,7 @@
        = http://openam.example.com:8080/openam/cdcservlet?goto=
        http://www.example.com/landing.jsp</literal>.
       The agent uses this parameter to append the original request URL
-      to this cdcserlet URL. The landing page consumes this parameter to
+      to this cdcservlet URL. The landing page consumes this parameter to
       redirect to the original URL.</para>
      <para>As an example, if you set this value to <literal>goto2</literal>,
       then the complete URL sent for authentication is
@@ -1529,7 +1529,7 @@
     <listitem>
      <para>Specifies a class implementing
       <literal>com.sun.identity.agents.filter.IWebServiceResponseProcessor</literal>,
-      used to process web service reponses.</para>
+      used to process web service responses.</para>
      <para>Property: <literal>com.sun.identity.agents.config.webservice.responseprocessor</literal></para>
     </listitem>
    </varlistentry>

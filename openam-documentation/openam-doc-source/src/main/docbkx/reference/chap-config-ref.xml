@@ -131,7 +131,7 @@
       logs out.</para>
       <para><command>ssoadm</command> attributes:
       <literal>sunAMAuthKeepPostProcessInstances</literal>, and
-      <literal>sunAMAuthKeepAuthModuleIntances</literal></para>
+      <literal>sunAMAuthKeepAuthModuleInstances</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1879,7 +1879,7 @@
     <term>SAML Error Page URL</term>
     <listitem>
      <para>OpenAM redirects users here when an error occurs in the SAML2
-     engine. Users are redirected to absolute URLs, whereas releative URLs
+     engine. Users are redirected to absolute URLs, whereas relative URLs
      are displayed within the request.</para>
 
      <para><command>ssoadm</command> attribute:

@@ -1184,7 +1184,7 @@ $ <userinput>backup \
       <imagedata fileref="images/cts-adv-properties.png" format="PNG" />
      </imageobject>
      <textobject>
-      <para>Shows the console page is used to the CTS tunine properties for
+      <para>Shows the console page is used to the CTS tuning properties for
        queue size and timeout.
       </para>
      </textobject>

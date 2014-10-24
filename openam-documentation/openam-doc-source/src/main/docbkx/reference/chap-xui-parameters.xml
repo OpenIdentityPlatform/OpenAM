@@ -178,7 +178,7 @@
                                 <para><literal>href-color</literal>: Color of text links.</para>
                             </listitem>
                             <listitem>
-                                <para><literal>href-color-hover</literal>: Color of text links of the optiom
+                                <para><literal>href-color-hover</literal>: Color of text links of the option
                                 currently being hovered over by the pointer </para>
                             </listitem>
                             <listitem>

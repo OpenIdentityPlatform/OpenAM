@@ -508,7 +508,7 @@ $ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-conf
     ],
     "issuer": "https://openam.example.com:8443/openam",
     "jwks_uri": "",
-    "id_token_siging_alg_values_supported": [
+    "id_token_signing_alg_values_supported": [
     "HmacSHA256",
     "HmacSHA512",
     "HmacSHA384"

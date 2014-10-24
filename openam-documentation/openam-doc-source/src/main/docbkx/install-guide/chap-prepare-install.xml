@@ -1488,7 +1488,7 @@ $ <userinput>cat WEB-INF/jboss-web.xml</userinput>
   &lt;class-loading java2ClassLoadingCompliance='true'&gt;
     &lt;loader-repository&gt;
     jbia.loader:loader=opensso
-    &lt;loader-repository-config&gt;java2ParentDelegaton=true&lt;/loader-repository-config&gt;
+    &lt;loader-repository-config&gt;java2ParentDelegation=true&lt;/loader-repository-config&gt;
     &lt;/loader-repository&gt;
   &lt;/class-loading&gt;
 &lt;/jboss-web&gt;</computeroutput>

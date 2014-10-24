@@ -177,7 +177,7 @@
    <varlistentry>
     <term>DNS Claim</term>
     <listitem>
-     <para>Specifies a Uniform Resource Identitier shared by the WSP and
+     <para>Specifies a Uniform Resource Identifier shared by the WSP and
      WSC.</para>
     </listitem>
    </varlistentry>
@@ -468,7 +468,7 @@
    <varlistentry>
     <term>DNS Claim</term>
     <listitem>
-     <para>Specifies a Uniform Resource Identitier shared by the WSP and
+     <para>Specifies a Uniform Resource Identifier shared by the WSP and
      WSC.</para>
     </listitem>
    </varlistentry>
@@ -729,14 +729,14 @@
    <varlistentry>
     <term>Requested Claims</term>
     <listitem>
-     <para>Specifies the Uniform Resource Identitiers for the claims to
+     <para>Specifies the Uniform Resource Identifiers for the claims to
      be represented in the Security Token.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
     <term>DNS Claim</term>
     <listitem>
-     <para>Specifies a Uniform Resource Identitier shared by the agent and the
+     <para>Specifies a Uniform Resource Identifier shared by the agent and the
      WSC.</para>
     </listitem>
    </varlistentry>

@@ -1495,7 +1495,7 @@ com.sun.identity.agents.config.fqdn.mapping[valid3] = xyz.hostname.com</literall
      = http://openam.example.com:8080/openam/cdcservlet?goto=
      http://www.example.com/landing.jsp</literal>.
      The agent uses this parameter to append the original request URL
-     to this cdcserlet URL. The landing page consumes this parameter to
+     to this cdcservlet URL. The landing page consumes this parameter to
      redirect to the original URL.</para>
      <para>As an example, if you set this value to <literal>goto2</literal>,
      then the complete URL sent for authentication is
@@ -1742,7 +1742,7 @@ com.sun.identity.agents.config.fqdn.mapping[valid3] = xyz.hostname.com</literall
     <listitem>
      <para>Specifies a class implementing
      <literal>com.sun.identity.agents.filter.IWebServiceResponseProcessor</literal>,
-     used to process web service reponses.</para>
+     used to process web service responses.</para>
      <para>For centralized configurations this property is configured under
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Advanced &gt;

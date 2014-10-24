@@ -956,7 +956,7 @@
           <term><literal>AgentConfigInherit.jsp</literal></term>
           <listitem>
               <para>Allows an administrator to review default settings for the agent, as configured in the Inheritance
-                  Settings page. Inheritance assumes that agent is part of a previously confiugred group.
+                  Settings page. Inheritance assumes that agent is part of a previously configured group.
                   To access Inheritance Settings, refer to the <link
                   xlink:href="admin-guide#create-agent-profiles"
                   xlink:role="http://docbook.org/xlink/role/olink">
@@ -1388,7 +1388,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
 </varlistentry>
 
 <varlistentry>
-    <term><literal>FSSAMLTrustedPartersEdit.jsp</literal></term>
+    <term><literal>FSSAMLTrustedPartnersEdit.jsp</literal></term>
     <listitem>
         <para>Called when you edit an existing "trusted partner" in the SAML 1.x Configuration area of the Federation
             window.</para>
@@ -2765,7 +2765,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>ServerEditSecurity.jsp</literal></term>
                 <listitem>
-                    <para>Supports the editing of security properties for default servers; associated wtih SFO.
+                    <para>Supports the editing of security properties for default servers; associated with SFO.
                         Includes default security settings such as encryption keys, cookie encoding, key stores, and
                         certificate management. To access, select Configuration &gt; Severs and Sites &gt;
                         Default Server Settings, and click Security.</para>
@@ -2912,7 +2912,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>SubSchemaTypeSelect.jsp</literal></term>
                 <listitem>
-                    <para>Allows you to configure a schema assocaited with breadcrumbs.</para>
+                    <para>Allows you to configure a schema associated with breadcrumbs.</para>
                     <!-- Best guess -->
                 </listitem>
             </varlistentry>
@@ -3316,7 +3316,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <term><literal>registerClient.jsp</literal></term>
                 <listitem>
                     <para>Enables registration of an OAuth 2.0 client with the OpenAM OAuth 2.0 authorization service.
-                    For details, see the Administration Guide chatper on
+                    For details, see the Administration Guide chapter on
                         <link xlink:href="admin-guide#register-oauth2-client"
                                               xlink:role="http://docbook.org/xlink/role/olink">
                             <citetitle>Managing OAuth 2.0 Authorization</citetitle></link>.
@@ -3389,7 +3389,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>PWResetQuestion.jsp</literal></term>
                 <listitem>
-                    <para>Starts the password reset process by propmting for the User ID. For more information on the
+                    <para>Starts the password reset process by prompting for the User ID. For more information on the
                     process, see the method for the associated <literal>PWResetQuestionModel</literal>, available from
                         the <link xlink:href=
                   "http://download.forgerock.org/downloads/openam/javadocs/internal/com/sun/identity/password/ui/model/PWResetQuestionModel.html
@@ -3633,7 +3633,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <term><literal>spMNIRedirect.jsp</literal></term>
                 <listitem>
                     <para>This particular endpoint handles the <literal>ManageNameIDRequest</literal>
-                        and <literal>ManageNameIDRespnose</literal> messages with the help of HTTP Redirect. Less
+                        and <literal>ManageNameIDResponse</literal> messages with the help of HTTP Redirect. Less
                         commonly used. </para>
                 </listitem>
             </varlistentry>
@@ -3697,7 +3697,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <tertiary>WS Federation</tertiary>
         </indexterm>
 
-        <para>The endpoints described in this section, in the wsfederation/jsp subdirectory, relate to Kantera Alliance
+        <para>The endpoints described in this section, in the wsfederation/jsp subdirectory, relate to Kantara Initiative
             standards that originated with the Liberty Alliance Project Identity Federation Framework.</para>
 
         <variablelist>
@@ -3831,7 +3831,8 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/ui/*</literal></term>
                 <listitem>
-                    <para>Associated with the servlet naemd PWResetServlet, associated with password resets.</para>
+                    <para>Associated with the servlet named PWResetServlet,
+                     associated with password resets.</para>
                 </listitem>
             </varlistentry>
 
@@ -4213,7 +4214,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
             </varlistentry>
 
             <varlistentry>
-                <term><literal>/AuthnQuerySerivceSoap/*</literal></term>
+                <term><literal>/AuthnQueryServiceSoap/*</literal></term>
                 <listitem>
                     <para>Used by a servlet named AuthnQueryServiceSoap. <!-- The associated
                         AuthnQueryServiceSOAP.java file was deleted from at least one of
@@ -4501,7 +4502,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>Used by a servlet named ProcessLogout. Associated with the
                         FSProcessLogoutServlet class. It is designed to handle single logout requests related to
-                        Kantera / Liberty ID-FF processes.
+                        Kantara / Liberty ID-FF processes.
                     </para>
                 </listitem>
             </varlistentry>
@@ -4511,8 +4512,8 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>Used by a servlet named ReturnLogout. Associated with the
                         FSReturnLogoutServlet class. It is designed to handle single logout responses related to
-                        Kantera / Liberty ID-FF processes. (Note the subtle difference with the ProcessLogout endpoint
-                        which handles logout requests.)
+                        Kantara / Liberty ID-FF processes. (Note the subtle
+                     difference with the ProcessLogout endpoint which handles logout requests.)
                     </para>
                 </listitem>
             </varlistentry>
@@ -4522,7 +4523,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>Used by a servlet named LogoutServlet. Associated with the
                         FSSingleLogoutServlet class. It is designed to start single logout requests related to
-                        Kantera / Liberty ID-FF processes.
+                        Kantara / Liberty ID-FF processes.
                     </para>
                 </listitem>
             </varlistentry>
@@ -4763,7 +4764,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                                              xlink:role="http://docbook.org/xlink/role/olink">
                             <citetitle>Using RESTful Web Services</citetitle></link>. In addition, you
                     can read more about associated REST endpoints in <link xlink:href="reference#json-rest-endpoints"
-                    xlink:role="http://docbook.org/xlink/role/olink"></link>
+                    xlink:role="http://docbook.org/xlink/role/olink" />
                     <citetitle>JSON REST Endpoints</citetitle></para>
                 </listitem>
             </varlistentry>

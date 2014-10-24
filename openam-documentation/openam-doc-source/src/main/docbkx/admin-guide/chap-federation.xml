@@ -1045,7 +1045,7 @@ CookieWriterServlet.doGetPost: Redirect to
     </varlistentry>
    </variablelist>
    
-   <variablelist xml:id="idp-service-attibutes">
+   <variablelist xml:id="idp-service-attributes">
     <title>IDP Service Attributes</title>
     <varlistentry>
      <term>Artifact Resolution Service</term>
@@ -1459,7 +1459,7 @@ CookieWriterServlet.doGetPost: Redirect to
     </varlistentry>
    </variablelist>
    
-   <variablelist xml:id="sp-service-attibutes">
+   <variablelist xml:id="sp-service-attributes">
     <title>SP Service Attributes</title>
     <varlistentry>
      <term>Single Logout Service</term>

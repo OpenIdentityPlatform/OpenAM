@@ -135,8 +135,8 @@ attributeTypes: ( temp-custom-attr-oid NAME 'customAttribute' EQUALITY case
  Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 USAGE userApplications )
 -
 add: objectClasses
-objectClasses: ( temp-custom-oc-oid NAME 'customObjectclass' SUP top AUX
- ILIARY MAY customAttribute )</computeroutput>
+objectClasses: ( temp-custom-oc-oid NAME 'customObjectclass' SUP top AUXILIARY
+  MAY customAttribute )</computeroutput>
    </screen>
   </step>
   <step>

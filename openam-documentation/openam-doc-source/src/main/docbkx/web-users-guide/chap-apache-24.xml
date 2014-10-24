@@ -227,7 +227,7 @@ Install log file location:
     <para>If your policy agent configuration is not in the top-level realm (/),
        then you must edit
        <filename>config/OpenSSOAgentBootstrap.properties</filename> to
-       indentify the sub-realm that has your policy agent configuration.
+       identify the sub-realm that has your policy agent configuration.
        Find com.sun.identity.agents.config.organization.name and change
        the / to the path to your policy agent profile. This allows the
        policy agent to properly identify itself to the OpenAM server.</para>

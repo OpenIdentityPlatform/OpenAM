@@ -627,7 +627,7 @@ Finished installing ASP.NET (4.0.30319).</computeroutput>
       </listitem>
       <listitem>
        <para>Replace <literal>FEDLET_DEPLOY_URI</literal> with the URL to the
-       .NET Fedlet, generally theh same as the entity identifier.</para>
+       .NET Fedlet, generally the same as the entity identifier.</para>
       </listitem>
       <listitem>
        <para>Replace <literal>IDP_ENTITY_ID</literal> with the entity identifier

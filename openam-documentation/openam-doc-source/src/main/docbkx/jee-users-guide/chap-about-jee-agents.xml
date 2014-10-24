@@ -118,7 +118,7 @@
      security settings that define role-based access control over the web resources.
      You can define the roles in the descriptor files and then define
      the user's roles within OpenAM, allowing the application to check authorization.
-     JAAS support provides another powerful feture in that you can implement
+     JAAS support provides another powerful feature in that you can implement
      Java EE permissions-related annotations, such as @RolesAllowed and @DeclareRoles,
      which are specifically designed to secure Enterprise Java Bean (EJB) modules
      for authenticated users.

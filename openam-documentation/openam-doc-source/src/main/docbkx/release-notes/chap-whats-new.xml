@@ -600,7 +600,7 @@ Agreement (yes/no): [no]:</screen>
    </para>
 
     <mediaobject xml:id="figure-user-self-register-login-xui">
-     <alt>User Self-Registation Link</alt>
+     <alt>User Self-Registration Link</alt>
      <imageobject >
       <imagedata fileref="images/user-self-register-login-xui.png"
                  format="PNG" />
@@ -615,7 +615,7 @@ Agreement (yes/no): [no]:</screen>
     Register your account page where the user enters his or her email address.</para>
 
    <mediaobject xml:id="figure-register-your-acct">
-    <alt>User Self-Registation Register Your Account</alt>
+    <alt>User Self-Registration Register Your Account</alt>
     <imageobject>
      <imagedata fileref="images/register-your-acct.png"
                 format="PNG" />
@@ -631,7 +631,7 @@ Agreement (yes/no): [no]:</screen>
 
 
     <mediaobject xml:id="figure-user-self-registration-email">
-     <alt>User Self-Registation Email</alt>
+     <alt>User Self-Registration Email</alt>
      <imageobject>
       <imagedata fileref="images/user-self-registration-email.png"
                  format="PNG" />
@@ -649,7 +649,7 @@ Agreement (yes/no): [no]:</screen>
    </para>
 
     <mediaobject xml:id="figure-user-self-registration-xui">
-     <alt>User Self-Registation Account</alt>
+     <alt>User Self-Registration Account</alt>
      <imageobject>
       <imagedata fileref="images/user-self-registration-xui.png"
                  format="PNG" />

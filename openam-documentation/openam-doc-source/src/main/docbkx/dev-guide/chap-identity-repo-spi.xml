@@ -107,7 +107,7 @@ public void removeListener()</programlisting>
    connections to the underlying identity data store.</para>
   </section>
 
-  <section xml:id="idrepo-plugin-capabilties">
+  <section xml:id="idrepo-plugin-capabilities">
    <title>IdRepo Plugin Capabilities</title>
    
    <para>Your IdRepo plugin provides OpenAM with a generic means to manage

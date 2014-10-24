@@ -37,7 +37,7 @@
  </indexterm>
 
  <para>OpenAM provides a login interface called the <emphasis>distributed authentication
-  service (DAS)</emphasis>, deployed within network delimitarized zones
+  service (DAS)</emphasis>, deployed within network demilitarized zones
   to limit OpenAM's exposure to the Internet.
   Login requests through the DAS are forwarded through the internal firewall to
   the OpenAM core server.
