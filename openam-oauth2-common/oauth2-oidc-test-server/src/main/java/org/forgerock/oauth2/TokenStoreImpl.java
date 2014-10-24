@@ -59,7 +59,7 @@ public class TokenStoreImpl implements TokenStore {
         final String code = UUID.randomUUID().toString();
         final long expiryTime = (providerSettings.getAuthorizationCodeLifetime() * 1000) + System.currentTimeMillis();
         final AuthorizationCode authorizationCode = new AuthorizationCode(code, resourceOwnerId, clientId, redirectUri,
-                scope, expiryTime, nonce, null);
+                scope, expiryTime, nonce, null, null);
 
         authorizationCodes.put(code, authorizationCode);
 
@@ -90,7 +90,7 @@ public class TokenStoreImpl implements TokenStore {
         final String id = UUID.randomUUID().toString();
         final long expiryTime = (providerSettings.getRefreshTokenLifetime() * 1000) + System.currentTimeMillis();
 
-        final RefreshToken refreshToken = new RefreshToken(id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, "Bearer", OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType, null);
+        final RefreshToken refreshToken = new RefreshToken(id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, "Bearer", OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType, null, null);
 
         refreshTokens.put(id, refreshToken);
 
