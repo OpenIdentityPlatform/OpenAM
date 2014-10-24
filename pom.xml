@@ -117,7 +117,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Version Properties -->
-        <opendj.server.version>2.6.0</opendj.server.version>
+        <opendj.server.version>2.6.2</opendj.server.version>
         <opendj.sdk.version>2.6.9</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.3.5-SNAPSHOT</commons.forgerock-util.version>
@@ -155,7 +155,7 @@
         <jaxrpc-impl.version>1.1.3_01-041406</jaxrpc-impl.version>
         <jaxrpc-spi.version>1.1.3_01</jaxrpc-spi.version>
         <jdom.version>2.0.1</jdom.version>
-        <je.version>5.0.73</je.version>
+        <je.version>5.0.104</je.version>
         <jersey-bundle.version>1.1.1-ea</jersey-bundle.version>
         <jato.version>2005-05-04</jato.version>
         <cc-ui.version>2008-08-08</cc-ui.version>
@@ -443,6 +443,15 @@
             <releases>
                 <enabled>true</enabled>
             </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>oracle-repository</id>
+            <name>Oracle Repository</name>
+            <url>http://download.oracle.com/maven</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
