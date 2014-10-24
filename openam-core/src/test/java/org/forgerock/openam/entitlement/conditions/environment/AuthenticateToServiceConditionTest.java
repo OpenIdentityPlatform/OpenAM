@@ -140,7 +140,32 @@ public class AuthenticateToServiceConditionTest {
         //Then
         assertThat(decision.isSatisfied()).isFalse();
         assertThat(decision.getAdvices()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
-                Collections.singleton("SERVICE_NAME")));
+                Collections.singleton("REALM:SERVICE_NAME")));
+    }
+
+    @Test
+    public void conditionShouldNotAlterARealmQualifiedServiceString()
+            throws EntitlementException {
+
+        //Given
+        String realm = "REALM";
+        Subject subject = new Subject();
+        String resourceName = "RESOURCE_NAME";
+        Map<String, Set<String>> env = new HashMap<String, Set<String>>();
+        Set<String> services = new HashSet<String>();
+
+        given(coreWrapper.getRealmFromRealmQualifiedData("SERVICE_NAME")).willReturn("REALM");
+        services.add("OTHER_SERVICE_NAME");
+        env.put(REQUEST_AUTHENTICATED_TO_SERVICES, services);
+        condition.setState("{\"authenticateToService\": \"REALM:SERVICE_NAME\"}");
+
+        //When
+        ConditionDecision decision = condition.evaluate(realm, subject, resourceName, env);
+
+        //Then
+        assertThat(decision.isSatisfied()).isFalse();
+        assertThat(decision.getAdvices()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
+                Collections.singleton("REALM:SERVICE_NAME")));
     }
 
     @Test
@@ -189,7 +214,7 @@ public class AuthenticateToServiceConditionTest {
         //Then
         assertThat(decision.isSatisfied()).isFalse();
         assertThat(decision.getAdvices()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
-                Collections.singleton("SERVICE_NAME")));
+                Collections.singleton("REALM:SERVICE_NAME")));
     }
 
     @Test
@@ -242,7 +267,7 @@ public class AuthenticateToServiceConditionTest {
         //Then
         assertThat(decision.isSatisfied()).isFalse();
         assertThat(decision.getAdvices()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
-                Collections.singleton("SERVICE_NAME")));
+                Collections.singleton("REALM:SERVICE_NAME")));
     }
 
     @Test
@@ -295,6 +320,6 @@ public class AuthenticateToServiceConditionTest {
         //Then
         assertThat(decision.isSatisfied()).isFalse();
         assertThat(decision.getAdvices()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
-                Collections.singleton("SERVICE_NAME")));
+                Collections.singleton("REALM:SERVICE_NAME")));
     }
 }

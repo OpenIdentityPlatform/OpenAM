@@ -20,23 +20,23 @@
 package org.forgerock.openam.entitlement.conditions.environment;
 
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.util.AMAuthUtils;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
+import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import javax.security.auth.Subject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
+import javax.security.auth.Subject;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_SERVICE;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_AUTHENTICATED_TO_SERVICES;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * An implementation of an {@link com.sun.identity.entitlement.EntitlementCondition} that will check whether the
@@ -142,22 +142,39 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
         }
 
         Map<String, Set<String>> advices = new HashMap<String, Set<String>>();
+        final String realmAwareService = getRealmAwareService(authenticateToService, realm);
+
         if (!allowed) {
             Set<String> adviceMessages = new HashSet<String>(1);
-            adviceMessages.add(authenticateToService);
+
+            adviceMessages.add(realmAwareService);
             advices.put(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE, adviceMessages);
             if (debug.messageEnabled()) {
                 debug.message("At AuthenticateToServiceCondition.getConditionDecision():authenticateToService not "
-                        + "satisfied = " + authenticateToService);
+                        + "satisfied = " + realmAwareService);
             }
         }
 
         if (debug.messageEnabled()) {
             debug.message("At AuthenticateToServiceCondition.getConditionDecision():authenticateToService = "
-                    + authenticateToService + "," + " requestAuthnServices = " + requestAuthnServices + ", "
+                    + realmAwareService + "," + " requestAuthnServices = " + requestAuthnServices + ", "
                     + " allowed = " + allowed);
         }
         return new ConditionDecision(allowed, advices);
+    }
+
+    /**
+     * Confirms that the String is in the format /:service, by validating that
+     * there is a colon in the String - as per
+     * {@link com.sun.identity.authentication.util.AMAuthUtils#getDataFromRealmQualifiedData}.
+     */
+    private String getRealmAwareService(String authenticateToService, String realm) {
+
+        if (!authenticateToService.contains(ISAuthConstants.COLON)) {
+            return realm + ISAuthConstants.COLON + authenticateToService;
+        }
+
+        return authenticateToService;
     }
 
     private JSONObject toJSONObject() throws JSONException {
