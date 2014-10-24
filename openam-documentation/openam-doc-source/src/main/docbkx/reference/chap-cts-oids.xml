@@ -131,27 +131,14 @@ I don't think it's a big deal, but am not sure. -->
     <literal>enterprises.36733.1.2.999.1.1.2</literal></para>
 
    <para>
-    The options for the token table are shown in the following diagram
-    and table. For example, the token table OID for SAML 2 is based on
+    The options for the token table are shown in the following table.
+    For example, the token table OID for SAML 2 is based on
     the entries associated with ForgeRock, <literal>enterprises.36733</literal>,
     OpenAM <literal>1</literal>, SNMP <literal>2</literal>, CTS Monitoring
     <literal>999</literal>, token table <literal>1</literal>, entry
     <literal>1</literal>, and SAML 2 <literal>2</literal>, which is
     <literal>enterprises.36733.1.2.999.1.1.2</literal>.
    </para>
-   <mediaobject xml:id="cts-token-table-diagram">
-    <alt>
-     Diagram of CTS Token Table OIDs
-    </alt>
-    <imageobject>
-     <imagedata fileref="images/cts-token-table.png" format="PNG" />
-    </imageobject>
-    <textobject>
-     <para>A visual diagram of Token Table OIDs related to the
-      Core Token Service.</para>
-    </textobject>
-   </mediaobject>
-
 
    <table xml:id="cts-monitoring-oid-token-types">
     <title>CTS Monitoring OID Categories</title>
@@ -200,21 +187,8 @@ I don't think it's a big deal, but am not sure. -->
    </para>
 
    <para>
-    The options for the operation table are shown in the following diagram
-    and table.
+    The options for the operation table are shown in the following table.
    </para>
-   <mediaobject xml:id="cts-ops-table-diagram">
-    <alt>
-     Diagram of CTS Operations Table OIDs
-    </alt>
-    <imageobject>
-     <imagedata fileref="images/cts-ops-table.png" format="PNG" />
-    </imageobject>
-    <textobject>
-     <para>A visual diagram of Operation Table OIDs related to the
-      Core Token Service.</para>
-    </textobject>
-   </mediaobject>
 
    <table xml:id="cts-monitoring-oid-op-type">
     <title>CTS Monitoring Operation Types</title>
@@ -266,23 +240,11 @@ I don't think it's a big deal, but am not sure. -->
    </para>
 
    <para>
-    The options for the CRUD operations table are shown in the following diagram
-    and tables. Each value from <literal>cumulativeCount</literal> to
+    The options for the CRUD operations table are shown in the following tables.
+    Each value from <literal>cumulativeCount</literal> to
     <literal>failureMinimum</literal> is associated with CRUD and List
     operations.
    </para>
-   <mediaobject xml:id="cts-crudops-table-diagram">
-    <alt>
-     Diagram of CRUD Operations Table CTS OIDs
-    </alt>
-    <imageobject>
-     <imagedata fileref="images/cts-crudops-table.png" format="PNG" />
-    </imageobject>
-    <textobject>
-     <para>A visual diagram of Operations Table OIDs related to the
-      Core Token Service.</para>
-    </textobject>
-   </mediaobject>
 
    <table xml:id="cts-monitoring-oid-ops-entries">
     <title>CTS CRUD Operation Entries</title>
@@ -701,25 +663,13 @@ I don't think it's a big deal, but am not sure. -->
 
    <para>
     The options for CRUD operations, by token type, are shown in the following
-    diagram and tables. Each entry between <literal>cumulativeCount</literal>,
+    tables. Each entry between <literal>cumulativeCount</literal>,
     and <literal>minimum</literal> is associated with the four basic token
     types: <literal>Session</literal>, <literal>SAML 2</literal>,
     <literal>OAuth2</literal>, and <literal>REST</literal>. Each token type
     is used in CRUD and List operations. So the following tables describe 80
     different OIDs.
    </para>
-   <mediaobject xml:id="cts-crudops-tokentype-diagram">
-    <alt>
-     Diagram of CRUD Operations Table CTS OIDs
-    </alt>
-    <imageobject>
-     <imagedata fileref="images/cts-crudops-tokentype.png" format="PNG" />
-    </imageobject>
-    <textobject>
-     <para>A visual diagram of Operation Table OIDs related to the
-      Core Token Service.</para>
-    </textobject>
-   </mediaobject>
 
    <para>For tokens in this section, the following table specifies the base OIDs
    for various values. The token type (Session, SAML2, OAuth 2, REST), followed
@@ -1570,22 +1520,10 @@ I don't think it's a big deal, but am not sure. -->
    along with their average current lifetimes.</para>
 
    <para>
-    The options for Token Operations are shown in the following diagram
-    and tables. Total and Average Current Lifetimes are associated with
+    The options for Token Operations are shown in the following tables.
+    Total and Average Current Lifetimes are associated with
     the four basic token types: Session, SAML 2, OAuth 2, and REST.
    </para>
-   <mediaobject xml:id="cts-token-ops-diagram">
-    <alt>
-     Diagram of CTS Token Operations OIDs
-    </alt>
-    <imageobject>
-     <imagedata fileref="images/cts-token-ops.png" format="PNG" />
-    </imageobject>
-    <textobject>
-     <para>A visual diagram of Token Operation OIDs related to the
-      Core Token Service.</para>
-    </textobject>
-   </mediaobject>
 
    <table xml:id="cts-token-totals" pgwide="1">
     <title>CTS Total Tokens, by Type</title>
@@ -1674,22 +1612,6 @@ I don't think it's a big deal, but am not sure. -->
 
    <!-- I could say "By default, the CTS Reaper is run in 60 second periods."
     but that should be variable.-->
-   <para>
-    For completeness, the one OID related to the CTS Reaper is shown in
-    the following diagram.
-   </para>
-   <mediaobject xml:id="cts-reaper-diagram">
-    <alt>
-     Diagram of the CTS Reaper Operations OID
-    </alt>
-    <imageobject>
-     <imagedata fileref="images/cts-reaper.png" format="PNG" />
-    </imageobject>
-    <textobject>
-     <para>A visual diagram of the CTS Reaper Operations OID related to the
-      Core Token Service.</para>
-    </textobject>
-   </mediaobject>
 
    <para>
     One OID relates to the CTS Reaper, which specifies the average rate of
@@ -1721,26 +1643,8 @@ I don't think it's a big deal, but am not sure. -->
     </para>
 
    <para>
-    The following diagram describes the OIDs related to the
-    CTSConnectionFactory. A <literal>cumulativeCount</literal>,
-    <literal>average</literal>, <literal>success</literal>, and
-    <literal>failure</literal> OID is associated with CTSConnectionFactory
-    success and failure.
+    The following tables list the OIDs related to the CTSConnectionFactory.
    </para>
-   <mediaobject xml:id="cts-connections-diagram">
-    <alt>
-     Diagram of the CTS Reaper Operations OID
-    </alt>
-    <imageobject>
-     <imagedata fileref="images/cts-connections.png" format="PNG" />
-    </imageobject>
-    <textobject>
-     <para>A visual diagram of CTSConnectionFactory OIDs related to the
-      Core Token Service.</para>
-    </textobject>
-   </mediaobject>
-
-
 
    <table xml:id="cts-token-factory-success" pgwide="1">
     <title>CTSConnectionFactory, Successful Connections</title>
