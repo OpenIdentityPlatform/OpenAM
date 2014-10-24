@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-ports-used'
@@ -91,12 +91,13 @@
                  <entry>50389, 50899, 58989</entry>
                  <entry>Supports LDAP communication between embedded OpenAM data stores.</entry>
              </row>
-             <row>
-                 <entry>57943, 58943</entry>
-                 <entry>Used by the <link xlink:show="new" xlink:href="admin-guide#securid-module-conf-hints"
-                 xlink:role="http://docbook.org/xlink/role/olink"><citetitle>SecurID Authentication
-                 Module</citetitle></link>.</entry>
-             </row>
+
+             <xinclude:include href="../shared/securid/row-ports-used${skipSecurID}.xml">
+              <xinclude:fallback>
+               <!-- Module not present in nightly builds -->
+              </xinclude:fallback>
+             </xinclude:include>
+
          </tbody>
 
      </tgroup>

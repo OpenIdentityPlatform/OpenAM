@@ -82,15 +82,6 @@
     UI installations for example.</para>
    </listitem>
 
-<!-- Fix for OpenAM-699
-   <listitem>
-    <para>RSA has marked the RSA Authentication API used in earlier versions of
-    OpenAM as End of Life. The current API version used in OpenAM is now 8.1.
-    As a result, OpenAM now supports RSA Authentication Manager versions 6.1.2
-    and 7.1.</para>
-   </listitem>
- -->
-
    <listitem>
     <para>In versions before OpenAM 10.1.0 the default root suffix DN for OpenAM
     configuration and profile data was <literal>dc=opensso,dc=java,dc=net</literal>.

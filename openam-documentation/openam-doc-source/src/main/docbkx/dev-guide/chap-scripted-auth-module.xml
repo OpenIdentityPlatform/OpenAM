@@ -29,7 +29,8 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Scripted Authentication</title>
 
  <para>
@@ -188,7 +189,11 @@
     LDAP,
     Membership,
     RADIUS,
-    SecurID,
+    <xinclude:include href="../shared/securid/phrase-scripted-auth-module.xml${skipSecurID}">
+     <xinclude:fallback>
+      <!-- Module not present in nightly builds -->
+     </xinclude:fallback>
+    </xinclude:include>
     Windows Desktop SSO,
     &amp; Windows NT
     authentication modules.
@@ -260,7 +265,11 @@
          LDAP,
          Membership,
          RADIUS,
-         SecurID,
+         <xinclude:include href="../shared/securid/phrase-scripted-auth-module${skipSecurID}.xml">
+          <xinclude:fallback>
+           <!- - Module not present in nightly builds - ->
+          </xinclude:fallback>
+         </xinclude:include>
          Windows Desktop SSO,
          &amp; Windows NT
          authentication modules
@@ -287,7 +296,11 @@
          LDAP,
          Membership,
          RADIUS,
-         SecurID,
+         <xinclude:include href="../shared/securid/phrase-scripted-auth-module${skipSecurID}.xml">
+          <xinclude:fallback>
+           <!- - Module not present in nightly builds - ->
+          </xinclude:fallback>
+         </xinclude:include>
          &amp; Windows NT
          authentication modules
         </para>
@@ -1301,7 +1314,7 @@ var response = httpClient.post("http://example.com:8080/openam/json/authenticate
     The following table lists the methods
     of the <literal>requestData</literal> object. Note that this object differs
     from the client-side <literal>requestData</literal> object (see
-     <xref linkend="scripted-auth-module-http-client-methods">HTTP Client Methods</xref>)
+     <xref linkend="scripted-auth-module-http-client-methods" />)
     and contains information about the original authentication request made by the user.
    </para>
 

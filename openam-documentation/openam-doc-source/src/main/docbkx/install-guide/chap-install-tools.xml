@@ -424,90 +424,15 @@ Installing OpenAM configuration store in /home/openam/openam/... ...Success.
 Creating OpenAM suffixImport+task+ ... ...Success
 Tag swapping schema files....Success.
 Loading Schema opendj_config_schema.ldif...Success.
-Loading Schema opendj_user_schema.ldif...Success.
-Loading Schema opendj_embinit.ldif...Success.
-Loading Schema opendj_user_index.ldif...Success.
-Loading Schema opendj_plugin.ldif...Success.
-Loading Schema cts-container.ldif...Success.
-Loading Schema cts-add-schema.ldif...Success.
-Loading Schema cts-indices.ldif...Success.
-Loading Schema opendj_dashboard.ldif...Success.
-Loading Schema opendj_deviceprint.ldif...Success.
+
+...
+
 ...Success.
 Reinitializing system properties....Done
 Registering service dashboardService.xml...Success.
-Registering service amEntrySpecific.xml...Success.
-Registering service amAuthConfig.xml...Success.
-Registering service amAuthHTTPBasic.xml...Success.
-Registering service amAdminConsole.xml...Success.
-Registering service idRepoService.xml...Success.
-Registering service amAuth.xml...Success.
-Registering service amAuthAD.xml...Success.
-Registering service amAuthAdaptive.xml...Success.
-Registering service amAuthAnonymous.xml...Success.
-Registering service amAuthCert.xml...Success.
-Registering service amAuthDataStore.xml...Success.
-Registering service amAuthPersistentCookie.xml...Success.
-Registering service amAuthDevicePrintModule.xml...Success.
-Registering service amAuthJDBC.xml...Success.
-Registering service amAuthLDAP.xml...Success.
-Registering service amAuthMSISDN.xml...Success.
-Registering service amAuthMembership.xml...Success.
-Registering service amAuthNT.xml...Success.
-Registering service amAuthOAuth.xml...Success.
-Registering service amAuthWindowsDesktopSSO.xml...Success.
-Registering service amAuthOpenIdConnect.xml...Success.
-Registering service amClientData.xml...Success.
-Registering service amClientDetection.xml...Success.
-Registering service amDelegation.xml...Success.
-Registering service amFilteredRole.xml...Success.
-Registering service amG11NSettings.xml...Success.
-Registering service amLogging.xml...Success.
-Registering service amNaming.xml...Success.
-Registering service amPlatform.xml...Success.
-Registering service amPolicy.xml...Success.
-Registering service amPolicyConfig.xml...Success.
-Registering service amRealmService.xml...Success.
-Registering service amSession.xml...Success.
-Registering service amWebAgent.xml...Success.
-Registering service crestPolicyService.xml...Success.
-Registering service amUser.xml...Success.
-Registering service identityLocaleService.xml...Success.
-Registering service amAgent70.xml...Success.
-Registering service amPasswordReset.xml...Success.
-Registering service amAuthRadius.xml...Success.
-Registering service amAuthHOTP.xml...Success.
-Registering service amAuthSecurID.xml...Success.
-Registering service amMonitoring.xml...Success.
-Registering service AgentService.xml...Success.
-Registering service policyIndex.xml...Success.
-Registering service entitlement.xml...Success.
-Registering service openProvisioning.xml...Success.
-Registering service banking.xml...Success.
-Registering service CoreTokenConfig.xml...Success.
-Registering service CoreTokenStore.xml...Success.
-Registering service amAuthOATH.xml...Success.
-Registering service fmAuthFederation.xml...Success.
-Registering service fmAuthSAE.xml...Success.
-Registering service fmAuthnSvc.xml...Success.
-Registering service fmDisco.xml...Success.
-Registering service fmIDFF.xml...Success.
-Registering service fmLibertyPersonalProfile.xml...Success.
-Registering service fmCOTConfig.xml...Success.
-Registering service fmSAML2.xml...Success.
-Registering service fmSAML.xml...Success.
-Registering service fmSOAPBinding.xml...Success.
-Registering service fmSAML2SOAPBinding.xml...Success.
-Registering service fmWSFederation.xml...Success.
-Registering service fmMultiProtocol.xml...Success.
-Registering service famSTS.xml...Success.
-Registering service famFederationCommon.xml...Success.
-Registering service famIDFFConfig.xml...Success.
-Registering service famSAML2Config.xml...Success.
-Registering service famWSSAuthService.xml...Success.
-Registering service OAuth2Provider.xml...Success.
-Registering service MailServer.xml...Success.
-Registering service RestSecurity.xml...Success.
+
+...
+
 Configuring system....Done
 Configuring server instance....Done
 Creating demo user....Done

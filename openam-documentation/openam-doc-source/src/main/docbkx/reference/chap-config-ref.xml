@@ -29,7 +29,8 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Configuration Reference</title>
 
  <indexterm><primary>Configuration</primary></indexterm>
@@ -5855,13 +5856,11 @@
     </listitem>
    </varlistentry>
 
-   <varlistentry>
-    <term><literal>securidHelper.ports</literal></term>
-    <listitem>
-     <para>Port on which SecurID daemon listens.</para>
-     <para>Default: 58943</para>
-    </listitem>
-   </varlistentry>
+   <xinclude:include href="../shared/securid/varlistentry-config-ref.xml${skipSecurID}">
+    <xinclude:fallback>
+     <!-- Module not present in nightly builds -->
+    </xinclude:fallback>
+   </xinclude:include>
 
    <varlistentry>
     <term><literal>ssoadm.disabled</literal></term>

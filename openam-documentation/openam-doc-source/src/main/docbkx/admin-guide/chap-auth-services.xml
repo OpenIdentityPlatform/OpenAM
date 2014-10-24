@@ -2016,9 +2016,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
       by SMS or email, prompting the user to enter a password.
      </para>
      <para>
-      You can also use any other module that provides two-factor authentication,
-      such as SecurID. For information on the SecurID module, see
-      <xref linkend="securid-module-conf-hints"/>.
+      You can also use any other module that provides two-factor authentication.
      </para>
      <para>
       After the HOTP has successfully validated the user, the Device ID (Save)
@@ -4459,41 +4457,11 @@ ssoadm \
    </variablelist>
   </section>
 
-  <section xml:id="securid-module-conf-hints">
-   <title>Hints For the SecurID Authentication Module</title>
-   <para>The SecurID module lets OpenAM authenticate users with RSA
-   Authentication Manager software and RSA SecurID authenticators.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>SecurID</secondary>
-   </indexterm>
-   
-   <para><command>ssoadm</command> service name:
-   <literal>iPlanetAMAuthSecurIDService</literal></para>
-   
-   <variablelist>
-    <varlistentry>
-     <term>ACE/Server Configuration Path</term>
-     <listitem>
-      <para>Specify the directory in which the SecurID ACE/Server
-      <filename>sdconf.rec</filename> file is located, which by default is
-      expected under the configuration directory for OpenAM, such as
-      <filename>$HOME/openam/openam/auth/ace/data</filename>. The directory
-      must exist before OpenAM can use SecurID authentication.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-securid-server-config-path</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Authentication Level</term>
-     <listitem>
-      <para>Sets the authentication level used to indicate the level of security
-      associated with the module. The value can range from 0 to any positive integer.</para>
-      <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-auth-securid-auth-level</literal></para></listitem>
-    </varlistentry>
-   </variablelist>
-  </section>
+  <xinclude:include href="../shared/securid/section-auth-services.xml${skipSecurID}">
+   <xinclude:fallback>
+    <!-- Module not present in nightly builds -->
+   </xinclude:fallback>
+  </xinclude:include>
   
   <section xml:id="desktop-module-conf-hints">
    <title>Hints For the Windows Desktop SSO Authentication Module</title>

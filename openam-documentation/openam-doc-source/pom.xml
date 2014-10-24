@@ -141,6 +141,9 @@
         <products-basedir>${basedir}</products-basedir>
         <gaId>UA-23412190-7</gaId>
 
+        <!-- Empty this property to build release docs, e.g. -DskipSecurID="" -->
+        <skipSecurID>yes</skipSecurID>
+
         <!--
           Release date and publication date are set at release build time.
             -D"releaseDate=Software release date: January 1, 1970"
