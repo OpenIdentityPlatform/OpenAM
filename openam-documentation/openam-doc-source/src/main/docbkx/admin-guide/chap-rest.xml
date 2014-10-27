@@ -102,9 +102,8 @@
    </step>
 
    <step performance="optional">
-    <para>Optionally, enable 'Warning Header' to include a warning
-     in the headers of responses to requests that do not contain
-     the <literal>Accept-API-Version</literal> header.</para>
+    <para>Optionally, enable 'Warning Header' to include warning messages in the
+     headers of responses to requests.</para>
    </step>
 
    <step>
