@@ -27,18 +27,13 @@
 --%>
 
 <%--
-   Portions Copyrighted 2010-2013 ForgeRock Inc
+   Portions copyright 2010-2014 ForgeRock AS.
 --%>
 
 <%@ page import="com.iplanet.am.util.SystemProperties" %>
-<%@ page import="com.iplanet.sso.*" %>
 <%@ page import="com.sun.identity.cli.*" %>
 <%@ page import="com.sun.identity.shared.Constants" %>
 <%@ page import="java.text.MessageFormat" %>
-<%@ page import="com.sun.identity.common.DNUtils" %>
-<%@ page import="com.sun.identity.idm.AMIdentity" %>
-<%@ page import="com.sun.identity.idm.IdType" %>
-<%@ page import="java.util.ResourceBundle" %>
 
 <%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -62,6 +57,17 @@
     <table class="SkpMedGry1" border="0" cellpadding="5" cellspacing="0" width="100%"><tr><td><img src="com_sun_web_ui/images/other/dot.gif" alt="Jump to End of Masthead" border="0" height="1" width="1" /></a></td></tr></table>
     <table border="0" cellpadding="10" cellspacing="0" width="100%"><tr><td></td></tr></table>
 
+<%@ include file="/WEB-INF/jsp/admincheck.jsp" %>
+<%
+
+    SSOToken ssoToken = requireAdminSSOToken(request, response, out, "showServerConfig.jsp");
+    if (ssoToken == null) {
+%>
+</body></html>
+<%
+        return;
+    }
+%>
 <table cellpadding=5>
 <tr>
 <td>
@@ -70,49 +76,23 @@
 <%
     String strDisabled = SystemProperties.get("ssoadm.disabled", "true");
     if (Boolean.parseBoolean(strDisabled)) {
-        response.sendRedirect(SystemProperties.get(
-            Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR));
+        response.sendRedirect(SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR));
+
     } else {
+
         try {
-            SSOTokenManager manager = SSOTokenManager.getInstance();
-            SSOToken ssoToken = manager.createSSOToken(request);
-            String adminUserDN = "";
-            AMIdentity adminUserId = null;
-
-            // This will give you the 'amAdmin' user dn
-            String adminUser = SystemProperties.get(
-            "com.sun.identity.authentication.super.user");
-            if (adminUser != null) {
-                adminUserDN = DNUtils.normalizeDN(adminUser);
-                // This will give you the 'amAdmin' Identity
-                adminUserId = new AMIdentity(ssoToken, adminUser,
-                    IdType.USER, "/", null);
-            }
-
-            // This will be your incoming user/token.
-            AMIdentity user = new AMIdentity(ssoToken);
-
-            if ((!adminUserDN.equals(DNUtils.normalizeDN(
-                ssoToken.getPrincipal().getName()))) &&
-                (!user.equals(adminUserId))) {
-    
-                out.println(ResourceBundle.getBundle("encode", request.getLocale()).getString("no.permission"));
-                return;
-            }
-
-            WebCLIHelper helper = new WebCLIHelper(request,
-                "com.sun.identity.cli.AccessManager,com.sun.identity.federation.cli.FederationManager",
-                "ssoadm", request.getContextPath() + "/ssoadm.jsp");
+            WebCLIHelper helper = new WebCLIHelper(
+                    request,
+                    "com.sun.identity.cli.AccessManager,com.sun.identity.federation.cli.FederationManager",
+                    "ssoadm",
+                    request.getContextPath() + "/ssoadm.jsp");
             out.println(helper.getHTML(request, ssoToken));
             Object[] param = {"0"};
-            out.println(MessageFormat.format(
-                CLIConstants.JSP_EXIT_CODE_TAG, param));
-        } catch (SSOException e) {
-            response.sendRedirect("UI/Login?goto=../ssoadm.jsp");
+            out.println(MessageFormat.format(CLIConstants.JSP_EXIT_CODE_TAG, param));
+
         } catch (CLIException e) {
             Object[] param = {Integer.toString(e.getExitCode())};
-            out.println(MessageFormat.format(
-                CLIConstants.JSP_EXIT_CODE_TAG, param));
+            out.println(MessageFormat.format(CLIConstants.JSP_EXIT_CODE_TAG, param));
             out.println(WebCLIHelper.escapeTags(e.getMessage()));
         }
     }

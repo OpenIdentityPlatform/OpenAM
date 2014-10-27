@@ -1,7 +1,7 @@
 <%--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
 
     The contents of this file are subject to the terms
     of the Common Development and Distribution License
@@ -23,17 +23,8 @@
 
 --%>
 
-<%--
-   Portions Copyrighted 2013 ForgeRock Inc
---%>
-
-<%@ page language="java"
-         import="java.security.AccessController,
-                 com.sun.identity.security.AdminTokenAction,
-                 com.iplanet.sso.SSOTokenManager,
-                 com.iplanet.sso.SSOException,
-                 com.iplanet.sso.SSOToken"
-        %>
+<%@ page language="java" %>
+<%@ page import="com.iplanet.sso.SSOToken" %>
 <%@ page import="com.sun.identity.sm.*" %>
 <%@ page import="java.util.*" %>
 
@@ -181,8 +172,19 @@
         <td></td>
     </tr>
 </table>
+<%@ include file="/WEB-INF/jsp/admincheck.jsp" %>
+<%
 
-<table cellpadding=15>
+    SSOToken ssoToken = requireAdminSSOToken(request, response, out, "showServerConfig.jsp");
+    if (ssoToken == null) {
+%>
+</body></html>
+<%
+        return;
+    }
+
+%>
+    <table cellpadding=15>
     <tr>
         <td>
 
@@ -240,18 +242,7 @@
 
             <%
 
-                // Get valid SSOToken (must be logged in as amadmin)
-                SSOTokenManager sMgr;
-                SSOToken token;
-                try {
-                    sMgr = SSOTokenManager.getInstance();
-                    token = sMgr.createSSOToken(request);
-                } catch (SSOException e) {
-                    response.sendRedirect("UI/Login?goto=../services.jsp");
-                    return;
-                }
-
-                ServiceManager sm = new ServiceManager(token);
+                ServiceManager sm = new ServiceManager(ssoToken);
                 Set serviceNames = sm.getServiceNames();
 
                 for (Object o : serviceNames) {

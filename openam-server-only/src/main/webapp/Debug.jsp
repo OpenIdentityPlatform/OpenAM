@@ -27,21 +27,13 @@
 --%>
 
 <%--
-   Portions Copyrighted 2010-2013 ForgeRock Inc
+   Portions copyright 2010-2014 ForgeRock AS.
 --%>
 
 <%@ page pageEncoding="UTF-8" %>
 <%@ page 
     import="
-        com.iplanet.sso.SSOException,
         com.iplanet.sso.SSOToken,
-        com.iplanet.sso.SSOTokenManager,
-        com.iplanet.am.util.SystemProperties,
-        com.sun.identity.common.DNUtils,
-        com.sun.identity.idm.AMIdentity,
-        com.sun.identity.idm.IdRepoException,
-        com.sun.identity.idm.IdType,
-        com.sun.identity.idm.IdUtils,
         com.sun.identity.shared.debug.Debug,
         com.sun.identity.shared.encode.Hash,
         java.text.MessageFormat,
@@ -49,98 +41,12 @@
         java.util.Enumeration,
         java.util.Collections,
         java.util.HashMap,
-        java.util.HashSet,
         java.util.Iterator,
         java.util.List,
         java.util.Map,
         java.util.MissingResourceException,
         java.util.ResourceBundle,
-        java.util.Set,
-        java.util.StringTokenizer,
-        com.sun.identity.shared.ldap.util.DN,
         org.owasp.esapi.ESAPI"
-%>
-
-<% 
-    String category = request.getParameter("category");
-    String instance = request.getParameter("instance");
-    String level = request.getParameter("level");
-    if (!ESAPI.validator().isValidInput("category", category, "HTTPParameterValue", 512, true)
-        || !ESAPI.validator().isValidInput("instance", instance, "HTTPParameterValue", 512, true)
-        || !ESAPI.validator().isValidInput("level", level, "HTTPParameterValue", 512, true)) {
-        //Invalid values received, let's null them out and ignore them.
-        category = null;
-        instance = null;
-        level = null;
-    }
-    boolean performAction = Boolean.valueOf(request.getParameter("do")).
-        booleanValue();
-
-    ResourceBundle resourceBundle = ResourceBundle.getBundle("debug", request.getLocale());
-    ResourceBundle rbFiles = ResourceBundle.getBundle("debugfiles");
-    Map categories = new HashMap();
-    String adminUserDN = "";
-    List<String> instances = new ArrayList<String>();
-    AMIdentity adminUserId = null;
-    String formToken = null;
-    try {
-        SSOTokenManager sMgr = SSOTokenManager.getInstance();
-        SSOToken ssoToken = sMgr.createSSOToken(request);
-
-        // This will give you the 'amAdmin' user dn
-        String adminUser = SystemProperties.get(
-            "com.sun.identity.authentication.super.user");
-        if (adminUser != null) {
-            adminUserDN = DNUtils.normalizeDN(adminUser);
-            // This will give you the 'amAdmin' Identity
-            adminUserId = new AMIdentity(ssoToken, adminUser,
-                IdType.USER, "/", null);
-        }
-
-        // This will be your incoming user/token.
-        AMIdentity user = new AMIdentity(ssoToken);
-
-        if ((!adminUserDN.equals(DNUtils.normalizeDN(
-            ssoToken.getPrincipal().getName()))) &&
-            (!user.equals(adminUserId))) {
-
-            out.println(resourceBundle.getString("message-no-privileges"));
-            return;
-        }
-        formToken = Hash.hash(ssoToken.getTokenID().toString());
-
-        // Make a copy to prevent ConcurrentModificationException
-        List<Debug> temp = new ArrayList<Debug>(Debug.getInstances());
-        for (Debug debug : temp) {
-            instances.add(debug.getName());
-        }
-        Collections.sort(instances);
-        for (Enumeration e = rbFiles.getKeys();
-            e.hasMoreElements();
-        ) {
-            String key = (String)e.nextElement();
-            String val = rbFiles.getString(key);
-            List lst = (List) categories.get(val);
-            if (lst == null) {
-                lst = new ArrayList();
-             }
-             lst.add(key);
-             categories.put(val, lst);
-          }
-    } catch (SSOException e) {
-        response.sendRedirect("UI/Login?goto=../Debug.jsp");
-        return;
-    } catch (MissingResourceException e) {
-        out.println(e.getMessage());
-        return;
-    }
-    if (performAction) {
-        String receivedToken = request.getParameter("formToken");
-        if (!formToken.equals(receivedToken)) {
-            out.println("Invalid form token provided!");
-            return;
-        }
-    }
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -163,14 +69,77 @@
     <table class="SkpMedGry1" border="0" cellpadding="5" cellspacing="0" width="100%"><tr><td><img src="com_sun_web_ui/images/other/dot.gif" alt="Jump to End of Masthead" border="0" height="1" width="1" /></a></td></tr></table>
     <table border="0" cellpadding="10" cellspacing="0" width="100%"><tr><td></td></tr></table>
 
+<%@ include file="/WEB-INF/jsp/admincheck.jsp" %>
+<%
+
+    SSOToken ssoToken = requireAdminSSOToken(request, response, out, "showServerConfig.jsp");
+    if (ssoToken == null) {
+%>
+</body></html>
+<%
+        return;
+    }
+
+    String category = request.getParameter("category");
+    String instance = request.getParameter("instance");
+    String level = request.getParameter("level");
+    if (!ESAPI.validator().isValidInput("category", category, "HTTPParameterValue", 512, true)
+            || !ESAPI.validator().isValidInput("instance", instance, "HTTPParameterValue", 512, true)
+            || !ESAPI.validator().isValidInput("level", level, "HTTPParameterValue", 512, true)) {
+        //Invalid values received, let's null them out and ignore them.
+        category = null;
+        instance = null;
+        level = null;
+    }
+    boolean performAction = Boolean.valueOf(request.getParameter("do"));
+
+    ResourceBundle resourceBundle = ResourceBundle.getBundle("debug", request.getLocale());
+    ResourceBundle rbFiles = ResourceBundle.getBundle("debugfiles");
+    Map categories = new HashMap();
+    List<String> instances = new ArrayList<String>();
+    String formToken;
+    try {
+
+        formToken = Hash.hash(ssoToken.getTokenID().toString());
+
+        // Make a copy to prevent ConcurrentModificationException
+        List<Debug> temp = new ArrayList<Debug>(Debug.getInstances());
+        for (Debug debug : temp) {
+            instances.add(debug.getName());
+        }
+        Collections.sort(instances);
+        for (Enumeration e = rbFiles.getKeys(); e.hasMoreElements();) {
+            String key = (String)e.nextElement();
+            String val = rbFiles.getString(key);
+            List lst = (List) categories.get(val);
+            if (lst == null) {
+                lst = new ArrayList();
+            }
+            lst.add(key);
+            categories.put(val, lst);
+        }
+
+    } catch (MissingResourceException e) {
+        out.println(e.getMessage());
+        return;
+    }
+
+    if (performAction) {
+        String receivedToken = request.getParameter("formToken");
+        if (!formToken.equals(receivedToken)) {
+            out.println("Invalid form token provided!");
+            return;
+        }
+    }
+%>
+
 <table cellpadding=5>
 <tr>
 <td>
 
 <%
 if ((instance == null || instance.length() == 0) && (category == null || category.length() == 0)
-    || level == null || level.length() == 0
-) {
+    || level == null || level.length() == 0) {
 %>
 <form name="frm" action="Debug.jsp" method="POST">
 <table>
