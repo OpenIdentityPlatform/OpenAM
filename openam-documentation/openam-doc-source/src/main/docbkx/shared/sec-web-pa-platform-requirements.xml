@@ -73,7 +73,7 @@
     </row>
 
     <row>
-     <entry morerows="1">
+     <entry>
       <simplelist>
        <member>Microsoft Windows Server</member>
       </simplelist>
@@ -89,7 +89,25 @@
       </simplelist>
      </entry>
     </row>
-
+    
+    <!-- QA needs to confirm this -->
+    <row>
+     <entry>
+      <simplelist>
+       <member>Microsoft Windows Server</member>
+      </simplelist>
+     </entry>
+     <entry>
+      <simplelist>
+       <member>2008 R2</member>
+      </simplelist>
+     </entry>
+     <entry>
+      <simplelist>
+       <member>Microsoft IIS 7.5</member>
+      </simplelist>
+     </entry>
+    </row>
     <row>
      <entry>
       <simplelist>
