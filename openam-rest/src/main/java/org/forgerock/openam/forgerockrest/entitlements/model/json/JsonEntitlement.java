@@ -17,11 +17,10 @@
 package org.forgerock.openam.forgerockrest.entitlements.model.json;
 
 import com.sun.identity.entitlement.Entitlement;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.forgerock.util.Reject;
-
 import java.util.Map;
 import java.util.Set;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.forgerock.util.Reject;
 
 /**
  * Wrapper for an {@link com.sun.identity.entitlement.Entitlement} object to provide a nicer JSON format.

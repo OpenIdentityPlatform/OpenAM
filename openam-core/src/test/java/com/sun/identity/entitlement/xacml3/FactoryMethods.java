@@ -24,10 +24,6 @@ import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ResourceAttribute;
 import com.sun.identity.entitlement.xacml3.core.Policy;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
-import org.forgerock.openam.entitlement.conditions.environment.SessionCondition;
-import org.json.JSONException;
-
-import javax.xml.bind.JAXBElement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,8 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-
+import javax.xml.bind.JAXBElement;
+import org.forgerock.openam.entitlement.conditions.environment.SessionCondition;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import org.json.JSONException;
 
 /**
  * Collection of factory methods for unit tests.
@@ -84,7 +82,7 @@ public final class FactoryMethods {
 
         Entitlement entitlement = new Entitlement();
         entitlement.setName("arbitraryEntitlementName");
-        entitlement.setResourceNames(new HashSet<String>());
+        entitlement.setResourceName("http://www.artibrary.com/resource");
         Map<String, Boolean> actionValues = new HashMap<String, Boolean>();
         actionValues.put("arbitraryAction", true);
         entitlement.setActionValues(actionValues);

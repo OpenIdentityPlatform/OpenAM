@@ -22,13 +22,12 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.ResourceAttribute;
+import java.util.Date;
+import java.util.Set;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.annotate.JsonUnwrapped;
 import org.forgerock.util.Reject;
-
-import java.util.Date;
-import java.util.Set;
 
 /**
  * A representation of a policy for the entitlements resource. Provides a thin wrapper over an underlying
@@ -195,9 +194,15 @@ public final class JsonPolicy {
      * Sets the entitlement pattern used to determine which resources and actions this policy is applicable to.
      *
      * @param jsonEntitlement the JSON wrapped entitlement to set on the policy.
-     * @throws EntitlementException if the entitlement is invalid.
+     * @throws EntitlementException if the entitlement is invalid, including if its resource list is empty.
      */
     public void setEntitlement(JsonEntitlementPattern jsonEntitlement) throws EntitlementException {
+
+        if (jsonEntitlement.asEntitlement() != null && (jsonEntitlement.asEntitlement().getResourceNames() == null ||
+                jsonEntitlement.asEntitlement().getResourceNames().size() == 0)) {
+            throw new EntitlementException(EntitlementException.RESOURCE_LIST_EMPTY);
+        }
+
         privilege.setEntitlement(jsonEntitlement.asEntitlement());
     }
 

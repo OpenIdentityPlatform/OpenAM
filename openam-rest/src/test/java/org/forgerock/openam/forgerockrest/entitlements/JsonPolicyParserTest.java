@@ -18,7 +18,6 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.AndCondition;
 import com.sun.identity.entitlement.AndSubject;
-import com.sun.identity.entitlement.AnyUserSubject;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
@@ -32,18 +31,6 @@ import com.sun.identity.entitlement.opensso.OpenSSOPrivilege;
 import com.sun.identity.entitlement.opensso.PolicyCondition;
 import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
 import com.sun.identity.shared.DateUtils;
-import org.forgerock.json.fluent.JsonPointer;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
-import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
-import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -53,10 +40,21 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fest.assertions.MapAssert.entry;
-import static org.forgerock.json.fluent.JsonValue.*;
+import org.forgerock.json.fluent.JsonPointer;
+import org.forgerock.json.fluent.JsonValue;
+import static org.forgerock.json.fluent.JsonValue.array;
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
+import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class JsonPolicyParserTest {
     private static final String POLICY_NAME = "aPolicy";
@@ -93,7 +91,8 @@ public class JsonPolicyParserTest {
     public void shouldRejectEmptyPolicyNames() throws Exception {
         // Given
         String name = " ";
-        JsonValue content = json(object());
+        JsonValue content = buildJson(null);
+        content.put("applicationName", name);
 
         // When
         parser.parsePolicy(name, content);
@@ -105,7 +104,7 @@ public class JsonPolicyParserTest {
     public void shouldUseJsonNameFirst() throws Exception {
         // Given
         String name = "realName";
-        JsonValue content = json(object(field("name", name)));
+        JsonValue content = buildJson(field("name", name));
 
         // When
         Privilege result = parser.parsePolicy("resourceName", content);
@@ -118,7 +117,7 @@ public class JsonPolicyParserTest {
     public void shouldUsePassedNameIfJsonNameIsMissing() throws Exception {
         // Given
         String name = "resourceName";
-        JsonValue content = json(object());
+        JsonValue content = buildJson(null);
 
         // When
         Privilege result = parser.parsePolicy(name, content);
@@ -130,7 +129,7 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldParsePolicyActiveFlag() throws Exception {
         // Given
-        JsonValue content = json(object(field("active", true)));
+        JsonValue content = buildJson(field("active", true));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -142,7 +141,7 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldNotAllowSettingCreationDate() throws Exception {
         // Given
-        JsonValue content = json(object(field("creationDate", "2014-01-01T00:00:00.000Z")));
+        JsonValue content = buildJson(field("creationDate", "2014-01-01T00:00:00.000Z"));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -154,7 +153,7 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldNotAllowSettingCreatedBy() throws Exception {
         // Given
-        JsonValue content = json(object(field("createdBy", "Bobby Tables")));
+        JsonValue content = buildJson(field("createdBy", "Bobby Tables"));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -166,7 +165,7 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldNotAllowSettingLastModifiedDate() throws Exception {
         // Given
-        JsonValue content = json(object(field("lastModified", "2014-01-01T00:00:00.000Z")));
+        JsonValue content = buildJson(field("lastModified", "2014-01-01T00:00:00.000Z"));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -178,7 +177,7 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldNotAllowSettingLastModifiedBy() throws Exception {
         // Given
-        JsonValue content = json(object(field("lastModifiedBy", "Little Bobby")));
+        JsonValue content = buildJson(field("lastModifiedBy", "Little Bobby"));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -191,7 +190,7 @@ public class JsonPolicyParserTest {
     public void shouldParseDescription() throws Exception {
         // Given
         String description = "A test description";
-        JsonValue content = json(object(field("description", description)));
+        JsonValue content = buildJson(field("description", description));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -214,23 +213,11 @@ public class JsonPolicyParserTest {
     }
 
     @Test
-    public void shouldDefaultIncludedResourcesToEmpty() throws Exception {
-        // Given
-        List<String> included = new ArrayList<String>();
-        JsonValue content = json(object(field("resources", included)));
-
-        // When
-        Privilege result = parser.parsePolicy(POLICY_NAME, content);
-
-        // Then
-        assertThat(result.getEntitlement().getResourceNames()).isNullOrEmpty();
-    }
-
-    @Test
-    public void shouldParseApplicationName() throws Exception {
+    public void shouldParseApplicationNameAlongsideResource() throws Exception {
         // Given
         String applicationName = "a test application";
-        JsonValue content = json(object(field("applicationName", applicationName)));
+        JsonValue content = buildJson(null);
+        content.put("applicationName", applicationName);
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -245,7 +232,9 @@ public class JsonPolicyParserTest {
         Map<String, Boolean> actionValues = new HashMap<String, Boolean>();
         actionValues.put("one", true);
         actionValues.put("two", false);
-        JsonValue content = json(object(field("actionValues", actionValues)));
+        JsonValue content = buildJson(null);
+
+        content.put("actionValues", actionValues);
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -258,7 +247,7 @@ public class JsonPolicyParserTest {
     public void shouldIgnoreAdvice() throws Exception {
         // Given
         Map<String, List<String>> advice = Collections.singletonMap("test", Arrays.asList("one", "two"));
-        JsonValue content = json(object(field("advice", advice)));
+        JsonValue content = buildJson(field("advice", advice));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -271,7 +260,7 @@ public class JsonPolicyParserTest {
     public void shouldIgnoreEntitlementAttributes() throws Exception {
         // Given
         Map<String, List<String>> attributes = Collections.singletonMap("test", Arrays.asList("one", "two"));
-        JsonValue content = json(object(field("attributes", attributes)));
+        JsonValue content = buildJson(field("attributes", attributes));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -284,7 +273,7 @@ public class JsonPolicyParserTest {
     public void shouldIgnoreTTLForPolicies() throws Exception {
         // Given
         long ttl = 1234l;
-        JsonValue content = json(object(field("ttl", ttl)));
+        JsonValue content = buildJson(field("ttl", ttl));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -297,9 +286,9 @@ public class JsonPolicyParserTest {
     public void shouldCorrectlyParseConditionTypes() throws Exception {
         // Given
         String scope = "cn givenName";
-        JsonValue content = json(object(field("condition",
+        JsonValue content = buildJson(field("condition",
                 object(field("type", "OAuth2Scope"),
-                       field("requiredScopes", array(scope))))));
+                       field("requiredScopes", array(scope)))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -332,11 +321,11 @@ public class JsonPolicyParserTest {
         // Given
         // An AND condition containing a single OAuth2Scope condition
         String scope = "cn givenName";
-        JsonValue content = json(object(field("condition",
+        JsonValue content = buildJson(field("condition",
                 object(field("type", "AND"),
                        field("conditions",
                                Collections.singletonList(object(field("type", "OAuth2Scope"),
-                                       field("requiredScopes", array(scope)))))))));
+                                       field("requiredScopes", array(scope))))))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -355,11 +344,11 @@ public class JsonPolicyParserTest {
         // Given
         // An OR condition containing a single OAuth2Scope condition
         String scope = "cn givenName";
-        JsonValue content = json(object(field("condition",
+        JsonValue content = buildJson(field("condition",
                 object(field("type", "OR"),
                         field("conditions",
                                 Collections.singletonList(object(field("type", "OAuth2Scope"),
-                                        field("requiredScopes", array(scope)))))))));
+                                        field("requiredScopes", array(scope))))))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -378,10 +367,10 @@ public class JsonPolicyParserTest {
         // Given
         // A NOT condition containing an OAuth2Scope condition
         String scope = "cn givenName";
-        JsonValue content = json(object(field("condition",
+        JsonValue content = buildJson(field("condition",
                 object(field("type", "NOT"),
                         field("condition", object(field("type", "OAuth2Scope"),
-                                field("requiredScopes", array(scope))))))));
+                                field("requiredScopes", array(scope)))))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -398,10 +387,11 @@ public class JsonPolicyParserTest {
     public void shouldAllowLegacyPolicyConditions() throws Exception {
         // Given
         List<String> realm = Arrays.asList("REALM");
-        JsonValue content = json(object(field("condition",
+
+        JsonValue content = buildJson(field("condition",
                 object(field("type", "Policy"),
-                       field("className", AuthenticateToRealmCondition.class.getName()),
-                       field("properties", object(field("AuthenticateToRealm", realm)))))));
+                        field("className", AuthenticateToRealmCondition.class.getName()),
+                        field("properties", object(field("AuthenticateToRealm", realm))))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -416,7 +406,7 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldParseSimpleSubjects() throws Exception {
         // Given
-        JsonValue content = json(object(field("subject", object(field("type", "AuthenticatedUsers")))));
+        JsonValue content = buildJson(field("subject", object(field("type", "AuthenticatedUsers"))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -428,10 +418,10 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldParseComplexSubjects() throws Exception {
         // Given
-        JsonValue content = json(object(field("subject",
+        JsonValue content = buildJson(field("subject",
                 object(field("type", "AND"),
                        field("subjects",
-                               Arrays.asList(object(field("type", "AuthenticatedUsers"))))))));
+                               Arrays.asList(object(field("type", "AuthenticatedUsers")))))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -447,10 +437,10 @@ public class JsonPolicyParserTest {
     public void shouldParseResourceAttributes() throws Exception {
         // Given
         List<String> values = Arrays.asList("one", "two", "three");
-        JsonValue content = json(object(field("resourceAttributes",
+        JsonValue content = buildJson(field("resourceAttributes",
                 Arrays.asList(object(field("type", "Static"),
                                      field("propertyName", "test"),
-                                     field("propertyValues", values))))));
+                                     field("propertyValues", values)))));
 
         // Given
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -723,5 +713,13 @@ public class JsonPolicyParserTest {
                 .isEqualTo(staticAttrName);
         assertThat(result.get(new JsonPointer("resourceAttributes/1/propertyValues")).asList(String.class))
                 .containsOnly(staticAttrValue.toArray());
+    }
+
+    private JsonValue buildJson(Map.Entry<String, Object> fieldValue) {
+        return json(object(fieldValue,
+                field("applicationName", "iPlanetAMWebAgentService"),
+                field("resources", array("http://www.arbitrary.com/resource")),
+                field("actionValues", object(field("GET", "true"))))
+        );
     }
 }

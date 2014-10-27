@@ -785,8 +785,9 @@ public abstract class Privilege implements IPrivilege {
     public void setEntitlement(Entitlement entitlement)
         throws EntitlementException {
         if (entitlement == null) {
-            throw new EntitlementException(4);
+            throw new EntitlementException(EntitlementException.NULL_ENTITLEMENT);
         }
+
         this.entitlement = entitlement;
     }
 
