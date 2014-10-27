@@ -45,6 +45,7 @@ import com.sun.identity.authentication.config.AMConfiguration;
 import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.service.DSAMECallbackHandler.DSAMECallbackHandlerError;
+import com.sun.identity.authentication.spi.AuthErrorCodeException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.spi.MessageLoginException;
@@ -678,6 +679,15 @@ public class AMLoginContext {
             }
             isFailed = true;
             authContext.setLoginException(ipe);
+        } catch (AuthErrorCodeException e) {
+            if (debug.messageEnabled()) {
+                debug.message(e.getMessage());
+            }
+            isFailed = true;
+            java.util.Locale locale = com.sun.identity.shared.locale.Locale.getLocale(loginState.getLocale());
+            loginState.setModuleErrorMessage(e.getL10NMessage(locale));
+            loginState.setErrorCode(e.getAuthErrorCode());
+            authContext.setLoginException(e);
         } catch (MessageLoginException me) {
             if (debug.messageEnabled()) {
                 debug.message("LOGINFAILED MessageAuthLoginException....");

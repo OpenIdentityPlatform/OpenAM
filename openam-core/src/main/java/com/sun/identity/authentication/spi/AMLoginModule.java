@@ -1021,21 +1021,25 @@ public abstract class AMLoginModule implements LoginModule {
                 }
             }
             return process(callbacks, state);
+        } catch (InvalidPasswordException e) {
+            setFailureState();
+            setFailureID(e.getTokenId());
+            throw e;
+        } catch (AuthLoginException e) {
+            setFailureState();
+            throw e;
         } catch (LoginException e) {
-            currentState = ISAuthConstants.LOGIN_IGNORE;
-            setFailureModuleName(moduleName);
-            if (e instanceof InvalidPasswordException){
-                setFailureID(((InvalidPasswordException)e).getTokenId());
-                throw new InvalidPasswordException(e);
-            } else {
-                throw new AuthLoginException(e);
-            }
+            setFailureState();
+            throw new AuthLoginException(e);
         } catch (RuntimeException re) {
-            currentState = ISAuthConstants.LOGIN_IGNORE;
-            setFailureModuleName(moduleName);
-            //rethrow the exception
+            setFailureState();
             throw re;
         }
+    }
+
+    private void setFailureState() {
+        currentState = ISAuthConstants.LOGIN_IGNORE;
+        setFailureModuleName(moduleName);
     }
     
     /**

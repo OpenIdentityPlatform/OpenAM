@@ -34,6 +34,8 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.service.AMAuthErrorCode;
+import com.sun.identity.authentication.spi.AuthErrorCodeException;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
@@ -175,7 +177,7 @@ public class HOTP extends AMLoginModule {
                     hotpService.sendHOTP();
                     substituteHeader(START_STATE, bundle.getString("send.success"));
                 } catch (AuthLoginException ale) {
-                    substituteHeader(START_STATE, bundle.getString("send.failure"));
+                    throw new AuthErrorCodeException(AMAuthErrorCode.AUTH_ERROR, amAuthHOTP, "send.failure");
                 }
             }
             return START_STATE;
@@ -219,8 +221,7 @@ public class HOTP extends AMLoginModule {
                             hotpService.sendHOTP();
                             substituteHeader(START_STATE, bundle.getString("send.success"));
                         } catch (AuthLoginException ale) {
-                            //it's already logged so we just handle the exception
-                            substituteHeader(START_STATE, bundle.getString("send.failure"));
+                            throw new AuthErrorCodeException(AMAuthErrorCode.AUTH_ERROR, amAuthHOTP, "send.failure");
                         }
                         return START_STATE;
                     }
