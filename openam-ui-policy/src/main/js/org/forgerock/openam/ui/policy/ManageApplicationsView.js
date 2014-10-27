@@ -111,7 +111,24 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                         width: 501,
                         height: 180
                     },
-                    storageKey: constants.OPENAM_STORAGE_KEY_PREFIX + 'PE-mng-apps-sel-col'
+                    storageKey: constants.OPENAM_STORAGE_KEY_PREFIX + 'PE-mng-apps-sel-col',
+                    // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
+                    serializeGridData: function(postedData) {
+                        var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name'),
+                            filter = '';
+
+                        _.each(colNames, function (element, index, list) {
+                            if (postedData[element]) {
+                                if (filter.length > 0) {
+                                    filter += ' AND ';
+                                }
+                                filter = filter.concat(element, ' eq "*', postedData[element], '*"');
+                            }
+                            delete postedData[element];
+                        });
+
+                        return filter;
+                    }
                 };
 
                 this.grid = uiUtils.buildRestResponseBasedJQGrid(this, '#manageApps', options, additionalOptions, callback);
