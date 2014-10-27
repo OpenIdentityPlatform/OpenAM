@@ -22,6 +22,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2014 ForgeRock AS
+ *
  * $Id: AuthPropertiesViewBean.java,v 1.5 2008/07/07 20:39:19 veiming Exp $
  *
  */
@@ -38,6 +40,8 @@ import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.OptionList;
 
 import com.sun.identity.authentication.config.AMAuthenticationInstance;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.console.authentication.model.AuthConfigurationModel;
 import com.sun.identity.console.authentication.model.AuthConfigurationModelImpl;
 import com.sun.identity.console.authentication.model.AuthPropertiesModel;
@@ -328,6 +332,13 @@ public  class AuthPropertiesViewBean
             instanceSet.addAll(instanceMap.keySet());
         }
 
+        AMAuthenticationManager mgr = null;
+        try {
+            mgr = new AMAuthenticationManager(model.getUserSSOToken(), "/");
+        } catch (AMConfigurationException e) {
+            debug.warning("Could not create Authentication Manager. Using non-localized type names", e);
+        }
+
         for (Iterator i=instanceSet.iterator(); i.hasNext(); ) {
             String name = (String)i.next();
             AMAuthenticationInstance instance = 
@@ -356,6 +367,16 @@ public  class AuthPropertiesViewBean
                     tableModel.setValue(ACTION_COLUMN_HREF, 
                         stringToHex(name));
                     tableModel.setValue(NAME_COLUMN_DATA_NO_HREF, name);
+                }
+
+                if (mgr != null) {
+                    try {
+                        type = model.getLocalizedServiceName(mgr.getAuthenticationSchema(type).getServiceName());
+                    } catch (AMConfigurationException e) {
+                        if (debug.warningEnabled()) {
+                            debug.warning("Could not get schema for type " + type + ". Using non-localized name.", e);
+                        }
+                    }
                 }
 
                 tableModel.setValue(TYPE_COLUMN_DATA, type);
