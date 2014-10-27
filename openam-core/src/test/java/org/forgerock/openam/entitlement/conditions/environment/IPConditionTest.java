@@ -18,6 +18,8 @@ package org.forgerock.openam.entitlement.conditions.environment;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONObject;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -165,5 +167,31 @@ public class IPConditionTest {
 
         // Then
         assertThat(result.isSatisfied()).isFalse();
+    }
+
+    @Test
+    public void testToStringV4() {
+        // Given
+        condition.setState(V4_STATE);
+
+        // When
+        JsonValue json = JsonValueBuilder.toJsonValue(condition.toString());
+
+        // Then
+        assertThat(json.get("startIp").asString()).isEqualTo(V4_BASE + "3");
+        assertThat(json.get("endIp").asString()).isEqualTo(V4_BASE + "5");
+    }
+
+    @Test
+    public void testToStringV6() {
+        // Given
+        condition.setState(V6_STATE);
+
+        // When
+        JsonValue json = JsonValueBuilder.toJsonValue(condition.toString());
+
+        // Then
+        assertThat(json.get("startIp").asString()).isEqualTo(V6_BASE + "3");
+        assertThat(json.get("endIp").asString()).isEqualTo(V6_BASE + "5");
     }
 }

@@ -319,8 +319,8 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
             dnsJson.put(dns);
         }
         jo.put(DNS_NAME, dnsJson);
-        jo.put(START_IP, startIp);
-        jo.put(END_IP, endIp);
+        jo.put(START_IP, startIpString);
+        jo.put(END_IP, endIpString);
         return jo;
     }
 
