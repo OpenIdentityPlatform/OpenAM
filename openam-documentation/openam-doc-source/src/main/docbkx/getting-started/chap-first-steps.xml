@@ -308,6 +308,20 @@ ServerName www.example.com:8000</computeroutput>
     
     <substeps>
      <step>
+      <para>
+       Make sure that your system's firewall does not block the port
+       that Apache HTTP Server uses.
+      </para>
+
+      <para>
+       See the documentation for your version of your system regarding
+       how to allow traffic through the firewall on a specific port.
+       A variety of firewalls are in use on Linux systems.
+       Which one is in use depends on your specific distribution.
+      </para>
+     </step>
+
+     <step>
       <para>Start the web server.</para>
       
       <screen>
@@ -410,6 +424,20 @@ $ <userinput>grep ^JAVA_HOME /path/to/tomcat/bin/catalina.sh</userinput>
 $ <userinput>grep ^CATALINA /path/to/tomcat/bin/catalina.sh</userinput>
 <computeroutput>CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"</computeroutput>
     </screen>
+   </step>
+
+   <step>
+    <para>
+     Make sure that your system's firewall does not block the port
+     that Apache Tomcat uses.
+    </para>
+
+    <para>
+     See the documentation for your version of your system regarding
+     how to allow traffic through the firewall on a specific port.
+     A variety of firewalls are in use on Linux systems.
+     Which one is in use depends on your specific distribution.
+    </para>
    </step>
 
    <step>
