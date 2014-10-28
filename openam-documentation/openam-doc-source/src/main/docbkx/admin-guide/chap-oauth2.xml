@@ -273,8 +273,8 @@
 
    <para>OpenAM can function as an OAuth 2.0 client for installations where the
    web resources are protected by OpenAM. To configure OpenAM as an OAuth 2.0
-   client, you set up an OpenAM OAuth 2.0 authentication module instance, and
-   then integrate the authentication module into your authentication chains as
+   client, you set up an OpenAM OAuth 2.0 / OpenID Connect authentication module
+    instance, and then integrate the authentication module into your authentication chains as
    necessary.</para>
 
    <para>When OpenAM functions as an OAuth 2.0 client, OpenAM provides an
@@ -303,10 +303,8 @@
    implementation when using OpenAM as an OAuth 2.0 client. Instead, use policy
    agents or OpenIG to protect resources.</para>
 
-   <para>To configure OpenAM as an OAuth 2.0 client, see <link
-   xlink:href="admin-guide#oauth2-module-conf-hints"
-   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For the
-   OAuth 2.0 Authentication Module</citetitle></link>.</para>
+   <para>To configure OpenAM as an OAuth 2.0 client, see
+    <xref linkend="oauth2-module-conf-hints" />.</para>
   </section>
 
   <section xml:id="oauth2-byo-client">
@@ -891,7 +889,8 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
 
     <para>
      Fix any problems you have in accessing the resources
-     before you try to set up access through the OAuth 2.0 authentication module.
+     before you try to set up access through the OAuth 2.0 / OpenID Connect
+     authentication module.
     </para>
    </listitem>
    <listitem>
@@ -903,17 +902,15 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
    <listitem>
     <para>
      Configure the other OpenAM server with the policy agent profile and policy
-     as an OAuth 2.0 client, by setting up an OAuth 2.0 authentication module
-     according to the <link xlink:show="new"
-     xlink:href="admin-guide#oauth2-module-conf-hints"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For the
-     OAuth 2.0 Authentication Module</citetitle></link>.
+     as an OAuth 2.0 client, by setting up an OAuth 2.0 / OpenID Connect
+     authentication module according to the <xref
+     linkend="oauth2-module-conf-hints" />.
     </para>
    </listitem>
    <listitem>
     <para>
-     On the authorization server, register the OAuth 2.0 authentication module
-     as an OAuth 2.0 client, which is described in
+     On the authorization server, register the OAuth 2.0 / OpenID Connect
+     authentication module as an OAuth 2.0 client, which is described in
      <xref linkend="register-oauth2-client" />.
     </para>
    </listitem>
@@ -998,8 +995,8 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
     <listitem>
      <para>
       On the OpenAM server to be configured as an OAuth 2.0 client,
-      configure an OpenAM OAuth 2.0 authentication module instance
-      for the top-level realm.
+      configure an OpenAM OAuth 2.0 / OpenID Connect authentication module
+      instance for the top-level realm.
      </para>
 
      <para>Under Access Control &gt; / (Top-Level Realm) &gt; Authentication
@@ -1143,9 +1140,9 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
     <listitem>
      <para>
       On the OpenAM server configured to act as an OAuth 2.0 authorization server,
-      register the OAuth 2.0 authentication module
-      as an OAuth 2.0 confidential client,
-      which is described in <xref linkend="register-oauth2-client" />.
+      register the OAuth 2.0 / OpenID Connect authentication module
+      as an OAuth 2.0 confidential client, which is described in
+      <xref linkend="register-oauth2-client" />.
      </para>
 
      <para>Under Access Control &gt; / (Top-Level Realm) &gt; Agents &gt;

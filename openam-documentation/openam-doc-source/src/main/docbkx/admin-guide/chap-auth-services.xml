@@ -155,6 +155,321 @@
   chains lets you use OpenAM to protect access to a wide range of applications
   used in your organization.</para>
  </section>
+
+ <section xml:id="configure-social-authn">
+  <title>Configuring Social Authentication</title>
+
+  <para>OpenAM allows delegation of authentication to any third party
+   OpenID Connect 1.0 server that implements the <link
+    xlink:show="new"
+    xlink:href="http://openid.net/specs/openid-connect-discovery-1_0.html"
+    ><citetitle>OpenID Connect Discovery 1.0 specification</citetitle></link>.</para>
+
+  <para>The OpenAM console provides wizards for configuring authentication
+   with selected third parties: Facebook, Google, or Microsoft. An additional
+   wizard provides the ability to configure other third party authentication
+   providers.</para>
+
+  <para>The wizards create an Authentication Module
+   and an Authentication Chain containing the correct configuration
+   needed to authenticate with the third party. The wizard also adds
+   configuration data to the realm's <emphasis>Social Authentication Implementations</emphasis>
+   Service (and provisions the service if it is not already present) that
+   enables the display of logos of configured third party authentication
+   providers on the OpenAM login screen, as shown below.</para>
+
+  <figure xml:id="figure-login-with-social-logos">
+  <title>Login Screen With Social Authentication Logos.</title>
+  <mediaobject>
+   <alt>Login screen with social authentication logos.</alt>
+   <imageobject>
+    <imagedata fileref="images/login-with-social-authentication.png" format="PNG" />
+   </imageobject>
+   <textobject><para>The login screen displays additional logos after you configure
+    the <emphasis>Social Authentication Implementations</emphasis> service.</para>
+   </textobject>
+  </mediaobject>
+  </figure>
+
+  <section xml:id="social-authn-wizard-pre-populated">
+   <title>Configuring Pre-Populated Social Authentication Providers</title>
+   <para>OpenAM provides wizards to quickly enable authentication with
+    Facebook, Google and Microsoft. Most settings are pre-populated,
+    only a <emphasis>Client ID</emphasis> and <emphasis>Client
+     Secret</emphasis> are required.</para>
+
+   <para>To obtain a <emphasis>Client ID</emphasis> and <emphasis>Client
+    Secret</emphasis> you should register an application with the
+    third party provider, at the following links:</para>
+   <variablelist>
+    <varlistentry>
+     <term>Facebook</term>
+     <listitem>
+      <para>
+      <link
+       xlink:show="new"
+       xlink:href="https://developers.facebook.com/quickstarts/?platform=web">
+       <citetitle>Facebook App Quickstart</citetitle></link></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Google</term>
+     <listitem>
+      <para><link
+       xlink:show="new"
+       xlink:href="https://console.developers.google.com/project"
+       ><citetitle>Google Developers Console</citetitle></link></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Microsoft</term>
+     <listitem><para>
+      <link
+       xlink:show="new"
+       xlink:href="https://account.live.com/developers/applications/index"
+       ><citetitle>Microsoft account Developer Center</citetitle></link></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <procedure xml:id="howto-social-authn-wizard-pre-populated"><title>To
+    Configure Pre-Populated Social Authentication Providers</title>
+    <para>Once you have registered an application and obtained credentials from
+     the social authentication provider, follow the steps below to configure
+     authentication with the provider.</para>
+    <step>
+     <para>On the Common Tasks tab page of the OpenAM console, click the link
+      for the social authentication provider you want to configure, either
+      <emphasis>Configure Facebook Authentication</emphasis>,
+      <emphasis>Configure Google Authentication</emphasis>, or
+      <emphasis>Configure Microsoft Authentication</emphasis>.
+     </para>
+    </step>
+    <step>
+     <para>On the configure third party authentication page:</para>
+     <substeps>
+      <step><para>Select the realm in which to enable social authentication.</para>
+      </step>
+      <step><para>Enter the <emphasis>Client ID</emphasis> obtained from
+       the third party authentication provider.</para>
+      </step>
+      <step><para>Enter the <emphasis>Client Secret</emphasis> obtained from
+       the third party authentication provider, and repeat it in the
+       <literal>Confirm Client Secret</literal> field.</para>
+      </step>
+      <step><para>Leave the default <literal>Redirect URL</literal>,
+       unless you are using an external server as a proxy.</para>
+      </step>
+      <step><para>Click <literal>Create</literal>.</para>
+      </step>
+     </substeps>
+
+
+     <figure xml:id="figure-google-authn-wizard">
+      <title>The Configure Google Authentication Wizard</title>
+      <mediaobject>
+       <alt>The Configure Google Authentication wizard.</alt>
+       <imageobject>
+        <imagedata fileref="images/google-authn-wizard.png" format="PNG" />
+       </imageobject>
+       <textobject><para>Choose the realm, enter the Client ID, the
+        Client Secret (twice), and confirm the Redirect URL.</para></textobject>
+      </mediaobject>
+     </figure>
+     <para>On completion, the wizard displays a message confirming
+      the successful creation of a new Authentication Module and an
+      Authentication Chain for the provider, and either the creation of a new
+      Social Authentication Implementations service named
+      <literal>socialAuthNService</literal>, or an update if it already existed.</para>
+    </step>
+   </procedure>
+   <para>You can configure the Authentication Module, Authentication Chain,
+    and Social Authentication Implementations service that you created by using the
+    wizards in the same way as manually created versions. For more information, see
+    <xref linkend="configure-authn-modules" />,
+    <xref linkend="configure-authn-chains" />, and
+    <xref linkend="social-authn-implementations-service" />.
+   </para>
+  </section>
+
+  <section xml:id="social-authn-wizard-custom">
+   <title>Configuring Custom Social Authentication Providers</title>
+   <para>OpenAM provides a wizard to quickly enable authentication with
+    any third party provider that supports the <link xlink:show="new"
+     xlink:href="http://openid.net/specs/openid-connect-discovery-1_0.html">
+     <citetitle>OpenID Connect Discovery 1.0 specification</citetitle></link>.</para>
+   <para>You must first register an application with the third party
+    provider to obtain a <emphasis>Client ID</emphasis>, <emphasis>Client
+     Secret</emphasis>, and the <emphasis>OpenID Discovery URL</emphasis>.</para>
+
+   <procedure xml:id="howto-social-authn-wizard-custom"><title>To Configure
+    Custom Social Authentication Providers</title>
+    <para>Once you have registered an application and obtained your
+     credentials from the social authentication provider,
+     follow the steps below to configure authentication with the provider.</para>
+    <step>
+     <para>On the Common Tasks tab page of the OpenAM console, click the
+      <literal>Configure Other Authentication</literal> link.
+     </para>
+    </step>
+    <step>
+     <para>On the configure social authentication page:</para>
+     <substeps>
+      <step><para>Select the realm in which to enable social authentication.</para>
+      </step>
+      <step><para>Enter the <emphasis>OpenID Discovery URL</emphasis> obtained
+       from the third party authentication provider.</para>
+      </step>
+      <step><para>Enter a name for the provider in the <literal>Provider
+      Name</literal> field. OpenAM uses this as a label on the
+       login page to identify the provider.</para>
+      </step>
+      <step><para>Enter the URL of an image to be used on the login page in the
+       <literal>Image URL</literal> field. OpenAM places the image on the
+       login page, to enable authentication with the provider.</para>
+      </step>
+      <step><para>Enter the <emphasis>Client ID</emphasis> obtained from
+       the third party authentication provider.</para>
+      </step>
+      <step><para>Enter the <emphasis>Client Secret</emphasis> obtained from
+       the third party authentication provider, and repeat it in the
+       <literal>Confirm Client Secret</literal> field.</para>
+      </step>
+      <step><para>Leave the default <literal>Redirect URL</literal>,
+       unless you are using an external server as a proxy.</para>
+      </step>
+      <step><para>Click <literal>Create</literal>.</para>
+      </step>
+     </substeps>
+
+
+     <figure xml:id="figure-social-authn-wizard">
+      <title>The Configure Social Authentication Wizard</title>
+      <mediaobject>
+       <alt>The Configure Social Authentication wizard.</alt>
+       <imageobject>
+        <imagedata fileref="images/social-authn-wizard.png" format="PNG" />
+       </imageobject>
+       <textobject><para>Choose the realm, enter the OpenID Discovery
+        URL, Provider Name, Image URL, Client ID, the Client Secret (twice), and
+        confirm the Redirect URL.</para></textobject>
+      </mediaobject>
+     </figure>
+     <para>On completion, the wizard displays a message confirming
+      the successful creation of a new Authentication Module and an
+      Authentication Chain for the provider, and either the creation of a new
+      Social Authentication Implementations service named
+      <literal>socialAuthNService</literal>, or an update if it already existed.</para>
+    </step>
+   </procedure>
+   <para>You can configure the Authentication Module, Authentication Chain,
+    and Social Authentication Implementations service that you created by using the
+    wizard in the same way as manually created versions. For more information, see
+    <xref linkend="configure-authn-modules" />,
+    <xref linkend="configure-authn-chains" />, and
+    <xref linkend="social-authn-implementations-service" />.
+   </para>
+  </section>
+
+  <section xml:id="social-authn-implementations-service">
+   <title>Configuring the Social Authentication Implementations service</title>
+   <para>You can add logos to the login page to allow users to authenticate
+    using configured social authentication providers.</para>
+   <para>Wizards are provided to configure common social authentication
+    providers, which also configure the Social Authentication Implementations
+    service to add logos to the login page. You can manually add other
+    Authentication Chains that contain an OAuth 2.0 / OpenID Connect
+    authentication module.</para>
+   <para>To add a social authentication provider to the login screen,
+    you must first configure an OAuth 2.0 / OpenID Connect Authentication Module
+    , and an Authentication Chain that contains it. You can create the by using a
+    wizard, see <xref linkend="social-authn-wizard-pre-populated" /> and
+    <xref linkend="social-authn-wizard-custom" />
+   or created manually, see <xref linkend="configure-authn-modules" /> and
+    <xref linkend="configure-authn-chains" />.</para>
+
+   <procedure xml:id="howto-social-authn-implementations"><title>To Configure
+    Social Authentication Implementations</title>
+    <para>Once you have created an Authentication Chain containing an OAuth
+     2.0 / OpenID Connect Authentication Module, follow the steps below to add a logo for the
+     authentication provider to the login screen.</para>
+    <step>
+     <para>On the Access Control tab page of the OpenAM console, click the
+      realm containing the authentication module and authentication chain to
+      be added to the login screen.
+     </para>
+    </step>
+    <step>
+     <para>On the Services tab page for the realm:</para>
+     <itemizedlist>
+      <listitem>
+       <para>If the
+        <literal>Social Authentication Implementations</literal> service
+        exists, click on it.</para>
+      </listitem>
+     </itemizedlist>
+     <itemizedlist>
+      <listitem>
+       <para>If the
+        <literal>Social Authentication Implementations</literal> service
+        does not exist, click New, select
+        Social Authentication Implementations, and then click
+        Next.</para>
+      </listitem>
+     </itemizedlist>
+    </step>
+    <step><para>On the Social Authentication Implementations page:</para>
+     <substeps>
+      <step><para>In the <emphasis>Display Names</emphasis> section, enter a
+       Map Key, enter the text to display as ALT text on the logo in
+       the Corresponding Map Value field, and then click Add.</para>
+      <note><para>OpenAM uses the value in the Map Key fields throughout the
+       configuration to tie the various implementation settings
+       to each other. The value is case-sensitive.</para></note>
+      </step>
+      <step><para>In the <emphasis>Authentication Chains</emphasis> section,
+       re-enter the Map Key used in the previous step, select the Authentication Chain
+       from the Corresponding Map Value list, and then click Add.</para>
+      </step>
+      <step><para>In the <emphasis>Icons</emphasis> section,
+       re-enter the  Map Key used in the previous steps, enter the path to a
+       logo image to be used on the login screen in the Corresponding Map Value
+       list, and then click Add.</para>
+      </step>
+      <step><para>In the <emphasis>Enabled Implementations</emphasis> section,
+       re-enter the  Map Key used in the previous steps, and then click Add.</para>
+       <tip><para>Removing a Map Key from the Enabled Implementations
+        list removes the associated logo from the login screen. There
+        is no need to delete the Display Name, Authentication Chain or
+        Icon configuration to remove the logo from the login screen.</para></tip>
+      </step>
+      <step><para>Click Add or Save.</para></step>
+     </substeps>
+     <figure xml:id="figure-social-authn-implementations">
+      <title>Configuring the Social Authentication Implementations
+       service</title>
+      <mediaobject>
+       <alt>Configuring the Social Authentication Implementations
+        service.</alt>
+       <imageobject>
+        <imagedata fileref="images/social-authn-implementations.png" format="PNG" />
+       </imageobject>
+       <textobject><para>Enter a display name, path to a logo,
+        select an authentication chain, and enable the implementation
+        to display the logo on the login screen.</para></textobject>
+      </mediaobject>
+     </figure>
+   </step>
+   </procedure>
+   <para>An icon now appears on the OpenAM login screen,
+    allowing users to authenticate with the third party
+    authentication provider.</para>
+
+  </section>
+
+
+
+ </section>
  
  <section xml:id="configure-authn-modules">
   <title>Configuring Authentication Modules</title>
@@ -184,7 +499,7 @@
   to send the password during authentication.</para>
     
   <section xml:id="ad-module-conf-hints">
-   <title>Hints For the Active Directory Authentication Module</title>
+   <title>Hints for the Active Directory Authentication Module</title>
    <para>OpenAM connects to Active Directory over Lightweight Directory Access
    Protocol (LDAP). OpenAM provides separate Active Directory and LDAP
    modules to support the use of both Active Directory and
@@ -374,7 +689,7 @@
   </section>
   
   <section xml:id="adaptive-auth-module-conf-hints">
-   <title>Hints For the Adaptive Risk Authentication Module</title>
+   <title>Hints for the Adaptive Risk Authentication Module</title>
    <para>The Adaptive Risk module is designed to assess risk during
    authentication so that OpenAM can determine whether to require the
    user to complete further authentication steps. After configuring the
@@ -423,7 +738,7 @@
      xlink:show="new"
      xlink:href="install-guide#handle-request-headers"
      xlink:role="http://docbook.org/xlink/role/olink"
-    ><citetitle>Handling HTTP Request Headers</citetitle></link>.
+     ><citetitle>Handling HTTP Request Headers</citetitle></link>.
    </para>
 
    <para><command>ssoadm</command> service name:
@@ -910,7 +1225,7 @@
   </section>
   
   <section xml:id="anon-module-conf-hints">
-   <title>Hints For the Anonymous Authentication Module</title>
+   <title>Hints for the Anonymous Authentication Module</title>
     <para>This module lets you configure and track anonymous users, who can log in
      to your application or web site without login credentials.
      Typically, you would provide such users with very limited access,
@@ -1024,7 +1339,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
   
   <section xml:id="cert-module-conf-hints">
-   <title>Hints For the Certificate Authentication Module</title>
+   <title>Hints for the Certificate Authentication Module</title>
    <para>X.509 digital certificates can enable secure authentication without
    the need for user names and passwords or other credentials. Certificate
    authentication can be handy to manage authentication by applications.
@@ -1278,7 +1593,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
 
   <section xml:id="core-module-conf-hints">
-   <title>Hints For the Core Authentication Module</title>
+   <title>Hints for the Core Authentication Module</title>
    <para>The Core module is a meta-module.</para>
    <para>The Core module lets you set up the list of modules available,
    and specify what types of client applications can authenticate with which
@@ -1330,8 +1645,6 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
                   xlink:role="http://docbook.org/xlink/role/olink">
                 <citetitle>Authentication Configuration</citetitle></link> section of the
             OpenAM Reference Guide.</para>
-        <!-- This was the only way I could keep the other variablelist's from errors -->
-
         <!-- New "XUI Interface" option added to that section of the Reference Guide -->
     </section>
 
@@ -1839,7 +2152,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
   
   <section xml:id="datastore-module-conf-hints">
-   <title>Hints For the Data Store Authentication Module</title>
+   <title>Hints for the Data Store Authentication Module</title>
 
    <para>The Data Store authentication module allows a login using the Identity
    Repository of the realm to authenticate users. Using the Data Store module
@@ -2234,7 +2547,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
 
   <section xml:id="federation-module-conf-hints">
-   <title>Hints For the Federation Authentication Module</title>
+   <title>Hints for the Federation Authentication Module</title>
    <para>The Federation authentication module is used by a service provider
    to create a user session after validating single sign-on protocol messages.
    This authentication module is used by the SAML, SAMLv2, ID-FF, and
@@ -2260,7 +2573,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
   
   <section xml:id="hotp-module-conf-hints">
-   <title>Hints For the HOTP Authentication Module</title>
+   <title>Hints for the HOTP Authentication Module</title>
    <para>The HMAC One-Time Password authentication module works together with
    the Data Store module to retrieve a user's mail address or telephone number
    to send a one-time password to complete authentication.</para>
@@ -2424,7 +2737,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
   
   <section xml:id="http-module-conf-hints">
-   <title>Hints For the HTTP Basic Authentication Module</title>
+   <title>Hints for the HTTP Basic Authentication Module</title>
    <para>HTTP basic authentication takes a user name and password from HTTP
    authentication and tries authentication against the backend module in OpenAM,
    depending on what you configure as the Backend Module Name.</para>
@@ -2458,7 +2771,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
   
   <section xml:id="jdbc-module-conf-hints">
-   <title>Hints For the JDBC Authentication Module</title>
+   <title>Hints for the JDBC Authentication Module</title>
    <para>The Java Database Connectivity (JDBC) module lets OpenAM connect to
    a database such as MySQL or Oracle DB to authenticate users.</para>
    <indexterm>
@@ -2571,7 +2884,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
   
   <section xml:id="ldap-module-conf-hints">
-   <title>Hints For the LDAP Authentication Module</title>
+   <title>Hints for the LDAP Authentication Module</title>
    <para>OpenAM connects to directory servers using Lightweight Directory
    Access Protocol (LDAP). To build an easy-to-manage, high performance, pure
    Java, open source directory service, try
@@ -2809,7 +3122,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
 
   <!--section xml:id="membership-module-conf-hints">
-   <title>Hints For the Membership Authentication Module</title>
+   <title>Hints for the Membership Authentication Module</title>
    <para>The Membership module permits self-registration for new users. You
     can then have OpenAM create new user profiles in the identity
     repository.</para>
@@ -2867,7 +3180,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section-->
 
   <section xml:id="msisdn-module-conf-hints">
-   <title>Hints For the MSISDN Authentication Module</title>
+   <title>Hints for the MSISDN Authentication Module</title>
    <para>The Mobile Station Integrated Services Digital Network (MSISDN)
    authentication module enables non-interactive authentication using a mobile
    subscriber ISDN associated with a terminal such as a mobile phone.
@@ -2886,7 +3199,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
      <term>Trusted Gateway IP Address</term>
      <listitem>
       <para>Specifies a list of IP addresses of trusted clients that can access
-      MSIDSN modules. Either restrict the clients allowed to access the MSISDN
+      MSISDN modules. Either restrict the clients allowed to access the MSISDN
       module by adding each IPv4 or IPv6 address here, or leave the list empty to allow
       all clients to access the module. If you specify the value
       <literal>none</literal>, no clients are allowed access.</para>
@@ -3016,7 +3329,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
   
   <section xml:id="OATH-module-conf-hints">
-   <title>Hints For the OATH Module</title>
+   <title>Hints for the OATH Module</title>
    <para>The Open Authentication (OATH) module provides a more secure method for users to 
       access their accounts with the help of a device, such as their mobile phone or 
       Yubikey. Users can log into OpenAM and update their information more securely from
@@ -3186,20 +3499,26 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>  
 
   <section xml:id="oauth2-module-conf-hints">
-   <title>Hints For the OAuth 2.0 Authentication Module</title>
+   <title>Hints for the OAuth 2.0 / OpenID Connect Authentication Module</title>
 
-   <para>The OAuth 2.0 authentication module lets OpenAM authenticate clients
-   of OAuth resource servers. References in this section are to RFC 6749, <link
+   <para>The OAuth 2.0 / OpenID Connect authentication module lets OpenAM
+    authenticate clients of OAuth resource servers. References in this section
+    are to RFC 6749, <link
    xlink:href="http://tools.ietf.org/html/rfc6749" xlink:show="new">The OAuth
    2.0 Authorization Framework</link>.</para>
+
+   <tip><para>OpenAM provides a wizard for configuring common OAuth 2.0 /
+    OpenID Connect authentication providers such as Facebook, Google and
+    Microsoft. For more information, see
+    <xref linkend="social-authn-wizard-pre-populated" />.</para></tip>
 
    <para>
     If the module is configured to create an account if none exists,
     then you must provide valid SMTP settings.
-    As part of account creation, the OAuth 2.0 client authentication module
+    As part of account creation, the OAuth 2.0 / OpenID Connect client authentication module
     sends the resource owner an email with an account activation code.
     To send email, OpenAM uses the SMTP settings from the configuration
-    for the OAuth 2.0 authentication module.
+    for the OAuth 2.0 / OpenID Connect authentication module.
    </para>
 
    <indexterm>
@@ -3364,11 +3683,11 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
       retrieve a password and activation code from the user, and then create
       the profile. The default mode is <literal>Enabled</literal>.</para>
 
-      <para>When the OAuth 2.0 client is configured to create new accounts,
+      <para>When the OAuth 2.0 / OpenID Connect client is configured to create new accounts,
       the SMTP settings must also be valid. As part of account creation,
-      the OAuth 2.0 client authentication module sends the resource owner
+      the OAuth 2.0 / OpenID Connect client authentication module sends the resource owner
       an email with an account activation code. To send the mail, OpenAM
-      uses the SMTP settings you provide here in the OAuth 2.0 client
+      uses the SMTP settings you provide here in the OAuth 2.0 / OpenID Connect client
       configuration.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-createaccount-flag</literal></para>
@@ -3505,7 +3824,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
     <para>The following tables show endpoint URLs for OpenAM when <link
     xlink:href="admin-guide#chap-oauth2"
     xlink:role="http://docbook.org/xlink/role/olink">configured as an
-    OAuth 2.0 provider</link>, and also URLs for large OAuth 2.0 providers.
+    OAuth 2.0 provider</link>.
     The default endpoints are for Facebook as the OAuth 2.0 provider.</para>
 
     <para>In addition to the endpoint URLs you can set other fields, like scope
@@ -3570,139 +3889,28 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
       </tbody>
      </tgroup>
     </table>
-
-    <table xml:id="oauth2-facebook" pgwide="1">
-     <title>Endpoint URLs for Facebook</title>
-     <tgroup cols="2">
-      <thead>
-       <row>
-        <entry>OpenAM Field</entry>
-        <entry>Details</entry>
-       </row>
-      </thead>
-      <tbody>
-       <row>
-        <entry>Authentication Endpoint URL</entry>
-        <entry>https://www.facebook.com/dialog/oauth</entry>
-       </row>
-       <row>
-        <entry>Access Token Endpoint URL</entry>
-        <entry>https://graph.facebook.com/oauth/access_token</entry>
-       </row>
-       <row>
-        <entry>User Profile Service URL</entry>
-        <entry>https://graph.facebook.com/me</entry>
-       </row>
-       <row>
-        <entry>OAuth 2.0 Provider logout service</entry>
-        <entry>http://www.facebook.com/logout.php</entry>
-       </row>
-      </tbody>
-     </tgroup>
-    </table>
-
-
-    <table xml:id="oauth2-google" pgwide="1">
-     <title>Endpoint URLs for Google</title>
-     <tgroup cols="2">
-      <thead>
-       <row>
-        <entry>OpenAM Field</entry>
-        <entry>Details</entry>
-       </row>
-      </thead>
-      <tbody>
-       <row>
-        <entry>Authentication Endpoint URL</entry>
-        <entry>https://accounts.google.com/o/oauth2/auth</entry>
-       </row>
-       <row>
-        <entry>Access Token Endpoint URL</entry>
-        <entry>https://accounts.google.com/o/oauth2/token</entry>
-       </row>
-       <row>
-        <entry>User Profile Service URL</entry>
-        <entry>https://www.googleapis.com/oauth2/v1/userinfo</entry>
-       </row>
-       <row>
-        <entry>OAuth 2.0 Provider logout service</entry>
-        <entry>https://mail.google.com/mail/?logout</entry>
-       </row>
-      </tbody>
-     </tgroup>
-    </table>
-
-    <table xml:id="oauth2-msn" pgwide="1">
-     <title>Endpoint URLs for MSN</title>
-     <tgroup cols="2">
-      <thead>
-       <row>
-        <entry>OpenAM Field</entry>
-        <entry>Details</entry>
-       </row>
-      </thead>
-      <tbody>
-       <row>
-        <entry>Authentication Endpoint URL</entry>
-        <entry>https://oauth.live.com/authorize</entry>
-       </row>
-       <row>
-        <entry>Access Token Endpoint URL</entry>
-        <entry>https://oauth.live.com/token</entry>
-       </row>
-       <row>
-        <entry>User Profile Service URL</entry>
-        <entry>https://apis.live.net/v5.0/me</entry>
-       </row>
-       <row>
-        <entry>OAuth 2.0 Provider logout service</entry>
-        <entry>http://oauth.live.com/logout</entry>
-       </row>
-      </tbody>
-     </tgroup>
-    </table>
-    
-<!-- Waiting for User Profile Service URL info from Twitter
-  <table xml:id="oauth2-twitter" pgwide="1">
-     <title>Endpoint URLs for Twitter</title>
-     <tgroup cols="2">
-      <thead>
-       <row>
-        <entry>OpenAM Field</entry>
-        <entry>Details</entry>
-       </row>
-      </thead>
-      <tbody>
-       <row>
-        <entry>Authentication Endpoint URL</entry>
-        <entry>https://api.twitter.com/oauth/authenticate</entry>
-       </row>
-       <row>
-        <entry>Access Token Endpoint URL</entry>
-        <entry>https://api.twitter.com/oauth/request_token</entry>
-       </row>
-       <row>
-        <entry>User Profile Service URL</entry>
-        <entry>STILL NEED</entry>
-       </row>
-       <row>
-        <entry>OAuth 2.0 Provider logout service</entry>
-        <entry>TODO</entry>
-       </row>
-      </tbody>
-     </tgroup>
-    </table>   
--->
   </section>
 
   <section xml:id="oidc-module-conf-hints">
-   <title>Hints for the OpenID Connect Module</title>
+   <title>Hints for the OpenID Connect id_token bearer Module</title>
 
    <para>
-    The OpenID Connect ID module lets OpenAM rely on
+    The OpenID Connect id_token bearer module lets OpenAM rely on
     an <link xlink:show="new" xlink:href="http://openid.net/connect/"
-    >OpenID Connect 1.0</link> provider's ID Token to authenticate an end user.
-    The module expects an OpenID Connect ID Token in an HTTP request header.
+    >OpenID Connect 1.0</link> provider's ID Token to authenticate an end
+    user.</para>
+
+   <note><para>This module validates an OpenID Connect ID token and matches
+    it with a user profile. You should not use this module if you want OpenAM
+    to act as a client in the full OpenID Connect authentication flow.</para>
+    <para>To provision OpenAM as an OpenID Connect client, you should instead configure
+    an OAuth 2.0 / OpenID Connect module. OpenAM provides a wizard to configure
+     an OAuth 2.0 / OpenID Connect module that will
+    authenticate against an OpenID Connect 1.0 provider. For more information, see
+    <xref linkend="social-authn-wizard-custom" />.</para></note>
+
+   <para>The OpenID Connect id_token bearer module expects an OpenID Connect
+    ID Token in an HTTP request header.
     It validates the ID Token, and if successful,
     looks up the OpenAM user profile corresponding to the end user
     for whom the ID Token was issued.
@@ -3711,7 +3919,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
    </para>
 
    <para>
-    You configure the OpenID Connect module
+    You configure the OpenID Connect id_token bearer module
     to specify how OpenAM gets the information needed to validate the ID Token,
     which request header contains the ID Token,
     the issuer identifier for the provider who issued the ID Token,
@@ -4060,7 +4268,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
 
   <section xml:id="radius-module-conf-hints">
-   <title>Hints For the RADIUS Authentication Module</title>
+   <title>Hints for the RADIUS Authentication Module</title>
    <para>The Remote Authentication Dial-In User Service (RADIUS) module lets
    OpenAM authenticate users against RADIUS servers.</para>
    <indexterm>
@@ -4131,7 +4339,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
   
   <section xml:id="sae-module-conf-hints">
-   <title>Hints For the SAE Authentication Module</title>
+   <title>Hints for the SAE Authentication Module</title>
    <para>The Secure Attribute Exchange (SAE) module lets OpenAM authenticate
    a user who has already authenticated with an entity that can vouch for
    the user to OpenAM, so that OpenAM creates a session for the user.
@@ -4161,7 +4369,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
 
   <section xml:id="scripted-module-conf-hints">
-   <title>Hints For Scripted Authentication Modules</title>
+   <title>Hints for Scripted Authentication Modules</title>
 
    <para>
     This section covers what to configure for scripted authentication modules.
@@ -4464,7 +4672,7 @@ ssoadm \
   </xinclude:include>
   
   <section xml:id="desktop-module-conf-hints">
-   <title>Hints For the Windows Desktop SSO Authentication Module</title>
+   <title>Hints for the Windows Desktop SSO Authentication Module</title>
    <para>The Windows Desktop SSO module uses Kerberos authentication. The user
    presents a Kerberos token to OpenAM through the Simple and Protected
    GSS-API Negotiation Mechanism (SPNEGO) protocol. The Windows Desktop SSO
@@ -4575,7 +4783,7 @@ ssoadm \
   </section>
   
   <section xml:id="winnt-module-conf-hints">
-   <title>Hints For the Windows NT Authentication Module</title>
+   <title>Hints for the Windows NT Authentication Module</title>
    <para>The Windows NT module lets OpenAM authenticate against a Microsoft
    Windows NT server.</para>
    <para>This module requires that you install a Samba client in a 
@@ -4627,7 +4835,7 @@ ssoadm \
   </section>
   
   <section xml:id="wss-module-conf-hints">
-   <title>Hints For the WSSAuth Authentication Module</title>
+   <title>Hints for the WSSAuth Authentication Module</title>
    <para>The Web Service Security (WSSAuth) module lets OpenAM validate a
    user name, password combination received as an authentication token in
    a request from a Web Service Client to a Web Service Provider.</para>
@@ -4681,7 +4889,7 @@ ssoadm \
   </section>
 
 <!--   <section xml:id="yubikey-module-conf-hints">
-   <title>Hints For the YubiKey Authentication Module</title>
+   <title>Hints for the YubiKey Authentication Module</title>
    <para>Use the following hints to configure the module.</para>
    <indexterm>
     <primary>Authentication</primary>
@@ -4712,10 +4920,14 @@ ssoadm \
   to the list of module instances, you can configure authentication chains.
   Authentication chains let you handle situations where alternative modules
   are needed, or where a single set of credentials is not sufficient.</para>
-  
+
+  <tip><para>OpenAM provides a wizard for configuring authentication providers,
+   including Facebook, Google and Microsoft. The wizard creates a
+   relevant Authentication Chain as part of the process. For more
+   information, see <xref linkend="configure-social-authn"  />.</para></tip>
+
   <procedure xml:id="create-authn-chain">
    <title>To Create an Authentication Chain</title>
-   
    <step>
     <para>On the Access Control tab page of the OpenAM console, click the
     realm for which to create the authentication chain.</para>
