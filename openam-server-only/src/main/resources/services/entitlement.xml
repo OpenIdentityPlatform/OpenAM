@@ -470,6 +470,10 @@
                     <SubConfiguration name="iPlanetAMWebAgentService"
                         id="application">
                         <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in Application used by OpenAM Policy Agents.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
                             <Attribute name="applicationType" />
                             <Value>iPlanetAMWebAgentService</Value>
                         </AttributeValuePair>

@@ -239,7 +239,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext, "REALM");
         ServerContext context = new ServerContext(realmContext);
-        String resourceId = "RESOURCE_ID";
+        String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         Subject subject = new Subject();
@@ -350,56 +350,6 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void mapBetweenReservedAppNamesDuringCreate() throws EntitlementException {
-        // Given...
-        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "/");
-        Subject mockSubject = new Subject();
-
-        applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes) {
-
-            @Override
-            protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
-                    throws IOException, EntitlementException {
-                return applicationWrapper;
-            }
-
-            @Override
-            protected ApplicationWrapper createApplicationWrapper(Application application,
-                                                                  ApplicationTypeManagerWrapper type) {
-                return applicationWrapper;
-            }
-        };
-
-        given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
-
-        Application mockApplication = mock(Application.class);
-        given(applicationWrapper.getApplication()).willReturn(mockApplication);
-        given(mockApplication.getRealm()).willReturn("/");
-
-        given(applicationWrapper.getName())
-                .willReturn("agentProtectedApplication")
-                .willReturn("iPlanetAMWebAgentService");
-
-        given(applicationManagerWrapper
-                .getApplication(any(Subject.class), anyString(), anyString()))
-                .willReturn(null)
-                .willReturn(mockApplication);
-
-        ResultHandler mockResultHandler = mock(ResultHandler.class);
-        CreateRequest mockCreateRequest = mock(CreateRequest.class);
-
-        // When...
-        applicationsResource.createInstance(realmContext, mockCreateRequest, mockResultHandler);
-
-        // Then...
-        verify(applicationWrapper).setName("iPlanetAMWebAgentService");
-        verify(applicationWrapper).setName("agentProtectedApplication");
-        verify(mockResultHandler, times(1)).handleResult(any(Resource.class));
-    }
-
-    @Test
     public void shouldThrowBadRequestIfSubjectNotFoundOnRead() {
         // Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
@@ -419,7 +369,7 @@ public class ApplicationsResourceTest {
     @Test
     public void shouldUseResourceIDForFetchingApplicationOnRead() throws EntitlementException {
         // Given
-        String resourceID = "ferret";
+        String resourceID = "iPlanetAMWebAgentService";
 
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext, "badger");
@@ -484,59 +434,6 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void mapBetweenReservedAppNamesDuringRead() throws EntitlementException {
-        // Given...
-
-        // Override the creation of the application wrapper so to return a mocked version.
-        applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes) {
-
-            @Override
-            protected ApplicationWrapper createApplicationWrapper(
-                    Application application, ApplicationTypeManagerWrapper type) {
-
-                ApplicationWrapper wrapper = mock(ApplicationWrapper.class);
-                String appName = application.getName();
-                given(wrapper.getName()).willReturn(appName);
-
-                try {
-                    JsonValue jsonValue = mock(JsonValue.class);
-                    given(wrapper.toJsonValue()).willReturn(jsonValue);
-                } catch (IOException e) {
-                    fail();
-                }
-
-                return wrapper;
-            }
-        };
-
-        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "/abc");
-        ServerContext serverContext = new ServerContext(realmContext);
-
-        Subject subject = new Subject();
-        given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
-
-        Application mockApplication = mock(Application.class);
-        given(applicationManagerWrapper.getApplication(
-                any(Subject.class), anyString(), eq("iPlanetAMWebAgentService"))).willReturn(mockApplication);
-        given(mockApplication.getName()).willReturn("agentProtectedApplication");
-
-        // When...
-        applicationsResource.readInstance(serverContext, "agentProtectedApplication", null, mockResultHandler);
-
-        // Then...
-        verify(applicationManagerWrapper).getApplication(eq(subject), anyString(), eq("iPlanetAMWebAgentService"));
-        verify(mockApplication).setName("agentProtectedApplication");
-
-        ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
-        verify(mockResultHandler).handleResult(resourceCaptor.capture());
-
-        Resource resource = resourceCaptor.getValue();
-        assertThat(resource.getId()).isEqualTo("agentProtectedApplication");
-    }
-
-    @Test
     public void shouldReturnNotFoundDeleteInstance() throws EntitlementException {
 
         //Given
@@ -569,7 +466,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext, "REALM");
         ServerContext context = new ServerContext(realmContext);
-        String resourceId = "RESOURCE_ID";
+        String resourceId = "iPlanetAMWebAgentService";
         DeleteRequest request = mock(DeleteRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         Subject subject = new Subject();
@@ -588,35 +485,6 @@ public class ApplicationsResourceTest {
         verify(handler).handleResult(resourceCaptor.capture());
         Resource resource = resourceCaptor.getValue();
         Assert.assertEquals(resource.getId(), resourceId);
-        Assert.assertEquals(resource.getRevision(), "0");
-        Assert.assertEquals(resource.getContent(), json(object()));
-    }
-
-    @Test
-    public void mapReservedAppNameDuringDelete() throws EntitlementException {
-        // Given...
-        SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext, "REALM");
-        ServerContext context = new ServerContext(realmContext);
-        Subject subject = new Subject();
-        Application mockApplication = mock(Application.class);
-        given(applicationManagerWrapper.getApplication(any(Subject.class),
-                anyString(), anyString())).willReturn(mockApplication);
-        given(subjectContext.getCallerSubject()).willReturn(subject);
-
-        DeleteRequest request = mock(DeleteRequest.class);
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
-
-        // When...
-        applicationsResource.deleteInstance(context, "agentProtectedApplication", request, handler);
-
-        // Then...
-        verify(applicationManagerWrapper).deleteApplication(subject, "REALM", "iPlanetAMWebAgentService");
-
-        ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
-        verify(handler).handleResult(resourceCaptor.capture());
-        Resource resource = resourceCaptor.getValue();
-        Assert.assertEquals(resource.getId(), "agentProtectedApplication");
         Assert.assertEquals(resource.getRevision(), "0");
         Assert.assertEquals(resource.getContent(), json(object()));
     }
@@ -681,7 +549,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext, "REALM");
         ServerContext context = new ServerContext(realmContext);
-        String resourceId = "RESOURCE_ID";
+        String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         Subject subject = new Subject();
@@ -714,54 +582,6 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void updateMapsUserFacingToInternalName() throws EntitlementException, IOException {
-        // Given...
-        SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext, "REALM");
-        ServerContext context = new ServerContext(realmContext);
-        Subject subject = new Subject();
-        given(subjectContext.getCallerSubject()).willReturn(subject);
-
-        UpdateRequest request = mock(UpdateRequest.class);
-        JsonValue content = mock(JsonValue.class);
-        given(request.getContent()).willReturn(content);
-
-        given(applicationWrapper.getName())
-                .willReturn("agentProtectedApplication")
-                .willReturn("agentProtectedApplication")
-                .willReturn("iPlanetAMWebAgentService")
-                .willReturn("iPlanetAMWebAgentService")
-                .willReturn("agentProtectedApplication");
-
-        Application application = mock(Application.class);
-        given(applicationManagerWrapper.getApplication(subject, "REALM", "iPlanetAMWebAgentService")).willReturn(application);
-
-        Application newApplication = mock(Application.class);
-        JsonValue response = mock(JsonValue.class);
-        given(applicationWrapper.getApplication()).willReturn(newApplication);
-        given(newApplication.getRealm()).willReturn("REALM");
-        given(newApplication.getLastModifiedDate()).willReturn(1000L);
-        given(applicationWrapper.toJsonValue()).willReturn(response);
-
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
-
-        // When...
-        applicationsResource.updateInstance(context, "agentProtectedApplication", request, handler);
-
-        // Then...
-        verify(applicationWrapper).setName("iPlanetAMWebAgentService");
-        verify(applicationManagerWrapper)
-                .updateApplication(application, applicationWrapper.getApplication(), subject);
-        verify(applicationWrapper).setName("agentProtectedApplication");
-        ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
-        verify(handler).handleResult(resourceCaptor.capture());
-        Resource resource = resourceCaptor.getValue();
-        Assert.assertEquals(resource.getId(), "agentProtectedApplication");
-        Assert.assertEquals(resource.getRevision(), "1000");
-        Assert.assertEquals(resource.getContent(), response);
-    }
-
-    @Test
     public void updateInstanceShouldReturnConflictExceptionWhenApplicationNameAlreadyExists() throws
             EntitlementException, IOException {
 
@@ -769,7 +589,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext, "REALM");
         ServerContext context = new ServerContext(realmContext);
-        String resourceId = "RESOURCE_ID";
+        String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         Subject subject = new Subject();
@@ -808,7 +628,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext, "REALM");
         ServerContext context = new ServerContext(realmContext);
-        String resourceId = "RESOURCE_ID";
+        String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         Subject subject = new Subject();
@@ -845,7 +665,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext, "REALM");
         ServerContext context = new ServerContext(realmContext);
-        String resourceId = "RESOURCE_ID";
+        String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         Subject subject = new Subject();
@@ -1059,7 +879,6 @@ public class ApplicationsResourceTest {
         // Then...
         verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), any(Set.class));
         verify(applicationManagerWrapper).getApplication(eq(subject), eq("/abc"), anyString());
-        verify(app).setName("agentProtectedApplication");
 
         ArgumentCaptor<Resource> resourceCapture = ArgumentCaptor.forClass(Resource.class);
         verify(handler).handleResource(resourceCapture.capture());

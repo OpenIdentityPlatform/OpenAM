@@ -80,6 +80,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     private static final String AUDIT_MODIFIED_TYPE_START = "upgrade.entitlement.modified.type.start";
     private static final String AUDIT_MODIFIED_SUB_START = "upgrade.entitlement.modified.subjects.start";
     private static final String AUDIT_MODIFIED_CON_START = "upgrade.entitlement.modified.conditions.start";
+    private static final String AUDIT_MODIFIED_DES_START = "upgrade.entitlement.modified.description.start";
     private static final String AUDIT_MODIFIED_COM_START = "upgrade.entitlement.modified.combiners.start";
     private static final String AUDIT_MODIFIED_RES_START = "upgrade.entitlement.modified.resources.start";
     private static final String AUDIT_UPGRADE_SUCCESS = "upgrade.success";
@@ -91,6 +92,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     private final List<Node> missingTypes;
     private final List<Node> missingApps;
     private final Map<String, Set<String>> changedConditions;
+    private final Map<String, String> changedDescriptions;
     private final Map<String, Set<String>> changedSubjects;
     private final Map<String, Set<String>> changedResources;
     private final Map<String, Map<String, Boolean>> missingActions;
@@ -107,6 +109,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         missingApps = new ArrayList<Node>();
         missingActions = new HashMap<String, Map<String, Boolean>>();
         changedConditions = new HashMap<String, Set<String>>();
+        changedDescriptions = new HashMap<String, String>();
         changedSubjects = new HashMap<String, Set<String>>();
         changedResources = new HashMap<String, Set<String>>();
         changedCombiners = new HashMap<String, String>();
@@ -142,8 +145,14 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
                 captureDifferentSet(app == null ? null : app.getSubjects(),
                         EntitlementUtils.getSubjects(subConfigAttrs), changedSubjects, name);
                 captureDifferentSet(app == null ? null : app.getConditions(),
-                        EntitlementUtils.getConditions(subConfigAttrs),
-                        changedConditions, name);
+                        EntitlementUtils.getConditions(subConfigAttrs), changedConditions, name);
+                Set<String> configDescriptionSet = EntitlementUtils.getDescription(subConfigAttrs);
+                String configDescription = null;
+                if (configDescriptionSet != null && !configDescriptionSet.isEmpty()) {
+                    configDescription = configDescriptionSet.iterator().next();
+                }
+                captureDifferentString(app == null ? null : app.getDescription(),
+                        configDescription, changedDescriptions, name);
 
                 final EntitlementCombiner combiner = (app == null ? null : app.getEntitlementCombiner());
 
@@ -195,6 +204,28 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             map.put(appName, defaultValue);
         } else if (newName != null && !newName.equals(oldName)) {
             map.put(appName, newName);
+        }
+    }
+
+    /**
+     * Adds entries to the passed in map, using the supplied appName as the key. The value is a new, empty
+     * set if both oldSet and newSet are null, or newSet if the contents of oldSet and newSet differ.
+     *
+     * If the two sets are the same, no entries are added to the map.
+     *
+     * @param oldString The older string data. May be null.
+     * @param newString The newer string data. May be null.
+     * @param map The map into which to push the appropriate string. May not be null.
+     * @param appName The key to use when pushing data into the set. May not be null.
+     */
+    private void captureDifferentString(String oldString, String newString,
+                                        Map<String, String> map, String appName) {
+
+        Reject.ifNull(appName);
+        Reject.ifNull(map);
+
+        if (oldString == null ? newString != null : !oldString.equals(newString)) {
+            map.put(appName, newString);
         }
     }
 
@@ -262,8 +293,8 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     @Override
     public boolean isApplicable() {
         return !missingTypes.isEmpty() || !missingApps.isEmpty() || !missingActions.isEmpty() ||
-                !changedConditions.isEmpty() || !changedSubjects.isEmpty() || !changedCombiners.isEmpty() ||
-                !changedResources.isEmpty();
+                !changedConditions.isEmpty() || !changedDescriptions.isEmpty() || !changedSubjects.isEmpty() ||
+                !changedCombiners.isEmpty() || !changedResources.isEmpty();
     }
 
     @Override
@@ -279,6 +310,9 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         }
         if (!changedConditions.isEmpty()) {
             addChangedConditions();
+        }
+        if (!changedDescriptions.isEmpty()) {
+            addChangedDescription();
         }
         if (!changedSubjects.isEmpty()) {
             addChangedSubjects();
@@ -433,6 +467,33 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
                 }
                 final Application application = getApplication(name);
                 application.setConditions(conditions);
+                entitlementService.storeApplication(application);
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
+            } catch (EntitlementException ee) {
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+                throw new UpgradeException(ee);
+            }
+        }
+    }
+
+    /**
+     * Clears the description currently associated with an application, then replaces it with
+     * the new description defined.
+     *
+     * @throws UpgradeException If there was an error while updating the application.
+     */
+    private void addChangedDescription() throws UpgradeException {
+        for (final Map.Entry<String, String> entry : changedDescriptions.entrySet()) {
+            final String name = entry.getKey();
+            final String description = entry.getValue();
+
+            try {
+                UpgradeProgress.reportStart(AUDIT_MODIFIED_DES_START, name);
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("Modifying application " + name + " ; adding description: " + description);
+                }
+                final Application application = getApplication(name);
+                application.setDescription(description);
                 entitlementService.storeApplication(application);
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException ee) {

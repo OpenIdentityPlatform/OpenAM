@@ -75,31 +75,6 @@ public class ApplicationsResource extends RealmAwareResource {
     private final Debug debug;
 
     /**
-     * This enum supports the first steps to migrating away from the idea of having a "reserved" application.
-     * However, until PAs allow for the configuration of any arbitrary application name, the initial step
-     * has been to map the well known legacy name to something more meaning. AME-4991 will see this work to completion.
-     */
-    private static enum ReservedAppName {
-
-        INTERNAL("iPlanetAMWebAgentService"), USER_FACING("agentProtectedApplication");
-
-        private final String appName;
-
-        private ReservedAppName(final String appName) {
-            this.appName = appName;
-        }
-
-        boolean equals(final String appName) {
-            return this.appName.equals(appName);
-        }
-
-        String getName() {
-            return appName;
-        }
-
-    }
-
-    /**
      * @param debug Debug instance
      * @param appManager Wrapper for the static {@link com.sun.identity.entitlement.ApplicationManager}. Cannot be null.
      * @param appTypeManagerWrapper instantiable version of the static ApplicationTypeManager class. Cannot be null.
@@ -199,11 +174,6 @@ public class ApplicationsResource extends RealmAwareResource {
             return;
         }
 
-        // Map to the internal name.
-        if (ReservedAppName.USER_FACING.equals(wrapp.getName())) {
-            wrapp.setName(ReservedAppName.INTERNAL.getName());
-        }
-
         final Application previousApp;
 
         try {
@@ -240,11 +210,6 @@ public class ApplicationsResource extends RealmAwareResource {
         try {
             Application savedApp = appManager.getApplication(callingSubject, realm, wrapp.getName());
             ApplicationWrapper savedAppWrapper = createApplicationWrapper(savedApp, appTypeManagerWrapper);
-
-            // Map to the external name.
-            if (ReservedAppName.INTERNAL.equals(savedAppWrapper.getName())) {
-                savedAppWrapper.setName(ReservedAppName.USER_FACING.getName());
-            }
 
             final Resource resource = new Resource(savedAppWrapper.getName(),
                     Long.toString(savedAppWrapper.getLastModifiedDate()), savedAppWrapper.toJsonValue());
@@ -341,18 +306,16 @@ public class ApplicationsResource extends RealmAwareResource {
 
         final String realm = getRealm(context);
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(callingSubject);
-        final String mappedResourceId = (ReservedAppName.USER_FACING.equals(resourceId))
-                ? ReservedAppName.INTERNAL.getName() : resourceId;
 
         try {
-            Application oldApp = appManager.getApplication(callingSubject, realm, mappedResourceId);
+            Application oldApp = appManager.getApplication(callingSubject, realm, resourceId);
 
             if (oldApp == null) {
                 handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
                 return;
             }
 
-            appManager.deleteApplication(callingSubject, realm, mappedResourceId);
+            appManager.deleteApplication(callingSubject, realm, resourceId);
 
             final Resource resource = new Resource(resourceId, "0", JsonValue.json(JsonValue.object()));
             handler.handleResult(resource);
@@ -407,21 +370,13 @@ public class ApplicationsResource extends RealmAwareResource {
 
         try {
             final Set<String> appNames = query(request, mySubject, realm);
-            // Ensure the reserved application is always present.
-            final Set<String> appNamesWithReservedApp = new HashSet<String>(appNames);
-            appNamesWithReservedApp.add(ReservedAppName.INTERNAL.getName());
 
-            for (String appName : appNamesWithReservedApp) {
+            for (String appName : appNames) {
                 final Application application = appManager.getApplication(mySubject, realm, appName);
 
                 if (application == null) {
                     debug.warning("Unable to find application " + appName);
                     continue;
-                }
-
-                if (ReservedAppName.INTERNAL.equals(appName)) {
-                    // Replace internal name with user facing name.
-                    application.setName(ReservedAppName.USER_FACING.getName());
                 }
 
                 apps.add(createApplicationWrapper(application, appTypeManagerWrapper));
@@ -487,15 +442,11 @@ public class ApplicationsResource extends RealmAwareResource {
             return;
         }
 
-        // Map from user facing to internal name.
-        final String mappedResourceId = ReservedAppName.USER_FACING.equals(resourceId)
-                ? ReservedAppName.INTERNAL.getName() : resourceId;
-
         final String realm = getRealm(context);
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
 
         try {
-            final Application app = appManager.getApplication(mySubject, realm, mappedResourceId);
+            final Application app = appManager.getApplication(mySubject, realm, resourceId);
             // Replace name with the requested app name.
             app.setName(resourceId);
 
@@ -544,9 +495,6 @@ public class ApplicationsResource extends RealmAwareResource {
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
-        // Map from user facing to internal name.
-        final String mappedResourceId = ReservedAppName.USER_FACING.equals(resourceId)
-                ? ReservedAppName.INTERNAL.getName() : resourceId;
 
         final ApplicationWrapper wrapp;
         try {
@@ -568,15 +516,12 @@ public class ApplicationsResource extends RealmAwareResource {
         }
 
         if (wrapp.getName() == null) {
-            wrapp.setName(mappedResourceId);
-        } else if (ReservedAppName.USER_FACING.equals(wrapp.getName())) {
-            // Map from user facing to internal name.
-            wrapp.setName(ReservedAppName.INTERNAL.getName());
+            wrapp.setName(resourceId);
         }
 
         final Application oldApplication;
         try {
-            oldApplication = appManager.getApplication(mySubject, getRealm(context), mappedResourceId);
+            oldApplication = appManager.getApplication(mySubject, getRealm(context), resourceId);
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
@@ -606,7 +551,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
         //conflict if the name we're changing TO is currently taken, and isn't this one
         try {
-            if (!mappedResourceId.equals(wrapp.getName()) && //return conflict
+            if (!resourceId.equals(wrapp.getName()) && //return conflict
                     appManager.getApplication(mySubject, getRealm(context), wrapp.getName()) != null) {
                 if (debug.errorEnabled()) {
                     debug.error("ApplicationsResource :: UPDATE by " + principalName +
@@ -633,11 +578,6 @@ public class ApplicationsResource extends RealmAwareResource {
             }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
-        }
-
-        if (ReservedAppName.INTERNAL.equals(wrapp.getName())) {
-            // Map from internal name to user facing.
-            wrapp.setName(ReservedAppName.USER_FACING.getName());
         }
 
         try {

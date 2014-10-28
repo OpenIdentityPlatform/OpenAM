@@ -220,6 +220,19 @@ public final class EntitlementUtils {
         return data.get(CONFIG_CONDITIONS);
     }
 
+    /**
+     * Returns the list of conditions from the provided set of data within
+     * the entitlement format.
+     *
+     * @param data The entire set of information about an application
+     * @return A set of Strings representing each of the conditions this application supports
+     */
+    public static Set<String> getDescription(Map<String, Set<String>> data) {
+        Reject.ifNull(data);
+
+        return data.get(CONFIG_APPLICATION_DESC);
+    }
+
     public static Set<String> getResources(Map<String, Set<String>> data) {
         Reject.ifNull(data);
 

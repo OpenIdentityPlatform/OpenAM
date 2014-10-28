@@ -256,6 +256,32 @@ public class UpgradeEntitlementSubConfigsStepTest {
         verify(entitlementService, atLeastOnce()).storeApplication(app);
     }
 
+    @Test
+    public void newApplicationDescriptionNoNewTypesOrApplications() throws UpgradeException, InstantiationException,
+            IllegalAccessException, EntitlementException {
+        // Both application type 4 and app (application 4) exist, no need to add either.
+        mockTypes.add(newType("type4"));
+        app.setDescription("New description.");
+        mockApplications.add(app);
+
+        when(entitlementService.getApplicationTypes()).thenReturn(mockTypes);
+        when(entitlementService.getApplications()).thenReturn(mockApplications);
+
+        upgradeStep.initialize();
+
+        assertThat(upgradeStep.isApplicable()).isTrue();
+        assertThat(upgradeStep.getShortReport("-")).isEqualTo("");
+        assertThat(upgradeStep.getDetailedReport("-")).isEqualTo(
+                DETAILED_REPORT.replace("%ENTITLEMENT_DATA%", ""));
+
+        upgradeStep.perform();
+
+        verify(entitlementService, atMost(2)).getApplicationTypes();
+        verify(entitlementService, times(3)).getApplications();
+        verify(entitlementService, atLeastOnce()).storeApplication(argThat(new ApplicationMatch()));
+        verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
+    }
+
     // Used to match the application as defined in the test xml.
     private static final class ApplicationMatch extends ArgumentMatcher<Application> {
 
