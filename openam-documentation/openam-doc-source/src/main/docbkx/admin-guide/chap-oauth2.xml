@@ -21,7 +21,7 @@
   ! CCPL HEADER END
   !
   !      Copyright 2012-2014 ForgeRock AS
-  !    
+  !
 -->
 <chapter xml:id='chap-oauth2'
  xmlns='http://docbook.org/ns/docbook'
@@ -429,10 +429,10 @@
      and then click OAuth2 Provider.
     </para>
 
-    <para>In addition to setting up an OAuth 2.0 authorization server for the
-    realm, OpenAM sets up a policy to protect the authorization endpoint.
-    The policy appears in the list of policies for the realm. Its name is
-    <literal>OAuth2ProviderPolicy</literal>.</para>
+    <para>In addition to setting up an OAuth 2.0 authorization service for the
+    realm, OpenAM sets up a policy in the top level realm to protect the
+     authorization endpoint. The policy appears in the list of policies for the
+     realm. Its name is <literal>OAuth2ProviderPolicy</literal>.</para>
    </step>
 
    <step performance="optional">
