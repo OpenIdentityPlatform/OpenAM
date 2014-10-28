@@ -28,7 +28,8 @@
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Managing SAML 2.0 Federation</title>
 
  <para>This chapter addresses how to set up and manage SAML 2.0 SSO for
@@ -177,38 +178,12 @@
     (Name in Assertion), to user profile names from your identity repository
     (Local Attribute Name).</para>
 
-    <para>The default IDP mapping implementation allows you to add static values
-    in addition to values taken from the user profile. You add a static value
-    by enclosing the profile attribute name in double quotes
-    (<literal>"</literal>), as in the following examples.</para>
+    <para>
+     Use this approach to set up a mapping with all SPs in the Circle of Trust
+     that do not have their own specific mappings configured.
+    </para>
 
-    <para>To add a static SAML attribute called <literal>partnerID</literal>
-    with a value of <literal>staticPartnerIDValue</literal>, add
-    <literal>partnerID</literal> as the Name in Assertion with
-    <literal>"staticPartnerIDValue"</literal> as the Local Attribute
-    Name.</para>
-
-   <para>
-    The default IDP attribute mapper also allows you
-    to Base64 encode binary attributes when adding them to the SAML attributes.
-    Add <literal>;binary</literal> to the end of the attribute name,
-    as in the following example:
-   </para>
-
-   <literallayout class="monospaced">objectGUID=objectGUID;binary</literallayout>
-
-   <para>
-    This maps the local binary attribute <literal>objectGUID</literal>
-    to a SAML attribute called <literal>objectGUID</literal> that is Base64 encoded.
-   </para>
-
-   <para>
-    The default IDP attribute mapper also supports
-    <literal>NameFormatURI</literal> format as shown in the following example:
-   </para>
-
-   <literallayout class="monospaced"
-   >urn:oasis:names:tc:SAML:2.0:attrname-format:uri|objectGUID=objectGUID;binary</literallayout>
+    <xinclude:include href="../shared/itemizedlist-attribute-mapping.xml" />
    </step>
    <step>
     <para>Click Configure to save your configuration.</para>
@@ -327,6 +302,12 @@ http://www.sp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceabl
     <para>If the identity provider has not already mapped the attributes you
     share, map identity provider attribute names (Name in Assertion), to user
     profile names from your identity repository (Local Attribute Name).</para>
+
+    <para>
+     Use this approach to set up a mapping that is specific to this SP.
+    </para>
+
+    <xinclude:include href="../shared/itemizedlist-attribute-mapping.xml" />
    </step>
    <step>
     <para>Either add the provider to the circle of trust you already created,
