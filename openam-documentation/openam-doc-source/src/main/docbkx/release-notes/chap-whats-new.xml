@@ -298,10 +298,10 @@
   </itemizedlist>
  </section>
  
-  <section xml:id="product-documentation">
-   <title>OpenAM Documentation</title>
+ <section xml:id="product-documentation">
+  <title>OpenAM Documentation</title>
 
-   <itemizedlist>
+  <itemizedlist>
     <para>
      You can read the following additional
      <link xlink:show="new" xlink:href="http://docs.forgerock.org/en/openam/11.0.0/"
@@ -356,5 +356,32 @@
      </para>
     </listitem>
    </itemizedlist>
+ </section>
+
+ <section xml:id="doc-changes">
+  <title>Documentation Changes</title>
+  <para>
+   The following changes have been made to the documentation:
+  </para>
+  <itemizedlist>
+   <listitem>
+    <para>
+     The installation instructions for the Distributed Authentication
+     (see
+     <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/install-guide#chap-install-das"
+           xlink:show="new">Installing OpenAM Distributed Authentication</link>)
+           is missing a step.</para>
+     <para>
+      After "Step 2. Make sure the realms used have a Realm/DNS alias for the DAS
+      configured in OpenAM under Access Control &gt; <replaceable>Realm
+      Name</replaceable> &gt; General."
+     </para>
+     <para>
+      Add step 3. "Create a 2.2 agent profile in OpenAM for the DAS to
+      connect to the server."
+     </para>
+    </listitem>
+   </itemizedlist>
   </section>
+
 </chapter>
