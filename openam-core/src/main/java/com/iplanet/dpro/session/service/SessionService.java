@@ -2274,7 +2274,7 @@ public class SessionService {
                     }
 
                     reducedCrosstalkPurgeDelay = CollectionHelper.getLongMapAttr(sessionAttrs,
-                            CoreTokenConstants.REDUCED_CROSSTALK_PURGE_DELAY, 5, sessionDebug);
+                            CoreTokenConstants.REDUCED_CROSSTALK_PURGE_DELAY, 1, sessionDebug);
 
                     // Obtain Site Ids
                     Set<String> serverIDs = WebtopNaming.getSiteNodes(sessionServerID);

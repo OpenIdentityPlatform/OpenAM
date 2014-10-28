@@ -225,7 +225,7 @@
                                      rangeStart="1" rangeEnd="2147483647"
                                      i18nKey="a121e.session.reduced.crosstalk.purge.delay">
                         <DefaultValues>
-                            <Value>5</Value>
+                            <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <!-- This property is deprecated as of 10.1.0 -->
