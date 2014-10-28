@@ -22,12 +22,12 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.XmlMarshaller;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
@@ -70,8 +70,8 @@ public class TokenTransformFactoryImplTest {
     static class MyModule extends AbstractModule {
         @Override
         protected void configure() {
-            bindConstant().annotatedWith(Names.named(AMSTSConstants.AM_DEPLOYMENT_URL)).to("faux_deployment_url");
-            bindConstant().annotatedWith(Names.named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT)).to("faux_logout_url");
+            bindConstant().annotatedWith(Names.named(AMSTSConstants.AM_DEPLOYMENT_URL)).to("http://host.com/");
+            bindConstant().annotatedWith(Names.named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT)).to("json/session");
             bindConstant().annotatedWith(Names.named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT)).to("faux_id_from_session_url");
             bindConstant().annotatedWith(Names.named(AMSTSConstants.AM_SESSION_COOKIE_NAME)).to("faux_cookie_name");
             bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class);

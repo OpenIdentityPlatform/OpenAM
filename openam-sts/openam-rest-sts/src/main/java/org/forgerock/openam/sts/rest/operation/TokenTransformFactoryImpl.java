@@ -22,6 +22,7 @@ import org.apache.cxf.sts.token.validator.TokenValidator;
 
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
@@ -45,7 +46,7 @@ import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
 import java.security.cert.X509Certificate;
 
 import org.slf4j.Logger;
@@ -73,6 +74,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private final XMLUtilities xmlUtilities;
     private final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
     private final AuthnContextMapper authnContextMapper;
+    private final HttpURLConnectionWrapperFactory connectionWrapperFactory;
     private final String crestVersion;
     private final Logger logger;
 
@@ -95,6 +97,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             XMLUtilities xmlUtilities,
             TokenGenerationServiceConsumer tokenGenerationServiceConsumer,
             AuthnContextMapper authnContextMapper,
+            HttpURLConnectionWrapperFactory connectionWrapperFactory,
             @Named(AMSTSConstants.CREST_VERSION) String crestVersion,
             Logger logger) {
 
@@ -115,6 +118,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         this.xmlUtilities = xmlUtilities;
         this.tokenGenerationServiceConsumer = tokenGenerationServiceConsumer;
         this.authnContextMapper = authnContextMapper;
+        this.connectionWrapperFactory = connectionWrapperFactory;
         this.crestVersion = crestVersion;
         this.logger = logger;
     }
@@ -185,10 +189,10 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             try {
                 final AMSessionInvalidator sessionInvalidator =
                         new AMSessionInvalidatorImpl(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement,
-                                amSessionCookieName, urlConstituentCatenator, crestVersion, logger);
+                                amSessionCookieName, urlConstituentCatenator, crestVersion, connectionWrapperFactory, logger);
                 return new AMSAMLTokenProvider(tokenGenerationServiceConsumer, sessionInvalidator,
                         threadLocalAMTokenCache, stsInstanceId, realm, xmlUtilities, authnContextMapper, logger);
-            } catch (URISyntaxException e) {
+            } catch (MalformedURLException e) {
                 throw new STSInitializationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
             }
         } else {

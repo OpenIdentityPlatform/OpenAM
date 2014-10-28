@@ -17,15 +17,17 @@
 package org.forgerock.openam.sts.rest.token.provider;
 
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.HttpURLConnectionWrapper;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
-import org.restlet.engine.header.Header;
-import org.restlet.resource.ClientResource;
-import org.restlet.resource.ResourceException;
-import org.restlet.util.Series;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 
@@ -33,9 +35,10 @@ import org.slf4j.Logger;
  * {@link org.forgerock.openam.sts.rest.token.provider.AMSessionInvalidator}
  */
 public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
-    private final URI logoutUri;
+    private final URL logoutUrl;
     private final String amSessionCookieName;
     private final String crestVersion;
+    private final HttpURLConnectionWrapperFactory connectionWrapperFactory;
     private final Logger logger;
 
     public AMSessionInvalidatorImpl(String amDeploymentUrl,
@@ -45,44 +48,55 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
                                     String amSessionCookieName,
                                     UrlConstituentCatenator urlConstituentCatenator,
                                     String crestVersion,
-                                    Logger logger) throws URISyntaxException {
-        this.logoutUri = constituteLogoutUri(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement, urlConstituentCatenator);
+                                    HttpURLConnectionWrapperFactory connectionWrapperFactory,
+                                    Logger logger) throws MalformedURLException {
+        this.logoutUrl = constituteLogoutUrl(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement, urlConstituentCatenator);
         this.amSessionCookieName = amSessionCookieName;
         this.crestVersion = crestVersion;
+        this.connectionWrapperFactory = connectionWrapperFactory;
         this.logger = logger;
     }
 
-    private URI constituteLogoutUri(String amDeploymentUrl,
+    private URL constituteLogoutUrl(String amDeploymentUrl,
                                     String jsonRestRoot,
                                     String realm,
                                     String restLogoutUriElement,
-                                    UrlConstituentCatenator urlConstituentCatenator) throws URISyntaxException {
+                                    UrlConstituentCatenator urlConstituentCatenator) throws MalformedURLException {
         StringBuilder sb = new StringBuilder(urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, jsonRestRoot));
         if (!AMSTSConstants.ROOT_REALM.equals(realm)) {
             sb = urlConstituentCatenator.catentateUrlConstituent(sb, realm);
         }
         sb = urlConstituentCatenator.catentateUrlConstituent(sb, restLogoutUriElement);
-        return new URI(sb.toString());
+        return new URL(sb.toString());
     }
 
     @Override
     public void invalidateAMSession(String sessionId) throws TokenCreationException {
-        ClientResource resource = new ClientResource(logoutUri);
-        resource.setFollowingRedirects(false);
-        Series<Header> headers = (Series<Header>)resource.getRequestAttributes().get(AMSTSConstants.RESTLET_HEADER_KEY);
-        if (headers == null) {
-            headers = new Series<Header>(Header.class);
-            resource.getRequestAttributes().put(AMSTSConstants.RESTLET_HEADER_KEY, headers);
-        }
-        headers.set(amSessionCookieName, sessionId);
-        headers.set(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-        headers.set(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
         try {
-            resource.post(null);
-        } catch (ResourceException e) {
-            throw new TokenCreationException(e.getStatus().getCode(),
-                    "Exception caught in AM Session invalidation invocation against url: " + logoutUri +
-                            ". Exception: " + e.getMessage(), e);
+            Map<String, String> headerMap = new HashMap<String, String>();
+            headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
+            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+            headerMap.put(amSessionCookieName, sessionId);
+            HttpURLConnectionWrapper.ConnectionResult connectionResult =
+                    connectionWrapperFactory
+                    .httpURLConnectionWrapper(logoutUrl)
+                    .setRequestHeaders(headerMap)
+                    .setRequestMethod(AMSTSConstants.POST)
+                    .makeInvocation();
+            final int responseCode = connectionResult.getStatusCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new TokenCreationException(responseCode, "Non-200 response from invalidating session " + sessionId +
+                        "against url " + logoutUrl);
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Invalidated session " + sessionId);
+                }
+            }
+        } catch (IOException e) {
+            throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
+                    "Exception caught invalidating session: " + sessionId + " against Url " + logoutUrl
+                            + ". Exception: " + e, e);
         }
+
     }
 }
