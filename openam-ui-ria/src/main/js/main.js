@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global require, define*/
+/*global require, define, window */
 
 
 /**
@@ -74,7 +74,7 @@ require.config({
             exports: "handlebars"
         },
         i18next: {
-            deps: ["handlebars"],
+            deps: ["jquery", "handlebars"],
             exports: "i18next"
         },
         moment: {
@@ -90,6 +90,7 @@ require.config({
 require([
     "org/forgerock/commons/ui/common/util/Constants", 
     "org/forgerock/commons/ui/common/main/EventManager",
+    "jquery",
     "underscore",
     "backbone",
     "form2js",
@@ -110,6 +111,12 @@ require([
     "ThemeManager",
     "org/forgerock/commons/ui/user/main",
     "org/forgerock/commons/ui/common/main"
-], function(constants, eventManager) {
+], function(constants, eventManager, $, _, Backbone) {
+
+    // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
+    window.$ = $;
+    window._ = _;
+    window.Backbone = Backbone;
+
     eventManager.sendEvent(constants.EVENT_DEPENDECIES_LOADED);
 });

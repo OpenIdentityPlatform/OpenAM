@@ -37,13 +37,14 @@ require.config({
 });
 
 require([
+    "jquery",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "sinon",
     "../test/tests/mocks/systemInit",
     "../test/tests/mocks/policyInit",
     "../test/tests/policy"
-], function (constants, eventManager, sinon, systemInit, policyInit, policyTests) {
+], function ($, constants, eventManager, sinon, systemInit, policyInit, policyTests) {
 
     var server = sinon.fakeServer.create();
     server.autoRespond = true;

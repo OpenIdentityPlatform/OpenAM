@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                     if (params.hasOwnProperty("callback_" + i)) {
                         populatedRequirements.callbacks[i].input[0].value = params["callback_" + i];
                     }
-                });       
+                });
             }
 
             authNDelegate

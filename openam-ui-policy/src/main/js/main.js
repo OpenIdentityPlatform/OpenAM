@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global require, _ */
+/*global require, window */
 
 require.config({
     paths: {
@@ -82,7 +82,7 @@ require.config({
             exports: "sortable"
         },
         i18next: {
-            deps: ["handlebars"],
+            deps: ["jquery", "handlebars"],
             exports: "i18next"
         },
         moment: {
@@ -122,6 +122,7 @@ require.config({
  * required synchronously
  */
 require([
+    "jquery",
     "underscore",
     "backbone",
     "form2js",
@@ -147,7 +148,12 @@ require([
     "org/forgerock/openam/ui/policy/main", 
     "ThemeManager",
     "config/main"
-], function ( _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqueryui, multiselect, jqgrid, clockPicker, autosizeInput, selectize, i18nManager, constants, eventManager) {
+], function ($, _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqueryui, multiselect, jqgrid, clockPicker, autosizeInput, selectize, i18nManager, constants, eventManager) {
+
+    // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
+    window.$ = $;
+    window._ = _;
+    window.Backbone = Backbone;
 
     eventManager.sendEvent(constants.EVENT_DEPENDECIES_LOADED);
 });

@@ -75,7 +75,7 @@ require.config({
             exports: "handlebars"
         },
         i18next: {
-            deps: ["handlebars"],
+            deps: ["jquery", "handlebars"],
             exports: "i18next"
         },
         moment: {
@@ -84,7 +84,10 @@ require.config({
     }
 });
 
-require([   
+require([
+    "jquery",
+    "underscore",
+    "backbone",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/commons/ui/common/util/UIUtils",
@@ -94,7 +97,7 @@ require([
     "org/forgerock/commons/ui/user/main",
     "org/forgerock/openam/ui/common/main",
     "org/forgerock/openam/ui/user/main"
-], function(constants,serviceInvoker,uiUtils,cookieHelper) {
+], function($, _, Backbone, constants,serviceInvoker,uiUtils,cookieHelper) {
 
     var 
         conf = {
@@ -105,6 +108,12 @@ require([
         urlParams = uiUtils.convertCurrentUrlToJSON().params,
         host = constants.host + "/"+ constants.context + "/json",
         searchParams = window.location.search.substring(1);
+
+    // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
+    window.$ = $;
+    window._ = _;
+    window.Backbone = Backbone;
+
 
         callParams = {
             url: host + urlParams.realm +'/serverinfo/*',
