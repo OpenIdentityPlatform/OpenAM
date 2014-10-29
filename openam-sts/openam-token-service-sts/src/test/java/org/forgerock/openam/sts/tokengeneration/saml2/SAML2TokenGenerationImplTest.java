@@ -220,8 +220,8 @@ public class SAML2TokenGenerationImplTest {
                 .saml2Config(saml2Config)
                 .issuerName("idpEntityId")
                 .addSupportedTokenTranslation(
-                        TokenType.USERNAME,
-                        TokenType.OPENAM,
+                        TokenType.X509,
+                        TokenType.SAML2,
                         !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
                 .addSupportedTokenTranslation(
                         TokenType.USERNAME,

@@ -37,7 +37,6 @@ import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
-import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.provider.AuthnContextMapper;
 import org.forgerock.openam.sts.token.provider.AuthnContextMapperImpl;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
@@ -100,11 +99,6 @@ public class TokenTransformFactoryImplTest {
 
         @Provides
         UsernameTokenValidator getUsernameTokenValidator() {
-            return null;
-        }
-
-        @Provides
-        AMTokenProvider getAMTokenProvider() {
             return null;
         }
 
@@ -182,11 +176,5 @@ public class TokenTransformFactoryImplTest {
         transform = transformFactory.buildTokenTransform(ttc);
         assertTrue(transform.isTransformSupported(TokenType.OPENIDCONNECT, TokenType.SAML2));
         assertFalse(transform.isTransformSupported(TokenType.USERNAME, TokenType.SAML2));
-    }
-
-    @Test(expectedExceptions = STSInitializationException.class)
-    public void testIncorrectTransformCreation() throws STSInitializationException {
-        TokenTransformConfig ttc = new TokenTransformConfig(TokenType.USERNAME, TokenType.USERNAME, INVALIDATE_INTERIM_AM_SESSIONS);
-        transformFactory.buildTokenTransform(ttc);
     }
 }

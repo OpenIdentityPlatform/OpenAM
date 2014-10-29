@@ -36,7 +36,6 @@ import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
-import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
@@ -119,12 +118,6 @@ public class TokenOperationFactoryImplTest {
 
         @Provides
         @Inject
-        public AMTokenProvider getAMTokenProvider(ThreadLocalAMTokenCache tokenCache, XmlMarshaller<OpenAMSessionToken> marshaller, org.slf4j.Logger logger) {
-             return new AMTokenProvider(tokenCache, marshaller, logger);
-        }
-
-        @Provides
-        @Inject
         UsernameTokenValidator getWssUsernameTokenValidator(
                 AuthenticationHandler<UsernameToken> authenticationHandler,
                 Logger logger) {
@@ -172,11 +165,6 @@ public class TokenOperationFactoryImplTest {
     @Test(expectedExceptions = STSInitializationException.class)
     public void testNonExistentTokenRenewer() throws STSInitializationException {
         operationFactory.getTokenRenewerForType(TokenType.USERNAME);
-    }
-
-    @Test
-    public void testTokenTransform() throws STSInitializationException {
-        assertTrue(operationFactory.getTokenProviderForTransformOperation(TokenType.USERNAME, TokenType.OPENAM) instanceof AMTokenProvider);
     }
 
     @Test(expectedExceptions = STSInitializationException.class)

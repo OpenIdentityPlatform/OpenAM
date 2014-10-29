@@ -35,7 +35,6 @@ import org.forgerock.openam.sts.rest.token.provider.AMSAMLTokenProvider;
 import org.forgerock.openam.sts.rest.token.provider.AMSessionInvalidatorImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.provider.AuthnContextMapper;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.validator.AMTokenValidator;
@@ -64,7 +63,6 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private final String realm;
     private final String stsInstanceId;
     private final Provider<UsernameTokenValidator> wssUsernameTokenValidatorProvider;
-    private final Provider<AMTokenProvider> amTokenProviderProvider;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final PrincipalFromSession principalFromSession;
     private final AuthenticationHandler<OpenIdConnectIdToken> openIdConnectIdTokenAuthenticationHandler;
@@ -87,7 +85,6 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             @Named (AMSTSConstants.REALM) String realm,
             @Named(AMSTSConstants.STS_INSTANCE_ID) String stsInstanceId,
             Provider<UsernameTokenValidator> wssUsernameTokenValidatorProvider,
-            Provider<AMTokenProvider> amTokenProviderProvider,
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
             PrincipalFromSession principalFromSession,
             AuthenticationHandler<OpenIdConnectIdToken> openIdConnectIdTokenAuthenticationHandler,
@@ -108,7 +105,6 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         this.realm = realm;
         this.stsInstanceId = stsInstanceId;
         this.wssUsernameTokenValidatorProvider = wssUsernameTokenValidatorProvider;
-        this.amTokenProviderProvider = amTokenProviderProvider;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
         this.openIdConnectIdTokenAuthenticationHandler = openIdConnectIdTokenAuthenticationHandler;
@@ -144,9 +140,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         }
 
         TokenProvider tokenProvider;
-        if (TokenType.OPENAM.equals(outputTokenType)) {
-            tokenProvider = buildOpenAMTokenProvider();
-        } else if (TokenType.SAML2.equals(outputTokenType)) {
+        if (TokenType.SAML2.equals(outputTokenType)) {
             tokenProvider = buildOpenSAMLTokenProvider(tokenTransformConfig.isInvalidateInterimOpenAMSession());
         } else {
             String message = "Unexpected output token type of: " + outputTokenType;
@@ -170,14 +164,6 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
 
     private TokenValidator buildX509TokenValidator() {
         return new RestCertificateTokenValidator(x509TokenAuthenticationHandler, threadLocalAMTokenCache, principalFromSession);
-    }
-
-    /*
-    The AMTokenProvider does not need the state from the TokenTransformConfig on whether the interimOpenAMSessionToken
-    should be invalidated - if it is issuing an OpenAM token, then obviously this token should not be invalidated.
-     */
-    private TokenProvider buildOpenAMTokenProvider() {
-        return amTokenProviderProvider.get();
     }
 
     private TokenValidator buildOpenAMTokenValidator() {

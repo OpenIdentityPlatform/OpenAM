@@ -28,10 +28,7 @@ import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
 import org.apache.cxf.sts.token.validator.UsernameTokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
-import org.forgerock.openam.sts.token.UrlConstituentCatenator;
-import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.validator.AMTokenValidator;
 import org.forgerock.openam.sts.TokenType;
@@ -44,7 +41,6 @@ import org.slf4j.Logger;
  */
 public class TokenOperationFactoryImpl implements TokenOperationFactory {
     private final Provider<org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator> wssUsernameTokenValidatorProvider;
-    private final Provider<AMTokenProvider> amTokenProviderProvider;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final PrincipalFromSession principalFromSession;
     private final Logger logger;
@@ -52,12 +48,10 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
     @Inject
     public TokenOperationFactoryImpl(
             Provider<org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator> wssUsernameTokenValidatorProvider,
-            Provider<AMTokenProvider> amTokenProviderProvider,
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
             PrincipalFromSession principalFromSession,
             Logger logger) {
         this.wssUsernameTokenValidatorProvider = wssUsernameTokenValidatorProvider;
-        this.amTokenProviderProvider = amTokenProviderProvider;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
         this.logger = logger;
@@ -109,8 +103,8 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
     @Override
     public TokenProvider getTokenProviderForTransformOperation(TokenType inputTokenType, TokenType outputTokenType)
             throws STSInitializationException{
-        if (TokenType.OPENAM.equals(outputTokenType)) {
-            return amTokenProviderProvider.get();
+        if (TokenType.SAML2.equals(outputTokenType)) {
+            return new SAMLTokenProvider();
         }
         throw new STSInitializationException(ResourceException.BAD_REQUEST, "Unhandled outputTokenType specified in " +
                 "getTokenProviderForTransformOperation. OutputTokenType: " + outputTokenType);

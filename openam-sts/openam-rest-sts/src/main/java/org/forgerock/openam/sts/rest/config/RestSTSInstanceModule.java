@@ -62,7 +62,6 @@ import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
-import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.provider.AuthnContextMapper;
 import org.forgerock.openam.sts.token.provider.AuthnContextMapperImpl;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
@@ -148,7 +147,6 @@ public class RestSTSInstanceModule extends AbstractModule {
 
         /*
         bind the class that can issue XML Element instances encapsulating an OpenAM session Id.
-        Needed by the AMTokenProvider.
          */
         bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
         bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
@@ -191,17 +189,6 @@ public class RestSTSInstanceModule extends AbstractModule {
 
     }
 
-    /*
-    Provides the AMTokenProvider Provider to issue AMTokens.
-     */
-    @Provides
-    @Inject
-    AMTokenProvider getAMTokenProviderProvider(/*AMTokenCache tokenCache,*/
-                                               ThreadLocalAMTokenCache tokenCache,
-                                               XmlMarshaller<OpenAMSessionToken> sessionTokenMarshaller,
-                                               org.slf4j.Logger logger) {
-        return new AMTokenProvider(tokenCache, sessionTokenMarshaller, logger);
-    }
 
     /*
     Bindings below required by the STSAuthenticationUriProviderImpl - necessary to construct the URI for the REST authn call.

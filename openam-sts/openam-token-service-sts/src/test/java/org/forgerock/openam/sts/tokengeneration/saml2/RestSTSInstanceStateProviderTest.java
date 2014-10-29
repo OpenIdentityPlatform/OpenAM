@@ -121,8 +121,8 @@ public class RestSTSInstanceStateProviderTest {
                 .saml2Config(saml2Config)
                 .issuerName("http://macbook.dirk.internal.forgerock.com:8080/openam")
                 .addSupportedTokenTranslation(
-                        TokenType.USERNAME,
-                        TokenType.OPENAM,
+                        TokenType.X509,
+                        TokenType.SAML2,
                         !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
                 .addSupportedTokenTranslation(
                         TokenType.USERNAME,

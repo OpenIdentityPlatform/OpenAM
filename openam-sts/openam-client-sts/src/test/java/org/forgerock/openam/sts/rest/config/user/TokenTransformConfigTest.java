@@ -48,6 +48,16 @@ public class TokenTransformConfigTest {
         assertNotEquals(ttc1.hashCode(), ttc2.hashCode());
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testInvalidInputToken() {
+        new TokenTransformConfig(TokenType.SAML2, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testInvalidOutputToken() {
+        new TokenTransformConfig(TokenType.USERNAME, TokenType.OPENAM, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
+    }
+
     @Test
     public void testJsonRoundTrip() {
         TokenTransformConfig ttc1 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);

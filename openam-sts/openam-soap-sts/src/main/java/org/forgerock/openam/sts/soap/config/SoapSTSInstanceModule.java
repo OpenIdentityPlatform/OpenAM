@@ -63,7 +63,6 @@ import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
-import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.provider.AuthnContextMapper;
 import org.forgerock.openam.sts.token.provider.AuthnContextMapperImpl;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
@@ -130,7 +129,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
 
         /*
         bind the class that can issue XML Element instances encapsulating an OpenAM session Id.
-        Needed by the AMTokenProvider.
          */
         bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
 
@@ -291,19 +289,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
             Logger logger) {
         return new UsernameTokenValidator(logger, authenticationHandler);
 
-    }
-
-    /*
-    Provides the AMTokenProvider Provider to issue AMTokens.
-    Should probably go away when TokneOperationProviderImpl is removed and all bindings done directly.
-     */
-    @Provides
-    @Inject
-    AMTokenProvider getAMTokenProviderProvider(/*AMTokenCache tokenCache,*/
-                                               ThreadLocalAMTokenCache tokenCache,
-                                               XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller,
-                                               Logger logger) {
-        return new AMTokenProvider(tokenCache, amSessionTokenXmlMarshaller, logger);
     }
 
     /*
