@@ -73,17 +73,14 @@ public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestV
             InvalidScopeException {
         final ClientRegistration clientRegistration = clientRegistrationStore.get(
                 request.<String>getParameter(CLIENT_ID), request);
-        final boolean openIdConnectRequested = Utils.splitScope(request.<String>getParameter(SCOPE)).contains(OPENID);
-        final Set<String> responseTypes = Utils.splitResponseType(request.<String>getParameter(RESPONSE_TYPE));
+        if (Utils.isOpenIdConnectClient(clientRegistration)) {
+            final boolean openIdConnectRequested = Utils.splitScope(request.<String>getParameter(SCOPE)).contains(OPENID);
+            final Set<String> responseTypes = Utils.splitResponseType(request.<String>getParameter(RESPONSE_TYPE));
 
-        if (Utils.isOpenIdConnectClient(clientRegistration) && !openIdConnectRequested) {
-            throw new InvalidRequestException("Missing expected scope=openid from request",
-                    Utils.isOpenIdConnectFragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
-        }
-
-        if (!Utils.isOpenIdConnectClient(clientRegistration) && openIdConnectRequested) {
-            throw new InvalidScopeException("Missing expected scope=openid from OpenID Connect client",
-                    Utils.isOAuth2FragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
+            if (!openIdConnectRequested) {
+                throw new InvalidRequestException("Missing expected scope=openid from request",
+                        Utils.isOpenIdConnectFragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
+            }
         }
     }
 }

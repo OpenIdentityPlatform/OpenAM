@@ -102,9 +102,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                 clientRegistrationStore.get(request.<String>getParameter(CLIENT_ID), request);
 
         final Set<String> scope = Utils.splitScope(request.<String>getParameter(SCOPE));
-
         //plugin point
-        final Set<String> validatedScope = providerSettings.validateAuthorizationScope(clientRegistration, scope);
+        final Set<String> validatedScope = providerSettings.validateAuthorizationScope(clientRegistration, scope,
+                request);
 
         final boolean consentSaved = providerSettings.isConsentSaved(resourceOwner,
                 clientRegistration.getClientId(), validatedScope);
@@ -168,7 +168,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         }
 
         final Set<String> scope = Utils.splitScope(request.<String>getParameter(SCOPE));
-        final Set<String> validatedScope = providerSettings.validateAuthorizationScope(clientRegistration, scope);
+        final Set<String> validatedScope = providerSettings.validateAuthorizationScope(clientRegistration, scope,
+                request);
 
         if (saveConsent) {
             providerSettings.saveConsent(resourceOwner, clientRegistration.getClientId(), validatedScope);

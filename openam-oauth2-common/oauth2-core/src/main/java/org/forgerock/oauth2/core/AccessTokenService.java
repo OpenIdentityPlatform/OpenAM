@@ -23,6 +23,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
@@ -56,7 +57,7 @@ public interface AccessTokenService {
      */
     AccessToken requestAccessToken(OAuth2Request request) throws InvalidGrantException, RedirectUriMismatchException,
             InvalidClientException, InvalidRequestException, ClientAuthenticationFailedException, InvalidCodeException,
-            ServerException, UnauthorizedClientException;
+            ServerException, UnauthorizedClientException, InvalidScopeException;
 
     /**
      * Handles a request to refresh an already issued access token for a OAuth2 client, validates that the request is
@@ -76,5 +77,5 @@ public interface AccessTokenService {
      * @throws InvalidGrantException If the given token is not a refresh token.
      */
     AccessToken refreshToken(OAuth2Request request) throws ClientAuthenticationFailedException, InvalidClientException,
-            InvalidRequestException, BadRequestException, ServerException, ExpiredTokenException, InvalidGrantException;
+            InvalidRequestException, BadRequestException, ServerException, ExpiredTokenException, InvalidGrantException, InvalidScopeException;
 }

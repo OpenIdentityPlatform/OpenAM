@@ -66,7 +66,7 @@
         <property required="true">
             <label name="lblServiceScopeImpl" defaultValue="configure.oauth2.label.service.scopeImpl" labelFor="choiceScopeImpl" />
             <cc name="choiceScopeImpl" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
-                <attribute name="defaultValue" value="org.forgerock.openam.oauth2.provider.impl.ScopeImpl" />
+                <attribute name="defaultValue" value="org.forgerock.openam.oauth2.OpenAMScopeValidator" />
             </cc>
             <fieldhelp name="helpChoiceScopeImpl" defaultValue="configure.oauth2.label.service.scopeImpl.help" />
         </property>

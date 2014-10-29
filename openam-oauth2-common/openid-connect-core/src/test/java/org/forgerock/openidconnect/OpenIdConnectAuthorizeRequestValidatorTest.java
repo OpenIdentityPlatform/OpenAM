@@ -79,20 +79,6 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
         requestValidator.validateRequest(request);
     }
 
-    @Test (expectedExceptions = InvalidScopeException.class)
-    public void validateShouldFailForRequestWithOpenidScopeOnNonOidcClient() throws Exception {
-
-        //Given
-        OAuth2Request request = mock(OAuth2Request.class);
-        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("nonoidcscope"));
-
-        given(request.getParameter("client_id")).willReturn("CLIENT_ID");
-        given(request.getParameter("scope")).willReturn("openid");
-
-        //When
-        requestValidator.validateRequest(request);
-    }
-
     @Test
     public void validateShouldFailWithInvalidRequestExceptionAndFragmentParameters() throws Exception {
 
@@ -109,27 +95,6 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
             requestValidator.validateRequest(request);
             fail();
         } catch (InvalidRequestException e) {
-            //Then
-            assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.FRAGMENT);
-        }
-    }
-
-    @Test
-    public void validateShouldFailWithInvalidScopeExceptionAndFragmentParameters() throws Exception {
-
-        //Given
-        OAuth2Request request = mock(OAuth2Request.class);
-        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("nonoidcscope"));
-
-        given(request.getParameter("client_id")).willReturn("CLIENT_ID");
-        given(request.getParameter("scope")).willReturn("openid");
-        given(request.getParameter("response_type")).willReturn("token");
-
-        //When
-        try {
-            requestValidator.validateRequest(request);
-            fail();
-        } catch (InvalidScopeException e) {
             //Then
             assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.FRAGMENT);
         }
@@ -156,24 +121,4 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
         }
     }
 
-    @Test
-    public void validateShouldFailWithInvalidScopeExceptionAndQueryParameters() throws Exception {
-
-        //Given
-        OAuth2Request request = mock(OAuth2Request.class);
-        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("nonoidcscope"));
-
-        given(request.getParameter("client_id")).willReturn("CLIENT_ID");
-        given(request.getParameter("scope")).willReturn("openid");
-        given(request.getParameter("response_type")).willReturn("code");
-
-        //When
-        try {
-            requestValidator.validateRequest(request);
-            fail();
-        } catch (InvalidScopeException e) {
-            //Then
-            assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.QUERY);
-        }
-    }
 }

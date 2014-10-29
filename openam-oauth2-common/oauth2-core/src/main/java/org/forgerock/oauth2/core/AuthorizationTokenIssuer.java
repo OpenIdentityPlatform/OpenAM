@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.inject.Singleton;
 import static org.forgerock.oauth2.core.Utils.splitResponseType;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ public class AuthorizationTokenIssuer {
      */
     public AuthorizationToken issueTokens(OAuth2Request request, ClientRegistration clientRegistration,
             ResourceOwner resourceOwner, Set<String> authorizationScope, OAuth2ProviderSettings providerSettings)
-            throws InvalidClientException, UnsupportedResponseTypeException, ServerException {
+            throws InvalidClientException, UnsupportedResponseTypeException, ServerException, InvalidScopeException {
 
         //issue tokens
         final Set<String> requestedResponseTypes = splitResponseType(request.<String>getParameter("response_type"));

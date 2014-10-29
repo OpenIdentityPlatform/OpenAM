@@ -77,7 +77,7 @@ public class AuthorizationServiceImplTest {
 
         given(resourceOwnerSessionValidator.validate(request)).willReturn(resourceOwner);
         given(clientRegistrationStore.get(anyString(), eq(request))).willReturn(clientRegistration);
-        given(providerSettings.validateAuthorizationScope(eq(clientRegistration), anySetOf(String.class)))
+        given(providerSettings.validateAuthorizationScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
                 .willReturn(validatedScope);
         given(providerSettings.isConsentSaved(eq(resourceOwner), anyString(), eq(validatedScope))).willReturn(false);
         given(resourceOwnerConsentVerifier.verify(anyBoolean(), eq(request))).willReturn(false);
@@ -100,7 +100,7 @@ public class AuthorizationServiceImplTest {
 
         given(resourceOwnerSessionValidator.validate(request)).willReturn(resourceOwner);
         given(clientRegistrationStore.get(anyString(), eq(request))).willReturn(clientRegistration);
-        given(providerSettings.validateAuthorizationScope(eq(clientRegistration), anySetOf(String.class)))
+        given(providerSettings.validateAuthorizationScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
                 .willReturn(validatedScope);
         given(providerSettings.isConsentSaved(eq(resourceOwner), anyString(), eq(validatedScope))).willReturn(false);
         given(resourceOwnerConsentVerifier.verify(anyBoolean(), eq(request))).willReturn(true);

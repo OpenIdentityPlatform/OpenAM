@@ -69,8 +69,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
     }
 
     @Test
-    public void shouldHandle() throws InvalidGrantException, ClientAuthenticationFailedException, ServerException,
-            InvalidRequestException, InvalidClientException, UnauthorizedClientException {
+    public void shouldHandle() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -102,9 +101,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
     }
 
     @Test (expectedExceptions = InvalidGrantException.class)
-    public void handleShouldThrowInvalidGrantExceptionWhenResourceOwnerCannotBeVerified() throws InvalidGrantException,
-            ClientAuthenticationFailedException, ServerException, InvalidRequestException, InvalidClientException,
-            UnauthorizedClientException {
+    public void handleShouldThrowInvalidGrantExceptionWhenResourceOwnerCannotBeVerified() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -122,8 +119,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
     }
 
     @Test
-    public void shouldHandleAndIssueRefreshToken() throws InvalidGrantException, ClientAuthenticationFailedException,
-            ServerException, InvalidRequestException, InvalidClientException, UnauthorizedClientException {
+    public void shouldHandleAndIssueRefreshToken() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -159,9 +155,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
     }
 
     @Test
-    public void shouldHandleAndIncludeScopeInAccessToken() throws InvalidGrantException,
-            ClientAuthenticationFailedException, ServerException, InvalidRequestException, InvalidClientException,
-            UnauthorizedClientException {
+    public void shouldHandleAndIncludeScopeInAccessToken() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);

@@ -33,13 +33,17 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.forgerock.openam.oauth2.OAuthProblemException;
 import org.forgerock.openam.oauth2.IdentityManager;
+import org.forgerock.openam.oauth2.OAuthProblemException;
 import org.forgerock.openam.oauth2.legacy.AccessTokenToLegacyAdapter;
 import org.forgerock.openam.oauth2.legacy.CoreToken;
 import org.forgerock.openam.oauth2.provider.Scope;
@@ -53,6 +57,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
 
 /**
  * This is the default scope implementation class. This class by default
@@ -93,55 +100,60 @@ public class ScopeImpl implements Scope {
     private final IdentityManager identityManager;
     private final OAuth2RequestFactory<Request> requestFactory;
     private final OpenIDTokenIssuer openIDTokenIssuer;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     @Inject
     public ScopeImpl(IdentityManager identityManager, OAuth2RequestFactory<Request> requestFactory,
-            final OpenIDTokenIssuer openIDTokenIssuer) {
+            final OpenIDTokenIssuer openIDTokenIssuer, OAuth2ProviderSettingsFactory providerSettingsFactory) {
         this.identityManager = identityManager;
         this.requestFactory = requestFactory;
         this.openIDTokenIssuer = openIDTokenIssuer;
+        this.providerSettingsFactory = providerSettingsFactory;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScope, Set<String> availableScopes, Set<String> defaultScopes) {
-
-        if (requestedScope == null || requestedScope.isEmpty()) {
-            return defaultScopes;
-        }
-
-        Set<String> scopes = new HashSet<String>(availableScopes);
-        scopes.retainAll(requestedScope);
-        return scopes;
+    public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScope, Set<String> availableScopes,
+            Set<String> defaultScopes) throws ServerException, InvalidScopeException {
+        return selectValidScopes(requestedScope, defaultScopes, availableScopes);
     }
 
     /**
      * {@inheritDoc}
      */
-    public Set<String> scopeRequestedForAccessToken(Set<String> requestedScope, Set<String> availableScopes, Set<String> defaultScopes) {
-
-        if (requestedScope == null || requestedScope.isEmpty()) {
-            return defaultScopes;
-        }
-
-        Set<String> scopes = new HashSet<String>(availableScopes);
-        scopes.retainAll(requestedScope);
-        return scopes;
+    public Set<String> scopeRequestedForAccessToken(Set<String> requestedScope, Set<String> availableScopes,
+            Set<String> defaultScopes) throws ServerException, InvalidScopeException {
+        return selectValidScopes(requestedScope, defaultScopes, availableScopes);
     }
 
     /**
      * {@inheritDoc}
      */
     public Set<String> scopeRequestedForRefreshToken(Set<String> requestedScope, Set<String> availableScopes,
-            Set<String> allScopes, Set<String> defaultScopes) {
+            Set<String> allScopes, Set<String> defaultScopes) throws ServerException, InvalidScopeException {
+        return selectValidScopes(requestedScope, availableScopes, availableScopes);
+    }
 
-        if (requestedScope == null || requestedScope.isEmpty()) {
-            return availableScopes;
+    private Set<String> selectValidScopes(Set<String> requestedScopes, Set<String> defaultScopes,
+            Set<String> allowedScopes) throws InvalidScopeException, ServerException {
+        if (requestedScopes == null || requestedScopes.isEmpty()) {
+            return defaultScopes;
         }
 
-        Set<String> scopes = new HashSet<String>(availableScopes);
-        scopes.retainAll(requestedScope);
+        Set<String> scopes = new HashSet<String>(allowedScopes);
+        scopes.retainAll(requestedScopes);
+
+        OAuth2Request request = this.requestFactory.create(Request.getCurrent());
+
+        if (requestedScopes.size() > scopes.size()) {
+            Set<String> invalidScopes = new HashSet<String>(requestedScopes);
+            invalidScopes.removeAll(allowedScopes);
+            final Set<String> responseTypes = Utils.splitResponseType(request.<String>getParameter(RESPONSE_TYPE));
+            throw new InvalidScopeException("Unknown/invalid scope(s): " + invalidScopes.toString(),
+                    Utils.isOAuth2FragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
+        }
+
         return scopes;
     }
 

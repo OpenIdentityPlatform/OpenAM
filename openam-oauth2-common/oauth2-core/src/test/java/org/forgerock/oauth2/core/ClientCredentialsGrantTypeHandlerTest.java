@@ -66,8 +66,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
     }
 
     @Test
-    public void shouldHandle() throws InvalidClientException, ServerException, InvalidRequestException,
-            UnauthorizedClientException, ClientAuthenticationFailedException {
+    public void shouldHandle() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -94,8 +93,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
     }
 
     @Test
-    public void shouldHandleAndIncludeScopeInAccessToken() throws InvalidClientException, ServerException,
-            InvalidRequestException, UnauthorizedClientException, ClientAuthenticationFailedException {
+    public void shouldHandleAndIncludeScopeInAccessToken() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);

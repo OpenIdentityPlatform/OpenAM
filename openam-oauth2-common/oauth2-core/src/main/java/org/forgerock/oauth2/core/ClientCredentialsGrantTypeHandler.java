@@ -19,6 +19,7 @@ package org.forgerock.oauth2.core;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 
@@ -62,7 +63,7 @@ public class ClientCredentialsGrantTypeHandler implements GrantTypeHandler {
      * {@inheritDoc}
      */
     public AccessToken handle(OAuth2Request request) throws ClientAuthenticationFailedException, InvalidClientException,
-            InvalidRequestException, ServerException, UnauthorizedClientException {
+            InvalidRequestException, ServerException, UnauthorizedClientException, InvalidScopeException {
 
         final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request);
 

@@ -21,6 +21,7 @@ import org.forgerock.oauth2.core.AuthorizationToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
@@ -122,6 +123,9 @@ public class AuthorizeResource extends ServerResource {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
         } catch (RedirectUriMismatchException e) {
+            throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
+                    request.<String>getParameter("state"));
+        } catch (InvalidScopeException e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {

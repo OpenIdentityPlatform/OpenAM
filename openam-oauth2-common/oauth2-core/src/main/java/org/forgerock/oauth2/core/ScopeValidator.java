@@ -17,6 +17,7 @@
 package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 
@@ -39,9 +40,11 @@ public interface ScopeValidator {
      *
      * @param clientRegistration The client registration.
      * @param scope The requested scope.
+     * @param request The OAuth2 request.
      * @return The updated scope used in the remaining OAuth2 process.
      */
-    Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope);
+    Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope,
+            OAuth2Request request) throws InvalidScopeException, ServerException;
 
     /**
      * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when an access token
@@ -53,7 +56,7 @@ public interface ScopeValidator {
      * @return The updated scope used in the remaining OAuth2 process.
      */
     Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope,
-            OAuth2Request request);
+            OAuth2Request request) throws InvalidScopeException, ServerException;
 
     /**
      * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when a refresh token
@@ -66,7 +69,7 @@ public interface ScopeValidator {
      * @return The updated scope used in the remaining OAuth2 process.
      */
     Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope,
-            Set<String> tokenScope, OAuth2Request request);
+            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException;
 
     /**
      * Gets the resource owners information based on an issued access token.

@@ -41,8 +41,7 @@ public class AuthorizationTokenIssuerTest {
     }
 
     @Test (expectedExceptions = UnsupportedResponseTypeException.class)
-    public void issueTokensShouldThrowUnsupportedResponseTypeExceptionIfResponseTypeMissing() throws ServerException,
-            InvalidClientException, UnsupportedResponseTypeException {
+    public void issueTokensShouldThrowUnsupportedResponseTypeExceptionIfResponseTypeMissing() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -59,8 +58,7 @@ public class AuthorizationTokenIssuerTest {
     }
 
     @Test (expectedExceptions = UnsupportedResponseTypeException.class)
-    public void issueTokensShouldThrowUnsupportedResponseTypeExceptionIfResponseTypeIsEmpty() throws ServerException,
-            InvalidClientException, UnsupportedResponseTypeException {
+    public void issueTokensShouldThrowUnsupportedResponseTypeExceptionIfResponseTypeIsEmpty() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);

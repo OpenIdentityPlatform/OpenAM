@@ -24,6 +24,8 @@
 
 package org.forgerock.openam.oauth2.provider;
 
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.legacy.CoreToken;
 
 import java.util.Map;
@@ -49,7 +51,7 @@ public interface Scope {
      */
     public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScopes,
                                                          Set<String> availableScopes,
-                                                         Set<String> defaultScopes);
+                                                         Set<String> defaultScopes) throws ServerException, InvalidScopeException;
 
     /**
      * ScopeRequestedForAccessToken is called when a token is created and the token scope is requested.
@@ -61,7 +63,7 @@ public interface Scope {
      */
     public Set<String> scopeRequestedForAccessToken(Set<String> requestedScopes,
                                                     Set<String> availableScopes,
-                                                    Set<String> defaultScopes);
+                                                    Set<String> defaultScopes) throws ServerException, InvalidScopeException;
 
     /**
      * ScopeRequestedForRefreshToken is called when the client tries to refresh an Access Token. The scope returned MUST
@@ -76,7 +78,7 @@ public interface Scope {
     public Set<String> scopeRequestedForRefreshToken(Set<String> requestedScopes,
                                                      Set<String> availableScopes,
                                                      Set<String> allScopes,
-                                                     Set<String> defaultScopes);
+                                                     Set<String> defaultScopes) throws ServerException, InvalidScopeException;
 
     /**
      * This method is called on the /tokeninfo endpoint. The purpose of this function is to evaluate scope and return

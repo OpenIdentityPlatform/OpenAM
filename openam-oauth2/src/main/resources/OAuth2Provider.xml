@@ -90,9 +90,10 @@
                                  validator="RequiredValueValidator"
                                  i18nKey="a104">
                     <DefaultValues>
-                        <Value>org.forgerock.openam.oauth2.provider.impl.ScopeImpl</Value>
+                        <Value>org.forgerock.openam.oauth2.OpenAMScopeValidator</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
                 <AttributeSchema name="forgerock-oauth2-provider-response-type-map-class"
                                  type="list"
                                  syntax="string"
@@ -349,9 +350,10 @@
                                      validator="RequiredValueValidator"
                                      i18nKey="a104">
                         <DefaultValues>
-                            <Value>org.forgerock.openam.oauth2.provider.impl.ScopeImpl</Value>
+                            <Value>org.forgerock.openam.oauth2.OpenAMScopeValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>
+
                     <AttributeSchema name="forgerock-oauth2-provider-response-type-map-class"
                                      type="list"
                                      syntax="string"

@@ -17,6 +17,7 @@
 package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -65,8 +66,8 @@ public interface OAuth2ProviderSettings {
      * @return The updated scope used in the remaining OAuth2 process.
      * @throws ServerException If any internal server error occurs.
      */
-    Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope)
-            throws ServerException;
+    Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope,
+            OAuth2Request request) throws ServerException, InvalidScopeException;
 
     /**
      * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when an access token
@@ -79,7 +80,7 @@ public interface OAuth2ProviderSettings {
      * @throws ServerException If any internal server error occurs.
      */
     Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope,
-            OAuth2Request request) throws ServerException;
+            OAuth2Request request) throws ServerException, InvalidScopeException;
 
     /**
      * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when a refresh token
@@ -93,7 +94,7 @@ public interface OAuth2ProviderSettings {
      * @throws ServerException If any internal server error occurs.
      */
     Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope,
-            Set<String> tokenScope, OAuth2Request request) throws ServerException;
+            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException;
 
     /**
      * Gets the resource owners information based on an issued access token.

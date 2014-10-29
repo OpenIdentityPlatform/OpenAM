@@ -795,6 +795,7 @@ public class OAuth2Constants {
         public static final String AMR_VALUE_MAPPING = "forgerock-oauth2-provider-amr-mappings";
         public static final String ACR_VALUE_MAPPING = "forgerock-oauth2-provider-loa-mapping";
         public static final String DEFAULT_ACR = "forgerock-oauth2-provider-default-acr";
+        public static final String INVALID_SCOPE_BEHAVIOUR = "forgerock-oauth2-provider-invalid-scope-behaviour";
     }
 
     /**

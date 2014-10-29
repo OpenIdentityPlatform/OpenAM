@@ -21,6 +21,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
@@ -53,5 +54,5 @@ public interface GrantTypeHandler {
      */
     AccessToken handle(OAuth2Request request) throws RedirectUriMismatchException, InvalidClientException,
             InvalidRequestException, ClientAuthenticationFailedException, InvalidGrantException, InvalidCodeException,
-            ServerException, UnauthorizedClientException;
+            ServerException, UnauthorizedClientException, InvalidScopeException;
 }

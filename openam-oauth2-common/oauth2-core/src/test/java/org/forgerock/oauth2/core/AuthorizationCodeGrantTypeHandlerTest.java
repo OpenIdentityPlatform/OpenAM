@@ -197,9 +197,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     }
 
     @Test
-    public void shouldHandleAndIssueRefreshToken() throws InvalidGrantException, RedirectUriMismatchException,
-            ClientAuthenticationFailedException, InvalidRequestException, InvalidCodeException, InvalidClientException,
-            ServerException {
+    public void shouldHandleAndIssueRefreshToken() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -242,9 +240,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     }
 
     @Test
-    public void shouldHandle() throws InvalidGrantException, RedirectUriMismatchException,
-            ClientAuthenticationFailedException, InvalidRequestException, InvalidCodeException, InvalidClientException,
-            ServerException {
+    public void shouldHandle() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);

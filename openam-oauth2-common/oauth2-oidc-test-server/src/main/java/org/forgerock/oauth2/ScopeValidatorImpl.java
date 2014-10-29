@@ -68,7 +68,7 @@ public class ScopeValidatorImpl implements ScopeValidator {
         this.openIDTokenIssuer = openIDTokenIssuer;
     }
 
-    public Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope) {
+    public Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope, OAuth2Request request) {
         if (scope == null || scope.isEmpty()) {
             return clientRegistration.getDefaultScopes();
         }

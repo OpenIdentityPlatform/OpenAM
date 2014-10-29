@@ -39,6 +39,7 @@ import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.util.Reject;
 import org.forgerock.util.encode.Base64;
@@ -74,7 +75,7 @@ public class Saml2GrantTypeHandler implements GrantTypeHandler {
     }
 
     public AccessToken handle(OAuth2Request request) throws InvalidGrantException, InvalidClientException,
-            ClientAuthenticationFailedException, InvalidRequestException, ServerException {
+            ClientAuthenticationFailedException, InvalidRequestException, ServerException, InvalidScopeException {
 
         String clientId = request.getParameter("client_id");
         Reject.ifTrue(isEmpty(clientId), "Missing parameter, 'client_id'");

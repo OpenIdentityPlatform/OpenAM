@@ -30,6 +30,7 @@ import org.forgerock.oauth2.core.ResponseTypeHandler;
 import org.forgerock.oauth2.core.ScopeValidator;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -117,15 +118,15 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         return scopeValidator;
     }
 
-    public Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope) throws ServerException {
-        return getScopeValidator().validateAuthorizationScope(clientRegistration, scope);
+    public Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope, OAuth2Request request) throws ServerException, InvalidScopeException {
+        return getScopeValidator().validateAuthorizationScope(clientRegistration, scope, request);
     }
 
-    public Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope, OAuth2Request request) throws ServerException {
+    public Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope, OAuth2Request request) throws ServerException, InvalidScopeException {
         return getScopeValidator().validateAccessTokenScope(clientRegistration, scope, request);
     }
 
-    public Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope, Set<String> tokenScope, OAuth2Request request) throws ServerException {
+    public Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope, Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException {
         return getScopeValidator().validateRefreshTokenScope(clientRegistration, requestedScope, tokenScope, request);
     }
 
@@ -275,4 +276,5 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     public Map<String, String> getAMRAuthModuleMappings() throws ServerException {
         return Collections.emptyMap();
     }
+
 }
