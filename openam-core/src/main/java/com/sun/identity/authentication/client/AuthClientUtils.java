@@ -938,7 +938,33 @@ public class AuthClientUtils {
             utilDebug.message("Check session upgrade : " + upgrade);
         }
         return (upgrade);
-    }   
+    }
+
+    /**
+     * Tells whether the incoming request corresponds to a session upgrade or ForceAuth.
+     *
+     * @param request The incoming HttpServletRequest.
+     * @return <code>true</code> if the request corresponds to a session upgrade or ForceAuth, <code>false</code>
+     * otherwise.
+     */
+    public static boolean isSessionUpgradeOrForceAuth(HttpServletRequest request) {
+        Hashtable reqDataHash = parseRequestParameters(request);
+        boolean isForceAuth = forceAuthFlagExists(reqDataHash);
+        if (!isForceAuth) {
+            try {
+                SSOTokenManager tokenManager = SSOTokenManager.getInstance();
+                SSOToken token = tokenManager.createSSOToken(request);
+                return checkSessionUpgrade(token, reqDataHash);
+            } catch (SSOException ssoe) {
+                if (utilDebug.messageEnabled()) {
+                    utilDebug.message("Unable to create sso token for isSessionUpgrade check: " + ssoe);
+                }
+            }
+        }
+
+        return isForceAuth;
+    }
+
     public static String getCookieURLForSessionUpgrade(HttpServletRequest request) {
         String cookieURL = null;
         try {

@@ -24,10 +24,7 @@
  *
  * $Id: LoginServlet.java,v 1.9 2009/02/18 03:38:42 222713 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.authentication.UI;
 
@@ -169,8 +166,8 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
             if (debug.messageEnabled()) {
                 debug.message("cookieURL : " + cookieURL);
             }
-            if (isLoginRequest && cookieURL != null && !cookieURL.isEmpty()
-                    && !AuthUtils.isLocalServer(cookieURL,true)) {
+            if (isLoginRequest && cookieURL != null && !cookieURL.isEmpty() && !AuthUtils.isLocalServer(cookieURL,true)
+                    && !AuthUtils.isSessionUpgradeOrForceAuth(request)) {
                 rerouteRequest(request, response, cookieURL);
             }
         }
