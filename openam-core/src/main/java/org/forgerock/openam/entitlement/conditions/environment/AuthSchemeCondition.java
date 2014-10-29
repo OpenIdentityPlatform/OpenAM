@@ -73,7 +73,7 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
     private final TimeService timeService;
 
     private Set<String> authScheme = new HashSet<String>();
-    private int applicationIdleTimeout = Integer.MAX_VALUE; //millis
+    private Integer applicationIdleTimeout = Integer.MAX_VALUE; //minutes
     private String applicationName;
     private String appIdleTimesoutAtSessionKey;
     private boolean appIdleTimeoutEnabled = false;
@@ -124,27 +124,11 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
             }
             setAuthScheme(authSc);
 
-            JSONArray applicationName = jo.getJSONArray(APPLICATION_NAME);
-            if (applicationName != null && applicationName.length() > 0) {
-                setApplicationName(applicationName.getString(0));
+            if (jo.has(APPLICATION_NAME)) {
+                setApplicationName(jo.getString(APPLICATION_NAME));
             }
-
-            JSONArray idleTimeout = jo.getJSONArray(APPLICATION_IDLE_TIMEOUT);
-            if (idleTimeout != null && idleTimeout.length() > 0) {
-                String idleTimeoutString = idleTimeout.getString(0).trim();
-                if (!idleTimeoutString.isEmpty()) {
-                    try {
-                        applicationIdleTimeout = Integer.parseInt(idleTimeoutString);
-                        setApplicationIdleTimeout(applicationIdleTimeout);
-                    } catch (NumberFormatException nfe) {
-                        //debug warning
-                        if (debug.warningEnabled()) {
-                            debug.warning("At AuthSchemeCondition.validateProperties():can not parse applicationIdleTimeout "
-                                    + "defaulting to " + Integer.MAX_VALUE);
-                        }
-                        setApplicationIdleTimeout(Integer.MAX_VALUE);
-                    }
-                }
+            if (jo.has(APPLICATION_IDLE_TIMEOUT)) {
+                setApplicationIdleTimeout(jo.getInt(APPLICATION_IDLE_TIMEOUT));
             }
         } catch (JSONException e) {
             debug.message("AuthSchemeCondition: Failed to set state", e);
@@ -257,7 +241,7 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
             }
 
             if (allowed) { //condition satisfied
-                long appIdleTimesoutAt = currentTimeMillis + applicationIdleTimeout;
+                long appIdleTimesoutAt = currentTimeMillis + getApplicationIdleTimeoutInMilliseconds();
                 setTokenProperty(token, appIdleTimesoutAtSessionKey, Long.toString(appIdleTimesoutAt));
                 timeToLive = appIdleTimesoutAt;
                 if (debug.messageEnabled()) {
@@ -335,7 +319,7 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
             if (idleTimesoutAtMillis <= currentTimeMillis) {
                 for (String authScheme : this.authScheme) {
                     long authInstant = AMAuthUtils.getAuthInstant(ssoToken, MODULE_INSTANCE, authScheme);
-                    idleTimesoutAtMillis = authInstant + applicationIdleTimeout;
+                    idleTimesoutAtMillis = authInstant + getApplicationIdleTimeoutInMilliseconds();
                     if (debug.messageEnabled()) {
                         debug.message("At AuthSchemeCondition.getApplicationIdleTimesoutAt():authScheme=" + authScheme
                                 + ",authInstant=" + authInstant + ",idleTimesoutAtMillis=" + idleTimesoutAtMillis
@@ -361,6 +345,9 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
     private JSONObject toJSONObject() throws JSONException {
         JSONObject jo = new JSONObject();
         toJSONObject(jo);
+        jo.put(AUTH_SCHEME, getAuthScheme());
+        jo.put(APPLICATION_NAME, getApplicationName());
+        jo.put(APPLICATION_IDLE_TIMEOUT, getApplicationIdleTimeout());
         return jo;
     }
 
@@ -386,13 +373,12 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
         this.authScheme = authScheme;
     }
 
-    public int getApplicationIdleTimeout() {
-        return applicationIdleTimeout;
+    public Integer getApplicationIdleTimeout() {
+        return applicationIdleTimeout == Integer.MAX_VALUE ? null : applicationIdleTimeout;
     }
 
     public void setApplicationIdleTimeout(int applicationIdleTimeout) {
-        //convert timeout in minutes to milliseconds
-        this.applicationIdleTimeout = applicationIdleTimeout * 60 * 1000;
+        this.applicationIdleTimeout = applicationIdleTimeout;
         updateIdleTimeoutEnabled();
     }
 
@@ -414,5 +400,9 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
         if (applicationName != null && applicationIdleTimeout != Integer.MAX_VALUE) {
             appIdleTimeoutEnabled = true;
         }
+    }
+
+    private long getApplicationIdleTimeoutInMilliseconds() {
+        return applicationIdleTimeout * 60 * 1000;
     }
 }
