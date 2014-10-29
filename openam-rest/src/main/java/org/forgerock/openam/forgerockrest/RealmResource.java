@@ -60,6 +60,9 @@ import org.forgerock.openam.utils.RealmUtils;
  */
 public final class RealmResource implements CollectionResourceProvider {
 
+    private static final String ACTIVE = "Active";
+    private static final String INACTIVE = "Inactive";
+
     private static final Debug debug = Debug.getInstance("frRest");
 
     // TODO: filters, sorting, paged results.
@@ -520,7 +523,8 @@ public final class RealmResource implements CollectionResourceProvider {
         try {
             Map map = new HashMap(2);
             Set values = new HashSet(2);
-            values.add(rstatus);
+
+            values.add(getStatusAttribute(rstatus));
             map.put(IdConstants.ORGANIZATION_STATUS_ATTR, values);
             if (realmAliases != null && !realmAliases.isEmpty()) {
                 Set values1 = new HashSet(2);
@@ -532,6 +536,17 @@ public final class RealmResource implements CollectionResourceProvider {
             throw e;
         }
         return defaultValues;
+    }
+
+    /**
+     * Defaults new realms to being active.
+     */
+    private String getStatusAttribute(String status) {
+        if (INACTIVE.equalsIgnoreCase(status)) {
+            return INACTIVE;
+        } else {
+            return ACTIVE;
+        }
     }
 
     /**
