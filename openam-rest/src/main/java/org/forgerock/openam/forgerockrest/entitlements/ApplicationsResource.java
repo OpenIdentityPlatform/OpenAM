@@ -447,8 +447,6 @@ public class ApplicationsResource extends RealmAwareResource {
 
         try {
             final Application app = appManager.getApplication(mySubject, realm, resourceId);
-            // Replace name with the requested app name.
-            app.setName(resourceId);
 
             final ApplicationWrapper wrapp = createApplicationWrapper(app, appTypeManagerWrapper);
 
