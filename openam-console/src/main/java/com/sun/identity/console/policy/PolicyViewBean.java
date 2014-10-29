@@ -32,6 +32,7 @@
  */
 package com.sun.identity.console.policy;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.jato.CompleteRequestException;
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestManager;
@@ -50,6 +51,7 @@ import com.sun.identity.console.policy.model.PolicyModelImpl;
 import com.sun.identity.console.realm.HasEntitiesTabs;
 import com.sun.identity.console.realm.RealmPropertiesBase;
 import com.sun.identity.policy.Policy;
+import com.sun.identity.shared.Constants;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
@@ -74,7 +76,7 @@ public class PolicyViewBean
     public static final String DEFAULT_DISPLAY_URL =
         "/console/policy/Policy.jsp";
 
-    public static final String XUI_POLICY_EDITOR = "../policyEditor/{0}#apps/";
+    public static final String XUI_POLICY_EDITOR = "{0}/policyEditor/{1}#apps/";
     public static final String XUI_POLICY_REALM = "?realm={0}";
 
     private static final String TF_FILTER = "tfFilter";
@@ -151,21 +153,22 @@ public class PolicyViewBean
         return view;
     }
 
-    public void beginDisplay(DisplayEvent event) throws ModelControlException
-    {
-        String redirect;
+    public void beginDisplay(DisplayEvent event) throws ModelControlException {
 
         String redirectRealm = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
+        String deploymentUri = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
 
+        String redirect;
         if (!"/".equals(redirectRealm)) {
-            redirect = MessageFormat.format(XUI_POLICY_EDITOR, MessageFormat.format(XUI_POLICY_REALM, redirectRealm));
+            redirect = MessageFormat.format(XUI_POLICY_EDITOR, deploymentUri,
+                    MessageFormat.format(XUI_POLICY_REALM, redirectRealm));
         } else {
-            redirect = MessageFormat.format(XUI_POLICY_EDITOR, "");
+            redirect = MessageFormat.format(XUI_POLICY_EDITOR, deploymentUri, "");
         }
 
         RequestContext rc = RequestManager.getRequestContext();
         try {
-            rc.getResponse().sendRedirect(redirect.toString());
+            rc.getResponse().sendRedirect(redirect);
             throw new CompleteRequestException();
         } catch (IOException e) {
             //never thrown, empty catch
