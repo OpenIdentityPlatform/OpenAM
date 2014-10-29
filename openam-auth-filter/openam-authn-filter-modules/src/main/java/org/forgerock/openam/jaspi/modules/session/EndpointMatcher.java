@@ -14,7 +14,7 @@
  * Copyright 2013-2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.jaspi.filter;
+package org.forgerock.openam.jaspi.modules.session;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.rest.router.RestEndpointManager;

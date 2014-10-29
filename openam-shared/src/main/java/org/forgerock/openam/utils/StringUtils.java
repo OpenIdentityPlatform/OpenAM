@@ -32,6 +32,8 @@ import org.forgerock.util.Reject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,6 +59,37 @@ public final class StringUtils {
 
     public static String insertContent(String original, int position, String content) {
         return original.substring(0, position) + content + original.substring(position);
+    }
+
+    /**
+     * Takes a list as a String (where each element is of the form name=value) and returns the value
+     * specified by parameterName (if it exists).
+     * @param list The list e.g. a=1,b=2,c=5
+     * @param delimiter The delimiter used to separate the elements (e.g. ",")
+     * @param parameterName The name of the parameter to return
+     * @return The value(s) specified by parameterName
+     */
+    public static List<String> getParameter(String list, String delimiter, String parameterName) {
+        String[] parameters = null;
+        if (list != null) {
+            parameters = list.split(delimiter);
+        }
+
+        List<String> result = new ArrayList<String>();
+        if (parameters != null) {
+            for (String parameter : parameters) {
+                String[] valueParameterPair = parameter.split("=");
+                final String currentParameterName = valueParameterPair[0];
+                if (currentParameterName != null) {
+                    if (parameterName.equals(currentParameterName.trim())) {
+                        if (valueParameterPair.length == 2) {
+                            result.add(valueParameterPair[1]);
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     /**

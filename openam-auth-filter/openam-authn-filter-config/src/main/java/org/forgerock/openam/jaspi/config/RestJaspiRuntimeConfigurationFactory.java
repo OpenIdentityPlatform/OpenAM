@@ -18,15 +18,12 @@ package org.forgerock.openam.jaspi.config;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.auth.common.AuditLogger;
-import org.forgerock.auth.common.AuditRecord;
-import org.forgerock.auth.common.AuthResult;
 import org.forgerock.auth.common.DebugLogger;
-import org.forgerock.auth.common.LoggingConfigurator;
 import org.forgerock.jaspi.logging.JaspiLoggingConfigurator;
 import org.forgerock.jaspi.runtime.context.config.ModuleConfigurationFactory;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.auth.shared.AuthDebugLogger;
-import org.forgerock.openam.jaspi.modules.session.LocalSSOTokenSessionModule;
+import org.forgerock.openam.jaspi.modules.session.OpenAMSessionModule;
 
 import javax.security.auth.message.MessageInfo;
 
@@ -74,7 +71,7 @@ public enum RestJaspiRuntimeConfigurationFactory implements JaspiLoggingConfigur
             JsonValue.object(
                 JsonValue.field(SERVER_AUTH_CONTEXT_KEY, JsonValue.object(
                     JsonValue.field(SESSION_MODULE_KEY, JsonValue.object(
-                        JsonValue.field(AUTH_MODULE_CLASS_NAME_KEY, LocalSSOTokenSessionModule.class.getName()),
+                        JsonValue.field(AUTH_MODULE_CLASS_NAME_KEY, OpenAMSessionModule.class.getName()),
                         JsonValue.field(AUTH_MODULE_PROPERTIES_KEY, JsonValue.object())
                     ))
                 ))

@@ -14,52 +14,63 @@
  * Copyright 2013-2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.jaspi.filter;
+package org.forgerock.openam.jaspi.modules.session;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.auth.common.FilterConfiguration;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.jaspi.JaspiRuntimeFilter;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.message.AuthException;
+import javax.security.auth.message.AuthStatus;
+import javax.security.auth.message.MessageInfo;
+import javax.security.auth.message.MessagePolicy;
+import javax.security.auth.message.module.ServerAuthModule;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
-import java.io.IOException;
+import java.util.Map;
 
 /**
- * Adds a check to see if the REST endpoint being hit is the authentication endpoint and if is then will skip
- * the authentication check. All other REST endpoints will be protected resulting in the request requiring a
- * SSOToken cookie set.
+ * Module to route endpoints to correct ServerAuthModule
  */
-public class AMAuthNFilter extends JaspiRuntimeFilter {
+public class OpenAMSessionModule implements ServerAuthModule {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
-
-    private final EndpointMatcher endpointMatcher;
+    private EndpointMatcher endpointMatcher;
+    private final OptionalSSOTokenSessionModule optionalSSOTokenSessionModule;
+    private final LocalSSOTokenSessionModule localSSOTokenSessionModule;
 
     /**
-     * Constructs an instance of the AMAuthNFilter.
+     * Constructs an instance of the RouterModule.
      */
-    public AMAuthNFilter() {
+    public OpenAMSessionModule() {
+        optionalSSOTokenSessionModule = new OptionalSSOTokenSessionModule();
+        localSSOTokenSessionModule = new LocalSSOTokenSessionModule();
+    }
+
+    @Override
+    public void initialize(MessagePolicy messagePolicy, MessagePolicy messagePolicy2, CallbackHandler callbackHandler, Map map) throws AuthException {
         endpointMatcher = new EndpointMatcher("/json", InjectorHolder.getInstance(RestEndpointManager.class));
+
+        optionalSSOTokenSessionModule.initialize(messagePolicy, messagePolicy2, callbackHandler, map);
+
+        localSSOTokenSessionModule.initialize(messagePolicy, messagePolicy2, callbackHandler, map);
         init();
     }
 
     /**
-     * Constructs an instance of the AMAuthNFilter.
+     * Constructs an instance of the RouterModule.
      * <p>
      * Used by tests.
      *
      * @param endpointManager An instance of the RestEndpointManager.
-     * @param filterConfiguration An instance of the FilterConfiguration.
      */
-    public AMAuthNFilter(final RestEndpointManager endpointManager, final FilterConfiguration filterConfiguration) {
-        super(filterConfiguration);
+    public OpenAMSessionModule(final RestEndpointManager endpointManager, OptionalSSOTokenSessionModule
+            optionalSSOTokenSessionModule, LocalSSOTokenSessionModule localSSOTokenSessionModule) {
+        this.optionalSSOTokenSessionModule = optionalSSOTokenSessionModule;
+        this.localSSOTokenSessionModule = localSSOTokenSessionModule;
         endpointMatcher = new EndpointMatcher("/json", endpointManager);
         init();
     }
@@ -83,39 +94,35 @@ public class AMAuthNFilter extends JaspiRuntimeFilter {
         endpointMatcher.endpoint(RestEndpointManager.SESSIONS, HttpMethod.POST, "_action", "validate");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void init(FilterConfig filterConfig) {
-        super.init(filterConfig);
+    @Override
+    public Class[] getSupportedMessageTypes() {
+        return new Class[]{HttpServletRequest.class, HttpServletResponse.class};
     }
 
-    /**
-     * Parses the URI and request method from the request and creates an UnprotectedEndpoint object and compares it
-     * against the set of valid UnprotectedEndpoints. If it matches then the request is passed down the filter chain,
-     * if it doesn't match then the Commons Authentication Filter is given the request to authenticate it first.
-     *
-     * @param servletRequest {@inheritDoc}
-     * @param servletResponse {@inheritDoc}
-     * @param filterChain {@inheritDoc}
-     * @throws IOException {@inheritDoc}
-     * @throws ServletException {@inheritDoc}
-     */
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-            throws IOException, ServletException {
-
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
+    @Override
+    public AuthStatus validateRequest(MessageInfo messageInfo, Subject subject, Subject subject2) throws AuthException {
+        HttpServletRequest request = (HttpServletRequest) messageInfo.getRequestMessage();
 
         String contextPath = request.getContextPath();
         String requestURI = request.getRequestURI();
         String path = requestURI.substring(contextPath.length());
 
         if (endpointMatcher.match(request)) {
-            DEBUG.message("Path: " + path + " Method: " + request.getMethod() + " Added as exception. Not protected.");
-            filterChain.doFilter(servletRequest, servletResponse);
+            DEBUG.message("Path: " + path + " Method: " + request.getMethod() + " Added as exception. Not protected");
+            return optionalSSOTokenSessionModule.validateRequest(messageInfo, subject, subject2);
         } else {
             DEBUG.message("Path: " + path + " Method: " + request.getMethod() + " Protected resource.");
-            super.doFilter(servletRequest, servletResponse, filterChain);
+            return localSSOTokenSessionModule.validateRequest(messageInfo, subject, subject2);
         }
+    }
+
+    @Override
+    public AuthStatus secureResponse(MessageInfo messageInfo, Subject subject) throws AuthException {
+        return localSSOTokenSessionModule.secureResponse(messageInfo, subject);
+    }
+
+    @Override
+    public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
+        localSSOTokenSessionModule.cleanSubject(messageInfo, subject);
     }
 }

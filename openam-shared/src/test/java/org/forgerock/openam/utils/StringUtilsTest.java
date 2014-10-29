@@ -101,4 +101,21 @@ public class StringUtilsTest {
         assertThat(StringUtils.isNotBlank("")).isFalse();
         assertThat(StringUtils.isNotBlank("             ")).isFalse();
     }
+
+    @Test
+    public void shouldReturnSingleValue() {
+        assertThat(StringUtils.getParameter("a=1,b=4,c=5", ",", "b").size() == 1);
+    }
+
+    @Test
+    public void shouldReturnMulitpleValues() {
+        assertThat(StringUtils.getParameter("a=1,b=4,c=5,b=6", ",", "b").size() == 2);
+    }
+
+    @Test
+    public void shouldReturnAnEmptyList() {
+        assertThat(StringUtils.getParameter("a=1,b=,c=5", ",", "b").size() == 0);
+        assertThat(StringUtils.getParameter("a=1,b,c=5", ",", "b").size() == 0);
+    }
+
 }

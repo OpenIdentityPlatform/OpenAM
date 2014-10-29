@@ -64,12 +64,18 @@ public class SessionResourceTest {
 
     private AMIdentity amIdentity;
 
+    private String headerResponse;
+    private String urlResponse;
+    private String cookieResponse;
+
     @BeforeMethod
     public void setUp() throws IdRepoException {
-
         sessionQueryManager = mock(SessionQueryManager.class);
         ssoTokenManager = mock(SSOTokenManager.class);
         authUtilsWrapper = mock(AuthUtilsWrapper.class);
+        headerResponse = null;
+        urlResponse = null;
+        cookieResponse = null;
 
         amIdentity = new AMIdentity(new DN("id=demo,dc=example,dc=com"), null);
 
@@ -82,6 +88,21 @@ public class SessionResourceTest {
             @Override
             String convertDNToRealm(String dn) {
                 return "/";
+            }
+
+            @Override
+            protected String getTokenIdFromHeader(ServerContext context, String cookieName) {
+                return headerResponse;
+            }
+
+            @Override
+            protected String getTokenIdFromUrlParam(ActionRequest request) {
+                return urlResponse;
+            }
+
+            @Override
+            protected String getTokenIdFromCookie(ServerContext context, String cookieName) {
+                return cookieResponse;
             }
         };
     }
@@ -155,6 +176,7 @@ public class SessionResourceTest {
     public void actionCollectionShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException {
 
         //Given
+        cookieResponse = "SSO_TOKEN_ID";
         final Map<String, Object> authzContext = new HashMap<String, Object>();
         authzContext.put("tokenId", "SSO_TOKEN_ID");
         final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
@@ -186,21 +208,16 @@ public class SessionResourceTest {
     public void actionCollectionShouldLogoutSessionAndReturnEmptyJsonObjectWhenSSOTokenValid() throws SSOException {
 
         //Given
+        cookieResponse = "SSO_TOKEN_ID";
         final Map<String, Object> authzContext = new HashMap<String, Object>();
         authzContext.put("tokenId", "SSO_TOKEN_ID");
         final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
         final ServerContext context = new ServerContext(tokenContext);
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
-        final SSOToken ssoToken = mock(SSOToken.class);
         final SSOTokenID ssoTokenId = mock(SSOTokenID.class);
 
         given(request.getAction()).willReturn("logout");
-        given(tokenContext.getCallerSSOToken(ssoTokenManager)).willReturn(ssoToken);
-        given(ssoTokenManager.isValidToken(ssoToken)).willReturn(true);
-        given(ssoToken.getTokenID()).willReturn(ssoTokenId);
-        given(ssoTokenId.toString()).willReturn("SSO_TOKEN_ID");
-        given(ssoTokenManager.createSSOToken(ssoTokenId.toString())).willReturn(ssoToken);
         given(authUtilsWrapper.logout(ssoTokenId.toString(), null, null)).willReturn(true);
 
         //When

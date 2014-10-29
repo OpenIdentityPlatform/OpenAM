@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.forgerockrest.session;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
@@ -23,9 +24,9 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.CaseInsensitiveHashMap;
-import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import org.forgerock.json.fluent.JsonValue;
@@ -42,13 +43,13 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
 
 import javax.inject.Inject;
@@ -58,9 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.json.fluent.JsonValue.*;
 
 /**
  * Represents Sessions that can queried via a REST interface.
@@ -135,11 +134,11 @@ public class SessionResource implements CollectionResourceProvider {
     /**
      * Actions supported are:
      * <ul>
-     *     <li>{@link #LOGOUT_ACTION_ID}</li>
-     *     <li>{@link #VALIDATE_ACTION_ID}</li>
-     *     <li>{@link #IS_ACTIVE_ACTION_ID}</li>
-     *     <li>{@link #GET_MAX_TIME_ACTION_ID}</li>
-     *     <li>{@link #GET_IDLE_ACTION_ID}</li>
+     * <li>{@link #LOGOUT_ACTION_ID}</li>
+     * <li>{@link #VALIDATE_ACTION_ID}</li>
+     * <li>{@link #IS_ACTIVE_ACTION_ID}</li>
+     * <li>{@link #GET_MAX_TIME_ACTION_ID}</li>
+     * <li>{@link #GET_IDLE_ACTION_ID}</li>
      * </ul>
      *
      * @param context {@inheritDoc}
@@ -147,42 +146,53 @@ public class SessionResource implements CollectionResourceProvider {
      * @param handler {@inheritDoc}
      */
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+        final String cookieName = SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro");
 
-        try {
-            final SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken(ssoTokenManager);
+        String tokenId = getTokenIdFromHeader(context, cookieName);
 
-            // Should any of these actions in the future be allowed to function without an SSO token, this
-            // code will have to be moved/changed.
-            //
-            if (handleNullSSOToken(ssoToken, handler)) {
-                return;
-            }
-            String tokenId = request.getAdditionalParameter("tokenId");
-            if (tokenId == null) {
-                tokenId = ssoToken.getTokenID().toString();
-            }
-            internalHandleAction(tokenId, request, handler);
-
-        } catch (SSOException e) {
-            LOGGER.message("SessionResource.actionCollection :: SSO Token unreadable from provided context.", e);
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, e.getMessage()));
+        if (tokenId == null) {
+            tokenId = getTokenIdFromCookie(context, cookieName);
         }
-    }
 
-    /**
-     * Handle the situation where we don't have an SSO token.
-     * @param ssoToken The sso token, which may or may not be null
-     * @param handler The result handler
-     * @return true if the ssoToken is null and the error is handled, false otherwise.
-     */
-    private boolean handleNullSSOToken(SSOToken ssoToken, ResultHandler<JsonValue> handler) {
-        if (ssoToken == null) {
+        if (tokenId == null) {
+            tokenId = getTokenIdFromUrlParam(request);
+        }
+
+        // Should any of these actions in the future be allowed to function without an SSO token, this
+        // code will have to be moved/changed.
+        if (tokenId == null) {
             final BadRequestException e = new BadRequestException("iPlanetDirectoryCookie not set on request");
             LOGGER.message("SessionResource.handleNullSSOToken :: iPlanetDirectoryCookie not set on request", e);
             handler.handleError(e);
-            return true;
+            return;
         }
-        return false;
+
+        internalHandleAction(tokenId, request, handler);
+    }
+
+    protected String getTokenIdFromUrlParam(ActionRequest request) {
+        return request.getAdditionalParameter("tokenId");
+    }
+
+    protected String getTokenIdFromCookie(ServerContext context, String cookieName) {
+        List<String> cookieValue = StringUtils.getParameter(context.asContext(HttpContext.class).getHeaderAsString("cookie"), ";",
+                cookieName);
+
+        if (!cookieValue.isEmpty()) {
+            return cookieValue.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    protected String getTokenIdFromHeader(ServerContext context, String cookieName) {
+        final List<String> header = context.asContext(HttpContext.class).getHeader
+                (cookieName.toLowerCase());
+
+        if (!header.isEmpty()) {
+            return header.get(0);
+        }
+        return null;
     }
 
     /**

@@ -220,6 +220,14 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
                 return AuthStatus.SUCCESS;
             }
         }
+        return getDefaultAuthStatus();
+    }
+
+    /**
+     * The AuthStatus to be returned if no tokenId is specified in the request
+     * @return The default AuthStatus to be returned if no tokenId is specified in the request
+     */
+    protected AuthStatus getDefaultAuthStatus() {
         return AuthStatus.SEND_FAILURE;
     }
 

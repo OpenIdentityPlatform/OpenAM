@@ -23,7 +23,7 @@ import org.forgerock.jaspi.logging.JaspiLoggingConfigurator;
 import org.forgerock.jaspi.runtime.context.config.ModuleConfigurationFactory;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.auth.shared.AuthDebugLogger;
-import org.forgerock.openam.jaspi.modules.session.LocalSSOTokenSessionModule;
+import org.forgerock.openam.jaspi.modules.session.OpenAMSessionModule;
 import org.testng.annotations.Test;
 
 import javax.security.auth.message.MessageInfo;
@@ -49,7 +49,7 @@ public class RestJaspiRuntimeConfigurationFactoryTest {
         //Then
         assertEquals(configuration.get(SERVER_AUTH_CONTEXT_KEY)
                 .get(SESSION_MODULE_KEY)
-                .get(AUTH_MODULE_CLASS_NAME_KEY).asString(), LocalSSOTokenSessionModule.class.getName());
+                .get(AUTH_MODULE_CLASS_NAME_KEY).asString(), OpenAMSessionModule.class.getName());
         assertTrue(configuration.get(SERVER_AUTH_CONTEXT_KEY)
                 .get(SESSION_MODULE_KEY)
                 .get(AUTH_MODULE_PROPERTIES_KEY).asMap().isEmpty());

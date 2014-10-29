@@ -14,7 +14,7 @@
  * Copyright 2013-2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.jaspi.filter;
+package org.forgerock.openam.jaspi.modules.session;
 
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.testng.annotations.BeforeMethod;
