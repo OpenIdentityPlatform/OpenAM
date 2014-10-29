@@ -1,0 +1,27 @@
+<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+<div class="striped-list created-items" id="selectedRealms">
+    <h3>Realms</h3>
+    <ul>
+        {{#if entity.realms}}
+        {{#each entity.realms}}
+        <li data-realm="{{this}}" {{#equals this ../../options.justAdded}}class="highlight-good"{{/equals}}>
+            {{policyEditorRealmHelper this}}
+            <span tabindex="0" class="icon-close float-right"></span>
+        </li>
+        {{/each}}
+        {{else}}
+        <li class="invalid">There are no realms...</li>
+        {{/if}}
+
+        <li class="editing clearfix">
+            {{policyEditorRealmHelper options.parentRealm}}
+            <span class="realm">/</span>
+            <input id="siblingRealm" type="text" placeholder="{{options.currentRealm}}{{#unless options.currentRealm}}Enter realm...{{/unless}}" value="{{options.currentRealm}}"  />
+            {{#if options.currentRealm}}
+            <span class="realm" id="lastFSlash">/</span>
+            <input id="subRealm"type="text" placeholder="" />
+            {{/if}}
+            <span tabindex="0" class="icon-plus float-right"></span>
+        </li>
+    </ul>
+</div>

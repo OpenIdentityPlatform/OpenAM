@@ -76,7 +76,6 @@ define("org/forgerock/openam/ui/policy/ReviewInfoView", [
 
         toggleAdvancedView: function (e) {
             e.preventDefault();
-
             this.data.advancedMode = !this.data.advancedMode;
             sessionStorage.setItem(this.storageKey, this.data.advancedMode);
             this.renderParent();

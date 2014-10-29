@@ -151,6 +151,60 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         });
     };
 
+
+
+    obj.getReferralByName = function (name) {
+
+        var myReferral = {
+          "name" : "myReferral",
+          "resources" : {
+            "Referrals" : [ "http://host.com/resources/*" ]
+          },
+          "realms" : [ "/subrealm", "/subrealm/subrealm2",  "/subrealm/subrealm2/subrealm3",  "/subrealm/subrealm2/subrealm3/subrealm4",  "/subrealm/subrealm2/subrealm3/subrealm4/subrealm5"  ],
+          "creationDate" : 1413804802968,
+          "lastModifiedDate" : 1413804802968,
+          "createdBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+          "lastModifiedBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org"
+        };
+        return myReferral;
+
+
+        /*obj.serviceCall({
+            url: "/referrals/" + name,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+        });*/
+    };
+
+    obj.updateReferral = function (name, data) {
+        return obj.serviceCall({
+            url: "/referrals/" + name,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            type: "PUT",
+            data: JSON.stringify(data),
+            errorsHandlers: obj.ERROR_HANDLERS
+        });
+    };
+
+    obj.createReferral = function (data) {
+        return obj.serviceCall({
+            url: "/referrals/" + data.name,
+            headers: { "If-None-Match": "*", "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            type: "PUT",
+            data: JSON.stringify(data),
+            errorsHandlers: obj.ERROR_HANDLERS
+        });
+    };
+
+    obj.deleteReferral = function (name) {
+        return obj.serviceCall({
+            url: "/referrals/" + name,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            type: "DELETE"
+        });
+    };
+
+
+
     obj.getAllUserAttributes = function () {
         return obj.serviceCall({
             url: "/subjectattributes?_queryId",
@@ -164,7 +218,6 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
-
 
     obj.importPolicies = function (data) {
         return obj.serviceCall({

@@ -77,7 +77,10 @@ define("config/messages/PolicyMessages", [], function () {
         "duplicateResource": {
             msg: "config.messages.PolicyMessages.duplicateResource",
             type: "error"
-
+        },
+        "duplicateRealm": {
+            msg: "config.messages.PolicyMessages.duplicateRealm",
+            type: "error"
         },
         "unableToPersistPolicy": {
             msg: "config.messages.PolicyMessages.unableToPersistPolicy",

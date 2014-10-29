@@ -1,14 +1,19 @@
-<p>Switch to <a href="" id="toggleAdvanced">{{#if advancedMode}}non-advanced{{else}}advanced{{/if}}</a> view state.</p>
+<p>Review the policy configuration and click Finish to save.</p>
+<p>Switch to <a href="#" id="toggleAdvanced">{{#if advancedMode}}non-advanced{{else}}advanced{{/if}}</a> view state.</p>
 
 {{! The IDs are used for testing }}
 <div class="col2">
     <div class="review-row clearfix{{#equals '' entity.name}} invalid{{/equals}}" tabindex="0">
         <h2>Name</h2>
         {{#unless advancedMode}}
+        {{#if entity.name}}
         <span class="icon-arrow-down2"></span>
+        {{/if}} 
         {{/unless}}
         <div class="advanced-mode">
-            <p id="reviewName">{{entity.name}}</p>
+            
+            <p id="reviewName"{{#unless entity.name}} class="invalid"{{/unless}}>{{#if entity.name}}{{entity.name}}{{else}}There is no name{{/if}}</p>
+        
             {{#if entity.description}}
             <h2>Description</h2>
             <p id="reviewDesc">{{entity.description}}</p>
@@ -27,7 +32,7 @@
                 {{#each entity.resources}}<li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>{{/each}}
             </ul>
             {{else}}
-            <pre>There are no resources...</pre>
+            <p class="invalid">There are no resources</p>
             {{/if}}
         </div>
     </div>
@@ -62,6 +67,8 @@
         <div class="advanced-mode">
             {{#if subjectString}}
             <pre>{{subjectString}}</pre>
+            {{else}}
+            <pre>There are no subject conditions...</pre>
             {{/if}}
         </div>
     </div>

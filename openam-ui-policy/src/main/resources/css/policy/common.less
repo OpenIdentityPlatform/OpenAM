@@ -77,14 +77,6 @@
 
     }
 
-    .group-field-block {
-        margin: 15px 0;
-
-        input {
-            margin: 2px 5px 0 0;
-        }
-    }
-
     .prop-val {
         float: left;
     }
@@ -118,6 +110,8 @@
         overflow-x: auto;
         position: relative;
 
+        transition: background 100ms linear;
+
         [class*="icon-arrow-"], .advanced-empty-msg {
             position: absolute;
             top: 8px;
@@ -135,13 +129,9 @@
 
         .advanced-mode {
             margin: 0 0 13px;
-
-            &.hidden {
-                display: none;
-            }
         }
 
-        &.invalid{
+        &.invalid {
             .invalid-background;
             .invalid {
                 color: red;
@@ -149,6 +139,10 @@
 
             .advanced-empty-msg {
                 display: none;
+            }
+
+            &:hover {
+                background-color: #FFB5B5;
             }
         }
 
@@ -304,7 +298,7 @@
             }
         }
 
-        td[aria-describedby*="_name"] {
+        td[aria-describedby*="_name"], td[aria-describedby*="_description"] {
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
@@ -538,6 +532,7 @@ span.item-button-panel {
       &#createdResources {
           li.editing, li.editing:hover {
               min-height: 36px;
+              line-height: 36px;
               input {
                   width: 27px;
                   min-width: 27px;
@@ -557,6 +552,8 @@ span.item-button-panel {
         border: 1px solid #ccc;
         border-top:none;
         transition: background 1s linear;
+        word-wrap: break-word;
+        word-break: break-all;
 
         &.highlight-info {
             background:#ffc;
@@ -707,10 +704,6 @@ html .selectize-dropdown .optgroup-header{
     content: ' ';
 }
 
-#realImport {
-    display: none;
-}
-
 /* These are jquery-theme over-rides*/
 
 .ui-widget-content .ui-state-hover{
@@ -727,3 +720,22 @@ html .selectize-dropdown .optgroup-header{
 
 
 /*...*/
+
+
+
+span.realm{
+    color:#80b7ab;
+    padding:0 5px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+#lastFSlash {
+    transition:opacity 300ms linear;
+    &.fade{
+        opacity:0;  
+    }
+}
+
+
+

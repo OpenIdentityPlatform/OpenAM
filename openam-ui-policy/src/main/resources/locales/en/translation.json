@@ -47,10 +47,12 @@
                 "edit": "Edit ",
                 "createApp": "Create Application",
                 "createPol": "Create Policy",
+                "createRef": "Create Referal",
                 "unableToRetrievePolicy" : "Unable to retrieve policy",
                 "invalidResource" : "Invalid resource",
                 "duplicateResource" : "Duplicate resource",
                 "duplicateAttribute": "Duplicate attribute",
+                "duplicateRealm": "Duplicate realm",
                 "unableToPersistPolicy" : "Unable to persist policy in datastore",
                 "policiesUploaded" : "Policies uploaded successfully",
                 "policiesUploadFailed": "Failed to upload policies"

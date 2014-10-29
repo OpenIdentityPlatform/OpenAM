@@ -188,7 +188,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
         prepareInfoReview: function(){
             this.data.combinedStaticAttrs = responseAttrsStaticView.getCombinedAttrs();
             this.data.userAttrs =           responseAttrsUserView.getAttrs();
-            this.data.responseAttrs = this.data.combinedStaticAttrs.concat(this.data.userAttrs);
+            this.data.responseAttrs =       this.data.combinedStaticAttrs.concat(this.data.userAttrs);
             this.data.subjectString =       JSON.stringify(this.data.entity.subject, null, 2);
             this.data.environmentString =   JSON.stringify(this.data.entity.condition, null, 2);
         },

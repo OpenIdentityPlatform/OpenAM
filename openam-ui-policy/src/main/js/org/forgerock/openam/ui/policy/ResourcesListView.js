@@ -140,7 +140,6 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
         },
 
         flashDomItem: function ( item, className ) {
-            var self = this;
             item.addClass(className);
             $.doTimeout(_.uniqueId(className), 2000, function() {
                 item.removeClass(className);
@@ -149,7 +148,7 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
 
     });
 
-    Handlebars.registerHelper('resourceHelper', function() {
+    Handlebars.registerHelper('policyEditorResourceHelper', function() {
         var result  = this.options.newPattern.replace('-*-', '̂');
         result = result.replace(/\*/g, '<input required type="text" value="*" placeholder="*" />');
         result = result.replace('̂',   '<input required type="text" value="-*-" placeholder="-*-" pattern="[^\/]+" />');

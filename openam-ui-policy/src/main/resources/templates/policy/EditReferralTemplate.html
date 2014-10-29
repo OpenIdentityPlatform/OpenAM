@@ -1,0 +1,62 @@
+<div class="content-bg">
+    <div class="policy-header">
+        <a href="#app/{{appName}}/policies/" id="cancelButton" class="button float-right">Back</a>
+        {{#if entity.name}}
+        <h1>{{t "config.messages.PolicyMessages.edit"}}<span>{{entity.name}}</span></h1>
+        {{else}}
+        <h1>{{t "config.messages.PolicyMessages.createRef"}}</h1>
+        {{/if}}
+        <h2>Realm: {{options.realm}}</h2>
+    </div>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        
+    <form class="form">
+
+        <div id="policy-steps" class="accordion">
+
+
+            <h1 class="accordion-header" tabindex="0">Step 1: Define a Referral Name</h1>
+            <section class="accordion-step clearfix">
+
+                <div class="group-field-block">
+                    <label class="short" for="policyName">Name</label>
+                    <input class="prop-val" id="policyName" type="text" value="{{entity.name}}" data-field="name" autofocus required/>
+                </div>
+
+                <input class="button" type="button" value="Next" name="nextButton">
+
+            </section>
+
+            <h1 class="accordion-header" tabindex="0">Step 2: Add Resources</h1>
+            <section class="accordion-step clearfix">
+
+                <div class="clearfix">
+                    <div class="col2" id="patterns"></div>
+                    <div class="col2" id="resourcesList"></div>
+                </div>
+                <input class="button" type="button" value="Next" name="nextButton">
+
+            </section>
+
+            <h1 class="accordion-header" tabindex="0">Step 3: Select Realms</h1>
+            <section class="accordion-step clearfix">
+
+                <div class="clearfix" id="selectRealms">
+       
+                </div>
+                
+                <input class="button" type="button" value="Next" name="nextButton">
+
+            </section>
+
+            <h1 class="accordion-header" tabindex="0">Step 4: Summary and Confirmation View</h1>
+            <section class="accordion-step clearfix">
+
+                <div id="reviewInfo" class="clearfix"></div>
+                <input class="button" type="button" value="Finish" name="submitForm">
+
+            </section>
+ 
+        </div>
+    </form>
+</div>

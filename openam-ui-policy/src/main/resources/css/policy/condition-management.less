@@ -561,11 +561,18 @@ section.active-step{
 
 
 /* Jquery-UI overrides */
-.ui-widget-content {
+
+.ui-jqgrid tr.ui-widget-content {
 	border: 1px solid #ccc;
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+
+	&.jqgrow td {
+		
+		padding: 5px 10px;
+	}
 }
+
 
 .ui-autocomplete {
     max-height: 200px;

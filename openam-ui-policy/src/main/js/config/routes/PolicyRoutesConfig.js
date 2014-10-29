@@ -53,6 +53,13 @@ define("config/routes/PolicyRoutesConfig", [
             role: "ui-admin",
             pattern: "app/?/policy/?"
         },
+        "editReferral": {
+            view: "org/forgerock/openam/ui/policy/EditReferralView",
+            url: /^app\/([%A-Za-z0-9 ]+)\/ref\/([%A-Za-z0-9 ]*)(?:\/){0,1}$/,
+            defaults: ["", ""],
+            role: "ui-admin",
+            pattern: "app/?/ref/?"
+        },
         "amConsole": {
             url: "console",
             event: constants.EVENT_RETURN_TO_AM_CONSOLE

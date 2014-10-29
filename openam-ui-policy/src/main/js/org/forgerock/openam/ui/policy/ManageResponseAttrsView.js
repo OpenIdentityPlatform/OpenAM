@@ -58,7 +58,6 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
             this.parentRender(function () {
 
                 delete self.data.options.justAdded;
-
                 self.flashDomItem( self.$el.find('.highlight-good'), 'highlight-good');
     
                 if (callback) {

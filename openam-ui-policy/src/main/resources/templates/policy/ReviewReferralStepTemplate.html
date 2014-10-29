@@ -13,18 +13,11 @@
         {{/unless}}
         <div class="advanced-mode">
             <p id="reviewName"{{#unless entity.name}} class="invalid"{{/unless}}>{{#if entity.name}}{{entity.name}}{{else}}There is no name{{/if}}</p>
-            {{#if entity.description}}
-            <h2>Description</h2>
-            <p id="reviewDesc">{{entity.description}}</p>
-            {{/if}}
         </div>
     </div>
 
-</div>
-
-<div class="col2">
     <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resources}} invalid{{/unless}}" tabindex="0" >
-        <h2>Application Base</h2>
+        <h2>Resources</h2>
         {{#unless advancedMode}}
         {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
         {{/unless}}
@@ -40,4 +33,27 @@
             {{/if}}
         </div>
     </div>
+
+</div>
+
+<div class="col2">
+
+    <div class="review-row clearfix {{#unless entity.realms}} invalid{{/unless}}" tabindex="0" >
+        <h2>Realms</h2>
+        {{#unless advancedMode}}
+        {{#if entity.realms}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if entity.realms}}
+            <ul id="reviewRes">
+                {{#each entity.realms}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+            {{else}}
+            <p class="invalid">There are no realms</p>
+            {{/if}}
+        </div>
+    </div>
+
 </div>
