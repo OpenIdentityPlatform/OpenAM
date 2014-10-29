@@ -20,8 +20,10 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.rest.RestEndpoints;
 import org.restlet.Application;
 import org.restlet.Restlet;
-import org.restlet.data.MediaType;
 import org.restlet.service.StatusService;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Restlet Application for REST Service Endpoints.
@@ -29,6 +31,14 @@ import org.restlet.service.StatusService;
  * @since 12.0.0
  */
 public abstract class ServiceEndpointApplication extends Application {
+
+    final static String RESTLET_LOGGER_NAME = "org.restlet.Component.LogService";
+
+    // OPENAM-3275
+    static {
+        Logger logger = Logger.getLogger(RESTLET_LOGGER_NAME);
+        logger.setLevel(Level.OFF);
+    }
 
     private final RestEndpoints restEndpoints;
 
