@@ -458,6 +458,7 @@
     <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ConfigureGoogleAppsViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ConfigureGoogleAppsWarningViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ConfigureGoogleAppsCompleteViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ConfigureSocialAuthNViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FSSAMLSiteIDEditViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ConfigureSalesForceAppsCompleteViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FSSAMLSetTrustedPartnerTypeViewBean" />
