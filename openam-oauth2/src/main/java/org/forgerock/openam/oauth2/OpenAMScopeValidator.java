@@ -56,6 +56,7 @@ import java.util.Set;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.*;
 
 /**
  * Provided as extension points to allow the OpenAM OAuth2 provider to customise the requested scope of authorize,
@@ -167,10 +168,13 @@ public class OpenAMScopeValidator implements ScopeValidator {
                 ((OpenAMAccessToken) token).getRealm(), request));
         for(String scope: scopes){
 
+            if (OPENID.equals(scope)) {
+                continue;
+            }
             //get the attribute associated with the scope
             Object attributes = scopeToUserUserProfileAttributes.get(scope);
             if (attributes == null){
-                logger.error("ScopeImpl.getUserInfo()::Invalid Scope in token scope=" + scope);
+                logger.error("OpenAMScopeValidator.getUserInfo()::Invalid Scope in token scope=" + scope);
             } else if (attributes instanceof String){
                 Set<String> attr = null;
 
@@ -178,9 +182,15 @@ public class OpenAMScopeValidator implements ScopeValidator {
                 try {
                     attr = id.getAttribute((String)attributes);
                 } catch (IdRepoException e) {
-                    logger.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                    if (logger.warningEnabled()) {
+                        logger.warning("OpenAMScopeValidator.getUserInfo(): Unable to retrieve attribute=" +
+                                attributes, e);
+                    }
                 } catch (SSOException e) {
-                    logger.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                    if (logger.warningEnabled()) {
+                        logger.warning("OpenAMScopeValidator.getUserInfo(): Unable to retrieve attribute=" +
+                                attributes, e);
+                    }
                 }
 
                 //add a single object to the response.
@@ -189,8 +199,11 @@ public class OpenAMScopeValidator implements ScopeValidator {
                 } else if (attr != null && attr.size() > 1){ // add a set to the response
                     response.put(scope, attr);
                 } else {
-                    //attr is null or attr is empty
-                    logger.error("ScopeImpl.getUserInfo(): Got an empty result for scope=" + scope);
+                    if (logger.warningEnabled()) {
+                        //attr is null or attr is empty
+                        logger.warning("OpenAMScopeValidator.getUserInfo(): Got an empty result for attribute=" +
+                                attributes + " of scope=" + scope);
+                    }
                 }
             } else if (attributes instanceof Map){
 
@@ -206,9 +219,15 @@ public class OpenAMScopeValidator implements ScopeValidator {
                         try {
                             attr = id.getAttribute(attribute);
                         } catch (IdRepoException e) {
-                            logger.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                            if (logger.warningEnabled()) {
+                                logger.warning("OpenAMScopeValidator.getUserInfo(): Unable to retrieve attribute=" +
+                                        attributes, e);
+                            }
                         } catch (SSOException e) {
-                            logger.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                            if (logger.warningEnabled()) {
+                                logger.warning("OpenAMScopeValidator.getUserInfo(): Unable to retrieve attribute=" +
+                                        attributes, e);
+                            }
                         }
 
                         //add the attribute value(s) to the response
@@ -217,8 +236,11 @@ public class OpenAMScopeValidator implements ScopeValidator {
                         } else if (attr != null && attr.size() > 1){
                             response.put(entry.getKey(), attr);
                         } else {
-                            //attr is null or attr is empty
-                            logger.error("ScopeImpl.getUserInfo(): Got an empty result for scope=" + scope);
+                            if (logger.warningEnabled()) {
+                                //attr is null or attr is empty
+                                logger.warning("OpenAMScopeValidator.getUserInfo(): Got an empty result for scope=" +
+                                        scope);
+                            }
                         }
                     }
                 }
@@ -232,36 +254,43 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * {@inheritDoc}
      */
     public Map<String, Object> evaluateScope(AccessToken accessToken) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        Set<String> scopes = accessToken.getScope();
-        String resourceOwner = accessToken.getResourceOwnerId();
+        final Map<String, Object> map = new HashMap<String, Object>();
+        final Set<String> scopes = accessToken.getScope();
 
-        if ((resourceOwner != null) && (scopes != null) && (!scopes.isEmpty())){
-            AMIdentity id = null;
-            try {
-                id = identityManager.getResourceOwnerIdentity(resourceOwner,
-                        ((OpenAMAccessToken) accessToken).getRealm());
-            } catch (Exception e){
-                logger.error("Unable to get user identity", e);
+        if (scopes.isEmpty()) {
+            return map;
+        }
+
+        final String resourceOwner = accessToken.getResourceOwnerId();
+        final String clientId = accessToken.getClientId();
+        final String realm = ((OpenAMAccessToken) accessToken).getRealm();
+        AMIdentity id = null;
+        try {
+            if (clientId != null && CLIENT_CREDENTIALS.equals(accessToken.getGrantType()) ) {
+                id = identityManager.getClientIdentity(clientId, realm);
+            } else if (resourceOwner != null) {
+                id = identityManager.getResourceOwnerIdentity(resourceOwner, realm);
             }
-            if (id != null){
-                for (String scope : scopes){
-                    try {
-                        Set<String> attributes = id.getAttribute(scope);
-                        if (attributes != null || !attributes.isEmpty()) {
-                            Iterator<String> iter = attributes.iterator();
-                            StringBuilder builder = new StringBuilder();
-                            while (iter.hasNext()) {
-                                builder.append(iter.next());
-                                if (iter.hasNext()) {
-                                    builder.append(MULTI_ATTRIBUTE_SEPARATOR);
-                                }
+        } catch (Exception e) {
+            logger.error("Unable to get user identity", e);
+        }
+        if (id != null) {
+            for (String scope : scopes) {
+                try {
+                    Set<String> attributes = id.getAttribute(scope);
+                    if (attributes != null || !attributes.isEmpty()) {
+                        Iterator<String> iter = attributes.iterator();
+                        StringBuilder builder = new StringBuilder();
+                        while (iter.hasNext()) {
+                            builder.append(iter.next());
+                            if (iter.hasNext()) {
+                                builder.append(MULTI_ATTRIBUTE_SEPARATOR);
                             }
-                            map.put(scope, builder.toString());
                         }
-                    } catch (Exception e) {
-                        logger.error("Unable to get attribute", e);
+                        map.put(scope, builder.toString());
                     }
+                } catch (Exception e) {
+                    logger.error("Unable to get attribute", e);
                 }
             }
         }
@@ -283,7 +312,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
     public void additionalDataToReturnFromTokenEndpoint(AccessToken accessToken, OAuth2Request request)
             throws ServerException, InvalidClientException {
         final Set<String> scope = accessToken.getScope();
-        if (scope != null && scope.contains("openid")) {
+        if (scope != null && scope.contains(OPENID)) {
             final Map.Entry<String, String> tokenEntry = openIDTokenIssuer.issueToken(accessToken, request);
             if (tokenEntry != null) {
                 accessToken.addExtraData(tokenEntry.getKey(), tokenEntry.getValue());
