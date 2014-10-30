@@ -61,6 +61,7 @@ public class MigrateValidGotoSetting extends AbstractUpgradeStep {
     private static final String DELEGATION_POLICY_FILE = "/WEB-INF/template/sms/validationServiceDelegationPolicy.xml";
     private static final String GOTO_DATA = "%GOTO_DATA%";
     private final Map<String, Set<String>> changes = new HashMap<String, Set<String>>();
+    private boolean delegationPolicyFound = false;
 
     @Inject
     public MigrateValidGotoSetting(PrivilegedAction<SSOToken> adminTokenAction,
@@ -70,7 +71,7 @@ public class MigrateValidGotoSetting extends AbstractUpgradeStep {
 
     @Override
     public boolean isApplicable() {
-        return !changes.isEmpty();
+        return !delegationPolicyFound;
     }
 
     @Override
@@ -99,6 +100,8 @@ public class MigrateValidGotoSetting extends AbstractUpgradeStep {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("Found the following existing goto URL domains in realms: " + changes);
                 }
+            } else {
+                delegationPolicyFound = true;
             }
         } catch (final NameNotFoundException nnfe) {
             throw new UpgradeException("Unable to find hidden realm", nnfe);
@@ -114,27 +117,28 @@ public class MigrateValidGotoSetting extends AbstractUpgradeStep {
     @Override
     public void perform() throws UpgradeException {
         try {
-            final ServiceConfigManager validationService = new ServiceConfigManager(VALIDATION_SERVICE,
-                    getAdminToken());
-            final ServiceConfigManager authService = new ServiceConfigManager(ISAuthConstants.AUTH_SERVICE_NAME,
-                    getAdminToken());
-            for (final Map.Entry<String, Set<String>> entry : changes.entrySet()) {
-                final String realm = entry.getKey();
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("Starting to migrate goto domains for realm: " + realm);
-                }
-                UpgradeProgress.reportStart("upgrade.goto.migrate.start", realm);
-                validationService.createOrganizationConfig(realm, getAttrMap(GOTO_RESOURCES, entry.getValue()));
+            if (!changes.isEmpty()) {
+                final ServiceConfigManager validationService = new ServiceConfigManager(VALIDATION_SERVICE,
+                        getAdminToken());
+                final ServiceConfigManager authService = new ServiceConfigManager(ISAuthConstants.AUTH_SERVICE_NAME,
+                        getAdminToken());
+                for (final Map.Entry<String, Set<String>> entry : changes.entrySet()) {
+                    final String realm = entry.getKey();
+                    if (DEBUG.messageEnabled()) {
+                        DEBUG.message("Starting to migrate goto domains for realm: " + realm);
+                    }
+                    UpgradeProgress.reportStart("upgrade.goto.migrate.start", realm);
+                    validationService.createOrganizationConfig(realm, getAttrMap(GOTO_RESOURCES, entry.getValue()));
 
-                //The settings now are migrated, we should now clear up the legacy settings
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("Removing old goto domains from iPlanetAMAuthService");
+                    //The settings now are migrated, we should now clear up the legacy settings
+                    if (DEBUG.messageEnabled()) {
+                        DEBUG.message("Removing old goto domains from iPlanetAMAuthService");
+                    }
+                    final ServiceConfig organizationConfig = authService.getOrganizationConfig(realm, null);
+                    organizationConfig.setAttributes(getAttrMap(LEGACY_GOTO_DOMAINS_SETTING, Collections.EMPTY_SET));
+                    UpgradeProgress.reportEnd("upgrade.success");
                 }
-                final ServiceConfig organizationConfig = authService.getOrganizationConfig(realm, null);
-                organizationConfig.setAttributes(getAttrMap(LEGACY_GOTO_DOMAINS_SETTING, Collections.EMPTY_SET));
-                UpgradeProgress.reportEnd("upgrade.success");
             }
-
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Attempting to create the delegation policy in the hidden realm");
             }
