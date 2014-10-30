@@ -1304,5 +1304,8 @@ public interface Constants {
      */
     public static final String CORE_TOKEN_RESOURCE_ENABLED = "org.forgerock.openam.cts.rest.enabled";
 
-
+    /**
+     * Property to enable/disable the behaviour of Referrals.  AME-5055
+     */
+    public static final String AM_REFERRALS_ENABLED_PROPERTY = "com.sun.identity.policy.Referrals";
 }

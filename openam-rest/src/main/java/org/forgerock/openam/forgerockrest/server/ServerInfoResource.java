@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -138,8 +140,11 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
             result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
             result.put("lang", locale.getLocale().getLanguage());
-            result.put("successfulUserRegistrationDestination", restSecurity.getSuccessfulUserRegistrationDestination());
+            result.put("successfulUserRegistrationDestination",
+                    restSecurity.getSuccessfulUserRegistrationDestination());
             result.put("socialImplementations", getSocialAuthnImplementations(realm));
+            result.put("referrals",
+                    getEnabledValue(SystemProperties.get(Constants.AM_REFERRALS_ENABLED_PROPERTY), false));
 
             if (debug.messageEnabled()) {
                 debug.message("ServerInfoResource.getAllServerInfo ::" +
@@ -153,6 +158,33 @@ public class ServerInfoResource extends RealmAwareResource {
             debug.error("ServerInfoResource.getAllServerInfo : Cannot retrieve all server info domains.", e);
             handler.handleError(new NotFoundException(e.getMessage()));
         }
+    }
+
+    /**
+     * Generate and return one of two values, "enabled" or "disabled" based on the value of the specified string.
+     * If the specified string is utterly weird, use the value specified in defaultValue to help make up our minds
+     * (true being enabled and false being disabled).
+     * @param value The string value to interpret.
+     * @param defaultValue A boolean value to fall back to, in case value cannot be interpreted.
+     * @return the string "enabled" or the string "disabled"
+     */
+    private String getEnabledValue(String value, boolean defaultValue) {
+        final String ENABLED = "enabled";
+        final String DISABLED = "disabled";
+
+        String result = defaultValue ? ENABLED : DISABLED;
+
+        if (StringUtils.isNotBlank(value)) {
+            value = value.trim();
+            value = value.toLowerCase();
+
+            if (value.equals("t") || value.equals("true") || value.equals("on") || value.equals(ENABLED)) {
+                result = ENABLED;
+            } else if (value.equals("f") || value.equals("false") || value.equals("off") || value.equals(DISABLED)) {
+                result = DISABLED;
+            }
+        }
+        return result;
     }
 
     /**
