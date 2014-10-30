@@ -47,7 +47,9 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.serviceCall = function (args) {
         var realm = conf.globalData.auth.realm;
         if (realm !== "/" && // prevents urls like /openam/json//applicationtypes
-            _.indexOf(["policies","applications"], args.url.replace(/^\/(.*?)\//, "$1")) !== -1) { // the only two options which are currently realm "aware"
+            _.find(["/applications", "/policies"], function (w) { // the only two options which are currently realm "aware"
+                return args.url.indexOf(w) === 0;
+            })) {
             args.url = realm + args.url;
         }
         return AbstractDelegate.prototype.serviceCall.call(this, args);
