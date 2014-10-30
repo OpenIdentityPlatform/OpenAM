@@ -31,12 +31,12 @@
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'>
 
-  <title>RESTful User-Self Services</title>
+  <title>RESTful User Self-Service</title>
 
   <indexterm><primary>REST API</primary></indexterm>
 
   <para>This chapter shows how to use the OpenAM RESTful interfaces for user
-   self-services: user self-registration and forgotten password reset.
+   self-service functionality: user self-registration and forgotten password reset.
   </para>
 
   <para>In this chapter, long URLs are wrapped to fit the printed page, as some
