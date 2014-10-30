@@ -983,86 +983,62 @@ $ <userinput>ssoadm \
   the body of the page returned), then OpenAM is in operation.</para>
  </section>
  
- <section xml:id="log-mgmt">
-  <title>Log Management</title>
-  <indexterm><primary>Logging</primary></indexterm>
+ <section xml:id="debug-logging">
+  <title>Debug Logging</title>
+  <indexterm>
+   <primary>Logging</primary>
+   <secondary>Debug</secondary>
+  </indexterm>
   
-  <para>OpenAM implements logging as a service. This means remote clients
-  such as your OpenAM policy agents can log messages to the central logging
-  service.</para>
-  
-  <section xml:id="log-mgmt-core">
-   <title>Logging in OpenAM Core Services</title>
-   
-   <para>By default OpenAM logs to files in the configuration directory for
-   the instance, such as <filename>$HOME/openam/log/</filename> for log files,
-   and <filename>$HOME/openam/debug/</filename> for debug files. You can also
-   configure OpenAM to log through JDBC to a database such as MySQL or Oracle
-   DB.</para>
-   
-   <para>OpenAM sends messages to different log files, each named after the
-   service logging the message, with two different types log files per service:
-   <filename>.access</filename> and <filename>.error</filename>. Thus the
-   current log files for the authentication service are named
-   <filename>amAuthentication.access</filename> and
-   <filename>amAuthentication.error</filename>.</para>
-   
-   <para>See the <link xlink:href="reference#chap-log-messages"
-   xlink:role="http://docbook.org/xlink/role/olink">Log Messages</link>
-   reference for details.</para>
-   
-   <para>OpenAM lets you change the log level on the fly. OpenAM also supports
-   log rotation, secure logging, and log message buffering.</para>
-   
-   <para>To configure OpenAM logging properties overall, login to the OpenAM
-   console as OpenAM administrator, and browse to Configuration &gt; System &gt;
-   Logging.</para>
+  <para>
+   OpenAM services capture a variety of information in debug logs.
+   Unlike audit log records, debug log records are unstructured.
+   Debug logs contain a variety of types of information that is useful
+   when troubleshooting OpenAM, including stack traces.
+   The level of debug log record output is configurable.
+   Debug log records are always written to flat files.
+  </para>
 
+  <section xml:id="log-debug-levels">
+   <title>Setting Debug Logging Levels</title>
    <indexterm>
     <primary>Debug logging</primary>
     <secondary>Level</secondary>
    </indexterm>
-   <para>To adjust the debug level while OpenAM is running, login to the OpenAM
-   console as OpenAM administrator, and browse to Configuration &gt; Servers
-   and Sites &gt; <replaceable>Server Name</replaceable> &gt; General, and then
-   scroll down to Debugging. The default level for debug logging is Error.
-   This level is appropriate for normal production operations, in which case
-   no debug log messages are expected.</para>
+   <para>
+    To adjust the debug level while OpenAM is running, login to the OpenAM
+    console as OpenAM administrator, and browse to Configuration &gt; Servers
+    and Sites &gt; <replaceable>Server Name</replaceable> &gt; General, and then
+    scroll down to Debugging. The default level for debug logging is Error.
+    This level is appropriate for normal production operations, in which case
+    no debug log messages are expected.
+   </para>
+   <para>
+    Setting the debug log level to Warning increases the volume of messages.
+    Setting the debug log level to Message dumps detailed trace messages. Unless
+    told to do so by qualified support personnel, do not use Warning and Message
+    levels in production.
+   </para>
+  </section>
 
-   <para>Setting debug log level to Warning increases the volume of messages.
-   Setting debug log level to Message dumps detailed trace messages. Unless
-   told to do so by qualified support personnel, do not use Warning and Message
-   levels in production.</para>
-
+  <section xml:id="log-debug-single-file">
+   <title>Debug Logging to a Single File</title>
    <indexterm>
     <primary>Debug logging</primary>
     <secondary>Single file</secondary>
    </indexterm>
-   <para>During development, you might find it useful to log all debug messages
-   to a single file. In order to do so, set Merge Debug Files to
-   <literal>on</literal>.</para>
+   <para>
+    During development, you might find it useful to log all debug messages
+    to a single file. In order to do so, set Merge Debug Files to
+    <literal>on</literal>.
+   </para>
 
-   <para>After changing this setting, restart OpenAM or the container in which
-   it runs for the change to take effect.</para>
+   <para>
+    After changing this setting, restart OpenAM or the container in which
+    it runs for the change to take effect.
+   </para>
   </section>
   
-  <section xml:id="log-mgmt-agents">
-   <title>Logging in OpenAM Policy Agents</title>
-   
-   <para>By default, OpenAM Policy Agents log to local files in their
-   configuration directories for debugging. The exact location depends on
-   where you installed the agent.</para>
-   
-   <para>By default OpenAM policy agents send log messages remotely to OpenAM
-   when you log auditing information about URL access attempts. To configure
-   audit logging for a centrally managed policy agent, login to the OpenAM
-   console as administrator, and browse to Access Control &gt;
-   <replaceable>Realm Name</replaceable> &gt; Agents &gt;
-   <replaceable>Agent Type</replaceable> &gt; <replaceable>Agent
-   Name</replaceable> &gt; Global, and then scroll down to the Audit
-   section.</para>
-  </section>
-
   <section xml:id="log-debug-selective-capture">
    <title>Debug Logging by Service</title>
    <indexterm>
@@ -1149,7 +1125,7 @@ $ <userinput>ssoadm \
    to take effect.</para>
   </section>
  </section>
- 
+
  <section xml:id="session-mgmt">
   <title>Session Management</title>
   <indexterm><primary>Sessions</primary></indexterm>

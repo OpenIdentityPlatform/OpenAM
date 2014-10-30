@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-audit-logging'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Configuring Audit Logging</title>
+
+ <indexterm>
+  <primary>Logging</primary>
+  <secondary>Audit</secondary>
+ </indexterm>
+
+ <para>
+  OpenAM servers generate two types of log files: audit logs and debug logs.
+ </para>
+
+ <para>
+  Audit logs capture normal operational information about OpenAM usage.
+  Audit file records are structured: they adhere to a consistent, documented
+  file format. You can configure OpenAM to write audit logs to flat files,
+  or to relational database tables. OpenAM servers running on UNIX hosts
+  can write audit logs to syslog.
+ </para>
+
+ <para>
+  OpenAM policy agents also produce agent logs. Agent audit logs
+  provide a trail of policy agent activity.
+ </para>
+
+ <para>
+  The OpenAM Logging Service encapsulates the audit logging configuration.
+  The Logging Service is an OpenAM system service. There is a single audit
+  logging configuration for the entire OpenAM deployment.
+ </para>
+
+ <para>
+  OpenAM lets you change the log level on the fly. OpenAM also supports
+  log rotation, secure logging, and log message buffering.
+ </para>
+
+ <para>
+  By default, OpenAM audit logs are written to files in the
+  configuration directory for the instance, such as
+  <filename>$HOME/openam/log/</filename>.
+ </para>
+
+ <para>
+  To configure OpenAM logging properties, log in to the OpenAM
+  console as OpenAM administrator, and browse to Configuration &gt; System &gt;
+  Logging.
+ </para>
+
+ <para>
+  OpenAM services can capture a variety of information in debug logs, which you
+  can use when troubleshooting OpenAM. For more information about the OpenAM
+  debug logs, see
+  <link xlink:href="admin-guide#debug-logging"
+        xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink">
+   <citetitle>Debug Logging</citetitle>.
+  </link>
+ </para>
+
+ <section xml:id="log-mgmt-core">
+  <title>Audit Logging to Flat Files</title>
+
+  <para>
+   OpenAM sends messages to different log files, each named after the
+   service logging the message, with two different types log files per service:
+   <filename>.access</filename>
+   and<filename>.error</filename>. Thus the
+   current log files for the authentication service are named
+   <filename>amAuthentication.access</filename>
+   and
+   <filename>amAuthentication.error</filename>.
+  </para>
+
+  <para>
+   See the
+   <link xlink:href="reference#chap-log-messages"
+         xlink:role="http://docbook.org/xlink/role/olink">
+    Log Messages
+   </link>
+   reference for details.
+  </para>
+ </section>
+
+ <section xml:id="log-mgmt-agents">
+  <title>Audit Logging in OpenAM Policy Agents</title>
+
+  <para>
+   By default, OpenAM Policy Agents log to local files in their
+   configuration directories for debugging. The exact location depends on
+   where you installed the agent.
+  </para>
+
+  <para>
+   By default OpenAM policy agents send log messages remotely to OpenAM
+   when you log auditing information about URL access attempts. To configure
+   audit logging for a centrally managed policy agent, login to the OpenAM
+   console as administrator, and browse to Access Control &gt;
+   <replaceable>Realm Name</replaceable>
+   &gt; Agents &gt;
+   <replaceable>Agent Type</replaceable>
+   &gt;
+   <replaceable>Agent
+    Name
+   </replaceable>
+   &gt; Global, and then scroll down to the Audit
+   section.
+  </para>
+ </section>
+
+</chapter>
