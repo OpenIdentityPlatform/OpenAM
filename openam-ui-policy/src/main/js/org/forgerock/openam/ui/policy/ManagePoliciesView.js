@@ -42,7 +42,8 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         template: "templates/policy/ManagePoliciesTemplate.html",
 
         events: {
-            'click #deleteItems': 'deletePolicies'
+            'click #deleteItems': 'deletePolicies',
+            'click .tab-links a': 'showTab'
         },
 
         render: function (args, callback) {
@@ -161,6 +162,13 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
             }
 
             this.deleteItems(e, promises);
+        },
+
+        showTab: function (e) {
+            e.preventDefault();
+            var currentAttrValue = $(e.target).attr('href');
+            this.$el.find('.tabs ' + currentAttrValue).fadeIn(400).siblings().hide();
+            $(e.target).parent('li').addClass('active-tab').siblings().removeClass('active-tab');
         }
     });
 

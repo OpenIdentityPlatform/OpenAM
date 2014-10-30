@@ -636,7 +636,7 @@ input[type="text"]:invalid:required{
 }
 
 #globalActions{
-    margin: 20px 0 0 -5px;
+    margin: 20px 0 0 2px;
     display: block;
 }
 
@@ -733,9 +733,59 @@ span.realm{
 #lastFSlash {
     transition:opacity 300ms linear;
     &.fade{
-        opacity:0;  
+        opacity:0;
     }
 }
 
+/*----- Tabs -----*/
+.tabs {
+    width:100%;
+    display:inline-block;
+    .tab-links {
+        a {
+            .linear-gradient( top, #fcfcfc, #C8C8C8);
+            padding: 7px 10px;
+            display:inline-block;
+            border: 1px solid #C8C8C8;
+            border-radius: 5px 5px 0px 0px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            color:#4c4c4c;
+            transition:all linear 0.15s;
+            &:hover {
+                background:#E0E0E0;
+            }
+        }
+        li {
+            margin:0px 5px;
+            float:left;
+            list-style:none;
+        }
+        .active-tab {
+            border-bottom: 2px solid #fff;
+            a, a:hover {
+                background:#fff;
+                color:#4c4c4c;
+                border: none;
+            }
+        }
+    }
 
+    .tab-content {
+        width: 920px;
+        border-radius: 5px;
+        box-shadow: 1px 1px 1px rgba(0,0,0,0.15);
+        background: #fff;
+        .tab {
+            display:none;
+        }
+        .active-tab {
+            display:block;
+        }
+        p {
+            padding:15px;
+        }
+    }
+}
 
