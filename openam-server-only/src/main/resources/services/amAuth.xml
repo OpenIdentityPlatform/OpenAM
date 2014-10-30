@@ -217,6 +217,26 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam.auth.zero.page.login.referer.whitelist"
+                                type="list"
+                                syntax="string"
+                                i18nKey="a155">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam.auth.zero.page.login.allow.null.referer"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a156">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-login-failure-lockout-mode"
                                  type="single"
                                  syntax="boolean"

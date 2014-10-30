@@ -114,7 +114,8 @@ public class AuthClientUtils {
     public static final String ERROR_MESSAGE = "Error_Message";
     public static final String ERROR_TEMPLATE = "Error_Template";
     public static final String MSG_DELIMITER= "|";
-    public static final String BUNDLE_NAME="amAuth";   
+    public static final String BUNDLE_NAME="amAuth";
+    private static final String HTTP_REFERER = "Referer";
 
     private static boolean setRequestEncoding = false;
 
@@ -3219,7 +3220,32 @@ public class AuthClientUtils {
         }
         return data;
     }
-    
+
+
+    /**
+     * Determines whether Zero Page Login (ZPL) should be allowed for this request. This includes checking whether
+     * ZPL is enabled for this AuthContext and, if so, whether the HTTP Referer header on the request matches the
+     * ZPL whitelist. POST requests are always enabled, but are still subject to the Referer whitelist.
+     *
+     * @param config the ZPL configuration.
+     * @param request the HTTP request.
+     * @return true if ZPL is allowed, otherwise false.
+     */
+    public static boolean isZeroPageLoginAllowed(ZeroPageLoginConfig config, HttpServletRequest request) {
+        final boolean isPost = "POST".equalsIgnoreCase(request.getMethod());
+        if (!isPost && !config.isEnabled()) {
+            return false;
+        }
+
+        final String referer = request.getHeader(HTTP_REFERER);
+        final Set<String> whitelist = config.getRefererWhitelist();
+
+        if (referer == null) {
+            return config.isAllowedWithoutReferer();
+        }
+
+        return whitelist.isEmpty() || whitelist.contains(referer);
+    }
 
     private static String getCharDecodedField(String strIn, String charset,
             Debug debug) {

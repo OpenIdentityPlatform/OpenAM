@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  * Portions Copyrighted 2012 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.UI;
@@ -1012,7 +1012,8 @@ public class LoginViewBean extends AuthViewBeanBase {
                     }
                 }
                 
-                if (onePageLogin && (isPost || AuthUtils.isZeroPageLoginEnabled(ac))) {
+                if (onePageLogin &&
+                        AuthUtils.isZeroPageLoginAllowed(ac.getLoginState().getZeroPageLoginConfig(), request)) {
                     // user input login info in URL
                     loginDebug.message("User input login information in URL!");
                     processLoginDisplay();

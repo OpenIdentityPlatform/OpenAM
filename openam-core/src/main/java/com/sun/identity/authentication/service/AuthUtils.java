@@ -39,6 +39,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.client.ZeroPageLoginConfig;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
 import com.sun.identity.authentication.config.AMAuthLevelManager;
 import com.sun.identity.authentication.server.AuthContextLocal;
@@ -57,13 +58,25 @@ import com.sun.identity.policy.plugins.AuthenticateToServiceCondition;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.util.Reject;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.login.AppConfigurationEntry;
+import javax.security.auth.login.Configuration;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.URL;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -76,13 +89,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 
 public class AuthUtils extends AuthClientUtils {
     
@@ -705,10 +711,6 @@ public class AuthUtils extends AuthClientUtils {
         return getLoginState(authContext).getPersistentCookieMode();
     }
 
-    public static boolean isZeroPageLoginEnabled(AuthContextLocal authContext) {
-        return getLoginState(authContext).isZeroPageLoginEnabled();
-    }
-    
     /* return persistent cookie */
     public static Cookie getPersistentCookieString(AuthContextLocal authContext,
     String cookieDomain ) {
@@ -2133,5 +2135,27 @@ public class AuthUtils extends AuthClientUtils {
         }
         
         return isTokenValid;
+    }
+
+    /**
+     * Gets the ZPL configuration for the given realm.
+     *
+     * @param realm the realm to get the ZPL configuration for. Not null.
+     * @return the ZPL configuration object. Never null.
+     * @throws SSOException if there is a problem authenticating the configuration lookup.
+     * @throws SMSException if there is a problem fetching the configuration data.
+     */
+    public static ZeroPageLoginConfig getZeroPageLoginConfig(final String realm) throws SSOException, SMSException {
+        Reject.ifNull(realm);
+        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+        final ServiceConfigManager mgr = new ServiceConfigManager(ISAuthConstants.AUTH_SERVICE_NAME, token);
+        final ServiceConfig serviceConfig = mgr.getOrganizationConfig(realm, null);
+        @SuppressWarnings("unchecked")
+        final Map<String, Set<String>> configMap = serviceConfig.getAttributes();
+        return new ZeroPageLoginConfig(
+                CollectionHelper.getBooleanMapAttr(configMap, Constants.ZERO_PAGE_LOGIN_ENABLED, false),
+                configMap.get(Constants.ZERO_PAGE_LOGIN_WHITELIST),
+                CollectionHelper.getBooleanMapAttr(configMap, Constants.ZERO_PAGE_LOGIN_ALLOW_MISSING_REFERER, true)
+        );
     }
 }

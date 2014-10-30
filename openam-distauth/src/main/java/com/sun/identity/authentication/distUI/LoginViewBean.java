@@ -45,6 +45,7 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.UI.ButtonTiledView;
 import com.sun.identity.authentication.UI.CallBackTiledView;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.client.ZeroPageLoginConfig;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -62,6 +63,23 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.L10NMessageImpl;
+import org.forgerock.openam.authentication.service.protocol.RemoteCookie;
+import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
+import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.utils.ClientUtils;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.ChoiceCallback;
+import javax.security.auth.callback.ConfirmationCallback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -73,22 +91,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.ChoiceCallback;
-import javax.security.auth.callback.ConfirmationCallback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import org.forgerock.openam.authentication.service.protocol.RemoteCookie;
-import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
-import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
-import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
-import org.forgerock.openam.utils.ClientUtils;
 
 /**
  * A default implementation of <code>LoginViewBean</code> auth Login UI.
@@ -785,7 +787,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     }
     
     private void setOnePageLogin() {
-        if (!bAuthLevel && (isPost || SystemProperties.getAsBoolean(Constants.ZERO_PAGE_LOGIN_ENABLED))) {
+        if (!bAuthLevel && isZeroPageLoginAllowed()) {
             // Auth Level login will never do one page login.
             parseUserCredentials();
 
@@ -799,7 +801,26 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             }
         }
     }
-    
+
+    /**
+     * Determines whether Zero Page Login (ZPL) should be allowed for this request. ZPL is only permitted if it is
+     * enabled and the HTTP Referer for this request is in the configured whitelist (or no referer is provided and
+     * the server is configured to allow requests without a Referer header).
+     *
+     * @return true if ZPL is allowed for this request.
+     * @see com.sun.identity.shared.Constants#ZERO_PAGE_LOGIN_ENABLED
+     * @see com.sun.identity.shared.Constants#ZERO_PAGE_LOGIN_WHITELIST
+     * @see com.sun.identity.shared.Constants#ZERO_PAGE_LOGIN_ALLOW_MISSING_REFERER
+     */
+    private boolean isZeroPageLoginAllowed() {
+        final ZeroPageLoginConfig config = new ZeroPageLoginConfig(
+                SystemProperties.getAsBoolean(Constants.ZERO_PAGE_LOGIN_ENABLED),
+                SystemProperties.getAsSet(Constants.ZERO_PAGE_LOGIN_WHITELIST),
+                SystemProperties.getAsBoolean(Constants.ZERO_PAGE_LOGIN_ALLOW_MISSING_REFERER)
+        );
+        return AuthClientUtils.isZeroPageLoginAllowed(config, request);
+    }
+
     protected void getLoginDisplay() throws Exception {
         loginDebug.message("In getLoginDisplay()");
         

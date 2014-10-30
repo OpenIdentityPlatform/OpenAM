@@ -40,6 +40,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.client.ZeroPageLoginConfig;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
 import com.sun.identity.authentication.config.AMAuthenticationInstance;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
@@ -156,7 +157,9 @@ public class LoginState {
     boolean ignoreUserProfile = false;
     boolean createWithAlias = false;
     boolean persistentCookieMode = false;
-    boolean zeroPageLoginEnabled = false;
+
+    private ZeroPageLoginConfig zeroPageLoginConfig;
+
     /**
      * Max. cookie time in seconad. Integer range is 0 - 2147483.
      * persistentCookieOn has to be true.
@@ -742,8 +745,19 @@ public class LoginState {
             persistentCookieTime = tmp;
 
             tmp = CollectionHelper.getMapAttr(attrs, Constants.ZERO_PAGE_LOGIN_ENABLED);
-            zeroPageLoginEnabled = Boolean.valueOf(tmp);
-            
+            boolean zplEnabled = Boolean.valueOf(tmp);
+
+            @SuppressWarnings("unchecked")
+            Set<String> zplWhitelist = (Set<String>) attrs.get(Constants.ZERO_PAGE_LOGIN_WHITELIST);
+            if (zplWhitelist == null) {
+                zplWhitelist = Collections.emptySet();
+            }
+
+            boolean allowZPLWithoutReferer = CollectionHelper.getBooleanMapAttr(attrs,
+                    Constants.ZERO_PAGE_LOGIN_ALLOW_MISSING_REFERER, true);
+
+            this.zeroPageLoginConfig = new ZeroPageLoginConfig(zplEnabled, zplWhitelist, allowZPLWithoutReferer);
+
             AMAuthenticationManager authManager =
             new AMAuthenticationManager(ad.getSSOAuthSession(),getOrgDN());
             
@@ -908,7 +922,7 @@ public class LoginState {
                         + "\nloginLockoutNotification->" + loginLockoutNotification
                         + "\ninvalidAttemptsDataAttrName->" + invalidAttemptsDataAttrName
                         + "\npersistentCookieMode->" + persistentCookieMode
-                        + "\nzeroPageLoginEnabled->" + zeroPageLoginEnabled
+                        + "\nzeroPageLoginConfig->" + zeroPageLoginConfig
                         + "\nidentityTypes->" + identityTypes
                         + "\naliasAttrNames ->" + aliasAttrNames);
             }
@@ -3179,12 +3193,12 @@ public class LoginState {
     }
 
     /**
-     * Tells whether zero page login is enabled
+     * Returns the configuration for whether Zero Page Login (ZPL) should be allowed or not.
      *
-     * @return <code>true</code> if zero page login is enabled
+     * @return the ZPL configuration
      */
-    public boolean isZeroPageLoginEnabled() {
-        return zeroPageLoginEnabled;
+    public ZeroPageLoginConfig getZeroPageLoginConfig() {
+        return zeroPageLoginConfig;
     }
 
     void setToken(String token) {

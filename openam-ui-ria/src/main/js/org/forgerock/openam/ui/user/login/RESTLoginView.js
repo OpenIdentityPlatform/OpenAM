@@ -76,6 +76,20 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             conf.globalData.auth.autoLoginAttempts = 1;
             eventManager.sendEvent(constants.EVENT_LOGIN_REQUEST, submitContent);
         },
+        isZeroPageLoginAllowed: function() {
+            var referer = document.referrer,
+                whitelist = conf.globalData.zeroPageLogin.refererWhitelist;
+
+            if (!conf.globalData.zeroPageLogin.enabled) {
+                return false;
+            }
+
+            if (!referer) {
+                return conf.globalData.zeroPageLogin.allowedWithoutReferer;
+            }
+
+            return !whitelist || !whitelist.length || whitelist.indexOf(referer) > -1;
+        },
         formSubmit: function (e) {
             var submitContent,expire;
 
@@ -121,7 +135,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 }
 
                 //if there are IDTokens try to login with the provided credentials
-                if(urlParams.IDToken1 && !conf.globalData.auth.autoLoginAttempts){
+                if(urlParams.IDToken1 && this.isZeroPageLoginAllowed() && !conf.globalData.auth.autoLoginAttempts){
                     this.autoLogin();
                 }
             }

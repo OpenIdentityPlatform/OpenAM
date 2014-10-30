@@ -28,6 +28,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.configuration.MapValueParser;
 import com.sun.identity.security.AdminTokenAction;
@@ -117,7 +118,6 @@ public class ServerInfoResource extends RealmAwareResource {
      * @param context Current Server Context.
      * @param realm realm in whose security context we use.
      * @param handler Result handler which handles error or success.
-     * @param realm The realm
      */
     private void getAllServerInfo(ServerContext context, ResultHandler<Resource> handler, String realm) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
@@ -145,6 +145,7 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("socialImplementations", getSocialAuthnImplementations(realm));
             result.put("referrals",
                     getEnabledValue(SystemProperties.get(Constants.AM_REFERRALS_ENABLED_PROPERTY), false));
+            result.put("zeroPageLogin", AuthUtils.getZeroPageLoginConfig(realm));
 
             if (debug.messageEnabled()) {
                 debug.message("ServerInfoResource.getAllServerInfo ::" +
@@ -200,10 +201,8 @@ public class ServerInfoResource extends RealmAwareResource {
                 new ArrayList<SocialAuthenticationImplementation>();
 
         try {
-            SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager mgr = new ServiceConfigManager(SocialAuthenticationImplementation.SERVICE_NAME, token);
-            ServiceConfig serviceConfig = mgr.getOrganizationConfig(realm, null);
-
+            final ServiceConfig serviceConfig = getServiceConfig(SocialAuthenticationImplementation.SERVICE_NAME,
+                    realm);
             Set<String> enabledImplementationSet = ServiceConfigUtils.getSetAttribute(serviceConfig,
                     SocialAuthenticationImplementation.ENABLED_IMPLEMENTATIONS_ATTRIBUTE);
 
@@ -237,6 +236,13 @@ public class ServerInfoResource extends RealmAwareResource {
 
         return implementations;
 
+    }
+
+    private ServiceConfig getServiceConfig(final String serviceName, final String realm) throws SSOException,
+            SMSException {
+        SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+        ServiceConfigManager mgr = new ServiceConfigManager(serviceName, token);
+        return mgr.getOrganizationConfig(realm, null);
     }
 
     /**
