@@ -1099,7 +1099,14 @@
             <!-- Groovy scripting support -->
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-all</artifactId>
+                <artifactId>groovy-jsr223</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <!-- Groovy JSON parsing support -->
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-json</artifactId>
                 <version>${groovy.version}</version>
             </dependency>
 
