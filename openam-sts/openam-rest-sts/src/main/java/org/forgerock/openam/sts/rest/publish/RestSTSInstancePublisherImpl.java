@@ -51,8 +51,6 @@ import java.util.Map;
  * will occur infrequently, synchronizing both of these actions seemed a better trade-off to insure consistent, non-interleaved
  * mutations of all stateful elements involved with publishing a rest-sts instance.
  *
- * TODO: transaction semantics for publish and remove - if one of the mutations throws an exception, take steps to unwind
- * the other mutations!!!
  */
 public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
     private final Router router;
@@ -79,6 +77,9 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
     /**
      * Publishes the rest STS instance at the specified relative path. This method will be invoked when the Rest STS instance
      * is initially published, and to re-constitute previously-published instances following a server restart.
+     * Note on transaction semantics: publishing a rest-sts instance means modifying both the CREST router, and the SMS.
+     * First the CREST router is modified, and then the SMS. If the SMS modifications fail, the CREST router modifications
+     * will be rolled-back, so that a publish can be successfully re-tried.
      * @param instanceConfig The RestSTSInstanceConfig which defined the guice bindings which specify the functionality of
      *                       the RestSTS instance. This RestSTSInstanceConfig will be persisted so that persisted instances
      *                       can be reconstituted in case of a server restart.
@@ -120,7 +121,14 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         on the publish service by the RestSTSInstanceRepublishServlet.
          */
         if (!republish) {
-            persistentStore.persistSTSInstance(deploymentSubPath, instanceConfig);
+            try {
+                persistentStore.persistSTSInstance(deploymentSubPath, instanceConfig);
+            } catch (STSPublishException e) {
+                //roll-back the router mutation before throwing exception
+                router.removeRoute(route);
+                publishedRoutes.remove(normalizeDeploymentSubPathForRouteCache(deploymentSubPath));
+                throw e;
+            }
         }
         return deploymentSubPath;
     }
@@ -130,6 +138,14 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
      * instances are reconstituted following an OpenAM restart, the publishInstance above will be called, which will
      * re-constitute the Route state in the Map, state necessary to remove the Route corresponding to the STS instance
      * from the Crest router. This is important because the Route has a package-private ctor.
+     * Note on transaction semantics: The removal of a previously-published rest-sts instance involves removing the associated
+     * route from the CREST router (first step), and then removing the instance state from the SMS (second step). This
+     * method lacks the state to re-constitute CREST router state if the SMS modifications fail, and it may be a safe
+     * assumption that a removal would want the instance unavailable for invocation first-and-foremost. Nevertheless, it
+     * should be possible to invoke this method several times for the same rest-sts instance, in case the LDAP server was
+     * down in previous invocations. That means that the lack of a CREST route for a previously-published instance should
+     * not prevent the attempted removal of the associated configuration state from the SMS. Note that the consumption
+     * of this service is limited to Administrators, so malicious consumption is prevented.
      * @param stsId the path, relative to the base rest-sts service, to the to-be-removed service. Note that this path
      *              includes the realm.
      * @param realm The realm of the STS instance
@@ -142,10 +158,34 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
     public synchronized void removeInstance(String stsId, String realm, boolean removeOnlyFromRouter) throws STSPublishException {
         Route route = publishedRoutes.remove(normalizeDeploymentSubPathForRouteCache(stsId));
         if (route == null) {
-            throw new STSPublishException(ResourceException.NOT_FOUND, "No previously published STS instance with id "
-                    + stsId + " in realm " + realm + " found!");
+            /*
+            The route is null. Check to see if caller is attempting to delete a non-existent instance, or whether this is
+            a deletion retry which previously failed due to an ldap issue. The presence of SMS config state will allow us
+            to make that determination. The STSPublishException will be thrown if no config state is present in the SMS.
+             */
+            try {
+                persistentStore.getSTSInstanceConfig(stsId, realm);
+            } catch (STSPublishException e) {
+                throw new STSPublishException(ResourceException.NOT_FOUND, "A rest sts instance with id " + stsId +
+                        " in realm " + realm + " not found.");
+            }
+            /*
+            No route was found in the route table, but state was found in the SMS. Thus we are dealing with either the
+            retry of a previously-failed deletion, or an illegal state.
+             */
+            if (!removeOnlyFromRouter) {
+                logger.warn("A previously published STS instance with id " + stsId + " in realm " + realm +
+                        " found in SMS, but not in route table. This indicates a previously failed deletion attempt." +
+                        " Will attempt to remove from SMS.");
+            } else {
+                logger.error("A previously published STS instance with id " + stsId + " in realm " + realm +
+                        " not found in router, but found in SMS, and the removeOnlyFromRouter is true, indicating a " +
+                        "ServiceListener invoked deletion triggered by a deletion on another site server. " +
+                        "This is an illegal state.");
+            }
+        } else {
+            router.removeRoute(route);
         }
-        router.removeRoute(route);
         if (!removeOnlyFromRouter) {
             persistentStore.removeSTSInstance(stsId, realm);
         }
