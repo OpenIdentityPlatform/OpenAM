@@ -159,7 +159,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         return obj.serviceCall({
             url: "/referrals/" + name,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
-        })
+        });
     };
 
     obj.updateReferral = function (name, data) {
