@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;
@@ -75,6 +76,7 @@ public class AuthorizationServiceImplTest {
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         Set<String> validatedScope = new HashSet<String>();
 
+        given(request.getLocale()).willReturn(Locale.ENGLISH);
         given(resourceOwnerSessionValidator.validate(request)).willReturn(resourceOwner);
         given(clientRegistrationStore.get(anyString(), eq(request))).willReturn(clientRegistration);
         given(providerSettings.validateAuthorizationScope(eq(clientRegistration), anySetOf(String.class), eq(request)))

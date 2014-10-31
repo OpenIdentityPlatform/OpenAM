@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -101,6 +102,11 @@ public class IdentityManager {
 
                     public JsonValue getBody() {
                         throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
+                    }
+
+                    @Override
+                    public Locale getLocale() {
+                        throw new UnsupportedOperationException();
                     }
                 });
                 final Map<String, Set<String>> avPairs = toAvPairMap(

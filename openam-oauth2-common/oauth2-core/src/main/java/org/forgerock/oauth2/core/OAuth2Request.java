@@ -20,6 +20,8 @@ import org.forgerock.guava.common.collect.ClassToInstanceMap;
 import org.forgerock.guava.common.collect.MutableClassToInstanceMap;
 import org.forgerock.json.fluent.JsonValue;
 
+import java.util.Locale;
+
 /**
  * An abstraction of the actual request so as to allow the core of the OAuth2 provider to be agnostic of the library
  * used to translate the HTTP request.
@@ -82,4 +84,10 @@ public abstract class OAuth2Request {
     public <T extends Token> T getToken(Class<T> tokenClass) {
         return tokens.getInstance(tokenClass);
     }
+
+    /**
+     * Get the request locale.
+     * @return The Locale object.
+     */
+    public abstract Locale getLocale();
 }

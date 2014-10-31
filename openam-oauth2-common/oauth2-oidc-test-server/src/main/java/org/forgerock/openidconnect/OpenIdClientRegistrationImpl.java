@@ -23,6 +23,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,13 +64,13 @@ public class OpenIdClientRegistrationImpl implements OpenIdConnectClientRegistra
         return "Bearer";
     }
 
-    public String getDisplayName(String locale) {
+    public String getDisplayName(Locale locale) {
         String defaultName = null;
         final String DELIMITER = "|";
         for (String name : client.getDisplayName()) {
             if (name.contains(DELIMITER)) {
                 int locationOfDelimiter = name.indexOf(DELIMITER);
-                if (name.substring(0, locationOfDelimiter).equalsIgnoreCase(locale)) {
+                if (name.substring(0, locationOfDelimiter).equalsIgnoreCase(locale.getLanguage())) {
                     return name.substring(locationOfDelimiter+1, name.length());
                 }
             } else {
@@ -80,13 +81,13 @@ public class OpenIdClientRegistrationImpl implements OpenIdConnectClientRegistra
         return defaultName;
     }
 
-    public String getDisplayDescription(String locale) {
+    public String getDisplayDescription(Locale locale) {
         String defaultName = null;
         final String DELIMITER = "|";
         for (String name : client.getDisplayDescription()) {
             if (name.contains(DELIMITER)) {
                 int locationOfDelimiter = name.indexOf(DELIMITER);
-                if (name.substring(0, locationOfDelimiter).equalsIgnoreCase(locale)) {
+                if (name.substring(0, locationOfDelimiter).equalsIgnoreCase(locale.getLanguage())) {
                     return name.substring(locationOfDelimiter+1, name.length());
                 }
             } else {
@@ -97,7 +98,7 @@ public class OpenIdClientRegistrationImpl implements OpenIdConnectClientRegistra
         return defaultName;
     }
 
-    public Map<String, String> getScopeDescriptions(String locale) {
+    public Map<String, String> getScopeDescriptions(Locale locale) {
         final String DELIMITER = "\\|";
         final Map<String, String> scopeDescriptions = new LinkedHashMap<String, String>();
         final Set<String> combinedScopes = new HashSet<String>();
@@ -114,7 +115,7 @@ public class OpenIdClientRegistrationImpl implements OpenIdConnectClientRegistra
                     scopeDescriptions.put(parts[0], parts[1]);
                 } else if (parts.length == 3) {
                     //locale and description
-                    if (parts[1].equalsIgnoreCase(locale)){
+                    if (parts[1].equalsIgnoreCase(locale.getLanguage())){
                         scopeDescriptions.put(parts[0], parts[2]);
                     }
                 }

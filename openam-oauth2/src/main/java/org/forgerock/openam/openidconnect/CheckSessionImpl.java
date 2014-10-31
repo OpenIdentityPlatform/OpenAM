@@ -40,6 +40,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -120,6 +121,10 @@ public class CheckSessionImpl implements CheckSession {
                 }
 
                 public JsonValue getBody() {
+                    throw new UnsupportedOperationException();
+                }
+
+                public Locale getLocale() {
                     throw new UnsupportedOperationException();
                 }
             });

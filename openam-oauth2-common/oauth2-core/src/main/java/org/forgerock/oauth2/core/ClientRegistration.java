@@ -19,6 +19,7 @@ package org.forgerock.oauth2.core;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
 
 import java.net.URI;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,7 +71,7 @@ public interface ClientRegistration {
      * @param locale The locale.
      * @return The display name.
      */
-    String getDisplayName(String locale);
+    String getDisplayName(Locale locale);
 
     /**
      * Gets the display description of the client in the specified locale.
@@ -78,7 +79,7 @@ public interface ClientRegistration {
      * @param locale The locale.
      * @return The display description.
      */
-    String getDisplayDescription(String locale);
+    String getDisplayDescription(Locale locale);
 
     /**
      * Gets the display descriptions for the allowed and default scopes combined, in the specified locale.
@@ -86,7 +87,7 @@ public interface ClientRegistration {
      * @param locale The locale.
      * @return The descriptions of the allowed and default scopes combined.
      */
-    Map<String, String> getScopeDescriptions(String locale);
+    Map<String, String> getScopeDescriptions(Locale locale);
 
     /**
      * Gets the default scopes configured for the client.

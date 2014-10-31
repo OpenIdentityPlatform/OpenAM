@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -113,7 +114,13 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         final boolean haveConsent = consentVerifier.verify(consentSaved, request);
 
         if (!haveConsent) {
-            final String locale = request.getParameter(LOCALE);
+            String localeParameter = request.getParameter(LOCALE);
+            Locale locale;
+            if (localeParameter == null) {
+                locale = request.getLocale();
+            } else {
+                locale = Locale.forLanguageTag(localeParameter);
+            }
             final String clientName = clientRegistration.getDisplayName(locale);
             final String clientDescription = clientRegistration.getDisplayDescription(locale);
             final Set<String> scopeDescriptions = getScopeDescriptions(validatedScope,

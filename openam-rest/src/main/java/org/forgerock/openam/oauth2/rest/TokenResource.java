@@ -443,7 +443,12 @@ public class TokenResource implements CollectionResourceProvider {
                 public JsonValue getBody() {
                     return null;
                 }
-            };
+
+            @Override
+            public java.util.Locale getLocale() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     private String getExpiryDate(JsonValue token) throws CoreTokenException, InternalServerErrorException {
