@@ -36,8 +36,9 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    "org/forgerock/openam/ui/user/delegates/SessionDelegate"
-], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router, i18nManager, sessionDelegate) {
+    "org/forgerock/openam/ui/user/delegates/SessionDelegate",
+    "org/forgerock/commons/ui/common/components/Messages"
+], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router, i18nManager, sessionDelegate, messageManager) {
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/authenticate"),
         requirementList = [],
@@ -77,7 +78,6 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
             })
         .done(function (requirements) {
             // only resolve the auth promise when we know the cookie name
-
             var tokenCookie = cookieHelper.getCookie(configuration.globalData.auth.cookieName);
             if(configuration.loggedUser && tokenCookie && window.location.hash.replace(/^#/, '').match(router.configuration.routes.login.url)){
                 requirements.tokenId = tokenCookie;
@@ -155,12 +155,15 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 url: "",
                 errorsHandlers: {
                     "unauthorized": { status: "401"},
-                    "timeout": { status: "408" }
+                    "timeout": { status: "408" },
+                    "Internal Server Error ": { status: "500" }
                 }
             })
             .then(processSucceeded,
                   function (jqXHR) {
-                    var oldReqs,errorBody,currentStage = requirementList.length;
+                    var oldReqs,errorBody,msg,
+                        currentStage = requirementList.length,
+                        responseMessage = jqXHR.responseJSON.message;
                     if (jqXHR.status === 408) {
                         // we timed out, so let's try again with a fresh session
                         oldReqs = requirementList[0];
@@ -187,6 +190,12 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                                 }
                             })
                             .fail(processFailed); // this is very unlikely, since it would require a call to .begin() to fail after having succeeded once before
+                    } else if (jqXHR.status === 500) {
+                        msg = {
+                                message: responseMessage,
+                                type: "error"
+                        };
+                    messageManager.messages.addMessage(msg);
                     } else { // we have a 401 unauthorized response
                         errorBody = $.parseJSON(jqXHR.responseText);
 
