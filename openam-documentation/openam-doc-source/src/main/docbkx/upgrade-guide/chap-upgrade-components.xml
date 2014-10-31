@@ -62,9 +62,10 @@
   <step>
    <para>
     Remove the old policy agent as described in the
-    <link xlink:show="new" xlink:href="web-install-guide#web-install-guide"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle
-    >Web Policy Agent Installation Guide</citetitle></link>.
+    <link
+     xlink:show="new"
+     xlink:href="${webPaDocBase}/web-users-guide/#web-users-guide"
+    ><citetitle>OpenAM Web Policy Agent User's Guide</citetitle></link>.
    </para>
 
    <para>

@@ -45,8 +45,7 @@
    (see the <citetitle>Web Policy Agent Release Notes</citetitle> section,
    <link
     xlink:show="new"
-    xlink:href="web-release-notes#web-pa-platform-requirements"
-    xlink:role="http://docbook.org/xlink/role/olink"
+    xlink:href="${webPaDocBase}/web-release-notes/#web-pa-platform-requirements"
    ><citetitle>Web Policy Agents Platform Requirements</citetitle></link>)
    with a minimum of 1 GB of free RAM memory,
    a few hundred MB of free disk space,

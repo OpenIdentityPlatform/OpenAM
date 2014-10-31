@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-sso'
@@ -237,14 +237,20 @@
         </step>
 
         <step>
-            <para>Install the appropriate policy agent, as described in the <link xlink:href="web-install-guide#web-install-guide"
-            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
-            Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
-            or <link xlink:href="jee-users-guide#jee-users-guide"
-            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
-            Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>. 
-            This procedure uses an agent URL of <literal>http://app.example.net:80</literal>, 
-            and an agent name of <literal>webagent1</literal>.</para>
+            <para>
+             Install the appropriate policy agent, as described in the
+             <link
+              xlink:href="${webPaDocBase}/web-users-guide/#web-users-guide"
+              xlink:show="new"
+             ><citetitle>OpenAM Web Policy Agent User's Guide</citetitle></link>
+             or the
+             <link
+              xlink:href="${jeePaDocBase}/jee-users-guide/#jee-users-guide"
+              xlink:show="new"
+             ><citetitle>OpenAM Java EE Policy Agent User's Guide</citetitle></link>.
+             This procedure uses an agent URL of <literal>http://app.example.net:80</literal>,
+             and an agent name of <literal>webagent1</literal>.
+            </para>
         </step>
 
         <step>
@@ -254,14 +260,20 @@
         </step>
 
         <step>
-            <para>Return to the OpenAM server on <literal>http://openam.example.net:8080/openam</literal>. Log in as
-                the administrative user, normally <literal>amadmin</literal>. To activate and configure the agent,
-                follow the procedure described in the <link xlink:href="web-install-guide#web-install-guide"
-                xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
-                Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
-                or <link xlink:href="jee-users-guide#jee-users-guide"
-                xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
-                Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>.</para>
+            <para>
+             Return to the OpenAM server on <literal>http://openam.example.net:8080/openam</literal>. Log in as
+             the administrative user, normally <literal>amadmin</literal>. To activate and configure the agent,
+             follow the procedure described in the
+             <link
+              xlink:href="${webPaDocBase}/web-users-guide/#web-users-guide"
+              xlink:show="new"
+             ><citetitle>OpenAM Web Policy Agent User's Guide</citetitle></link>
+             or the
+             <link
+              xlink:href="${jeePaDocBase}/jee-users-guide/#jee-users-guide"
+              xlink:show="new"
+             ><citetitle>OpenAM Java EE Policy Agent User's Guide</citetitle></link>.
+            </para>
         </step>
 
         <step>

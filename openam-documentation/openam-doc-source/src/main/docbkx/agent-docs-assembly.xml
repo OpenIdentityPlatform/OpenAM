@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions Copyright [year] [name of copyright owner]".
+
+  Copyright 2014 ForgeRock AS
+
+-->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2
+                              http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+  <id>agent-docs</id>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <files>
+   <file>
+    <source>src/main/docbkx/shared/chap-feedback.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/chap-support.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/itemizedlist-java-requirements.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/listitem-conditional-login-url-jee.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/listitem-conditional-login-url-web.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/para-licensing-agreement-procedure.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/para-requirements-support.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/procedure-create-j2ee-agent-profile.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/procedure-create-password-file.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/procedure-create-web-agent-profile.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-accessing-doc-online.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-apache-mpm-tuning.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-browser-requirements.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-configure-22-policy-agent.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-configure-agent-authenticators.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-configuring-j2ee-policy-agents.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-configuring-web-policy-agents.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-create-agent-profiles.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-delegate-agent-profile-creation.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-formatting-conventions.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-gateway-or-policy-agent.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-jee-pa-platform-requirements.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-joining-the-community.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-kinds-of-agent-profiles.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-native-application-platforms.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-policy-agent-properties.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-special-requests.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/sec-web-pa-platform-requirements.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+
+   <file>
+    <source>src/main/docbkx/shared/variablelist-agentadmin-folders.xml</source>
+    <outputDirectory>shared</outputDirectory>
+   </file>
+  </files>
+  <formats>
+    <format>jar</format>
+  </formats>
+</assembly>

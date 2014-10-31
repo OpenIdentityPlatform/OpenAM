@@ -955,12 +955,17 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
       <literal>/</literal>, to protect resources.
      </para>
 
-     <para>See the <link xlink:href="web-install-guide#web-install-guide"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
-     Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
-     or <link xlink:href="jee-users-guide#jee-users-guide"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
-     Agent User's Guide</citetitle></link>
+     <para>
+      See the
+      <link
+       xlink:href="${webPaDocBase}/web-users-guide/#web-users-guide"
+       xlink:show="new"
+      ><citetitle>Web Policy Agent User's Guide</citetitle></link>
+      or the
+      <link
+       xlink:href="${jeePaDocBase}/jee-users-guide/#jee-users-guide"
+       xlink:show="new"
+      ><citetitle>Java EE Policy Agent User's Guide</citetitle></link>
      for instructions on installing a policy agent. This example relies on the
      Apache Tomcat Java EE policy agent, configured to protect resources in
      Apache Tomcat at <literal>http://www.example.com:8080/</literal>.</para>

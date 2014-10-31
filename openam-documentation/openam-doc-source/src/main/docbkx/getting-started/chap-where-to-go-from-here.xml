@@ -262,15 +262,21 @@
   servers, for a variety of Java EE web application containers, for protecting
   SOAP-based web services, and for OAuth 2.0 clients.</para>
 
-  <para>For details about web policy agents also see the <link xlink:show="new"
-  xlink:href="web-install-guide#web-install-guide"
-  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Web Policy Agent
-  Installation Guide</citetitle></link>.</para>
+  <para>
+   For details about web policy agents also see the
+   <link
+    xlink:show="new"
+    xlink:href="${webPaDocBase}/web-users-guide/#web-users-guide"
+   ><citetitle>Web Policy Agent User's Guide</citetitle></link>.
+  </para>
 
-  <para>For details about Java EE policy agents also see the
-  <link xlink:show="new" xlink:href="jee-users-guide#jee-users-guide"
-  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Java EE Policy
-  Agent Installation Guide</citetitle></link>.</para>
+  <para>
+   For details about Java EE policy agents also see the
+   <link
+    xlink:show="new"
+    xlink:href="${jeePaDocBase}/jee-users-guide/#jee-users-guide"
+   ><citetitle>Java EE Policy Agent User's Guide</citetitle></link>.
+  </para>
 
   <para>Furthermore <link xlink:show="new" xlink:href="http://openig.forgerock.org"
   >OpenIG Identity Gateway</link> works with applications where you want to

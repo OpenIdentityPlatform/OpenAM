@@ -3486,13 +3486,14 @@ $ <userinput>ssoadm \
 
     <para>
      The basic process for installing policy agents is available in the
-     <link xlink:href="web-install-guide#web-install-guide"
-           xlink:show="new"
-           xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>Web Policy Agent Installation Guide</citetitle></link>
-     and the <link xlink:href="jee-users-guide#jee-users-guide"
-                   xlink:show="new"
-                   xlink:role="http://docbook.org/xlink/role/olink"
+     <link
+      xlink:href="${webPaDocBase}/web-users-guide/#web-users-guide"
+      xlink:show="new"
+     ><citetitle>Web Policy Agent User's Guide</citetitle></link>
+     and the
+     <link
+      xlink:href="${jeePaDocBase}/jee-users-guide/#jee-users-guide"
+      xlink:show="new"
      ><citetitle>Java EE Policy Agent User's Guide</citetitle></link>.
     </para>
    </step>

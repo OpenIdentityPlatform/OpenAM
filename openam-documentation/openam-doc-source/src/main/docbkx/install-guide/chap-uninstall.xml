@@ -32,14 +32,22 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Removing OpenAM Software</title>
  <indexterm><primary>Uninstalling</primary></indexterm>
- <para>This chapter shows you how to uninstall OpenAM core software. See
- the <link xlink:href="web-install-guide#web-install-guide"
- xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
- Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
- or <link xlink:href="jee-users-guide#jee-users-guide"
- xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
- Agent User's Guide</citetitle></link> for
- instructions on removing OpenAM agents.</para>
+
+ <para>
+  This chapter shows you how to uninstall OpenAM core software.
+  See the
+  <link
+   xlink:show="new"
+   xlink:href="${webPaDocBase}/web-users-guide/#web-users-guide"
+  ><citetitle>OpenAM Web Policy Agent User's Guide</citetitle></link>,
+  or the
+  <link
+   xlink:show="new"
+   xlink:href="${jeePaDocBase}/jee-users-guide/#jee-users-guide"
+   xlink:role="http://docbook.org/xlink/role/olink"
+  ><citetitle>OpenAM Java EE Policy Agent User's Guide</citetitle></link>
+  for instructions on removing OpenAM agents.
+ </para>
 
  <procedure xml:id="uninstall-OpenAM-core">
   <title>To Remove OpenAM Core Software</title>
