@@ -448,6 +448,10 @@ public class ApplicationsResource extends RealmAwareResource {
         try {
             final Application app = appManager.getApplication(mySubject, realm, resourceId);
 
+            if (app == null) {
+                throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, new String[]{realm});
+            }
+
             final ApplicationWrapper wrapp = createApplicationWrapper(app, appTypeManagerWrapper);
 
             final Resource resource = new Resource(resourceId, Long.toString(app.getLastModifiedDate()),
