@@ -400,7 +400,8 @@ public class JsonPolicyParserTest {
         assertThat(result.getCondition()).isInstanceOf(PolicyCondition.class);
         PolicyCondition condition = (PolicyCondition) result.getCondition();
         assertThat(condition.getClassName()).isEqualTo(AuthenticateToRealmCondition.class.getName());
-        assertThat(condition.getProperties()).isEqualTo(Collections.singletonMap("AuthenticateToRealm", new HashSet<String>(realm)));
+        assertThat(condition.getProperties()).isEqualTo(Collections.singletonMap("AuthenticateToRealm",
+                                                                                    new HashSet<String>(realm)));
     }
 
     @Test
@@ -482,7 +483,7 @@ public class JsonPolicyParserTest {
     }
 
     @Test
-    public void shouldPrintCreationDateInIsoFormat() throws Exception {
+    public void shouldPrintCreationDateInIsoFormatButWithMilliseconds() throws Exception {
         // Given
         Privilege policy = new StubPrivilege();
         Date createdDate = new Date(123456789l);
@@ -492,7 +493,8 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        assertThat(result.get("creationDate").asString()).isEqualTo(DateUtils.toUTCDateFormat(createdDate));
+        assertThat(result.get("creationDate").asString())
+                .isEqualTo(DateUtils.toUTCDateFormatWithMilliseconds(createdDate));
     }
 
     @Test
@@ -520,7 +522,8 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        assertThat(result.get("lastModified").asString()).isEqualTo(DateUtils.toUTCDateFormat(lastModified));
+        assertThat(result.get("lastModified").asString())
+                .isEqualTo(DateUtils.toUTCDateFormatWithMilliseconds(lastModified));
     }
 
     @Test

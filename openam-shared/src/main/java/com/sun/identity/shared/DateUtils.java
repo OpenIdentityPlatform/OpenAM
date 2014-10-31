@@ -43,14 +43,15 @@ import java.util.TimeZone;
 public class DateUtils {
 
     private static final String UTC_DATE_Z_FORMAT = "{0}-{1}-{2}T{3}:{4}:{5}Z";
+    private static final String UTC_DATE_MILLISECONDS_Z_FORMAT = "{0}-{1}-{2}T{3}:{4}:{5}.{6}Z";
     private static final String UTC_DATE_FORMAT = "{0}-{1}-{2}T{3}:{4}:{5}";
-    private static final String FULL_DATE_FORMAT = "{0}-{1}-{2}T{3}:{4}:{5}{6}";
+    private static final String FULL_DATE_FORMAT = "{0}-{1}-{2}T{3}:{4}:{5}{7}";
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
 
     /**
      * Returns <code>yyyy-MM-dd HH:mm:ss</code> String representation of a
      * date.
-     * 
+     *
      * @param date Date object.
      * @return The formatted date.
      */
@@ -61,12 +62,23 @@ public class DateUtils {
     /**
      * Returns UTC String representation of a date. For instance,
      * 2004-03-20T05:53:32Z.
-     * 
+     *
      * @param date Date object.
      * @return The formatted date.
      */
     public static String toUTCDateFormat(final Date date) {
         return dateToString(date, UTC_DATE_Z_FORMAT, UTC_TIME_ZONE);
+    }
+
+    /**
+     * Returns UTC String representation of a date with milliseconds. For instance,
+     * 2004-03-20T05:53:32.321Z.
+     *
+     * @param date Date object.
+     * @return The formatted date.
+     */
+    public static String toUTCDateFormatWithMilliseconds(final Date date) {
+        return dateToString(date, UTC_DATE_MILLISECONDS_Z_FORMAT, UTC_TIME_ZONE);
     }
 
     /**
@@ -86,7 +98,7 @@ public class DateUtils {
             cal.setTimeZone(tz);
         }
         cal.setTime(date);
-        String[] params = new String[7];
+        String[] params = new String[8];
 
         params[0] = formatInteger(cal.get(Calendar.YEAR), 4);
         params[1] = formatInteger(cal.get(Calendar.MONTH) + 1, 2);
@@ -94,16 +106,16 @@ public class DateUtils {
         params[3] = formatInteger(cal.get(Calendar.HOUR_OF_DAY), 2);
         params[4] = formatInteger(cal.get(Calendar.MINUTE), 2);
         params[5] = formatInteger(cal.get(Calendar.SECOND), 2);
+        params[6] = formatInteger(cal.get(Calendar.MILLISECOND), 3);
 
         int offset = cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET);
         if (offset == 0) {
-            params[6] = "Z";
+            params[7] = "Z";
         } else {
-            params[6] = (offset < 0 ? "-" : "+")
+            params[7] = (offset < 0 ? "-" : "+")
                 + formatInteger(Math.abs(offset) / 3600000, 2)
                 + ":" + formatInteger((Math.abs(offset) / 60000) % 60, 2);
         }
-
         return MessageFormat.format(format, (Object[]) params);
     }
 
@@ -114,7 +126,6 @@ public class DateUtils {
         for (int i = 0; i < diff; i++) {
             val = "0" + val;
         }
-
         return val;
     }
 
@@ -141,7 +152,7 @@ public class DateUtils {
      * least four digits, the MM, DD, SS, hh, mm and ss fields exactly two
      * digits each (not counting fractional seconds); leading zeroes must be
      * used if the field would otherwise have too few digits.
-     * 
+     *
      * This representation may be immediately followed by a "Z" to indicate
      * Coordinated Universal Time (UTC) or, to indicate the time zone, i.e. the
      * difference between the local time and Coordinated Universal Time,
@@ -150,11 +161,11 @@ public class DateUtils {
      * 8601 Date and Time Formats ('D) for details about legal values in the
      * various fields. If the time zone is included, both hours and minutes must
      * be present.
-     * 
+     *
      * For example, to indicate 1:20 pm on May the 31st, 1999 for Eastern
      * Standard Time which is 5 hours behind Coordinated Universal Time (UTC),
      * one would write: 1999-05-31T13:20:00-05:00.
-     * 
+     *
      * @param strDate String representation of date.
      * @throws ParseException if <code>strDate</code> is in an invalid format.
      */
@@ -179,15 +190,10 @@ public class DateUtils {
             strDate = strDate.substring(0, idxDiffUTC);
         }
 
-        int idxMilliSec = strDate.indexOf('.');
-        if (idxMilliSec != -1) {
-            strDate = strDate.substring(0, idxMilliSec);
-        } else {
-            // remove the trailing z/Z character
-            char lastChar = strDate.charAt(strDate.length() - 1);
-            if ((lastChar == 'z') || (lastChar == 'Z')) {
-                strDate = strDate.substring(0, strDate.length() - 1);
-            }
+        // remove the trailing z/Z character
+        char lastChar = strDate.charAt(strDate.length() - 1);
+        if ((lastChar == 'z') || (lastChar == 'Z')) {
+            strDate = strDate.substring(0, strDate.length() - 1);
         }
 
         return createDate(strDate, diffTime, plusTime);
@@ -197,7 +203,7 @@ public class DateUtils {
      * Returns the difference portion of a date string. Array of integer with
      * the first element defining the hour difference; and second element
      * defining the minute difference
-     * 
+     *
      * @param strDate Date String.
      * @param idx Index of the +/- character.
      * @returns the difference portion of a date string.
@@ -226,15 +232,15 @@ public class DateUtils {
 
     /**
      * Returns a date with a string of yyyy-MM-ssThh:mm:ss or yyyy-MM-ssThh:mm.
-     * 
+     *
      * @param strDate String representation of a date.
      * @param timeDiff Time differences
-     * @param plusDiff Time differences (plus/minus). true indicates do a plus 
-     *        to the computed date. Ignore this value if <code>timeDiff</code> 
+     * @param plusDiff Time differences (plus/minus). true indicates do a plus
+     *        to the computed date. Ignore this value if <code>timeDiff</code>
      *        is null.
      */
     private static Date createDate(
-        String strDate, 
+        String strDate,
         int[] timeDiff,
         boolean plusDiff
     ) throws ParseException {
@@ -270,6 +276,11 @@ public class DateUtils {
                 second = Integer.parseInt(strDate.substring(17, 19));
             }
 
+            int milliSeconds = 0;
+            if (strDate.length() > 19 && strDate.charAt(19) == '.') {
+                milliSeconds = Integer.parseInt(strDate.substring(20, 23));
+            }
+
             GregorianCalendar cal = new GregorianCalendar(year, month, day,
                     hour, minute, second);
             cal.setTimeZone(UTC_TIME_ZONE);
@@ -280,6 +291,8 @@ public class DateUtils {
                 cal.add(Calendar.HOUR, hourDiff);
                 cal.add(Calendar.MINUTE, minuteDiff);
             }
+
+            cal.add(Calendar.MILLISECOND, milliSeconds);
 
             return cal.getTime();
         } catch (NumberFormatException nfe) {

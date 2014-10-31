@@ -62,11 +62,11 @@ public final class JsonPolicyParser implements PolicyParser {
     private static final EntitlementToDecisionMapper ENTITLEMENT_TO_DECISION = new EntitlementToDecisionMapper();
 
     static {
-        // Configure the JSON MAPPER to use a standard ISO-8601 format for timestamps.
         // Note: while SimpleDateFormat is not thread-safe, ObjectMapper does the right thing and clones it before use.
-        DateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        iso8601Format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        MAPPER.setDateFormat(iso8601Format);
+        // OPENAM-4757: Include milliseconds in the time output
+        DateFormat iso8601FormatWithMilliseconds = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+        iso8601FormatWithMilliseconds.setTimeZone(TimeZone.getTimeZone("UTC"));
+        MAPPER.setDateFormat(iso8601FormatWithMilliseconds);
         // Exclude null fields from serialisation (e.g., condition names etc).
         MAPPER.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
     }
