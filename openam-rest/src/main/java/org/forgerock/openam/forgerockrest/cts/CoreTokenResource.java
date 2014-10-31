@@ -17,8 +17,6 @@
 package org.forgerock.openam.forgerockrest.cts;
 
 import com.sun.identity.shared.debug.Debug;
-import java.util.HashMap;
-import java.util.Map;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -39,6 +37,10 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
+import org.forgerock.openam.utils.JsonValueBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * CoreTokenResource is responsible for exposing the functions of the CoreTokenService via a REST
@@ -151,12 +153,14 @@ public class CoreTokenResource implements CollectionResourceProvider {
     }
 
     /**
-     * Read the contents of a Token based on its TokenID referred to by the Resource path.
+     * Read the token based on its Token ID.
+     *
+     * If successful, the Token will be returned to the caller in serialised JSON format.
      *
      * @param serverContext Required context.
      * @param tokenId The TokenID of the Token to read.
      * @param readRequest Not used.
-     * @param handler To handle errors.
+     * @param handler To handle the response of the operation, including errors.
      */
     public void readInstance(ServerContext serverContext, String tokenId, ReadRequest readRequest,
                              ResultHandler<Resource> handler) {
@@ -175,7 +179,10 @@ public class CoreTokenResource implements CollectionResourceProvider {
             }
 
             String json = serialisation.serialise(token);
-            Resource response = new Resource(tokenId, String.valueOf(System.currentTimeMillis()), new JsonValue(json));
+            Resource response = new Resource(
+                    tokenId,
+                    String.valueOf(System.currentTimeMillis()),
+                    JsonValueBuilder.toJsonValue(json));
             if (debug.messageEnabled()) {
                 debug.message("CoreTokenResource :: READ by " + principal + ": Read token resource with ID: " + tokenId);
             }
