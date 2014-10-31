@@ -115,11 +115,18 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         if (!haveConsent) {
             String localeParameter = request.getParameter(LOCALE);
-            Locale locale;
-            if (localeParameter == null) {
+            Locale locale = null;
+            if (localeParameter == null || localeParameter.isEmpty()) {
                 locale = request.getLocale();
             } else {
-                locale = Locale.forLanguageTag(localeParameter);
+                String[] localeComponents = localeParameter.split("-");
+                if (localeComponents.length == 1) {
+                    locale = new Locale(localeComponents[0]);
+                } else if (localeComponents.length == 2) {
+                    locale = new Locale(localeComponents[0], localeComponents[1]);
+                } else if (localeComponents.length > 2) {
+                    locale = new Locale(localeComponents[0], localeComponents[1], localeComponents[2]);
+                }
             }
             final String clientName = clientRegistration.getDisplayName(locale);
             final String clientDescription = clientRegistration.getDisplayDescription(locale);
