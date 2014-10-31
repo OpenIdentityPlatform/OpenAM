@@ -290,7 +290,9 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
         return adminSubject;
     }
 
-    protected void notifyPrivilegeChanged(String realm, Privilege previous, Privilege current) {
+    protected void notifyPrivilegeChanged(String realm, Privilege previous, Privilege current)
+            throws EntitlementException {
+
         Set<String> resourceNames = new HashSet<String>();
         if (previous != null) {
             Set<String> r = previous.getEntitlement().getResourceNames();

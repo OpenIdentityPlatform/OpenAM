@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -147,12 +148,24 @@ public class CollectionUtilsTest {
         CollectionUtils.transformSet(someSet, new FailMapping());
     }
 
+    @Test
+    public void getFirstString() {
+        List<String> aList = Arrays.asList("abc", "def", "hik");
+        assertThat(CollectionUtils.getFirstItem(aList, "xyz")).isEqualTo("abc");
+    }
+
+    @Test
+    public void returnDefaultValueWithEmptyList() {
+        List<String> aList = Collections.emptyList();
+        assertThat(CollectionUtils.getFirstItem(aList, "xyz")).isEqualTo("xyz");
+    }
+
     /**
      * Mapper that maps a list of strings to a set of strings.
      */
     private static final class MapListToSet implements Function<List<String>, Set<String>, NeverThrowsException> {
 
-        public Set<String> apply(List<String> value) throws NeverThrowsException {
+        public Set<String> apply(List<String> value) {
             return new HashSet<String>(value);
         }
 
@@ -163,7 +176,7 @@ public class CollectionUtilsTest {
      */
     private static final class MapStringToInt implements Function<String, Integer, NumberFormatException> {
 
-        public Integer apply(String value) throws NumberFormatException {
+        public Integer apply(String value) {
             return Integer.valueOf(value);
         }
 

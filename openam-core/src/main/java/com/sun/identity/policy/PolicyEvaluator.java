@@ -150,6 +150,7 @@ public class PolicyEvaluator {
     private String orgName;
     private String realm;
     private String serviceTypeName;
+    private String applicationName;
     private ServiceType serviceType;
     private PolicyCache policyCache;
     private PolicyManager policyManager;
@@ -218,8 +219,8 @@ public class PolicyEvaluator {
      *
      * Used to clean up the decision cache on policy change notification
      */
-    private static Map policyListenerRegistry =
-              Collections.synchronizedMap(new HashMap());
+    private static Map<String, PolicyDecisionCacheListener> policyListenerRegistry =
+              Collections.synchronizedMap(new HashMap<String, PolicyDecisionCacheListener>());
 
     /**
      * The user <code>nsRole</code> attribute cache.
@@ -295,28 +296,7 @@ public class PolicyEvaluator {
 
         this("", serviceTypeName);
 
-        /* Register a policy listener for updating policy decision 
-         * cache if there is none already registered
-         */
-        synchronized (lock) {
-            if (!(policyListenerRegistry.containsKey(serviceTypeName))) {
-                listener = new PolicyDecisionCacheListener(serviceTypeName);
-                try {
-                    PolicyCache.getInstance().addPolicyListener(listener);
-                } catch (PolicyException pe) {
-                    DEBUG.error("PolicyEvaluator: registering policy decision "
-                            + " cache listener failed");
-                }
-                policyListenerRegistry.put(serviceTypeName, listener);
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("PolicyEvaluator:policy listener for service "
-                            + serviceTypeName + " added");
-                }
-            } else {
-                listener = (PolicyDecisionCacheListener)
-                    policyListenerRegistry.get(serviceTypeName);
-            }
-        }
+        registerListener();
     }
 
     /**
@@ -330,8 +310,8 @@ public class PolicyEvaluator {
      */
     public PolicyEvaluator(String orgName, String serviceTypeName)
             throws SSOException, PolicyException, NameNotFoundException {
-        
-        if ( (orgName == null) || (orgName.equals("/")) 
+
+        if ( (orgName == null) || (orgName.equals("/"))
                     || (orgName.length() == 0) ) {
             orgName = ServiceManager.getBaseDN();
         } else {
@@ -341,6 +321,8 @@ public class PolicyEvaluator {
 
         this.realm = com.sun.identity.sm.DNMapper.orgNameToRealmName(orgName);
         this.serviceTypeName = serviceTypeName;
+        // Default application to be the service type, this maintains legacy behaviour.
+        this.applicationName = serviceTypeName;
 
         this.policyCache = PolicyCache.getInstance();
 
@@ -351,11 +333,11 @@ public class PolicyEvaluator {
         this.serviceTypeNames.add(serviceTypeName);
         resourceIndexManager = policyManager.getResourceIndexManager();
 
-        String resultsCacheSessionCapString 
+        String resultsCacheSessionCapString
                 = SystemProperties.get(RESULTS_CACHE_SESSION_CAP);
         if (resultsCacheSessionCapString != null) {
             try {
-                resultsCacheSessionCap 
+                resultsCacheSessionCap
                         = Integer.parseInt(resultsCacheSessionCapString);
             } catch (NumberFormatException nfe) {
                 if (PolicyManager.debug.warningEnabled()) {
@@ -380,11 +362,11 @@ public class PolicyEvaluator {
                     + "resultsCacheSessionCap=" + resultsCacheSessionCap);
         }
 
-        String resultsCacheResourceCapString 
+        String resultsCacheResourceCapString
                 = SystemProperties.get(RESULTS_CACHE_RESOURCE_CAP);
         if (resultsCacheResourceCapString != null) {
             try {
-                resultsCacheResourceCap 
+                resultsCacheResourceCap
                         = Integer.parseInt(resultsCacheResourceCapString);
             } catch (NumberFormatException nfe) {
                 if (PolicyManager.debug.warningEnabled()) {
@@ -409,8 +391,57 @@ public class PolicyEvaluator {
                     + "resultsCacheResourceCap=" + resultsCacheResourceCap);
         }
 
-    }        
-    
+    }
+
+    /**
+     * Creates a new policy evaluator instance.
+     *
+     * @param orgName
+     *         the name of the organization under which the evaluation is being done
+     * @param serviceTypeName
+     *         the name of the <code>ServiceType</code> for which this evaluator can be used
+     * @param applicationName
+     *         the application name containing the policies in question
+     *
+     * @throws PolicyException
+     *         should some error occur constructor the evaluator
+     * @throws SSOException
+     *         should some error occur with regards to any SSO token
+     */
+    public PolicyEvaluator(String orgName, String serviceTypeName, String applicationName)
+            throws PolicyException, SSOException {
+        this(orgName, serviceTypeName);
+        this.applicationName = applicationName;
+
+        registerListener();
+    }
+
+    /**
+     * Register a policy listener for updating policy decision cache if there is none already registered.
+     */
+    private void registerListener() {
+        synchronized (lock) {
+            if (!policyListenerRegistry.containsKey(serviceTypeName)) {
+                listener = new PolicyDecisionCacheListener(serviceTypeName);
+
+                try {
+                    PolicyCache.getInstance().addPolicyListener(listener);
+                } catch (PolicyException pe) {
+                    DEBUG.error("PolicyEvaluator: registering policy decision cache listener failed");
+                }
+
+                policyListenerRegistry.put(serviceTypeName, listener);
+
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("PolicyEvaluator:policy listener for service " + serviceTypeName + " added");
+                }
+
+            } else {
+                listener = policyListenerRegistry.get(serviceTypeName);
+            }
+        }
+    }
+
     /**
      * Evaluates a simple privilege of boolean type. The privilege indicate
      * if the user can perform specified action on the specified resource.
@@ -540,7 +571,7 @@ public class PolicyEvaluator {
         try {
             Application appl = ApplicationManager.getApplication(
                 PrivilegeManager.superAdminSubject,
-                realmName, serviceTypeName);
+                realmName, applicationName);
             resourceName = appl.getResourceComparator().canonicalize(
                 resourceName);
         } catch (EntitlementException e) {
@@ -616,7 +647,7 @@ public class PolicyEvaluator {
             Entitlement entitlement = new Entitlement(serviceTypeName, resourceName, actions);
             entitlement.canonicalizeResources(adminSubject, realm);
 
-            Evaluator eval = new Evaluator(adminSubject, serviceTypeName);
+            Evaluator eval = new Evaluator(adminSubject, applicationName);
             return eval.hasEntitlement(realm, SubjectUtils.createSubject(token), entitlement, envParameters);
 
         } catch (EntitlementException e) {
@@ -836,7 +867,7 @@ public class PolicyEvaluator {
 
         try {
             Evaluator eval = new Evaluator(
-                SubjectUtils.createSubject(adminSSOToken), serviceTypeName);
+                SubjectUtils.createSubject(adminSSOToken), applicationName);
             Subject sbj = (token != null) ? SubjectUtils.createSubject(token) :
                 null;
             List<Entitlement> entitlements = eval.evaluate(
@@ -1455,7 +1486,7 @@ public class PolicyEvaluator {
 
             Subject userSubject = SubjectUtils.createSubject(token);
             Evaluator eval = new Evaluator(
-                SubjectUtils.createSubject(adminSSOToken), serviceTypeName);
+                SubjectUtils.createSubject(adminSSOToken), applicationName);
 
             List<Entitlement> entitlements = eval.evaluate(
                 realm, userSubject, resourceName,

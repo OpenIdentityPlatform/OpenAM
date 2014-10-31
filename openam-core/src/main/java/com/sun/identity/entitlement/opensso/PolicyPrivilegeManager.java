@@ -30,6 +30,8 @@ package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationPrivilege;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
@@ -366,7 +368,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
     }
 
     @Override
-    protected void notifyPrivilegeChanged(String realm, Privilege previous, Privilege current) {
+    protected void notifyPrivilegeChanged(String realm, Privilege previous, Privilege current) throws EntitlementException {
         Set<String> resourceNames = new HashSet<String>();
         if (previous != null) {
             Set<String> r = previous.getEntitlement().getResourceNames();
@@ -390,7 +392,16 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
             applicationName, current.getName(), resourceNames);
 
         if (policyCache != null) {
-            policyCache.firePrivilegeChanged(applicationName, resourceNames, PolicyEvent.POLICY_MODIFIED);
+            // Retrieve the underlying application type to map to the legacy service type model.
+            final Application application = ApplicationManager
+                    .getApplication(PrivilegeManager.superAdminSubject, realm, applicationName);
+
+            if (application == null) {
+                throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, new Object[] {realm});
+            }
+
+            final String serviceTypeName = application.getApplicationType().getName();
+            policyCache.firePrivilegeChanged(serviceTypeName, resourceNames, PolicyEvent.POLICY_MODIFIED);
         }
     }
 }

@@ -20,8 +20,10 @@ import org.forgerock.util.promise.Function;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -192,6 +194,28 @@ public class CollectionUtils {
         }
 
         return newSet;
+    }
+
+
+    /**
+     * Retrieves the first item from a collections.
+     *
+     * @param collection
+     *         the collection
+     * @param defaultValue
+     *         the default value should not initial value exist
+     * @param <T>
+     *         the type of the collection
+     *
+     * @return the first instance of the collection else null if not present
+     */
+    public static <T> T getFirstItem(final Collection<T> collection, final T defaultValue) {
+        if (collection == null) {
+            return defaultValue;
+        }
+
+        final Iterator<T> iterator = collection.iterator();
+        return iterator.hasNext() ? iterator.next() : defaultValue;
     }
 
 }

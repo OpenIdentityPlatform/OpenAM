@@ -37,7 +37,7 @@ import java.util.ResourceBundle;
  * Entitlement related exception.
  */
 public class EntitlementException extends Exception {
-    private static final String RES_BUNDLE_NAME = "EntitlementException";
+    public static final String RES_BUNDLE_NAME = "EntitlementException";
 
     /*
      * Selected error code constants. See EntitlementException.properties for full list.
