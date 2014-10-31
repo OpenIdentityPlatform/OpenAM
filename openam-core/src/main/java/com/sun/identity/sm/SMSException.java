@@ -61,13 +61,10 @@ import com.sun.identity.shared.ldap.LDAPException;
  */
 public class SMSException extends Exception implements L10NMessage {
 
-    // Static variable
-    transient AMResourceBundleCache amCache = AMResourceBundleCache
-            .getInstance();
+    transient AMResourceBundleCache amCache = AMResourceBundleCache.getInstance();
 
     transient Debug debug = Debug.getInstance(IUMSConstants.UMS_DEBUG);
 
-    // Instance variables
     private int exceptionStatus = STATUS_NONE;
 
     private Throwable rootCause;
@@ -469,22 +466,22 @@ public class SMSException extends Exception implements L10NMessage {
 
     // Error codes
     /** No status code is set */
-    public static int STATUS_NONE = -1;
+    public static final int STATUS_NONE = -1;
 
     /** Retry connection to data store */
-    public static int STATUS_RETRY = 0;
+    public static final int STATUS_RETRY = 0;
 
     /** Repeated retry to data store failed */
-    public static int STATUS_REPEATEDLY_FAILED = 0;
+    public static final int STATUS_REPEATEDLY_FAILED = 0;
 
     /** Status to abort operation */
-    public static int STATUS_ABORT = 1;
+    public static final int STATUS_ABORT = 1;
 
     /**
      * If root LDAP cause is <code>LDAP_PARTIAL_RESULTS </code> then this
      * status is set
      */
-    public static int STATUS_QUO_ANTE = 2;
+    public static final int STATUS_QUO_ANTE = 2;
 
     /**
      * If root LDAP cause is an LDAP exception with one of the following error
@@ -500,21 +497,21 @@ public class SMSException extends Exception implements L10NMessage {
      * </PRE>
      */
 
-    public static int STATUS_LDAP_OP_FAILED = 3;
+    public static final int STATUS_LDAP_OP_FAILED = 3;
 
     /**
      * If the root LDAP exception is <code> INVALID_CREDENTIALS </code> or
      * <code> REFERRAL </code> then this status is set
      */
-    public static int STATUS_CONFIG_PROBLEM = 4;
+    public static final int STATUS_CONFIG_PROBLEM = 4;
 
     /** If root cause is other than any of those listed in other status codes */
-    public static int STATUS_UNKNOWN_EXCEPTION = 5;
+    public static final int STATUS_UNKNOWN_EXCEPTION = 5;
 
     /** If the root LDAP cause is <code> INSUFFICIENT_ACCESS_RIGHTS </code> */
-    public static int STATUS_NO_PERMISSION = 8;
+    public static final int STATUS_NO_PERMISSION = 8;
 
     /** the operation is not allowed. */
-    public static int STATUS_NOT_ALLOW = 9;
+    public static final int STATUS_NOT_ALLOW = 9;
 
 }

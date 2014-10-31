@@ -365,6 +365,16 @@
                             <Value>READ</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
+                    <SubConfiguration name="RealmResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/realms/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
                 </SubConfiguration>
                 <SubConfiguration name="Privileges">
                     <SubConfiguration name="RealmAdmin" id="Privilege">
@@ -458,6 +468,13 @@
                         <AttributeValuePair>
                             <Attribute name="listOfPermissions" />
                             <Value>ApplicationResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="RealmReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>RealmResourceRead</Value>
+                            <Value>RealmReadOnly</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>

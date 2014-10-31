@@ -153,7 +153,7 @@ public class RestEndpoints {
                 .forVersion("1.0").to(ReferralsResourceV1.class);
 
         dynamicRealmRouter.route("/realms")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(RealmResource.class);
 
         dynamicRealmRouter.route("/sessions")

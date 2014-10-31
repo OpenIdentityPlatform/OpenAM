@@ -18,12 +18,15 @@ package org.forgerock.openam.forgerockrest;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import static com.sun.identity.sm.SMSException.*;
 import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -47,9 +50,12 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+
+import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
 import static org.forgerock.openam.forgerockrest.RestUtils.hasPermission;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.RealmContext;
@@ -58,7 +64,7 @@ import org.forgerock.openam.utils.RealmUtils;
 /**
  * A simple {@code Map} based collection resource provider.
  */
-public final class RealmResource implements CollectionResourceProvider {
+public class RealmResource implements CollectionResourceProvider {
 
     private static final String ACTIVE = "Active";
     private static final String INACTIVE = "Inactive";
@@ -66,8 +72,6 @@ public final class RealmResource implements CollectionResourceProvider {
     private static final Debug debug = Debug.getInstance("frRest");
 
     // TODO: filters, sorting, paged results.
-
-    private Set subRealms = null;
 
     final private static String SERVICE_NAMES = "serviceNames";
     final private static String TOP_LEVEL_REALM = "topLevelRealm";
@@ -319,32 +323,63 @@ public final class RealmResource implements CollectionResourceProvider {
     }
 
     /**
+     * Returns names of all realms included in the subtree rooted by the realm indicated
+     * in the query url.
+     *
+     * Names are unsorted and given as full paths.
+     *
+     * Filtering, sorting, and paging of results is not supported.
+     *
      * {@inheritDoc}
      */
     @Override
     public void queryCollection(final ServerContext context, final QueryRequest request,
                                 final QueryResultHandler handler) {
+
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+        final RealmContext realmContext = context.asContext(RealmContext.class);
+        final String realmPath = realmContext.getRealm();
+
         try {
-            hasPermission(context);
-            for (Object theRealm : subRealms) {
-                String realm = (String) theRealm;
-                JsonValue val = new JsonValue(realm);
-                Resource resource = new Resource("0", "0", val);
+
+            final SSOTokenManager mgr = SSOTokenManager.getInstance();
+            final SSOToken ssoToken = mgr.createSSOToken(getCookieFromServerContext(context));
+
+            final OrganizationConfigManager ocm = new OrganizationConfigManager(ssoToken, realmPath);
+            final List<String> realmsInSubTree = new ArrayList<String>();
+            realmsInSubTree.add(realmPath);
+            for (final Object subRealmRelativePath : ocm.getSubOrganizationNames("*", true)) {
+                if (realmPath.endsWith("/")) {
+                    realmsInSubTree.add(realmPath + subRealmRelativePath);
+                } else {
+                    realmsInSubTree.add(realmPath + "/" + subRealmRelativePath);
+                }
+            }
+
+            debug.message("RealmResource :: QUERY : performed by " + principalName);
+
+            for (final Object realmName : realmsInSubTree) {
+                JsonValue val = new JsonValue(realmName);
+                Resource resource = new Resource((String)realmName, "0", val);
                 handler.handleResource(resource);
             }
-            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-            debug.message("RealmResource.queryCollection :: QUERY of realms performed by " + principalName);
             handler.handleResult(new QueryResult());
-        } catch (SSOException sso){
-            debug.error("RealmResource.queryCollection() : Cannot QUERY "
-                    + ":" + sso);
-            handler.handleError(new PermanentException(401, "Access Denied", null));
-        } catch (ForbiddenException fe){
-            debug.error("RealmResource.updateInstance() : Cannot QUERY "
-                    + ":" + fe);
-            handler.handleError(fe);
-        } catch (Exception e) {
-            handler.handleError(new BadRequestException(e.getMessage(), e));
+
+        } catch (SSOException ex) {
+            debug.error("RealmResource :: QUERY by " + principalName + " failed : " + ex);
+            handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN));
+
+        } catch (SMSException ex) {
+            debug.error("RealmResource :: QUERY by " + principalName + " failed :" + ex);
+            switch (ex.getExceptionCode()) {
+                case STATUS_NO_PERMISSION:
+                    // This exception will be thrown if permission to read realms from SMS has not been delegated
+                    handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN));
+                    break;
+                default:
+                    handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+                    break;
+            }
         }
     }
 
