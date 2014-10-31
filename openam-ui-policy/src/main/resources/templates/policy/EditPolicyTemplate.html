@@ -6,7 +6,8 @@
         {{else}}
         <h1>{{t "config.messages.PolicyMessages.createPol"}}</h1>
         {{/if}}
-        <h2>Realm: {{options.realm}}</h2>
+        <h2><span>Application:</span> {{entity.applicationName}}</h2>
+        <h2><span>Realm:</span> {{options.realm}}</h2>
     </div>
     <p>To designate the conditions that define access to a protected resource, begin with Step 1 and progress through to step 7. Modifications can be made after it has been created.</p>
         
@@ -25,7 +26,6 @@
                     <label class="short" for="description">Description (optional)</label>
                     <textarea class="prop-val" id="description" data-field="description">{{entity.description}}</textarea>
                 </div>
-
                 <input class="button" type="button" value="Next" name="nextButton">
 
             </section>

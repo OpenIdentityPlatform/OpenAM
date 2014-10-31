@@ -59,18 +59,15 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
             var self = this,
                 data = self.data,
                 referralName = args[1],
-                referalPromise  = policyDelegate.getReferralByName(referralName),
+                referalPromise  = this.getReferral(referralName),
                 appPromise      = policyDelegate.getApplicationByName(args[0]);
-
-
-                data.appName = args[0];
 
             $.when(appPromise, referalPromise).done(function(app, referral){
 
                 if (referralName) {
                     data.entity = referral;
-                    data.entity.resources = data.entity.resources[data.appName];
                     data.entityName = referralName;
+                    data.entity.resources = _.clone(data.entity.resources[args[0]]);
 
                 } else {
                     data.entity = {};
@@ -78,6 +75,7 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
                 }
 
                 data.options = {};
+                data.options.appName = args[0];
                 data.options.realm = app[0].realm;
                 data.options.resourcePatterns = _.sortBy(app[0].resources);
 
@@ -147,12 +145,55 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
             this.accordion.setActive(targetIndex);
         },
 
+        getReferral: function (name) {
+            var self = this,
+                deferred = $.Deferred(),
+                referral = {};
+
+            if (name) {
+                policyDelegate.getReferralByName(name).done(function (referral) {
+                    deferred.resolve(referral);
+                });
+            } else {
+                deferred.resolve(referral);
+            }
+            return deferred.promise(referral);
+        },
+
         submitForm: function () {
-           //TODO
+    
+            var self = this,
+                persisted = _.clone(this.data.entity),
+                resources = _.clone(persisted.resources);
+
+            persisted.resources = {};
+            persisted.resources[this.data.options.appName] = resources;
+
+            if (this.data.entityName) {
+                policyDelegate.updateReferral( this.data.entityName, persisted )
+                .done(function (e) {
+                    router.routeTo(router.configuration.routes.managePolicies, {args: [self.data.options.appName], trigger: true});
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "referralUpdated");
+                })
+                .fail(function (e) {
+                    self.errorHandler(e);
+                });
+            } else {
+                policyDelegate.createReferral(persisted)
+                .done(function (e) {
+                    console.log(e);
+                    router.routeTo(router.configuration.routes.managePolicies, {args: [self.data.options.appName], trigger: true});
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "referralCreated");
+                })
+                .fail(function (e) {
+                    self.errorHandler(e);
+                });
+            }
         },
 
         errorHandler: function (e) {
             //TODO
+            console.error(e.responseJSON, e.responseText, e);
         }
     });
 

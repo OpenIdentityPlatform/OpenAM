@@ -1,12 +1,13 @@
 <div class="content-bg">
     <div class="policy-header">
-        <a href="#app/{{appName}}/policies/" id="cancelButton" class="button float-right">Back</a>
+        <a href="#app/{{options.appName}}/policies/" id="cancelButton" class="button float-right">Back</a>
         {{#if entity.name}}
         <h1>{{t "config.messages.PolicyMessages.edit"}}<span>{{entity.name}}</span></h1>
         {{else}}
         <h1>{{t "config.messages.PolicyMessages.createRef"}}</h1>
         {{/if}}
-        <h2>Realm: {{options.realm}}</h2>
+        <h2><span>Application:</span> {{options.appName}}</h2>
+        <h2><span>Realm:</span> {{options.realm}}</h2>
     </div>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
         

@@ -653,7 +653,12 @@ input[type="text"]:invalid:required{
     h2 {
         font-weight: normal;
         font-size: 15px;
-        line-height: 15px;
+        line-height: 18px;
+
+        span{
+            font-weight:normal;
+            color: #999;
+        }
     }
 }
 
@@ -706,24 +711,28 @@ html .selectize-dropdown .optgroup-header{
 
 /* These are jquery-theme over-rides*/
 
-.ui-widget-content .ui-state-hover{
-    border-color: #5d6871;
-    font-weight: normal;
-    color: #80b7ab;
-    background: #5d6871;
-}
+.ui-widget-content {
 
-.ui-widget-content th.ui-state-hover{
-    background: lighten(#5d6871, 10%);
-    color: white;
+    border-color: #bbb;
+
+    .ui-state-hover{
+        border-color: #5d6871;
+        font-weight: normal;
+        color: #80b7ab;
+        background: #5d6871;
+    }
+
+    th.ui-state-hover{
+        background: lighten(#5d6871, 10%);
+        color: white;
+    }
 }
 
 
 /*...*/
 
 
-
-span.realm{
+span.realm {
     color:#80b7ab;
     padding:0 5px;
     font-size:20px;
@@ -733,7 +742,7 @@ span.realm{
 #lastFSlash {
     transition:opacity 300ms linear;
     &.fade{
-        opacity:0;
+        opacity:0;  
     }
 }
 

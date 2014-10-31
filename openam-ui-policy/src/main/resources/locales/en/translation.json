@@ -33,11 +33,13 @@
                 "securityDataChanged" : "Security data has been changed",
                 "userAlreadyExists" : "User already exists",
                 "errorDeletingNotification" : "Error deleting notification.",
-                "errorFetchingNotifications" : "Error Fetching notifications."
+                "errorFetchingNotifications" : "Error fetching notifications."
             },
             "PolicyMessages": {
                 "applicationCreated": "Application created successfully",
                 "applicationUpdated": "Application updated successfully",
+                "referralCreated": "Referral created successfully",
+                "referralUpdated": "Referral updated successfully",
                 "deleteSuccess": "Deleted successfully",
                 "deleteFail": "Failed to delete",
                 "policyCreated": "Policy created successfully",
@@ -47,7 +49,7 @@
                 "edit": "Edit ",
                 "createApp": "Create Application",
                 "createPol": "Create Policy",
-                "createRef": "Create Referal",
+                "createRef": "Create Referral",
                 "unableToRetrievePolicy" : "Unable to retrieve policy",
                 "invalidResource" : "Invalid resource",
                 "duplicateResource" : "Duplicate resource",

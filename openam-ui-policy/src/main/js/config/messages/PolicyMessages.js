@@ -38,6 +38,14 @@ define("config/messages/PolicyMessages", [], function () {
             msg: "config.messages.PolicyMessages.applicationUpdated",
             type: "info"
         },
+        "referralCreated": {
+            msg: "config.messages.PolicyMessages.referralCreated",
+            type: "info"
+        },
+        "referralUpdated": {
+            msg: "config.messages.PolicyMessages.referralUpdated",
+            type: "info"
+        },
         "deleteSuccess": {
             msg: "config.messages.PolicyMessages.deleteSuccess",
             type: "info"

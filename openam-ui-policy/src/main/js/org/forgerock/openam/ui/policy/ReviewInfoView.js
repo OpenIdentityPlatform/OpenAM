@@ -35,7 +35,8 @@ define("org/forgerock/openam/ui/policy/ReviewInfoView", [
     var ReviewInfoView = AbstractView.extend({
         noBaseTemplate: true,
         events: {
-            'click #toggleAdvanced': 'toggleAdvancedView'
+            'click #toggleAdvanced': 'toggleAdvancedView',
+            'click .icon-arrow-down2': 'toggleAdvancedView'
         },
 
         render: function (args, callback, element, template) {
@@ -75,6 +76,7 @@ define("org/forgerock/openam/ui/policy/ReviewInfoView", [
         },
 
         toggleAdvancedView: function (e) {
+            e.stopPropagation();
             e.preventDefault();
             this.data.advancedMode = !this.data.advancedMode;
             sessionStorage.setItem(this.storageKey, this.data.advancedMode);
