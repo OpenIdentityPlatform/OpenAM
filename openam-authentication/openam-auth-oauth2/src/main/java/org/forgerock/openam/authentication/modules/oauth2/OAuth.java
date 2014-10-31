@@ -26,6 +26,8 @@
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
+
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
@@ -39,12 +41,19 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
 import org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper;
 import org.forgerock.openam.authentication.modules.oidc.JwtHandler;
 import org.forgerock.openam.authentication.modules.oidc.JwtHandlerConfig;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,6 +69,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -71,8 +81,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 public class OAuth extends AMLoginModule {
 
@@ -89,9 +97,11 @@ public class OAuth extends AMLoginModule {
     String data = "";
     String userPassword = "";
     String proxyURL = "";
+    private final CTSPersistentStore ctsStore;
 
     public OAuth() {
         OAuthUtil.debugMessage("OAuth()");
+        ctsStore = InjectorHolder.getInstance(CTSPersistentStore.class);
     }
 
     public void init(Subject subject, Map sharedState, Map config) {
@@ -152,21 +162,36 @@ public class OAuth extends AMLoginModule {
                 Set<String> domains = AuthClientUtils.getCookieDomains();
                 
                 String ProviderLogoutURL = config.getLogoutServiceUrl();
-                
+
+                String csrfStateTokenId = RandomStringUtils.randomAlphanumeric(32);
+                String csrfState = createAuthorizationState();
+                Token csrfStateToken = new Token(csrfStateTokenId, TokenType.GENERIC);
+                csrfStateToken.setAttribute(CoreTokenField.STRING_ONE, csrfState);
+                try {
+                    ctsStore.create(csrfStateToken);
+                } catch (CoreTokenException e) {
+                    OAuthUtil.debugError("OAuth.process(): Authorization redirect failed to be sent because the state "
+                            + "could not be stored");
+                    throw new AuthLoginException("OAuth.process(): Authorization redirect failed to be sent because "
+                            + "the state could not be stored", e);
+                }
+
                 // Set the return URL Cookie
                 // Note: The return URL cookie from the RedirectCallback can not
                 // be used because the framework changes the order of the 
                 // parameters in the query. OAuth2 requires an identical URL 
                 // when retrieving the token
                 for (String domain : domains) {
-                   CookieUtils.addCookieToResponse(response,
-                           CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
+                    CookieUtils.addCookieToResponse(response,
+                            CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
                     CookieUtils.addCookieToResponse(response,
                             CookieUtils.newCookie(COOKIE_ORIG_URL, requestedURI, "/", domain));
-                   if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
-                       CookieUtils.addCookieToResponse(response,
-                               CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", domain));
-                   }
+                    CookieUtils.addCookieToResponse(response,
+                            CookieUtils.newCookie(NONCE_TOKEN_ID, csrfStateTokenId, "/", domain));
+                    if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
+                        CookieUtils.addCookieToResponse(response,
+                                CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", domain));
+                    }
                 }
 
                 // The Proxy is used to return with a POST to the module
@@ -176,7 +201,7 @@ public class OAuth extends AMLoginModule {
                 setUserSessionProperty(SESSION_LOGOUT_BEHAVIOUR,
                         config.getLogoutBhaviour());
 
-                String authServiceUrl = config.getAuthServiceUrl(proxyURL);
+                String authServiceUrl = config.getAuthServiceUrl(proxyURL, csrfState);
                 OAuthUtil.debugMessage("OAuth.process(): New RedirectURL=" + authServiceUrl);
 
                 Callback[] callbacks1 = getCallback(2);
@@ -191,16 +216,32 @@ public class OAuth extends AMLoginModule {
             }
 
             case GET_OAUTH_TOKEN_STATE: {
-                // We are being redirected back from an OAuth 2 Identity Provider
-                code = request.getParameter(PARAM_CODE);
-                if (code == null || code.isEmpty()) {
-                        OAuthUtil.debugMessage("OAuth.process(): LOGIN_IGNORE");
-                        return ISAuthConstants.LOGIN_START;
+                final String csrfState = request.getParameter("state");
+                if (csrfState == null) {
+                    OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because there was no state "
+                            + "parameter");
+                    throw new AuthLoginException(BUNDLE_NAME, "noState", null);
                 }
-   
-                validateInput("code", code, "HTTPParameterValue", 512, false);
-                
+
                 try {
+                    Token csrfStateToken = ctsStore.read(OAuthUtil.findCookie(request, NONCE_TOKEN_ID));
+                    ctsStore.delete(csrfStateToken);
+                    String expectedCsrfState = csrfStateToken.getValue(CoreTokenField.STRING_ONE);
+                    if (!expectedCsrfState.equals(csrfState)) {
+                        OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because the state parameter "
+                                + "contained an unexpected value");
+                        throw new AuthLoginException(BUNDLE_NAME, "incorrectState", null);
+                    }
+
+                    // We are being redirected back from an OAuth 2 Identity Provider
+                    code = request.getParameter(PARAM_CODE);
+                    if (code == null || code.isEmpty()) {
+                            OAuthUtil.debugMessage("OAuth.process(): LOGIN_IGNORE");
+                            return ISAuthConstants.LOGIN_START;
+                    }
+
+                    validateInput("code", code, "HTTPParameterValue", 512, false);
+
                     OAuthUtil.debugMessage("OAuth.process(): code parameter: " + code);
 
                     String tokenSvcResponse = getContent(
@@ -304,6 +345,10 @@ public class OAuth extends AMLoginModule {
                     OAuthUtil.debugError("OAuth.process(): IdRepoException: "
                             + ire.getMessage());
                     throw new AuthLoginException(BUNDLE_NAME, "ire", null, ire);
+                } catch (CoreTokenException e) {
+                    OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because the state parameter "
+                            + "contained an unexpected value");
+                    throw new AuthLoginException(BUNDLE_NAME, "incorrectState", null, e);
                 }
                 break;
             }
@@ -386,6 +431,10 @@ public class OAuth extends AMLoginModule {
         }
         
         throw new AuthLoginException(BUNDLE_NAME, "unknownState", null);
+    }
+
+    private String createAuthorizationState() {
+        return new BigInteger(160, new SecureRandom()).toString(Character.MAX_RADIX);
     }
 
     // Search for the user in the realm, using the instantiated account mapper

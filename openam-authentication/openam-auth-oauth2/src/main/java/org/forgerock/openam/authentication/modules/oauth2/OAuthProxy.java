@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2013 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2014 ForgeRock AS.
  * Copyright 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -76,9 +76,9 @@ public class OAuthProxy  {
                 }
             }
             if (action.contains("?")) {
-                action = action + "&code=" + code;
+                action += "&" + req.getQueryString();
             } else {
-                action = action + "?code=" + code;
+                action += "?" + req.getQueryString();
             }
 
             String onLoad = "document.postform.submit()";

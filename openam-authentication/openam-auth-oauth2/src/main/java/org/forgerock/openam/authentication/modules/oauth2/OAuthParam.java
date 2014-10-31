@@ -95,6 +95,7 @@ public class OAuthParam {
     public final static String COOKIE_ORIG_URL = "ORIG_URL";
     public final static String COOKIE_PROXY_URL = "PROXY_URL";
     public final static String COOKIE_LOGOUT_URL = "OAUTH_LOGOUT_URL";
+    public final static String NONCE_TOKEN_ID = "NTID";
     
     // Login states
     public final static int LOGIN_START = 1;
