@@ -25,78 +25,89 @@
  * $Id: ConditionDecision.java,v 1.3 2009/09/05 00:24:04 veiming Exp $
  */
 
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Class to represent condition result and advices
+ * Class to represent condition result and - if applicable - its advices.
  */
 public class ConditionDecision {
+
     private boolean satisfied;
     private Map<String, Set<String>> advices;
-    public static final String TIME_TO_LIVE = "timeToLive";
-    public static final String MAX_TIME = "maxTime";
     private long timeToLive = Long.MAX_VALUE;
 
     /**
-     * Constructs an instance of <code>ConditionDecision</code>
-     * @param satisfied boolean result of condition decision
-     * @param advices advice map of condition decision
+     * Constructs an instance of <code>ConditionDecision</code>.
+     *
+     * @param satisfied Result of condition decision.
+     * @param advices Advice map of condition decision.
      */
-    public ConditionDecision(
-        boolean satisfied,
-        Map<String, Set<String>> advices) {
+    public ConditionDecision(boolean satisfied, Map<String, Set<String>> advices) {
         this.satisfied = satisfied;
-        this.advices = advices;
+        this.advices = new HashMap<String, Set<String>>(advices);
     }
 
     /**
-     * Constructs an instance of <code>ConditionDecision</code>
-     * @param satisfied boolean result of condition decision
-     * @param advices advice map of condition decision
-     * @param ttl The TTL of the decision
+     * Constructs an instance of <code>ConditionDecision</code>.
+     *
+     * @param satisfied Result of condition decision.
+     * @param advices Advice map of condition decision.
+     * @param ttl The TTL of the decision.
      */
-    public ConditionDecision(
-        boolean satisfied,
-        Map<String, Set<String>> advices,
-        long ttl) {
-        this.satisfied = satisfied;
-        this.advices = advices;
+    public ConditionDecision(boolean satisfied, Map<String, Set<String>> advices, long ttl) {
+        this(satisfied, advices);
         this.timeToLive = ttl;
     }
 
     /**
-     * Returns true if condition is fulfilled.
+     * Whether the condition is satisfied.
      *
-     * @return true if condition is fulfilled.
+     * @return <code>true</code> if condition is fulfilled.
      */
     public boolean isSatisfied() {
         return satisfied;
     }
 
     /**
-     * Sets satisfied member.
+     * Sets satisfied state.
      *
-     * @param satisfied value for satified member.
+     * @param satisfied New satisfied state.
      */
     public void setSatisfied(boolean satisfied) {
         this.satisfied = satisfied;
     }
 
     /**
-     * Returns advices of condition decsion
-     * @return advices of condiiton decision
+     * Query for a list of advices associated with this condition decision.
+     *
+     * @return advices of condition decision.
      */
     public Map<String, Set<String>> getAdvices() {
-        return advices;
+        return Collections.unmodifiableMap(advices);
     }
 
+    /**
+     * Clears the current advices associated with this decision.
+     */
+    public void clearAdvices() {
+        advices.clear();
+    }
+
+    /**
+     * Adds an advice (represented as a ConditionDecision) to this
+     * ConditionDecision.
+     *
+     * @param decision The decision whose advices to add.
+     */
     public void addAdvices(ConditionDecision decision) {
         if (decision != null) {
             Map<String, Set<String>> otherAdvices = decision.getAdvices();
@@ -110,9 +121,9 @@ public class ConditionDecision {
     }
 
     /**
-     * Returns the TTL of this decision
+     * Returns the time to live (TTL) of this decision.
      *
-     * @return The TTL time in ms
+     * @return The TTL time in ms.
      */
     public long getTimeToLive() {
         return timeToLive;

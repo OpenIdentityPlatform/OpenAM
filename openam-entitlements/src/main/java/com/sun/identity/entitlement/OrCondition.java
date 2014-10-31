@@ -24,6 +24,10 @@
  *
  * $Id: OrCondition.java,v 1.2 2009/09/05 00:24:04 veiming Exp $
  */
+
+/**
+ * Portions Copyrighted 2014 ForgeRock AS.
+ */
 package com.sun.identity.entitlement;
 
 import java.util.Collections;
@@ -32,12 +36,14 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 /**
- * <code>EntitlementCondition</code> wrapper on a set of
- * <code>EntitlementCondition</code>(s) to provide boolean OR logic
- * Membership is of OrCondition is satisfied if the user is a member of any
- * of the wrapped EntitlementCondition
+ * {@link EntitlementCondition} wrapper on a set of
+ * {@link EntitlementCondition}s to provide boolean OR logic.
+ *
+ * Membership of {@link OrCondition} is satisfied if the user is a member of any
+ * of the wrapped {@link EntitlementCondition}.
  */
 public class OrCondition extends LogicalCondition {
+
     /**
      * Constructor.
      */
@@ -46,63 +52,56 @@ public class OrCondition extends LogicalCondition {
     }
 
     /**
-     * Constructor.
+     * Constructor for providing {@link EntitlementCondition}s.
      *
-     * @param eConditions wrapped EntitlementCondition(s)
+     * @param eConditions Wrapped {@link EntitlementCondition}(s).
      */
     public OrCondition(Set<EntitlementCondition> eConditions) {
         super(eConditions);
     }
 
     /**
-     * Constructor.
+     * Constructor for providing {@link EntitlementCondition}s and
      *
-     * @param eConditions wrapped EntitlementCondition(s)
-     * @param pConditionName subject name as used in OpenSSO policy,
-     * this is releavant only when UserECondition was created from
-     * OpenSSO policy Condition
+     *
+     * @param eConditions Wrapped {@link EntitlementCondition}(s).
+     * @param pConditionName Subject name as used in OpenAM policy, this is relevant only when
+     *                       UserECondition was created from OpenAM Policy Condition.
      */
-    public OrCondition(
-        Set<EntitlementCondition> eConditions,
-        String pConditionName
-    ) {
+    public OrCondition(Set<EntitlementCondition> eConditions, String pConditionName) {
         super(eConditions, pConditionName);
     }
 
 
     /**
-     * Returns <code>ConditionDecision</code> of
-     * <code>EntitlementCondition</code> evaluation
+     * Evaluates this {@link ConditionDecision}'s {@link EntitlementCondition}s to determine the correct
+     * decision to return - if any of the {@link EntitlementCondition}s are true, the returned decision is
+     * satisfied and has no advices.
      *
      * @param realm Realm name.
-     * @param subject EntitlementCondition who is under evaluation.
+     * @param subject EntitlementCondition under evaluation.
      * @param resourceName Resource name.
      * @param environment Environment parameters.
-     * @return <code>ConditionDecision</code> of
-     * <code>EntitlementCondition</code> evaluation
-     * @throws com.sun.identity.entitlement,  EntitlementException in case
-     * of any error
+     * @return the {@link ConditionDecision} having performed the {@link EntitlementCondition}(s) evaluation.
+     * @throws {@link EntitlementException} in case of any error.
      */
-    public ConditionDecision evaluate(
-        String realm,
-        Subject subject,
-        String resourceName,
-        Map<String, Set<String>> environment
-    ) throws EntitlementException {
-        Set<EntitlementCondition> eConditions = getEConditions();
-        if ((eConditions == null) || eConditions.isEmpty()) {
-            return new ConditionDecision(true, Collections.EMPTY_MAP);
+    public ConditionDecision evaluate(String realm, Subject subject, String resourceName,
+                                      Map<String, Set<String>> environment) throws EntitlementException {
+        final Set<EntitlementCondition> eConditions = getEConditions();
+
+        if (eConditions == null || eConditions.isEmpty()) {
+            return new ConditionDecision(true, Collections.<String, Set<String>>emptyMap());
         }
 
-        ConditionDecision decision = new ConditionDecision(false,
-            Collections.EMPTY_MAP);
+        final ConditionDecision decision = new ConditionDecision(false,  Collections.<String, Set<String>>emptyMap());
+
         for (EntitlementCondition ec : eConditions) {
-            ConditionDecision d = ec.evaluate(realm, subject, resourceName,
-                environment);
+            ConditionDecision d = ec.evaluate(realm, subject, resourceName, environment);
             decision.addAdvices(d);
 
             if (d.isSatisfied()) {
                 decision.setSatisfied(true);
+                decision.clearAdvices(); //ensure we don't send back advice from unmet conditions
                 return decision;
             }
         }
