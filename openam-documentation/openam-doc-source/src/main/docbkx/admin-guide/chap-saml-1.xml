@@ -1082,14 +1082,13 @@ $ <userinput>java \
 
     <para>
      For example if your host is a laptop,
-     with a static FQDN that you set as laptop.example.com,
-     add the aliases for that host name
+     you can add the aliases to the loopback address
      as in the following example line
      from an <filename>/etc/hosts</filename> file.
     </para>
 
     <literallayout class="monospaced"
-    >192.168.0.15    laptop.example.com ap.example.net rp.example.com</literallayout>
+    >127.0.0.1    localhost ap.example.net rp.example.com</literallayout>
 
     <para>
      Then run one application server to listen on port 8080,
@@ -1168,9 +1167,9 @@ $ <userinput>java \
 
    <step>
     <para>
-     Click Back to the Local Site Properties page
+     On the Local Site Properties page
      for the asserting party server,
-     and then Select Sign SAML Response.
+     select Sign SAML Response.
     </para>
 
     <para>
@@ -1181,7 +1180,8 @@ $ <userinput>java \
 
    <step>
     <para>
-     Save your work.
+     Save your work,
+     and then click Back to Federation.
     </para>
    </step>
 
@@ -1195,7 +1195,7 @@ $ <userinput>java \
    <step>
     <para>
      In the Destination area of the Select trusted partner type and profile page,
-     select both Artifact and Post, and then click Next.
+     select Artifact and Post (not SOAP Query), and then click Next.
     </para>
    </step>
 
@@ -1216,13 +1216,16 @@ $ <userinput>java \
      <member>Name: rp.example.com:9080</member>
      <member>Source ID: relying party Site ID that you recorded</member>
      <member>Target: rp.example.com:9080</member>
-     <member>Host List: rp.example.com</member>
     </simplelist>
 
     <para>
-     Under Source > Artifact,
-     set SOAP URL: http://rp.example.com:9080/rp/SAMLAwareServlet
+     Under Destination > Artifact, use these settings:
     </para>
+
+    <simplelist>
+     <member>SOAP URL: http://rp.example.com:9080/rp/SAMLAwareServlet</member>
+     <member>Host List: rp.example.com</member>
+    </simplelist>
 
     <para>
      Under Source > Post,
@@ -1232,7 +1235,7 @@ $ <userinput>java \
 
    <step>
     <para>
-     Save your work.
+     Click Finish to save your work.
     </para>
    </step>
   </procedure>
@@ -1256,7 +1259,7 @@ $ <userinput>java \
    <step>
     <para>
      In the Source area of the Select trusted partner type and profile page,
-     select both Artifact and Post, and then click Next.
+     select Artifact and Post, and then click Next.
     </para>
    </step>
 
@@ -1289,7 +1292,7 @@ $ <userinput>java \
     </para>
 
     <para>
-     Save your work.
+     Click Finish to save your work.
     </para>
    </step>
   </procedure>
