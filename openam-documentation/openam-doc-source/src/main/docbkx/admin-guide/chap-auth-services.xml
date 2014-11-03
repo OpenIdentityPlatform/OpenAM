@@ -4213,6 +4213,33 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
                   </para>
               </listitem>
           </varlistentry>
+          <varlistentry>
+           <term>Use secure cookie</term>
+           <listitem>
+            <para>
+             When enabled, adds the "Secure" attribute to the persistent cookie.
+            </para>
+
+            <para>
+             <command>ssoadm</command> attribute:
+             <literal>openam-auth-persistent-cookie-secure-cookie</literal>
+            </para>
+           </listitem>
+          </varlistentry>
+          <varlistentry>
+           <term>Use HTTP only cookie</term>
+           <listitem>
+            <para>
+             When enabled, adds the "HttpOnly" attribute to the persistent
+             cookie.
+            </para>
+
+            <para>
+             <command>ssoadm</command> attribute:
+             <literal>openam-auth-persistent-cookie-http-only-cookie</literal>
+            </para>
+           </listitem>
+          </varlistentry>
       </variablelist>
 
       <para>
