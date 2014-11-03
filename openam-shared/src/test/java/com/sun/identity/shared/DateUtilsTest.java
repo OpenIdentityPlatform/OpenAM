@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import static org.fest.assertions.Assertions.*;
 
@@ -36,18 +37,14 @@ public class DateUtilsTest {
 
     @BeforeTest
     public void setup() {
-        Calendar calendar = new GregorianCalendar(2013,1,28,13,24,56);
-
-        dateWithoutMilliseconds = calendar.getTime();
-
-        calendar.set(Calendar.MILLISECOND, 666);
-        dateWithMilliseconds = calendar.getTime();
+        dateWithoutMilliseconds = utcDate(2013, 1, 28, 13, 24, 56, 0);
+        dateWithMilliseconds = utcDate(2013, 1, 28, 13, 24, 56, 666);
     }
 
     @Test
     public void testDateToString() {
         String have = DateUtils.dateToString(dateWithoutMilliseconds);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat sdf = utcSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         String expect = sdf.format(dateWithoutMilliseconds);
 
         assertThat(have).isEqualTo(expect);
@@ -56,7 +53,7 @@ public class DateUtilsTest {
     @Test
     public void testToUTCDateFormat() {
         String have = DateUtils.toUTCDateFormat(dateWithoutMilliseconds);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat sdf = utcSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String expect = sdf.format(dateWithoutMilliseconds);
 
         assertThat(have).isEqualTo(expect);
@@ -65,7 +62,7 @@ public class DateUtilsTest {
     @Test
     public void testToUTCDateFormatWithMilliseconds() {
         String have = DateUtils.toUTCDateFormatWithMilliseconds(dateWithoutMilliseconds);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        SimpleDateFormat sdf = utcSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         String expect = sdf.format(dateWithoutMilliseconds);
 
         assertThat(have).isEqualTo(expect);
@@ -81,7 +78,7 @@ public class DateUtilsTest {
     @Test
     public void testToFullLocalDateFormat() {
         String have = DateUtils.toFullLocalDateFormat(dateWithoutMilliseconds);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat sdf = localSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         String expect = sdf.format(dateWithoutMilliseconds);
 
         // test needs improving
@@ -90,10 +87,10 @@ public class DateUtilsTest {
 
     @Test
     public void testStringToDate() throws ParseException {
-        SimpleDateFormat formatNoMilliseconds = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        SimpleDateFormat formatWithMilliseconds = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        SimpleDateFormat formatNoMillisecondsZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        SimpleDateFormat formatWithMillisecondsZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        SimpleDateFormat formatNoMilliseconds = utcSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat formatWithMilliseconds = utcSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        SimpleDateFormat formatNoMillisecondsZ = utcSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat formatWithMillisecondsZ = utcSimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
         String zeroMillisecondDateWithoutMilliseconds = formatNoMilliseconds.format(dateWithoutMilliseconds);
         String zeroMillisecondDateWithoutMillisecondsZ = formatNoMillisecondsZ.format(dateWithoutMilliseconds);
@@ -123,5 +120,22 @@ public class DateUtilsTest {
         Date reconstructedDate1 = DateUtils.stringToDate(zeroMillisecondDateWithoutMillisecondsZ);
         Date reconstructedDate2 = DateUtils.stringToDate(nonzeroMillisecondDateWithMillisecondsZ);
         assertThat(reconstructedDate1).isNotEqualTo(reconstructedDate2);
+    }
+
+    private SimpleDateFormat localSimpleDateFormat(String format) {
+        return new SimpleDateFormat(format);
+    }
+
+    private SimpleDateFormat utcSimpleDateFormat(String format) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return simpleDateFormat;
+    }
+
+    private Date utcDate(int year, int month, int date, int hours, int minutes, int seconds, int milliseconds) {
+        GregorianCalendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        calendar.set(year, month, date, hours, minutes, seconds);
+        calendar.set(Calendar.MILLISECOND, milliseconds);
+        return calendar.getTime();
     }
 }
