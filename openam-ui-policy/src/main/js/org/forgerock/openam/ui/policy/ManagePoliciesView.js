@@ -229,8 +229,8 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 return;
             }
 
-            var self = this, i, promises = [];
-            for (i = 0; i < this.policyGridView.selectedItems.length; i++) {
+            var self = this, i, length, promises = [];
+            for (i = 0, length = this.policyGridView.selectedItems.length; i < length; i++) {
                 promises.push(policyDelegate.deletePolicy(self.policyGridView.selectedItems[i]));
             }
 
@@ -244,7 +244,12 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 return;
             }
 
-            // TODO
+            var self = this, i, length, promises = [];
+            for (i = 0, length = this.refGridView.selectedItems.length; i < length; i++) {
+                promises.push(policyDelegate.deleteReferral(self.refGridView.selectedItems[i]));
+            }
+
+            this.refGridView.deleteItems(e, promises);
         },
 
         showTab: function (e) {
