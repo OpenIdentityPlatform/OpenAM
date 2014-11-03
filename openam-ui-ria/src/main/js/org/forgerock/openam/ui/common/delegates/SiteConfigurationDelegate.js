@@ -77,9 +77,9 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
                 errorsHandlers: {
                     "unauthorized": { status: "401"},
                     "Bad Request": { 
-                                        status: "400",
-                                        event: constants.EVENT_INVALID_REALM
-                                    }
+                        status: "400",
+                        event: constants.EVENT_INVALID_REALM
+                    }
                 }
             });        
         } else {

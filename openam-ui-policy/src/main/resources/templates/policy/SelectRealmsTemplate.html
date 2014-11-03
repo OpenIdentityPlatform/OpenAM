@@ -14,14 +14,15 @@
         {{/if}}
 
         <li class="editing clearfix">
+            <span tabindex="0" class="icon-plus float-right"></span>
             {{policyEditorRealmHelper options.parentRealm}}
-            <span class="realm">/</span>
+            <span class="realm icon-arrow-right2"></span>
             <input id="siblingRealm" type="text" placeholder="{{options.currentRealm}}{{#unless options.currentRealm}}Enter realm...{{/unless}}" value="{{options.currentRealm}}"  />
             {{#if options.currentRealm}}
-            <span class="realm" id="lastFSlash">/</span>
+            <span class="realm icon-arrow-right2" id="lastFSlash"></span>
             <input id="subRealm"type="text" placeholder="" />
             {{/if}}
-            <span tabindex="0" class="icon-plus float-right"></span>
+            
         </li>
     </ul>
 </div>

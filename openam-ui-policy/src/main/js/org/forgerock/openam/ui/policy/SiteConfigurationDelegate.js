@@ -50,7 +50,7 @@ define("org/forgerock/openam/ui/policy/SiteConfigurationDelegate", [
         obj.serviceCall({url: "configuration.json", 
             success: function (data) {
                 if (successCallback) {
-                    successCallback(_.merge({lang: "en"}, data.configuration));
+                    successCallback(data.configuration);
                 }
             }, 
             error: function (data) {

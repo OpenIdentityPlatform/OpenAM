@@ -82,20 +82,19 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
             var self = this;
             return {
                 url: '/openam/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/policies',
-                colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified',
-                    'Actions', 'Resources', 'Resource Attributes', 'Subject'],
+                colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified', 'Actions', 'Resources', 'Resource Attributes', 'Subject'],
                 colModel: [
-                    {name: 'iconChB', width: 40, sortable: false, formatter: this.policyGridView.checkBoxFormatter, frozen: true, title: false, search: false},
-                    {name: 'name', width: 250, frozen: true},
-                    {name: 'description', sortable: false, width: 150},
-                    {name: 'createdBy', width: 250, hidden: true},
-                    {name: 'creationDate', width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                    {name: 'iconChB',        width: 40, sortable: false, formatter: this.policyGridView.checkBoxFormatter, frozen: true, title: false, search: false},
+                    {name: 'name',           width: 250, frozen: true},
+                    {name: 'description',    width: 150, sortable: false},
+                    {name: 'createdBy',      width: 250, hidden: true},
+                    {name: 'creationDate',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
                     {name: 'lastModifiedBy', width: 250, hidden: true},
-                    {name: 'lastModified', width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                    {name: 'actionValues', width: 205, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
-                    {name: 'resources', width: 250, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'lastModified',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                    {name: 'actionValues',   width: 140, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                    {name: 'resources',      width: 200, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                     {name: 'resourceAttributes', width: 150, sortable: false, hidden: true, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                    {name: 'subject', width: 150, sortable: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.objectFormatter}
+                    {name: 'subject',        width: 150, sortable: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.objectFormatter}
 
                 ],
                 beforeSelectRow: function (rowId, e) {
@@ -116,7 +115,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                     }
                 },
                 sortname: 'name',
-                width: 900,
+                width: 915,
                 shrinkToFit: false,
                 pager: '#policiesPager'
             };
@@ -128,13 +127,13 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 url: '/openam/json/referrals',
                 colNames: ['', 'Name', 'Resources', 'Realms', 'Created', 'Last Modified', 'Created By', 'ModifiedBy'],
                 colModel: [
-                    {name: 'iconChB', width: 40, sortable: false, formatter: this.refGridView.checkBoxFormatter, frozen: true, title: false, search: false},
-                    {name: 'name', width: 280, frozen: true},
-                    {name: 'resources', sortable: false, width: 280, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
-                    {name: 'realms', sortable: false, width: 280, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                    {name: 'creationDate', width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                    {name: 'lastModified', width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                    {name: 'createdBy', width: 250, hidden: true},
+                    {name: 'iconChB',        width: 40,  sortable: false, formatter: this.refGridView.checkBoxFormatter, frozen: true, title: false, search: false},
+                    {name: 'name',           width: 280, frozen: true},
+                    {name: 'resources',      width: 295, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                    {name: 'realms',         width: 295, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'creationDate',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                    {name: 'lastModified',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                    {name: 'createdBy',      width: 250, hidden: true},
                     {name: 'lastModifiedBy', width: 250, hidden: true}
                 ],
                 beforeSelectRow: function (rowId, e) {
@@ -148,7 +147,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                     self.refGridView.onRowSelect(rowid, status, e);
                 },
                 sortname: 'name',
-                width: 900,
+                width: 915,
                 shrinkToFit: false,
                 pager: '#refsPager'
             };
@@ -254,9 +253,23 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
 
         showTab: function (e) {
             e.preventDefault();
-            var currentAttrValue = $(e.target).attr('href');
-            this.$el.find('.tabs ' + currentAttrValue).fadeIn(400).siblings().hide();
-            $(e.target).parent('li').addClass('active-tab').siblings().removeClass('active-tab');
+
+            var index = $(e.currentTarget).parent().index(),
+                tabs =  this.$el.find('.tab-content .tab'),
+                tabLinks = this.$el.find('.tab-links li');
+
+            tabLinks.not(':eq('+ index +')').removeClass('active-tab');
+            tabLinks.eq(index).addClass('active-tab');
+
+            tabs.not(':eq('+ index +')').addClass('inactive-tab');
+            tabs.eq(index).removeClass('inactive-tab');
+
+            //this.$el.each('.tab-content .tab:not:eq('+ index +')').addClass('inactive-tab');
+
+
+           // this.$el.each('.tab-content .tab:eq('+ index +')').removeClass('inactive-tab');
+
+           // this.$el.find('.tab-content').
         }
     });
 

@@ -1,13 +1,14 @@
 {
   "configuration" : {
+    "lang":"en",
     "policyEditorConfig" : {
-        "defaultApplicatons" : {
-          "config" : {
-            "hideByDefault" : true,
-            "exceptThese" : []
-          },
-          "defaultApplicatonList" : ["calendar","crestPolicyService","im","openProvisioning","paycheck","sunAMDelegationService","sunBank","sunIdentityServerDiscoveryService","sunIdentityServerLibertyPPService"]
-        }
+      "defaultApplicatons" : {
+        "config" : {
+          "hideByDefault" : true,
+          "exceptThese" : []
+        },
+        "defaultApplicatonList" : ["calendar","crestPolicyService","im","openProvisioning","paycheck","sunAMDelegationService","sunBank","sunIdentityServerDiscoveryService","sunIdentityServerLibertyPPService"]
       }
+    }
   }
 }

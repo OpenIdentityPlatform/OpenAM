@@ -6,85 +6,88 @@
         {{else}}
         <h1>{{t "config.messages.PolicyMessages.createPol"}}</h1>
         {{/if}}
+        <h2><span>Realm:</span> {{policyEditorRealmHelper options.realm}}</h2>
         <h2><span>Application:</span> {{entity.applicationName}}</h2>
-        <h2><span>Realm:</span> {{options.realm}}</h2>
-    </div>
-    <p>To designate the conditions that define access to a protected resource, begin with Step 1 and progress through to step 7. Modifications can be made after it has been created.</p>
         
-    <form class="form">
+    </div>
 
-        <div id="policy-steps" class="accordion">
-            
-            <h1 class="accordion-header" tabindex="0">Step 1: Define a Policy Name and Description</h1>
-            <section class="accordion-step clearfix">
+    <div class="policy-content">
+        <p>To designate the conditions that define access to a protected resource, begin with Step 1 and progress through to step 7. Modifications can be made after it has been created.</p>        
+        <form class="form">
 
-                <div class="group-field-block">
-                    <label class="short" for="policyName">Name</label>
-                    <input class="prop-val" id="policyName" type="text" value="{{entity.name}}" data-field="name" autofocus required/>
-                </div>
-                <div class="group-field-block">
-                    <label class="short" for="description">Description (optional)</label>
-                    <textarea class="prop-val" id="description" data-field="description">{{entity.description}}</textarea>
-                </div>
-                <input class="button" type="button" value="Next" name="nextButton">
-
-            </section>
-
-            <h1 class="accordion-header" tabindex="0">Step 2: Add Resources</h1>
-            <section class="accordion-step clearfix">
-
-                <div class="clearfix">
-                    <div class="col2" id="patterns"></div>
-                    <div class="col2" id="resourcesList"></div>
-                </div>
-                <input class="button" type="button" value="Next" name="nextButton">
-
-            </section>
-
-            <h1 class="accordion-header" tabindex="0">Step 3: Configure Actions</h1>
-            <section class="accordion-step clearfix">
-
-                <div id="actions"></div>
-                <input class="button" type="button" value="Next" name="nextButton">
-
-            </section>
-
-            <h1 class="accordion-header" tabindex="0">Step 4: Select Subjects</h1>
-            <section class="accordion-step clearfix">
-
-                <div id="subjectContainer" class="clearfix"></div>
-                <input class="button" type="button" value="Next" name="nextButton">
-
-            </section>
-
-            <h1 class="accordion-header" tabindex="0">Step 5: Environmental Conditions</h1>
-            <section class="accordion-step clearfix">
-
-                <div id="environmentContainer" class="clearfix"></div>
-                <input class="button" type="button" value="Next" name="nextButton">
-
-            </section>
-
-            <h1 class="accordion-header" tabindex="0">Step 6: Response Attributes</h1>
-            <section class="accordion-step clearfix">
-
-                <div class="clearfix">
-                    <div class="col2" id="userAttrs"></div>
-                    <div class="col2" id="staticAttrs"></div>
-                </div>
+            <div id="policy-steps" class="accordion">
                 
-                <input class="button" type="button" value="Next" name="nextButton">
+                <h1 class="accordion-header" tabindex="0">Step 1: Define a Policy Name and Description</h1>
+                <section class="accordion-step clearfix">
 
-            </section>
+                    <div class="group-field-block">
+                        <label class="short" for="policyName">Name</label>
+                        <input class="prop-val" id="policyName" type="text" value="{{entity.name}}" data-field="name" autofocus required/>
+                    </div>
+                    <div class="group-field-block">
+                        <label class="short" for="description">Description (optional)</label>
+                        <textarea class="prop-val" id="description" data-field="description">{{entity.description}}</textarea>
+                    </div>
+                    <input class="button" type="button" value="Next" name="nextButton">
 
-            <h1 class="accordion-header" tabindex="0">Step 7: Summary and Confirmation View</h1>
-            <section class="accordion-step clearfix">
+                </section>
 
-                <div id="reviewPolicyInfo" class="clearfix"></div>
-                <input class="button" type="button" value="Finish" name="submitForm">
+                <h1 class="accordion-header" tabindex="0">Step 2: Add Resources</h1>
+                <section class="accordion-step clearfix">
 
-            </section>
- 
-        </div>
-    </form>
+                    <div class="clearfix">
+                        <div class="col2" id="patterns"></div>
+                        <div class="col2" id="resourcesList"></div>
+                    </div>
+                    <input class="button" type="button" value="Next" name="nextButton">
+
+                </section>
+
+                <h1 class="accordion-header" tabindex="0">Step 3: Configure Actions</h1>
+                <section class="accordion-step clearfix">
+
+                    <div id="actions"></div>
+                    <input class="button" type="button" value="Next" name="nextButton">
+
+                </section>
+
+                <h1 class="accordion-header" tabindex="0">Step 4: Select Subjects</h1>
+                <section class="accordion-step clearfix">
+
+                    <div id="subjectContainer" class="clearfix"></div>
+                    <input class="button" type="button" value="Next" name="nextButton">
+
+                </section>
+
+                <h1 class="accordion-header" tabindex="0">Step 5: Environmental Conditions</h1>
+                <section class="accordion-step clearfix">
+
+                    <div id="environmentContainer" class="clearfix"></div>
+                    <input class="button" type="button" value="Next" name="nextButton">
+
+                </section>
+
+                <h1 class="accordion-header" tabindex="0">Step 6: Response Attributes</h1>
+                <section class="accordion-step clearfix">
+
+                    <div class="clearfix">
+                        <div class="col2" id="userAttrs"></div>
+                        <div class="col2" id="staticAttrs"></div>
+                    </div>
+                    
+                    <input class="button" type="button" value="Next" name="nextButton">
+
+                </section>
+
+                <h1 class="accordion-header" tabindex="0">Step 7: Summary and Confirmation View</h1>
+                <section class="accordion-step clearfix">
+
+                    <div id="reviewPolicyInfo" class="clearfix"></div>
+                    <input class="button" type="button" value="Finish" name="submitForm">
+
+                </section>
+     
+            </div>
+        </form>
+    </div>
 </div>

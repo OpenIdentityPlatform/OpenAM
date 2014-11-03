@@ -148,8 +148,11 @@ define("org/forgerock/openam/ui/policy/SelectRealmsView", [
     });
 
     Handlebars.registerHelper('policyEditorRealmHelper', function(string) {
-        var result  = string.replace(/\//g, '<span class="realm">/</span>');
-        return new Handlebars.SafeString(result);
+        var result =  string.slice(1);
+        if(result.length > 0){
+            result = '<span class="realm icon-arrow-right2"></span>' + result.replace(/\//g, '<span class="realm icon-arrow-right2"></span>');
+        } 
+        return new Handlebars.SafeString('<span class="realm toplevel">/</span>' + result);
     });
 
     return new SelectRealmsView();

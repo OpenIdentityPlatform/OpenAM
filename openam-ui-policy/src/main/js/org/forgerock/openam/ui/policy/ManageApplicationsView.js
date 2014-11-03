@@ -80,28 +80,27 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 url: '/openam/json' + this.subrealm + '/applications',
                 colNames: ['', '', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
                 colModel: [
-                    {name: 'iconChB', width: 40, sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false},
-                    {name: 'actions', width: 65, sortable: false, formatter: actionsFormatter, frozen: true, title: false, search: false},
-                    {name: 'name', width: 230, frozen: true},
-                    {name: 'description', width: 220, sortable: false},
-                    {name: 'resources', width: 340, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                    {name: 'createdBy', width: 250, hidden: true},
-                    {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false},
-                    {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false}
+                    {name: 'iconChB',           width: 40,  sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false},
+                    {name: 'actions',           width: 65,  sortable: false, formatter: actionsFormatter, frozen: true, title: false, search: false},
+                    {name: 'name',              width: 230, frozen: true},
+                    {name: 'description',       width: 220, sortable: false},
+                    {name: 'resources',         width: 228, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'createdBy',         width: 250, hidden: true},
+                    {name: 'creationDate',      width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false},
+                    {name: 'lastModifiedDate',  width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false}
                 ],
                 beforeSelectRow: function (rowId, e) {
                     var checkBoxCellSelected = self.appGridView.isCheckBoxCellSelected(e);
                     if (!checkBoxCellSelected && !$(e.target).hasClass('icon-pencil')) {
                         self.viewPolicies(e);
                     }
-
                     return checkBoxCellSelected;
                 },
                 onSelectRow: function (rowid, status, e) {
                     self.appGridView.onRowSelect(rowid, status, e);
                 },
                 sortname: 'name',
-                width: 920,
+                width: 918,
                 shrinkToFit: false,
                 pager: '#appsPager'
             };

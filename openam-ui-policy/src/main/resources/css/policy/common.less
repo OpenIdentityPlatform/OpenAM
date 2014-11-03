@@ -86,7 +86,7 @@
     }
 
     textarea.prop-val, input.prop-val {
-        width: 180px;
+        //width: 180px;
     }
 
     textarea.prop-val {
@@ -268,6 +268,7 @@
     }
 
     tr.ui-widget-content {
+        background:#fff;
         box-shadow: none;
         td {
             vertical-align: middle;
@@ -301,7 +302,7 @@
         }
 
         td[aria-describedby*="_actions"] {
-            background-color: #ebebeb;
+            background-color: #d7e9f8;
             overflow: visible;
             white-space: normal;
             text-align: center;
@@ -631,33 +632,38 @@ input[type="text"]:invalid:required{
 }
 
 .global-actions {
-    margin: 0 0 10px;
-    padding: 0;
-    display: block;
-
-    .button {
-        margin: 0 5px 0 0;
-    }
+    margin: 20px 0 0 -5px;
 }
 
-.content-bg .policy-header{
-    padding:0 0 30px;
-    h1 {
-        padding:0 0 5px;
-        span{
-            font-weight:normal;
-            color: #80b7ab;
-        }
+.content-bg {
+
+    padding: 20px 10px;
+
+    .policy-content {
+        margin: 0 10px;
     }
 
-    h2 {
-        font-weight: normal;
-        font-size: 15px;
-        line-height: 18px;
+    .policy-header {
+        padding:0 0 30px;
+        margin: 0 10px;
+        h1 {
+            padding:0 0 10px;
+            span{
+                font-weight:normal;
+                color: #80b7ab;
+            }
+        }
 
-        span{
-            font-weight:normal;
-            color: #999;
+        h2 {
+            font-weight: normal;
+            line-height: 18px;
+            font-style: italic;
+            font-size: 12px;
+
+            span{
+                font-weight:normal;
+                color: #999;
+            }
         }
     }
 }
@@ -711,6 +717,11 @@ html .selectize-dropdown .optgroup-header{
 
 /* These are jquery-theme over-rides*/
 
+
+html body .ui-jqgrid tr.ui-widget-content{
+    box-shadow:none;
+}
+
 .ui-widget-content {
 
     border-color: #bbb;
@@ -732,67 +743,91 @@ html .selectize-dropdown .optgroup-header{
 /*...*/
 
 
-span.realm {
-    color:#80b7ab;
-    padding:0 5px;
-    font-size:20px;
-    font-weight:bold;
+span.realm,.content-bg .policy-header h2 span.realm  {
+    color: #80b7ab;
+    font-size: 20px;
+    font-weight: bold;
+    position: relative;
+    bottom: -4px;
+    line-height: 10px;
+    cursor: default;
+    &.toplevel{
+        padding: 0 0 0 5px; 
+        bottom: -2px;
+    }
 }
+
 
 #lastFSlash {
     transition:opacity 300ms linear;
     &.fade{
-        opacity:0;  
+        opacity:0;
     }
 }
 
 /*----- Tabs -----*/
 .tabs {
-    width:100%;
-    display:inline-block;
-    .tab-links {
+    .tab-links {  
         a {
-            .linear-gradient( top, #fcfcfc, #C8C8C8);
-            padding: 7px 10px;
-            display:inline-block;
-            border: 1px solid #C8C8C8;
-            border-radius: 5px 5px 0px 0px;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 7px 10px 5px;
+            display:block;
+            border: 1px solid #ddd;
+            border-radius: 3px 3px 0 0;  
+            font-weight: bold;
             text-decoration: none;
             color:#4c4c4c;
-            transition:all linear 0.15s;
+            background:#eee;
+            transition:background 200ms ease-in-out;
+            margin: 0px 5px;
+            float: left;
+            position: relative;
+            top:1px;
+            border-bottom:none;
+            border-bottom: 1px solid #ddd;
+            margin-top: 3px;
+            padding-bottom: 3px;
+
             &:hover {
-                background:#E0E0E0;
+                background:#fff;
             }
+      
         }
-        li {
-            margin:0px 5px;
-            float:left;
-            list-style:none;
-        }
+
+
+
         .active-tab {
-            border-bottom: 2px solid #fff;
             a, a:hover {
                 background:#fff;
-                color:#4c4c4c;
-                border: none;
+                border-bottom:transparent;
+                margin-top: 0;
+                padding-bottom: 7px;
+                cursor: default;
+                
             }
         }
     }
 
     .tab-content {
-        width: 920px;
-        border-radius: 5px;
-        box-shadow: 1px 1px 1px rgba(0,0,0,0.15);
+        border-radius: 3px;
         background: #fff;
-        .tab {
-            padding: 10px;
-            display: none;
+        padding: 0 10px 10px;
+        border: 1px solid #ddd;
+       
+
+        .inactive-tab {
+           height: 0;
+           overflow: hidden;
+           position:absolute;
+           top:-1000px;
+           left:-1000px;
         }
-        .active-tab {
-            display: block;
+
+        p {
+            padding:15px 5px 0 5px;
         }
     }
 }
+
+
+
 

@@ -153,8 +153,6 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         });
     };
 
-
-
     obj.getReferralByName = function (name) {
         return obj.serviceCall({
             url: "/referrals/" + name,
