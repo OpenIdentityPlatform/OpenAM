@@ -26,7 +26,7 @@
  * @author Eugenia Sergueeva
  */
 
-/*global window, define, $, _, document, console, sessionStorage */
+/*global define, $, _, sessionStorage */
 
 define("org/forgerock/openam/ui/policy/GenericGridView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -36,16 +36,7 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
     "org/forgerock/commons/ui/common/main/EventManager"
 ], function (AbstractView, uiUtils, router, constants, eventManager) {
     var GenericGridView = AbstractView.extend({
-        baseTemplate: 'templates/policy/BaseTemplate.html',
-
-        grid: null,
-
-        globalActionsTemplate: '',
-        globalButtonSetId: '#globalActions',
-        globalButtonSet: null,
-
-        selectedItems: [],
-        storageKey: '',
+        noBaseTemplate: true,
 
         checkBox: '[class*="icon-checkbox"]',
         checkBoxCheckedClass: 'icon-checkbox-checked',
@@ -55,14 +46,30 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
             return "<span data-selection='" + rowObject.name + "' class='icon-checkbox-unchecked' tabindex='0' ></span>";
         },
 
-        initBaseView: function (globalActionsTemplate, storageKey) {
-            this.globalActionsTemplate = globalActionsTemplate;
+        render: function (options, callback) {
+            this.element = options.element;
+            this.template = options.tpl;
 
-            this.storageKey = constants.OPENAM_STORAGE_KEY_PREFIX + storageKey;
+            this.gridId = options.gridId;
+
+            this.data[this.gridId] = {};
+
+            this.actionsTpl = options.actionsTpl;
+            this.storageKey = constants.OPENAM_STORAGE_KEY_PREFIX + options.storageKey;
 
             var storedItems = JSON.parse(sessionStorage.getItem(this.storageKey));
             this.selectedItems = storedItems ? storedItems : [];
-            this.data.itemNumber = this.selectedItems.length;
+
+            this.parentRender(function () {
+                this.actions = this.$el.find('.global-actions');
+                this.grid = uiUtils.buildJQGrid(this, options.gridId, options.initOptions, options.additionalOptions, callback);
+
+                if (options.additionalOptions.callback) {
+                    options.additionalOptions.callback.apply(this);
+                }
+
+                this.reloadGlobalActionsTemplate();
+            });
         },
 
         getSelectedRowId: function (e) {
@@ -76,12 +83,12 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
 
             if (!checked) {
                 $chB.removeClass(this.checkBoxUncheckedClass).addClass(this.checkBoxCheckedClass);
-                this.selectedItems.push(this.data.result[rowid - 1].name);
+                this.selectedItems.push(this.data[this.gridId].result[rowid - 1].name);
                 $target.closest('tr').addClass("highlight");
                 this.grid.find('tr[id=' + rowid + ']').addClass("highlight");
             } else {
                 $chB.removeClass(this.checkBoxCheckedClass).addClass(this.checkBoxUncheckedClass);
-                this.selectedItems = _.without(this.selectedItems, this.data.result[rowid - 1].name);
+                this.selectedItems = _.without(this.selectedItems, this.data[this.gridId].result[rowid - 1].name);
                 this.grid.jqGrid('resetSelection', rowid);
                 $target.closest('tr').removeClass("highlight");
                 this.grid.find('tr[id=' + rowid + ']').removeClass("highlight");
@@ -121,13 +128,9 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
             eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, message);
         },
 
-        setGridButtonSet: function () {
-            this.globalButtonSet = this.$el.find(this.globalButtonSetId);
-        },
-
         reloadGlobalActionsTemplate: function () {
-            this.data.itemNumber = this.selectedItems.length;
-            this.globalButtonSet.html(uiUtils.fillTemplateWithData(this.globalActionsTemplate, this.data));
+            this.data[this.gridId].selected = this.selectedItems.length;
+            this.actions.html(uiUtils.fillTemplateWithData(this.actionsTpl, this.data));
         },
 
         isCheckBoxCellSelected: function (e) {

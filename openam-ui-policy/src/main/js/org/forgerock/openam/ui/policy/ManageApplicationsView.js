@@ -26,9 +26,10 @@
  * @author Eugenia Sergueeva
  */
 
-/*global window, define, $, _, document, console, sessionStorage, FileReader */
+/*global define, $, _, sessionStorage, FileReader */
 
 define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
+    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/policy/GenericGridView",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/Router",
@@ -36,110 +37,111 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/policy/PolicyDelegate"
-], function (GenericGridView, uiUtils, router, constants, conf, eventManager, policyDelegate) {
-    var ManageApplicationsView = GenericGridView.extend({
-        template: "templates/policy/ManageApplicationsTemplate.html",
+], function (AbstractView, GenericGridView, uiUtils, router, constants, conf, eventManager, policyDelegate) {
+    var ManageApplicationsView = AbstractView.extend({
+        baseTemplate: 'templates/policy/BaseTemplate.html',
+        template: "templates/policy/ManageAppsTemplate.html",
 
         events: {
             'click .icon-pencil': 'editApplication',
             'click .icon-file': 'viewPolicies',
-            'click #deleteItems': 'deleteApplications',
+            'click #deleteApps': 'deleteApplications',
             'click #importPolicies': 'startImportPolicies',
             'click #exportPolicies': 'exportPolicies',
             'change #realImport': 'readImportFile'
         },
 
         render: function (args, callback) {
-            var self = this,
-                actionsFormatter = function (cellvalue, options, rowObject) {
-                    return uiUtils.fillTemplateWithData("templates/policy/ApplicationTableCellActionsTemplate.html");
-                };
-
-            this.initBaseView('templates/policy/ApplicationTableGlobalActionsTemplate.html', 'PE-mng-apps-sel');
-
             this.data.realm = conf.globalData.auth.realm;
 
             this.parentRender(function () {
-                var options,
-                    additionalOptions,
-                    defaultFilter;
+                this.subrealm = this.data.realm !== "/" ? this.data.realm : "";
 
-                if (this.data.realm !== "/") {
-                    this.subrealm = this.data.realm;
-                } else {
-                    this.subrealm = "";
-                }
-
-                this.setGridButtonSet();
-
-                defaultFilter = this.getDefaultFilter();
-
-                options = {
-                    url: '/openam/json' + this.subrealm + '/applications',
-                    colNames: ['', '', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
-                    colModel: [
-                        {name: 'iconChB',           width: 40,  sortable: false, formatter: self.checkBoxFormatter, frozen: true,title: false, search: false},
-                        {name: 'actions',           width: 65,  sortable: false, formatter: actionsFormatter, frozen: true, title: false, search: false},
-                        {name: 'name',              width: 230, frozen: true},
-                        {name: 'description',       width: 220, sortable: false},
-                        {name: 'resources',         width: 340, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                        {name: 'createdBy',         width: 250, hidden: true},
-                        {name: 'creationDate',      width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false},
-                        {name: 'lastModifiedDate',  width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false}
-                    ],
-                    beforeSelectRow: function (rowId, e) {
-                        var checkBoxCellSelected = self.isCheckBoxCellSelected(e);
-                        if (!checkBoxCellSelected && !$(e.target).hasClass('icon-pencil')) {
-                            self.viewPolicies(e);
-                        }
-
-                        return checkBoxCellSelected;
-                    },
-                    onSelectRow: function (rowid, status, e) {
-                        self.onRowSelect(rowid, status, e);
-                    },
-                    sortname: 'name',
-                    width: 920,
-                    shrinkToFit: false,
-                    pager: '#appsPager'
-                };
-
-                additionalOptions = {
-                    search: true,
-                    searchFilter: defaultFilter,
-                    columnChooserOptions: {
-                        width: 501,
-                        height: 180
-                    },
-                    storageKey: constants.OPENAM_STORAGE_KEY_PREFIX + 'PE-mng-apps-sel-col',
-                    // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
-                    serializeGridData: function(postedData) {
-                        var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name'),
-                            filter = '';
-
-                        _.each(colNames, function (element, index, list) {
-                            if (postedData[element]) {
-                                if (filter.length > 0) {
-                                    filter += ' AND ';
-                                }
-                                filter = filter.concat(element, ' eq "*', postedData[element], '*"');
-                            }
-                            delete postedData[element];
-                        });
-
-                        return filter;
-                    }
-                };
-
-                this.grid = uiUtils.buildRestResponseBasedJQGrid(this, '#manageApps', options, additionalOptions, callback);
-
-                this.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
-                    self.selectRow(e, rowid, rowdata);
-                });
-
-                this.grid.jqGrid('setFrozenColumns');
-                this.reloadGlobalActionsTemplate();
+                this.appGridView = new GenericGridView();
+                this.appGridView.render({
+                    element: '#manageApps',
+                    tpl: 'templates/policy/ManageAppsGridTemplate.html',
+                    actionsTpl: 'templates/policy/ManageAppsGridActionsTemplate.html',
+                    gridId: 'apps',
+                    initOptions: this.getGridInitOptions(),
+                    additionalOptions: this.getGridAdditionalOptions(),
+                    storageKey: 'PE-mng-apps-sel-' + this.data.realm
+                }, callback);
             });
+        },
+
+        getGridInitOptions: function () {
+            var self = this,
+                actionsFormatter = function (cellVal, options, rowObject) {
+                    return uiUtils.fillTemplateWithData("templates/policy/ManageAppsGridCellActionsTemplate.html");
+                };
+
+            return {
+                url: '/openam/json' + this.subrealm + '/applications',
+                colNames: ['', '', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
+                colModel: [
+                    {name: 'iconChB', width: 40, sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false},
+                    {name: 'actions', width: 65, sortable: false, formatter: actionsFormatter, frozen: true, title: false, search: false},
+                    {name: 'name', width: 230, frozen: true},
+                    {name: 'description', width: 220, sortable: false},
+                    {name: 'resources', width: 340, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'createdBy', width: 250, hidden: true},
+                    {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false},
+                    {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false}
+                ],
+                beforeSelectRow: function (rowId, e) {
+                    var checkBoxCellSelected = self.appGridView.isCheckBoxCellSelected(e);
+                    if (!checkBoxCellSelected && !$(e.target).hasClass('icon-pencil')) {
+                        self.viewPolicies(e);
+                    }
+
+                    return checkBoxCellSelected;
+                },
+                onSelectRow: function (rowid, status, e) {
+                    self.appGridView.onRowSelect(rowid, status, e);
+                },
+                sortname: 'name',
+                width: 920,
+                shrinkToFit: false,
+                pager: '#appsPager'
+            };
+        },
+
+        getGridAdditionalOptions: function () {
+            var self = this;
+
+            return {
+                search: true,
+                searchFilter: this.getDefaultFilter(),
+                columnChooserOptions: {
+                    width: 501,
+                    height: 180
+                },
+                // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
+                serializeGridData: function (postedData) {
+                    var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name'),
+                        filter = '';
+
+                    _.each(colNames, function (element, index, list) {
+                        if (postedData[element]) {
+                            if (filter.length > 0) {
+                                filter += ' AND ';
+                            }
+                            filter = filter.concat(element, ' eq "*', postedData[element], '*"');
+                        }
+                        delete postedData[element];
+                    });
+
+                    return filter;
+                },
+                callback: function () {
+                    self.appGridView.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
+                        self.appGridView.selectRow(e, rowid, rowdata);
+                    });
+
+                    self.appGridView.grid.jqGrid('setFrozenColumns');
+                }
+            };
         },
 
         editApplication: function (e) {
@@ -151,25 +153,25 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
         },
 
         getAppName: function (e) {
-            return this.grid.getRowData(this.getSelectedRowId(e)).name;
+            return this.appGridView.grid.getRowData(this.appGridView.getSelectedRowId(e)).name;
         },
 
-        getDefaultFilter: function(){
+        getDefaultFilter: function () {
             var exceptions = '',
                 defaultApplicatons,
                 returnList = [];
 
             if (conf.globalData.policyEditorConfig) {
                 defaultApplicatons = conf.globalData.policyEditorConfig.defaultApplicatons;
-                 if ( defaultApplicatons.config.hideByDefault ){
+                if (defaultApplicatons.config.hideByDefault) {
                     exceptions = _.difference(defaultApplicatons.defaultApplicatonList, defaultApplicatons.config.exceptThese);
                 } else {
                     exceptions = defaultApplicatons.config.exceptThese;
                 }
             }
 
-            _.each(exceptions, function(string){
-                returnList.push({field: 'name', op: 'eq', val: '^(?!'+string+'$).*'});
+            _.each(exceptions, function (string) {
+                returnList.push({field: 'name', op: 'eq', val: '^(?!' + string + '$).*'});
             });
 
             return returnList;
@@ -184,10 +186,10 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
             var self = this, i, promises = [];
 
-            for (i = 0; i < self.selectedItems.length; i++) {
-                promises.push(policyDelegate.deleteApplication(self.selectedItems[i]));
+            for (i = 0; i < this.appGridView.selectedItems.length; i++) {
+                promises.push(policyDelegate.deleteApplication(self.appGridView.selectedItems[i]));
             }
-            this.deleteItems(e, promises);
+            this.appGridView.deleteItems(e, promises);
         },
 
         startImportPolicies: function () {
@@ -196,11 +198,11 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
         },
 
         importPolicies: function (e) {
-            policyDelegate.importPolicies( e.target.result)
-                .done( function () {
+            policyDelegate.importPolicies(e.target.result)
+                .done(function () {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploaded");
                 })
-                .fail( function () {
+                .fail(function () {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploadFailed");
                 });
         },
@@ -212,7 +214,6 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
             if (file) {
                 reader.readAsText(file, "UTF-8");
             }
-
         },
 
         exportPolicies: function () {
@@ -221,5 +222,4 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
     });
 
     return new ManageApplicationsView();
-})
-;
+});

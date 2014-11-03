@@ -1,5 +1,5 @@
 <a href="#app/" class="button" id="addNewApp">Add new</a>
-<a class="button {{#unless itemNumber}} inactive {{/unless}}" id="deleteItems">Delete Selected{{#if itemNumber}} ({{itemNumber}}) {{/if}}</a>
+<a class="button {{#unless apps.selected}} inactive {{/unless}}" id="deleteApps">Delete Selected{{#if apps.selected}} ({{apps.selected}}) {{/if}}</a>
 <a class="button float-right" id="importPolicies">Import Policies</a>
 <a class="button float-right" id="exportPolicies">Export Policies</a>
 <input type="file" id="realImport" class="hidden"/>

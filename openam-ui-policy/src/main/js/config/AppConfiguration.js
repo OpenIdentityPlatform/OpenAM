@@ -107,9 +107,10 @@ define("config/AppConfiguration", function () {
                         "templates/policy/ConditionAttrArray.html",
                         "templates/policy/ListItem.html",
                         "templates/policy/LegacyListItem.html",
-                        "templates/policy/ApplicationTableCellActionsTemplate.html",
-                        "templates/policy/ApplicationTableGlobalActionsTemplate.html",
-                        "templates/policy/PoliciesTableGlobalActionsTemplate.html"
+                        "templates/policy/ManageAppsGridCellActionsTemplate.html",
+                        "templates/policy/ManageAppsGridActionsTemplate.html",
+                        "templates/policy/ManagePoliciesGridActionsTemplate.html",
+                        "templates/policy/ManageRefsGridActionsTemplate.html"
                     ]
                 }
             },

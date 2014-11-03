@@ -30,6 +30,7 @@
 /*global window, define, $, _, document, console, sessionStorage */
 
 define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
+    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/policy/GenericGridView",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/Router",
@@ -37,116 +38,188 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration"
-], function (GenericGridView, uiUtils, router, policyDelegate, eventManager, constants, conf) {
-    var ManagePoliciesView = GenericGridView.extend({
+], function (AbstractView, GenericGridView, uiUtils, router, policyDelegate, eventManager, constants, conf) {
+    var ManagePoliciesView = AbstractView.extend({
+        baseTemplate: 'templates/policy/BaseTemplate.html',
         template: "templates/policy/ManagePoliciesTemplate.html",
 
         events: {
-            'click #deleteItems': 'deletePolicies',
+            'click #deletePolicies': 'deletePolicies',
+            'click #deleteRef': 'deleteReferrals',
             'click .tab-links a': 'showTab'
         },
 
         render: function (args, callback) {
-            var self = this,
-                subrealm = "";
-
             this.data.realm = conf.globalData.auth.realm;
-
-            if (this.data.realm !== "/") {
-                subrealm = this.data.realm;
-            }
-
-            _.extend(this.data, {appName: args[0]});
-
-            this.initBaseView('templates/policy/PoliciesTableGlobalActionsTemplate.html', 'PE-mng-pols-sel-' + this.data.appName);
+            this.data.appName = args[0];
 
             this.parentRender(function () {
-                this.setGridButtonSet();
+                this.policyGridView = new GenericGridView();
+                this.policyGridView.render({
+                    element: '#managePolicies',
+                    tpl: 'templates/policy/ManagePoliciesGridTemplate.html',
+                    actionsTpl: 'templates/policy/ManagePoliciesGridActionsTemplate.html',
+                    gridId: 'policies',
+                    initOptions: this.getPolicyGridInitOptions(),
+                    additionalOptions: this.getPolicyGridAdditionalOptions(),
+                    storageKey: 'PE-mng-pols-sel-' + this.data.appName
+                }, callback);
 
-                var options = {
-                        url: '/openam/json' + subrealm + '/policies',
-                        colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified',
-                            'Actions', 'Resources', 'Resource Attributes', 'Subject'],
-                        colModel: [
-                            {name: 'iconChB', width: 40, sortable: false, formatter: self.checkBoxFormatter, frozen: true, title: false, search: false},
-                            {name: 'name', width: 250, frozen: true},
-                            {name: 'description', sortable: false, width: 150},
-                            {name: 'createdBy', width: 250, hidden: true},
-                            {name: 'creationDate', width: 150, search: false, hidden: true,formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                            {name: 'lastModifiedBy', width: 250, hidden: true},
-                            {name: 'lastModified', width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                            {name: 'actionValues', width: 205, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
-                            {name: 'resources', width: 250, sortable: false, search: false,formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'resourceAttributes', width: 150, sortable: false, hidden: true, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'subject', width: 150, sortable: false, hidden: true,  formatter: uiUtils.commonJQGridFormatters.objectFormatter}
-
-                        ],
-                        beforeSelectRow: function (rowId, e) {
-                            var checkBoxCellSelected = self.isCheckBoxCellSelected(e);
-                            if (!checkBoxCellSelected) {
-                                self.editPolicy(e);
-                            }
-                            return checkBoxCellSelected;
-                        },
-                        onSelectRow: function (rowid, status, e) {
-                            self.onRowSelect(rowid, status, e);
-                        },
-                        loadError: function (xhr, status, error){
-                            if ( uiUtils.responseMessageMatch(xhr.responseText, "Unable to retrieve policy") ){
-                                eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRetrievePolicy");
-                            } else {
-                                console.log('loadError', xhr.responseText, status, error);
-                            }
-                        },
-                        sortname: 'name',
-                        width: 920,
-                        shrinkToFit: false,
-                        pager: '#policiesPager'
-                    },
-                    additionalOptions = {
-                        search: true,
-                        searchFilter: [
-                            {field: 'applicationName', op: 'eq', val: this.data.appName}
-                        ],
-                        columnChooserOptions: {
-                            width: 501,
-                            height: 230
-                        },
-                        storageKey: constants.OPENAM_STORAGE_KEY_PREFIX + 'PE-mng-pols-sel-col-' + this.data.appName,
-                        // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
-                        serializeGridData: function(postedData) {
-                            var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name'),
-                                filter = '';
-
-                            _.each(colNames, function (element, index, list) {
-                                if (postedData[element]) {
-                                    if (filter.length > 0) {
-                                        filter += ' AND ';
-                                    }
-                                    filter = filter.concat(element, ' eq "*', postedData[element], '*"');
-                                }
-                                delete postedData[element];
-                            });
-
-                            return filter;
-                        }
-                    };
-
-                this.grid = uiUtils.buildRestResponseBasedJQGrid(this, '#managePolicies', options, additionalOptions, callback);
-                this.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
-                    self.selectRow(e, rowid, rowdata);
-                });
-
-                this.grid.jqGrid('setFrozenColumns');
-                this.reloadGlobalActionsTemplate();
+                this.refGridView = new GenericGridView();
+                this.refGridView.render({
+                    element: '#manageRefs',
+                    tpl: 'templates/policy/ManageRefsGridTemplate.html',
+                    actionsTpl: 'templates/policy/ManageRefsGridActionsTemplate.html',
+                    gridId: 'refs',
+                    initOptions: this.getRefGridInitOptions(),
+                    additionalOptions: this.getRefGridAdditionalOptions(),
+                    storageKey: 'PE-mng-ref-sel-' + this.data.appName
+                }, callback);
             });
         },
 
-        editPolicy: function (e) {
-            var policyName = this.grid.getRowData(this.getSelectedRowId(e)).name;
+        getPolicyGridInitOptions: function () {
+            var self = this;
+            return {
+                url: '/openam/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/policies',
+                colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified',
+                    'Actions', 'Resources', 'Resource Attributes', 'Subject'],
+                colModel: [
+                    {name: 'iconChB', width: 40, sortable: false, formatter: this.policyGridView.checkBoxFormatter, frozen: true, title: false, search: false},
+                    {name: 'name', width: 250, frozen: true},
+                    {name: 'description', sortable: false, width: 150},
+                    {name: 'createdBy', width: 250, hidden: true},
+                    {name: 'creationDate', width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                    {name: 'lastModifiedBy', width: 250, hidden: true},
+                    {name: 'lastModified', width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                    {name: 'actionValues', width: 205, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                    {name: 'resources', width: 250, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'resourceAttributes', width: 150, sortable: false, hidden: true, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'subject', width: 150, sortable: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.objectFormatter}
 
-            router.routeTo(router.configuration.routes.editPolicy,
-                {args: [this.data.appName, policyName], trigger: true});
+                ],
+                beforeSelectRow: function (rowId, e) {
+                    var checkBoxCellSelected = self.policyGridView.isCheckBoxCellSelected(e);
+                    if (!checkBoxCellSelected) {
+                        self.editPolicy(e);
+                    }
+                    return checkBoxCellSelected;
+                },
+                onSelectRow: function (rowid, status, e) {
+                    self.policyGridView.onRowSelect(rowid, status, e);
+                },
+                loadError: function (xhr, status, error) {
+                    if (uiUtils.responseMessageMatch(xhr.responseText, "Unable to retrieve policy")) {
+                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRetrievePolicy");
+                    } else {
+                        console.log('loadError', xhr.responseText, status, error);
+                    }
+                },
+                sortname: 'name',
+                width: 900,
+                shrinkToFit: false,
+                pager: '#policiesPager'
+            };
+        },
+
+        getRefGridInitOptions: function () {
+            var self = this;
+            return {
+                url: '/openam/json/referrals',
+                colNames: ['', 'Name', 'Resources', 'Realms', 'Created', 'Last Modified', 'Created By', 'ModifiedBy'],
+                colModel: [
+                    {name: 'iconChB', width: 40, sortable: false, formatter: this.refGridView.checkBoxFormatter, frozen: true, title: false, search: false},
+                    {name: 'name', width: 280, frozen: true},
+                    {name: 'resources', sortable: false, width: 280, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                    {name: 'realms', sortable: false, width: 280, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'creationDate', width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                    {name: 'lastModified', width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                    {name: 'createdBy', width: 250, hidden: true},
+                    {name: 'lastModifiedBy', width: 250, hidden: true}
+                ],
+                beforeSelectRow: function (rowId, e) {
+                    var checkBoxCellSelected = self.refGridView.isCheckBoxCellSelected(e);
+                    if (!checkBoxCellSelected) {
+                        self.editReferral(e);
+                    }
+                    return checkBoxCellSelected;
+                },
+                onSelectRow: function (rowid, status, e) {
+                    self.refGridView.onRowSelect(rowid, status, e);
+                },
+                sortname: 'name',
+                width: 900,
+                shrinkToFit: false,
+                pager: '#refsPager'
+            };
+        },
+
+        getPolicyGridAdditionalOptions: function () {
+            var self = this;
+            return {
+                search: true,
+                searchFilter: [
+                    {field: 'applicationName', op: 'eq', val: this.data.appName}
+                ],
+                columnChooserOptions: {
+                    width: 501,
+                    height: 230
+                },
+                // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
+                serializeGridData: function (postedData) {
+                    var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name'),
+                        filter = '';
+
+                    _.each(colNames, function (element, index, list) {
+                        if (postedData[element]) {
+                            if (filter.length > 0) {
+                                filter += ' AND ';
+                            }
+                            filter = filter.concat(element, ' eq "*', postedData[element], '*"');
+                        }
+                        delete postedData[element];
+                    });
+
+                    return filter;
+                },
+                callback: function () {
+                    self.policyGridView.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
+                        self.policyGridView.selectRow(e, rowid, rowdata);
+                    });
+                    self.policyGridView.grid.jqGrid('setFrozenColumns');
+                }
+            };
+        },
+
+        getRefGridAdditionalOptions: function () {
+            var self = this;
+            return {
+                search: false,
+                columnChooserOptions: {
+                    width: 501,
+                    height: 230
+                },
+                callback: function () {
+                    self.refGridView.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
+                        self.refGridView.selectRow(e, rowid, rowdata);
+                    });
+                    self.refGridView.grid.jqGrid('setFrozenColumns');
+                }
+            };
+        },
+
+        editPolicy: function (e) {
+            this.navigate(router.configuration.routes.editPolicy,
+                [this.data.appName, this.policyGridView.grid.getRowData(this.policyGridView.getSelectedRowId(e)).name]);
+        },
+
+        editReferral: function (e) {
+            this.navigate(router.configuration.routes.editReferral,
+                [this.data.appName, this.refGridView.grid.getRowData(this.refGridView.getSelectedRowId(e)).name]);
+        },
+
+        navigate: function (route, args) {
+            router.routeTo(route, {args: args, trigger: true});
         },
 
         deletePolicies: function (e) {
@@ -157,11 +230,21 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
             }
 
             var self = this, i, promises = [];
-            for (i = 0; i < self.selectedItems.length; i++) {
-                promises.push(policyDelegate.deletePolicy(self.selectedItems[i]));
+            for (i = 0; i < this.policyGridView.selectedItems.length; i++) {
+                promises.push(policyDelegate.deletePolicy(self.policyGridView.selectedItems[i]));
             }
 
-            this.deleteItems(e, promises);
+            this.policyGridView.deleteItems(e, promises);
+        },
+
+        deleteReferrals: function (e) {
+            e.preventDefault();
+
+            if ($(e.target).hasClass('inactive')) {
+                return;
+            }
+
+            // TODO
         },
 
         showTab: function (e) {

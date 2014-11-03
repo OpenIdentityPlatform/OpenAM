@@ -231,10 +231,6 @@
     cursor: pointer;
     margin: 15px 0 0 0;
 
-    .ui-jqgrid-hbox {
-        height: 56px;
-    }
-
     .ui-jqgrid-htable .ui-search-toolbar {
         th {
             height: 30px;
@@ -355,7 +351,6 @@ th.ui-state-default.ui-th-column {
 [id*='gview_'] .frozen-bdiv {
     overflow: visible !important;
     height: auto !important;
-    top: 57px !important;
 }
 
 .ui-multiselect {
@@ -635,9 +630,14 @@ input[type="text"]:invalid:required{
     margin-top:-300px;
 }
 
-#globalActions{
-    margin: 20px 0 0 2px;
+.global-actions {
+    margin: 0 0 10px;
+    padding: 0;
     display: block;
+
+    .button {
+        margin: 0 5px 0 0;
+    }
 }
 
 .content-bg .policy-header{
@@ -787,13 +787,11 @@ span.realm {
         box-shadow: 1px 1px 1px rgba(0,0,0,0.15);
         background: #fff;
         .tab {
-            display:none;
+            padding: 10px;
+            display: none;
         }
         .active-tab {
-            display:block;
-        }
-        p {
-            padding:15px;
+            display: block;
         }
     }
 }
