@@ -1,38 +1,38 @@
 <div class="content-bg">
     <div class="policy-header">
-        <a href="#app/{{entity.applicationName}}/policies/" id="cancelButton" class="button float-right">Back</a>
+        <a href="#app/{{entity.applicationName}}/policies/" id="cancelButton" class="button float-right">{{t "common.form.back"}}</a>
         {{#if entity.name}}
-        <h1>{{t "config.messages.PolicyMessages.edit"}}<span>{{entity.name}}</span></h1>
+        <h1>{{t "templates.policy.edit"}}<span>{{entity.name}}</span></h1>
         {{else}}
-        <h1>{{t "config.messages.PolicyMessages.createPol"}}</h1>
+        <h1>{{t "templates.policy.createPol"}}</h1>
         {{/if}}
-        <h2><span>Realm:</span> {{policyEditorRealmHelper options.realm}}</h2>
-        <h2><span>Application:</span> {{entity.applicationName}}</h2>
+        <h2><span>{{t "templates.policy.realm"}}</span> {{policyEditorRealmHelper options.realm}}</h2>
+        <h2><span>{{t "templates.policy.app"}}</span> {{entity.applicationName}}</h2>
         
     </div>
 
     <div class="policy-content">
-        <p>To designate the conditions that define access to a protected resource, begin with Step 1 and progress through to step 7. Modifications can be made after it has been created.</p>        
+        <p>{{t "templates.policy.polText"}}</p>
         <form class="form">
 
             <div id="policy-steps" class="accordion">
                 
-                <h1 class="accordion-header" tabindex="0">Step 1: Define a Policy Name and Description</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.polStep1"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div class="group-field-block">
-                        <label class="short" for="policyName">Name</label>
+                        <label class="short" for="policyName">{{t "templates.policy.name"}}</label>
                         <input class="prop-val" id="policyName" type="text" value="{{entity.name}}" data-field="name" autofocus required/>
                     </div>
                     <div class="group-field-block">
-                        <label class="short" for="description">Description (optional)</label>
+                        <label class="short" for="description">{{t "templates.policy.descriptionOpt"}}</label>
                         <textarea class="prop-val" id="description" data-field="description">{{entity.description}}</textarea>
                     </div>
                     <input class="button" type="button" value="Next" name="nextButton">
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">Step 2: Add Resources</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.polStep2"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div class="clearfix">
@@ -43,7 +43,7 @@
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">Step 3: Configure Actions</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.polStep3"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div id="actions"></div>
@@ -51,7 +51,7 @@
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">Step 4: Select Subjects</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.polStep4"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div id="subjectContainer" class="clearfix"></div>
@@ -59,7 +59,7 @@
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">Step 5: Environmental Conditions</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.polStep5"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div id="environmentContainer" class="clearfix"></div>
@@ -67,7 +67,7 @@
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">Step 6: Response Attributes</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.polStep6"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div class="clearfix">
@@ -79,11 +79,11 @@
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">Step 7: Summary and Confirmation View</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.polStep7"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div id="reviewPolicyInfo" class="clearfix"></div>
-                    <input class="button" type="button" value="Finish" name="submitForm">
+                    <input class="button" type="button" value="{{t 'templates.policy.finish'}}" name="submitForm">
 
                 </section>
      

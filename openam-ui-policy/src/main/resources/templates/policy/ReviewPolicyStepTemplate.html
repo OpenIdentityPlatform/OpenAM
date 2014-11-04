@@ -1,10 +1,10 @@
-<p>Review the policy configuration and click Finish to save.</p>
-<p>Switch to <a href="#" id="toggleAdvanced">{{#if advancedMode}}non-advanced{{else}}advanced{{/if}}</a> view state.</p>
+<p>{{t "templates.policy.reviewPol"}}</p>
+<p>{{t "templates.policy.switchTo"}} <a href="#" id="toggleAdvanced">{{#if advancedMode}}{{t "templates.policy.non-advanced"}}{{else}}{{t "templates.policy.advanced"}}{{/if}}</a> {{t "templates.policy.viewState"}}</p>
 
 {{! The IDs are used for testing }}
 <div class="col2">
     <div class="review-row clearfix{{#equals '' entity.name}} invalid{{/equals}}" tabindex="0">
-        <h2>Name</h2>
+        <h2>{{t "templates.policy.name"}}</h2>
         {{#unless advancedMode}}
         {{#if entity.name}}
         <span class="icon-arrow-down2"></span>
@@ -12,19 +12,19 @@
         {{/unless}}
         <div class="advanced-mode">
             
-            <p id="reviewName"{{#unless entity.name}} class="invalid"{{/unless}}>{{#if entity.name}}{{entity.name}}{{else}}There is no name{{/if}}</p>
+            <p id="reviewName"{{#unless entity.name}} class="invalid"{{/unless}}>{{#if entity.name}}{{entity.name}}{{else}}{{t "templates.policy.noName"}}{{/if}}</p>
         
             {{#if entity.description}}
-            <h2>Description</h2>
+            <h2>{{t "templates.policy.description"}}</h2>
             <p id="reviewDesc">{{entity.description}}</p>
             {{/if}}
         </div>
     </div>
 
     <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resources}} invalid{{/unless}}" tabindex="0">
-        <h2>Resources</h2>
+        <h2>{{t "templates.policy.resources"}}</h2>
         {{#unless advancedMode}}
-        {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">{{t "templates.policy.empty"}}</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
             {{#if entity.resources}}
@@ -32,27 +32,27 @@
                 {{#each entity.resources}}<li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>{{/each}}
             </ul>
             {{else}}
-            <p class="invalid">There are no resources</p>
+            <p class="invalid">{{t "templates.policy.noResources"}}</p>
             {{/if}}
         </div>
     </div>
 
     <div class="review-row clearfix" tabindex="0">
-        <h2>Actions</h2>
+        <h2>{{t "templates.policy.actions"}}</h2>
         {{#unless advancedMode}}
-        {{#if actionsSelected}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{#if actionsSelected}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">{{t "templates.policy.empty"}}</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
             {{#if actionsSelected}}
             <ul id="reviewActions">
                 {{#each entity.actions}}
                 {{#if selected}}
-                <li>{{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}</li>
+                <li>{{action}}: {{#if value}} {{t "templates.policy.allowed"}} {{else}} {{t "templates.policy.denied"}} {{/if}}</li>
                 {{/if}}
                 {{/each}}
             </ul>
             {{else}}
-            <pre>There are no actions...</pre>
+            <pre>{{t "templates.policy.noActions"}}</pre>
             {{/if}}
         </div>
     </div>
@@ -60,40 +60,40 @@
 
 <div class="col2">
     <div class="review-row clearfix" tabindex="0">
-        <h2>Subjects</h2>
+        <h2>{{t "templates.policy.subjects"}}</h2>
         {{#unless advancedMode}}
-        {{#if subjectString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{#if subjectString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">{{t "templates.policy.empty"}}</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
             {{#if subjectString}}
             <pre>{{subjectString}}</pre>
             {{else}}
-            <pre>There are no subject conditions...</pre>
+            <pre>{{t "templates.policy.noSubjectConditions"}}</pre>
             {{/if}}
         </div>
     </div>
 
     <div class="review-row clearfix" tabindex="0">
-        <h2>Environments</h2>
+        <h2>{{t "templates.policy.environments"}}</h2>
         {{#unless advancedMode}}
-        {{#if environmentString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{#if environmentString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">{{t "templates.policy.empty"}}</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
             {{#if environmentString}}
             <pre>{{environmentString}}</pre>
             {{else}}
-            <pre>There are no environment conditions...</pre>
+            <pre>{{t "templates.policy.noEnvironmentConditions"}}</pre>
             {{/if}}
         </div>
     </div>
 
     <div class="review-row clearfix" tabindex="0">
-        <h2>Response attributes</h2>
+        <h2>{{t "templates.policy.responseAttributes"}}</h2>
         {{#unless advancedMode}}
-        {{#if responseAttrs}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">(empty)</span>{{/if}}
+        {{#if responseAttrs}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">{{t "templates.policy.empty"}}</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
-            <h3>Static attributes</h3>
+            <h3>{{t "templates.policy.staticAttributes"}}</h3>
             {{#if combinedStaticAttrs}}
             <ul>
                 {{#each combinedStaticAttrs}}
@@ -103,12 +103,12 @@
                 {{/each}}
             </ul>
             {{else}}
-            <pre>There are no static attributes..</pre>
+            <pre>{{t "templates.policy.noStaticAttributes"}}</pre>
             {{/if}}
         </div>
 
         <div class="advanced-mode">
-            <h3>Subject attributes</h3>
+            <h3>{{t "templates.policy.subjectAttributes"}}</h3>
             {{#if userAttrs}}
             <ul>
                 {{#each userAttrs}}
@@ -116,7 +116,7 @@
                 {{/each}}
             </ul>
             {{else}}
-            <pre>There are no subject attributes..</pre>
+            <pre>{{t "templates.policy.noSubjectAttribute"}}</pre>
             {{/if}}
         </div>
     </div>

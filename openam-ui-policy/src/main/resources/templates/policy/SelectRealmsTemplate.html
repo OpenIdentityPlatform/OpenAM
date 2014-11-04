@@ -1,6 +1,6 @@
-<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+<p>{{t "templates.policy.selectRealmsText"}}</p>
 <div class="striped-list created-items" id="selectedRealms">
-    <h3>Realms</h3>
+    <h3>{{t "templates.policy.realms"}}</h3>
     <ul>
         {{#if entity.realms}}
         {{#each entity.realms}}
@@ -10,7 +10,7 @@
         </li>
         {{/each}}
         {{else}}
-        <li class="invalid">There are no realms...</li>
+        <li class="invalid">{{t "templates.policy.noRealms"}}</li>
         {{/if}}
 
         <li class="editing clearfix">

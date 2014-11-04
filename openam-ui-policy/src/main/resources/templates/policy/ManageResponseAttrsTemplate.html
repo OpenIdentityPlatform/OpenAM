@@ -1,6 +1,6 @@
 <p>Add static attributes.</p>
 <div class="striped-list created-items" data-attr-type="{{attrType.STATIC}}" id="attrTypeStatic">
-    <h3>Static attributes</h3>
+    <h3>{{t "templates.policy.staticAttributes"}}</h3>
     <ul>
         {{#if staticAttributes}}
         {{#each staticAttributes}}
@@ -10,7 +10,7 @@
         </li>
         {{/each}}
         {{else}}
-        <li class="disabled">There are no static attributes...</li>
+        <li class="disabled">{{t "templates.policy.noStaticAttributes"}}</li>
         {{/if}}
 
         <li class="editing clearfix">

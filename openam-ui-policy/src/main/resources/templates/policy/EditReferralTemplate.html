@@ -1,27 +1,27 @@
 <div class="content-bg">
     <div class="policy-header">
-        <a href="#app/{{options.appName}}/policies/" id="cancelButton" class="button float-right">Back</a>
+        <a href="#app/{{options.appName}}/policies/" id="cancelButton" class="button float-right">{{t "common.form.back"}}</a>
         {{#if entity.name}}
-        <h1>{{t "config.messages.PolicyMessages.edit"}}<span>{{entity.name}}</span></h1>
+        <h1>{{t "templates.policy.edit"}}<span>{{entity.name}}</span></h1>
         {{else}}
-        <h1>{{t "config.messages.PolicyMessages.createRef"}}</h1>
+        <h1>{{t "templates.policy.createRef"}}</h1>
         {{/if}}
-        <h2><span>Realm:</span> {{policyEditorRealmHelper options.realm}}</h2>
-        <h2><span>Application:</span> {{options.appName}}</h2>
+        <h2><span>{{t "templates.policy.realm"}}</span> {{policyEditorRealmHelper options.realm}}</h2>
+        <h2><span>{{t "templates.policy.app"}}</span> {{options.appName}}</h2>
         
     </div>
 
     <div class="policy-content">
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p>{{t "templates.policy.refText"}}</p>
             
         <form class="form">
 
             <div id="policy-steps" class="accordion">
-                <h1 class="accordion-header" tabindex="0">Step 1: Define a Referral Name</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.refStep1"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div class="group-field-block">
-                        <label class="short" for="policyName">Name</label>
+                        <label class="short" for="policyName">{{t "templates.policy.name"}}</label>
                         <input class="prop-val" id="policyName" type="text" value="{{entity.name}}" data-field="name" autofocus required/>
                     </div>
 
@@ -29,7 +29,7 @@
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">Step 2: Add Resources</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.refStep2"}</h1>
                 <section class="accordion-step clearfix">
 
                     <div class="clearfix">
@@ -40,7 +40,7 @@
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">Step 3: Select Realms</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.refStep3"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div class="clearfix" id="selectRealms">
@@ -51,11 +51,11 @@
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">Step 4: Summary and Confirmation View</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.refStep4"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div id="reviewInfo" class="clearfix"></div>
-                    <input class="button" type="button" value="Finish" name="submitForm">
+                    <input class="button" type="button" value="{{t 'templates.policy.finish'}}" name="submitForm">
 
                 </section>
      

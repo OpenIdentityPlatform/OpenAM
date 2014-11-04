@@ -5,7 +5,7 @@
 		<div class="field-float-select data-obj" id="typeSelector">
 			<label for="selection" >Type</label>
 			<select id="selection" class="placeholdertext" tabindex="0" >
-				<option value="" selected disabled >select...</option>
+				<option value="" selected disabled >{{t "templates.policy.select"}}</option>
 				{{#subjects}}<option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{camelCaseToTitle title}}</option>{{/subjects}}
 			</select>
 		</div>

@@ -1,7 +1,7 @@
 <div class="field-float-select data-obj">
     <label for="selection_{{id}}" data-title="{{title}}">{{camelCaseToTitle title}}</label>
     <select id="selection_{{id}}" class="placeholderText" tabindex="0" required>
-        <option value=""  disabled="">select...</option>
+        <option value=""  disabled="">{{t "templates.policy.select"}}</option>
         {{#each data.enum}}
             <option value="{{this}}" {{#equals this ../selected}}selected=""{{/equals}} >{{this}}</option>
         {{/each}}

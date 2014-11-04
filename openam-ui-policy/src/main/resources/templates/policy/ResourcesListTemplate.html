@@ -1,13 +1,13 @@
-<p>Create your resource</p>
+<p>{{t "templates.policy.createResource"}}</p>
 <div class="striped-list created-items" id="createdResources">
-    <h3>Resources</h3>
+    <h3>{{t "templates.policy.resources"}}</h3>
     <ul>
     {{#if entity.resources}}
         {{#each entity.resources}}
         <li data-resource="{{this}}" {{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}{{#equals this ../../options.justAdded}}class="highlight-good"{{/equals}} >{{this}}<span tabindex="0" class="icon-close float-right"></span></li>
         {{/each}}
     {{else}}
-        <li class="invalid">There are no resources...</li>
+        <li class="invalid">{{t "templates.policy.noResources"}}</li>
     {{/if}}
 
     {{#if options.newPattern}}
