@@ -29,8 +29,9 @@ public class BaseURLResourceNameTest {
 
     @Test
     public void testWildcardMatchCompare() throws Exception {
-        match(WILDCARD_MATCH, "http://example.com:80/fred/index.html", "http*://*example.com:*/fred/*", true);
-        match(WILDCARD_MATCH, "http://www.example.com:80/fred/index.html", "http*://*example.com:*/fred/*", true);
+    //    match(WILDCARD_MATCH, "http://example.com:80/fred/index.html", "http*://*example.com:*/fred/*", true);
+    //    match(WILDCARD_MATCH, "http://www.example.com:80/fred/index.html", "http*://*example.com:*/fred/*", true);
+        match(WILDCARD_MATCH, "http://www.google.com:80/asdf/blah/wibble/asdf/blah", "http://www.google.com:80/*/blah/wibble/*/blah", true);
     }
 
     @Test
@@ -54,6 +55,7 @@ public class BaseURLResourceNameTest {
         match(NO_MATCH, "http://example.com:80/private/fred/index.html", "http*://*example.com:*/fred/*", true);
         match(NO_MATCH, "http://hello.world:80/hacked.example.com:80/index.html", "http://*.example.com:80/index.html", true);
         match(NO_MATCH, "https://example.com", "http://ex*mple.com", true);
+        match(NO_MATCH, "http://example.com:80/foo/asdf/bar", "http://example.com:80/fred*/asdf/bar", true);
     }
 
     private void match(ResourceMatch expected, String requestResource, String targetResource, boolean wildcard) {

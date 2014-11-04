@@ -114,7 +114,7 @@ public class RedirectUrlValidatorTest {
             {"http://example.com/a/b/c", false},
             {"http://example.com/a/b/c/world.php", false},
             {"http://example.com/a/b.html/c", false},
-//            {"http://example.com/?", true}, see OPENAM-1974
+            {"http://example.com/?", true},
             {"http://example.com/?d", true},
             {"http://example.com/?d=e", true},
             {"http://example.com/a?d=e", true},
