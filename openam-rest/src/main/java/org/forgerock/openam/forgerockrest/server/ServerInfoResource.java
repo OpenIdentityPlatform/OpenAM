@@ -31,6 +31,7 @@ import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.configuration.MapValueParser;
+import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -143,8 +144,7 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("successfulUserRegistrationDestination",
                     restSecurity.getSuccessfulUserRegistrationDestination());
             result.put("socialImplementations", getSocialAuthnImplementations(realm));
-            result.put("referrals",
-                    getEnabledValue(SystemProperties.get(Constants.AM_REFERRALS_ENABLED_PROPERTY), false));
+            result.put("referralsEnabled", String.valueOf(PolicyConfig.isReferralsEnabled()));
             result.put("zeroPageLogin", AuthUtils.getZeroPageLoginConfig(realm));
 
             if (debug.messageEnabled()) {
@@ -159,33 +159,6 @@ public class ServerInfoResource extends RealmAwareResource {
             debug.error("ServerInfoResource.getAllServerInfo : Cannot retrieve all server info domains.", e);
             handler.handleError(new NotFoundException(e.getMessage()));
         }
-    }
-
-    /**
-     * Generate and return one of two values, "enabled" or "disabled" based on the value of the specified string.
-     * If the specified string is utterly weird, use the value specified in defaultValue to help make up our minds
-     * (true being enabled and false being disabled).
-     * @param value The string value to interpret.
-     * @param defaultValue A boolean value to fall back to, in case value cannot be interpreted.
-     * @return the string "enabled" or the string "disabled"
-     */
-    private String getEnabledValue(String value, boolean defaultValue) {
-        final String ENABLED = "enabled";
-        final String DISABLED = "disabled";
-
-        String result = defaultValue ? ENABLED : DISABLED;
-
-        if (StringUtils.isNotBlank(value)) {
-            value = value.trim();
-            value = value.toLowerCase();
-
-            if (value.equals("t") || value.equals("true") || value.equals("on") || value.equals(ENABLED)) {
-                result = ENABLED;
-            } else if (value.equals("f") || value.equals("false") || value.equals("off") || value.equals(DISABLED)) {
-                result = DISABLED;
-            }
-        }
-        return result;
     }
 
     /**

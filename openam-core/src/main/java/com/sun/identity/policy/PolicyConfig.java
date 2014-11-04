@@ -189,6 +189,8 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
     public static final String ADVICES_HANDLEABLE_BY_AM 
             = "sun-am-policy-config-advices-handleable-by-am";
 
+    public static final String REFERRALS_ENABLED = "openam-referrals-enabled";
+
     public static final String ORG_DN = "orgDN";
 
     /** 
@@ -207,6 +209,7 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
 
     private static ServiceConfigManager scm = null;
     private static ServiceSchemaManager ssm = null;
+    private static PolicyConfig pcm = new PolicyConfig();
     private static Map attrMap = new HashMap();
     private static Map resourceCompMap = new HashMap();
     private static PolicyCache policyCache;
@@ -217,6 +220,22 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
   
     private PolicyConfig() {
         // do nothing
+    }
+
+    private static ServiceConfigManager getServiceConfigManager() throws SSOException, SMSException {
+        if (scm == null) {
+            scm = new ServiceConfigManager(POLICY_CONFIG_SERVICE, ServiceTypeManager.getSSOToken());
+            scm.addListener(pcm); // listener for org config changes
+        }
+        return scm;
+    }
+
+    private static ServiceSchemaManager getServiceSchemaManager() throws SSOException, SMSException {
+        if (ssm == null) {
+            ssm = new ServiceSchemaManager(POLICY_CONFIG_SERVICE, ServiceTypeManager.getSSOToken());
+            ssm.addListener(pcm); // listener for global schema changes
+        }
+        return ssm;
     }
 
     /**
@@ -232,36 +251,18 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
      *  Note that return value would be null if service name passed in is null 
      * or if there is no configuration available for service
      */
-    public static Map getResourceCompareConfig(String service) 
+    public static Map getResourceCompareConfig(String service)
                                                 throws PolicyException {
         Map config = null;
-        if (scm == null || ssm == null) {
-            // following should happen only once, until scm is not null
-            try {
-                scm = new ServiceConfigManager(POLICY_CONFIG_SERVICE, 
-                                        ServiceTypeManager.getSSOToken());
-                ssm = new ServiceSchemaManager(POLICY_CONFIG_SERVICE, 
-                                        ServiceTypeManager.getSSOToken());
-                PolicyConfig pcm = new PolicyConfig();
-                scm.addListener(pcm); // listener for org config changes
-                ssm.addListener(pcm); // listener for global schema changes
-            } catch (SMSException se) {
-                PolicyManager.debug.error("getResourceCompareConfig: " +
-                                "Unable to create ServiceConfigManager", se);
-                throw (new PolicyException(se));
-            } catch (SSOException se) {
-                PolicyManager.debug.error("getResourceCompareConfig: " + 
-                                "Unale to create ServiceConfigManager", se);
-                throw (new PolicyException(se));
-            }
-        }
         ServiceSchema globalSchema = null;
         if ( (service == null) || !resourceCompMap.containsKey(service)) {
             try {
-                globalSchema = ssm.getGlobalSchema();    
+                globalSchema = getServiceSchemaManager().getGlobalSchema();
             } catch (SMSException se) {
-                PolicyManager.debug.error("getResourceCompConfig: " +
-                                "Unable to get ServiceConfig", se);
+                PolicyManager.debug.error("getResourceCompConfig: Unable to get ServiceConfig", se);
+                throw (new PolicyException(se));
+            } catch (SSOException se) {
+                PolicyManager.debug.error("getResourceCompConfig: Unable to get ServiceSchemaManager", se);
                 throw (new PolicyException(se));
             }
             if (globalSchema != null) {
@@ -296,30 +297,10 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
         if (policyCache == null) {
             policyCache = PolicyCache.getInstance();
         }
-        if (scm == null) {
-            // following should happen only once, until scm is not null
-            try {
-                scm = new ServiceConfigManager(POLICY_CONFIG_SERVICE, 
-                                        ServiceTypeManager.getSSOToken());
-                ssm = new ServiceSchemaManager(POLICY_CONFIG_SERVICE, 
-                                        ServiceTypeManager.getSSOToken());
-                PolicyConfig pcm = new PolicyConfig();
-                scm.addListener(pcm); // listener for org config changes
-                ssm.addListener(pcm); // listener for global schema changes
-            } catch (SMSException se) {
-                PolicyManager.debug.error("getPolicyConfig: " +
-                                "Unable to create ServiceConfigManager", se);
-                throw (new PolicyException(se));
-            } catch (SSOException se) {
-                PolicyManager.debug.error("getPolicyConfig " + 
-                                "Unable to create ServiceConfigManager", se);
-                throw (new PolicyException(se));
-            }
-        }
         if (!attrMap.containsKey(org)) {
             ServiceConfig orgConfig = null;
             try {
-                orgConfig = scm.getOrganizationConfig(org, null);
+                orgConfig = getServiceConfigManager().getOrganizationConfig(org, null);
             } catch (SMSException se) {
                 PolicyManager.debug.error("getPolicyConfig: " +
                                 "Unable to get ServiceConfig", se);
@@ -354,8 +335,8 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
         ServiceSchema globalSchema = null;
         PolicyManager.debug.message("PolicyConfig.schemaChanged():entering");
         try {
-            globalSchema = ssm.getGlobalSchema();
-        } catch (SMSException se) {
+            globalSchema = getServiceSchemaManager().getGlobalSchema();
+        } catch (Exception se) {
             PolicyManager.debug.error("globalConfigChanged: " +
                                 "Unable to get global config ", se);
             return;
@@ -407,7 +388,7 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
         Map orgAttrMap = null;
         ServiceConfig orgConfig = null;
         try {
-            orgConfig = scm.getOrganizationConfig(orgName, null);
+            orgConfig = getServiceConfigManager().getOrganizationConfig(orgName, null);
         } catch (SMSException se) {
             PolicyManager.debug.error("orgConfigChanged: " +
                                 "Unable to get org config: " + orgName, se);
@@ -743,5 +724,15 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
                     + advicesHandleableByAM);
         }
         return advicesHandleableByAM;
+    }
+
+    /**
+     * Find out if Referrals are enabled or not. This is a Global Attribute.
+     * @return True if Referrals are enabled, false if not or if the attribute can not be read.
+     * @throws SMSException
+     */
+    public static boolean isReferralsEnabled() throws SMSException, SSOException {
+        return CollectionHelper.getBooleanMapAttr(
+                getServiceSchemaManager().getGlobalSchema().getAttributeDefaults(), REFERRALS_ENABLED, false);
     }
 }
