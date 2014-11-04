@@ -175,6 +175,165 @@
     </mediaobject>
    </section>
 
+   <section xml:id="oauth2-jwt-bearer">
+    <title>JWT Bearer Profile</title>
+
+    <para>
+     The Internet-Draft,
+     <link
+      xlink:href="http://self-issued.info/docs/draft-ietf-oauth-jwt-bearer.html"
+      xlink:show="new"
+     ><citetitle>JSON Web Token (JWT) Profile for OAuth 2.0 Client
+      Authentication and Authorization Grants</citetitle></link>
+     describes a means to use a JWT for client authentication
+     or to use a JWT to request an access token.
+     When clients are also resource owners,
+     the profile allows clients to issue JWTs to obtain access tokens
+     rather than use the resource owner password credentials grant.
+    </para>
+
+    <para>
+     OpenAM implements both features of the profile.
+     Both involve HTTP POST requests to the access token endpoint.
+    </para>
+
+    <para>
+     When the client bearing the JWT uses it for authentication,
+     then in the POST data the client sets
+     <literal>client_assertion_type</literal> to
+     <literal>urn:ietf:params:oauth:client-assertion-type:jwt-bearer</literal>
+     and <literal>client_assertion</literal> to the JWT string.
+    </para>
+
+    <mediaobject xml:id="figure-oauth2-jwt-bearer-authn">
+     <alt>JWT Bearer Client Authentication</alt>
+     <imageobject>
+      <imagedata fileref="images/oauth2-jwt-bearer-authn.png" format="PNG"/>
+     </imageobject>
+     <textobject>
+      <para>
+       OpenAM supports uses of a JWT for client authentication.
+      </para>
+     </textobject>
+    </mediaobject>
+
+    <para>
+     The HTTP POST to OpenAM looks something like the following,
+     where the assertion value is the JWT.
+    </para>
+
+    <programlisting language="http">
+POST /openam/oauth2/access_token HTTP/1.1
+Host: openam.example.com
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&amp;
+code=362ad374-735c-4f69-aa8e-bf384f8602de&amp;
+client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3A
+ client-assertion-type%3Ajwt-bearer&amp;
+client_assertion=eyAiYWxnIjogIlJTMjU2IiB9.eyAic3ViIjogImp3...
+    </programlisting>
+
+    <para>
+     When the client bearing the JWT uses it as an authorization grant,
+     then in the POST data the client sets
+     <literal>grant_type</literal> to
+     <literal>urn:ietf:params:oauth:grant-type:jwt-bearer</literal>
+     and <literal>assertion</literal> to the JWT string.
+    </para>
+
+    <mediaobject xml:id="figure-oauth2-jwt-bearer-authz">
+     <alt>JWT Bearer as Authorization Grant</alt>
+     <imageobject>
+      <imagedata fileref="images/oauth2-jwt-bearer-authz.png" format="PNG"/>
+     </imageobject>
+     <textobject>
+      <para>
+       OpenAM supports uses of a JWT for client authentication.
+      </para>
+     </textobject>
+    </mediaobject>
+
+    <para>
+     The HTTP POST to OpenAM looks something like the following,
+     where the assertion value is the JWT.
+     This listing does not show the client credentials,
+     which must be provided, for example
+     as form parameters, a JWT token, or an authorization header.
+    </para>
+
+    <programlisting language="http">
+POST /openam/oauth2/access_token HTTP/1.1
+Host: openam.example.com
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&amp;
+assertion=eyAiYWxnIjogIlJTMjU2IiB9.eyAic3ViIjogImp3...
+    </programlisting>
+
+    <para>
+     In both profiles, OpenAM must be able to validate the JWT.
+    </para>
+
+    <itemizedlist>
+     <para>
+      For validation, the JWT must include the following claims:
+     </para>
+
+     <listitem>
+      <para>
+       "iss" (issuer) whose value identifies the JWT issuer
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       "sub" (subject) whose value identifies the principal
+       who is the subject of the JWT
+      </para>
+
+      <para>
+       For client authentication, the "sub" value
+       must be the same as the value of the "client_id".
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       "aud" (audience) whose value identifies the authorization server
+       that is the intended audience of the JWT
+      </para>
+
+      <para>
+       When the JWT is used for authentication,
+       this is the OpenAM access token endpoint.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       "exp" (expiration) whose value specifies the time of expiration
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <para>
+     Also for validation, the issuer must digitally sign the JWT
+     or apply a keyed message digest.
+     When the issuer is also the client,
+     the client can sign the JWT by using a private key,
+     and include the public key in its profile registered with OpenAM.
+    </para>
+
+    <para>
+     A sample Java-based client is
+     <link
+      xlink:href="https://github.com/markcraig/jwt-bearer-client"
+      xlink:show="new"
+     >available online</link>.
+    </para>
+   </section>
+
    <section xml:id="oauth2-saml2-bearer">
     <title>SAML 2.0 Bearer Assertion Profiles</title>
     <indexterm>

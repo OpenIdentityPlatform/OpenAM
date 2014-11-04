@@ -167,6 +167,32 @@ Agreement (yes/no): [no]:</screen>
   </listitem>
 
   <listitem>
+   <para>
+    <emphasis role="bold">Support for JWT Profile for OAuth 2.0</emphasis>.
+    OpenAM now supports the
+    <link
+     xlink:href="http://self-issued.info/docs/draft-ietf-oauth-jwt-bearer.html"
+     xlink:show="new"
+    ><citetitle>JSON Web Token (JWT) Profile for OAuth 2.0 Client
+     Authentication and Authorization Grants</citetitle></link>
+    (
+     <link
+      xlink:show="new"
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4394"
+      >OPENAM-4394</link>
+     ).
+    This profile allows OAuth 2.0 clients to use JWTs
+    for authentication and to request access tokens.
+    For details, see the <citetitle>Administration Guide</citetitle> section on
+    <link
+     xlink:href="admin-guide#rest-api-authz"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>Authorization</citetitle></link>.
+   </para>
+  </listitem>
+
+  <listitem>
    <para><!-- Enhancement: AME-3299 -->
     <emphasis role="bold">CORS support for OpenAM APIs</emphasis>.
     OpenAM now supports cross-origin resource sharing (CORS)

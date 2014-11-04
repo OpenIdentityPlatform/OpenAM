@@ -1045,6 +1045,181 @@
      automatically when tokens are issued.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term>Response Types</term>
+    <listitem>
+     <para>
+      Specify response type lists that the client uses.
+     </para>
+
+     <itemizedlist>
+      <para>
+       The default lists are the following.
+      </para>
+
+      <listitem>
+       <para>
+        <literal>code</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>token</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>id_token</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>code token</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>token id_token</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>code id_token</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>code token id_token</literal>
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Contacts</term>
+    <listitem>
+     <para>
+      Specify email address of users who administer the client.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Client Name</term>
+    <listitem>
+     <para>
+      Specify a human-readable name for the client.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Client JWT Bearer Public Key</term>
+    <listitem>
+     <para>
+      Specify the public key of the client's key pair
+      that is used to sign JWTs issued by the client
+      and used for client authentication or to request access tokens.
+     </para>
+
+     <para>
+      This is not the certificate, but instead only the public key,
+      as in the following example.
+     </para>
+
+     <programlisting language="none">
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgPhln8MgYQGvhALa7PQZ
+gU4JSUA9qfFfbVpgdK8QuxbIxrsMmUP6aeNoXxw9FEySFhkVcMmj8BVyPJuXJPee
+2ov7YmzcPtOZLoFKOTFlawkfKEkhgShTDCWhzSSLOBKbXkzAExxueSxBU3lVaI57
+jLgkxuLfS3qTfyUzrYoq1pI8/qO+dbUtOYv26KotbPngAzqFTc2UIjcnpF+HzBoE
+g8ASOYdk2q46Xa4aBa6bO5tgMUluiYtJCo7nxG4pVpJUzANuYQ20xhZcgpAvbFO3
+lcBvARASAn/OyTCkDZpC3UcTp17dTKY6E42FGK7iuTcAgScRVvGu/LgiT7BeDstl
+WwIDAQAB
+-----END PUBLIC KEY-----
+     </programlisting>
+
+     <para>
+      You can generate a key pair and export the certificate
+      by using the Java <command>keytool</command> command.
+     </para>
+
+     <screen>
+$ <userinput>keytool \
+ -genkeypair \
+ -keysize 2048 \
+ -alias self-signed \
+ -keyalg rsa \
+ -dname "CN=jwt-bearer-client,O=openam.example.com" \
+ -keystore keystore.jks \
+ -keypass changeit \
+ -storepass changeit \
+ -validity 3650 \
+ -v</userinput>
+<computeroutput>Generating 2,048 bit RSA key pair and self-signed certificate (SHA256withRSA)
+ with a validity of 3,650 days
+    for: CN=jwt-bearer-client, O=openam.example.com
+[Storing keystore.jks]</computeroutput>
+
+$ <userinput>keytool \
+ -list \
+ -alias self-signed \
+ -rfc \
+ -keystore keystore.jks \
+ -keypass changeit \
+ -storepass changeit</userinput>
+<computeroutput>Alias name: self-signed
+Creation date: Oct 27, 2014
+Entry type: PrivateKeyEntry
+Certificate chain length: 1
+Certificate[1]:
+-----BEGIN CERTIFICATE-----
+MIIDETCCAfmgAwIBAgIEU8SXLjANBgkqhkiG9w0BAQsFADA5MRswGQYDVQQKExJvcGVuYW0uZXhh
+bXBsZS5jb20xGjAYBgNVBAMTEWp3dC1iZWFyZXItY2xpZW50MB4XDTE0MTAyNzExNTY1NloXDTI0
+MTAyNDExNTY1NlowOTEbMBkGA1UEChMSb3BlbmFtLmV4YW1wbGUuY29tMRowGAYDVQQDExFqd3Qt
+YmVhcmVyLWNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAID4ZZ/DIGEBr4QC
+2uz0GYFOCUlAPanxX21aYHSvELsWyMa7DJlD+mnjaF8cPRRMkhYZFXDJo/AVcjyblyT3ntqL+2Js
+3D7TmS6BSjkxZWsJHyhJIYEoUwwloc0kizgSm15MwBMcbnksQVN5VWiOe4y4JMbi30t6k38lM62K
+KtaSPP6jvnW1LTmL9uiqLWz54AM6hU3NlCI3J6Rfh8waBIPAEjmHZNquOl2uGgWumzubYDFJbomL
+SQqO58RuKVaSVMwDbmENtMYWXIKQL2xTt5XAbwEQEgJ/zskwpA2aQt1HE6de3UymOhONhRiu4rk3
+AIEnEVbxrvy4Ik+wXg7LZVsCAwEAAaMhMB8wHQYDVR0OBBYEFIuI7ejuZTg5tJsh1XyRopGOMBcs
+MA0GCSqGSIb3DQEBCwUAA4IBAQBM/+/tYYVIS6LvPl3mfE8V7x+VPXqj/uK6UecAbfmRTrPk1ph+
+jjI6nmLX9ncomYALWL/JFiSXcVsZt3/412fOqjakFVS0PmK1vEPxDlav1drnVA33icy1wORRRu5/
+qA6mwDYPAZSbm5cDVvCR7Lt6VqJ+D0V8GABFxUw9IaX6ajTqkWhldY77usvNeTD0Xc4R7OqSBrnA
+SNCaUlJogWyzhbFlmE9Ne28j4RVpbz/EZn0oc/cHTJ6Lryzsivf4uDO1m3M3kM/MUyXc1Zv3rqBj
+TeGSgcqEAd6XlGXY1+M/yIeouUTi0F1bk1rNlqJvd57Xb4CEq17tVbGBm0hkECM8
+-----END CERTIFICATE-----</computeroutput>
+     </screen>
+
+     <para>
+      You can then obtain the public key from the certificate
+      by using the <command>openssl x509</command> command
+      as in the following example,
+      where <filename>cert.pem</filename> holds the public key certificate.
+     </para>
+
+     <screen>
+$ <userinput>openssl x509 -pubkey -noout -in cert.pem</userinput>
+<computeroutput>-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgPhln8MgYQGvhALa7PQZ
+gU4JSUA9qfFfbVpgdK8QuxbIxrsMmUP6aeNoXxw9FEySFhkVcMmj8BVyPJuXJPee
+2ov7YmzcPtOZLoFKOTFlawkfKEkhgShTDCWhzSSLOBKbXkzAExxueSxBU3lVaI57
+jLgkxuLfS3qTfyUzrYoq1pI8/qO+dbUtOYv26KotbPngAzqFTc2UIjcnpF+HzBoE
+g8ASOYdk2q46Xa4aBa6bO5tgMUluiYtJCo7nxG4pVpJUzANuYQ20xhZcgpAvbFO3
+lcBvARASAn/OyTCkDZpC3UcTp17dTKY6E42FGK7iuTcAgScRVvGu/LgiT7BeDstl
+WwIDAQAB
+-----END PUBLIC KEY-----</computeroutput>
+     </screen>
+    </listitem>
+   </varlistentry>
   </variablelist>
 
   <variablelist xml:id="configure-oauth2-client-openid-connect">
@@ -1217,7 +1392,10 @@
     <listitem>
      <para>Algorithm that the ID Token for this client must be signed with</para>
 
-     <para>Default: <literal>HmacSHA256</literal></para>
+     <para>
+      Default: <literal>HS256</literal>
+      (HmacSHA256, where the secret is the client_secret value)
+     </para>
 
      <para>Valid values are listed in <citetitle>JSON Web Algorithms
      (JWA)</citetitle>: <link xlink:show="new"
@@ -1315,7 +1493,7 @@
    -->
 
    <varlistentry>
-    <term>The access token used to update the client</term>
+    <term>Access Token</term>
     <listitem>
      <para>The <literal>registration_access_token</literal> value that you
      provide when registering the client, and then subsequently when reading
