@@ -32,14 +32,11 @@ define("org/forgerock/openam/ui/policy/SiteConfigurationDelegate", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate"
 
 ], function(constants, conf, eventManager, uiUtils, AbstractDelegate) {
-
-
     var obj = new AbstractDelegate('');
-
     
     obj.getConfiguration = function(successCallback, errorCallback) {
-
         console.info("Getting configuration");
+
         var urlParams = uiUtils.convertCurrentUrlToJSON().params;
         if (urlParams) {
             conf.globalData.auth.realm = urlParams.realm;
@@ -61,13 +58,16 @@ define("org/forgerock/openam/ui/policy/SiteConfigurationDelegate", [
             headers: {}
         });
 
+        obj.serviceCall({
+            serviceUrl: constants.host + "/openam/json",
+            url: "/serverinfo/*",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+        }).done(function (info) {
+            _.extend(conf.globalData, {serverInfo: info});
+        });
     };
 
-
     return obj;
-    
-
-
 });
 
 

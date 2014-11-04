@@ -52,6 +52,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         render: function (args, callback) {
             this.data.realm = conf.globalData.auth.realm;
             this.data.appName = args[0];
+            this.data.referralsEnabled = conf.globalData.serverInfo && conf.globalData.serverInfo.referralsEnabled === "true";
 
             this.parentRender(function () {
                 this.policyGridView = new GenericGridView();
@@ -65,16 +66,18 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                     storageKey: 'PE-mng-pols-sel-' + this.data.appName
                 }, callback);
 
-                this.refGridView = new GenericGridView();
-                this.refGridView.render({
-                    element: '#manageRefs',
-                    tpl: 'templates/policy/ManageRefsGridTemplate.html',
-                    actionsTpl: 'templates/policy/ManageRefsGridActionsTemplate.html',
-                    gridId: 'refs',
-                    initOptions: this.getRefGridInitOptions(),
-                    additionalOptions: this.getRefGridAdditionalOptions(),
-                    storageKey: 'PE-mng-ref-sel-' + this.data.appName
-                }, callback);
+                if (this.data.referralsEnabled) {
+                    this.refGridView = new GenericGridView();
+                    this.refGridView.render({
+                        element: '#manageRefs',
+                        tpl: 'templates/policy/ManageRefsGridTemplate.html',
+                        actionsTpl: 'templates/policy/ManageRefsGridActionsTemplate.html',
+                        gridId: 'refs',
+                        initOptions: this.getRefGridInitOptions(),
+                        additionalOptions: this.getRefGridAdditionalOptions(),
+                        storageKey: 'PE-mng-ref-sel-' + this.data.appName
+                    }, callback);
+                }
             });
         },
 
