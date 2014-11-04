@@ -163,7 +163,7 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
         JsonValue r;
         try {
             r = new JsonValue(serialisation.deserialise(data, Map.class));
-            Set<String> keys = r.keys();
+            Set<String> keys = new HashSet<String>(r.keys());
             for (String key : keys){
                 List<String> x = r.get(key).asList(String.class);
                 Set<String> set = new HashSet<String>(x);
