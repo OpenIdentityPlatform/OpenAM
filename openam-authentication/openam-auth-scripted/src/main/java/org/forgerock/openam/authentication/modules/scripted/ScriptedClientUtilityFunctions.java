@@ -30,13 +30,19 @@ public class ScriptedClientUtilityFunctions {
      * @param outputParameterId The id of the form element.
      * @return The anonymous function, supplied with the element with the id.
      */
-    public static String createClientSideScriptExecutorFunction(String script, String outputParameterId) {
+    public static String createClientSideScriptExecutorFunction(String script, String outputParameterId,
+                boolean clientSideScriptEnabled) {
+        String collectingDataMessage = "";
+        if (clientSideScriptEnabled) {
+            collectingDataMessage = "    messenger.messages.addMessage( message );\n";
+        }
+
         String spinningWheelScript = "if (window.require) {\n" +
                 "    var messenger = require(\"org/forgerock/commons/ui/common/components/Messages\"),\n" +
                 "        spinner =  require(\"org/forgerock/commons/ui/common/main/SpinnerManager\"),\n" +
                 "        message =  {message:\"Collecting Data...\", type:\"info\"};\n" +
                 "    spinner.showSpinner();\n" +
-                "    messenger.messages.addMessage( message );\n" +
+                collectingDataMessage +
                 "}";
 
         return String.format(
