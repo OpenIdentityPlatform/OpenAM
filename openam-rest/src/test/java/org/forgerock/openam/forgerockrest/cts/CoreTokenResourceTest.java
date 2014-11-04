@@ -25,47 +25,54 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import org.mockito.Matchers;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertEquals;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class CoreTokenResourceTest {
 
-    Debug mockDebug = mock(Debug.class);
+    private Debug mockDebug;
+    private Token mockToken;
+    private CTSPersistentStore mockStore;
+    private JSONSerialisation mockSerialisation;
+    private CoreTokenResource resource;
+    private ResultHandler mockHandler;
+
+    @BeforeMethod
+    public void setup() {
+        mockToken = mock(Token.class);
+        mockDebug = mock(Debug.class);
+        mockStore = mock(CTSPersistentStore.class);
+        mockHandler = mock(ResultHandler.class);
+        mockSerialisation = mock(JSONSerialisation.class);
+
+        resource = new CoreTokenResource(mockSerialisation, mockStore, mockDebug);
+    }
 
     @Test
-    public void shouldUseDeserialisedTokenToCreate() throws CoreTokenException {
+    public void shouldCreateTokenInCTS() throws CoreTokenException {
         // Given
-        Token token = mock(Token.class);
-        CTSPersistentStore store = mock(CTSPersistentStore.class);
-
-        JSONSerialisation serialisation = mock(JSONSerialisation.class);
-        given(serialisation.deserialise(anyString(), Matchers.<Class<Object>>any())).willReturn(token);
-
-        CoreTokenResource resource = new CoreTokenResource(serialisation, store, mockDebug);
-
         CreateRequest request = mock(CreateRequest.class);
         given(request.getContent()).willReturn(new JsonValue(""));
+        given(mockSerialisation.deserialise(anyString(), Matchers.<Class<Object>>any())).willReturn(mockToken);
 
         // When
-        resource.createInstance(null, request, mock(ResultHandler.class));
+        resource.createInstance(null, request, mockHandler);
+
         // Then
-        verify(store).create(token);
+        verify(mockStore).create(mockToken);
     }
 
     @Test
@@ -73,74 +80,55 @@ public class CoreTokenResourceTest {
         // Given
         String one = "one";
 
-        CTSPersistentStore store = mock(CTSPersistentStore.class);
-        CoreTokenResource resource = new CoreTokenResource(mock(JSONSerialisation.class), store, mockDebug);
-
         // When
-        resource.deleteInstance(null, one, mock(DeleteRequest.class), mock(ResultHandler.class));
+        resource.deleteInstance(null, one, mock(DeleteRequest.class), mockHandler);
 
         // Then
-        verify(store).delete(one);
+        verify(mockStore).delete(one);
     }
 
     @Test
     public void shouldReadTokenFromStore() throws CoreTokenException {
         // Given
         String one = "badger";
-        Token token = mock(Token.class);
-
-        CTSPersistentStore store = mock(CTSPersistentStore.class);
-        given(store.read(anyString())).willReturn(token);
-        CoreTokenResource resource = new CoreTokenResource(mock(JSONSerialisation.class), store, mockDebug);
+        given(mockStore.read(anyString())).willReturn(mockToken);
+        given(mockSerialisation.serialise(any())).willReturn("{ \"value\": \"some JSON\" }");
 
         // When
-        resource.readInstance(null, one, mock(ReadRequest.class), mock(ResultHandler.class));
+        resource.readInstance(null, one, mock(ReadRequest.class), mockHandler);
 
         // Then
-        verify(store).read(one);
+        verify(mockStore).read(one);
     }
 
     @Test
     public void shouldReadAndReturnTokenInSerialisedForm() throws CoreTokenException {
         // Given
-        String serialisedToken = "badger";
-
-        CTSPersistentStore store = mock(CTSPersistentStore.class);
-        given(store.read(anyString())).willReturn(mock(Token.class));
-
-        JSONSerialisation serialisation = mock(JSONSerialisation.class);
-        given(serialisation.serialise(any(Token.class))).willReturn(serialisedToken);
-
-        CoreTokenResource resource = new CoreTokenResource(serialisation, store, mockDebug);
-
-        ResultHandler handler = mock(ResultHandler.class);
+        String serialisedToken = "{ \"value\": \"some JSON\" }";
+        given(mockStore.read(anyString())).willReturn(mockToken);
+        given(mockSerialisation.serialise(any(Token.class))).willReturn(serialisedToken);
 
         // When
-        resource.readInstance(null, "", mock(ReadRequest.class), handler);
+        resource.readInstance(null, "", mock(ReadRequest.class), mockHandler);
 
         // Then
         ArgumentCaptor<Resource> captor = ArgumentCaptor.forClass(Resource.class);
-        verify(handler).handleResult(captor.capture());
+        verify(mockHandler).handleResult(captor.capture());
         Resource r = captor.getValue();
-        Assert.assertEquals(r.getContent().toString(), new JsonValue(serialisedToken).toString());
+        assertThat(r.getContent().toString()).isEqualTo(serialisedToken);
     }
 
     @Test
     public void shouldIndicateWhenNoTokenCanBeRead() throws CoreTokenException {
         // Given
-        CTSPersistentStore store = mock(CTSPersistentStore.class);
-        given(store.read(anyString())).willReturn(null);
-
-        CoreTokenResource resource = new CoreTokenResource(mock(JSONSerialisation.class), store, mockDebug);
-
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
+        given(mockStore.read(anyString())).willReturn(null);
 
         // When
-        resource.readInstance(null, "badger", mock(ReadRequest.class), handler);
+        resource.readInstance(null, "badger", mock(ReadRequest.class), mockHandler);
 
         // Then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
-        verify(handler).handleError(captor.capture());
+        verify(mockHandler).handleError(captor.capture());
         ResourceException exception = captor.getValue();
         Assert.assertEquals(exception.getCode(), ResourceException.NOT_FOUND);
     }
@@ -148,25 +136,16 @@ public class CoreTokenResourceTest {
     @Test
     public void shouldUpdateUsingTokenInUpdateRequest() throws CoreTokenException {
         // Given
-        JSONSerialisation serialisation = new JSONSerialisation();
-
-        CTSPersistentStore store = mock(CTSPersistentStore.class);
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
         UpdateRequest updateRequest = mock(UpdateRequest.class);
-        CoreTokenResource resource = new CoreTokenResource(serialisation, store, mockDebug);
         JsonValue value = mock(JsonValue.class);
-
-        //Ensure the Token is included in the UpdateRequest
-        Token token = new Token("badger", TokenType.OAUTH);
-        String tokenJson = serialisation.serialise(token);
-
-        given(value.toString()).willReturn(tokenJson);
+        given(value.toString()).willReturn("{ \"value\": \"test\" }");
         given(updateRequest.getContent()).willReturn(value);
+        given(mockSerialisation.deserialise(anyString(), Matchers.<Class<Object>>any())).willReturn(mockToken);
 
         // When
-        resource.updateInstance(null, "badger", updateRequest, handler);
+        resource.updateInstance(null, "badger", updateRequest, mockHandler);
 
         // Then
-        verify(store).update(any(Token.class));
+        verify(mockStore).update(any(Token.class));
     }
 }

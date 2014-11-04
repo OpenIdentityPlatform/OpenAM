@@ -17,8 +17,6 @@
 package org.forgerock.openam.forgerockrest.cts;
 
 import com.sun.identity.shared.debug.Debug;
-import java.util.HashMap;
-import java.util.Map;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -39,6 +37,11 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
+import org.forgerock.openam.utils.JsonValueBuilder;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * CoreTokenResource is responsible for exposing the functions of the CoreTokenService via a REST
@@ -49,6 +52,7 @@ import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
  *
  */
 public class CoreTokenResource implements CollectionResourceProvider {
+    public static final String DEBUG_HEADER = "CoreTokenResource :: ";
     // Injected
     private final JSONSerialisation serialisation;
     private final CTSPersistentStore store;
@@ -93,21 +97,15 @@ public class CoreTokenResource implements CollectionResourceProvider {
             Map<String, String> result = new HashMap<String, String>();
             result.put(TOKEN_ID, token.getTokenId());
 
-            Resource resource = new Resource(token.getTokenId(),
-                    String.valueOf(System.currentTimeMillis()), new JsonValue(result));
+            Resource resource = new Resource(
+                    token.getTokenId(),
+                    String.valueOf(System.currentTimeMillis()),
+                    new JsonValue(result));
 
-            if (debug.messageEnabled()) {
-                debug.message("CoreTokenResource :: CREATE by " + principal +
-                        " : Stored token with ID: " + token.getTokenId());
-            }
-
+            debug("CREATE by {0}: Stored token with ID: {1}", principal, token.getTokenId());
             handler.handleResult(resource);
-
         } catch (CoreTokenException e) {
-            if (debug.errorEnabled()) {
-                debug.error("CoreTokenResource :: CREATE by " + principal + ": Error creating token resource with ID: "
-                        + token.getTokenId(), e);
-            }
+            error(e, "CREATE by {0}: Error creating token resource with ID: {1}", principal, token.getTokenId());
             handler.handleError(generateException(e));
         }
     }
@@ -131,32 +129,29 @@ public class CoreTokenResource implements CollectionResourceProvider {
             Map<String, String> result = new HashMap<String, String>();
             result.put(TOKEN_ID, tokenId);
 
-            Resource resource = new Resource(tokenId, String.valueOf(System.currentTimeMillis()),
+            Resource resource = new Resource(
+                    tokenId,
+                    String.valueOf(System.currentTimeMillis()),
                     new JsonValue(result));
 
-            if (debug.messageEnabled()) {
-                debug.message("CoreTokenResource :: DELETE by " + principal + ": Deleted token resource with ID: "
-                        + tokenId);
-            }
-
+            debug("DELETE by {0}: Deleted token resource with ID: {1}", principal, tokenId);
             handler.handleResult(resource);
         } catch (CoreTokenException e) {
-            if (debug.errorEnabled()) {
-                debug.error("CoreTokenResource :: DELETE by " + principal + ": Error deleting token resource with ID: "
-                        + tokenId, e);
-            }
+            error(e, "DELETE by {0}: Error deleting token resource with ID: {1}", principal, tokenId);
             handler.handleError(generateException(e));
         }
 
     }
 
     /**
-     * Read the contents of a Token based on its TokenID referred to by the Resource path.
+     * Read the token based on its Token ID.
+     *
+     * If successful, the Token will be returned to the caller in serialised JSON format.
      *
      * @param serverContext Required context.
      * @param tokenId The TokenID of the Token to read.
      * @param readRequest Not used.
-     * @param handler To handle errors.
+     * @param handler To handle the response of the operation, including errors.
      */
     public void readInstance(ServerContext serverContext, String tokenId, ReadRequest readRequest,
                              ResultHandler<Resource> handler) {
@@ -167,24 +162,20 @@ public class CoreTokenResource implements CollectionResourceProvider {
             Token token = store.read(tokenId);
             if (token == null) {
                 handler.handleError(generateNotFoundException(tokenId));
-                if (debug.errorEnabled()) {
-                    debug.error("CoreTokenResource :: READ by " + principal + ": No token resource to read with ID: " +
-                            tokenId);
-                }
+                error("READ by {0}: No token resource to read with ID: {1}", principal, tokenId);
                 return;
             }
 
             String json = serialisation.serialise(token);
-            Resource response = new Resource(tokenId, String.valueOf(System.currentTimeMillis()), new JsonValue(json));
-            if (debug.messageEnabled()) {
-                debug.message("CoreTokenResource :: READ by " + principal + ": Read token resource with ID: " + tokenId);
-            }
+            Resource response = new Resource(
+                    tokenId,
+                    String.valueOf(System.currentTimeMillis()),
+                    JsonValueBuilder.toJsonValue(json));
+
+            debug("READ by {0}: Read token resource with ID: {1}", principal, tokenId);
             handler.handleResult(response);
         } catch (CoreTokenException e) {
-            if (debug.errorEnabled()) {
-                debug.error("CoreTokenResource :: READ by " + principal + ": Error reading token resource with ID: " +
-                        tokenId, e);
-            }
+            error(e, "READ by {0}: Error reading token resource with ID: {1}", principal, tokenId);
             handler.handleError(generateException(e));
         }
     }
@@ -207,18 +198,15 @@ public class CoreTokenResource implements CollectionResourceProvider {
         try {
             store.update(newToken);
 
-            Resource resource = new Resource(newToken.getTokenId(), String.valueOf(System.currentTimeMillis()),
+            Resource resource = new Resource(
+                    newToken.getTokenId(),
+                    String.valueOf(System.currentTimeMillis()),
                     new JsonValue("Token Updated"));
-            if (debug.messageEnabled()) {
-                debug.message("CoreTokenResource :: UPDATE by " + principal + ": Updated token resource with ID: "
-                        + tokenId);
-            }
+
+            debug("UPDATE by {0}: Updated token resource with ID: {1}", principal, tokenId);
             handler.handleResult(resource);
         } catch (CoreTokenException e) {
-            if (debug.errorEnabled()) {
-                debug.error("CoreTokenResource :: UPDATE by " + principal + ": Error updating token resource with ID: "
-                        + tokenId, e);
-            }
+            error(e, "UPDATE by {0}: Error updating token resource with ID: {1}", principal, tokenId);
             handler.handleError(generateException(e));
         }
     }
@@ -276,5 +264,21 @@ public class CoreTokenResource implements CollectionResourceProvider {
      */
     public void actionCollection(ServerContext serverContext, ActionRequest actionRequest, ResultHandler<JsonValue> jsonValueResultHandler) {
         RestUtils.generateUnsupportedOperation(jsonValueResultHandler);
+    }
+
+    private void debug(String format, Object... args) {
+        if (debug.messageEnabled()) {
+            debug.message(DEBUG_HEADER + MessageFormat.format(format, args));
+        }
+    }
+
+    private void error(Exception e, String format, Object... args) {
+        if (debug.errorEnabled()) {
+            debug.error(DEBUG_HEADER + MessageFormat.format(format, args), e);
+        }
+    }
+
+    private void error(String format, Object... args) {
+        error(null, format, args);
     }
 }
