@@ -328,7 +328,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             attributes.put("createdBy", new QueryAttribute(STRING, Privilege.CREATED_BY_ATTRIBUTE));
             attributes.put("creationDate", new QueryAttribute(TIMESTAMP, Privilege.CREATION_DATE_ATTRIBUTE));
             attributes.put("lastModifiedBy", new QueryAttribute(STRING, Privilege.LAST_MODIFIED_BY_ATTRIBUTE));
-            attributes.put("lastModified", new QueryAttribute(TIMESTAMP, Privilege.LAST_MODIFIED_DATE_ATTRIBUTE));
+            attributes.put("lastModifiedDate", new QueryAttribute(TIMESTAMP, Privilege.LAST_MODIFIED_DATE_ATTRIBUTE));
 
             return attributes;
         }
@@ -347,7 +347,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             attributes.put("createdBy", new QueryAttribute(STRING, Application.CREATED_BY_ATTRIBUTE));
             attributes.put("creationDate", new QueryAttribute(TIMESTAMP, Application.CREATION_DATE_ATTRIBUTE));
             attributes.put("lastModifiedBy", new QueryAttribute(STRING, Application.LAST_MODIFIED_BY_ATTRIBUTE));
-            attributes.put("lastModified", new QueryAttribute(TIMESTAMP, Application.LAST_MODIFIED_DATE_ATTRIBUTE));
+            attributes.put("lastModifiedDate", new QueryAttribute(TIMESTAMP, Application.LAST_MODIFIED_DATE_ATTRIBUTE));
 
             return attributes;
         }

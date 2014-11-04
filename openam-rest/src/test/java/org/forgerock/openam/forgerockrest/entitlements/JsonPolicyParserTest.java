@@ -165,7 +165,7 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldNotAllowSettingLastModifiedDate() throws Exception {
         // Given
-        JsonValue content = buildJson(field("lastModified", "2014-01-01T00:00:00.000Z"));
+        JsonValue content = buildJson(field("lastModifiedDate", "2014-01-01T00:00:00.000Z"));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -522,7 +522,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        assertThat(result.get("lastModified").asString())
+        assertThat(result.get("lastModifiedDate").asString())
                 .isEqualTo(DateUtils.toUTCDateFormatWithMilliseconds(lastModified));
     }
 

@@ -39,7 +39,7 @@ import org.forgerock.util.Reject;
  */
 @JsonPropertyOrder({
         "name", "active", "description", "entitlement", "subject", "condition",
-        "resourceAttributes", "lastModifiedBy", "lastModified", "createdBy", "creationDate"
+        "resourceAttributes", "lastModifiedBy", "lastModifiedDate", "createdBy", "creationDate"
 })
 public final class JsonPolicy {
 
@@ -146,7 +146,7 @@ public final class JsonPolicy {
      *
      * @return the last modified timestamp.
      */
-    public Date getLastModified() {
+    public Date getLastModifiedDate() {
         return new Date(privilege.getLastModifiedDate());
     }
 
