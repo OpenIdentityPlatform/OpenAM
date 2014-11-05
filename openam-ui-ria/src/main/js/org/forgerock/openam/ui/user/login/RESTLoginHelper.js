@@ -172,13 +172,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                         window.location.hash += obj.filterUrlParams(_this.getLoginUrlParams());
                     }
                     successCallback();
-                });
+                }).always(obj.removeSessionCookie());
             } else {
+                obj.removeSessionCookie();
                 if (errorCallback) {
                     errorCallback();
                 }
             }
-            obj.removeSessionCookie();
         }, function () {
             if (errorCallback) {
                 errorCallback();
