@@ -22,12 +22,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define*/
+/*global define, location */
 
 define("org/forgerock/openam/ui/common/util/Constants", [
     "org/forgerock/commons/ui/common/util/Constants"
 ], function (commonConstants) {
-    commonConstants.context = "openam";
+    var context = location.pathname.substring(1,location.pathname.indexOf('policyEditor')-1);
+    commonConstants.context = context;
     commonConstants.THEME_CONFIG_PATH = 'themeConfig.json';
     commonConstants.CONSOLE_PATH = '/' + commonConstants.context + '/console';
     commonConstants.CONSOLE_USERS = ['amadmin']; 
