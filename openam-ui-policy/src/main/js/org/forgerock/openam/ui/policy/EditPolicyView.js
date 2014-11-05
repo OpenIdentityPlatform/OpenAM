@@ -150,9 +150,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             return deferred.promise(policy);
         },
 
-        /**
-         * Initializes accordion.
-         */
         initAccordion: function () {
             var self = this,
                 options = {};

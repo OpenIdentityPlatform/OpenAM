@@ -202,6 +202,13 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         });
     };
 
+    obj.getAllRealms = function () {
+        return obj.serviceCall({
+            url: "/realms?_queryFIlter=true",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+        });
+    };
+
     obj.importPolicies = function (data) {
         return obj.serviceCall({
             serviceUrl: constants.host + "/openam/",

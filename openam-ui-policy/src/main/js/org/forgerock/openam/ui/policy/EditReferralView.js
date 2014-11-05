@@ -60,9 +60,10 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
                 data = self.data,
                 referralName = args[1],
                 referalPromise  = this.getReferral(referralName),
-                appPromise      = policyDelegate.getApplicationByName(args[0]);
+                appPromise      = policyDelegate.getApplicationByName(args[0]),
+                allRealmsPromise = policyDelegate.getAllRealms();
 
-            $.when(appPromise, referalPromise).done(function(app, referral){
+            $.when(appPromise, referalPromise, allRealmsPromise).done(function(app, referral, allRealms){
 
                 if (referralName) {
                     data.entity = referral;
@@ -78,7 +79,8 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
                 data.options.appName = args[0];
                 data.options.realm = app[0].realm;
                 data.options.resourcePatterns = _.sortBy(app[0].resources);
-
+                data.options.filteredRealms =  self.filterRealms(allRealms[0].result);
+          
                 self.parentRender(function () {
 
                     addNewResourceView.render(data);
@@ -108,7 +110,6 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
             }
 
             this.accordion = new Accordion(this.$el.find('.accordion'), options);
-
             this.accordion.on('beforeChange', function (e, id) {
                 if (id === self.REVIEW_INFO_STEP) {
                     self.updateFields();
@@ -143,6 +144,33 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
                 });
 
             this.accordion.setActive(targetIndex);
+        },
+
+        filterRealms: function (allRealms) {
+
+            var currentRealm = this.data.options.realm,
+                lastFSlash = currentRealm.lastIndexOf('/'),
+                parentRealm = currentRealm.substring(0,lastFSlash),
+                realmDepth =  lastFSlash === 0 ? 1 : currentRealm.match(/\//g).length,
+                filtered = [],
+                realmLength = 0;
+
+            _.each(allRealms, function(realm){
+
+                realmLength = realm.match(/\//g).length;
+                if (realm !== currentRealm && 
+                   ((realm.indexOf(currentRealm + '/') === 0 && realmLength === realmDepth + 1) || //children
+                    (realm.indexOf(parentRealm + '/')  === 0 && realmLength === realmDepth && realm !== "/") //sibligns
+                    )) {
+                  
+                  filtered.push(realm);
+                }
+
+            });
+
+            filtered = _.sortBy(filtered);
+            return filtered;
+
         },
 
         getReferral: function (name) {

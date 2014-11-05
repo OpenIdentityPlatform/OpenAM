@@ -89,13 +89,13 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 colModel: [
                     {name: 'iconChB',        width: 40, sortable: false, formatter: this.policyGridView.checkBoxFormatter, frozen: true, title: false, search: false},
                     {name: 'name',           width: 250, frozen: true},
-                    {name: 'description',    width: 150, sortable: false},
+                    {name: 'description',    width: 180, sortable: false},
                     {name: 'createdBy',      width: 250, hidden: true},
                     {name: 'creationDate',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
                     {name: 'lastModifiedBy', width: 250, hidden: true},
                     {name: 'lastModified',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                    {name: 'actionValues',   width: 140, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
-                    {name: 'resources',      width: 200, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'actionValues',   width: 210, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                    {name: 'resources',      width: 210, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                     {name: 'resourceAttributes', width: 150, sortable: false, hidden: true, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                     {name: 'subject',        width: 150, sortable: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.objectFormatter}
 
@@ -132,8 +132,8 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 colModel: [
                     {name: 'iconChB',        width: 40,  sortable: false, formatter: this.refGridView.checkBoxFormatter, frozen: true, title: false, search: false},
                     {name: 'name',           width: 280, frozen: true},
-                    {name: 'resources',      width: 295, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
-                    {name: 'realms',         width: 295, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'resources',      width: 290, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                    {name: 'realms',         width: 285, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                     {name: 'creationDate',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
                     {name: 'lastModified',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
                     {name: 'createdBy',      width: 250, hidden: true},

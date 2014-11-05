@@ -15,14 +15,14 @@
 
         <li class="editing clearfix">
             <span tabindex="0" class="icon-plus float-right"></span>
-            {{policyEditorRealmHelper options.parentRealm}}
-            <span class="realm icon-arrow-right2"></span>
-            <input id="siblingRealm" type="text" placeholder="{{options.currentRealm}}{{#unless options.currentRealm}}Enter realm...{{/unless}}" value="{{options.currentRealm}}"  />
-            {{#if options.currentRealm}}
-            <span class="realm icon-arrow-right2" id="lastFSlash"></span>
-            <input id="subRealm"type="text" placeholder="" />
-            {{/if}}
-            
+            <div id="selectableRealmContainer">
+            <select id="selectableRealms" placeholder="{{t templates.policy.selectRealms}}">
+                <option disabled selected value="">{{t "templates.policy.selectRealms"}}</option>
+                {{#each options.selectableRealms}}
+                    <option value={{this}}>{{this}}</option>
+                {{/each}}
+            </select>  
+            </div>      
         </li>
     </ul>
 </div>

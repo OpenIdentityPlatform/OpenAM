@@ -24,7 +24,7 @@
     <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resources}} invalid{{/unless}}" tabindex="0">
         <h2>{{t "templates.policy.resources"}}</h2>
         {{#unless advancedMode}}
-        {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">{{t "templates.policy.empty"}}</span>{{/if}}
+        {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "templates.policy.empty"}})</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
             {{#if entity.resources}}
@@ -40,7 +40,7 @@
     <div class="review-row clearfix" tabindex="0">
         <h2>{{t "templates.policy.actions"}}</h2>
         {{#unless advancedMode}}
-        {{#if actionsSelected}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">{{t "templates.policy.empty"}}</span>{{/if}}
+        {{#if actionsSelected}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "templates.policy.empty"}})</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
             {{#if actionsSelected}}
@@ -62,7 +62,7 @@
     <div class="review-row clearfix" tabindex="0">
         <h2>{{t "templates.policy.subjects"}}</h2>
         {{#unless advancedMode}}
-        {{#if subjectString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">{{t "templates.policy.empty"}}</span>{{/if}}
+        {{#if subjectString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "templates.policy.empty"}})</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
             {{#if subjectString}}
@@ -76,7 +76,7 @@
     <div class="review-row clearfix" tabindex="0">
         <h2>{{t "templates.policy.environments"}}</h2>
         {{#unless advancedMode}}
-        {{#if environmentString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">{{t "templates.policy.empty"}}</span>{{/if}}
+        {{#if environmentString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "templates.policy.empty"}})</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
             {{#if environmentString}}
@@ -90,7 +90,7 @@
     <div class="review-row clearfix" tabindex="0">
         <h2>{{t "templates.policy.responseAttributes"}}</h2>
         {{#unless advancedMode}}
-        {{#if responseAttrs}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">{{t "templates.policy.empty"}}</span>{{/if}}
+        {{#if responseAttrs}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "templates.policy.empty"}})</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
             <h3>{{t "templates.policy.staticAttributes"}}</h3>

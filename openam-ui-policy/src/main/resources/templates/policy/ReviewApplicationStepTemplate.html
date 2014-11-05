@@ -26,7 +26,7 @@
     <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resources}} invalid{{/unless}}" tabindex="0" >
         <h2>{{t "templates.policy.applicationBase"}}</h2>
         {{#unless advancedMode}}
-        {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">{{t "templates.policy.empty"}}</span>{{/if}}
+        {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "templates.policy.empty"}})</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
             {{#if entity.resources}}

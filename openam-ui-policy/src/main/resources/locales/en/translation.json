@@ -215,8 +215,9 @@
             "advanced" : "advanced",
             "viewState" : "view state.",
             "select" : "select...",
-            "empty" : "(empty)",
-            "finish" : "Finish"
+            "empty" : "empty",
+            "finish" : "Finish",
+            "selectRealms":"Select realms..."
         }
     },
     "common" : {

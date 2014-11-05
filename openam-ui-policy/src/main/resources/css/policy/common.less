@@ -687,6 +687,8 @@ input[type="text"]:invalid:required{
 .selectize-input > input {
     margin: 0 5px 0 5px !important;
 }
+
+
 html .selectize-dropdown .optgroup-header{
     font-weight:bold;
     color:#80b7ab;
@@ -713,6 +715,11 @@ html .selectize-dropdown .optgroup-header{
     border-style: solid;
     border-width: 5px 5px 0 5px;
     content: ' ';
+}
+
+.selectize-control.single .selectize-input{
+    padding:6px 5px 2px 5px;
+    border-radius: 0;
 }
 
 /* These are jquery-theme over-rides*/
@@ -757,8 +764,13 @@ span.realm,.content-bg .policy-header h2 span.realm  {
     }
 }
 
+#selectableRealmContainer{
+    padding: 0 30px 0 0px;
+    margin: 4px 0 0 3px;
+}
 
-#lastFSlash {
+
+#lastFSlash, select {
     transition:opacity 300ms linear;
     &.fade{
         opacity:0;

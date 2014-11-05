@@ -39,10 +39,6 @@ define("org/forgerock/openam/ui/policy/SelectRealmsView", [
         template: "templates/policy/SelectRealmsTemplate.html",
         noBaseTemplate: true,
         events: {
-            'change input#siblingRealm': 'editSibling',
-            'keyup  input#siblingRealm': 'editSibling',
-            'change input#subRealm': 'editSubRealm',
-            'keyup  input#subRealm': 'editSubRealm',
             'click .icon-plus': 'addRealm',
             'keyup .icon-plus': 'addRealm',
             'click .icon-close ': 'deleteRealm',
@@ -51,19 +47,26 @@ define("org/forgerock/openam/ui/policy/SelectRealmsView", [
 
         render: function (args, callback) {
 
+            var self = this;
             _.extend(this.data, args);
-
-            var self = this,
-                lastFSlash = this.data.options.realm.lastIndexOf('/');
-
-            this.data.options.parentRealm = this.data.options.realm.substring(0,lastFSlash);
-            this.data.options.currentRealm = this.data.options.realm.substring(lastFSlash+1);
             this.data.entity.realms = _.sortBy(this.data.entity.realms);
+            self.data.options.selectableRealms = $.extend({}, self.data.options.filteredRealms);
+           
+            _.each(this.data.entity.realms, function(realm){
+                self.data.options.selectableRealms = _.reject(self.data.options.selectableRealms, 
+                    function(selected) { 
+                        return selected === realm; 
+                    });                             
+            });
 
             this.parentRender(function () {
 
                 delete self.data.options.justAdded;
                 self.flashDomItem( self.$el.find('.highlight-good'), 'highlight-good');
+
+                self.$el.find('#selectableRealms').selectize({
+                    create: false
+                });
                
                 if (callback) {
                     callback();
@@ -74,21 +77,10 @@ define("org/forgerock/openam/ui/policy/SelectRealmsView", [
 
         addRealm: function (e) {
 
-            var siblingRealm =  this.$el.find('#siblingRealm').val(),
-                subRealm =      this.$el.find('#subRealm').val() || '',
-                newRealm =         '',
+            var newRealm =  this.$el.find('#selectableRealms').val(),
                 duplicateIndex = -1;
 
-            if ( subRealm !== '' ){
-                if(subRealm.charAt(0) !== '/'){
-                    subRealm = '/' + subRealm;
-                } 
-            }
-
-            newRealm =  this.data.options.parentRealm + '/' + siblingRealm + subRealm;  
-            
-            if(siblingRealm === ''){
-                this.$el.find('#siblingRealm').focus();
+            if(newRealm === ''){
                 return;
             }
 
@@ -105,31 +97,6 @@ define("org/forgerock/openam/ui/policy/SelectRealmsView", [
    
         },
 
-        editSibling: function (e) {
-            if (e.type === 'keyup' && e.keyCode === 191) { 
-                e.currentTarget.value = e.currentTarget.value.replace(/\//g, '');
-            }
-            if (e.currentTarget.value !== this.data.options.currentRealm) {
-                this.$el.find('#subRealm').addClass('readonly').prop('readonly', true).val('');
-                this.$el.find('#lastFSlash').addClass('fade');
-            } else {
-                this.$el.find('#subRealm').removeClass('readonly').prop('readonly', false);
-                this.$el.find('#lastFSlash').removeClass('fade');
-            }
-           
-        },
-
-        editSubRealm: function (e) {
-            if (e.type === 'keyup' && e.keyCode === 191) { 
-                e.currentTarget.value = e.currentTarget.value.replace(/\//g, '');
-            }
-
-            if (e.currentTarget.value !== '') {
-                this.$el.find('#siblingRealm').addClass('readonly').prop('readonly', true).val(this.data.options.currentRealm);
-            } else {
-                this.$el.find('#siblingRealm').removeClass('readonly').prop('readonly', false);
-            }
-        },
 
         deleteRealm: function (e) {
             if (e.type === 'keyup' && e.keyCode !== 13) { return;}
