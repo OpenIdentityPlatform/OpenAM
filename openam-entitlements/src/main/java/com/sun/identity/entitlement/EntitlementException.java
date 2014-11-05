@@ -72,6 +72,9 @@ public class EntitlementException extends Exception {
     public static final int INVALID_RESOURCE = 303;
     public static final int INVALID_ENTITLEMENT_SUBJECT_CLASS = 310;
 
+    public static final int INVALID_APP_TYPE = 317;
+    public static final int INVALID_APP_REALM = 318;
+
     public static final int NO_SUCH_APPLICATION = 321;
     public static final int NOT_FOUND = 325;
 

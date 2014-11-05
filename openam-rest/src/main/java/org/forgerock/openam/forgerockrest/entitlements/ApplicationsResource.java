@@ -19,6 +19,7 @@ import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.Locale;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -67,6 +68,9 @@ import org.forgerock.util.Reject;
 public class ApplicationsResource extends RealmAwareResource {
 
     public static final String APPLICATION_QUERY_ATTRIBUTES = "ApplicationQueryAttributes";
+
+    //todo resolve using CREST-96 the user's locale from their context
+    private final java.util.Locale locale = Locale.getDefaultLocale();
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private final ApplicationManagerWrapper appManager;
@@ -149,28 +153,25 @@ public class ApplicationsResource extends RealmAwareResource {
         final ApplicationWrapper wrapp;
         try {
             wrapp = createApplicationWrapper(creationRequest, callingSubject);
-        } catch (IOException e) {
-            if (debug.errorEnabled()) {
-                debug.error("ApplicationsResource :: CREATE by " + principalName +
-                ": Application failed to create the resource specified. ", e);
-            }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                         ": Application Type not correctly specified in the request. ", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
+                    e.getLocalizedMessage(locale)));
             return;
         }
 
         if (!realm.equals(wrapp.getApplication().getRealm())) {
+
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                         ": Attempted to create Application in different Realm from the request. ");
             }
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
+                    new EntitlementException(EntitlementException.INVALID_APP_REALM,
+                            new String[] { wrapp.getApplication().getRealm(), realm }).getLocalizedMessage(locale)));
             return;
         }
 
@@ -183,16 +184,20 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                         ": Application failed to query the resource set. ", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                    e.getLocalizedMessage(locale)));
             return;
         }
 
         if (previousApp != null) { //return conflict
+            
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                         ": Application already exists " + previousApp.getName());
             }
-            handler.handleError(ResourceException.getException(ResourceException.CONFLICT));
+            handler.handleError(ResourceException.getException(ResourceException.CONFLICT,
+                    new EntitlementException(EntitlementException.APPLICATION_ALREADY_EXISTS)
+                            .getLocalizedMessage(locale)));
             return;
         }
 
@@ -203,7 +208,8 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                         ": Application failed to store the created resource. ", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                    e.getLocalizedMessage(locale)));
             return;
         }
 
@@ -218,12 +224,13 @@ public class ApplicationsResource extends RealmAwareResource {
                         ": for Application: " + wrapp.getName());
             }
             handler.handleResult(resource);
-        } catch (Exception e) {
+        } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                         ": Application failed to return the resource created. ", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                    e.getLocalizedMessage(locale)));
         }
 
     }
@@ -233,10 +240,14 @@ public class ApplicationsResource extends RealmAwareResource {
      *
      * @param jsonValue The JsonValue to create the wrapper from
      * @return An ApplicationWrapper, wrapping the Application represented by the JsonValue provided
-     * @throws IOException If there were errors creating the application
+     * @throws EntitlementException If there were errors writing the application to disk
      */
-    protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue) throws IOException {
-        return mapper.readValue(jsonValue.toString(), ApplicationWrapper.class);
+    protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue) throws EntitlementException {
+        try {
+            return mapper.readValue(jsonValue.toString(), ApplicationWrapper.class);
+        } catch (IOException e) {
+            throw new EntitlementException(EntitlementException.INVALID_APPLICATION_CLASS);
+        }
     }
 
     /**
@@ -246,10 +257,10 @@ public class ApplicationsResource extends RealmAwareResource {
      * @param jsonValue The JSON to deserialize
      * @param mySubject The subject authorizing the request
      * @return An ApplicationWrapper containing an Application, null
-     * @throws IOException If there were issues generating the
+     * @throws EntitlementException If there were issues generating the application wrapper
      */
     protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
-            throws IOException, EntitlementException {
+            throws EntitlementException {
 
         final ApplicationWrapper wrapp = createApplicationWrapper(jsonValue);
 
@@ -261,7 +272,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource.createApplicationWrapper() : " +
                         "Specified Application Type was not available.");
             }
-            throw new EntitlementException(EntitlementException.JSON_PARSE_ERROR);
+            throw new EntitlementException(EntitlementException.INVALID_APP_TYPE);
         }
 
         return wrapp;
@@ -311,7 +322,9 @@ public class ApplicationsResource extends RealmAwareResource {
             Application oldApp = appManager.getApplication(callingSubject, realm, resourceId);
 
             if (oldApp == null) {
-                handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
+                handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND,
+                        new EntitlementException(EntitlementException.NO_SUCH_APPLICATION,
+                                new String[] { resourceId }).getLocalizedMessage(locale)));
                 return;
             }
 
@@ -324,7 +337,8 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: DELETE by " + principalName +
                         ": Application failed to delete the resource specified. ", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                    e.getLocalizedMessage(locale)));
         }
 
     }
@@ -386,7 +400,8 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: QUERY by " + principalName +
                         ": Application failed to retrieve the resource specified. ", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                    e.getLocalizedMessage(locale)));
             return;
         }
 
@@ -409,13 +424,14 @@ public class ApplicationsResource extends RealmAwareResource {
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: QUERY by " + principalName +
                         ": Unable to convert resource to JSON.", e);
 
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                    e.getLocalizedMessage(locale)));
             return;
         }
 
@@ -449,7 +465,7 @@ public class ApplicationsResource extends RealmAwareResource {
             final Application app = appManager.getApplication(mySubject, realm, resourceId);
 
             if (app == null) {
-                throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, new String[]{realm});
+                throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, new String[] { realm });
             }
 
             final ApplicationWrapper wrapp = createApplicationWrapper(app, appTypeManagerWrapper);
@@ -462,13 +478,8 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: READ by " + principalName +
                         ": Application failed to retrieve the resource specified.", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
-        } catch (IOException e) {
-            if (debug.errorEnabled()) {
-                debug.error("ApplicationsResource :: READ by " + principalName +
-                    ": Error converting resource to JSON format.", e);
-            }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND,
+                    e.getLocalizedMessage(locale)));
         }
 
     }
@@ -501,19 +512,13 @@ public class ApplicationsResource extends RealmAwareResource {
         final ApplicationWrapper wrapp;
         try {
             wrapp = createApplicationWrapper(request.getContent(), mySubject);
-        } catch (IOException e) {
-            if (debug.errorEnabled()) {
-                debug.error("ApplicationsResource :: UPDATE by " + principalName +
-                        ": Application Type not correctly specified in request.", e);
-            }
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Application failed to create the resource specified.", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
+                    e.getLocalizedMessage(locale)));
             return;
         }
 
@@ -529,7 +534,8 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Error retrieving Application to update.", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                    e.getLocalizedMessage(locale)));
             return;
         }
 
@@ -543,11 +549,16 @@ public class ApplicationsResource extends RealmAwareResource {
         }
 
         if (!getRealm(context).equals(wrapp.getApplication().getRealm())) {
+
+
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Attempted to modify Application to be in a different Realm from the request. ");
             }
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
+                    new EntitlementException(EntitlementException.INVALID_APP_REALM,
+                            new String[] { wrapp.getApplication().getRealm(), getRealm(context) })
+                            .getLocalizedMessage(locale)));
             return;
         }
 
@@ -559,7 +570,9 @@ public class ApplicationsResource extends RealmAwareResource {
                     debug.error("ApplicationsResource :: UPDATE by " + principalName +
                             ": Application already exists " + wrapp.getName());
                 }
-                handler.handleError(ResourceException.getException(ResourceException.CONFLICT));
+                handler.handleError(ResourceException.getException(ResourceException.CONFLICT,
+                        new EntitlementException(EntitlementException.APPLICATION_ALREADY_EXISTS)
+                                .getLocalizedMessage(locale)));
                 return;
             }
         } catch (EntitlementException e) {
@@ -567,7 +580,8 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Application failed to query the resource set. ", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                    e.getLocalizedMessage(locale)));
             return;
         }
 
@@ -578,7 +592,8 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Error performing update operation.");
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                    e.getLocalizedMessage(locale)));
             return;
         }
 
@@ -586,12 +601,13 @@ public class ApplicationsResource extends RealmAwareResource {
             final Resource resource = new Resource(wrapp.getName(),
                     Long.toString(wrapp.getApplication().getLastModifiedDate()), wrapp.toJsonValue());
             handler.handleResult(resource);
-        } catch (IOException e) {
+        } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Application failed to return the resource updated.", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                    e.getLocalizedMessage(locale)));
         }
 
     }
@@ -622,7 +638,6 @@ public class ApplicationsResource extends RealmAwareResource {
 
         } catch (UnsupportedOperationException ex) {
             throw new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER, new Object[]{ ex.getMessage() });
-
         } catch (IllegalArgumentException ex) {
             throw new EntitlementException(EntitlementException.INVALID_VALUE, new Object[] { ex.getMessage() });
         }

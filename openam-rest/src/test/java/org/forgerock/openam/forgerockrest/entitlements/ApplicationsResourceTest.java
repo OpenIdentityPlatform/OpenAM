@@ -21,7 +21,6 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.debug.Debug;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -118,7 +117,7 @@ public class ApplicationsResourceTest {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
-                    throws IOException, EntitlementException {
+                    throws EntitlementException {
                 return applicationWrapper;
             }
         };
@@ -148,7 +147,7 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void shouldThrowInternalErrorIfApplicationWrapperCannotBeCreated() {
+    public void shouldThrowBadRequestIfApplicationWrapperCannotBeCreated() {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
@@ -164,8 +163,8 @@ public class ApplicationsResourceTest {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
-                    throws IOException, EntitlementException {
-                throw new IOException("");
+                    throws EntitlementException {
+                throw new EntitlementException(1);
             }
         };
 
@@ -175,7 +174,7 @@ public class ApplicationsResourceTest {
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(mockResultHandler).handleError(captor.capture());
-        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.BAD_REQUEST);
     }
 
     @Test
@@ -194,7 +193,7 @@ public class ApplicationsResourceTest {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
-                    throws IOException, EntitlementException {
+                    throws EntitlementException {
                 throw new EntitlementException(1);
             }
         };
@@ -278,7 +277,7 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
         given(mockApplication.getRealm()).willReturn("/");
-        doThrow(EntitlementException.class).when
+        doThrow(new EntitlementException(1)).when
                 (applicationManagerWrapper).saveApplication(any(Subject.class), any(Application.class));
 
         //when
@@ -292,7 +291,7 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void shouldReturnBadRequestIfCannotReturnResource() throws IOException {
+    public void shouldReturnBadRequestIfCannotReturnResource() throws EntitlementException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext, "/");
@@ -301,7 +300,7 @@ public class ApplicationsResourceTest {
         Subject subject = null;
 
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
-        doThrow(IOException.class).when(applicationWrapper).toJsonValue();
+        doThrow(new EntitlementException(1)).when(applicationWrapper).toJsonValue();
 
         //when
         applicationsResource.createInstance(realmContext, mockCreateRequest, mockResultHandler);
@@ -327,7 +326,7 @@ public class ApplicationsResourceTest {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
-                    throws IOException, EntitlementException {
+                    throws EntitlementException {
                 return applicationWrapper;
             }
 
@@ -543,7 +542,7 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void shouldUpdateInstance() throws EntitlementException, IOException {
+    public void shouldUpdateInstance() throws EntitlementException {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
@@ -583,7 +582,7 @@ public class ApplicationsResourceTest {
 
     @Test
     public void updateInstanceShouldReturnConflictExceptionWhenApplicationNameAlreadyExists() throws
-            EntitlementException, IOException {
+            EntitlementException {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
@@ -607,7 +606,7 @@ public class ApplicationsResourceTest {
         given(applicationWrapper.getApplication()).willReturn(newApplication);
         given(newApplication.getRealm()).willReturn("REALM");
         given(newApplication.getLastModifiedDate()).willReturn(1000L);
-        doThrow(IOException.class).when(applicationWrapper).toJsonValue();
+        doThrow(EntitlementException.class).when(applicationWrapper).toJsonValue();
 
         //When
         applicationsResource.updateInstance(context, resourceId, request, handler);
@@ -621,8 +620,7 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void updateInstanceShouldReturnServerInternalExceptionWhenApplicationToJson() throws EntitlementException,
-            IOException {
+    public void updateInstanceShouldReturnServerInternalExceptionWhenApplicationToJson() throws EntitlementException {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
@@ -643,7 +641,7 @@ public class ApplicationsResourceTest {
         given(applicationWrapper.getApplication()).willReturn(newApplication);
         given(newApplication.getRealm()).willReturn("REALM");
         given(newApplication.getLastModifiedDate()).willReturn(1000L);
-        doThrow(IOException.class).when(applicationWrapper).toJsonValue();
+        doThrow(new EntitlementException(1)).when(applicationWrapper).toJsonValue();
 
         //When
         applicationsResource.updateInstance(context, resourceId, request, handler);
@@ -677,7 +675,7 @@ public class ApplicationsResourceTest {
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
         given(mockApplication.getRealm()).willReturn("REALM");
         given(applicationManagerWrapper.getApplication(subject, "REALM", resourceId)).willReturn(mockApplication);
-        doThrow(EntitlementException.class).when(applicationManagerWrapper)
+        doThrow(new EntitlementException(1)).when(applicationManagerWrapper)
                 .updateApplication(any(Application.class), any(Application.class), any(Subject.class));
 
         //When
@@ -767,14 +765,13 @@ public class ApplicationsResourceTest {
                 try {
                     JsonValue jsonValue = json(object(field("name", appName)));
                     given(wrapper.toJsonValue()).willReturn(jsonValue);
-                } catch (IOException e) {
+                } catch (EntitlementException e) {
                     fail();
                 }
 
                 return wrapper;
             }
         };
-
 
         // Given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
@@ -842,7 +839,7 @@ public class ApplicationsResourceTest {
                 try {
                     JsonValue jsonValue = mock(JsonValue.class);
                     given(wrapper.toJsonValue()).willReturn(jsonValue);
-                } catch (IOException e) {
+                } catch (EntitlementException e) {
                     fail();
                 }
 
@@ -935,10 +932,10 @@ public class ApplicationsResourceTest {
                 given(wrapper.getName()).willReturn(appName);
 
                 try {
-                    // Throws an IOException when attempting to parse the json.
-                    IOException ioException = new IOException();
-                    given(wrapper.toJsonValue()).willThrow(ioException);
-                } catch (IOException e) {
+                    // Throws an EntitlementException when attempting to parse the json.
+                    EntitlementException entitlementException = new EntitlementException(1);
+                    given(wrapper.toJsonValue()).willThrow(entitlementException);
+                } catch (EntitlementException e) {
                     fail();
                 }
 

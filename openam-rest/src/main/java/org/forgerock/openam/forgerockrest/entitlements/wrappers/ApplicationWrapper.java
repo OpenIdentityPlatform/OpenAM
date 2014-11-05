@@ -17,6 +17,7 @@ package org.forgerock.openam.forgerockrest.entitlements.wrappers;
 
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
+import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.util.Map;
@@ -296,9 +297,13 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         return application.getLastModifiedDate();
     }
 
-    public JsonValue toJsonValue() throws IOException {
-        final ObjectMapper mapper = JsonValueBuilder.getObjectMapper();
-        return JsonValueBuilder.toJsonValue(mapper.writeValueAsString(this));
+    public JsonValue toJsonValue() throws EntitlementException {
+        try {
+            final ObjectMapper mapper = JsonValueBuilder.getObjectMapper();
+            return JsonValueBuilder.toJsonValue(mapper.writeValueAsString(this));
+        } catch (IOException e) {
+            throw new EntitlementException(EntitlementException.INVALID_APPLICATION_CLASS);
+        }
     }
 
     @Override
