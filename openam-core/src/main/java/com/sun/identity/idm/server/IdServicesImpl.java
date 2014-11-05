@@ -2778,18 +2778,15 @@ public class IdServicesImpl implements IdServices {
                envMap.put(DELEGATION_ATTRS_NAME, attrs);
            }
            if (!de.isAllowed(token, dp, envMap)) {
-               Object[] args = { op.getName(), token.getPrincipal().getName() 
-                       };
-               throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "402",
-                       args);
+               Object[] args = { op.getName(), token.getPrincipal().getName()  };
+               throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoBundle.ACCESS_DENIED, args);
            }
            return true;
 
        } catch (DelegationException dex) {
-           DEBUG.error("IdServicesImpl.checkPermission " +
-               "Got Delegation Exception: ", dex);
+           DEBUG.error("IdServicesImpl.checkPermission Got Delegation Exception: ", dex);
            Object[] args = { op.getName(), token.getPrincipal().getName() };
-           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "402", args);
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoBundle.ACCESS_DENIED, args);
        }
    }
 

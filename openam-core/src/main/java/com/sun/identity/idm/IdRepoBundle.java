@@ -54,6 +54,11 @@ public class IdRepoBundle {
      */
     public static final String IDENTITY_OF_TYPE_ALREADY_EXISTS = "224";
 
+    /**
+     * Resource bundle key for error message template accepting operation name and principal name as String arguments.
+     */
+    public static final String ACCESS_DENIED = "402";
+
     static {
         profileBundle = com.sun.identity.shared.locale.Locale
                 .getInstallResourceBundle(BUNDLE_NAME);

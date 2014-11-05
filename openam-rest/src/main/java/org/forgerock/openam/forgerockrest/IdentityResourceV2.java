@@ -34,6 +34,7 @@ import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.Token;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.UpdateResponse;
+import com.sun.identity.idsvcs.opensso.GeneralAccessDeniedError;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
@@ -1131,14 +1132,52 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      */
     @Override
     public void createInstance(final ServerContext context, final CreateRequest request,
-            final ResultHandler<Resource> handler) {
-        identityResourceV1.createInstance(context, request, handler);
+                               final ResultHandler<Resource> handler) {
+
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        final String realm = realmContext.getRealm();
+
+        // anyone can create an account add
+        Token admin = new Token();
+        admin.setId(getCookieFromServerContext(context));
+
+        final JsonValue jVal = request.getContent();
+        String resourceId = request.getNewResourceId();
+
+        IdentityDetails identity = jsonValueToIdentityDetails(jVal, realm);
+        // check to see if request has included resource ID
+        if (resourceId != null ) {
+            if (identity.getName() != null) {
+                if (!resourceId.equalsIgnoreCase(identity.getName())) {
+                    ResourceException be = new BadRequestException("id in path does not match id in request body");
+                    debug.error("IdentityResource.createInstance() :: Cannot CREATE ", be);
+                    handler.handleError(be);
+                }
+            }
+            identity.setName(resourceId);
+        } else {
+            resourceId = identity.getName();
+        }
+
+        IdentityDetails dtls = attemptResourceCreation(handler, realm, admin, identity, resourceId);
+
+        if (dtls != null) {
+            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+            debug.message("IdentityResource.createInstance :: CREATE of " + resourceId + " in realm " + realm +
+                    " performed by " + principalName);
+
+            Resource resource = new Resource(resourceId, "0", identityDetailsToJsonValue(dtls));
+            handler.handleResult(resource);
+        }
     }
 
     private IdentityDetails attemptResourceCreation(ResultHandler<?> handler, String realm, Token admin,
             IdentityDetails identity, String resourceId) {
+
         IdentityDetails dtls = null;
+
         try {
+
             IdentityServicesImpl idsvc = new IdentityServicesImpl();
             // Create the resource
             idsvc.create(identity, admin);
@@ -1148,27 +1187,34 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 debug.message("IdentityResource.createInstance() :: Created " + resourceId + " in realm " + realm +
                         " by Admin with ID: " + admin.getId());
             }
+
         } catch (final ObjectNotFound notFound) {
             debug.error("IdentityResource.createInstance() :: Cannot READ " +
                     resourceId + ": Resource cannot be found." + notFound);
             handler.handleError(new NotFoundException("Resource not found.", notFound));
+
         } catch (final DuplicateObject duplicateObject) {
             debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
                     resourceId + ": Resource already exists!" + duplicateObject);
             handler.handleError(new ConflictException("Resource already exists", duplicateObject));
+
         } catch (final TokenExpired tokenExpired) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
-                    resourceId + ":" + tokenExpired);
+            debug.error("IdentityResource.createInstance() :: Cannot CREATE " + resourceId + ":" + tokenExpired);
             handler.handleError(new PermanentException(401, "Unauthorized", null));
+
         } catch (final NeedMoreCredentials needMoreCredentials) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
-                    needMoreCredentials);
+            debug.error("IdentityResource.createInstance() :: Cannot CREATE " + needMoreCredentials);
             handler.handleError(new ForbiddenException("Token is not authorized", needMoreCredentials));
+
+        } catch (final GeneralAccessDeniedError accessDenied) {
+            debug.error("IdentityResource.createInstance() :: Cannot CREATE " + accessDenied);
+            handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN));
+
         } catch (final Exception exception) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE! " +
-                    exception);
+            debug.error("IdentityResource.createInstance() :: Cannot CREATE! " + exception);
             handler.handleError(new NotFoundException(exception.getMessage(), exception));
         }
+
         return dtls;
     }
 
