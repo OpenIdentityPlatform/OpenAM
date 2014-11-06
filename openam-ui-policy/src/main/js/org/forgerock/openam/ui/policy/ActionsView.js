@@ -71,6 +71,8 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
             availableActions = data.options.availableActions;
             selectedActions = entity.actions;
 
+            this.data.selectedAll = false;
+
             if (!_.isEmpty(selectedActions)) {
                 this.data.selectedAll = true;
 
