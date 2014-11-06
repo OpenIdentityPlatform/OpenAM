@@ -67,8 +67,10 @@ import org.forgerock.openam.oauth2.OpenAMSettingsImpl;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.openidconnect.OpenAMOpenIDConnectProvider;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectClientRegistrationService;
+import org.forgerock.openam.openidconnect.OpenAMOpenIdTokenIssuer;
 import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.openidconnect.OpenIDConnectProvider;
+import org.forgerock.openidconnect.OpenIDTokenIssuer;
 import org.forgerock.openidconnect.OpenIdConnectAuthorizeRequestValidator;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationService;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
@@ -122,6 +124,8 @@ public class OAuth2GuiceModule extends AbstractModule {
                         OAuth2Constants.OAuth2ProviderService.VERSION);
             }
         });
+
+        bind(OpenIDTokenIssuer.class).to(OpenAMOpenIdTokenIssuer.class);
 
         final Multibinder<AuthorizeRequestValidator> authorizeRequestValidators =
                 Multibinder.newSetBinder(binder(), AuthorizeRequestValidator.class);
