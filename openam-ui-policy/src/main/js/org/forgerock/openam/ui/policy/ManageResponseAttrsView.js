@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
 ], function (AbstractView, eventManager, constants) {
     var ManageResponseAttrsView = AbstractView.extend({
         element: "#staticAttrs",
-        template: "templates/policy/ManageResponseAttrsTemplate.html",
+        template: "templates/policy/ResponseAttrsStatic.html",
         noBaseTemplate: true,
         events: {
             'change input' : 'checkedRequired',

@@ -2,60 +2,57 @@
     <div class="policy-header">
         <a href="#app/{{options.appName}}/policies/" id="cancelButton" class="button float-right">{{t "common.form.back"}}</a>
         {{#if entity.name}}
-        <h1>{{t "templates.policy.edit"}}<span>{{entity.name}}</span></h1>
+        <h1>{{t "policy.common.edit"}}<span> {{entity.name}}</span></h1>
         {{else}}
-        <h1>{{t "templates.policy.createRef"}}</h1>
+        <h1>{{t "policy.editReferrals.title"}}</h1>
         {{/if}}
-        <h2><span>{{t "templates.policy.realm"}}</span> {{policyEditorRealmHelper options.realm}}</h2>
-        <h2><span>{{t "templates.policy.app"}}</span> {{options.appName}}</h2>
+        <h2><span>{{t "policy.common.realm"}}:</span> {{policyEditorRealmHelper options.realm}}</h2>
+        <h2><span>{{t "policy.common.application"}}:</span> {{options.appName}}</h2>
         
     </div>
 
     <div class="policy-content">
-        <p>{{t "templates.policy.refText"}}</p>
+        <p>{{t "policy.editReferrals.description"}}</p>
             
         <form class="form">
 
             <div id="policy-steps" class="accordion">
-                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.refStep1"}}</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "policy.editReferrals.step1"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div class="group-field-block">
-                        <label class="short" for="policyName">{{t "templates.policy.name"}}</label>
-                        <input class="prop-val" id="policyName" type="text" value="{{entity.name}}" data-field="name" autofocus required/>
+                        <label class="short" for="policyName">{{t "policy.common.name"}}</label>
+                        <input class="prop-val" id="policyName" type="text" value="{{entity.name}}" data-field="name" autofocus required placeholder="{{t 'common.form.validation.required'}}"/>
                     </div>
 
-                    <input class="button" type="button" value="Next" name="nextButton">
+                    <input class="button" type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton">
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.refStep2"}}</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "policy.editReferrals.step2"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div class="clearfix">
                         <div class="col2" id="patterns"></div>
                         <div class="col2" id="resourcesList"></div>
                     </div>
-                    <input class="button" type="button" value="Next" name="nextButton">
+                    <input class="button" type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton">
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.refStep3"}}</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "policy.editReferrals.step3"}}</h1>
                 <section class="accordion-step clearfix">
 
-                    <div class="clearfix" id="selectRealms">
-           
-                    </div>
-                    
-                    <input class="button" type="button" value="Next" name="nextButton">
+                    <div class="clearfix" id="selectRealms"></div>    
+                    <input class="button" type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton">
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.refStep4"}}</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "policy.editReferrals.step4"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div id="reviewInfo" class="clearfix"></div>
-                    <input class="button" type="button" value="{{t 'templates.policy.finish'}}" name="submitForm">
+                    <input class="button" type="button" value="{{t 'policy.common.buttons.finish'}}" name="submitForm">
 
                 </section>
      

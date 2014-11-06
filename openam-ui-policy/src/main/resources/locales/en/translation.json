@@ -67,7 +67,8 @@
     "templates" : {
         "user" : {
             "LoginDialog" : {
-                "refreshOnLogin" : "Should refresh on login"
+                "refreshOnLogin" : "Should refresh on login",
+                "sessionEnded" : "Sorry, your session has ended. To perform your requested action, please <a href='%s' target='_new'>Login Again</a> in a new window. When logged-back in, you may return to this window, close this dialog, and then attempt to perform your action again."
             },
             "LoginTemplate" : {
                 "loginRemember" : "Remember my username",
@@ -116,109 +117,7 @@
                 "haveAccoutQuestion" : "Already have an account?",
                 "agreeToTerms" : "I agree to the "
             }
-        },
-        "policy" : {
-            "applications" : "Applications",
-            "policies" : "Policies",
-            "referrals" : "Referrals",
-            "realms" : "Realms",
-            "actions" : " Actions",
-            "applicationBase" : "Application Base",
-            "resources" : "Resources",
-            "subjects" : "Subjects",
-            "environments" : "Environments",
-            "responseAttributes" : "Response attributes",
-            "subjectAttributes" : "Subject attributes",
-            "avaliablePatterns" : "Avaliable patterns",
-            "staticAttributes" : "Static attributes",
-            "pols" : "policies",
-            "refs" : "&amp; referrals",
-            "edit": "Edit ",
-            "createApp": "Create Application",
-            "createPol": "Create Policy",
-            "createRef": "Create Referral",
-            "openamConsole" : "OpenAM Console",
-            "selectPattern" : "Select a pattern from the list below",
-            "startTime" : "Start Time",
-            "endTime" : "End Time",
-            "startDay" : "Start Day",
-            "endDay" : "End Day",
-            "startDate" : "Start Date",
-            "endDate" : "End Date",
-            "enforcementTimeZone" : "Enforcement Time Zone" ,
-            "timeRuleHelperText" : "A time condition must contain one or more of the following values: Time (Start and End), Day (Start and End), Date (Start and End) and/or Time Zone.",
-            "applicationText" : "An application (term as used in the Entitlements Service) consolidates policy-related meta data for a specified service. This template is then used when policies are created for the service. To create an application, begin with Step 1 and progress through step 3. Modifications can be made after the application has been created.",
-            "appStep1" : "Step 1: Define an Application Name",
-            "appStep2" : "Step 2: Add Application Base",
-            "appStep3" : "Step 3: Review Configuration",
-            "name" : "Name",
-            "description" : "Description",
-            "descriptionOpt" : "Description (optional)",
-            "realm" : "Realm:",
-            "app" : "Application:",
-            "polText" : "To designate the conditions that define access to a protected resource, begin with Step 1 and progress through to step 7. Modifications can be made after it has been created.",
-            "polStep1" : "Step 1: Define a Policy Name and Description",
-            "polStep2" : "Step 2: Add Resources",
-            "polStep3" : "Step 3: Configure Actions",
-            "polStep4" : "Step 4: Select Subjects",
-            "polStep5" : "Step 5: Environmental Conditions",
-            "polStep6" : "Step 6: Response Attributes",
-            "polStep7" : "Step 7: Summary and Confirmation View",
-            "type" : "Type",
-            "refText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-            "refStep1" : "Step 1: Define a Referral Name",
-            "refStep2" : "Step 2: Add Resources",
-            "refStep3" : "Step 3: Select Realms",
-            "refStep4" : "Step 4: Summary and Confirmation View",
-            "nothingSelected" : "Nothing selected",
-            "addNew" : "Add new",
-            "deleteSelected" : "Delete Selected",
-            "importPolicies" : "Import Policies",
-            "exportPolicies" : "Export Policies",
-            "editApplication" : "Edit Application",
-            "viewPolicies" : "View Policies",
-            "legacyFormat" : "This condition is in a legacy format, and should be replaced.",
-            "manageAppText" : "To modify configured applications, click the application name. You can also select the application to remove it.",
-            "addNewPol" : "Add New Policy",
-            "addNewRef" : "Add New Referral",
-            "managePolText" : "To modify configured policies, click the policy name. You can also select the policy to remove it or export it.",
-            "manageRefText" : "To modify configured referrals, click the referral name.",
-            "manageRulesText" : "To create policy rules, add a Condition or Logical with the buttons below, then drag the item up into the above section. The item can be configured both before and after is has been moved. Only rules inside the top section will be included final policy. To edit a Condition in the top section, just click the edit icon (pencil) or double-click the item.",
-            "deletingMessage" : "Deleting will also remove any objects",
-            "createResource" : "Create your resource",
-            "subjectAttributesText" : "Use the drop down list or search for subject attributes.",
-            "selectSubjectAttributes" : "Select or search for subject attributes",
-            "selectRealmsText" : "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-            "noName" : "There is no name...",
-            "noRealms" : "There are no realms...",
-            "noActions" : "There are no actions...",
-            "noResources" : "There are no resources...",
-            "noStaticAttributes" : "There are no static attributes...",
-            "noSubjectAttributeAv" : "There are no subject attributes avalible...",
-            "noSubjectConditions" : "There are no subject conditions...",
-            "noSubjectAttribute" : "There are no subject attributes...",
-            "noEnvironmentConditions" : "There are no environment conditions...",
-            "reviewApp" : "Review the application configuration and click Finish to save.",
-            "reviewPol" : "Review the policy configuration and click Finish to save.",
-            "reviewRef" : "Review the referral configuration and click Finish to save.",
-            "allow" : "Allow",
-            "deny" : "Deny",
-            "allowed" : "Allowed",
-            "denied" : "Denied",
-            "logical" : "Logical",
-            "clear" : "Clear",
-            "nA" : "n/a",
-            "true" : "true",
-            "false" : "false",
-            "switchTo" : "Switch to",
-            "non-advanced" : "non-advanced",
-            "advanced" : "advanced",
-            "viewState" : "view state.",
-            "select" : "select...",
-            "empty" : "empty",
-            "finish" : "Finish",
-            "selectRealms":"Select realms..."
-        }
+        } 
     },
     "common" : {
          "form" : {
@@ -334,5 +233,155 @@
             "SKYPE" : "SKYPE",
             "googlePlus" : "Google+"
          }
+    },
+
+    "policy" : {
+        "common" : {
+            "name" : "Name",
+            "description" : "Description",
+            "descriptionOptional" : "Description (optional)",
+            "openamConsole" : "OpenAM Console",
+            "edit": "Edit",
+            "clear" : "Clear",
+            "key" : "Key",
+            "value" : "Value",
+            "notApplicable" : "n/a",
+            "select" : "select...",
+            "empty" : "empty",
+
+            "realm" : "Realm",
+            "application" : "Application",
+            "applicationBase" : "Application Base",
+
+            "responseAttributes" : "Response attributes",
+            "subjectAttributes" : "Subject attributes",
+            "availablePatterns" : "Available patterns",
+            "staticAttributes" : "Static attributes",
+
+            "realms" : "Realms",
+            "actions" : "Actions",
+            "resources" : "Resources",
+            "subjects" : "Subjects",
+            "environments" : "Environments",
+
+            "noRealms" : "There are no realms...",
+            "noActions" : "There are no actions...",
+            "noResources" : "There are no resources...",
+
+            "noStaticAttributes" : "There are no static attributes...",
+            "noSubjectAttributes" : "There are no subject attributes avalible...",
+
+            "buttons" : {
+                "deleteSelected" : "Delete Selected",
+                "finish" : "Finish",
+                "next" : "Next" 
+            }
+        },
+
+        "manageApplications": {
+            "add" : "Add new",
+            "importPolicies" : "Import Policies",
+            "exportPolicies" : "Export Policies",
+            "title" : "Applications",
+            "description" : "To modify configured applications, click the application name. You can also select the application to remove it."
+        },
+
+        "editApplications" : {
+            "editApplication" : "Edit Application",
+            "title": "Create Application",
+            "description" : "An application (term as used in the Entitlements Service) consolidates policy-related meta data for a specified service. This template is then used when policies are created for the service. To create an application, begin with Step 1 and progress through step 3. Modifications can be made after the application has been created.",
+            "step1" : "Step 1: Define an Application Name",
+            "step2" : "Step 2: Add Application Base",
+            "step3" : "Step 3: Review Configuration",
+            "viewPolicies" : "View Policies"
+        },
+
+        "manageReferrals" : {
+            "referrals" : "Referrals",
+            "add" : "Add New Referral",
+            "description" : "To modify configured referrals, click the referral name.",
+            "andReferrals" : "&amp; referrals" 
+        },
+
+        "editReferrals" : {
+            "title": "Create Referral",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            "step1" : "Step 1: Define a Referral Name",
+            "step2" : "Step 2: Add Resources",
+            "step3" : "Step 3: Select Realms",
+            "step4" : "Step 4: Summary and Confirmation View",
+            "selectRealmsDescription" : "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            "selectRealmsPlaceholder" : "Select realms..."
+        },
+
+        "managePolicies" : {
+            "policies" : "Policies",
+            "add" : "Add New Policy",
+            "description" : "To modify configured policies, click the policy name. You can also select the policy to remove it or export it."
+        },
+
+        "editPolicies" : {
+            "title": "Create Policy",
+            "description" : "To designate the conditions that define access to a protected resource, begin with Step 1 and progress through to step 7. Modifications can be made after it has been created.",
+            "step1" : "Step 1: Define a Policy Name and Description",
+            "step2" : "Step 2: Add Resources",
+            "step3" : "Step 3: Configure Actions",
+            "step4" : "Step 4: Select Subjects",
+            "step5" : "Step 5: Environmental Conditions",
+            "step6" : "Step 6: Response Attributes",
+            "step7" : "Step 7: Summary and Confirmation View",
+            "deleteLogical" : "Deleting will also remove any objects",
+            "manageRulesDescription" : "To create policy rules, add a Condition or Logical with the buttons below, then drag the item up into the above section. The item can be configured both before and after is has been moved. Only rules inside the top section will be included final policy. To edit a Condition in the top section, just click the edit icon (pencil) or double-click the item.",
+            "logical" : "Logical",
+            "type" : "Type"
+        },
+
+        "actions" : {
+            "allow" : "Allow",
+            "deny" : "Deny",
+            "allowed" : "Allowed",
+            "denied" : "Denied"
+        }, 
+
+        "responseAttributes": {
+            "subjectAttributesDescription" : "Use the drop down list or search for subject attributes.",
+            "subjectAttributesPlaceholder" : "Select or search for subject attributes"
+        },
+
+        "summaryReview" : {
+            
+            "noName" : "There is no name...",
+            "noSubjectConditions" : "There are no subject conditions...",
+            "noSubjectAttribute" : "There are no subject attributes...",
+            "noEnvironmentConditions" : "There are no environment conditions...",
+            "applicationDescription" : "Review the application configuration and click Finish to save.",
+            "policyDescription" : "Review the policy configuration and click Finish to save.",
+            "referralDescription" : "Review the referral configuration and click Finish to save.",
+            "advancedFalse" : "Switch to <a href='#' id='toggleAdvanced'>advanced</a> view state.",
+            "advancedTrue" : "Switch to <a href='#' id='toggleAdvanced'>non-advanced</a> view state."
+        },
+
+        "addResources" : {
+            "patternDescription" : "Select a pattern from the list below",
+            "resourceDescription" : "Create your resource"
+        },
+
+        "conditionTypes": {
+
+            "simpleTime": {
+                "startTime" : "Start Time",
+                "endTime" : "End Time",
+                "startDay" : "Start Day",
+                "endDay" : "End Day",
+                "startDate" : "Start Date",
+                "endDate" : "End Date",
+                "enforcementTimeZone" : "Time Zone",
+                "enterTimeZone" : "Enter Time Zone",
+                "helper" : "A time condition must contain one or more of the following values: Time (Start and End), Day (Start and End), Date (Start and End) and/or Time Zone."
+            },
+
+            "legacyFormat" : "This condition is in a legacy format, and should be replaced.",
+            "nothingSelected" : "Nothing selected"
+        }
     }
 }

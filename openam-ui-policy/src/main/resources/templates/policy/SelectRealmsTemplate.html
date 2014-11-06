@@ -1,6 +1,6 @@
-<p>{{t "templates.policy.selectRealmsText"}}</p>
+<p>{{t "policy.editReferrals.selectRealmsDescription"}}</p>
 <div class="striped-list created-items" id="selectedRealms">
-    <h3>{{t "templates.policy.realms"}}</h3>
+    <h3>{{t "policy.common.realms"}}</h3>
     <ul>
         {{#if entity.realms}}
         {{#each entity.realms}}
@@ -10,14 +10,14 @@
         </li>
         {{/each}}
         {{else}}
-        <li class="invalid">{{t "templates.policy.noRealms"}}</li>
+        <li class="invalid">{{t "policy.common.noRealms"}}</li>
         {{/if}}
 
         <li class="editing clearfix">
             <span tabindex="0" class="icon-plus float-right"></span>
             <div id="selectableRealmContainer">
-            <select id="selectableRealms" placeholder="{{t templates.policy.selectRealms}}">
-                <option disabled selected value="">{{t "templates.policy.selectRealms"}}</option>
+            <select id="selectableRealms" placeholder="{{t 'policy.editReferrals.selectRealmsPlaceholder'}}">
+                <option disabled selected value="">{{t "policy.editReferrals.selectRealmsPlaceholder"}}</option>
                 {{#each options.selectableRealms}}
                     <option value={{this}}>{{this}}</option>
                 {{/each}}

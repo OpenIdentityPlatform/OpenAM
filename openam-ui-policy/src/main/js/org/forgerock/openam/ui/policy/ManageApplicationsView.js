@@ -82,9 +82,9 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 colModel: [
                     {name: 'iconChB',           width: 40,  sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false},
                     {name: 'actions',           width: 65,  sortable: false, formatter: actionsFormatter, frozen: true, title: false, search: false},
-                    {name: 'name',              width: 230, frozen: true},
-                    {name: 'description',       width: 220, sortable: false},
-                    {name: 'resources',         width: 228, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'name',              width: 262, frozen: true},
+                    {name: 'description',       width: 263, sortable: false},
+                    {name: 'resources',         width: 263, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                     {name: 'createdBy',         width: 250, hidden: true},
                     {name: 'creationDate',      width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false},
                     {name: 'lastModifiedDate',  width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false}

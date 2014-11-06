@@ -2,38 +2,38 @@
     <div class="policy-header">
         <a href="#apps/" class="button float-right" id="backButton">{{t "common.form.back"}}</a>
         {{#if entity.name}}
-        <h1>{{t "templates.policy.edit"}}<span>{{entity.name}}</span></h1>
+        <h1>{{t "policy.common.edit"}}<span>{{entity.name}}</span></h1>
         {{else}}
-        <h1>{{t "templates.policy.createApp"}}</h1>
+        <h1>{{t "policy.editApplications.title"}}</h1>
         {{/if}}
-        <h2><span>{{t "templates.policy.realm"}}</span> {{policyEditorRealmHelper entity.realm}}</h2>
+        <h2><span>{{t "policy.common.realm"}}</span> {{policyEditorRealmHelper entity.realm}}</h2>
     </div>
 
     <div class="policy-content">
-        <p>{{t "templates.policy.applicationText"}}</p>
+        <p>{{t "policy.editApplications.description"}}</p>
 
         <form class="form">
             <div class="accordion">
 
-                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.appStep1"}}</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "policy.editApplications.step1"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div class="clearfix">
                         <div class="group-field-block col2 ">
-                            <label class="prop-name" for="appName">{{t "templates.policy.name"}}</label>
-                            <input class="prop-val" id="appName" type="text" value="{{entity.name}}" data-field="name" placeholder="required" required autofocus/>
+                            <label class="prop-name" for="appName">{{t "policy.common.name"}}</label>
+                            <input class="prop-val" id="appName" type="text" value="{{entity.name}}" data-field="name" placeholder="{{t 'common.form.validation.required'}}" required autofocus/>
                         </div>
                     </div>
 
                     <div class="group-field-block">
-                        <label class="prop-name" for="appDescription">{{t "templates.policy.descriptionOpt"}}</label>
+                        <label class="prop-name" for="appDescription">{{t "policy.common.descriptionOptional"}}</label>
                         <textarea class="prop-val" id="appDescription" data-field="description">{{entity.description}}</textarea>
                     </div>
-                    <input type="button" value="Next" name="nextButton" class="button"/>
+                    <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="button"/>
 
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.appStep2"}}</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "policy.editApplications.step2"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div class="clearfix">
@@ -41,14 +41,14 @@
                         <div class="col2" id="resourcesList"></div>
                     </div>
 
-                    <input type="button" class="button" value="Next" name="nextButton"/>
+                    <input type="button" class="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton"/>
                 </section>
 
-                <h1 class="accordion-header" tabindex="0">{{t "templates.policy.appStep3"}}</h1>
+                <h1 class="accordion-header" tabindex="0">{{t "policy.editApplications.step3"}}</h1>
                 <section class="accordion-step clearfix">
 
                     <div id="reviewInfo" class="clearfix"></div>
-                    <input type="button" class="button" value="{{t 'templates.policy.finish'}}" name="submitForm"/>
+                    <input type="button" class="button" value="{{t 'policy.common.buttons.finish'}}" name="submitForm"/>
 
                 </section>
             </div>

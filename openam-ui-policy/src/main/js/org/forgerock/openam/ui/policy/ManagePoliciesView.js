@@ -266,13 +266,6 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
 
             tabs.not(':eq('+ index +')').addClass('inactive-tab');
             tabs.eq(index).removeClass('inactive-tab');
-
-            //this.$el.each('.tab-content .tab:not:eq('+ index +')').addClass('inactive-tab');
-
-
-           // this.$el.each('.tab-content .tab:eq('+ index +')').removeClass('inactive-tab');
-
-           // this.$el.find('.tab-content').
         }
     });
 
