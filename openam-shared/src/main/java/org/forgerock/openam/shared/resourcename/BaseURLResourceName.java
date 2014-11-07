@@ -117,7 +117,9 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
                 final String postColonRequest = schemelessRequest.substring(schemelessRequest.indexOf(COLON));
                 final String postColonTarget = schemelessTarget.substring(schemelessTarget.indexOf(COLON));
 
-                return compareSplit(postColonRequest, postColonTarget, SLASH);
+                T afterColon = compareSplit(postColonRequest, postColonTarget, SLASH);
+
+                return wildcardResponseCombiner(beforeColon, afterColon);
             } else { //case where firstColon >= 0; port wildcard
                 return compareSplit(schemelessRequest, schemelessTarget, COLON);
             }
@@ -142,11 +144,22 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
 
         T secondMatch = compareAfterBreakpoint(resource, target, breakPoint);
 
-        if (secondMatch.equals(exactMatch) && firstMatch.equals(wildcardMatch)) {
-            return wildcardMatch;
-        } else {
-            return secondMatch;
+        return wildcardResponseCombiner(firstMatch, secondMatch);
+    }
+
+    /**
+     * Ensures that e.g. if a wildcard match was made on the half of a URL, the overall
+     * result reflects this rather than the match-type of the latter half of the URL only.
+     */
+    private T wildcardResponseCombiner(T firstResult, T secondResult) {
+
+        if (exactMatch.equals(firstResult) && !exactMatch.equals(secondResult)) {
+            return secondResult;
+        } else if (exactMatch.equals(secondResult) && !exactMatch.equals(firstResult)) {
+            return firstResult;
         }
+
+        return secondResult;
     }
 
     /**
@@ -197,7 +210,7 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
     }
 
     /**
-     *
+     * Removes the scheme, appends a slash if the resource contains a port.
      */
     private String removeSchemeEnsureSlash(String url) {
         String part = url.substring(url.indexOf(SCHEME_DELIMITER) + SCHEME_DELIMITER.length());
