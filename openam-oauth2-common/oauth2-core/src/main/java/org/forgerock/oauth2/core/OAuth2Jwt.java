@@ -78,7 +78,7 @@ public class OAuth2Jwt {
                 contains("iss", "sub", "aud", "exp") &&
                 !isExpiryUnreasonable() &&
                 !isExpired() &&
-                !isBefore() &&
+                !isNowBeforeNbf() &&
                 !isIssuedAtUnreasonable();
         //FIXME: also check if the JWT has been replayed? http://self-issued.info/docs/draft-ietf-oauth-jwt-bearer.html Section 3 point 7
     }
@@ -97,12 +97,12 @@ public class OAuth2Jwt {
     }
 
     private boolean isExpired() {
-        return jwt.getClaimsSet().getExpirationTime().getTime() >= (timeService.now() + SKEW_ALLOWANCE);
+        return jwt.getClaimsSet().getExpirationTime().getTime() <= (timeService.now() - SKEW_ALLOWANCE);
     }
 
-    private boolean isBefore() {
+    private boolean isNowBeforeNbf() {
         boolean present = jwt.getClaimsSet().get("nbf").getObject() != null;
-        return present && (timeService.now() - SKEW_ALLOWANCE) < jwt.getClaimsSet().getNotBeforeTime().getTime();
+        return present && timeService.now() + SKEW_ALLOWANCE < jwt.getClaimsSet().getNotBeforeTime().getTime();
     }
 
     private boolean isIssuedAtUnreasonable() {
