@@ -147,7 +147,7 @@
             "actions" : "Actions",
             "complete" : "Complete",
             "reset" : "Reset",
-            "copyright" : "Copyright (c) 2010-14 ForgeRock, all rights reserved.",
+            "copyright" : "Copyright &copy; 2010-14 ForgeRock, all rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
             "reloadGrid" : "Reload Grid",
