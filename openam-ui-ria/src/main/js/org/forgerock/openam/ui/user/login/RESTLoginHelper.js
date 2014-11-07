@@ -168,11 +168,15 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         sessionDelegate.isSessionValid(tokenCookie).then(function(result) {
             if (result.valid) {
                 sessionDelegate.logout(tokenCookie).then(function () {
+                    obj.removeSessionCookie();
+
                     if (conf.globalData.auth.fullLoginURL) {
                         window.location.hash += obj.filterUrlParams(_this.getLoginUrlParams());
                     }
                     successCallback();
-                }).always(obj.removeSessionCookie());
+                    return true;
+
+                }, obj.removeSessionCookie);
             } else {
                 obj.removeSessionCookie();
                 if (errorCallback) {
