@@ -17,6 +17,7 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.EntitlementException;
+import javax.security.auth.Subject;
 import org.forgerock.json.resource.ServerContext;
 
 /**
@@ -33,4 +34,13 @@ public interface PolicyStoreProvider {
      * @return a policy store for the given realm.
      */
     PolicyStore getPolicyStore(ServerContext context) throws EntitlementException;
+
+    /**
+     * Gets a policy store for the given realm.
+     *
+     * @param adminSubject Responsible for retrieving the store.
+     * @param realm In which the store resides.
+     * @return a policy store for the given realm.
+     */
+    PolicyStore getPolicyStore(Subject adminSubject, String realm) throws EntitlementException;
 }

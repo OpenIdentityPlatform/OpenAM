@@ -67,6 +67,10 @@ public final class PrivilegePolicyStoreProvider implements PolicyStoreProvider {
         Subject adminSubject = context.asContext(SubjectContext.class).getCallerSubject();
         String realm = context.asContext(RealmContext.class).getRealm();
 
+        return getPolicyStore(adminSubject, realm);
+    }
+
+    public PolicyStore getPolicyStore(Subject adminSubject, String realm) {
         if (realm.isEmpty()) {
             realm = "/";
         }

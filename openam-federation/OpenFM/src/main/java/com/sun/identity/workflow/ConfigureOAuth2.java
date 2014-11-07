@@ -19,22 +19,32 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ *
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 package com.sun.identity.workflow;
 
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.policy.*;
-import com.sun.identity.policy.interfaces.Subject;
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Privilege;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.sm.ServiceConfigManager;
-
 import java.security.AccessController;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
+import org.forgerock.openam.forgerockrest.entitlements.PolicyStore;
+import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
+import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 
 public class ConfigureOAuth2 extends Task {
     private static final String SERVICE_NAME = "OAuth2Provider";
@@ -48,6 +58,7 @@ public class ConfigureOAuth2 extends Task {
 
     //params
     private static final String REALM = "realm";
+    private static final String ROOT = "/";
 
     //service params
     private static final String RTL = "rtl";
@@ -59,20 +70,18 @@ public class ConfigureOAuth2 extends Task {
 
     //policy params
     private static final String POLICY_NAME = "OAuth2ProviderPolicy";
-    private static final String RULE_NAME = "OAuth2ProviderRule";
-    private static final String SUBJECT_NAME = "OAuth2ProviderSubject";
     private static final String OAUTH2_AUTHORIZE_ENDPOINT = "/oauth2/authorize?*";
-    private static final String ROOT_REALM = "/";
     public static final String MESSAGE = "oauth2.provider.configured";
     public static final String POLICY_CREATED = "oauth2.provider.policy.created";
     public static final String POLICY_EXISTS = "oauth2.provider.policy.exists";
 
-    public ConfigureOAuth2(){
+    private final PolicyStoreProvider storeProvider;
 
+    public ConfigureOAuth2(){
+        storeProvider = new PrivilegePolicyStoreProvider(Collections.<String, QueryAttribute>emptyMap());
     }
 
-    public String execute(Locale locale, Map params)
-            throws WorkflowException {
+    public String execute(Locale locale, Map params) throws WorkflowException {
         String realm = getString(params, REALM);
 
         //get the service params
@@ -105,24 +114,23 @@ public class ConfigureOAuth2 extends Task {
         attrValues.put(SCOPE_PLUGIN_CLASS, temp);
 
         //create service
-        SSOToken token = null;
+        SSOToken token;
         try {
-            token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager sm = new ServiceConfigManager(SERVICE_NAME,token);
+            token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            ServiceConfigManager sm = new ServiceConfigManager(SERVICE_NAME, token);
             sm.createOrganizationConfig(realm,attrValues);
         } catch (Exception e){
             throw new WorkflowException("ConfigureOAuth2.execute() : Unable to create Service");
         }
 
-        //get policy url
         String policyURL = getRequestURL(params) + OAUTH2_AUTHORIZE_ENDPOINT;
 
         //check if policy exists
-        PolicyManager mgr = null;
+        PolicyManager mgr;
         boolean createPolicy = false;
         try {
-            mgr = new PolicyManager(token, ROOT_REALM);
-            if (mgr.getPolicy(POLICY_NAME) == null){
+            mgr = new PolicyManager(token, ROOT);
+            if (mgr.getPolicy(POLICY_NAME) == null) {
                 createPolicy = true;
             }
         } catch (Exception e){
@@ -130,48 +138,29 @@ public class ConfigureOAuth2 extends Task {
         }
 
         if (createPolicy){
-            //build the policy
-            Policy policy = null;
-            try {
-                policy = new Policy(POLICY_NAME);
-            } catch (Exception e){
-                throw new WorkflowException("ConfigureOAuth2.execute() : Unable create policy");
-            }
-            Map<String,Set<String>> actions = new HashMap<String,Set<String>>();
-            temp = new HashSet<String>();
-            temp.add("allow");
-            actions.put("POST", temp);
-            temp = new HashSet<String>();
-            temp.add("allow");
-            actions.put("GET", temp);
-
-            Rule policyURLRule = null;
-            Subject sub = null;
 
             try {
-                policyURLRule = new Rule(RULE_NAME,
-                        "iPlanetAMWebAgentService",
-                        policyURL,
-                        actions);
-                PolicyManager pm = new PolicyManager(token, ROOT_REALM);
-                SubjectTypeManager stm = pm.getSubjectTypeManager();
-                sub = stm.getSubject("AuthenticatedUsers");
-            } catch (Exception e){
-                throw new WorkflowException("ConfigureOAuth2.execute() : Unable to get Subject");
+                Privilege toStore = Privilege.getNewInstance();
+
+                Map<String, Boolean> actions = new HashMap<String, Boolean>();
+                actions.put("POST", true);
+                actions.put("GET", true);
+
+                Entitlement entitlement = new Entitlement();
+                entitlement.setActionValues(actions);
+                entitlement.setResourceName(policyURL);
+
+                toStore.setSubject(new AuthenticatedUsers());
+                toStore.setName(POLICY_NAME);
+                toStore.setEntitlement(entitlement);
+
+                PolicyStore policyStore = storeProvider.getPolicyStore(SubjectUtils.createSuperAdminSubject(), ROOT);
+                policyStore.create(toStore);
+
+            } catch (EntitlementException e) {
+                throw new WorkflowException("ConfigureOAuth2.execute() : Unable to create policy");
             }
-            try {
-                policy.addSubject(SUBJECT_NAME, sub);
-                policy.addRule(policyURLRule);
-            } catch (Exception e){
-                throw new WorkflowException("ConfigureOAuth2.execute() : Unable add subject and rule to policy");
-            }
-            mgr = null;
-            try {
-                mgr = new PolicyManager(token, ROOT_REALM);
-                mgr.addPolicy(policy);
-            } catch (Exception e){
-                throw new WorkflowException("ConfigureOAuth2.execute() : Unable to add policy");
-            }
+
         }
 
         String messageTemplate = getMessage(MESSAGE, locale);
