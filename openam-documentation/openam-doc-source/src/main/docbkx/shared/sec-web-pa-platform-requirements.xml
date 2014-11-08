@@ -162,31 +162,96 @@
 
  </table>
 
- <para>
-  Before installing web policy agents on Linux,
-  make sure the system can run <command>gcc</command> 4.4.7.
-  <literal>libc.so.6</literal> must be available
-  and it must support the GLIBC_2.3 ABI.
-  You can check this by running the following command:
-  <command>strings libc.so.6 | grep GLIBC_2</command>.
-  Also, <literal>libstdc++.so.6</literal> must be available
-  and it must support GLIBCXX_3.4 and CXXABI_1.3.
-  You can check this by running the following commands:
-  <command>strings libstdc++.so.6 | grep GLIBCXX_3</command>
-  and <command>strings libstdc++.so.6 | grep CXXABI_1</command>.
- </para>
+ <variablelist>
+  <para>
+   Before installing web policy agents on your platform,
+   also make sure that the system provides the required components.
+  </para>
 
- <para>
-  Before installing the IIS 7 web policy agent on Microsoft IIS 7 or IIS 8,
-  make sure that the optional Application Development component of
-  Web Server (IIS) is installed.
-  In the Windows Server 2012 Server Manager for example,
-  Application Development is a component of Web Server (IIS) | Web Server.
- </para>
+<!-- Not supported, yet.
+  <varlistentry>
+   <term>IBM AIX</term>
+   <listitem>
+    <para>
+     The operating system version must be 6.1 or later.
+    </para>
 
- <para>
-  Before installing web policy agents on Solaris 10,
-  make sure you have applied the latest shared library patch for C++,
-  at least 119963-16 on SPARC or 119964-12 on x64.
- </para>
+    <para>
+     Make sure that <literal>libxml2</literal>  2.8.0 or later is installed.
+    </para>
+
+    <para>
+     If agents use secure connections (SSL, TLS),
+     then also make sure that OpenSSL is installed.
+    </para>
+   </listitem>
+  </varlistentry>
+-->
+
+  <varlistentry>
+   <term>Linux systems</term>
+   <listitem>
+    <para>
+     Before installing web policy agents on Linux,
+     make sure the system can run <command>gcc</command> 4.4.7.
+     <literal>libc.so.6</literal> must be available
+     and it must support the GLIBC_2.3 ABI.
+     You can check this by running the following command:
+     <command>strings libc.so.6 | grep GLIBC_2</command>.
+     Also, <literal>libstdc++.so.6</literal> must be available
+     and it must support GLIBCXX_3.4 and CXXABI_1.3.
+     You can check this by running the following commands:
+     <command>strings libstdc++.so.6 | grep GLIBCXX_3</command>
+     and <command>strings libstdc++.so.6 | grep CXXABI_1</command>.
+    </para>
+
+    <para>
+     Make sure that <literal>libxml2</literal>  2.8.0 or later is installed.
+    </para>
+
+    <para>
+     If agents use secure connections (SSL, TLS),
+     then also make sure that OpenSSL is installed.
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Microsoft Windows</term>
+   <listitem>
+    <para>
+     Before installing the IIS 7 web policy agent on Microsoft IIS 7 or IIS 8,
+     make sure that the optional Application Development component of
+     Web Server (IIS) is installed.
+     In the Windows Server 2012 Server Manager for example,
+     Application Development is a component of Web Server (IIS) | Web Server.
+    </para>
+
+    <para>
+     Make sure that the VS2010 C/C++ and MSXML 6 runtime components are installed.
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Oracle Solaris</term>
+   <listitem>
+    <para>
+     Before installing web policy agents on Solaris 10,
+     make sure you have applied the latest shared library patch for C++,
+     at least 119963-16 on SPARC or 119964-12 on x64.
+     The library is bundled on Solaris 10 update 5 and later.
+    </para>
+
+    <para>
+     Make sure that <literal>libxml2</literal>  2.8.0 or later is installed.
+    </para>
+
+    <para>
+     If agents use secure connections (SSL, TLS),
+     then also make sure that OpenSSL is installed.
+    </para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
 </section>
