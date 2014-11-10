@@ -210,9 +210,10 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     };
 
     obj.importPolicies = function (data) {
+        var subrealm = conf.globalData.auth.realm !== "/" ? conf.globalData.auth.realm : "";
         return obj.serviceCall({
-            serviceUrl: constants.host + "/openam/",
-            url: "xacml/policies",
+            serviceUrl: constants.host + "/openam",
+            url: "/xacml" + subrealm +"/policies",
             type: "POST",
             data: data,
             errorsHandlers: obj.ERROR_HANDLERS
