@@ -502,7 +502,8 @@
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
-                            <Value>IP</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
                             <Value>LDAPFilter</Value>
                             <Value>OAuth2Scope</Value>
                             <Value>ResourceEnvIP</Value>
@@ -546,7 +547,8 @@
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
-                            <Value>IP</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
                             <Value>LDAPFilter</Value>
                             <Value>OAuth2Scope</Value>
                             <Value>ResourceEnvIP</Value>
@@ -591,7 +593,8 @@
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
-                            <Value>IP</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
                             <Value>LDAPFilter</Value>
                             <Value>OAuth2Scope</Value>
                             <Value>ResourceEnvIP</Value>
@@ -635,7 +638,8 @@
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
-                            <Value>IP</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
                             <Value>LDAPFilter</Value>
                             <Value>OAuth2Scope</Value>
                             <Value>ResourceEnvIP</Value>
@@ -721,7 +725,8 @@
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
-                            <Value>IP</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
                             <Value>LDAPFilter</Value>
                             <Value>OAuth2Scope</Value>
                             <Value>ResourceEnvIP</Value>
@@ -768,7 +773,8 @@
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
-                            <Value>IP</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
                             <Value>LDAPFilter</Value>
                             <Value>OAuth2Scope</Value>
                             <Value>ResourceEnvIP</Value>
@@ -813,7 +819,8 @@
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
-                            <Value>IP</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
                             <Value>LDAPFilter</Value>
                             <Value>OAuth2Scope</Value>
                             <Value>ResourceEnvIP</Value>
@@ -858,7 +865,8 @@
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
-                            <Value>IP</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
                             <Value>LDAPFilter</Value>
                             <Value>OAuth2Scope</Value>
                             <Value>ResourceEnvIP</Value>

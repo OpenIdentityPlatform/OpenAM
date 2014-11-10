@@ -30,7 +30,8 @@ import org.forgerock.openam.entitlement.conditions.environment.AuthSchemeConditi
 import org.forgerock.openam.entitlement.conditions.environment.AuthenticateToRealmCondition;
 import org.forgerock.openam.entitlement.conditions.environment.AuthenticateToServiceCondition;
 import org.forgerock.openam.entitlement.conditions.environment.ConditionConstants;
-import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
+import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
+import org.forgerock.openam.entitlement.conditions.environment.IPv6Condition;
 import org.forgerock.openam.entitlement.conditions.environment.LDAPFilterCondition;
 import org.forgerock.openam.entitlement.conditions.environment.LEAuthLevelCondition;
 import org.forgerock.openam.entitlement.conditions.environment.ResourceEnvIPCondition;
@@ -38,11 +39,12 @@ import org.forgerock.openam.entitlement.conditions.environment.SessionCondition;
 import org.forgerock.openam.entitlement.conditions.environment.SessionPropertyCondition;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
 import org.forgerock.openam.entitlement.conditions.subject.IdentitySubject;
-import org.forgerock.openam.network.ipv4.IPv4Condition;
+import static org.forgerock.openam.network.ipv4.IPv4Condition.IP_RANGE;
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -283,35 +285,57 @@ class PolicyConditionUpgradeMap {
                     }
                 });
 
-        environmentConditionsUpgradeMap.put(com.sun.identity.policy.plugins.IPCondition.class
-                        .getName(),
+        environmentConditionsUpgradeMap.put(com.sun.identity.policy.plugins.IPCondition.class.getName(),
                 new EntitlementConditionMigrator() {
                     @Override
                     public EntitlementCondition migrate(PolicyCondition condition, MigrationReport migrationReport) {
-                        IPCondition eCondition = new IPCondition();
+                        EntitlementCondition eCondition = null;
                         Map<String, Set<String>> properties = condition.getProperties();
 
-                        Set<String> ipRange = properties.get(IPv4Condition.IP_RANGE);
+                        String ipVersion = getIpConditionIpVersion(properties);
+                        Set<String> ipRange = properties.get(IP_RANGE);
                         Set<String> dnsName = properties.get(Condition.DNS_NAME);
                         String startIp = getValue(properties.get(Condition.START_IP));
                         String endIp = getValue(properties.get(Condition.END_IP));
 
-                        try {
-                            if (ipRange != null) {
-                                eCondition.setIpRange(new ArrayList<String>(ipRange));
+                        if (com.sun.identity.policy.plugins.IPCondition.IPV4.equals(ipVersion)) {
+                            IPv4Condition ipCondition = new IPv4Condition();
+                            try {
+                                if (ipRange != null) {
+                                    ipCondition.setIpRange(new ArrayList<String>(ipRange));
+                                }
+                                if (dnsName != null){
+                                    ipCondition.setDnsName(new ArrayList<String>(dnsName));
+                                }
+                                ipCondition.setStartIp(startIp);
+                                ipCondition.setEndIp(endIp);
+                                eCondition = ipCondition;
+                            } catch (EntitlementException e) {
+                                throw new RuntimeException(e);
                             }
-                            if (dnsName != null){
-                                eCondition.setDnsName(new ArrayList<String>(dnsName));
+                            migrationReport.migratedEnvironmentCondition(
+                                    com.sun.identity.policy.plugins.IPCondition.class.getName(),
+                                    IPv4Condition.class.getName());
+                        } else if (com.sun.identity.policy.plugins.IPCondition.IPV6.equals(ipVersion)) {
+                            IPv6Condition ipCondition = new IPv6Condition();
+                            try {
+                                if (ipRange != null) {
+                                    ipCondition.setIpRange(new ArrayList<String>(ipRange));
+                                }
+                                if (dnsName != null){
+                                    ipCondition.setDnsName(new ArrayList<String>(dnsName));
+                                }
+                                ipCondition.setStartIp(startIp);
+                                ipCondition.setEndIp(endIp);
+                                eCondition = ipCondition;
+                            } catch (EntitlementException e) {
+                                throw new RuntimeException(e);
                             }
-                            eCondition.setStartIp(startIp);
-                            eCondition.setEndIp(endIp);
-                        } catch (EntitlementException e) {
-                            throw new RuntimeException(e);
+                            migrationReport.migratedEnvironmentCondition(
+                                    com.sun.identity.policy.plugins.IPCondition.class.getName(),
+                                    IPv6Condition.class.getName());
                         }
 
-                        migrationReport.migratedEnvironmentCondition(
-                                com.sun.identity.policy.plugins.IPCondition.class.getName(),
-                                IPCondition.class.getName());
                         return eCondition;
                     }
                 });
@@ -440,4 +464,18 @@ class PolicyConditionUpgradeMap {
             PolicyCondition condition, MigrationReport migrationReport) {
         return environmentConditionsUpgradeMap.get(conditionClassName).migrate(condition, migrationReport);
     }
+
+    private static String getIpConditionIpVersion(Map properties) {
+        String ipVersion = com.sun.identity.policy.plugins.IPCondition.IPV4;
+        Set ipVersionProp = (Set) properties.get(com.sun.identity.policy.plugins.IPCondition.IP_VERSION);
+        if (ipVersionProp != null) {
+            Iterator ipVerItr = ipVersionProp.iterator();
+            String ip = (String) ipVerItr.next();
+            if (ip.equalsIgnoreCase(com.sun.identity.policy.plugins.IPCondition.IPV6)) {
+                ipVersion = com.sun.identity.policy.plugins.IPCondition.IPV6;
+            }
+        }
+        return ipVersion;
+    }
+
 }

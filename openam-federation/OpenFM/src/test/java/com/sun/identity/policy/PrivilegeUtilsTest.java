@@ -38,7 +38,6 @@ import com.sun.identity.entitlement.AndCondition;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementSubject;
-import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.OrSubject;
 import com.sun.identity.entitlement.Privilege;
@@ -59,6 +58,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
 import org.testng.annotations.Test;
 
 /**
@@ -87,7 +87,7 @@ public class PrivilegeUtilsTest {
         subjects.add(us1);
         subjects.add(us2);
         OrSubject os = new OrSubject(subjects);
-        IPCondition ipc = new IPCondition();
+        IPv4Condition ipc = new IPv4Condition();
         ipc.setStartIp("100.100.100.100");
         ipc.setEndIp("200.200.200.200");
 

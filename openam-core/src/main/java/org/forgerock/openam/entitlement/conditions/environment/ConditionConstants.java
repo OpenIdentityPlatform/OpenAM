@@ -339,20 +339,38 @@ public final class ConditionConstants {
     public static final String REQUEST_DNS_NAME = "requestDnsName";
 
     /**
-     * <p>Key that is used in {@code IPv4Condition} to define the  IP address values for which a policy applies. The
+     * <p>Key that is used in {@code IPCondition} to specify the IP version in use. The value assigned to this
+     * key must be either "IPv4" or "IPv6",  (though both values are handled case-insensitively).</p>
+     */
+    public static final String IP_VERSION = "ipVersion";
+
+    /**
+     * <p>Key that is used in {@code IPCondition} to define the  IP address values for which a policy applies. The
      * value corresponding to the key has to be a {@code Set} where each element is a {@code String} that conforms to
      * the pattern described here.</p>
      *
-     * <p>The pattern  has 2 parts separated by "-".</p>
+     * <p>The pattern has a mandatory start IP address, possibly followed by "-" and end IP address if
+     * specifying an IP address range rather than a single address. Ranges are inclusive of their bounds.</p>
      *
-     * <p>The patterns is :
-     *	  n.n.n.n[-n.n.n.n]
+     * <p>For IPv4, the patterns is: n.n.n.n[-n.n.n.n]
      * where n would take any integer value between 0 and 255 inclusive.</p>
      *
      * <p>Some sample values are
-     *	   122.100.85.45-125.110.90.66
-     *	   145.64.55.35-215.110.173.145
-     *	   15.64.55.35</p>
+     * <ul>
+     *     <li>122.100.85.45-125.110.90.66</li>
+     *     <li>145.64.55.35-215.110.173.145</li>
+     *     <li>15.64.55.35</li>
+     * </ul></p>
+     *
+     * <p>The patterns for IP Version 6 is:
+     *    x:x:x:x:x:x:x:x[-x:x:x:x:x:x:x:x]
+     * where x are the hexadecimal values of the eight 16-bit pieces of the address.</p>
+     *
+     * <p>Some sample values are:
+     *      FEDC:BA98:7654:3210:FEDC:BA98:7654:3210
+     *      1080:0:0:0:8:800:200C:417A</p>
+     *
+     * @see <a href="http://tools.ietf.org/html/rfc3513#section-2.2">RFC 3513 - Section 2.2</a>
      */
     public static final String IP_RANGE = "ipRange";
 

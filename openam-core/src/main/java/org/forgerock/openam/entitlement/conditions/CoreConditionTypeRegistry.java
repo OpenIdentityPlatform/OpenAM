@@ -25,7 +25,8 @@ import org.forgerock.openam.entitlement.conditions.environment.AuthLevelConditio
 import org.forgerock.openam.entitlement.conditions.environment.AuthSchemeCondition;
 import org.forgerock.openam.entitlement.conditions.environment.AuthenticateToRealmCondition;
 import org.forgerock.openam.entitlement.conditions.environment.AuthenticateToServiceCondition;
-import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
+import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
+import org.forgerock.openam.entitlement.conditions.environment.IPv6Condition;
 import org.forgerock.openam.entitlement.conditions.environment.LDAPFilterCondition;
 import org.forgerock.openam.entitlement.conditions.environment.LEAuthLevelCondition;
 import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
@@ -79,7 +80,8 @@ public class CoreConditionTypeRegistry implements ConditionTypeRegistry {
         conditions.add(SimpleTimeCondition.class);
         conditions.add(SessionPropertyCondition.class);
         conditions.add(AuthSchemeCondition.class);
-        conditions.add(IPCondition.class);
+        conditions.add(IPv4Condition.class);
+        conditions.add(IPv6Condition.class);
         conditions.add(LDAPFilterCondition.class);
 
         return conditions;

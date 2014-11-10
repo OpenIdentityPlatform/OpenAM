@@ -34,16 +34,16 @@ package com.sun.identity.entitlement;
 import java.util.HashSet;
 import java.util.Set;
 import static org.testng.Assert.assertTrue;
-import org.testng.annotations.Test;
-import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 
+import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
+import org.testng.annotations.Test;
 
 public class NotConditionTest {
 
     @Test
     public void testConstruction() throws Exception {
 
-        IPCondition ipc = new IPCondition();
+        IPv4Condition ipc = new IPv4Condition();
         ipc.setStartIp("100.100.100.100");
         ipc.setEndIp("200.200.200.200");
         NotCondition ac = new NotCondition(ipc);
@@ -65,10 +65,10 @@ public class NotConditionTest {
         //given
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
 
-        IPCondition ip = new IPCondition();
+        IPv4Condition ip = new IPv4Condition();
         ip.setStartIp("192.168.0.1");
         ip.setEndIp("192.168.0.2");
-        IPCondition ip2 = new IPCondition();
+        IPv4Condition ip2 = new IPv4Condition();
         ip2.setStartIp("192.168.0.5");
         ip2.setEndIp("192.168.0.6");
 
@@ -88,7 +88,7 @@ public class NotConditionTest {
     public void testSingleSubjectEnforced() throws Exception{
         //given
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
-        IPCondition ip = new IPCondition();
+        IPv4Condition ip = new IPv4Condition();
         ip.setStartIp("192.168.0.1");
         ip.setEndIp("192.168.0.2");
         conditions.add(ip);
@@ -105,7 +105,7 @@ public class NotConditionTest {
     @Test
     public void testSingleSubjectEnforcedRetrieval() throws Exception {
         //given
-        IPCondition ip = new IPCondition();
+        IPv4Condition ip = new IPv4Condition();
         ip.setStartIp("192.168.0.1");
         ip.setEndIp("192.168.0.2");
         NotCondition myNotCondition = new NotCondition(ip);

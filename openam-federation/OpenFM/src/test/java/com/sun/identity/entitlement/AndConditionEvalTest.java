@@ -36,7 +36,6 @@ package com.sun.identity.entitlement;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
-import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -75,7 +76,7 @@ public class AndConditionEvalTest {
             AndCondition cond = new AndCondition();
             Set<EntitlementCondition> conditions = new 
                     HashSet<EntitlementCondition>();
-            IPCondition ipc = new IPCondition();
+            IPv4Condition ipc = new IPv4Condition();
             ipc.setStartIp(START_IP);
             ipc.setEndIp(END_IP);
             conditions.add(ipc);
@@ -162,7 +163,7 @@ public class AndConditionEvalTest {
                     "AndConditionEvalTest.negativeTest: no advices.");
         }
 
-        Set<String> advice = advices.get(IPCondition.class.getName());
+        Set<String> advice = advices.get(IPv4Condition.class.getName());
         if ((advice == null) || advice.isEmpty()) {
             throw new Exception(
                     "AndConditionEvalTest.negativeTest: no advice for IPCondition.");

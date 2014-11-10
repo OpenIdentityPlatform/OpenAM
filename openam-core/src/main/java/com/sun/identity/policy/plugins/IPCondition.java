@@ -57,7 +57,8 @@ import java.util.Collections;
  * of <code>Condition</code>. This lets you define the IP addresses,
  * IP address ranges and DNS name patterns for which the policy applies
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.IPCondition} instead.
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.IPv4Condition}
+ * or {@link org.forgerock.openam.entitlement.conditions.environment.IPv6Condition} instead.
  */
 @Deprecated
 public class IPCondition implements Condition {

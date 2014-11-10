@@ -34,8 +34,8 @@ package com.sun.identity.entitlement;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
-import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import org.testng.annotations.Test;
 
 /**
@@ -47,7 +47,7 @@ public class AndConditionTest {
     @Test
     public void testConstruction() throws Exception {
 
-        IPCondition ipc = new IPCondition();
+        IPv4Condition ipc = new IPv4Condition();
         ipc.setStartIp("100.100.100.100");
         ipc.setEndIp("200.200.200.200");
         SimpleTimeCondition tc = new SimpleTimeCondition();

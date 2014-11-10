@@ -17,30 +17,14 @@
 package org.forgerock.openam.entitlement.conditions.environment;
 
 import com.googlecode.ipv6.IPv6Address;
-import com.googlecode.ipv6.IPv6AddressRange;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.ConditionDecision;
-import com.sun.identity.entitlement.EntitlementConditionAdaptor;
-import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.utils.ValidateIPaddress;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import javax.security.auth.Subject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import static com.sun.identity.entitlement.EntitlementException.*;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
-
+/**
+ * An <code>EntitlementCondition</code> that can be used to enable/disable an authorization policy
+ * based on the IP address and DNS name of the originating client requesting access to a resource.
+ */
 public class IPv6Condition extends IPvXCondition<IPv6Address> {
 
     /**
@@ -60,13 +44,19 @@ public class IPv6Condition extends IPvXCondition<IPv6Address> {
         super(debug, coreWrapper, null, null, IPVersion.IPV6);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected IPv6Address stringToIp(String ip) {
         return IPv6Address.fromString(ip);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected boolean validateIPaddress(String ip) throws EntitlementException {
+    protected boolean validateIpAddress(String ip) {
         return ValidateIPaddress.isIPv6(ip);
     }
 

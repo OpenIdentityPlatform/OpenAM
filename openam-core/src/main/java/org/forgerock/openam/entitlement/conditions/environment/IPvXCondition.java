@@ -22,8 +22,9 @@ import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.policy.PolicyException;
+import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.utils.ValidateIPaddress;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +41,12 @@ import java.util.StringTokenizer;
 import static com.sun.identity.entitlement.EntitlementException.*;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
 
-public abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditionAdaptor {
+/**
+ * Abstract Base Class for {@link IPv4Condition} and {@link IPv6Condition}.
+ *
+ * @param <T> The type used for IP address values.
+ */
+abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditionAdaptor {
 
     protected final Debug debug;
     private final CoreWrapper coreWrapper;
@@ -51,9 +57,10 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
     private String startIpString;
     private String endIpString;
     private final T initialStartIp;
+    private final T initialEndIp;
     private T startIp;
     private T endIp;
-    private IPVersion version;
+    private final IPVersion version;
 
     /**
      * Constructs a new IPvXCondition instance.
@@ -63,12 +70,27 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
         this.coreWrapper = coreWrapper;
         this.startIp = initialStartIp;
         this.initialStartIp = initialStartIp;
+        this.initialEndIp = initialEndIp;
         this.endIp = initialEndIp;
         this.version = version;
     }
 
+    /**
+     * Factory method for constructing an IP value from its String representation.
+     *
+     * @param ip A String representation of an IP value.
+     * @return An IP value.
+     * @throws EntitlementException If argument is not a string representing an IP value understood by this object.
+     */
     protected abstract T stringToIp(String ip) throws EntitlementException;
-    protected abstract boolean validateIPaddress(String ip) throws EntitlementException;
+
+    /**
+     * Checks if string represents an IP value understood by this object.
+     *
+     * @param ip A String representation of an IP value.
+     * @return <code>True</code> If argument is not a string representing an IP value understood by this object.
+     */
+    protected abstract boolean validateIpAddress(String ip);
 
     /**
      * {@inheritDoc}
@@ -79,27 +101,27 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
             JSONObject jo = new JSONObject(state);
             setState(jo);
 
-            setIpRanges(jo);
-            setDnsNames(jo);
-            setStartIp(jo);
-            setEndIp(jo);
+            setIpRangesFromJson(jo);
+            setDnsNamesFromJson(jo);
+            setStartIpFromJson(jo);
+            setEndIpFromJson(jo);
         } catch (Exception e) {
-            debug.message("IPvXCondition: Failed to set state", e);
+            debug.message(getClass().getSimpleName() + ": Failed to set state", e);
         }
     }
 
-    private void setStartIp(JSONObject jo) throws JSONException, EntitlementException {
+    private void setStartIpFromJson(JSONObject jo) throws JSONException, EntitlementException {
         setStartIp(jo.getString(START_IP));
     }
 
-    private void setEndIp(JSONObject jo) throws JSONException, EntitlementException {
-        if (startIp.equals(initialStartIp)) {
+    private void setEndIpFromJson(JSONObject jo) throws JSONException, EntitlementException {
+        if (!isStartIpSet()) {
             throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, new String[]{END_IP, START_IP});
         }
         setEndIp(jo.getString(END_IP));
     }
 
-    private void setIpRanges(JSONObject jo) throws JSONException, EntitlementException {
+    private void setIpRangesFromJson(JSONObject jo) throws JSONException, EntitlementException {
 
         JSONArray ipRanges = jo.getJSONArray(IP_RANGE);
         List<String> ipRange = new ArrayList<String>();
@@ -110,7 +132,7 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
         setIpRange(ipRange);
     }
 
-    private void setDnsNames(JSONObject jo) throws JSONException {
+    private void setDnsNamesFromJson(JSONObject jo) throws JSONException {
         dnsName.clear();
         JSONArray dnsNames = jo.getJSONArray(DNS_NAME);
         for (int i = 0; i < dnsNames.length(); i++) {
@@ -125,7 +147,7 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
 
     public void setStartIp(String startIp) throws EntitlementException {
         this.startIpString = startIp;
-        this.startIp = stringToIp(startIp);
+        this.startIp = startIp == null ? initialStartIp : stringToIp(startIp);
     }
 
     public String getEndIp() {
@@ -134,7 +156,7 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
 
     public void setEndIp(String endIp) throws EntitlementException {
         this.endIpString = endIp;
-        this.endIp = stringToIp(endIp);
+        this.endIp = endIp == null ? initialEndIp : stringToIp(endIp);
     }
 
     public List<String> getDnsName() {
@@ -152,20 +174,22 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
     public void setIpRange(List<String> ipRanges) throws EntitlementException {
         ipRange.clear();
         ipList.clear();
-        for (String ipRange : ipRanges) {
-            StringTokenizer st = new StringTokenizer(ipRange, "-");
-            int tokenCount = st.countTokens();
-            if (tokenCount > 2) {
-                throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{IP_RANGE, ipRange});
-            }
+        if (ipRanges != null) {
+            for (String ipRange : ipRanges) {
+                StringTokenizer st = new StringTokenizer(ipRange, "-");
+                int tokenCount = st.countTokens();
+                if (tokenCount > 2) {
+                    throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{IP_RANGE, ipRange});
+                }
 
-            String startIp = st.nextToken();
-            this.ipRange.add(startIp);
-            ipList.add(stringToIp(startIp));
-            if (tokenCount == 2) {
-                String endIp = st.nextToken();
-                this.ipRange.add(endIp);
-                ipList.add(stringToIp(endIp));
+                String startIp = st.nextToken();
+                this.ipRange.add(startIp);
+                ipList.add(stringToIp(startIp));
+                if (tokenCount == 2) {
+                    String endIp = st.nextToken();
+                    this.ipRange.add(endIp);
+                    ipList.add(stringToIp(endIp));
+                }
             }
         }
     }
@@ -180,20 +204,28 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
 
     private void validateProperties() throws EntitlementException {
 
-        //Check if the required key(s) are defined
-        if (!ipList.isEmpty() && !dnsName.isEmpty()) {
+        if (ipList.isEmpty() && dnsName.isEmpty() && (!isStartIpSet() || !isEndIpSet())) {
             if (debug.errorEnabled()) {
-                debug.error("IPv6Condition.validateProperties(): at least one time property MUST be defined, " +
-                        IP_RANGE + ", " + DNS_NAME + ", " + START_IP);
+                debug.error(getClass().getSimpleName() + ".validateProperties(): " +
+                        "at least one IP range or DNS name MUST be defined");
             }
-            throw new EntitlementException(AT_LEAST_ONE_OF_TIME_PROPS_SHOULD_BE_DEFINED,
-                    new String[]{IP_RANGE + "," + DNS_NAME + "," + START_IP});
+            throw new EntitlementException(IP_RANGE_OR_DNS_NAME_REQUIRED);
         }
 
         if (startIp.compareTo(endIp) > 0) {
-            debug.error("IPv6Condition.validateProperties(): END IP is before START IP");
+            if (debug.errorEnabled()) {
+                debug.error(getClass().getSimpleName() + ".validateProperties(): END IP is before START IP");
+            }
             throw new EntitlementException(END_IP_BEFORE_START_IP);
         }
+    }
+
+    private boolean isStartIpSet() {
+        return startIp != initialStartIp;
+    }
+
+    private boolean isEndIpSet() {
+        return endIp != initialEndIp;
     }
 
     /**
@@ -205,8 +237,8 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
 
         validateProperties();
 
-        String ip = IPCondition.getRequestIp(env);
-        if (!validateIPaddress(ip)) {
+        String ip = getRequestIp(env);
+        if (!validateIpAddress(ip)) {
             return new ConditionDecision(false, Collections.<String, Set<String>>emptyMap());
         }
 
@@ -234,12 +266,46 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
             }
         }
         if (debug.messageEnabled()) {
-            debug.message("At IPv4Condition.getConditionDecision():requestIp, requestDnsName, allowed = " + ip + ", "
-                    + reqDnsNames + "," + allowed );
+            debug.message(getClass().getSimpleName() + ".getConditionDecision(): requestIp, requestDnsName, " +
+                    "allowed = " + ip + ", " + reqDnsNames + "," + allowed );
         }
         return new ConditionDecision(allowed, Collections.<String, Set<String>>emptyMap());
     }
 
+    /**
+     * Helper method to extract {@code REQUEST_IP}.
+     *
+     * @param env The map containing environment description. Note that the type of the value corresponding to
+     *            {@code REQUEST_IP} parameter differs depending upon invocation path. It will be a {@code String} when
+     *            invoked by the agents, but it will be a {@code Set<String>} when invoked via the DecisionResource
+     *            (GET ws/1/entitlement/entitlements).
+     * @return The IP that was used.
+     */
+    public String getRequestIp(Map<String, Set<String>> env) {
+        Set<String> requestIpSet = env.get(REQUEST_IP);
+        if (requestIpSet != null && !requestIpSet.isEmpty()) {
+            if (requestIpSet.size() > 1) {
+                debug.warning("Set cardinality in environment map corresponding to " + REQUEST_IP +
+                        " key >1. Returning first value. The set: " + requestIpSet);
+            }
+            Object ip = requestIpSet.iterator().next();
+            if (ip != null) { // Set implementations can permit null values
+                return (String) ip;
+            } else {
+                debug.warning("In IPCondition, no value in Set corresponding to " + REQUEST_IP
+                        + " key contained environment map.");
+                return null;
+            }
+        } else {
+            debug.warning("In IPCondition, Set corresponding to " + REQUEST_IP
+                    + " key in environment map is null or empty.");
+            return null;
+        }
+    }
+
+    /**
+     * Return first value from Set or null if Set is empty.
+     */
     private <V> V getValue(Set<V> values) {
         if (values != null && values.iterator().hasNext()) {
             return values.iterator().next();
@@ -308,7 +374,7 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
         JSONObject jo = new JSONObject();
         toJSONObject(jo);
 
-        jo.put(IPCondition.IP_VERSION, version.toString());
+        jo.put(ConditionConstants.IP_VERSION, version.toString());
         JSONArray ipRangeJson = new JSONArray();
         for (String ip : ipRange) {
             ipRangeJson.put(ip);
@@ -333,9 +399,48 @@ public abstract class IPvXCondition<T extends Comparable<T>> extends Entitlement
         try {
             s = toJSONObject().toString(2);
         } catch (JSONException e) {
-            PrivilegeManager.debug.error("IPv4Condition.toString()", e);
+            PrivilegeManager.debug.error(getClass().getSimpleName() + ".toString()", e);
         }
         return s;
     }
 
+    /**
+     * Validates a DNS name for format
+     */
+    static boolean isValidDnsName(String dnsName) {
+        int starIndex = dnsName.indexOf("*");
+        if ((starIndex >= 0) && !dnsName.equals("*")) {
+            if ((starIndex > 0) || ((starIndex == 0) && ((dnsName.indexOf("*", 1) != -1) || (dnsName.charAt(1) != '.')))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+//    /**
+//     * JSON deserialization constructor used to ensure fields are set in an order
+//     * that allows inter-field validation to pass.
+//     *
+//     * @param startIp
+//     * @param endIp
+//     * @param ipRange
+//     * @param dnsName
+//     * @throws EntitlementException
+//     */
+//    @JsonCreator
+//    public IPCondition(@JsonProperty(START_IP) String startIp,
+//                       @JsonProperty(END_IP) String endIp,
+//                       @JsonProperty(IP_RANGE) List<String> ipRange,
+//                       @JsonProperty(DNS_NAME) List<String> dnsName) throws EntitlementException {
+//        this();
+//        if (startIp != null || endIp != null) {
+//            setStartIpAndEndIp(startIp, endIp);
+//        }
+//        if (ipRange != null) {
+//            setIpRange(ipRange);
+//        }
+//        if (dnsName != null) {
+//            setDnsName(dnsName);
+//        }
+//    }
 }

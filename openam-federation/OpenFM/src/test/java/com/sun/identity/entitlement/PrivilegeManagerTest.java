@@ -52,8 +52,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
-import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import org.json.JSONObject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -212,7 +212,7 @@ public class PrivilegeManagerTest {
         subjects.add(ua2);
         OrSubject os = new OrSubject(subjects);
 
-        IPCondition ipc = new IPCondition();
+        IPv4Condition ipc = new IPv4Condition();
         ipc.setStartIp(startIp);
         ipc.setEndIp(endIp);
         SimpleTimeCondition tc = new SimpleTimeCondition();
@@ -310,7 +310,7 @@ public class PrivilegeManagerTest {
 
         Privilege p = prm.findByName(PRIVILEGE_NAME);
 
-        IPCondition ipc1 = (IPCondition) p.getCondition();
+        IPv4Condition ipc1 = (IPv4Condition) p.getCondition();
         if (!ipc1.getStartIp().equals(startIp)) {
             throw new Exception(
                 "PrivilegeManagerTest.testAddPrivilege():"
@@ -356,7 +356,7 @@ public class PrivilegeManagerTest {
 
         Privilege p = prm.findByName(PRIVILEGE_NAME2);
 
-        IPCondition ipc1 = (IPCondition) p.getCondition();
+        IPv4Condition ipc1 = (IPv4Condition) p.getCondition();
         if (!ipc1.getStartIp().equals(startIp)) {
             throw new Exception(
                 "PrivilegeManagerTest.testAddPrivilege():"

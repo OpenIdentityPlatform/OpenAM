@@ -31,19 +31,18 @@
 
 package com.sun.identity.entitlement;
 
-import com.sun.identity.unittest.UnittestLog;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
-import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import org.testng.annotations.Test;
 
 public class OrConditionTest {
 
     @Test
     public void testConstruction() throws Exception {
-        IPCondition ipc = new IPCondition();
+        IPv4Condition ipc = new IPv4Condition();
         ipc.setStartIp("192.168.0.1");
         ipc.setEndIp("192.168.0.2");
 

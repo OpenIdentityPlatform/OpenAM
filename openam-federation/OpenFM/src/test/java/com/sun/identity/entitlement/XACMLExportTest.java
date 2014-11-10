@@ -40,7 +40,6 @@ import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
-import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
@@ -56,6 +55,7 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 import org.testng.annotations.BeforeClass;
@@ -121,7 +121,7 @@ public class XACMLExportTest {
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
         String startIp = "100.100.100.100";
         String endIp = "200.200.200.200";
-        IPCondition ipc = new IPCondition();
+        IPv4Condition ipc = new IPv4Condition();
         ipc.setStartIp(startIp);
         ipc.setEndIp(endIp);
         conditions.add(ipc);

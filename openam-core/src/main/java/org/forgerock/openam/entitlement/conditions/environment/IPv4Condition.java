@@ -19,30 +19,18 @@
 
 package org.forgerock.openam.entitlement.conditions.environment;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.ConditionDecision;
-import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.utils.ValidateIPaddress;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import javax.security.auth.Subject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import static com.sun.identity.entitlement.EntitlementException.*;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
 
+/**
+ * An <code>EntitlementCondition</code> that can be used to enable/disable an authorization policy
+ * based on the IP address and DNS name of the originating client requesting access to a resource.
+ */
 public class IPv4Condition extends IPvXCondition<Long> {
 
     /**
@@ -62,10 +50,10 @@ public class IPv4Condition extends IPvXCondition<Long> {
         super(debug, coreWrapper, Long.MAX_VALUE, Long.MAX_VALUE, IPVersion.IPV4);
     }
 
-
     /**
-     * Converts String representation of IP address to a long.
+     * {@inheritDoc}
      */
+    @Override
     protected Long stringToIp(String ip) throws EntitlementException {
         StringTokenizer st = new StringTokenizer(ip, ".");
         int tokenCount = st.countTokens();
@@ -89,8 +77,11 @@ public class IPv4Condition extends IPvXCondition<Long> {
         return ipValue;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected boolean validateIPaddress(String ip) throws EntitlementException {
+    protected boolean validateIpAddress(String ip) {
         return ValidateIPaddress.isIPv4(ip);
     }
 
