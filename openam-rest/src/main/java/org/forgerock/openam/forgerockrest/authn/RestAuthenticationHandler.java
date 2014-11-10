@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.jose.exceptions.JwsSigningException;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
@@ -175,6 +176,9 @@ public class RestAuthenticationHandler {
         } catch (AuthLoginException e) {
             throw new RestAuthException(amAuthErrorCodeResponseStatusMapping.getAuthLoginExceptionResponseStatus(
                     e.getErrorCode()), e);
+        } catch (JwsSigningException jse) {
+            DEBUG.error("JwsSigningException", jse);
+            throw new RestAuthException(ResourceException.INTERNAL_ERROR, "JwsSigningException, " + jse.getMessage());
         }
     }
 

@@ -44,6 +44,7 @@ class OpenIdConnectConfig extends JwtHandlerConfig {
     static final String ACCEPTED_AUTHORIZED_PARTIES_KEY = "openam-auth-openidconnect-accepted-authorized-parties";
 
     static final String BUNDLE_KEY_VERIFICATION_FAILED = "verification_failed";
+    static final String BUNDLE_KEY_JWS_SIGNING_EXCEPTION = "jws_signing_exception";
     static final String BUNDLE_KEY_ISSUER_MISMATCH = "issuer_mismatch";
     static final String BUNDLE_KEY_TOKEN_ISSUER_MISMATCH = "token_issuer_mismatch";
     static final String BUNDLE_KEY_JWT_PARSE_ERROR = "jwt_parse_error";

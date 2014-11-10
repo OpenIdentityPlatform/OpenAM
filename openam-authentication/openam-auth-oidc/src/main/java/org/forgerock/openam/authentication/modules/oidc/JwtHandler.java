@@ -24,6 +24,7 @@ import org.forgerock.jaspi.modules.openid.exceptions.OpenIdConnectVerificationEx
 import org.forgerock.jaspi.modules.openid.resolvers.OpenIdResolver;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.exceptions.InvalidJwtException;
+import org.forgerock.json.jose.exceptions.JwsSigningException;
 import org.forgerock.json.jose.exceptions.JwtReconstructionException;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
@@ -120,6 +121,9 @@ public class JwtHandler {
         } catch (OpenIdConnectVerificationException oice) {
             logger.warning("Verification of ID Token failed: " + oice);
             throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_VERIFICATION_FAILED, null);
+        } catch (JwsSigningException jse) {
+            logger.error("JwsSigningException", jse);
+            throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_JWS_SIGNING_EXCEPTION, null);
         }
         return jwtClaimSet;
     }
