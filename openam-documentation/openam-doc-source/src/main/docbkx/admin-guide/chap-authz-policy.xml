@@ -849,19 +849,23 @@ $ <userinput>ssoadm \
  </section>
  
  <section xml:id="delegate-policy">
-  <title>Delegating Policy Management &amp; Decisions</title>
-  <indexterm>
-   <primary>Authorization</primary>
-   <secondary>Delegating</secondary>
-  </indexterm>
+  <title>Delegating Policy Management</title>
+
   <indexterm>
    <primary>Policy</primary>
-   <secondary>Delegating</secondary>
+   <secondary>Delegating management</secondary>
   </indexterm>
-  <para>You use a <firstterm>referral</firstterm> to delegate policy
-  management, and to delegate policy decision making.</para>
-  <para>Referrals are covered in the <link xlink:href="admin-guide#chap-realms"
-  xlink:role="http://docbook.org/xlink/role/olink">chapter on
-  Realms</link>.</para>
+
+  <para>
+   To delegate policy management and other administrative tasks, use privileges.
+   You set privileges in OpenAM console on the Privileges page for a realm.
+  </para>
+
+  <para>
+   For details see the procedure,
+   <link
+    xlink:href="admin-guide#chap-realms"
+    xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>To Delegate Administration</citetitle></link>.</para>
  </section>
 </chapter>
