@@ -144,7 +144,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
             Set<String> invalidScopes = new HashSet<String>(requestedScopes);
             invalidScopes.removeAll(allowedScopes);
             final Set<String> responseTypes = Utils.splitResponseType(request.<String>getParameter(RESPONSE_TYPE));
-            throw new InvalidScopeException("Unknown/invalid scope(s): " + invalidScopes.toString(),
+            throw new InvalidScopeException("Unknown or invalid scope(s): " + invalidScopes.toString(),
                     Utils.isOAuth2FragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
         }
 

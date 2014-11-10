@@ -125,9 +125,6 @@ public class AuthorizeResource extends ServerResource {
         } catch (RedirectUriMismatchException e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
-        } catch (InvalidScopeException e) {
-            throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
-                    request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"),
