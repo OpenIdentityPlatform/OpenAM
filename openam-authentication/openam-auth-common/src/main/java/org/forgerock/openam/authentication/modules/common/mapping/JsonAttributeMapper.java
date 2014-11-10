@@ -32,7 +32,9 @@ import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -43,7 +45,24 @@ import java.util.StringTokenizer;
 public class JsonAttributeMapper implements AttributeMapper<String> {
 
     private static Debug debug = Debug.getInstance("amAuth");
+    private List<String> prefixedAttributes = null;
+    private String prefix = null;
     private String bundleName;
+
+    /**
+     * Default constructor if not being given any prefix parameter
+     */
+    public JsonAttributeMapper() {}
+
+    /**
+     * Constructor with a prefix that will be prepended to all mapped values.
+     * @param prefixedAttributesList Comma-separated list of attributes that need a prefix applied, or <code>*</code>.
+     * @param prefix The prefix to be applied.
+     */
+    public JsonAttributeMapper(String prefixedAttributesList, String prefix) {
+        this.prefix = prefix;
+        this.prefixedAttributes = Arrays.asList(prefixedAttributesList.split(","));
+    }
 
     /**
      * {@inheritDoc}
@@ -88,6 +107,9 @@ public class JsonAttributeMapper implements AttributeMapper<String> {
                     data = json.getString(responseName);
                 }
 
+                if (prefix != null && (prefixedAttributes.contains(localName) || prefixedAttributes.contains("*"))) {
+                    data = prefix + data;
+                }
                 attr.put(localName, CollectionUtils.asSet(data));
             } catch (JSONException ex) {
                 debug.error("defaultAttributeMapper.getAttributes: Could not get the attribute" + responseName, ex);

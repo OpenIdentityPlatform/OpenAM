@@ -24,12 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.testng.Assert.assertTrue;
-/*
-Not testing the lookupPrincipal method, as the AMIdentityRespository is final, and thus requires PowerMock. Introducing
-byte-code engineering to test the simple consumption of the AMIdentityRepository in the DefaultPrincipalMapper not
-worth the downsides of PowerMock.
- */
+import static org.fest.assertions.Assertions.assertThat;
+
 public class JwtAttributeMapperTest {
     private static final String EMAIL = "email";
     private static final String AM_EMAIL = "mail";
@@ -52,18 +48,18 @@ public class JwtAttributeMapperTest {
         jwtMappings.put(EMAIL, EMAIL_VALUE);
 
         attributeMappings = new HashMap<String, String>();
-        attributeMappings.put(UID, SUB);
-        attributeMappings.put(AM_EMAIL, EMAIL);
+        attributeMappings.put(SUB, UID);
+        attributeMappings.put(EMAIL, AM_EMAIL);
 
         claimsSet = new JwtClaimsSet(jwtMappings);
-        defaultPrincipalMapper = new JwtAttributeMapper();
+        defaultPrincipalMapper = new JwtAttributeMapper("uid", "prefix-");
     }
 
     @Test
     public void testBasicJwtMapping() {
         final Map<String, Set<String>> attrs =
                 defaultPrincipalMapper.getAttributes(attributeMappings, claimsSet);
-        assertTrue(SUBJECT_VALUE.equals(attrs.get(UID).iterator().next()));
-        assertTrue(EMAIL_VALUE.equals(attrs.get(AM_EMAIL).iterator().next()));
+        assertThat(attrs.get(UID).iterator().next()).isEqualTo("prefix-" + SUBJECT_VALUE);
+        assertThat(attrs.get(AM_EMAIL).iterator().next()).isEqualTo(EMAIL_VALUE);
     }
 }

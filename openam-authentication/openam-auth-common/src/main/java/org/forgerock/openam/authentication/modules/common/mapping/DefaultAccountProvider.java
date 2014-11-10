@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2014 ForgeRock AS. All rights reserved.
- * Copyright © 2011 Cybernetica AS.
+ * Copyright 2011-2014 ForgeRock AS.
+ * Copyright 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -49,6 +49,22 @@ public class DefaultAccountProvider implements AccountProvider {
 
     private static Debug debug = Debug.getInstance("amAuth");
 
+    private String idNameAttribute = "uid";
+
+    /**
+     * Default constructor uses default attribute for id name (uid) when creating users.
+     */
+    public DefaultAccountProvider() {}
+
+    /**
+     * Custom attribute name to be used for the id name.
+     * @param idNameAttribute The attribute name that should be used to extract the user ID from the map of attributes
+     *                        when creating users.
+     */
+    public DefaultAccountProvider(String idNameAttribute) {
+        this.idNameAttribute = idNameAttribute;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -61,7 +77,7 @@ public class DefaultAccountProvider implements AccountProvider {
         }
 
         IdSearchControl ctrl = getSearchControl(IdSearchOpModifier.OR, attr);
-        IdSearchResults results;       
+        IdSearchResults results;
         try {
             results = idrepo.searchIdentities(IdType.USER, "*", ctrl);
             Iterator<AMIdentity> iter = results.getSearchResults().iterator();
@@ -88,7 +104,13 @@ public class DefaultAccountProvider implements AccountProvider {
 
         AMIdentity identity = null;
             try {
-                String userId = UUID.randomUUID().toString();
+                String userId;
+                Set<String> idAttribute = attributes.get(idNameAttribute);
+                if (idAttribute != null && !idAttribute.isEmpty()) {
+                    userId = idAttribute.iterator().next();
+                } else {
+                    userId = UUID.randomUUID().toString();
+                }
                 identity = idrepo.createIdentity(IdType.USER, userId, attributes);
             } catch (IdRepoException ire) {
                 debug.error("DefaultAccountMapper.getAccount: IRE ", ire);

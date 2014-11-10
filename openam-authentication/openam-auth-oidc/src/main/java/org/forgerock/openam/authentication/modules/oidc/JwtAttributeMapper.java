@@ -16,27 +16,17 @@
 
 package org.forgerock.openam.authentication.modules.oidc;
 
-import com.iplanet.sso.SSOException;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchOpModifier;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper;
+import org.forgerock.openam.utils.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.forgerock.openam.authentication.modules.oidc.OpenIdConnectConfig.BUNDLE_KEY_PRINCIPAL_MAPPING_FAILURE;
-import static org.forgerock.openam.authentication.modules.oidc.OpenIdConnectConfig.RESOURCE_BUNDLE_NAME;
 
 /**
  * An {@code AttributeMapper} that gets its values from a JWT.
@@ -44,11 +34,24 @@ import static org.forgerock.openam.authentication.modules.oidc.OpenIdConnectConf
  */
 public class JwtAttributeMapper implements AttributeMapper<JwtClaimsSet> {
     private static Debug logger = Debug.getInstance("amAuth");
-    /*
-    This value should always be set to one, as we are returning the first result in the Set encapsulated in the
-    IdSearchResult class. See lookupPrincipal below.
+
+    private List<String> prefixedAttributes = null;
+    private String prefix = null;
+
+    /**
+     * Default constructor with no prefix
      */
-    private static final int SINGLE_SEARCH_RESULT = 1;
+    public JwtAttributeMapper() {}
+
+    /**
+     * Constructor that allows a prefix to be added to the mapped values
+     * @param prefixedAttributesList Comma-separated list of attributes that need a prefix applied, or <code>*</code>.
+     * @param prefix The prefix to be applied.
+     */
+    public JwtAttributeMapper(String prefixedAttributesList, String prefix) {
+        this.prefix = prefix;
+        this.prefixedAttributes = Arrays.asList(prefixedAttributesList.split(","));
+    }
 
     /**
      * {@inheritDoc}
@@ -75,12 +78,17 @@ public class JwtAttributeMapper implements AttributeMapper<JwtClaimsSet> {
         Just to be sure, I will log an error if I encounter this situation, in case any of the above invariants are violated.
          */
         for (Map.Entry<String, String> entry : localToJwtAttributeMapping.entrySet()) {
-            if (jwtClaimsSet.isDefined(entry.getValue())) {
-                if (!lookupAttributes.containsKey(entry.getKey())) {
+            String jwtName = entry.getKey();
+            if (jwtClaimsSet.isDefined(jwtName)) {
+                String localName = entry.getValue();
+                if (!lookupAttributes.containsKey(localName)) {
                     Set<String> value = new HashSet<String>();
                     //obtain the claim as an Object, and call toString on it, as a Set<String> needs to be populated.
-                    value.add(jwtClaimsSet.getClaim(entry.getValue()).toString());
-                    lookupAttributes.put(entry.getKey(), value);
+                    String data = jwtClaimsSet.getClaim(jwtName).toString();
+                    if (prefix != null && (prefixedAttributes.contains(localName) || prefixedAttributes.contains("*"))) {
+                        data = prefix + data;
+                    }
+                    lookupAttributes.put(localName, CollectionUtils.asSet(data));
                 } else {
                     logger.error("In JwtAttributeMapper.getAttributes, the " +
                             "localToJwtAttributeMappings appears to have duplicate entries: " + localToJwtAttributeMapping +

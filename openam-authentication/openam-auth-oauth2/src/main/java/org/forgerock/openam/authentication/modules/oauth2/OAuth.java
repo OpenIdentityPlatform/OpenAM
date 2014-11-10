@@ -69,12 +69,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Principal;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -466,9 +468,7 @@ public class OAuth extends AMLoginModule {
             throws AuthLoginException {
 
         try {
-            AttributeMapper<?> attributeMapper =
-                    Class.forName(config.getAccountMapper()).asSubclass(AttributeMapper.class).newInstance();
-            return attributeMapper;
+            return getConfiguredType(AttributeMapper.class, config.getAccountMapper());
         } catch (ClassCastException ex) {
             debug.error("Account Mapper is not an implementation of AttributeMapper.", ex);
             throw new AuthLoginException("Problem when trying to instantiate the account provider", ex);
@@ -481,9 +481,7 @@ public class OAuth extends AMLoginModule {
     private AccountProvider instantiateAccountProvider()
             throws AuthLoginException {
         try {
-            AccountProvider accountProvider =
-                    Class.forName(config.getAccountProvider()).asSubclass(AccountProvider.class).newInstance();
-            return accountProvider;
+            return getConfiguredType(AccountProvider.class, config.getAccountProvider());
         } catch (ClassCastException ex) {
             debug.error("Account Provider is not actually an implementation of AccountProvider.", ex);
             throw new AuthLoginException("Problem when trying to instantiate the account provider", ex);
@@ -501,8 +499,7 @@ public class OAuth extends AMLoginModule {
 
         for (String attributeMapperClassname : config.getAttributeMappers()) {
             try {
-                Class<?> attrMapperClass = Class.forName(attributeMapperClassname);
-                AttributeMapper attributeMapper = attrMapperClass.asSubclass(AttributeMapper.class).newInstance();
+                AttributeMapper attributeMapper = getConfiguredType(AttributeMapper.class, attributeMapperClassname);
                 attributeMapper.init(OAuthParam.BUNDLE_NAME);
                 attributes.putAll(getAttributes(svcProfileResponse, attributeMapperConfig, attributeMapper, jwtClaims));
             } catch (ClassCastException ex) {
@@ -513,6 +510,21 @@ public class OAuth extends AMLoginModule {
         }
         OAuthUtil.debugMessage("OAuth.getUser: creating new user; attributes = " + attributes);
         return attributes;
+    }
+
+    private <T> T getConfiguredType(Class<T> type, String config) throws ClassNotFoundException, InstantiationException,
+            IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        String[] parameters = new String[0];
+        int delimiter = config.indexOf('|');
+        if (delimiter > -1) {
+            parameters = config.substring(delimiter + 1).split("\\|");
+            config = config.substring(0, delimiter);
+        }
+
+        Class<? extends T> clazz = Class.forName(config).asSubclass(type);
+        Class<?>[] parameterTypes = new Class<?>[parameters.length];
+        Arrays.fill(parameterTypes, String.class);
+        return clazz.getConstructor(parameterTypes).newInstance(parameters);
     }
 
     private Map getAttributes(String svcProfileResponse, Map<String, String> attributeMapperConfig,
