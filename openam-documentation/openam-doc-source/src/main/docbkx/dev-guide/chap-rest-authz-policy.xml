@@ -459,13 +459,13 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "advices": {
-    "<replaceable>type</replaceable>": [
-    "<replaceable>advice</replaceable>"
-    ]
+        "<replaceable>type</replaceable>": [
+            "<replaceable>advice</replaceable>"
+        ]
     }
-    }
+}
    </programlisting>
 
    <para>
@@ -482,11 +482,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "type": "AttributeLookup",
     "key": "postaladdress",
     "value": "33 New Montgomery St."
-    }
+}
    </programlisting>
 
    <para>
@@ -494,11 +494,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "com.sun.identity.entitlement.AttributeLookupCondition": [
-    "33 New Montgomery St.=postaladdress"
+        "33 New Montgomery St.=postaladdress"
     ]
-    }
+}
    </programlisting>
 
    <para>
@@ -508,10 +508,10 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "type": "DNSName",
     "domainNameMask": "*.example.org"
-    }
+}
    </programlisting>
 
    <para>
@@ -519,11 +519,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "com.sun.identity.entitlement.DNSNameCondition": [
-    "requestDnsName=*.example.org"
+        "requestDnsName=*.example.org"
     ]
-    }
+}
    </programlisting>
 
    <para>
@@ -533,11 +533,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "type": "IP",
     "startIp": "127.0.0.1",
     "endIp": "127.0.1.255"
-    }
+}
    </programlisting>
 
    <para>
@@ -545,11 +545,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "com.sun.identity.entitlement.IPCondition": [
-    "requestIp=127.0.0.1-127.0.1.255"
+        "requestIp=127.0.0.1-127.0.1.255"
     ]
-    }
+}
    </programlisting>
 
    <para>
@@ -560,12 +560,12 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "type": "NumericAttribute",
     "attributeName": "gidNumber",
     "operator": "LESS_THAN",
     "value": "1000"
-    }
+}
    </programlisting>
 
    <para>
@@ -573,11 +573,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "com.sun.identity.entitlement.NumericAttributeCondition": [
-    "gidNumber&lt;1000.0"
+        "gidNumber&lt;1000.0"
     ]
-    }
+}
    </programlisting>
 
    <para>
@@ -587,12 +587,12 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "type": "StringAttribute",
     "attributeName": "location",
     "caseSensitive": false,
     "value": "Bristol"
-    }
+}
    </programlisting>
 
    <para>
@@ -600,11 +600,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "com.sun.identity.entitlement.StringAttributeCondition": [
-    "location=Bristol"
+        "location=Bristol"
     ]
-    }
+}
    </programlisting>
 
    <para>
@@ -626,11 +626,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "type": "Time",
     "startTime": "10:00",
     "endTime": "16:30"
-    }
+}
    </programlisting>
 
    <para>
@@ -638,14 +638,14 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "maxTime": [
-    "1410273000000"
+        "1410273000000"
     ],
     "timeToLive": [
-    "19648817"
+        "19648817"
     ]
-    }
+}
    </programlisting>
 
    <para>
@@ -654,11 +654,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "ForceAuth": [
-    "true"
+        "true"
     ]
-    }
+}
    </programlisting>
 
    <para>
@@ -666,27 +666,28 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "type": "Policy",
     "className": "com.sun.identity.policy.plugins.AuthenticateToRealmCondition",
     "name": "realm",
     "properties": {
-    "AuthenticateToRealm": [
-    "/realm"
-    ]
+        "AuthenticateToRealm": [
+            "/realm"
+        ]
     }
-    }      </programlisting>
+}
+   </programlisting>
 
    <para>
     Leads to this advice:
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "AuthenticateToRealmConditionAdvice": [
-    "/realm"
+        "/realm"
     ]
-    }
+}
    </programlisting>
 
    <para>
@@ -694,16 +695,16 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "type": "Policy",
     "className": "com.sun.identity.policy.plugins.AuthenticateToServiceCondition",
     "name": "Require MyAuthnChain",
     "properties": {
-    "AuthenticateToService": [
-    "MyAuthnChain"
-    ]
+        "AuthenticateToService": [
+            "MyAuthnChain"
+        ]
     }
-    }
+}
    </programlisting>
 
    <para>
@@ -711,11 +712,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "AuthenticateToServiceConditionAdvice": [
-    "MyAuthnChain"
+        "MyAuthnChain"
     ]
-    }
+}
    </programlisting>
 
    <para>
@@ -723,16 +724,16 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "type": "Policy",
     "className": "com.sun.identity.policy.plugins.AuthLevelCondition",
     "name": "AuthnLevelAtLeast5",
     "properties": {
-    "AuthLevel": [
-    "5"
-    ]
+        "AuthLevel": [
+            "5"
+        ]
     }
-    }
+}
    </programlisting>
 
    <para>
@@ -740,11 +741,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "AuthLevelConditionAdvice": [
-    "5"
+        "5"
     ]
-    }
+}
    </programlisting>
 
    <para>
@@ -752,16 +753,16 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "type": "Policy",
     "className": "com.sun.identity.policy.plugins.AuthSchemeCondition",
     "name": "RequireHOTP",
     "properties": {
-    "AuthScheme": [
-    "HOTP"
-    ]
+        "AuthScheme": [
+            "HOTP"
+        ]
     }
-    }
+}
    </programlisting>
 
    <para>
@@ -769,11 +770,11 @@ $ <userinput>curl \
    </para>
 
    <programlisting language="javascript">
-    {
+{
     "AuthSchemeConditionAdvice": [
-    "HOTP"
+        "HOTP"
     ]
-    }
+}
    </programlisting>
   </section>
 
