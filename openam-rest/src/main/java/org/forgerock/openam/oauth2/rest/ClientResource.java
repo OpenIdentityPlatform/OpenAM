@@ -295,6 +295,9 @@ public class ClientResource implements CollectionResourceProvider {
         JsonValue response;
         try {
             String realm = request.getAdditionalParameter("realm");
+            if (realm == null) {
+                realm = "/";
+            }
             manager.deleteIdentity(resourceId, realm);
 
             //delete the tokens associated with that client_id
