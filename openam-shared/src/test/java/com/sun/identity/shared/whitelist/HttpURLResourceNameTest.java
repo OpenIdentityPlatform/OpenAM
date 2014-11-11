@@ -37,12 +37,18 @@ public class HttpURLResourceNameTest {
         runner("http://www.google.com:80/blah/one/two/moo", pattern, true);
     }
 
+    @Test
+    public void checkSingleLevelInternal() {
+        String pattern = "http://www.google.com:80/blah/-*-/moo";
+        runner("http://www.google.com:80/blah/one/moo", pattern, true);
+        runner("http://www.google.com:80/blah/one/two/moo", pattern, false);
+    }
 
     @Test
     public void checkInternal() {
         String pattern = "http://www.google.com:80/blah/*/moo";
         runner("http://www.google.com:80/blah/one/moo", pattern, true);
-        runner("http://www.google.com:80/blah/one/two/moo", pattern, false);
+        runner("http://www.google.com:80/blah/one/two/moo", pattern, true);
     }
 
     private void runner(String url, String pattern, boolean expected) {
