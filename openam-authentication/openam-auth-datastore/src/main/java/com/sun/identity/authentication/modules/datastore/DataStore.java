@@ -31,6 +31,7 @@
  */
 package com.sun.identity.authentication.modules.datastore;
 
+import com.sun.identity.authentication.spi.UserNamePasswordValidationException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.authentication.spi.AMLoginModule;
@@ -120,15 +121,16 @@ public class DataStore extends AMLoginModule {
                     idCallbacks = callbacks;
                     //callbacks is not null
                     userName = ( (NameCallback) callbacks[0]).getName();
-                    userPassword = String.valueOf(((PasswordCallback)
-                        callbacks[1]).getPassword());
+                    char[] password = ((PasswordCallback) callbacks[1]).getPassword();
+                    userPassword = password == null ? null : String.valueOf(password);
+                }
+                if (userName == null) {
+                    debug.message("DataStore.process: Username is null/empty");
+                    throw new UserNamePasswordValidationException("amAuth", "InvalidUP", null);
                 }
                 if (userPassword == null || userPassword.length() == 0) {
-                    if (debug.messageEnabled()) {
-                        debug.message("DataStore.process: Password is null/empty");
-                    } 
-                    throw new InvalidPasswordException("amAuth",
-                            "invalidPasswd", null);
+                    debug.message("DataStore.process: Password is null/empty");
+                    throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
                 }
                 //store username password both in success and failure case
                 storeUsernamePasswd(userName, userPassword);
