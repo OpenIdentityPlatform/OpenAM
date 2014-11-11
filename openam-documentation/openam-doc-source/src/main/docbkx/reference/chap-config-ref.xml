@@ -1009,12 +1009,21 @@
   </variablelist>
 
   <variablelist xml:id="system-logging">
-   <title>Logging</title>
+   <title>Audit Logging</title>
 
-   <para>You configure global OpenAM logging settings on this page.</para>
+   <para>You configure OpenAM audit logging settings on this page.</para>
 
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMLoggingService</literal></para>
+
+   <varlistentry>
+    <term>Log Rotation</term>
+    <listitem>
+     <para>Enable log rotation to cause new log files to be created when
+      configured thresholds are reached, such as <emphasis>Maximum Log
+       Size</emphasis> or <emphasis>Logfile Rotation Interval</emphasis>.</para>
+    </listitem>
+   </varlistentry>
 
    <varlistentry>
     <term>Maximum Log Size</term>
@@ -1056,13 +1065,24 @@
    <varlistentry>
     <term>Logfile Rotation Suffix</term>
     <listitem>
-     <para>Changing this if you want to change the suffix for log files
-     governed by time-based log rotation. You can use
-     <literal>SimpleDateFormat</literal> patterns. The default is
-     <literal>-MM.dd.yy-kk.mm</literal>.</para>
-
+     <para>Specify a string to append to log file names when time-based rotation
+      is enabled by using the <emphasis>Logfile Rotation Interval</emphasis>
+      setting.</para>
+     <para>Allows date and time patterns, as defined in
+      <link xlink:href="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html"
+            xlink:show="new">SimpleDateFormat</link>. The default value is
+      <literal>-MM.dd.yy-kk.mm</literal>.</para>
      <para><command>ssoadm</command> attribute:
-     <literal>openam-logging-file-suffix</literal></para>
+      <literal>openam-logging-file-suffix</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Logfile Rotation Interval</term>
+    <listitem>
+     <para>Specify the amount of time before log file rotation occurs,
+      in minutes. Set to <literal>-1</literal> (the default) to disable
+      time-based logfile rotation and revert to sized-based rotation.</para>
     </listitem>
    </varlistentry>
 
@@ -1105,7 +1125,8 @@
    <varlistentry>
     <term>Logging Type</term>
     <listitem>
-     <para>Set this to <literal>DB</literal> to log to a database. Default:
+     <para>Set this to <literal>DB</literal> to log to a database, or
+      <literal>Syslog</literal> to log to a syslog server. Default:
      <literal>File</literal>. If you choose <literal>DB</literal> then be
      sure to set the connection attributes correctly, including the JDBC
      driver to use.</para>
@@ -1148,6 +1169,58 @@
 
      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-logging-db-driver</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Syslog server host</term>
+    <listitem>
+     <para>The URL or IP address of the syslog server,
+      for example <literal>http://mysyslog.example.com</literal>, or
+      <literal>localhost</literal>.</para>
+     <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-logging-syslog-host</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Syslog server port</term>
+    <listitem>
+     <para>The port number the syslog server is configured to listen to.
+      Often <literal>514</literal>.</para>
+     <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-logging-syslog-port</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Syslog server protocol</term>
+    <listitem>
+     <para>The protocol to use to connect to the syslog server. Either
+      <literal>UDP</literal> or <literal>TCP</literal>.</para>
+     <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-logging-syslog-protocol</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Syslog facility</term>
+    <listitem>
+     <para>Syslog uses the facility level to determine the type of
+      program that is logging the message. Often between
+      <literal>local0</literal> and <literal>local7</literal>.</para>
+     <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-logging-syslog-facility</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Syslog connection timeout</term>
+    <listitem>
+     <para>The amount of time to wait when attempting to connect to the syslog
+      server before reporting a failure, in seconds.</para>
+     <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-logging-syslog-connection-timeout</literal></para>
     </listitem>
    </varlistentry>
 

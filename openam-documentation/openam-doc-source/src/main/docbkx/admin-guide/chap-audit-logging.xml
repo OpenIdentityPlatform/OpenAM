@@ -45,13 +45,22 @@
   Audit logs capture normal operational information about OpenAM usage.
   Audit file records are structured: they adhere to a consistent, documented
   file format. You can configure OpenAM to write audit logs to flat files,
-  or to relational database tables. OpenAM servers running on UNIX hosts
-  can write audit logs to syslog.
+  relational database tables, or a syslog server.
  </para>
 
  <para>
-  OpenAM policy agents also produce agent logs. Agent audit logs
+  OpenAM policy agents also produce agent audit logs. Agent audit logs
   provide a trail of policy agent activity.
+ </para>
+
+ <para>
+  OpenAM services can capture a variety of information in debug logs, which you
+  can use when troubleshooting OpenAM. For more information about the OpenAM
+  debug logs, see
+  <link xlink:href="admin-guide#debug-logging"
+        xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink">
+   <citetitle>Debug Logging</citetitle>.
+  </link>
  </para>
 
  <para>
@@ -65,30 +74,29 @@
   log rotation, secure logging, and log message buffering.
  </para>
 
- <para>
-  By default, OpenAM audit logs are written to files in the
-  configuration directory for the instance, such as
-  <filename>$HOME/openam/log/</filename>.
- </para>
-
+ <section xml:id="log-mgmt-global-settings">
+ <title>Configuring Audit Logging</title>
  <para>
   To configure OpenAM logging properties, log in to the OpenAM
   console as OpenAM administrator, and browse to Configuration &gt; System &gt;
   Logging.
  </para>
 
- <para>
-  OpenAM services can capture a variety of information in debug logs, which you
-  can use when troubleshooting OpenAM. For more information about the OpenAM
-  debug logs, see
-  <link xlink:href="admin-guide#debug-logging"
-        xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink">
-   <citetitle>Debug Logging</citetitle>.
-  </link>
- </para>
+  <para>For more information on the available settings, see the <link
+   xlink:href="reference#system-logging"
+   xlink:role="http://docbook.org/xlink/role/olink">Audit Logging</link>
+   reference.</para>
+
+</section>
 
  <section xml:id="log-mgmt-core">
   <title>Audit Logging to Flat Files</title>
+
+  <para>
+   By default, OpenAM audit logs are written to files in the
+   configuration directory for the instance, such as
+   <filename>$HOME/openam/log/</filename>.
+  </para>
 
   <para>
    OpenAM sends messages to different log files, each named after the
@@ -110,7 +118,76 @@
    reference for details.
   </para>
  </section>
+ <section xml:id="log-mgmt-syslog">
+  <title>Audit Logging to a Syslog Server</title>
 
+  <para>OpenAM supports sending audit log messages to a syslog server for
+   collation.</para>
+
+  <para>You can enable syslog audit logging by using the OpenAM console,
+   or the <filename>ssoadm</filename> command.</para>
+  <procedure xml:id="enable-syslog-audit-logging-console">
+    <title>Enabling Syslog Audit Logging by Using the OpenAM Console</title>
+    <step>
+      <para>Login to the OpenAM console as OpenAM administrator.</para>
+    </step>
+    <step>
+      <para>Browse to Configuration &gt; System &gt; Logging.</para>
+    </step>
+   <step>
+   <para>Set the <emphasis>Logging Type</emphasis> option to
+    <literal>Syslog</literal>.</para>
+  </step>
+   <step>
+    <para>Complete the following settings as appropriate for your syslog
+     server:</para>
+    <itemizedlist>
+      <listitem><para><literal>Syslog server host</literal></para></listitem>
+      <listitem><para><literal>Syslog server port</literal></para></listitem>
+      <listitem><para><literal>Syslog server protocol</literal></para></listitem>
+      <listitem><para><literal>Syslog facility</literal></para></listitem>
+      <listitem><para><literal>Syslog connection timeout</literal></para></listitem>
+    </itemizedlist>
+    <para>For information on these settings, see the <link
+     xlink:href="reference#system-logging"
+     xlink:role="http://docbook.org/xlink/role/olink">Audit Logging</link>
+     reference.</para>
+   </step>
+   <step>
+    <para>Save your work.</para>
+   </step>
+</procedure>
+  <procedure xml:id="enable-syslog-audit-logging-SSOADM">
+   <title>Enabling Syslog Audit Logging by Using SSOADM</title>
+   <step>
+    <para>Create a text file, for example
+     <filename>MySyslogServerSettings.txt</filename> containing the settings
+     used when audit logging to a syslog server, as shown below:</para>
+<screen>
+<userinput>iplanet-am-logging-syslog-port=<replaceable>514</replaceable>
+iplanet-am-logging-syslog-protocol=<replaceable>UDP</replaceable>
+iplanet-am-logging-type=Syslog
+iplanet-am-logging-syslog-connection-timeout=<replaceable>30</replaceable>
+iplanet-am-logging-syslog-host=<replaceable>localhost</replaceable>
+iplanet-am-logging-syslog-facility=<replaceable>local5</replaceable></userinput>
+</screen>
+   </step>
+   <step>
+    <para>Use the following SSOADM command to configure audit logging to
+     a syslog server:</para>
+<screen>$ <userinput>ssoadm \
+ set-attr-defs \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --servicename iPlanetAMLoggingService \
+ --schematype Global \
+ --datafile <replaceable>MySyslogServerSettings.txt</replaceable></userinput>
+
+ <computeroutput>Schema attribute defaults were set.</computeroutput>
+</screen>
+   </step>
+  </procedure>
+ </section>
  <section xml:id="log-mgmt-agents">
   <title>Audit Logging in OpenAM Policy Agents</title>
 

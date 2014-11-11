@@ -307,6 +307,21 @@ Agreement (yes/no): [no]:</screen>
    </para>
   </listitem>
 
+  <listitem><!-- Enhancement: AME-2111 -->
+   <para><emphasis role="bold">Audit Logging to Syslog Servers</emphasis>.
+    OpenAM now supports logging audit messages to a syslog server.
+   </para>
+   <para>
+    For more information, see
+    <link
+     xlink:show="new"
+     xlink:href="admin-guide#log-mgmt-syslog"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Audit Logging to a Syslog Server</citetitle></link>
+    in the <citetitle>Administration Guide</citetitle>.
+   </para>
+  </listitem>
+
   <listitem><!-- Enhancement: AME-2210 -->
    <para><emphasis role="bold">Persistent Cookie from Client IP Issued</emphasis>.
     The Persistent Cookie module has been enhanced to enforce
