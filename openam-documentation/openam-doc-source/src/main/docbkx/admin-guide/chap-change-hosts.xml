@@ -100,18 +100,16 @@
 $ <userinput>ssoadm \
  export-svc-cfg \
  --adminid amadmin \
- --encryptsecret fZatIu68OiqccJMXosSRyVjMsWJIx+SA \
+ --encryptsecret myEncryptSecretString1234 \
  --password-file /tmp/pwd.txt \
  --outfile config.xml</userinput>
 
 <computeroutput>Service Configuration was exported.</computeroutput>
    </screen>
 
-   <para>In this example, the secret key for encrypting the password in
-   <option>--encryptsecret fZatIu68OiqccJMXosSRyVjMsWJIx+SA</option> was taken from the
-   Password Encryption Key field in the OpenAM console under Configuration &gt;
-   Servers and Sites &gt; <replaceable>Server Name</replaceable> &gt;
-   Security.</para>
+   <para>OpenAM uses the value entered in <option>--encryptsecret</option> to
+    encrypt passwords stored in the backup file. It can be any value,
+    and is required when restoring a configuration.</para>
   </step>
   <step>
    <para>Edit the service configuration file.</para>
@@ -188,7 +186,7 @@ $ <userinput>ssoadm \
 $ <userinput>ssoadm \
  import-svc-cfg \
  --adminid amadmin \
- --encryptsecret fZatIu68OiqccJMXosSRyVjMsWJIx+SA \
+ --encryptsecret myEncryptSecretString1234 \
  --password-file /tmp/pwd.txt \
  --xmlfile config.xml</userinput>
 
