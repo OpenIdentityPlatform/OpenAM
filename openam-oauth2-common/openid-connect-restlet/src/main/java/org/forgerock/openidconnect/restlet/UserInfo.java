@@ -67,15 +67,13 @@ public class UserInfo extends ServerResource {
      * @throws OAuth2RestletException If an error occurs whilst retrieving the user's information.
      */
     @Get
-    @Post
-    public Representation getUserInfo() throws OAuth2RestletException {
+    @Post("form:json")
+    public Representation getUserInfo(Representation body) throws OAuth2RestletException {
 
         final OAuth2Request request = requestFactory.create(getRequest());
 
-        final String tokenId = getRequest().getChallengeResponse().getRawValue();
-        final JsonValue userInfo;
         try {
-            userInfo = userInfoService.getUserInfo(tokenId, request);
+            final JsonValue userInfo = userInfoService.getUserInfo(request);
             return new JsonRepresentation(userInfo.asMap());
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);

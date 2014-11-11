@@ -85,7 +85,7 @@ public class OpenIdConnectClientRegistrationServiceImpl implements OpenIdConnect
     public JsonValue createRegistration(String accessToken, String deploymentUrl, OAuth2Request request)
             throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException {
 
-        if (!tokenVerifier.verify(request)) {
+        if (!tokenVerifier.verify(request).isValid()) {
             throw new ServerException("Access Token not valid");
         }
 

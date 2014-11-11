@@ -98,7 +98,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
         if (!providerSettings.isOpenDynamicClientRegistrationAllowed()) {
-            if (!tokenVerifier.verify(request)) {
+            if (!tokenVerifier.verify(request).isValid()) {
                 throw new AccessDeniedException("Access Token not valid");
             }
         }

@@ -16,13 +16,28 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+
 /**
  * Verifies that a OAuth2 request that is made to one of the protected endpoints on the OAuth2 provider,
  * (i.e. tokeninfo, userinfo) contains a valid access token.
  *
  * @since 12.0.0
  */
-public interface AccessTokenVerifier {
+public abstract class AccessTokenVerifier {
+
+    public static final String HEADER = "header";
+    public static final String FORM_BODY = "form-body";
+    protected final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+    private static final TokenState INVALID_TOKEN = new TokenState(null);
+
+    private TokenStore tokenStore;
 
     /**
      * Verifies that the specified OAuth2 request contains a valid access token which has not expired.
@@ -30,5 +45,66 @@ public interface AccessTokenVerifier {
      * @param request The OAuth2 request. Must not be {@code null}.
      * @return {@code true} if the request contains an access token which is valid and has not expired.
      */
-    boolean verify(OAuth2Request request);
+    public TokenState verify(OAuth2Request request) {
+        final String tokenId = obtainTokenId(request);
+
+        if (tokenId == null) {
+            logger.debug("Request does not contain token id.");
+            return INVALID_TOKEN;
+        }
+
+        try {
+            //verify token
+            final AccessToken accessToken = tokenStore.readAccessToken(request, tokenId);
+            //is token expired?
+            if (accessToken != null) {
+                return accessToken.isExpired() ? INVALID_TOKEN : new TokenState(tokenId);
+            }
+        } catch (BadRequestException e) {
+            logger.debug(e.getMessage());
+        } catch (ServerException e) {
+            logger.debug(e.getMessage());
+        } catch (InvalidGrantException e) {
+            logger.debug(e.getMessage());
+        }
+        return INVALID_TOKEN;
+    }
+
+    /**
+     * Obtain the token ID from the request.
+     * @param request The OAuth2 request. Must not be {@code null}.
+     * @return The String access token ID.
+     */
+    protected abstract String obtainTokenId(OAuth2Request request);
+
+    /**
+     * Sets the token store for verifying the access token.
+     *
+     * @param tokenStore An instance of the TokenStore.
+     */
+    @Inject
+    public void setTokenStore(TokenStore tokenStore) {
+        this.tokenStore = tokenStore;
+    }
+
+    /**
+     * Represents the state of the token on the request.
+     */
+    public static class TokenState {
+
+        private final String tokenId;
+
+        protected TokenState(String tokenId) {
+            this.tokenId = tokenId;
+        }
+
+        public boolean isValid() {
+            return tokenId != null;
+        }
+
+        public String getTokenId() {
+            return tokenId;
+        }
+    }
+
 }

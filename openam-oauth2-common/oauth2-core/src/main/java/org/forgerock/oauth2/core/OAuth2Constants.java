@@ -136,7 +136,7 @@ public class OAuth2Constants {
         public static final String GRANT_TYPE = "grant_type";
 
         /**
-         * Parameter usage location: authorization response, token response
+         * Parameter usage location: authorization response, token response, user info form
          */
         public static final String ACCESS_TOKEN = "access_token";
 

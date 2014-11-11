@@ -18,12 +18,16 @@ package org.forgerock.oauth2.restlet;
 
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenVerifier;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.restlet.Request;
+import org.restlet.data.Form;
+import org.restlet.data.MediaType;
+import org.restlet.representation.Representation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,24 +36,33 @@ import javax.inject.Singleton;
 
 /**
  * Verifies that a OAuth2 request that is made to one of the protected endpoints on the OAuth2 provider,
- * (i.e. tokeninfo, userinfo) contains a valid access token specified in the request header.
+ * (i.e. tokeninfo, userinfo) contains a valid access token specified in the request body.
  *
  * @since 12.0.0
  */
 @Singleton
-public class RestletHeaderAccessTokenVerifier extends AccessTokenVerifier {
+public class RestletFormBodyAccessTokenVerifier extends AccessTokenVerifier {
 
     /**
      * {@inheritDoc}
      */
     protected String obtainTokenId(OAuth2Request request) {
         final Request req = request.getRequest();
+        final Representation body = req.getEntity();
 
-        if (req.getChallengeResponse() == null) {
-            logger.debug("Request does not contain Authorization header.");
+        if (body == null || !MediaType.APPLICATION_WWW_FORM.equals(body.getMediaType())) {
+            logger.debug("Request does not contain form.");
             return null;
         }
 
-        return req.getChallengeResponse().getRawValue();
+        Form formBody = new Form(body);
+
+        if (!formBody.getNames().contains(OAuth2Constants.Params.ACCESS_TOKEN)) {
+            logger.debug("Request form does not contain access_token.");
+            return null;
+        }
+
+        return formBody.getFirstValue(OAuth2Constants.Params.ACCESS_TOKEN);
     }
+
 }

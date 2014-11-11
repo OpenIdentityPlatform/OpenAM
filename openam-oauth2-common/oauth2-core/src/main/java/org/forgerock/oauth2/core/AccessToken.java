@@ -277,7 +277,7 @@ public class AccessToken extends JsonValue implements Token {
      *
      * @return {@code true} if current time is greater than the expiry time.
      */
-    public final boolean isExpired() {
+    public boolean isExpired() {
         return System.currentTimeMillis() > getExpiryTime();
     }
 

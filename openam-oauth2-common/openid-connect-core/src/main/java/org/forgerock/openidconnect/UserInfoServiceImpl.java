@@ -29,7 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
+
+import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
 
 /**
  * Service for retrieving user's information from the access token the user granted the authorization.
@@ -42,31 +45,42 @@ public class UserInfoServiceImpl implements UserInfoService {
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final TokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
-    private final AccessTokenVerifier tokenVerifier;
+    private final AccessTokenVerifier headerTokenVerifier;
+    private final AccessTokenVerifier formTokenVerifier;
 
     /**
      * Constructs a new UserInfoServiceImpl.
      *
      * @param tokenStore An instance of the TokenStore.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
-     * @param tokenVerifier An instance of the AccessTokenVerifier.
+     * @param headerTokenVerifier An instance of the AccessTokenVerifier to validate Authorization header.
+     * @param formTokenVerifier An instance of the AccessTokenVerifier to validate form body.
      */
     @Inject
     public UserInfoServiceImpl(TokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
-            AccessTokenVerifier tokenVerifier) {
+            @Named(HEADER) AccessTokenVerifier headerTokenVerifier,
+            @Named(FORM_BODY) AccessTokenVerifier formTokenVerifier) {
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
-        this.tokenVerifier = tokenVerifier;
+        this.headerTokenVerifier = headerTokenVerifier;
+        this.formTokenVerifier = formTokenVerifier;
     }
 
     /**
      * {@inheritDoc}
      */
-    public JsonValue getUserInfo(String tokenId, OAuth2Request request) throws OAuth2Exception {
+    public JsonValue getUserInfo(OAuth2Request request) throws OAuth2Exception {
 
-        if (!tokenVerifier.verify(request)) {
+        AccessTokenVerifier.TokenState headerToken = headerTokenVerifier.verify(request);
+        AccessTokenVerifier.TokenState formToken = formTokenVerifier.verify(request);
+        if (!headerToken.isValid() && !formToken.isValid()) {
             throw new ServerException("Access Token not valid");
         }
+        if (headerToken.isValid() && formToken.isValid()) {
+            throw new ServerException("Access Token cannot be provided in both form and header");
+        }
+
+        final String tokenId = headerToken.isValid() ? headerToken.getTokenId() : formToken.getTokenId();
 
         final AccessToken token = tokenStore.readAccessToken(request, tokenId);
 

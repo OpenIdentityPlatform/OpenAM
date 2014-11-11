@@ -53,6 +53,7 @@ import org.forgerock.oauth2.core.TokenInfoService;
 import org.forgerock.oauth2.core.TokenInfoServiceImpl;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.restlet.AuthorizeRequestHook;
+import org.forgerock.oauth2.restlet.RestletFormBodyAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.RestletHeaderAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.RestletOAuth2RequestFactory;
 import org.forgerock.oauth2.restlet.TokenRequestHook;
@@ -87,6 +88,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static com.google.inject.name.Names.*;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
+
 /**
  * Guice module for OAuth2/OpenId Connect provider bindings.
  *
@@ -115,6 +119,8 @@ public class OAuth2GuiceModule extends AbstractModule {
         bind(UserInfoService.class).to(UserInfoServiceImpl.class);
         bind(TokenInfoService.class).to(TokenInfoServiceImpl.class);
         bind(AccessTokenVerifier.class).to(RestletHeaderAccessTokenVerifier.class);
+        bind(AccessTokenVerifier.class).annotatedWith(named(HEADER)).to(RestletHeaderAccessTokenVerifier.class);
+        bind(AccessTokenVerifier.class).annotatedWith(named(FORM_BODY)).to(RestletFormBodyAccessTokenVerifier.class);
         bind(OpenIDConnectProvider.class).to(OpenAMOpenIDConnectProvider.class);
         bind(ClientDAO.class).to(OpenAMClientDAO.class);
         bind(OpenIdConnectClientRegistrationService.class).to(OpenAMOpenIdConnectClientRegistrationService.class);

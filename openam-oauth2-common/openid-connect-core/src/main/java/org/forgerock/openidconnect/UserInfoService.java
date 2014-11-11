@@ -30,10 +30,9 @@ public interface UserInfoService {
     /**
      * Gets the user's information for the specified access token.
      *
-     * @param tokenId The id of the access token.
      * @param request The OAuth2 request.
      * @return A JsonValue of the user's information.
      * @throws OAuth2Exception If there is any issue in getting the user information.
      */
-    JsonValue getUserInfo(String tokenId, OAuth2Request request) throws OAuth2Exception;
+    JsonValue getUserInfo(OAuth2Request request) throws OAuth2Exception;
 }
