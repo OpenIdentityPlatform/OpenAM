@@ -158,7 +158,11 @@ public final class Utils {
      * @return True if the request is part of an OAuth2 Implicit Grant.
      */
     public static boolean isOAuth2FragmentErrorType(Set<String> requestedResponseTypes) {
-        return requestedResponseTypes.contains(TOKEN);
+        if (requestedResponseTypes == null) {
+            return false;
+        }
+
+        return requestedResponseTypes.size() == 1 && requestedResponseTypes.contains(TOKEN);
     }
 
     /**
