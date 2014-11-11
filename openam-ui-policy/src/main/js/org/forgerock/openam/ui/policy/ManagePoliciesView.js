@@ -87,8 +87,8 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 url: '/openam/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/policies',
                 colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified', 'Actions', 'Resources', 'Resource Attributes', 'Subject'],
                 colModel: [
-                    {name: 'iconChB',        width: 40, sortable: false, formatter: this.policyGridView.checkBoxFormatter, frozen: true, title: false, search: false},
-                    {name: 'name',           width: 250, frozen: true},
+                    {name: 'iconChB',        width: 40, sortable: false, formatter: this.policyGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
+                    {name: 'name',           width: 250, frozen: true, hidedlg: true},
                     {name: 'description',    width: 180, sortable: false},
                     {name: 'createdBy',      width: 250, hidden: true},
                     {name: 'creationDate',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
@@ -130,8 +130,8 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 url: '/openam/json/referrals',
                 colNames: ['', 'Name', 'Resources', 'Realms', 'Created', 'Last Modified', 'Created By', 'ModifiedBy'],
                 colModel: [
-                    {name: 'iconChB',        width: 40,  sortable: false, formatter: this.refGridView.checkBoxFormatter, frozen: true, title: false, search: false},
-                    {name: 'name',           width: 280, frozen: true},
+                    {name: 'iconChB',        width: 40,  sortable: false, formatter: this.refGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
+                    {name: 'name',           width: 280, frozen: true, hidedlg: true},
                     {name: 'resources',      width: 290, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
                     {name: 'realms',         width: 285, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                     {name: 'creationDate',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},

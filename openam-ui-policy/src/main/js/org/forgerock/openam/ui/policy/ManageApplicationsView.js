@@ -80,9 +80,9 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 url: '/openam/json' + this.subrealm + '/applications',
                 colNames: ['', '', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
                 colModel: [
-                    {name: 'iconChB',           width: 40,  sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false},
-                    {name: 'actions',           width: 65,  sortable: false, formatter: actionsFormatter, frozen: true, title: false, search: false},
-                    {name: 'name',              width: 262, frozen: true},
+                    {name: 'iconChB',           width: 40,  sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
+                    {name: 'actions',           width: 65,  sortable: false, formatter: actionsFormatter, frozen: true, title: false, search: false, hidedlg: true},
+                    {name: 'name',              width: 262, frozen: true, hidedlg: true},
                     {name: 'description',       width: 263, sortable: false},
                     {name: 'resources',         width: 263, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                     {name: 'createdBy',         width: 250, hidden: true},
