@@ -18,22 +18,18 @@ package org.forgerock.openam.oauth2;
 
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
 import org.forgerock.guava.common.annotations.VisibleForTesting;
-import org.forgerock.guava.common.base.Strings;
 import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.oauth2.core.ClientType;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.restlet.Request;
 
 import java.net.URI;
-import java.security.KeyFactory;
-import java.security.PublicKey;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -55,14 +51,17 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final AMIdentity amIdentity;
     private final SigningManager signingManager = new SigningManager();
+    private final PEMDecoder pemDecoder;
 
     /**
      * Constructs a new OpenAMClientRegistration.
      *
      * @param amIdentity The client's identity.
+     * @param pemDecoder A {@code PEMDecoder} instance.
      */
-    OpenAMClientRegistration(AMIdentity amIdentity) {
+    OpenAMClientRegistration(AMIdentity amIdentity, PEMDecoder pemDecoder) {
         this.amIdentity = amIdentity;
+        this.pemDecoder = pemDecoder;
     }
 
     /**
@@ -335,14 +334,8 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                         "No Client Bearer Jwt Public key set");
             }
 
-            String encodedKey = set.iterator().next()
-                    .replace("-----BEGIN PUBLIC KEY-----", "")
-                    .replace("-----END PUBLIC KEY-----", "")
-                    .trim();
-            byte[] decodedKey = Base64.decode(encodedKey);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
-            PublicKey key = keyFactory.generatePublic(keySpec);
+            String encodedKey = set.iterator().next();
+            RSAPublicKey key = pemDecoder.decodeRSAPublicKey(encodedKey);
 
             return signingManager.newRsaSigningHandler(key);
 

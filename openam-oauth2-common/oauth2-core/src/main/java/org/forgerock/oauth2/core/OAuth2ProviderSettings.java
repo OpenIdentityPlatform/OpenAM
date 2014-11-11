@@ -16,6 +16,7 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -291,6 +292,13 @@ public interface OAuth2ProviderSettings {
      * @throws ServerException If any internal server error occurs.
      */
     String getJWKSUri() throws ServerException;
+
+    /**
+     * Gets the JWK Set for this OAuth2 Authorization /OpenID Provider.
+     *
+     * @return The JWK Set of signing and encryption keys.
+     */
+    JsonValue getJWKSet() throws ServerException;
 
     /**
      * Gets the created timestamp attribute name.

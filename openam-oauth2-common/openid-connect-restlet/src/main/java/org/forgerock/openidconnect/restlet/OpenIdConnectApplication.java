@@ -52,6 +52,9 @@ public class OpenIdConnectApplication extends OAuth2Application {
         //connect session management
         router.attach("/connect/endSession", new GuicedRestlet(getContext(), EndSession.class));
 
+        //connect jwk_uri
+        router.attach("/connect/jwk_uri", new GuicedRestlet(getContext(), OpenIDConnectJWKEndpoint.class));
+
         return router;
     }
 }

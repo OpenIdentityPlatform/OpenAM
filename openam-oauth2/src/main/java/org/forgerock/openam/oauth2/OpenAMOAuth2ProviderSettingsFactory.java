@@ -19,6 +19,7 @@ package org.forgerock.openam.oauth2;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.PEMDecoder;
 import org.restlet.Request;
 
 import javax.inject.Inject;
@@ -37,17 +38,21 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
     private final Map<String, OAuth2ProviderSettings> providerSettingsMap = new HashMap<String, OAuth2ProviderSettings>();
     private final RealmNormaliser realmNormaliser;
     private final CookieExtractor cookieExtractor;
+    private final PEMDecoder pemDecoder;
 
     /**
      * Contructs a new OpenAMOAuth2ProviderSettingsFactory.
      *
      * @param realmNormaliser An instance of the RealmNormaliser.
      * @param cookieExtractor An instance of the CookieExtractor.
+     * @param pemDecoder An instance of the PEMDecoder.
      */
     @Inject
-    public OpenAMOAuth2ProviderSettingsFactory(RealmNormaliser realmNormaliser, CookieExtractor cookieExtractor) {
+    public OpenAMOAuth2ProviderSettingsFactory(RealmNormaliser realmNormaliser, CookieExtractor cookieExtractor,
+            PEMDecoder pemDecoder) {
         this.realmNormaliser = realmNormaliser;
         this.cookieExtractor = cookieExtractor;
+        this.pemDecoder = pemDecoder;
     }
 
     /**
@@ -83,7 +88,7 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
         synchronized (providerSettingsMap) {
             OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realm);
             if (providerSettings == null) {
-                providerSettings = new OpenAMOAuth2ProviderSettings(realm, deploymentUrl, cookieExtractor);
+                providerSettings = new OpenAMOAuth2ProviderSettings(realm, deploymentUrl, cookieExtractor, pemDecoder);
                 providerSettingsMap.put(realm, providerSettings);
             }
             return providerSettings;

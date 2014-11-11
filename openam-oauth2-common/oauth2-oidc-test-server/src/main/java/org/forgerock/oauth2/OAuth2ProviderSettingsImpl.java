@@ -18,6 +18,7 @@ package org.forgerock.oauth2;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.jose.jwk.JWKSet;
 import org.forgerock.json.jose.utils.KeystoreManager;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthenticationMethod;
@@ -233,6 +234,11 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
 
     public String getJWKSUri() throws ServerException {
         return configurationResource.getConfiguration().get("jwksUri").asString();
+    }
+
+    @Override
+    public JsonValue getJWKSet() throws ServerException {
+        return new JsonValue(Collections.singletonMap("keys", new JWKSet().getJWKsAsList()));
     }
 
     public String getCreatedTimestampAttributeName() throws ServerException {

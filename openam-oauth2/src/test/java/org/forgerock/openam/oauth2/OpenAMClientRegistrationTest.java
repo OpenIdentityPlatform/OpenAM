@@ -17,6 +17,7 @@
 package org.forgerock.openam.oauth2;
 
 import com.sun.identity.idm.AMIdentity;
+import org.forgerock.oauth2.core.PEMDecoder;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -40,7 +41,7 @@ public class OpenAMClientRegistrationTest {
     @BeforeMethod
     public void setup() throws Exception {
         amIdentity = mock(AMIdentity.class);
-        clientRegistration = new OpenAMClientRegistration(amIdentity);
+        clientRegistration = new OpenAMClientRegistration(amIdentity, new PEMDecoder());
     }
 
     @Test

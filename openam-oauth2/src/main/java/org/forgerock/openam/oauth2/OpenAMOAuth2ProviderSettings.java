@@ -16,6 +16,10 @@
 
 package org.forgerock.openam.oauth2;
 
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.oauth2.core.Utils.isEmpty;
+import static org.forgerock.oauth2.core.Utils.joinScope;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
@@ -27,6 +31,10 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.jose.jwk.KeyUse;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.ClientRegistration;
@@ -35,6 +43,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResponseTypeHandler;
 import org.forgerock.oauth2.core.ScopeValidator;
@@ -50,6 +59,7 @@ import org.forgerock.openam.oauth2.legacy.LegacyCoreTokenAdapter;
 import org.forgerock.openam.oauth2.legacy.LegacyResponseTypeHandler;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.util.encode.Base64url;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
 
@@ -57,15 +67,19 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.security.AccessController;
 import java.security.KeyPair;
+import java.security.PublicKey;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.forgerock.oauth2.core.Utils.isEmpty;
-import static org.forgerock.oauth2.core.Utils.joinScope;
+import java.util.UUID;
 
 /**
  * Models all of the possible settings the OpenAM OAuth2 provider can have and that can be configured.
@@ -78,6 +92,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     private final String realm;
     private final String deploymentUrl;
     private final CookieExtractor cookieExtractor;
+    private final PEMDecoder pemDecoder;
 
     private ScopeValidator scopeValidator;
 
@@ -87,12 +102,15 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * @param realm The realm.
      * @param deploymentUrl The deployment url.
      * @param cookieExtractor An instance of the CookieExtractor.
+     * @param pemDecoder An instance of the PEMDecoder.
      */
-    public OpenAMOAuth2ProviderSettings(String realm, String deploymentUrl, CookieExtractor cookieExtractor) {
+    public OpenAMOAuth2ProviderSettings(String realm, String deploymentUrl, CookieExtractor cookieExtractor,
+            PEMDecoder pemDecoder) {
         super(OAuth2ProviderService.NAME, OAuth2ProviderService.VERSION);
         this.realm = realm;
         this.deploymentUrl = deploymentUrl;
         this.cookieExtractor = cookieExtractor;
+        this.pemDecoder = pemDecoder;
         addServiceListener();
     }
 
@@ -113,6 +131,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     }
 
     private final Map<String, Set<String>> attributeCache = new HashMap<String, Set<String>>();
+    private final List<Map<String, Object>> jwks = new ArrayList<Map<String, Object>>();
 
     /**
      * {@inheritDoc}
@@ -654,7 +673,13 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      */
     public String getJWKSUri() throws ServerException {
         try {
-            return getStringSetting(realm, OAuth2ProviderService.JKWS_URI);
+            String userDefinedJWKUri = getStringSetting(realm, OAuth2ProviderService.JKWS_URI);
+            if (userDefinedJWKUri != null && !userDefinedJWKUri.isEmpty()) {
+                return userDefinedJWKUri;
+            }
+
+            // http://example.forgerock.com:8080/openam/oauth2/connect/jwk_uri?realm= + realm
+            return deploymentUrl + "/oauth2/connect/jwk_uri?realm=" + realm;
         } catch (SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -662,6 +687,63 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             logger.error(e.getMessage());
             throw new ServerException(e);
         }
+    }
+
+    private X509Certificate getCertificate(String certAttributeName) throws ServerException {
+        try {
+            String encodedCert = getStringSetting(realm, certAttributeName);
+            return pemDecoder.decodeX509Certificate(encodedCert);
+        } catch (SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (CertificateException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    public JsonValue getJWKSet() throws ServerException {
+        X509Certificate signingCert = getCertificate(OAuth2ProviderService.OP_SIGNING_CERT);
+        X509Certificate encryptionCert = getCertificate(OAuth2ProviderService.OP_ENCRYPTION_CERT);
+
+        synchronized (jwks) {
+            if (jwks.isEmpty()) {
+                if (signingCert != null) {
+                    PublicKey key = signingCert.getPublicKey();
+                    JwsAlgorithm jwsAlgorithm = JwsAlgorithm.getJwsAlgorithm(signingCert.getSigAlgName());
+                    if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())) {
+                        jwks.add(createRSAJWK((RSAPublicKey) key, KeyUse.SIG, jwsAlgorithm.name()));
+                    } else {
+                        if (logger.warningEnabled()) {
+                            logger.warning("Unsupported Signing Key Algorithm, " + jwsAlgorithm.getAlgorithm());
+                        }
+                    }
+                }
+
+                if (encryptionCert != null) {
+                    PublicKey key = encryptionCert.getPublicKey();
+                    JwsAlgorithm jwsAlgorithm = JwsAlgorithm.getJwsAlgorithm(encryptionCert.getSigAlgName());
+                    if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())) {
+                        jwks.add(createRSAJWK((RSAPublicKey) key, KeyUse.ENC, jwsAlgorithm.name()));
+                    } else {
+                        if (logger.warningEnabled()) {
+                            logger.warning("Unsupported Encryption Key Algorithm, " + jwsAlgorithm.getAlgorithm());
+                        }
+                    }
+                }
+            }
+        }
+        return new JsonValue(Collections.singletonMap("keys", jwks));
+    }
+
+    private Map<String, Object> createRSAJWK(RSAPublicKey key, KeyUse use, String alg) {
+        return json(object(field("kty", "RSA"), field("kid", UUID.randomUUID().toString()),
+                field("use", use.toString()), field("alg", alg),
+                field("n", Base64url.encode(key.getModulus().toByteArray())),
+                field("e", Base64url.encode(key.getPublicExponent().toByteArray())))).asMap();
     }
 
     public String getCreatedTimestampAttributeName() throws ServerException {
@@ -805,6 +887,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                 }
                 synchronized (attributeCache) {
                     attributeCache.clear();
+                    jwks.clear();
                 }
             } else {
                 if (logger.messageEnabled()) {

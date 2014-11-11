@@ -27,6 +27,7 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
@@ -47,15 +48,18 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final RealmNormaliser realmNormaliser;
+    private final PEMDecoder pemDecoder;
 
     /**
      * Constructs a new OpenAMClientRegistrationStore.
      *
      * @param realmNormaliser An instance of the RealmNormaliser.
+     * @param pemDecoder A {@code PEMDecoder} instance.
      */
     @Inject
-    public OpenAMClientRegistrationStore(RealmNormaliser realmNormaliser) {
+    public OpenAMClientRegistrationStore(RealmNormaliser realmNormaliser, PEMDecoder pemDecoder) {
         this.realmNormaliser = realmNormaliser;
+        this.pemDecoder = pemDecoder;
     }
 
     /**
@@ -64,7 +68,7 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
     public OpenIdConnectClientRegistration get(String clientId, OAuth2Request request) throws InvalidClientException {
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter("realm"));
-        return new OpenAMClientRegistration(getIdentity(clientId, realm));
+        return new OpenAMClientRegistration(getIdentity(clientId, realm), pemDecoder);
     }
 
     @SuppressWarnings("unchecked")
