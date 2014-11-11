@@ -14,31 +14,29 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.entitlement.conditions.environment;
+package org.forgerock.openam.core;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.util.AMAuthUtils;
-import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.DNMapper;
 
 import java.security.AccessController;
 import java.util.Set;
-
-import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUTATION_FAILED;
 
 /**
  * A wrapper around core utility class like, {@link AMAuthUtils} and {@link IdUtils} to facilitate testing.
  *
  * @since 12.0.0
  */
-class CoreWrapper {
+public class CoreWrapper {
 
     /**
      * Returns the Realm name from Realm qualified data.
@@ -47,7 +45,7 @@ class CoreWrapper {
      *                           authentication level or service.
      * @return String representing realm name.
      */
-    String getRealmFromRealmQualifiedData(String realmQualifiedData) {
+    public String getRealmFromRealmQualifiedData(String realmQualifiedData) {
         return AMAuthUtils.getRealmFromRealmQualifiedData(realmQualifiedData);
     }
 
@@ -59,7 +57,7 @@ class CoreWrapper {
      * @throws SSOException if {@code token.getProperty()} fails.
      */
     @SuppressWarnings("unchecked")
-    Set<String> getAuthenticatedLevels(SSOToken token) throws SSOException {
+    public Set<String> getAuthenticatedLevels(SSOToken token) throws SSOException {
         return AMAuthUtils.getAuthenticatedLevels(token);
     }
 
@@ -71,7 +69,7 @@ class CoreWrapper {
      * @throws SSOException If {@code token.getProperty()} fails.
      */
     @SuppressWarnings("unchecked")
-    Set<String> getRealmQualifiedAuthenticatedLevels(SSOToken token) throws SSOException {
+    public Set<String> getRealmQualifiedAuthenticatedLevels(SSOToken token) throws SSOException {
         return AMAuthUtils.getRealmQualifiedAuthenticatedLevels(token);
     }
 
@@ -83,7 +81,7 @@ class CoreWrapper {
      *                           authentication level or service.
      * @return String representing data. This could be authentication scheme or authentication level or service.
      */
-    String getDataFromRealmQualifiedData(String realmQualifiedData) {
+    public String getDataFromRealmQualifiedData(String realmQualifiedData) {
         return AMAuthUtils.getDataFromRealmQualifiedData(realmQualifiedData);
     }
 
@@ -92,15 +90,11 @@ class CoreWrapper {
      *
      * @param token valid user {@code SSOToken}.
      * @return Set containing String values representing realm qualified service names.
-     * @throws EntitlementException if {@code token.getProperty()} fails.
+     * @throws SSOException if {@code token.getProperty()} fails.
      */
     @SuppressWarnings("unchecked")
-    Set<String> getRealmQualifiedAuthenticatedServices(SSOToken token) throws EntitlementException {
-        try {
-            return AMAuthUtils.getRealmQualifiedAuthenticatedServices(token);
-        } catch (SSOException e) {
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
-        }
+    public Set<String> getRealmQualifiedAuthenticatedServices(SSOToken token) throws SSOException {
+        return AMAuthUtils.getRealmQualifiedAuthenticatedServices(token);
     }
 
     /**
@@ -108,15 +102,11 @@ class CoreWrapper {
      *
      * @param token Valid user {@code SSOToken}
      * @return Set containing String values representing Realm names.
-     * @throws EntitlementException If {@code token.getProperty()} fails.
+     * @throws SSOException If {@code token.getProperty()} fails.
      */
     @SuppressWarnings("unchecked")
-    Set<String> getAuthenticatedRealms(SSOToken token) throws EntitlementException {
-        try {
-            return AMAuthUtils.getAuthenticatedRealms(token);
-        } catch (SSOException e) {
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
-        }
+    public Set<String> getAuthenticatedRealms(SSOToken token) throws SSOException {
+        return AMAuthUtils.getAuthenticatedRealms(token);
     }
 
     /**
@@ -128,7 +118,7 @@ class CoreWrapper {
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If user's single sign on token is invalid.
      */
-    AMIdentity getIdentity(SSOToken token) throws IdRepoException, SSOException {
+    public AMIdentity getIdentity(SSOToken token) throws IdRepoException, SSOException {
         return IdUtils.getIdentity(token);
     }
 
@@ -139,7 +129,7 @@ class CoreWrapper {
      * @param univId String representation of the identity.
      * @return Identity object.
      */
-    AMIdentity getIdentity(SSOToken token, String univId) throws IdRepoException, SSOException {
+    public AMIdentity getIdentity(SSOToken token, String univId) throws IdRepoException, SSOException {
         return IdUtils.getIdentity(token, univId);
     }
 
@@ -180,15 +170,11 @@ class CoreWrapper {
      *
      * @param token A valid user {@code SSOToken}.
      * @return A {@code Set} containing String values representing realm qualified scheme names.
-     * @throws EntitlementException If {@code token.getProperty()} fails.
+     * @throws SSOException If {@code token.getProperty()} fails.
      */
     @SuppressWarnings("unchecked")
-    public Set<String> getRealmQualifiedAuthenticatedSchemes(SSOToken token) throws EntitlementException {
-        try {
-            return AMAuthUtils.getRealmQualifiedAuthenticatedSchemes(token);
-        } catch (SSOException e) {
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
-        }
+    public Set<String> getRealmQualifiedAuthenticatedSchemes(SSOToken token) throws SSOException {
+        return AMAuthUtils.getRealmQualifiedAuthenticatedSchemes(token);
     }
 
     /**
@@ -196,14 +182,43 @@ class CoreWrapper {
      *
      * @param token A A valid user {@code SSOToken}.
      * @return A {@code Set} containing String values representing Scheme names.
-     * @throws EntitlementException If {@code token.getProperty()} fails.
+     * @throws SSOException If {@code token.getProperty()} fails.
      */
     @SuppressWarnings("unchecked")
-    public Set<String> getAuthenticatedSchemes(SSOToken token) throws EntitlementException {
-        try {
-            return AMAuthUtils.getAuthenticatedSchemes(token);
-        } catch (SSOException e) {
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
-        }
+    public Set<String> getAuthenticatedSchemes(SSOToken token) throws SSOException {
+        return AMAuthUtils.getAuthenticatedSchemes(token);
+    }
+
+    /**
+     * Returns an organization which maps to the identifier used by application.
+     *
+     * @param orgIdentifier Organization identifier.
+     * @return Organization mapping to that identifier.
+     * @throws IdRepoException If the {@code getOrganization} fails.
+     * @throws SSOException If the {@code getOrganization} fails.
+     */
+    public String getOrganization(SSOToken adminToken, String orgIdentifier) throws IdRepoException, SSOException {
+        return IdUtils.getOrganization(adminToken, orgIdentifier);
+    }
+
+    /**
+     * Returns realm name in "/" separated format for the provided realm/organization name in DN format.
+     *
+     * @param orgName Name of organization.
+     * @return DN format "/" separated realm name of organization name.
+     */
+    public String convertOrgNameToRealmName(String orgName) {
+        return DNMapper.orgNameToRealmName(orgName);
+    }
+
+    /**
+     * Parses the policy condition advice and checks for realm advices.
+     *
+     * @param advice The policy advice XML.
+     * @return The realm defined in the policy advice, if defined, or {@code null}.
+     * @throws IllegalArgumentException if more than one realm is defined within the advice.
+     */
+    public String getRealmFromPolicyAdvice(String advice) {
+        return AuthClientUtils.getRealmFromPolicyAdvice(advice);
     }
 }

@@ -20,6 +20,7 @@
 package org.forgerock.openam.entitlement.conditions.environment;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.CoreWrapper;
 
 import java.util.Map;
 import java.util.Set;

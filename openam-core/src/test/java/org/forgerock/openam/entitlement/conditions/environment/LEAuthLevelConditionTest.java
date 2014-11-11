@@ -21,6 +21,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.CoreWrapper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

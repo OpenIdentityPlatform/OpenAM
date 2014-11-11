@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.VersionSelector;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
 import org.forgerock.openam.forgerockrest.IdentityResourceV2;
 import org.forgerock.openam.forgerockrest.RealmResource;
@@ -66,6 +67,7 @@ public class RestEndpoints {
 
     private final RestRealmValidator realmValidator;
     private final VersionSelector versionSelector;
+    private final CoreWrapper coreWrapper;
     private final CrestRouter resourceRouter;
     private final ServiceRouter jsonServiceRouter;
     private final ServiceRouter xacmlServiceRouter;
@@ -77,9 +79,10 @@ public class RestEndpoints {
      * @param versionSelector An instance of the VersionSelector.
      */
     @Inject
-    public RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector) {
+    public RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper) {
         this.realmValidator = realmValidator;
         this.versionSelector = versionSelector;
+        this.coreWrapper = coreWrapper;
 
         this.resourceRouter = createResourceRouter();
         this.jsonServiceRouter = createJSONServiceRouter();
@@ -201,7 +204,7 @@ public class RestEndpoints {
      */
     private ServiceRouter createJSONServiceRouter() {
 
-        ServiceRouter router = new ServiceRouter(realmValidator, versionSelector);
+        ServiceRouter router = new ServiceRouter(realmValidator, versionSelector, coreWrapper);
 
         router.addRoute("/authenticate")
                 .addVersion("1.1", wrap(AuthenticationServiceV1.class))
@@ -219,7 +222,7 @@ public class RestEndpoints {
      */
     private ServiceRouter createXACMLServiceRouter() {
 
-        ServiceRouter router = new ServiceRouter(realmValidator, versionSelector);
+        ServiceRouter router = new ServiceRouter(realmValidator, versionSelector, coreWrapper);
 
         router.addRoute("/policies")
                 .addVersion("1.0", wrap(XacmlService.class));

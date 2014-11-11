@@ -35,6 +35,8 @@ import javax.security.auth.Subject;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_SERVICE;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_AUTHENTICATED_TO_SERVICES;
+
+import org.forgerock.openam.core.CoreWrapper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -48,6 +50,7 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
 
     private final Debug debug;
     private final CoreWrapper coreWrapper;
+    private final EntitlementCoreWrapper entitlementCoreWrapper;
 
     private String authenticateToService = null;
     private boolean realmEmpty = false;
@@ -56,7 +59,7 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
      * Constructs a new AuthenticateToServiceCondition instance.
      */
     public AuthenticateToServiceCondition() {
-        this(PrivilegeManager.debug, new CoreWrapper());
+        this(PrivilegeManager.debug, new CoreWrapper(), new EntitlementCoreWrapper());
     }
 
     /**
@@ -64,10 +67,12 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
      *
      * @param debug A Debug instance.
      * @param coreWrapper An instance of the CoreWrapper.
+     * @param entitlementCoreWrapper An instance of the EntitlementCoreWrapper.
      */
-    AuthenticateToServiceCondition(Debug debug, CoreWrapper coreWrapper) {
+    AuthenticateToServiceCondition(Debug debug, CoreWrapper coreWrapper, EntitlementCoreWrapper entitlementCoreWrapper) {
         this.debug = debug;
         this.coreWrapper = coreWrapper;
+        this.entitlementCoreWrapper = entitlementCoreWrapper;
     }
 
     /**
@@ -119,7 +124,7 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
             }
         } else {
             SSOToken token = (SSOToken) subject.getPrivateCredentials().iterator().next();
-            Set<String> authenticatedServices = coreWrapper.getRealmQualifiedAuthenticatedServices(token);
+            Set<String> authenticatedServices = entitlementCoreWrapper.getRealmQualifiedAuthenticatedServices(token);
             if (authenticatedServices != null) {
                 requestAuthnServices.addAll(authenticatedServices);
             }

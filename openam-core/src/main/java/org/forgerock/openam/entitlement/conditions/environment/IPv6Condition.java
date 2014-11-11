@@ -19,6 +19,7 @@ package org.forgerock.openam.entitlement.conditions.environment;
 import com.googlecode.ipv6.IPv6Address;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.utils.ValidateIPaddress;
 
 /**

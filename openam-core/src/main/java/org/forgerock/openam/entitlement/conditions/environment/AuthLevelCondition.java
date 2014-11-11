@@ -26,6 +26,7 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.CoreWrapper;
 import org.json.JSONException;
 import org.json.JSONObject;
 

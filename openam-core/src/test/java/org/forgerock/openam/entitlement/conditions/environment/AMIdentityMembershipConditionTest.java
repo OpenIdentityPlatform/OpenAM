@@ -24,6 +24,7 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.CoreWrapper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

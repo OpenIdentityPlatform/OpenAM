@@ -22,6 +22,7 @@ import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.util.time.TimeService;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;

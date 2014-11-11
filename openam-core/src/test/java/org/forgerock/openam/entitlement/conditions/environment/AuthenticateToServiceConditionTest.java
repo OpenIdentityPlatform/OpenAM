@@ -20,6 +20,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.CoreWrapper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -43,14 +44,16 @@ public class AuthenticateToServiceConditionTest {
     private AuthenticateToServiceCondition condition;
 
     private CoreWrapper coreWrapper;
+    private EntitlementCoreWrapper entitlementCoreWrapper;
 
     @BeforeMethod
     public void setUp() {
 
         Debug debug = mock(Debug.class);
         coreWrapper = mock(CoreWrapper.class);
+        entitlementCoreWrapper = mock(EntitlementCoreWrapper.class);
 
-        condition = new AuthenticateToServiceCondition(debug, coreWrapper);
+        condition = new AuthenticateToServiceCondition(debug, coreWrapper, entitlementCoreWrapper);
     }
 
     @Test
@@ -232,7 +235,7 @@ public class AuthenticateToServiceConditionTest {
         given(coreWrapper.getRealmFromRealmQualifiedData("SERVICE_NAME")).willReturn("REALM");
         services.add("SERVICE_NAME");
         subject.getPrivateCredentials().add(ssoToken);
-        given(coreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);
+        given(entitlementCoreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);
         condition.setState("{\"authenticateToService\": \"SERVICE_NAME\"}");
 
         //When
@@ -258,7 +261,7 @@ public class AuthenticateToServiceConditionTest {
         given(coreWrapper.getRealmFromRealmQualifiedData("SERVICE_NAME")).willReturn("REALM");
         services.add("OTHER_SERVICE_NAME");
         subject.getPrivateCredentials().add(ssoToken);
-        given(coreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);
+        given(entitlementCoreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);
         condition.setState("{\"authenticateToService\": \"SERVICE_NAME\"}");
 
         //When
@@ -285,7 +288,7 @@ public class AuthenticateToServiceConditionTest {
         given(coreWrapper.getDataFromRealmQualifiedData("OTHER_SERVICE_NAME")).willReturn("SERVICE_NAME");
         services.add("OTHER_SERVICE_NAME");
         subject.getPrivateCredentials().add(ssoToken);
-        given(coreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);
+        given(entitlementCoreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);
         condition.setState("{\"authenticateToService\": \"SERVICE_NAME\"}");
 
         //When
@@ -311,7 +314,7 @@ public class AuthenticateToServiceConditionTest {
         given(coreWrapper.getDataFromRealmQualifiedData("OTHER_SERVICE_NAME")).willReturn("OTHER_SERVICE_NAME");
         services.add("OTHER_SERVICE_NAME");
         subject.getPrivateCredentials().add(ssoToken);
-        given(coreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);
+        given(entitlementCoreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);
         condition.setState("{\"authenticateToService\": \"SERVICE_NAME\"}");
 
         //When

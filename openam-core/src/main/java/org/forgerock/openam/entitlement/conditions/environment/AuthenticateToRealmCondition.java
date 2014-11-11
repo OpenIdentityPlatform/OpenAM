@@ -19,6 +19,9 @@
 
 package org.forgerock.openam.entitlement.conditions.environment;
 
+import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
+
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.entitlement.ConditionDecision;
@@ -35,9 +38,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
-
 /**
  * An implementation of an {@link com.sun.identity.entitlement.EntitlementCondition} that will check whether the
  * principal has authenticated to the specified realm.
@@ -47,7 +47,7 @@ import static org.forgerock.openam.entitlement.conditions.environment.ConditionC
 public class AuthenticateToRealmCondition extends EntitlementConditionAdaptor {
 
     private final Debug debug;
-    private final CoreWrapper coreWrapper;
+    private final EntitlementCoreWrapper entitlementCoreWrapper;
 
     private String authenticateToRealm;
 
@@ -55,18 +55,18 @@ public class AuthenticateToRealmCondition extends EntitlementConditionAdaptor {
      * Constructs a new AuthenticateToRealmCondition instance.
      */
     public AuthenticateToRealmCondition() {
-        this(PrivilegeManager.debug, new CoreWrapper());
+        this(PrivilegeManager.debug, new EntitlementCoreWrapper());
     }
 
     /**
      * Constructs a new AuthenticateToRealmCondition instance.
      *
      * @param debug A Debug instance.
-     * @param coreWrapper An instance of the CoreWrapper.
+     * @param entitlementCoreWrapper An instance of the EntitlementCoreWrapper.
      */
-    AuthenticateToRealmCondition(Debug debug, CoreWrapper coreWrapper) {
+    AuthenticateToRealmCondition(Debug debug, EntitlementCoreWrapper entitlementCoreWrapper) {
         this.debug = debug;
-        this.coreWrapper = coreWrapper;
+        this.entitlementCoreWrapper = entitlementCoreWrapper;
     }
 
     /**
@@ -113,7 +113,7 @@ public class AuthenticateToRealmCondition extends EntitlementConditionAdaptor {
                 }
         } else {
             SSOToken token = (SSOToken) subject.getPrivateCredentials().iterator().next();
-            Set<String> authenticatedRealms = coreWrapper.getAuthenticatedRealms(token);
+            Set<String> authenticatedRealms = entitlementCoreWrapper.getAuthenticatedRealms(token);
             if (authenticatedRealms != null) {
                 requestAuthnRealms.addAll(authenticatedRealms);
             }

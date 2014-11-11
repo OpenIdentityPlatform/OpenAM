@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.forgerock.json.resource.VersionSelector;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.DefaultVersionBehaviour;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.router.VersionedRouter;
@@ -47,9 +48,10 @@ public class ServiceRouter extends Restlet implements VersionedRouter<ServiceRou
      *
      * @param realmValidator An instance of the RestRealmValidator.
      * @param versionSelector An instance of the VersionSelector.
+     * @param coreWrapper An instance of the CoreWrapper.
      */
-    public ServiceRouter(RestRealmValidator realmValidator, VersionSelector versionSelector) {
-        this.router = new RestletRealmRouter(realmValidator);
+    public ServiceRouter(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper) {
+        this.router = new RestletRealmRouter(realmValidator, coreWrapper);
         this.versionSelector = versionSelector;
     }
 

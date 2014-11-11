@@ -22,6 +22,7 @@ package org.forgerock.openam.entitlement.conditions.environment;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.utils.ValidateIPaddress;
 import java.util.StringTokenizer;
 

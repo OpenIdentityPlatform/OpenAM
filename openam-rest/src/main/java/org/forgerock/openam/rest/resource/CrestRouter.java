@@ -311,9 +311,9 @@ public class CrestRouter<T extends CrestRouter> implements RequestHandler, Versi
      *
      * @param context The context.
      * @return The augmented context.
-     * @throws BadRequestException If the current full realm is not a valid realm.
+     * @throws ResourceException If the current full realm is not a valid realm.
      */
-    protected ServerContext transformContext(ServerContext context) throws BadRequestException {
+    protected ServerContext transformContext(ServerContext context) throws ResourceException {
         if (!context.containsContext(SSOTokenContext.class)) {
             return new SSOTokenContext(context);
         } else {

@@ -27,6 +27,7 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.util.time.TimeService;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,7 +70,7 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
     public static final String MODULE_INSTANCE = "module_instance";
 
     private final Debug debug;
-    private final CoreWrapper coreWrapper;
+    private final EntitlementCoreWrapper coreWrapper;
     private final TimeService timeService;
 
     private Set<String> authScheme = new HashSet<String>();
@@ -82,7 +83,7 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
      * Constructs a new AuthSchemeCondition instance.
      */
     public AuthSchemeCondition() {
-        this(PrivilegeManager.debug, new CoreWrapper(), new TimeService() {
+        this(PrivilegeManager.debug, new EntitlementCoreWrapper(), new TimeService() {
             @Override
             public long now() {
                 return System.currentTimeMillis();
@@ -99,10 +100,10 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
      * Constructs a new AuthSchemeCondition instance.
      *
      * @param debug A Debug instance.
-     * @param coreWrapper An instance of the CoreWrapper.
+     * @param coreWrapper An instance of the EntitlementCoreWrapper.
      * @param timeService An instance of the TimeService.
      */
-    AuthSchemeCondition(Debug debug, CoreWrapper coreWrapper, TimeService timeService) {
+    AuthSchemeCondition(Debug debug, EntitlementCoreWrapper coreWrapper, TimeService timeService) {
         this.debug = debug;
         this.coreWrapper = coreWrapper;
         this.timeService = timeService;

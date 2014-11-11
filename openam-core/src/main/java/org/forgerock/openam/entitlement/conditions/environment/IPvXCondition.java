@@ -25,6 +25,7 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.CoreWrapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -16,6 +16,11 @@
 
 package org.forgerock.openam.rest.service;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.idm.IdRepoException;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -26,6 +31,8 @@ import org.restlet.resource.ResourceException;
 import org.restlet.routing.Router;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -39,15 +46,18 @@ public class RestletRealmRouter extends Router {
     static final String REALM = "realm";
 
     private final RestRealmValidator realmValidator;
+    private final CoreWrapper coreWrapper;
     private final Restlet delegate;
 
     /**
      * Constructs a new RealmRouter instance.
      *
      * @param realmValidator An instance of the RestRealmValidator.
+     * @param coreWrapper An instance of the CoreWrapper.
      */
-    public RestletRealmRouter(RestRealmValidator realmValidator) {
+    public RestletRealmRouter(RestRealmValidator realmValidator, CoreWrapper coreWrapper) {
         this.realmValidator = realmValidator;
+        this.coreWrapper = coreWrapper;
         this.delegate = new Delegate(this);
     }
 
@@ -83,24 +93,99 @@ public class RestletRealmRouter extends Router {
      */
     @Override
     protected void doHandle(Restlet next, Request request, Response response) {
-        String realm = (String) request.getAttributes().get(REALM);
-        String subrealm = (String) request.getAttributes().get("subrealm");
-        if (realm == null || realm.isEmpty()) {
-            realm = "/";
-        } else if (subrealm != null && !subrealm.isEmpty()) {
-            realm = realm.equals("/") ? realm + subrealm : realm + "/" + subrealm;
+        String realm;
+
+        realm = getRealmFromPolicyAdvice(request);
+
+        if (realm == null) {
+            realm = getRealmFromURI(request);
         }
+
+        if (realm == null) {
+            realm = getRealmFromQueryString(request);
+        }
+
+        if (realm == null) {
+            realm = getRealmFromServerName(request);
+        }
+
         request.getAttributes().put(REALM, realm);
         HttpServletRequest httpRequest = ServletUtils.getRequest(request);
         httpRequest.setAttribute(REALM, realm);
         request.getAttributes().remove("subrealm");
 
         // Check that the path references an existing realm
-        if (!realmValidator.isRealm(realm)) {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid realm, " + realm);
-        }
+        validateRealm(request, realm);
 
         super.doHandle(next, request, response);
+    }
+
+    private String getRealmFromPolicyAdvice(Request request) {
+        String advice = request.getResourceRef().getQueryAsForm().getFirstValue(AuthClientUtils.COMPOSITE_ADVICE);
+        if (advice == null) {
+            return null;
+        }
+
+        try {
+            String decodedXml = URLDecoder.decode(advice, "UTF-8");
+            return coreWrapper.getRealmFromPolicyAdvice(decodedXml);
+        } catch (UnsupportedEncodingException uee) {
+            //Empty catch
+        }
+        return null;
+    }
+
+    private String getRealmFromURI(Request request) {
+        String realm = (String) request.getAttributes().get(REALM);
+        String subrealm = (String) request.getAttributes().get("subrealm");
+        if (subrealm != null && !subrealm.isEmpty()) {
+            return realm.equals("/") ? realm + subrealm : realm + "/" + subrealm;
+        }
+        return null;
+    }
+
+    private String getRealmFromQueryString(Request request) {
+        String realm = request.getResourceRef().getQueryAsForm().getFirstValue(REALM);
+        if (realm == null) {
+            return null;
+        }
+        return realm;
+    }
+
+    private String getRealmFromServerName(Request request) {
+        String serverName = request.getHostRef().getHostDomain();
+        try {
+            SSOToken adminToken = coreWrapper.getAdminToken();
+            String orgDN = coreWrapper.getOrganization(adminToken, serverName);
+            return coreWrapper.convertOrgNameToRealmName(orgDN);
+        } catch (IdRepoException e) {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
+        } catch (SSOException e) {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
+        }
+    }
+
+    private void validateRealm(Request request, String realm) {
+        if (!realmValidator.isRealm(realm)) {
+            try {
+                SSOToken adminToken = coreWrapper.getAdminToken();
+                //Need to strip off leading '/' from realm otherwise just generates a DN based of the realm value, which is wrong
+                if (realm.startsWith("/")) {
+                    realm = realm.substring(1);
+                }
+                String orgDN = coreWrapper.getOrganization(adminToken, realm);
+                realm = coreWrapper.convertOrgNameToRealmName(orgDN);
+                request.getAttributes().put(REALM, realm);
+                HttpServletRequest httpRequest = ServletUtils.getRequest(request);
+                httpRequest.setAttribute(REALM, realm);
+                return;
+            } catch (IdRepoException e) {
+                //Empty catch, fall through to throw exception
+            } catch (SSOException e) {
+                //Empty catch, fall through to throw exception
+            }
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid realm, " + realm);
+        }
     }
 
     /**
