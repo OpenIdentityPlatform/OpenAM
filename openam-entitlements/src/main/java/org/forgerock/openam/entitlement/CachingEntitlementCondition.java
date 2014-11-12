@@ -101,9 +101,12 @@ public class CachingEntitlementCondition implements EntitlementCondition {
 
         //context is shared across evaluator threads, so we can synchronize on it. Different privilege evaluations have
         //different contexts as well.
-        final String state = getState();
+        final String cacheKey = backingCondition.getClass().getName() + getState();
+
         synchronized (context) {
-            ConditionDecision cachedResult = context.getConditionDecisionCache().get(state);
+            ConditionDecision cachedResult = context.getConditionDecisionCache()
+                    .get(cacheKey);
+
             if (cachedResult != null) {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message(classMethod + "returning cached condition decision");
@@ -113,9 +116,9 @@ public class CachingEntitlementCondition implements EntitlementCondition {
             ConditionDecision result = backingCondition.evaluate(realm, subject, resourceName, environment);
             if (DEBUG.messageEnabled()) {
                 DEBUG.message(classMethod + "caching condition decision \"" + result.isSatisfied()
-                        + "\" for condition: " + state);
+                        + "\" for condition: " + cacheKey);
             }
-            context.getConditionDecisionCache().put(state, result);
+            context.getConditionDecisionCache().put(cacheKey, result);
             return result;
         }
     }
