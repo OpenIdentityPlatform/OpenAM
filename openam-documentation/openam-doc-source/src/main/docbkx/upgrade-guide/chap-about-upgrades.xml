@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-about-upgrades'
@@ -85,6 +85,43 @@
   including Sun Access Manager and OpenSSO releases, you must reinstall and
   configure OpenAM server rather than upgrade. Moving to a new release from a
   legacy release is therefore a migration, rather than a simple upgrade.</para>
+ </section>
+
+ <section xml:id="upgrade-policies">
+  <title>Upgrading &amp; Policies</title>
+
+  <para>
+   When upgrading from OpenAM 11 and earlier versions,
+   the upgrade process changes how OpenAM represents policies.
+   Most earlier policies transform directly to the newer representation.
+  </para>
+
+  <para>
+   If however the upgrade process encounters problems during the transformation,
+   it writes messages about the problems in the upgrade log.
+   When you open a policy in the policy editor
+   that caused problems during the upgrade process,
+   the policy editor shows the issues,
+   but does not let you fix them directly.
+   Instead you must create equivalent, corrected policies
+   in order to use them in OpenAM.
+  </para>
+
+  <para>
+   You should therefore plan to test policy upgrade
+   before upgrading the service,
+   and to correct any problems encountered before using the upgraded service.
+  </para>
+
+  <para>
+   For details on how to configure OpenAM policies,
+   see the <citetitle>Administration Guide</citetitle> chapter,
+   <link
+    xlink:show="new"
+    xlink:href="admin-guide#chap-authz-policy"
+    xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>Defining Authorization Policies</citetitle></link>.
+  </para>
  </section>
 
  <section xml:id="upgrade-best-practices">

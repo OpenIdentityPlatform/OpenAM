@@ -322,6 +322,51 @@ Agreement (yes/no): [no]:</screen>
    </para>
   </listitem>
 
+  <listitem>
+   <para>
+    <emphasis role="bold">Policy Configuration Improvements</emphasis>.
+    OpenAM policy configuration now supports applications.
+    OpenAM applications act as templates for all the policies
+    that govern access to the protected resources in your applications.
+    Furthermore applications, policies, and requests for policy decisions
+    can be fully managed through REST APIs, enabling new web-based PEPs.
+   </para>
+
+   <para>
+    When you create or edit a policy in OpenAM console for a particular realm,
+    you first choose the application that the policy belongs to,
+    and then create the policy or choose the policy to edit.
+    When applications share policies across realms,
+    you must create referrals between the applications
+    so that OpenAM can find the policies when making policy decisions.
+    You can create and edit referrals in OpenAM console as well,
+    though you must first enable the referral editor,
+    which is not enabled by default.
+   </para>
+
+   <para>
+    OpenAM policies are fully backwards compatible with existing policy agents.
+    However, existing policy agents expect
+    to find an application of the default type starting at the top level realm.
+    For new installations of OpenAM with realms and new applications,
+    to route policy agent requests to the correct application and realm,
+    this release introduces new properties in the policy agent profile
+    Policy Client Service to identify the application and the realm.
+    These properties are for OpenAM only.
+    They are not used by the policy agent itself.
+   </para>
+
+   <para>
+    For details on how to configure OpenAM policies,
+    see the <citetitle>Administration Guide</citetitle> chapter,
+    <link
+     xlink:show="new"
+     xlink:href="admin-guide#chap-authz-policy"
+     xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Defining Authorization Policies</citetitle></link>.
+   </para>
+  </listitem>
+
   <listitem><!-- Enhancement: AME-2210 -->
    <para><emphasis role="bold">Persistent Cookie from Client IP Issued</emphasis>.
     The Persistent Cookie module has been enhanced to enforce

@@ -47,6 +47,27 @@
  </glossentry>
 
  <glossentry>
+  <glossterm>Actions</glossterm>
+  <glossdef>
+   <para>
+    Defined as part of policies,
+    these verbs indicate what authorized subjects can do to resources.
+   </para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
+  <glossterm>Advice</glossterm>
+  <glossdef>
+   <para>
+    In the context of a policy decision denying access,
+    a hint to the policy enforcement point about remedial action to take
+    that could result in a decision allowing access.
+   </para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
   <glossterm>Agent administrator</glossterm>
   <glossdef>
    <para>User having privileges only to read and write policy agent profile
@@ -64,31 +85,17 @@
  </glossentry>
 
  <glossentry>
-  <glossterm>Application (general)</glossterm>
+  <glossterm>Application</glossterm>
   <glossdef>
    <para>
     In general terms, a service exposing protected resources.
    </para>
-  </glossdef>
- </glossentry>
 
- <glossentry>
-  <glossterm>Application (entitlements)</glossterm>
-  <glossdef>
-   <para>In the context of OpenAM entitlements, protected resources that share
-    a common set of actions and related policies</para>
-  </glossdef>
- </glossentry>
-
- <glossentry>
-  <glossterm>Application configuration</glossterm>
-  <glossdef>
    <para>
-    An application configuration defines the root resources,
-    the subset of environment and subject conditions, the set of actions,
-    the comparator logic, and the pre-defined policy configuration properties
-    for how policy applies for a specific application.
-    The application configuration constrains policies created for the application.
+    In the context of OpenAM policies,
+    the application is a template that constrains the policies
+    that govern access to protected resources.
+    An application can have zero or more policies.
    </para>
   </glossdef>
  </glossentry>
@@ -97,9 +104,17 @@
   <glossterm>Application type</glossterm>
   <glossdef>
    <para>
-    Application types act as templates for creating applications.
+    Application types act as templates for creating policy applications.
+   </para>
+
+   <para>
     Application types define a preset list of actions and functional logic,
     such as policy lookup and resource comparator logic.
+   </para>
+
+   <para>
+    Application types also define the internal normalization,
+    indexing logic, and comparator logic for applications.
    </para>
   </glossdef>
  </glossentry>
@@ -202,7 +217,22 @@
  <glossentry>
   <glossterm>Conditions</glossterm>
   <glossdef>
-   <para>Optional conditions under which a policy applies</para>
+   <para>
+    Defined as part of policies,
+    these determine the circumstances under which which a policy applies.
+   </para>
+
+   <para>
+    Environmental conditions reflect circumstances like
+    the client IP address, time of day, how the subject authenticated,
+    or the authentication level achieved
+   </para>
+
+   <para>
+    Subject conditions reflect characteristics of the subject like
+    whether the subject authenticated, the identity of the subject,
+    or claims in the subject's JWT
+   </para>
   </glossdef>
  </glossentry>
 
@@ -224,8 +254,9 @@
  <glossentry>
   <glossterm>Delegation</glossterm>
   <glossdef>
-   <para>In the context of OpenAM entitlements, a means of granting specific
-   users privileges to manage policies</para>
+   <para>
+    Granting users administrative privileges with OpenAM
+   </para>
   </glossdef>
  </glossentry>
 
@@ -335,8 +366,10 @@
  <glossentry>
   <glossterm>Policy</glossterm>
   <glossdef>
-   <para>Set of rules that define who is granted access to a protected
-   resource when, how, and under what conditions</para>
+   <para>
+    Set of rules that define who is granted access to a protected resource
+    when, how, and under what conditions
+   </para>
   </glossdef>
  </glossentry>
 
@@ -416,27 +449,51 @@
  <glossentry>
   <glossterm>Realm</glossterm>
   <glossdef>
-   <para>OpenAM unit for organizing configuration and identity information,
-   making it possible to delegate administration for part of OpenAM
-   configuration; realms can be used for example when different parts of an
-   organization using OpenAM have different policies and different identity
-   repositories</para>
+   <para>
+    OpenAM unit for organizing configuration and identity information
+   </para>
+
+   <para>
+    Realms can be used for example when different parts of an organization
+    have different applications and user data stores,
+    and when different organizations use the same OpenAM deployment.
+   </para>
+
+   <para>
+    Administrators can delegate realm administration.
+    The administrator assigns administrative privileges to users,
+    allowing them to perform administrative tasks within the realm.
+   </para>
   </glossdef>
  </glossentry>
 
  <glossentry>
   <glossterm>Referral</glossterm>
   <glossdef>
-   <para>Means to delegate policy management and decision making for a
-   realm</para>
+   <para>
+    Allows the policies for an application to be managed in the current realm,
+    and also in sibling and child realms
+   </para>
+
+   <para>
+    During policy evaluation, OpenAM uses referrals
+    to locate the application's policies in other realms
+    in order to find all policies that apply for a given request.
+   </para>
   </glossdef>
  </glossentry>
 
  <glossentry>
   <glossterm>Resource</glossterm>
   <glossdef>
-   <para>Something a principal can access over the network such as a web
-   page</para>
+   <para>
+    Something a user can access over the network such as a web page
+   </para>
+
+   <para>
+    Defined as part of policies,
+    these can include wildcards in order to match multiple actual resources.
+   </para>
   </glossdef>
  </glossentry>
 
@@ -457,10 +514,13 @@
  </glossentry>
 
  <glossentry>
-  <glossterm>Response providers</glossterm>
+  <glossterm>Response attributes</glossterm>
   <glossdef>
-   <para>Policy extensions that define additional information to return in an
-    authorization decision beyond "allow" or "deny"</para>
+   <para>
+    Defined as part of policies, these allow OpenAM
+    to return additional information in the form of "attributes"
+    with the response to a policy decision
+   </para>
   </glossdef>
  </glossentry>
 
@@ -469,14 +529,6 @@
   <glossdef>
    <para>Access control that is based on whether a user has been granted a set
    of permissions (a role)</para>
-  </glossdef>
- </glossentry>
-
- <glossentry>
-  <glossterm>Rules</glossterm>
-  <glossdef>
-   <para>Definitions identifying how a policy matches resources to which access
-   is granted or denied</para>
   </glossdef>
  </glossentry>
 
