@@ -160,10 +160,10 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         referralResourceFormatter: function (cellvalue, options, rowObject) {
             var key;
             for (key in cellvalue) {
-                if (cellvalue.hasOwnProperty(key)) {   
+                if (cellvalue.hasOwnProperty(key)) {
                     return uiUtils.commonJQGridFormatters.arrayFormatter(cellvalue[key], options, rowObject);
                 }
-            }  
+            }
         },
 
         getPolicyGridAdditionalOptions: function () {
@@ -206,7 +206,10 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         getRefGridAdditionalOptions: function () {
             var self = this;
             return {
-                search: false,
+                search: true,
+                searchFilter: [
+                    {field: 'applicationName', op: 'eq', val: this.data.appName}
+                ],
                 columnChooserOptions: {
                     width: 501,
                     height: 230
