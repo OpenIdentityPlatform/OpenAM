@@ -467,8 +467,6 @@
 
   </section>
 
-
-
  </section>
  
  <section xml:id="configure-authn-modules">
@@ -4951,7 +4949,8 @@ ssoadm \
   <tip><para>OpenAM provides a wizard for configuring authentication providers,
    including Facebook, Google and Microsoft. The wizard creates a
    relevant Authentication Chain as part of the process. For more
-   information, see <xref linkend="configure-social-authn"  />.</para></tip>
+   information, see <xref linkend="configure-social-authn"  />.
+  </para></tip>
 
   <procedure xml:id="create-authn-chain">
    <title>To Create an Authentication Chain</title>
@@ -5606,13 +5605,16 @@ ssoadm \
 
  <section xml:id="configure-valid-goto-url-resources">
   <title>Configuring Valid goto URL Resources</title>
-  <para>By default, OpenAM redirects the user to the URL specified in the
+
+  <para>
+   By default, OpenAM redirects the user to the URL specified in the
    <literal>goto</literal> and <literal>gotoOnFail</literal> query string parameters
    supplied to the authentication interface in the login URL.
    You can increase security against possible phishing attacks through open redirect
    by specifying a list of valid URL resources using the Valid
    <literal>goto</literal> URL Resource service.
   </para>
+
   <para>
    OpenAM only redirects a user if the <literal>goto</literal> and
    <literal>gotoOnFail</literal> URL matches any of the resources specified in
@@ -5621,62 +5623,116 @@ ssoadm \
    <literal>gotoOnFail</literal> URL is valid.
   </para>
 
+  <para>
+   The URL whitelisting and pattern matching follow the wildcard rules as specified in
+   <link
+    xlink:href="admin-guide#define-rules"
+    xlink:role="http://docbook.org/xlink/role/olink">
+    <citetitle>To Configure a Policy for a Web Site</citetitle></link>.
+   There is one main difference: when creating Applications, the URL pattern
+   matching for <literal>ApplicationTypes</literal> is different from the way
+   Applications are matched when creating policies.
+  </para>
   <itemizedlist>
-   <para>
-    When setting valid <literal>goto</literal> URLs,
-    you can use the "*" wildcard,
-    where "*" matches all characters except "?".
-    The following rules apply:
-   </para>
-
    <listitem>
     <para>
-     To allow only a single host name to be used
-     when redirecting the user after authentication,
-     specify the host name.
-    </para>
-
-    <para>
-     For example, if you specify
-     <literal>http*://secure.example.com</literal>,
-     then you can redirect only to
-     URLs on <literal>secure.example.com</literal>,
-     not URLs on <literal>www.example.com</literal>.
+     <emphasis role="bold">Creating an Application</emphasis>.
+     When creating an application, the default pattern is the asterisk ("*") wildcard.
+     There is one exception: the default application,
+     <literal>iPlanetAMWebAgentService</literal>,
+     uses a different pattern matching rule: <literal>*://*:*/*</literal> and
+     <literal>*://*:*/*?*</literal> as opposed to just <literal>*</literal>. This
+     rule is specified due to the application resource expecting a URI.
     </para>
    </listitem>
-
    <listitem>
     <para>
-     Start the domain name with <literal>*.</literal>
-     to allow all host names in the domain to be used
-     when redirecting the user after authentication.
-    </para>
-
-    <para>
-     For example, to allow redirects to URLs on any hosts in the domain
-     <literal>secure.example.com</literal>,
-     use <literal>http*://*.secure.example.com</literal>.
-    </para>
-
-    <para>
-     Note that <literal>http*://*.secure.example.com</literal>
-     matches URLs on <literal>www.secure.example.com</literal>,
-     and also URLs on <literal>www.subdomain.secure.example.com</literal>.
-    </para>
-
-    <para>
-     Also note that the <literal>*</literal> wildcard in the protocol,
-     <literal>http*://</literal>, matches URLs starting with
-     either <literal>http://</literal> or <literal>https://</literal>.
+     <emphasis role="bold">Creating a Policy</emphasis>.
+     When creating a policy, any rule with a trailing asterisk ("*") matches anything,
+     including a question mark ("?").
     </para>
    </listitem>
+  </itemizedlist>
 
+  <para>
+   Here are some general examples of URL pattern matching:
+  </para>
+  <itemizedlist>
    <listitem>
     <para>
-     To match URLs using secure connections
-     to <literal>www.example.com</literal> on any port,
-     but no URLs with query string parameters,
-     use <literal>https://www.example.com:*/*</literal>.
+     If no port is specified, <literal>http://www.example.com</literal> canonicalizes
+     to <literal>http://www.example.com:80</literal> and
+     <literal>https://www.example.com</literal> canonicalizes
+     to <literal>http://www.example.com:443</literal>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     A wildcard before "://" only matches up to "://"
+    </para>
+    <para>
+     For example, <literal>http*://*.com/*</literal> matches
+     <literal>http://www.example.com/hello/world</literal> and
+     <literal>https://www.example.com/hello</literal>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     A wildcard between "://" and ":" matches up to ":"
+    </para>
+    <para>
+     For example, <literal>http://*:85</literal> matches <literal>http://www.example.com:85</literal>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     A wildcard between ":" and "/" only matches up to the first "/"
+    </para>
+    <para>
+     For example, <literal>http://www.*:*/</literal> matches
+     <literal>http://www.example.com:80</literal>.
+     In another example, <literal>http://www.example.com:*</literal> matches
+     <literal>http://ww.example.com:[any port]</literal>
+     and <literal>http://www.example.com:[any port]/</literal> but nothing more.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     A wildcard after "/" matches anything depending on whether it is single-level
+     or a wildcard appropriately.
+    </para>
+    <para>
+     For example, <literal>https://www.example.com/*</literal> matches
+     <literal>https://www.example.com:443/foo/bar/baz/me</literal>
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     If you do not use any wildcards, OpenAM exactly matches the string, so
+     <literal>http://www.example.com</literal> only matches
+     <literal>http://www.example.com</literal> but NOT <literal>http://www.example.com/</literal>
+     (trailing slash).
+    </para>
+    <para>
+     If you put the wildcard after the path, OpenAM expects a path (even if it is blank),
+     so <literal>http://www.example.com/*</literal> matches
+     <literal>http://www.example.com/</literal>
+     and <literal>http://www.example.com/foo/bar/baz.html</literal> but NOT
+     <literal>http://www.example.com</literal>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <literal>http://www.example.com:*/</literal> matches
+     <literal>http://www.example.com/</literal>, which also canonicalizes to
+     <literal>http://www.example.com:80/</literal>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <literal>https://www.example.com:*/</literal> matches
+     <literal>https://www.example.com/</literal>, which also canonicalizes to
+     <literal>https://www.example.com:443/</literal>.
     </para>
    </listitem>
   </itemizedlist>
