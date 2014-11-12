@@ -200,7 +200,7 @@ public class VersionRouter {
      * @return An {@link AcceptAPIVersion} object containing the requested resource version.
      * @throws {@link NotFoundException} if the specified protocol is invalid.
      */
-    private AcceptAPIVersion parseAcceptAPIVersion(String versionHeader) throws NotFoundException {
+    private AcceptAPIVersion parseAcceptAPIVersion(String versionHeader) throws ResourceException {
 
         AcceptAPIVersion apiVersion = AcceptAPIVersion.newBuilder(versionHeader)
                 .withDefaultProtocolVersion("1.0")
