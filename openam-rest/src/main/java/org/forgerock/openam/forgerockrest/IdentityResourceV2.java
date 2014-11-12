@@ -25,7 +25,6 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.Attribute;
-import com.sun.identity.idsvcs.DeleteResponse;
 import com.sun.identity.idsvcs.DuplicateObject;
 import com.sun.identity.idsvcs.GeneralFailure;
 import com.sun.identity.idsvcs.IdentityDetails;
@@ -42,27 +41,9 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.mail.MessagingException;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -77,7 +58,6 @@ import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
@@ -91,8 +71,6 @@ import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
-import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.RealmContext;
@@ -1361,31 +1339,6 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         return false;
     }
 
-    private String getPasswordFromHeader(ServerContext context, String headerName){
-        List<String> headerList = null;
-        HttpContext header = null;
-
-        try {
-            header = context.asContext(HttpContext.class);
-            if (header == null) {
-                debug.error("IdentityResource.getPasswordFromHeader :: " +
-                        "Cannot retrieve ServerContext as HttpContext");
-                return null;
-            }
-            //get the oldusername from header directly
-            headerList = header.getHeaders().get(headerName);
-            if (headerList != null && !headerList.isEmpty()) {
-                for (String s : headerList) {
-                    return (s != null && !s.isEmpty()) ? s : null;
-                }
-            }
-        } catch (Exception e) {
-            debug.error("IdentityResource.getPasswordFromHeader :: " +
-                    "Cannot get currentpassword from ServerContext!" + e);
-        }
-        return null;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -1450,21 +1403,18 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                             }
                         }
                         // Compare newAttr and currentAttr
-                        if (currentAttr.equals(newAttr)){
-                            // attribute has not changed
-                        } else {
-                            if(hasReauthenticated){
-                                //already reauthed continue with attr change
+                        if (!currentAttr.equals(newAttr) && !hasReauthenticated) {
+                            // check header to make sure that password is there then check to see if it's correct
+                            String strCurrentPass = RestUtils.getMimeHeaderValue(context, CURRENT_PASSWORD);
+                            if (strCurrentPass != null && !strCurrentPass.isEmpty() &&
+                                    checkValidPassword(resourceId, strCurrentPass.toCharArray(), realm)) {
+                                //set a boolean value so we know reauth has been done
+                                hasReauthenticated = true;
+                                //continue will allow attribute(s) change(s)
                             } else {
-                                // check header to make sure that password is there then check to see if it's correct
-                                String strCurrentPass = getPasswordFromHeader(context, CURRENT_PASSWORD);
-                                if(strCurrentPass != null && !strCurrentPass.isEmpty() && checkValidPassword(resourceId, strCurrentPass.toCharArray(), realm)){
-                                    //set a boolean value so we know reauth has been done
-                                    hasReauthenticated = true;
-                                    //continue will allow attribute(s) change(s)
-                                } else{
-                                    throw new BadRequestException("Must provide a valid confirmation password to change protected attribute (" + protectedAttr + ") from '" + currentAttr + "' to '" + newAttr + "'");
-                                }
+                                throw new BadRequestException("Must provide a valid confirmation password to change " +
+                                        "protected attribute (" + protectedAttr + ") from '" + currentAttr + "' to '" +
+                                        newAttr + "'");
                             }
                         }
                     }

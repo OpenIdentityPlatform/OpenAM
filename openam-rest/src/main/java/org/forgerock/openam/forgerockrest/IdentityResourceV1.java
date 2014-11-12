@@ -42,20 +42,6 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.mail.MessagingException;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
@@ -1414,31 +1400,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         return false;
     }
 
-    private String getPasswordFromHeader(ServerContext context, String headerName){
-        List<String> headerList = null;
-        HttpContext header = null;
-
-        try {
-            header = context.asContext(HttpContext.class);
-            if (header == null) {
-                debug.error("IdentityResource.getPasswordFromHeader :: " +
-                        "Cannot retrieve ServerContext as HttpContext");
-                return null;
-            }
-            //get the oldusername from header directly
-            headerList = header.getHeaders().get(headerName);
-            if (headerList != null && !headerList.isEmpty()) {
-                for (String s : headerList) {
-                       return (s != null && !s.isEmpty()) ? s : null;
-                }
-            }
-        } catch (Exception e) {
-            debug.error("IdentityResource.getPasswordFromHeader :: " +
-                    "Cannot get currentpassword from ServerContext!" + e);
-        }
-        return null;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -1480,7 +1441,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                     // same password as before, update the attributes
                 } else {
                     // check header to make sure that oldpassword is there check to see if it's correct
-                    String strPass = getPasswordFromHeader(context, OLD_PASSWORD);
+                    String strPass = RestUtils.getMimeHeaderValue(context, OLD_PASSWORD);
                     if(strPass != null && !strPass.isEmpty() && checkValidPassword(resourceId, strPass.toCharArray(), realm)){
                         //continue will allow password change
                     } else{

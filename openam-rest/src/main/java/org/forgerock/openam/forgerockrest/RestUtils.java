@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock Inc.
+ * Copyright 2012-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest;
@@ -31,39 +31,38 @@ import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.dashboard.ServerContextHelper;
 
+import javax.mail.internet.MimeUtility;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.AccessController;
 
 /**
  * A collection of ForgeRock-REST based utility functions.
- *
- * @author alin.brici@forgerock.com
- * @author robert.wapshott@forgerock.com
  */
-final public class  RestUtils {
+final public class RestUtils {
 
-    private static Debug debug = Debug.getInstance("frRest");
+    private static final Debug debug = Debug.getInstance("frRest");
 
-    private static final SSOToken token;
-    private static final String adminUser;
-    private static final AMIdentity adminUserId;
-
-    static {
-        token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-        adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
-
-        if (adminUser != null) {
-            adminUserId = new AMIdentity(token,
-                    adminUser, IdType.USER, "/", null);
-        } else {
-            adminUserId = null;
-            debug.error("SystemProperties AUTHENTICATION_SUPER_USER not set");
+    /**
+     * Lazy initialization holder idiom.
+     */
+    private static final class AdminUserIdHolder {
+        static final AMIdentity adminUserId;
+        static {
+            final SSOToken adminToken = getToken();
+            final String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
+            if (adminUser != null) {
+                adminUserId = new AMIdentity(adminToken, adminUser, IdType.USER, "/", null);
+            } else {
+                adminUserId = null;
+                debug.error("SystemProperties AUTHENTICATION_SUPER_USER not set");
+            }
         }
     }
-
     /**
      * Returns TokenID from headers
      *
@@ -86,8 +85,8 @@ final public class  RestUtils {
             ssotok = mgr.createSSOToken(getCookieFromServerContext(context));
             amIdentity = new AMIdentity(ssotok);
 
-            if (!(amIdentity.equals(adminUserId))){
-                debug.error("Unauthorized user.");
+            if (!(amIdentity.equals(AdminUserIdHolder.adminUserId))){
+                debug.message("RestUtils.isAdmin: Non-admin user.");
                 return false;
             }
             return true;
@@ -111,7 +110,7 @@ final public class  RestUtils {
         mgr.refreshSession(ssotok);
         amIdentity = new AMIdentity(ssotok);
 
-        if (!(amIdentity.equals(adminUserId))){
+        if (!(amIdentity.equals(AdminUserIdHolder.adminUserId))) {
             debug.error("Unauthorized user.");
             throw new ForbiddenException("Access Denied");
         }
@@ -157,7 +156,31 @@ final public class  RestUtils {
      * @return
      */
     public static SSOToken getToken() {
-        return token;
+        return AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
 
+    /**
+     * Returns the value of the named header field from the request, decoding it if it is mime-encoded. If the header
+     * is not mime-encoded then it is returned as-is. If no such header is present, then {@code null} is returned. If
+     * there are multiple values for the header, then the first value is returned.
+     *
+     * @param serverContext the context of the request. Must contain a {@link HttpContext}.
+     * @param headerName the name of the header to get.
+     * @return the decoded header value, or {@code null} if no such header exists in the request.
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc2047">RFC 2047: MIME Part 3: Message Header Extensions for Non-ASCII
+     * Text</a>
+     */
+    public static String getMimeHeaderValue(final ServerContext serverContext, final String headerName) {
+        final HttpContext httpContext = serverContext.asContext(HttpContext.class);
+        final String headerValue = httpContext.getHeaderAsString(headerName);
+        try {
+            return headerValue == null ? null : MimeUtility.decodeText(headerValue);
+        } catch (UnsupportedEncodingException ex) {
+            if (debug.warningEnabled()) {
+                debug.warning("Unable to decode mime header: " + ex);
+            }
+            return headerValue;
+        }
+    }
 }
