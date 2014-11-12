@@ -1546,6 +1546,40 @@ $ <userinput>curl \
     error including the
     <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
     xlink:show="new">HTTP status code</link>.</para>
+
+   <para>
+    To read the top-level realm,
+    use <literal>toplevelrealm</literal> with the
+    <literal>realms</literal> endpoint.
+   </para>
+   <screen>
+    <userinput>
+     curl \
+     --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+     https://openam.example.com:8443/openam/json/realms/toplevelrealm
+    </userinput>
+    <computeroutput>
+     {
+      "serviceNames" : [
+       "sunAMAuthFederationService",
+       "sunEntitlementIndexes",
+       "iPlanetAMAuthService",
+       "sunAMAuthDataStoreService",
+       "sunAMAuthWSSAuthModuleService",
+       "sunAMDelegationService",
+       "iPlanetAMAuthOATHService",
+       "iPlanetAMAuthConfiguration",
+       "sunAMAuthHOTPService",
+       "sunIdentityRepositoryService",
+       "iPlanetAMPolicyConfigService",
+       "iPlanetAMAuthLDAPService",
+       "sunEntitlementService",
+       "iPlanetAMPolicyService",
+       "sunAMAuthSAEService",
+       "AgentService" ]
+     }
+    </computeroutput>
+   </screen>
    </section>
     
   <section xml:id="rest-api-update-realm">
