@@ -204,7 +204,14 @@
         "resourceN"
     ],
     "application": "optional, defaults to iPlanetAMWebAgentService",
-    "subject": "optional subject SSOToken",
+    "subject": {
+        "ssoToken": "SSO token ID string",
+        "jwt": "JSON Web Token string",
+        "claims": {
+            "key": "value",
+            ...
+        }
+    },
     "environment": {
         "optional key1": [
             "value",
@@ -271,19 +278,54 @@
      <term><literal>"subject"</literal></term>
      <listitem>
       <para>
-       This optional field holds the token ID of the subject,
-       returned for example on successful authentication.
-       See <link
-        xlink:show="new"
-        xlink:href="dev-guide#rest-api-auth-json"
-        xlink:role="http://docbook.org/xlink/role/olink"
-        >REST APIs for Authentication &amp; Logout
-       </link>.
       </para>
 
+      <variablelist>
+       <para>
+        This optional field holds an object that represents the subject.
+        You can specify one or more of the following keys.
+        If you specify multiple keys,
+        the subject can have multiple associated principals,
+        and you can use subject conditions corresponding to any type in the request.
+       </para>
+
+       <varlistentry>
+        <term>"ssoToken"</term>
+        <listitem>
+         <para>
+          The value is the SSO token ID string for the subject,
+          returned for example on successful authentication as described in,
+          <link
+           xlink:show="new"
+           xlink:href="dev-guide#rest-api-auth-json"
+           xlink:role="http://docbook.org/xlink/role/olink"
+          ><citetitle>REST APIs for Authentication &amp; Logout</citetitle></link>.
+         </para>
+        </listitem>
+       </varlistentry>
+
+       <varlistentry>
+        <term>"claims"</term>
+        <listitem>
+         <para>
+          The value is an object (map) of JWT claims to their values.
+         </para>
+        </listitem>
+       </varlistentry>
+
+       <varlistentry>
+        <term>"jwt"</term>
+        <listitem>
+         <para>
+          The value is a JWT string.
+         </para>
+        </listitem>
+       </varlistentry>
+      </variablelist>
+
       <para>
-       If you do not specify the token ID,
-       OpenAM uses the token ID of the subject making the request.
+       If you do not specify the subject,
+       OpenAM uses the SSO token ID of the subject making the request.
       </para>
      </listitem>
     </varlistentry>
@@ -800,7 +842,14 @@ $ <userinput>curl \
 {
     "resource": "resource string",
     "application": "optional, defaults to iPlanetAMWebAgentService",
-    "subject": "optional subject SSOToken",
+    "subject": {
+        "ssoToken": "SSO token ID string",
+        "jwt": "JSON Web Token string",
+        "claims": {
+            "key": "value",
+            ...
+        }
+    },
     "environment": {
         "optional key1": [
             "value",
@@ -864,19 +913,54 @@ $ <userinput>curl \
      <term><literal>"subject"</literal></term>
      <listitem>
       <para>
-       This optional field holds the token ID of the subject,
-       returned for example on successful authentication.
-       See
-        <link xlink:show="new"
-              xlink:href="dev-guide#rest-api-auth-json"
-              xlink:role="http://docbook.org/xlink/role/olink"
-          >REST APIs for Authentication &amp; Logout
-        </link>.
       </para>
 
+      <variablelist>
+       <para>
+        This optional field holds an object that represents the subject.
+        You can specify one or more of the following keys.
+        If you specify multiple keys,
+        the subject can have multiple associated principals,
+        and you can use subject conditions corresponding to any type in the request.
+       </para>
+
+       <varlistentry>
+        <term>"ssoToken"</term>
+        <listitem>
+         <para>
+          The value is the SSO token ID string for the subject,
+          returned for example on successful authentication as described in,
+          <link
+           xlink:show="new"
+           xlink:href="dev-guide#rest-api-auth-json"
+           xlink:role="http://docbook.org/xlink/role/olink"
+          ><citetitle>REST APIs for Authentication &amp; Logout</citetitle></link>.
+         </para>
+        </listitem>
+       </varlistentry>
+
+       <varlistentry>
+        <term>"claims"</term>
+        <listitem>
+         <para>
+          The value is an object (map) of JWT claims to their values.
+         </para>
+        </listitem>
+       </varlistentry>
+
+       <varlistentry>
+        <term>"jwt"</term>
+        <listitem>
+         <para>
+          The value is a JWT string.
+         </para>
+        </listitem>
+       </varlistentry>
+      </variablelist>
+
       <para>
-       If you do not specify the token ID,
-       OpenAM uses the token ID of the subject making the request.
+       If you do not specify the subject,
+       OpenAM uses the SSO token ID of the subject making the request.
       </para>
      </listitem>
     </varlistentry>
@@ -911,7 +995,7 @@ $ <userinput>curl \
  --header "Content-Type: application/json" \
  --data '{
     "resource": "http://www.example.com/",
-    "subject": "AQIC5...zE4*"
+    "subject": { "ssoToken": "AQIC5...zE4*" }
  }' \
  https://openam.example.com:8443/openam/json/realm/policies?_action=evaluateTree</userinput>
 <computeroutput>[ {
@@ -2737,6 +2821,7 @@ $ <userinput>curl \
       <member><literal>"AnyUser"</literal></member>
       <member><literal>"Attribute"</literal></member>
       <member><literal>"Group"</literal></member>
+      <member><literal>"JwtClaim"</literal></member>
       <member><literal>"NONE"</literal></member>
       <member><literal>"NOT"</literal></member>
       <member><literal>"OR"</literal></member>
