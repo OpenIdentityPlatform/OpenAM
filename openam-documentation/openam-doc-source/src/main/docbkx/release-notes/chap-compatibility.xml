@@ -58,6 +58,130 @@
    </listitem>
 
    <listitem>
+    <!-- AME-4013, AME-2766, etc. -->
+    <para>
+     When you visit the Policies tab for a realm in OpenAM console,
+     OpenAM now directs you to the new policy editor.
+     For instructions on using the new policy editor,
+     see the <citetitle>Administration Guide</citetitle> chapter,
+     <link
+      xlink:href="admin-guide#chap-authz-policy"
+      xlink:show="new"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Defining Authorization Policies</citetitle></link>.
+     Notice that policies now belong to applications
+     as described in that chapter.
+    </para>
+
+    <itemizedlist>
+     <para>
+      OpenAM has changed its internal representation for policies
+      to better fit the underlying implementation,
+      which is based on the newer engine
+      designed for higher performance and finer grained policies.
+      When you upgrade to this version,
+      OpenAM migrates your policies to the new representation.
+     </para>
+
+     <para>
+      Depending on your existing policies before upgrade,
+      you can see the following differences.
+     </para>
+
+     <listitem>
+      <para>
+       Existing policies with multiple resource rules
+       map to multiple new policies.
+      </para>
+
+      <para>
+       When a single policy maps to multiple policies during migration,
+       OpenAM appends a number to the existing name for each new policy.
+       This allows you to recognize the set of policies
+       when you must manage them together,
+       for example to change them all in the same way.
+      </para>
+
+      <para>
+       This behavior is to optimize policy evaluation performance.
+       The newer policy engine matches resources to policies during evaluation
+       with indexing that proves very efficient
+       as long as each policy specifies one resource pattern.
+       OpenAM processes the list of resources in policies in linear fashion,
+       so long lists of resources can slow policy evaluation.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       Conditions in existing policies map to newer representations.
+      </para>
+
+      <para>
+       New representations exist for all existing conditions
+       provided in OpenAM out of the box.
+       Custom conditions developed for your deployment
+       do not map to any of the newer conditions provided.
+       In that case you must migrate your custom conditions,
+       and then configure your policies to use them.
+       <!-- Q: How to migrate custom conditions? A: Pending OPENAM-4015. -->
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       When OpenAM encounters issues migrating policies during upgrade,
+       it writes messages about the problems in the upgrade log.
+       When you open a policy in the policy editor
+       that caused problems during the upgrade process
+       the policy editor shows the issues,
+       but does not let you fix them directly.
+       Instead you must create equivalent, corrected policies
+       in order to use them in OpenAM.
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+     <para>
+      OpenAM configuration has changed in several ways to accommodate
+      the changes to the way policies are managed.
+     </para>
+
+     <listitem>
+      <para>
+       The policy service configuration has changed,
+       as seen in the Policy Configuration pages in OpenAM console.
+       For details see the <citetitle>Reference</citetitle> section,
+       <link
+        xlink:href="reference#policy-configuration"
+        xlink:show="new"
+        xlink:role="http://docbook.org/xlink/role/olink"
+       ><citetitle>Policy Configuration</citetitle></link>.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       OpenAM now requires policy referrals only when an application
+       is administered across multiple realms,
+       as can be the case when one policy agent protects multiple applications.
+       Otherwise, OpenAM can use new settings in policy agent profiles
+       to direct policy agent requests to the appropriate realm and application.
+      </para>
+
+      <para>
+       The web and Java EE policy agent profiles includes the new settings
+       under OpenAM Services > Policy Client Service in OpenAM console.
+       These new settings allow you to set the realm and application
+       for a policy agent.
+       The settings are compatible with existing policy agents,
+       as they are not used by the policy agents themselves,
+       but instead by OpenAM when handling policy agent requests.
+      </para>
+     </listitem>
+    </itemizedlist>
+
     <para>
      The fix for <link xlink:show="new"
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3509"
