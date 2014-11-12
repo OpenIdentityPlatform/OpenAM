@@ -38,6 +38,12 @@
   <title>Important Changes to Existing Functionality</title>
 
   <itemizedlist>
+   <listitem>
+    <para>
+     TODO: Finish updating before release
+    </para>
+   </listitem>
+
    <!-- Update docs for click-through license acceptance KEEP THIS AT TOP -->
    <listitem>
        <para>All OpenAM core server, tools, and agent installers now display a
@@ -51,113 +57,7 @@
        screen to the user.</para>
    </listitem>
 
-     <listitem>
-      <para>The advanced server property used to set the HTTP header name,
-      <literal>com.sun.identity.authentication.client.ipAddressHeader</literal>,
-      has replaced the legacy OpenSSO property
-      <literal>com.sun.identity.session.httpClientIPHeader</literal> (<link
-      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1879"
-      xlink:show="new">OPENAM-1879</link>).</para>
-     </listitem>
-
    <listitem>
-    <para>Legacy naming conventions have been changed to conform to the
-    current product name, OpenAM.</para>
-
-    <para><filename>$HOME/.openamcfg/</filename> is the new name for
-    <filename>$HOME/.openssocfg/</filename>. If you upgrade, OpenAM still
-    supports use of <filename>$HOME/.openssocfg/</filename>, and does not
-    rename the folder. For new OpenAM installs, OpenAM creates the directory
-    with the new name, <filename>$HOME/.openamcfg/</filename>, at configuration
-    time.</para>
-
-    <para>Other files, such as the <filename>openam.war</filename> file, and
-    paths have been modified to ensure consistency with the naming
-    conventions.</para>
-   </listitem>
-
-   <listitem>
-    <para>OpenAM now ships with multiple .war files. You no longer have to
-    build custom .war files for core server-only or distributed authentication
-    UI installations for example.</para>
-   </listitem>
-
-   <listitem>
-    <para>In versions before OpenAM 10.1.0 the default root suffix DN for OpenAM
-    configuration and profile data was <literal>dc=opensso,dc=java,dc=net</literal>.
-    The default root suffix is now <literal><?eval ${defaultRootSuffix}?></literal>.</para>
-   </listitem>
-
-   <listitem>
-    <itemizedlist>
-     <para>The fix for <link xlink:show="new"
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1630"
-     >OPENAM-1630</link> changes SAML metadata signing in OpenAM to better
-     conform with the SAML 2.0 standard.</para>
-
-     <listitem>
-      <para>Metadata for hosted entities is signed using the
-      <literal>metadataSigningKey</literal> configured for the realm, or
-      inherited from the global configuration for the server.</para>
-     </listitem>
-
-     <listitem>
-      <para>OpenAM now signs the <literal>EntityDescriptor</literal> element
-      that contains child <literal>SPSSODescriptor</literal> or
-      <literal>IDPSSODescriptor</literal> elements.</para>
-     </listitem>
-
-     <listitem>
-      <para>When importing remote entity metadata with signatures, OpenAM does
-      not modify the signatures, but instead returns them as they were when they
-      were imported.</para>
-     </listitem>
-
-     <listitem>
-      <para>When OpenAM imports remote entity metadata that has no signature and
-      signed metadata is requested on export, OpenAM signs the metadata with
-      the <literal>metadataSigningKey</literal>.</para>
-     </listitem>
-    </itemizedlist>
-   </listitem>
-
-   <listitem>
-    <para>The default policy evaluation mode for new policy agent profiles is
-    now self rather than subtree, in order to better scale for large numbers of
-    policy rules.</para>
-
-    <para>Upgrade does not change existing policy agent profile configurations,
-    however. If you want to adopt the new default setting for existing policy
-    agents, you must change the setting manually.</para>
-
-    <para>To do so for Java EE policy agents, set
-    <literal>com.sun.identity.policy.client.cacheMode=self</literal>.</para>
-
-    <para>For web policy agents, set
-    <literal>com.sun.identity.agents.config.fetch.from.root.resource=false</literal>.</para>
-   </listitem>
-
-   <listitem>
-    <para>
-     You now specify rules for referrals in the same way as rules for policies.
-    </para>
-
-    <para>
-     For example, with previous releases a referral rule for
-     <literal>http://example.com/</literal> matched everything underneath.
-     Now you would need three rules, <literal>http://example.com/</literal>,
-     <literal>http://example.com/*</literal>,
-     and <literal>http://example.com/*?*</literal>.
-
-     When used at the end of a rule
-     <literal>*</literal> matches one or more characters,
-     rather than zero or more characters.
-    </para>
-
-    <para>
-     When you upgrade OpenAM, the upgrade tool converts existing referral rules.
-    </para>
-
     <para>
      The fix for <link xlink:show="new"
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3509"
@@ -208,7 +108,14 @@
   release.</para>
 
   <itemizedlist>
+   <listitem>
+    <para>
+     TODO: Update before release
+    </para>
+   </listitem>
 
+   <!-- Are any of these deprecated features removed in OpenAM 12.0.0? -->
+   <!-- START: Deprecated in OpenAM 11.0.0 -->
    <listitem>
     <para>With the implementation of OAuth 2.0 in this release, OAuth 1.0 has been 
     deprecated. OAuth 1.0 support was originally provided in OpenAM 9.</para>
@@ -230,8 +137,7 @@
     Core Authentication module persistent cookie options are deprecated and are
     likely to be removed in a future release.</para>
    </listitem>
-
-
+   <!-- END: Deprecated in OpenAM 11.0.0 -->
 
    <listitem>
     <para>
@@ -282,36 +188,13 @@
 
   <itemizedlist>
    <listitem>
-    <para>OpenAM Java SDK no longer supports JDK 5.</para>
-   </listitem>
-
-   <listitem>
-    <para>The <literal>iplanet-am-auth-ldap-server-check</literal> property for
-    LDAP and Active Directory authentication modules has been removed and
-    replaced with a heartbeat mechanism configurable through the LDAP Connection
-    Heartbeat Interval (<literal>openam-auth-ldap-heartbeat-interval</literal>)
-    and LDAP Connection Heartbeat Time Unit
-    (<literal>openam-auth-ldap-heartbeat-interval</literal>) properties for the
-    modules.</para>
-
-    <para>Set these new properties as necessary when you have firewalls or
-    load balancers that drop connections that remain idle for too long.</para>
-   </listitem>
-
-   <listitem>
-    <para>The advanced server property,
-    <literal>openam.session.destroy_all_sessions</literal>, has been replaced
-    by the built-in Global Session Service setting,
-    <literal>DESTROY_OLD_SESSIONS</literal>.</para>
-   </listitem>
-
-   <listitem>
-    <para>Javadoc for the client SDK is no longer delivered with the
-    distribution, but instead is <link xlink:show="new"
-    xlink:href="${javadocBase}">available online</link>.</para>
+    <para>
+     TODO: Finish updating before release
+    </para>
    </listitem>
   </itemizedlist>
  </section>
+
  <section xml:id="rest-changes">
   <title>REST API Changes &amp; Deprecated Functionality</title>
 
