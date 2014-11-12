@@ -41,6 +41,8 @@ define([
     "./ManageResponseAttrsView",
     "./ResponseAttrsUserView",
 
+    "./AbstractEditView",
+
 
     "./EditReferralView",
     "./SelectRealmsView",

@@ -29,7 +29,7 @@
 /*global window, define, $, form2js, _, js2form, document, console */
 
 define("org/forgerock/openam/ui/policy/EditReferralView", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/policy/AbstractEditView",
     "org/forgerock/openam/ui/policy/ResourcesListView",
     "org/forgerock/openam/ui/policy/AddNewResourceView",
     "org/forgerock/openam/ui/policy/ReviewInfoView",
@@ -39,20 +39,14 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
     "org/forgerock/openam/ui/common/components/Accordion",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/main/Router"
-], function (AbstractView, resourcesListView, addNewResourceView, reviewInfoView, selectRealmsView, policyDelegate, uiUtils, Accordion, constants, eventManager, router) {
-    var EditReferralView = AbstractView.extend({
-        baseTemplate: "templates/policy/BaseTemplate.html",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/components/Messages"
+], function (AbstractEditView, resourcesListView, addNewResourceView, reviewInfoView, selectRealmsView, policyDelegate, uiUtils, Accordion, constants, eventManager, router, messager) {
+    var EditReferralView = AbstractEditView.extend({
         template: "templates/policy/EditReferralTemplate.html",
-        events: {
-            'click input[name=nextButton]': 'openNextStep',
-            'click input[name=submitForm]': 'submitForm',
-            'click .review-row': 'reviewRowClick',
-            'keyup .review-row': 'reviewRowClick'
-        },
+        reviewTemplate: "templates/policy/ReviewReferralStepTemplate.html",
         data: {},
-
-        REVIEW_INFO_STEP: 3,
+        validationFields: ["name", "resources", "realms"], 
 
         render: function (args, callback) {
 
@@ -86,8 +80,7 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
                     addNewResourceView.render(data);
                     resourcesListView.render(data);
                     selectRealmsView.render(data);
-
-                    reviewInfoView.render(this.data, null, self.$el.find('#reviewInfo'), "templates/policy/ReviewReferralStepTemplate.html");
+                    self.validateThenRenderReview();
                     self.initAccordion();
 
                     if (callback) {
@@ -99,51 +92,14 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
 
         },
 
-        initAccordion: function () {
-            var self = this,
-                options = {};
-
-            if (this.data.entity.name) {
-                options.active = this.REVIEW_INFO_STEP;
-            } else {
-                options.disabled = true;
-            }
-
-            this.accordion = new Accordion(this.$el.find('.accordion'), options);
-            this.accordion.on('beforeChange', function (e, id) {
-                if (id === self.REVIEW_INFO_STEP) {
-                    self.updateFields();
-                    reviewInfoView.render(self.data, null, self.$el.find('#reviewInfo'), "templates/policy/ReviewReferralStepTemplate.html");
-                }
-            });
-        },
-
         updateFields: function () {
             var entity = this.data.entity,
-                dataFields = this.$el.find('[data-field]'),
-                field;
+                dataFields = this.$el.find('[data-field]');
 
             _.each(dataFields, function (field, key, list) {
                 entity[field.getAttribute('data-field')] = field.value;
             });
 
-        },
-
-        openNextStep: function (e) {
-            this.accordion.setActive(this.accordion.getActive() + 1);
-        },
-
-        reviewRowClick:function (e) {
-            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
-            var reviewRows = this.$el.find('.review-row'),
-                targetIndex = -1;
-                _.find(reviewRows, function(reviewRow, index){
-                    if(reviewRow === e.currentTarget){
-                        targetIndex = index;
-                    }
-                });
-
-            this.accordion.setActive(targetIndex);
         },
 
         filterRealms: function (allRealms) {
@@ -209,7 +165,6 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
             } else {
                 policyDelegate.createReferral(persisted)
                 .done(function (e) {
-                    console.log(e);
                     router.routeTo(router.configuration.routes.managePolicies, {args: [self.data.options.appName], trigger: true});
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "referralCreated");
                 })
@@ -221,6 +176,8 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
 
         errorHandler: function (e) {
             //TODO
+            var obj = { message: JSON.parse(e.responseText).message, type: "error"};
+            messager.messages.addMessage( obj ); 
             console.error(e.responseJSON, e.responseText, e);
         }
     });

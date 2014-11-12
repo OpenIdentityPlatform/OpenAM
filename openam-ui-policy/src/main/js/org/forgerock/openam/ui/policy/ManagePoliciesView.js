@@ -87,17 +87,18 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 url: '/openam/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/policies',
                 colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified', 'Actions', 'Resources', 'Resource Attributes', 'Subject'],
                 colModel: [
+
                     {name: 'iconChB',        width: 40, sortable: false, formatter: this.policyGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
-                    {name: 'name',           width: 250, frozen: true, hidedlg: true},
-                    {name: 'description',    width: 180, sortable: false},
+                    {name: 'name',           width: 285, frozen: true, hidedlg: true},
+                    {name: 'description',    width: 285, hidden: true, sortable: false},
                     {name: 'createdBy',      width: 250, hidden: true},
                     {name: 'creationDate',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
                     {name: 'lastModifiedBy', width: 250, hidden: true},
                     {name: 'lastModified',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                    {name: 'actionValues',   width: 210, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
-                    {name: 'resources',      width: 210, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                    {name: 'resourceAttributes', width: 150, sortable: false, hidden: true, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                    {name: 'subject',        width: 150, sortable: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.objectFormatter}
+                    {name: 'actionValues',   width: 285, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                    {name: 'resources',      width: 285, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'resourceAttributes', width: 285, sortable: false, hidden: true, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                    {name: 'subject',        width: 285, sortable: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.objectFormatter}
 
                 ],
                 beforeSelectRow: function (rowId, e) {
@@ -127,12 +128,12 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         getRefGridInitOptions: function () {
             var self = this;
             return {
-                url: '/openam/json/referrals',
+                url: '/openam/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/referrals',
                 colNames: ['', 'Name', 'Resources', 'Realms', 'Created', 'Last Modified', 'Created By', 'ModifiedBy'],
                 colModel: [
                     {name: 'iconChB',        width: 40,  sortable: false, formatter: this.refGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
-                    {name: 'name',           width: 280, frozen: true, hidedlg: true},
-                    {name: 'resources',      width: 290, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                    {name: 'name',           width: 285, frozen: true, hidedlg: true},
+                    {name: 'resources',      width: 285, sortable: false, formatter: this.referralResourceFormatter},
                     {name: 'realms',         width: 285, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                     {name: 'creationDate',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
                     {name: 'lastModified',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
@@ -154,6 +155,15 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 shrinkToFit: false,
                 pager: '#refsPager'
             };
+        },
+
+        referralResourceFormatter: function (cellvalue, options, rowObject) {
+            var key;
+            for (key in cellvalue) {
+                if (cellvalue.hasOwnProperty(key)) {   
+                    return uiUtils.commonJQGridFormatters.arrayFormatter(cellvalue[key], options, rowObject);
+                }
+            }  
         },
 
         getPolicyGridAdditionalOptions: function () {

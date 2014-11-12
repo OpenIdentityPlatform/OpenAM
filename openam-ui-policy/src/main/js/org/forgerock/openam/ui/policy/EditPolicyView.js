@@ -30,7 +30,7 @@
 /*global window, define, $, form2js, _, js2form, document, console */
 
 define("org/forgerock/openam/ui/policy/EditPolicyView", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/policy/AbstractEditView",
     "org/forgerock/openam/ui/policy/ActionsView",
     "org/forgerock/openam/ui/policy/ResourcesListView",
     "org/forgerock/openam/ui/policy/AddNewResourceView",
@@ -44,20 +44,14 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
     "org/forgerock/openam/ui/policy/ManageEnvironmentsView",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/main/Router"
-], function (AbstractView, actionsView, resourcesListView, addNewResourceView, responseAttrsStaticView, responseAttrsUserView, reviewInfoView, policyDelegate, uiUtils, Accordion, manageSubjects, manageEnvironments, constants,eventManager, router) {
-    var EditPolicyView = AbstractView.extend({
-        baseTemplate: "templates/policy/BaseTemplate.html",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/components/Messages"
+], function (AbstractEditView, actionsView, resourcesListView, addNewResourceView, responseAttrsStaticView, responseAttrsUserView, reviewInfoView, policyDelegate, uiUtils, Accordion, manageSubjects, manageEnvironments, constants,eventManager, router, messager) {
+    var EditPolicyView = AbstractEditView.extend({
         template: "templates/policy/EditPolicyTemplate.html",
-        events: {
-            'click input[name=nextButton]': 'openNextStep',
-            'click input[name=submitForm]': 'submitForm',
-            'click .review-row': 'reviewRowClick',
-            'keyup .review-row': 'reviewRowClick'
-        },
+        reviewTemplate: "templates/policy/ReviewPolicyStepTemplate.html",
         data: {},
-
-        REVIEW_INFO_STEP: 6,
+        validationFields: ["name", "resources"], 
 
         render: function (args, callback) {
             var self = this,
@@ -66,7 +60,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 policyName = args[1],
                 policyPromise = this.getPolicy(policyName),
                 appPromise = policyDelegate.getApplicationByName(appName),
-                allSubjectsPromise = policyDelegate.getSubjectConditions(), // this possibly should be in the parent. We need a means to check if this exsists, and only make this searxh if it does not
+                allSubjectsPromise = policyDelegate.getSubjectConditions(), // this possibly should be in the parent. We need a means to check if this exsists, and only make this search if it does not
                 allEnvironmentsPromise = policyDelegate.getEnvironmentConditions(),
                 allUserAttributesPromise = policyDelegate.getAllUserAttributes(),
                 identitySubjectUsersPromise  = policyDelegate.getAllIdentity("users"),
@@ -123,7 +117,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     responseAttrsUserView.render([userAttributes, allUserAttributes]);
 
                     self.prepareInfoReview();
-                    reviewInfoView.render(this.data, null, self.$el.find('#reviewPolicyInfo'), "templates/policy/ReviewPolicyStepTemplate.html");
+                    self.validateThenRenderReview();
                     self.initAccordion();
 
                     if (callback) {
@@ -150,30 +144,9 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             return deferred.promise(policy);
         },
 
-        initAccordion: function () {
-            var self = this,
-                options = {};
-
-            if (this.data.entity.name) {
-                options.active = this.REVIEW_INFO_STEP;
-            } else {
-                options.disabled = true;
-            }
-
-            this.accordion = new Accordion(this.$el.find('.accordion'), options);
-
-            this.accordion.on('beforeChange', function (e, id) {
-                if (id === self.REVIEW_INFO_STEP) {
-                    self.updateFields();
-                    reviewInfoView.render(self.data, null, self.$el.find('#reviewPolicyInfo'), "templates/policy/ReviewPolicyStepTemplate.html");
-                }
-            });
-        },
-
         updateFields: function () {
             var entity = this.data.entity,
-                dataFields = this.$el.find('[data-field]'),
-                field;
+                dataFields = this.$el.find('[data-field]');
 
             _.each(dataFields, function (field, key, list) {
                 entity[field.getAttribute('data-field')] = field.value;
@@ -189,24 +162,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             this.data.subjectString =       JSON.stringify(this.data.entity.subject, null, 2);
             this.data.environmentString =   JSON.stringify(this.data.entity.condition, null, 2);
         },
-
-        openNextStep: function (e) {
-            this.accordion.setActive(this.accordion.getActive() + 1);
-        },
-
-        reviewRowClick:function (e) {
-            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
-            var reviewRows = this.$el.find('.review-row'),
-                targetIndex = -1;
-                _.find(reviewRows, function(reviewRow, index){
-                    if(reviewRow === e.currentTarget){
-                        targetIndex = index;
-                    }
-                });
-
-            this.accordion.setActive(targetIndex);
-        },
-
+       
         submitForm: function () {
             var policy = this.data.entity,
                 persistedPolicy = _.clone(policy),
@@ -247,31 +203,44 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
 
         errorHandler: function (e) {
 
+            var obj = { message: JSON.parse(e.responseText).message, type: "error"},
+                invalidResourceText = "Invalid Resource";
+
             if( e.status === 500){
 
                 if (uiUtils.responseMessageMatch( e.responseText,"Unable to persist policy")){
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToPersistPolicy");
-                } else{
+                } else {
                     console.error(e.responseJSON, e.responseText, e);
+                    messager.messages.addMessage( obj ); 
                 }
 
             } else if (e.status === 400 || e.status === 404){
 
-                if ( uiUtils.responseMessageMatch( e.responseText,"Invalid Resource") ) {
-                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
+                if ( uiUtils.responseMessageMatch( e.responseText,invalidResourceText) ) {
 
-                    var message = JSON.parse(e.responseText).message;
-                    this.data.options.invalidResource = message.substr(17);
-                    reviewInfoView.render(this.data, null, this.$el.find('#reviewPolicyInfo'), "templates/policy/ReviewPolicyStepTemplate.html");
+                    this.data.options.invalidResource = obj.message.substr(invalidResourceText.length + 1);
+                    reviewInfoView.render(this.data, null, this.$el.find('#reviewInfo'), this.reviewTemplate);
                     resourcesListView.render(this.data);
                     delete this.data.options.invalidResource;
 
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
+
+                } else if ( obj.message === "Policy " + this.data.entity.name + " already exists"  ) {
+
+                    this.data.options.invalidName = true;
+                    reviewInfoView.render(this.data, null, this.$el.find('#reviewInfo'), this.reviewTemplate);
+                    delete this.data.options.invalidName;
+                    messager.messages.addMessage( obj ); 
+
                 } else {
                     console.log(e.responseJSON, e.responseText, e);
+                    messager.messages.addMessage( obj ); 
                 }
 
             } else {
                 console.log(e.responseJSON, e.responseText, e);
+                messager.messages.addMessage( obj ); 
             }
         },
 
@@ -286,7 +255,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     {name:"groups", data:identitySubjectGroups[0].result}
                 ];
             }
-
         }
     });
 

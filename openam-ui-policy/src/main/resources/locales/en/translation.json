@@ -352,7 +352,7 @@
             
             "noName" : "There is no name...",
             "noSubjectConditions" : "There are no subject conditions...",
-            "noSubjectAttribute" : "There are no subject attributes...",
+            "noSubjectAttributes" : "There are no subject attributes...",
             "noEnvironmentConditions" : "There are no environment conditions...",
             "applicationDescription" : "Review the application configuration and click Finish to save.",
             "policyDescription" : "Review the policy configuration and click Finish to save.",

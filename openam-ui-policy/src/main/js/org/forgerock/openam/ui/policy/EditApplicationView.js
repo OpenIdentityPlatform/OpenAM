@@ -28,7 +28,7 @@
 
 /*global window, define, $, form2js, _, js2form, document, console */
 define("org/forgerock/openam/ui/policy/EditApplicationView", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/policy/AbstractEditView",
     "org/forgerock/openam/ui/policy/ResourcesListView",
     "org/forgerock/openam/ui/policy/AddNewResourceView",
     "org/forgerock/openam/ui/policy/ReviewInfoView",
@@ -37,22 +37,18 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
     "org/forgerock/openam/ui/common/components/Accordion",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager"
-], function (AbstractView, resourcesListView, addNewResourceView, reviewInfoView, policyDelegate, uiUtils, Accordion, constants, conf, eventManager) {
-    var EditApplicationView = AbstractView.extend({
-        baseTemplate: "templates/policy/BaseTemplate.html",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/components/Messages"
+], function (AbstractEditView, resourcesListView, addNewResourceView, reviewInfoView, policyDelegate, uiUtils, Accordion, constants, conf, eventManager, messager) {
+    var EditApplicationView = AbstractEditView.extend({
         template: "templates/policy/EditApplicationTemplate.html",
-        events: {
-            'click input[name=nextButton]': 'openNextStep',
-            'click input[name=submitForm]': 'submitForm',
-            'click .review-row': 'reviewRowClick',
-            'keyup .review-row': 'reviewRowClick'
-        },
+        reviewTemplate: "templates/policy/ReviewApplicationStepTemplate.html",
         data: {},
-        REVIEW_INFO_STEP: 2,
         APPLICATION_TYPE: "iPlanetAMWebAgentService",
+        validationFields: ["name", "resources"], 
 
         render: function (args, callback) {
+
             var self = this,
                 data = self.data,
                 appName = args[0],
@@ -84,8 +80,8 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
                     self.parentRender(function () {
                         resourcesListView.render(data);
                         addNewResourceView.render(data);
-                        reviewInfoView.render(data, null, self.$el.find('#reviewInfo'), 'templates/policy/ReviewApplicationStepTemplate.html');
 
+                        self.validateThenRenderReview();
                         self.initAccordion();
 
                         if (callback) {
@@ -142,29 +138,6 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
             return result;
         },
 
-        /**
-         * Initializes accordion.
-         */
-        initAccordion: function () {
-            var self = this,
-                options = {};
-
-            if (this.data.entity.name) {
-                options.active = this.REVIEW_INFO_STEP;
-            } else {
-                options.disabled = true;
-            }
-
-            this.accordion = new Accordion(this.$el.find('.accordion'), options);
-
-            this.accordion.on('beforeChange', function (e, id) {
-                if (id === self.REVIEW_INFO_STEP) {
-                    self.updateFields();
-                    reviewInfoView.render(self.data, null, self.$el.find('#reviewInfo'), 'templates/policy/ReviewApplicationStepTemplate.html');
-                }
-            });
-        },
-
         updateFields: function () {
             var app = this.data.entity,
                 dataFields = this.$el.find('[data-field]'),
@@ -183,26 +156,6 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
             });
         },
 
-        /**
-         * Opens next accordion step.
-         * TODO: some validation probably will be done here
-         */
-        openNextStep: function (e) {
-            this.accordion.setActive(this.accordion.getActive() + 1);
-        },
-
-        reviewRowClick:function (e) {
-            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
-            var reviewRows = this.$el.find('.review-row'),
-                targetIndex = -1;
-                _.find(reviewRows, function(reviewRow, index){
-                    if(reviewRow === e.currentTarget){
-                        targetIndex = index;
-                    }
-                });
-
-            this.accordion.setActive(targetIndex);
-        },
 
         submitForm: function () {
             var app = this.data.entity,
@@ -231,24 +184,35 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
             }
         },
         errorHandler : function (e) {
+
+            var obj = { message: JSON.parse(e.responseText).message, type: "error"},
+                invalidResourceText = "Invalid Resource";
           
             if (e.status === 500) {
-               console.error(e.responseJSON, e.responseText, e);     
+               console.error(e.responseJSON, e.responseText, e);    
+               messager.messages.addMessage( obj ); 
             } else if (e.status === 400 || e.status === 404) {
                 
-                if ( uiUtils.responseMessageMatch( e.responseText,"Invalid Resource") ) {
-
-                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
-                    var message = JSON.parse(e.responseText).message;
-                    this.data.options.invalidResource = message.substr(17);
+                if ( uiUtils.responseMessageMatch( e.responseText, invalidResourceText) ) {  
+                    this.data.options.invalidResource = obj.message.substr(invalidResourceText.length + 1);
                     reviewInfoView.render(this.data, null, this.$el.find('#reviewInfo'), 'templates/policy/ReviewApplicationStepTemplate.html');
                     delete this.data.options.invalidResource;
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
 
                 } else {
                     console.log(e.responseJSON, e.responseText, e);
+                    messager.messages.addMessage( obj );
                 }
+            } else if (e.status === 409) {
+                // duplicate name
+                this.data.options.invalidName = true;
+                reviewInfoView.render(this.data, null, this.$el.find('#reviewInfo'), "templates/policy/ReviewApplicationStepTemplate.html");
+                delete this.data.options.invalidName;
+                 messager.messages.addMessage( obj ); 
+
             } else {
                 console.log(e.responseJSON, e.responseText, e);
+                messager.messages.addMessage( obj );
             }
         }
     });
