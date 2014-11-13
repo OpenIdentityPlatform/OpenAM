@@ -18,9 +18,6 @@ package org.forgerock.openam.entitlement;
 
 import com.sun.identity.entitlement.AndCondition;
 import com.sun.identity.entitlement.AndSubject;
-import com.sun.identity.entitlement.AnyUserSubject;
-import com.sun.identity.entitlement.AttributeLookupCondition;
-import com.sun.identity.entitlement.AttributeSubject;
 import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementCondition;
@@ -28,12 +25,10 @@ import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.NoSubject;
 import com.sun.identity.entitlement.NotCondition;
 import com.sun.identity.entitlement.NotSubject;
-import com.sun.identity.entitlement.NumericAttributeCondition;
 import com.sun.identity.entitlement.OrCondition;
 import com.sun.identity.entitlement.OrSubject;
 import com.sun.identity.entitlement.ResourceAttribute;
 import com.sun.identity.entitlement.StaticAttributes;
-import com.sun.identity.entitlement.StringAttributeCondition;
 import com.sun.identity.entitlement.UserAttributes;
 
 import java.util.Map;
@@ -274,7 +269,7 @@ public final class EntitlementRegistry {
      */
     public String getConditionName(EntitlementCondition condition) {
         for (Map.Entry<String, Class<? extends EntitlementCondition>> candidate : conditions.entrySet()) {
-            if (candidate.getValue().isInstance(condition)) {
+            if (candidate.getValue() == condition.getClass()) {
                 return candidate.getKey();
             }
         }
@@ -290,7 +285,7 @@ public final class EntitlementRegistry {
      */
     public String getSubjectName(EntitlementSubject subject) {
         for (Map.Entry<String, Class<? extends EntitlementSubject>> candidate : subjects.entrySet()) {
-            if (candidate.getValue().isInstance(subject)) {
+            if (candidate.getValue() == subject.getClass()) {
                 return candidate.getKey();
             }
         }
@@ -306,7 +301,7 @@ public final class EntitlementRegistry {
      */
     public String getAttributeName(ResourceAttribute attribute) {
         for (Map.Entry<String, Class<? extends ResourceAttribute>> candidate : attributes.entrySet()) {
-            if (candidate.getValue().isInstance(attribute)) {
+            if (candidate.getValue() == attribute.getClass()) {
                 return candidate.getKey();
             }
         }
