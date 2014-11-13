@@ -35,27 +35,27 @@ define("config/routes/PolicyRoutesConfig", [
         },
         "editApp": {
             view: "org/forgerock/openam/ui/policy/EditApplicationView",
-            url: /^app\/([%A-Za-z0-9 ]*)(?:\/){0,1}$/,
+            url: /^app\/(.*?)(?:\/){0,1}$/,
             defaults: [""],
             role: "ui-admin",
             pattern: "app/?"
         },
         "managePolicies": {
             view: "org/forgerock/openam/ui/policy/ManagePoliciesView",
-            url: /^app\/([%A-Za-z0-9 ]+)\/policies\//,
+            url: /^app\/(.+?)\/policies\//,
             role: "ui-admin",
             pattern: "app/?/policies/"
         },
         "editPolicy": {
             view: "org/forgerock/openam/ui/policy/EditPolicyView",
-            url: /^app\/([%A-Za-z0-9 ]+)\/policy\/([%A-Za-z0-9 ]*)(?:\/){0,1}$/,
+            url: /^app\/(.+?)\/policy\/(.*?)(?:\/){0,1}$/,
             defaults: ["", ""],
             role: "ui-admin",
             pattern: "app/?/policy/?"
         },
         "editReferral": {
             view: "org/forgerock/openam/ui/policy/EditReferralView",
-            url: /^app\/([%A-Za-z0-9 ]+)\/referral\/([%A-Za-z0-9 ]*)(?:\/){0,1}$/,
+            url: /^app\/(.+?)\/referral\/(.*?)(?:\/){0,1}$/,
             defaults: ["", ""],
             role: "ui-admin",
             pattern: "app/?/referral/?"
