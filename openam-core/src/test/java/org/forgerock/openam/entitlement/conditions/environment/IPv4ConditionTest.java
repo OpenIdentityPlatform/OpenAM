@@ -81,7 +81,8 @@ public class IPv4ConditionTest {
     public void testIsSatisfiedIfIpWithinAnyRange() throws Exception {
         // Given
         /**
-         * XXX: According to the {@link ConditionConstants.IP_RANGE} Javadoc it
+         * XXX: OPENAM-4942
+         * According to the {@link ConditionConstants.IP_RANGE} Javadoc it
          * should be possible to set a range using only a start IP address.
          * This syntax is accepted but will not evaluate correctly.
          */
@@ -105,15 +106,9 @@ public class IPv4ConditionTest {
         condition.setDnsName(asList("example.com", "example.net"));
 
         // Then
-        /**
-         * XXX: An IP address must be provided via environment
-         */
-//        assertConditionDecision(true, NO_IP_ADDRESS, "example.com");
-//        assertConditionDecision(true, NO_IP_ADDRESS, "example.net");
-//        assertConditionDecision(false, NO_IP_ADDRESS, "www.example.com");
-        assertConditionDecision(true, "0.0.0.0", "example.com");
-        assertConditionDecision(true, "0.0.0.0", "example.net");
-        assertConditionDecision(false, "0.0.0.0", "www.example.com");
+        assertConditionDecision(true, NO_IP_ADDRESS, "example.com");
+        assertConditionDecision(true, NO_IP_ADDRESS, "example.net");
+        assertConditionDecision(false, NO_IP_ADDRESS, "www.example.com");
     }
 
     @Test
@@ -122,15 +117,9 @@ public class IPv4ConditionTest {
         condition.setDnsName(asList("*.example.com", "*.example.net"));
 
         // Then
-        /**
-         * XXX: An IP address must be provided via environment
-         */
-//        assertConditionDecision(false, NO_IP_ADDRESS, "example.com");
-//        assertConditionDecision(true, NO_IP_ADDRESS, "www.example.com");
-//        assertConditionDecision(true, NO_IP_ADDRESS, "www.example.net");
-        assertConditionDecision(false, "0.0.0.0", "example.com");
-        assertConditionDecision(true, "0.0.0.0", "www.example.com");
-        assertConditionDecision(true, "0.0.0.0", "www.example.net");
+        assertConditionDecision(false, NO_IP_ADDRESS, "example.com");
+        assertConditionDecision(true, NO_IP_ADDRESS, "www.example.com");
+        assertConditionDecision(true, NO_IP_ADDRESS, "www.example.net");
     }
 
     @Test
@@ -141,22 +130,22 @@ public class IPv4ConditionTest {
         givenSsoTokenIpAddress("192.168.0.1");
 
         // Then
-        /**
-         * XXX: An IP address must be provided via environment
-         */
-//        assertConditionDecision(true, NO_IP_ADDRESS, NO_DNS_NAME);
-        // The request IP is always preferred if available
+        assertConditionDecision(true, NO_IP_ADDRESS, NO_DNS_NAME);
+        // However, the request IP is always preferred if available
         assertConditionDecision(false, "0.0.0.0", NO_DNS_NAME);
     }
 
     @Test
-    public void testIsNotSatisifiedIfIncorrectIpVersionIsUsed() throws Exception {
+    public void testIsNotSatisifiedIfIncorrectIpVersionIsUsedUnlessDnsNameMatches() throws Exception {
         // Given
         condition.setStartIp("0.0.0.0");
         condition.setEndIp("0.0.0.0");
+        condition.setDnsName(asList("example.com"));
 
         // Then
         assertConditionDecision(false, "0000:0000:0000:0000:0000:0000:0000:0000", NO_DNS_NAME);
+        // If DNS matches, it doesn't matter if the IP address version is incorrect:
+        assertConditionDecision(true, "0000:0000:0000:0000:0000:0000:0000:0000", "example.com");
     }
 
     private void givenSsoTokenIpAddress(String ipAddress) throws Exception {
@@ -218,7 +207,7 @@ public class IPv4ConditionTest {
         condition.setEndIp(invalidStartIp);
     }
 
-//    // XXX: startIp > endIp is not prevented
+//    // XXX: OPENAM-4941: startIp > endIp is not prevented
 //    @Test(expectedExceptions = EntitlementException.class)
 //    public void testStartIpCannotBeGreaterThanEndIp() {
 //        // Given
@@ -236,19 +225,19 @@ public class IPv4ConditionTest {
 //        // expect EntitlementException
 //    }
 
-//    // XXX: ipRange IP addresses are not validated
+//    // XXX: OPENAM-4941: ipRange IP addresses are not validated
 //    @Test(dataProvider = "invalidIpAddresses", expectedExceptions = EntitlementException.class)
 //    public void testStartIpOfRangeMustBeValidIfSet(String invalidStartIp) throws EntitlementException {
 //        condition.setIpRange(asList(invalidStartIp + "-0.0.0.0"));
 //    }
 
-//    // XXX: ipRange IP addresses are not validated
+//    // XXX: OPENAM-4941: ipRange IP addresses are not validated
 //    @Test(dataProvider = "invalidIpAddresses", expectedExceptions = EntitlementException.class)
 //    public void testEndIpOfRangeMustBeValidIfSet(String invalidStartIp) throws EntitlementException {
 //        condition.setIpRange(asList("0.0.0.0-" + invalidStartIp));
 //    }
 
-//    // XXX: startIp > endIp is not prevented
+//    // XXX: OPENAM-4941: startIp > endIp is not prevented
 //    @Test(expectedExceptions = EntitlementException.class)
 //    public void testIpRangeStartIpCannotBeGreaterThanIpRangeEndIp() {
 //        condition.setIpRange(asList("0.0.0.1-0.0.0.0"));
@@ -267,7 +256,7 @@ public class IPv4ConditionTest {
     public void testInvalidDnsNamesAreRejected(String invalidDnsName) throws EntitlementException {
         String description = "invalid dns: \"" + invalidDnsName + "\"";
         assertThat(IPvXCondition.isValidDnsName(invalidDnsName)).as(description).isFalse();
-//        // XXX: DNS names are not validated
+//        // XXX: OPENAM-4941: DNS names are not validated
 //        condition.setDnsName(asList(invalidDnsName));
     }
 
@@ -286,7 +275,7 @@ public class IPv4ConditionTest {
         assertThat(condition.getDnsName().get(0)).isEqualTo(validDnsName);
     }
 
-    // XXX: Poor configuration is not identified until first call to evaluate
+    // XXX: OPENAM-4941: Poor configuration is not identified until first call to evaluate
 //    @Test(expectedExceptions = EntitlementException.class)
 //    public void testRejectsConfigurationIfNoDnsNameOrIpRangeDefined() throws Exception {
 //        // At least one of the following must be provided:

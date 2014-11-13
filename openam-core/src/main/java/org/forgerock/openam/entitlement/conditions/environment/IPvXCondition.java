@@ -22,15 +22,16 @@ import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.policy.PolicyException;
-import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.core.CoreWrapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.security.auth.Subject;
+import java.net.InetAddress;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -107,7 +108,7 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
             setStartIpFromJson(jo);
             setEndIpFromJson(jo);
         } catch (Exception e) {
-            debug.message(getClass().getSimpleName() + ": Failed to set state", e);
+            debugMessage(e, "Failed to set state");
         }
     }
 
@@ -206,17 +207,12 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
     private void validateProperties() throws EntitlementException {
 
         if (ipList.isEmpty() && dnsName.isEmpty() && (!isStartIpSet() || !isEndIpSet())) {
-            if (debug.errorEnabled()) {
-                debug.error(getClass().getSimpleName() + ".validateProperties(): " +
-                        "at least one IP range or DNS name MUST be defined");
-            }
+            debugError("Validation: at least one IP range or DNS name MUST be defined");
             throw new EntitlementException(IP_RANGE_OR_DNS_NAME_REQUIRED);
         }
 
-        if (startIp.compareTo(endIp) > 0) {
-            if (debug.errorEnabled()) {
-                debug.error(getClass().getSimpleName() + ".validateProperties(): END IP is before START IP");
-            }
+        if (startIp != null && endIp != null && startIp.compareTo(endIp) > 0) {
+            debugError("Validation: {0} is before {1}", END_IP, START_IP);
             throw new EntitlementException(END_IP_BEFORE_START_IP);
         }
     }
@@ -236,29 +232,14 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName, Map<String, Set<String>> env)
             throws EntitlementException {
 
-        validateProperties();
-
-        String ip = getRequestIp(env);
-        if (!validateIpAddress(ip)) {
-            return new ConditionDecision(false, Collections.<String, Set<String>>emptyMap());
-        }
+        validateProperties(); // XXX: OPENAM-4941: Config should be validated when set, not when used
 
         boolean allowed = false;
-        SSOToken token = (SSOToken) getValue(subject.getPrivateCredentials());
-        if (ip == null) {
-            if (token != null) {
-                try {
-                    ip = token.getIPAddress().getHostAddress();
-                } catch (SSOException e) {
-                    throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
-                }
-            }
-        }
-        Set<String> reqDnsNames = env.get(REQUEST_DNS_NAME);
 
-        if (ip != null && isAllowedByIp(ip)) {
-            allowed = true;
-        } else if (reqDnsNames != null && !reqDnsNames.isEmpty()) {
+        // If DNS matches we can ignore incorrect IP version - So, check DNS first
+
+        Set<String> reqDnsNames = env.get(REQUEST_DNS_NAME);
+        if (reqDnsNames != null) {
             for (String dnsName : reqDnsNames) {
                 if (isAllowedByDns(dnsName)) {
                     allowed = true;
@@ -266,10 +247,25 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
                 }
             }
         }
-        if (debug.messageEnabled()) {
-            debug.message(getClass().getSimpleName() + ".getConditionDecision(): requestIp, requestDnsName, " +
-                    "allowed = " + ip + ", " + reqDnsNames + "," + allowed );
+
+        // If DNS didn't match, then we'll need to check IP
+
+        String ip = null;
+        if (!allowed) {
+            ip = getRequestIp(env);
+            if (ip == null) {
+                debugMessage("ConditionDecision: IP not provided in request, using session IP");
+                ip = getSessionIp(subject);
+            }
+            if (ip != null && isAllowedByIp(ip)) {
+                allowed = true;
+            }
         }
+
+        // Log and return result
+
+        String ipDesc = ip != null ? ip : "not checked";
+        debugMessage("ConditionDecision: requestIp={0}, requestDnsName={1}, allowed={2}", ipDesc, reqDnsNames, allowed);
         return new ConditionDecision(allowed, Collections.<String, Set<String>>emptyMap());
     }
 
@@ -283,61 +279,75 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
      * @return The IP that was used.
      */
     public String getRequestIp(Map<String, Set<String>> env) {
+        String ip = null;
         Set<String> requestIpSet = env.get(REQUEST_IP);
         if (requestIpSet != null && !requestIpSet.isEmpty()) {
             if (requestIpSet.size() > 1) {
-                debug.warning("Set cardinality in environment map corresponding to " + REQUEST_IP +
-                        " key >1. Returning first value. The set: " + requestIpSet);
+                debugWarning("Environment map {0} cardinality >1. Using first from: {1}", REQUEST_IP, requestIpSet);
             }
-            Object ip = requestIpSet.iterator().next();
-            if (ip != null) { // Set implementations can permit null values
-                return (String) ip;
+            String entry = requestIpSet.iterator().next();
+            if (entry != null) { // Set implementations can permit null values
+                ip = entry;
             } else {
-                debug.warning("In IPCondition, no value in Set corresponding to " + REQUEST_IP
-                        + " key contained environment map.");
-                return null;
+                debugWarning("Environment map {0} entry has null value", REQUEST_IP);
             }
         } else {
-            debug.warning("In IPCondition, Set corresponding to " + REQUEST_IP
-                    + " key in environment map is null or empty.");
-            return null;
+            debugWarning("Environment map {0} is null or empty", REQUEST_IP);
         }
+        return ip;
     }
 
     /**
-     * Return first value from Set or null if Set is empty.
+     * Helper method to retrieve IP from subject's {@link SSOToken}.
+     *
+     * @param subject Subject who is under evaluation.
+     * @return IP address from subject's {@link SSOToken} or null if no SSOToken is found.
+     * @throws EntitlementException If any exception occurs when accessing the subject's {@link SSOToken}.
      */
-    private <V> V getValue(Set<V> values) {
-        if (values != null && values.iterator().hasNext()) {
-            return values.iterator().next();
+    public String getSessionIp(Subject subject) throws EntitlementException {
+
+        SSOToken token = (SSOToken) CollectionUtils.getFirstItem(subject.getPrivateCredentials(), null);
+        if (token != null) {
+            try {
+                InetAddress ipAddress = token.getIPAddress();
+                if (ipAddress != null) {
+                    return ipAddress.getHostAddress();
+                }
+            } catch (SSOException e) {
+                throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+            }
         }
         return null;
     }
 
     /**
-     * Checks of the ip falls in the valid range between start and end IP addresses.
+     * Checks if the IP falls in the valid range between start and end IP addresses.
      *
      * @see ConditionConstants#START_IP
      * @see ConditionConstants#END_IP
+     * @see ConditionConstants#IP_RANGE
      */
     private boolean isAllowedByIp(String ip) throws EntitlementException {
-        boolean allowed = false;
-        T requestIp = stringToIp(ip);
+
+        T requestIp;
+        try {
+            requestIp = stringToIp(ip);
+        } catch (EntitlementException ex) {
+            return false;
+        }
+
         Iterator<T> ipValues = ipList.iterator();
-        while ( ipValues.hasNext() ) {
+        while (ipValues.hasNext()) {
             T startIp = ipValues.next();
-            if ( ipValues.hasNext() ) {
+            if (ipValues.hasNext()) {
                 T endIp = ipValues.next();
                 if (requestIp.compareTo(startIp) >= 0 && requestIp.compareTo(endIp) <= 0) {
-                    allowed = true;
-                    break;
+                    return true;
                 }
             }
         }
-        if (requestIp.compareTo(startIp) >= 0 && requestIp.compareTo(endIp) <= 0) {
-            allowed = true;
-        }
-        return allowed;
+
+        return (requestIp.compareTo(startIp) >= 0 && requestIp.compareTo(endIp) <= 0);
     }
 
     /**
@@ -416,6 +426,36 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
             }
         }
         return true;
+    }
+
+    private void debugMessage(String format, Object... args) {
+        debugMessage(null, format, args);
+    }
+
+    private void debugMessage(Exception e, String format, Object... args) {
+        if (debug.messageEnabled()) {
+            debug.message(formattedWithHeader(format, args), e);
+        }
+    }
+
+    private void debugWarning(String format, Object... args) {
+        if (debug.warningEnabled()) {
+            debug.warning(formattedWithHeader(format, args));
+        }
+    }
+
+    private void debugError(String format, Object... args) {
+        debugError(null, format, args);
+    }
+
+    private void debugError(Exception e, String format, Object... args) {
+        if (debug.errorEnabled()) {
+            debug.error(formattedWithHeader(format, args), e);
+        }
+    }
+
+    private String formattedWithHeader(String format, Object... args) {
+        return getClass().getSimpleName() + ": " + MessageFormat.format(format, args);
     }
 
 //    /**
