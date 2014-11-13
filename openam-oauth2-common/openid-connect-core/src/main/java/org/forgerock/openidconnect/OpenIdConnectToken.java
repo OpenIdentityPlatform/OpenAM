@@ -19,15 +19,17 @@ package org.forgerock.openidconnect;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.json.jose.jws.JwsHeader;
+import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jws.SigningManager;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.KeyPair;
 import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.List;
@@ -45,12 +47,14 @@ public class OpenIdConnectToken extends JsonValue implements Token {
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final JwtBuilderFactory jwtBuilderFactory = new JwtBuilderFactory();
     private final byte[] clientSecret;
+    private final KeyPair keyPair;
     private final String algorithm;
 
     /**
      * Constructs a new OpenIdConnectToken.
      *
      * @param clientSecret The client's secret.
+     * @param keyPair The token's signing key pair.
      * @param algorithm The algorithm.
      * @param iss The issuer.
      * @param sub The subject.
@@ -64,11 +68,13 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param acr The acr.
      * @param amr The amr.
      */
-    public OpenIdConnectToken(byte[] clientSecret, String algorithm, String iss, String sub, String aud, String azp,
-            long exp, long iat, long ath, String nonce, String ops, String atHash, String acr, List<String> amr) {
+    public OpenIdConnectToken(byte[] clientSecret, KeyPair keyPair, String algorithm, String iss, String sub,
+            String aud, String azp, long exp, long iat, long ath, String nonce, String ops, String atHash, String acr,
+            List<String> amr) {
         super(new HashMap<String, Object>());
         this.clientSecret = clientSecret;
         this.algorithm = algorithm;
+        this.keyPair = keyPair;
         setIss(iss);
         setSub(sub);
         setAud(aud);
@@ -274,16 +280,18 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      */
     public SignedJwt sign() throws SignatureException {
         final JwsAlgorithm jwsAlgorithm = JwsAlgorithm.valueOf(algorithm);
-        if (jwsAlgorithm == null){
+        if (jwsAlgorithm == null) {
             logger.error("Unable to find jws algorithm for: " + algorithm);
             throw new SignatureException();
         }
-        final JwsHeader header = new JwsHeader();
-        header.setAlgorithm(jwsAlgorithm);
-        header.setContentType("JWT");
-        final SigningManager signingManager = new SigningManager();
-        return jwtBuilderFactory.jws(signingManager.newHmacSigningHandler(clientSecret)).headers()
-                .alg(jwsAlgorithm).cty("JWT").done()
+
+        final SigningHandler signingHandler;
+        if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())) {
+            signingHandler = new SigningManager().newRsaSigningHandler(keyPair.getPrivate());
+        } else {
+            signingHandler = new SigningManager().newHmacSigningHandler(clientSecret);
+        }
+        return jwtBuilderFactory.jws(signingHandler).headers().alg(jwsAlgorithm).cty("JWT").done()
                 .claims(jwtBuilderFactory.claims().claims(asMap()).build()).asJwt();
     }
 }

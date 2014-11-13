@@ -464,4 +464,23 @@ public class SMSUtils {
 
         return buff.toString();
     }
+
+    /**
+     * Remove the validator attributes from the given attribute defaults map.
+     * @param attributeDefaults The attribute defaults.
+     * @param serviceSchema The service schema in which the attributes are specified.
+     * @return A copy of the attribute defaults with the validators removed.
+     */
+    public static Map<String, Set<String>> removeValidators(Map<String, Set<String>> attributeDefaults,
+                                                            ServiceSchema serviceSchema) {
+
+        final Map<String, Set<String>> subset = new HashMap<String, Set<String>>();
+        for (Map.Entry<String, Set<String>> entry : attributeDefaults.entrySet()) {
+            final String name = entry.getKey();
+            if (!AttributeSchema.Type.VALIDATOR.equals(serviceSchema.getAttributeSchema(name).getType())) {
+                subset.put(name, new HashSet<String>(entry.getValue()));
+            }
+        }
+        return subset;
+    }
 }

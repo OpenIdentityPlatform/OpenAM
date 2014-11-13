@@ -177,6 +177,7 @@
                         <Value>HS256</Value>
                         <Value>HS384</Value>
                         <Value>HS512</Value>
+                        <Value>RS256</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -452,6 +453,7 @@
                             <Value>HS256</Value>
                             <Value>HS384</Value>
                             <Value>HS512</Value>
+                            <Value>RS256</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

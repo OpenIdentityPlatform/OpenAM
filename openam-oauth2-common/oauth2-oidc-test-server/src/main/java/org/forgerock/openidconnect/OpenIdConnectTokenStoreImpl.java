@@ -16,6 +16,7 @@
 
 package org.forgerock.openidconnect;
 
+import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -61,7 +62,7 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
         final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Utils.CHARSET);
-
+        final KeyPair keyPair = providerSettings.getServerKeyPair();
         final long timeInSeconds = System.currentTimeMillis()/1000;
         final long tokenLifetime = providerSettings.getOpenIdTokenLifetime();
         final long exp = timeInSeconds + tokenLifetime;
@@ -78,8 +79,8 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
         final String acr = null;
         final List<String> amr = null;
 
-        return new OpenIdConnectToken(clientSecret, algorithm, iss, resourceOwnerId, clientId,  authorizationParty, exp,
-                iat, ath, nonce, ops, atHash, acr, amr);
+        return new OpenIdConnectToken(clientSecret, keyPair, algorithm, iss, resourceOwnerId, clientId,
+                authorizationParty, exp, iat, ath, nonce, ops, atHash, acr, amr);
     }
 
     /**

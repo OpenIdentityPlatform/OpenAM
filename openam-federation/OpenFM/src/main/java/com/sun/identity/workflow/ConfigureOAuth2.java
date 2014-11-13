@@ -24,6 +24,7 @@
  */
 package com.sun.identity.workflow;
 
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
@@ -31,15 +32,20 @@ import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.ServiceConfigManager;
 import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStore;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
@@ -47,6 +53,9 @@ import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvi
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 
 public class ConfigureOAuth2 extends Task {
+
+    private static final Debug DEBUG = Debug.getInstance("workflow");
+
     private static final String SERVICE_NAME = "OAuth2Provider";
 
     private static final String AUTHZ_CODE_LIFETIME_NAME = "forgerock-oauth2-provider-authorization-code-lifetime";
@@ -82,46 +91,19 @@ public class ConfigureOAuth2 extends Task {
     }
 
     public String execute(Locale locale, Map params) throws WorkflowException {
-        String realm = getString(params, REALM);
+        final String realm = getString(params, REALM);
+        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
 
-        //get the service params
-        String refreshTokenLifetime = getString(params, RTL);
-        String accessCodeLifetime = getString(params, ACL);
-        String accessTokenLifetime = getString(params, ATL);
-        String issueRefreshToken = getString(params, IRT);
-        String issueRefreshTokenOnRefreshing = getString(params, IRTR);
-        String scopeImplementationClass = getString(params, SIC);
+        //replace service attributes
+        final Map<String, Set<String>> attrValues = getDefaultOAuth2ProviderAttributes(token);
+        attrValues.put(REFRESH_TOKEN_LIFETIME_NAME, Collections.singleton(getString(params, RTL)));
+        attrValues.put(AUTHZ_CODE_LIFETIME_NAME, Collections.singleton(getString(params, ACL)));
+        attrValues.put(ACCESS_TOKEN_LIFETIME_NAME, Collections.singleton(getString(params, ATL)));
+        attrValues.put(ISSUE_REFRESH_TOKEN, Collections.singleton(getString(params, IRT)));
+        attrValues.put(ISSUE_REFRESH_TOKEN_ON_REFRESHING_TOKEN, Collections.singleton(getString(params, IRTR)));
+        attrValues.put(SCOPE_PLUGIN_CLASS, Collections.singleton(getString(params, SIC)));
 
-        //create service attrs
-        Map<String,Set<String>> attrValues = new HashMap<String, Set<String>>();
-        Set<String> temp = new HashSet<String>();
-        temp.add(refreshTokenLifetime);
-        attrValues.put(REFRESH_TOKEN_LIFETIME_NAME, temp);
-        temp = new HashSet<String>();
-        temp.add(accessCodeLifetime);
-        attrValues.put(AUTHZ_CODE_LIFETIME_NAME, temp);
-        temp = new HashSet<String>();
-        temp.add(accessTokenLifetime);
-        attrValues.put(ACCESS_TOKEN_LIFETIME_NAME, temp);
-        temp = new HashSet<String>();
-        temp.add(issueRefreshToken);
-        attrValues.put(ISSUE_REFRESH_TOKEN, temp);
-        temp = new HashSet<String>();
-        temp.add(issueRefreshTokenOnRefreshing);
-        attrValues.put(ISSUE_REFRESH_TOKEN_ON_REFRESHING_TOKEN, temp);
-        temp = new HashSet<String>();
-        temp.add(scopeImplementationClass);
-        attrValues.put(SCOPE_PLUGIN_CLASS, temp);
-
-        //create service
-        SSOToken token;
-        try {
-            token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager sm = new ServiceConfigManager(SERVICE_NAME, token);
-            sm.createOrganizationConfig(realm,attrValues);
-        } catch (Exception e){
-            throw new WorkflowException("ConfigureOAuth2.execute() : Unable to create Service");
-        }
+        createOAuth2Provider(token, realm, attrValues);
 
         String policyURL = getRequestURL(params) + OAUTH2_AUTHORIZE_ENDPOINT;
 
@@ -167,5 +149,31 @@ public class ConfigureOAuth2 extends Task {
 
         return MessageFormat.format(messageTemplate, realm,
                 MessageFormat.format(getMessage(createPolicy ? POLICY_CREATED : POLICY_EXISTS, locale), POLICY_NAME));
+    }
+
+    private Map<String, Set<String>> getDefaultOAuth2ProviderAttributes(SSOToken token) throws WorkflowException {
+        try {
+            final ServiceSchema serviceSchema = new ServiceSchemaManager(SERVICE_NAME, token).getOrganizationSchema();
+            return SMSUtils.removeValidators(serviceSchema.getReadOnlyAttributeDefaults(), serviceSchema);
+        } catch (SMSException e) {
+            DEBUG.error("An error occurred while trying to read the default OAuth2 Provider settings.", e);
+            throw new WorkflowException("oauth2.provider.read.error", null);
+        } catch (SSOException e) {
+            DEBUG.error("An error occurred while trying to read the default OAuth2 Provider settings.", e);
+            throw new WorkflowException("oauth2.provider.read.error", null);
+        }
+    }
+
+    private void createOAuth2Provider(SSOToken token, String realm, Map<String, Set<String>> attrValues)
+            throws WorkflowException {
+        try {
+            new ServiceConfigManager(SERVICE_NAME, token).createOrganizationConfig(realm, attrValues);
+        } catch (SMSException e) {
+            DEBUG.error("An error occurred while trying to create the OAuth2 Provider.", e);
+            throw new WorkflowException("oauth2.provider.create.error", null);
+        } catch (SSOException e) {
+            DEBUG.error("An error occurred while trying to create the OAuth2 Provider.", e);
+            throw new WorkflowException("oauth2.provider.create.error", null);
+        }
     }
 }

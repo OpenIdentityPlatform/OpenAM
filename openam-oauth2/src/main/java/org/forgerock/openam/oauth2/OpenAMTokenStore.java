@@ -51,6 +51,7 @@ import org.restlet.ext.servlet.ServletUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -164,15 +165,15 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final List<String> amr = getAMRFromAuthModules(request, providerSettings);
 
         final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Utils.CHARSET);
+        final KeyPair keyPair = providerSettings.getServerKeyPair();
 
         final String atHash = generateAtHash(algorithm, request, accessToken, providerSettings);
 
         // todo support acr/amr, should be 0 or one of the space-seperated values from acr_values in the request
         final String acr = getAuthenticationContextClassReference(request);
 
-        return new OpenAMOpenIdConnectToken(clientSecret,
-                algorithm, iss, resourceOwnerId, clientId, authorizationParty, exp, iat, ath, nonce, ops,
-                atHash, acr, amr, realm);
+        return new OpenAMOpenIdConnectToken(clientSecret, keyPair, algorithm, iss, resourceOwnerId, clientId,
+                authorizationParty, exp, iat, ath, nonce, ops, atHash, acr, amr, realm);
     }
 
     private List<String> getAMRFromAuthModules(OAuth2Request request, OAuth2ProviderSettings providerSettings) throws ServerException {

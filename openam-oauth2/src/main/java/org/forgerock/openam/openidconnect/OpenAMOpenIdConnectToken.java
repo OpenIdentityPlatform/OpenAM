@@ -20,6 +20,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import org.forgerock.openidconnect.OpenIdConnectToken;
 
+import java.security.KeyPair;
 import java.util.List;
 
 /**
@@ -34,6 +35,7 @@ public class OpenAMOpenIdConnectToken extends OpenIdConnectToken {
      *
      * @param clientSecret The client's secret.
      * @param algorithm The algorithm.
+     * @param keyPair The token's signing key pair.
      * @param iss The issuer.
      * @param sub The subject.
      * @param aud The audience.
@@ -45,10 +47,10 @@ public class OpenAMOpenIdConnectToken extends OpenIdConnectToken {
      * @param ops The ops.
      * @param realm The realm.
      */
-    public OpenAMOpenIdConnectToken(byte[] clientSecret, String algorithm, String iss, String sub,
+    public OpenAMOpenIdConnectToken(byte[] clientSecret, KeyPair keyPair, String algorithm, String iss, String sub,
             String aud, String azp, long exp, long iat, long ath, String nonce, String ops,
             String atHash, String acr, List<String> amr, String realm) {
-        super(clientSecret, algorithm, iss, sub, aud, azp, exp, iat, ath, nonce, ops, atHash, acr, amr);
+        super(clientSecret, keyPair, algorithm, iss, sub, aud, azp, exp, iat, ath, nonce, ops, atHash, acr, amr);
         setRealm(realm);
     }
 
