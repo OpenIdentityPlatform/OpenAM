@@ -1835,7 +1835,7 @@ public class AccessManager {
         description="Export service configuration.",
         webSupport="false",
         mandatoryOptions={
-            "encryptsecret|e|s|Secret key for encrypting password."},
+            "encryptsecret|e|s|Secret key for encrypting password. Any arbitrary value can be specified."},
         optionAliases={},
         macro="authentication",
         optionalOptions={"outfile|o|s|Filename where configuration was written."},
