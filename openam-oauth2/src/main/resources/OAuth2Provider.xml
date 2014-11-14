@@ -145,20 +145,6 @@
                 </AttributeSchema>
 
                 <AttributeSchema
-                        name="forgerock-oauth2-provider-op-signing-cert"
-                        type="single"
-                        syntax="paragraph"
-                        i18nKey="a109a">
-                </AttributeSchema>
-
-                <AttributeSchema
-                        name="forgerock-oauth2-provider-op-encryption-cert"
-                        type="single"
-                        syntax="paragraph"
-                        i18nKey="a109b">
-                </AttributeSchema>
-
-                <AttributeSchema
                         name="forgerock-oauth2-provider-subject-types-supported"
                         type="list"
                         syntax="string"
@@ -418,20 +404,6 @@
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema
-                            name="forgerock-oauth2-provider-op-signing-cert"
-                            type="single"
-                            syntax="paragraph"
-                            i18nKey="a109a">
-                    </AttributeSchema>
-
-                    <AttributeSchema
-                            name="forgerock-oauth2-provider-op-encryption-cert"
-                            type="single"
-                            syntax="paragraph"
-                            i18nKey="a109b">
                     </AttributeSchema>
 
                     <AttributeSchema

@@ -34,7 +34,6 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jwk.KeyUse;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.ClientRegistration;
@@ -68,8 +67,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.AccessController;
 import java.security.KeyPair;
 import java.security.PublicKey;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -689,51 +686,11 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         }
     }
 
-    private X509Certificate getCertificate(String certAttributeName) throws ServerException {
-        try {
-            String encodedCert = getStringSetting(realm, certAttributeName);
-            return pemDecoder.decodeX509Certificate(encodedCert);
-        } catch (SSOException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (SMSException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (CertificateException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        }
-    }
-
     public JsonValue getJWKSet() throws ServerException {
-        X509Certificate signingCert = getCertificate(OAuth2ProviderService.OP_SIGNING_CERT);
-        X509Certificate encryptionCert = getCertificate(OAuth2ProviderService.OP_ENCRYPTION_CERT);
-
         synchronized (jwks) {
             if (jwks.isEmpty()) {
-                if (signingCert != null) {
-                    PublicKey key = signingCert.getPublicKey();
-                    JwsAlgorithm jwsAlgorithm = JwsAlgorithm.getJwsAlgorithm(signingCert.getSigAlgName());
-                    if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())) {
-                        jwks.add(createRSAJWK((RSAPublicKey) key, KeyUse.SIG, jwsAlgorithm.name()));
-                    } else {
-                        if (logger.warningEnabled()) {
-                            logger.warning("Unsupported Signing Key Algorithm, " + jwsAlgorithm.getAlgorithm());
-                        }
-                    }
-                }
-
-                if (encryptionCert != null) {
-                    PublicKey key = encryptionCert.getPublicKey();
-                    JwsAlgorithm jwsAlgorithm = JwsAlgorithm.getJwsAlgorithm(encryptionCert.getSigAlgName());
-                    if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())) {
-                        jwks.add(createRSAJWK((RSAPublicKey) key, KeyUse.ENC, jwsAlgorithm.name()));
-                    } else {
-                        if (logger.warningEnabled()) {
-                            logger.warning("Unsupported Encryption Key Algorithm, " + jwsAlgorithm.getAlgorithm());
-                        }
-                    }
-                }
+                PublicKey key = getServerKeyPair().getPublic();
+                jwks.add(createRSAJWK((RSAPublicKey) key, KeyUse.SIG, JwsAlgorithm.RS256.name()));
             }
         }
         return new JsonValue(Collections.singletonMap("keys", jwks));
