@@ -44,7 +44,16 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
         obj.serviceCall({
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
             url: "/json/serverinfo/*",
-            success: successCallback,
+            success: function(response) {
+                var hostname = location.hostname,
+                    fqdn = response.FQDN,
+                    currentUrl = uiUtils.getUrl();
+                if (hostname !== fqdn) {
+                    location.href = currentUrl.replace(hostname,fqdn);
+                } else {
+                    successCallback(response);
+                }
+            },
             error: errorCallback
         });
 

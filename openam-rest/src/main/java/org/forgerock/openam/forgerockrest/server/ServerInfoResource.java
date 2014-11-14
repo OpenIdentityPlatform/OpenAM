@@ -29,6 +29,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.common.FQDNUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.configuration.MapValueParser;
 import com.sun.identity.policy.PolicyConfig;
@@ -38,15 +39,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -67,6 +59,15 @@ import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.ServiceConfigUtils;
 import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
 import org.forgerock.openam.services.RestSecurity;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.net.URI;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents Server Information that can be queried via a REST interface.
@@ -147,6 +148,10 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("referralsEnabled", String.valueOf(PolicyConfig.isReferralsEnabled()));
             result.put("zeroPageLogin", AuthUtils.getZeroPageLoginConfig(realm));
 
+            String hostname = URI.create(context.asContext(HttpContext.class).getPath()).getHost();
+
+            result.put("FQDN", getFQDN(hostname));
+
             if (debug.messageEnabled()) {
                 debug.message("ServerInfoResource.getAllServerInfo ::" +
                         " Added resource to response: " + ALL_SERVER_INFO);
@@ -159,6 +164,16 @@ public class ServerInfoResource extends RealmAwareResource {
             debug.error("ServerInfoResource.getAllServerInfo : Cannot retrieve all server info domains.", e);
             handler.handleError(new NotFoundException(e.getMessage()));
         }
+    }
+
+    private String getFQDN(String hostName) {
+        String fqdn = FQDNUtils.getInstance().getFullyQualifiedHostName(hostName);
+
+        if (fqdn != null) {
+            return fqdn;
+        }
+
+        return hostName;
     }
 
     /**
