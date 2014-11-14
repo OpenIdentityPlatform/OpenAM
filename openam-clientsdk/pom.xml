@@ -56,7 +56,6 @@
                     <include>amSSOProvider.properties</include>
                     <include>amSecurity.properties</include>
                     <include>amSession.properties</include>
-                    <include>amUtilMsgs.properties</include>
                     <include>debugconfig.properties</include>
                     <include>famSTS.properties</include>
                     <include>fmConfigurationService.properties</include>
@@ -134,7 +133,6 @@
                                 <include>amSSOProvider.properties</include>
                                 <include>amSecurity.properties</include>
                                 <include>amSession.properties</include>
-                                <include>amUtilMsgs.properties</include>
                                 <include>serverAttributeMap.properties</include>
                                 <include>com/iplanet/am/sdk/**</include>
                                 <include>com/iplanet/am/util/**</include>
