@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn;
@@ -194,7 +194,7 @@ public class RestAuthenticationHandler {
         }
 
         responseBuilder.header("Cache-control", "no-cache");
-        responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
+        responseBuilder.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_TYPE+"; charset=UTF-8" );
         return responseBuilder.build();
     }
 
