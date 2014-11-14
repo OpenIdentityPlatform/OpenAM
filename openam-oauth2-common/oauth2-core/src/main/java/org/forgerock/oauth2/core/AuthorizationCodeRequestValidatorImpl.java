@@ -50,6 +50,11 @@ public class AuthorizationCodeRequestValidatorImpl implements AuthorizationCodeR
     public void validateRequest(OAuth2Request request, ClientRegistration clientRegistration)
             throws InvalidRequestException, RedirectUriMismatchException, InvalidClientException {
 
+        if  (request.getParameter("scope") != null) {
+            throw new InvalidRequestException("Scope parameter is not supported on an authorization code access_token "+
+                    "exchange request. Scope parameter should be supplied to the authorize request.");
+        }
+
         Reject.ifTrue(Utils.isEmpty(request.<String>getParameter("code")), "Missing parameter, 'code'");
         Reject.ifTrue(Utils.isEmpty(request.<String>getParameter("redirect_uri")), "Missing parameter, 'redirect_uri'");
 

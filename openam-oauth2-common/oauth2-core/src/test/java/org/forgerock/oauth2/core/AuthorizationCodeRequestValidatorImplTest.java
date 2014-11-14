@@ -16,9 +16,13 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -143,4 +147,20 @@ public class AuthorizationCodeRequestValidatorImplTest {
             assertEquals(e.getMessage(), "Missing parameter, 'redirect_uri'");
         }
     }
+
+    @Test (expectedExceptions = InvalidRequestException.class)
+    public void shouldThrowInvalidRequestExceptionWhenScopeRequested() throws Exception {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("scope")).willReturn("fred");
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+
+        //When
+        requestValidator.validateRequest(request, clientRegistration);
+
+        //Then
+        // Expect InvalidRequestException
+    }
+
 }

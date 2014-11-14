@@ -96,9 +96,6 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             requestValidator.validateRequest(request);
         }
 
-        // is resource owner authenticated?
-        final ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
-
         final ClientRegistration clientRegistration =
                 clientRegistrationStore.get(request.<String>getParameter(CLIENT_ID), request);
 
@@ -106,6 +103,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         //plugin point
         final Set<String> validatedScope = providerSettings.validateAuthorizationScope(clientRegistration, scope,
                 request);
+
+        // is resource owner authenticated?
+        final ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
 
         final boolean consentSaved = providerSettings.isConsentSaved(resourceOwner,
                 clientRegistration.getClientId(), validatedScope);
