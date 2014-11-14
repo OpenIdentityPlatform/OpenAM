@@ -16,6 +16,7 @@
 
 package org.forgerock.openidconnect.restlet;
 
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
@@ -65,7 +66,7 @@ public class EndSession extends ServerResource {
     public Representation endSession() throws OAuth2RestletException {
 
         final OAuth2Request request = requestFactory.create(getRequest());
-        final String idToken = request.getParameter("id_token");
+        final String idToken = request.getParameter(OAuth2Constants.Params.END_SESSION_ID_TOKEN_HINT);
         try {
             openIDConnectEndSession.endSession(idToken);
         } catch (OAuth2Exception e) {

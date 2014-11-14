@@ -190,6 +190,10 @@ public class OAuth2Constants {
          */
         public static final String LOGIN_HINT = "login_hint";
 
+        /**
+         * Parameter usage location: OpenId Connect End Session request
+         */
+        public static final String END_SESSION_ID_TOKEN_HINT = "id_token_hint";
     }
 
     public class CoreTokenParams{

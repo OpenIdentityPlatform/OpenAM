@@ -57,8 +57,8 @@ public class OpenIDConnectEndSession {
     public void endSession(String idToken) throws BadRequestException, ServerException {
 
         if (idToken == null || idToken.isEmpty()) {
-            logger.warn("No id_token parameter supplied to the endSession endpoint");
-            throw new BadRequestException("The endSession endpoint requires an id_token parameter");
+            logger.warn("No id_token_hint parameter supplied to the endSession endpoint");
+            throw new BadRequestException("The endSession endpoint requires an id_token_hint parameter");
         }
         JwtReconstruction jwtReconstruction = new JwtReconstruction();
         SignedJwt jwt = jwtReconstruction.reconstructJwt(idToken, SignedJwt.class);
