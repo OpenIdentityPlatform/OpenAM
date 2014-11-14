@@ -28,7 +28,7 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.restlet.Request;
 
 import java.net.URI;
-import java.security.interfaces.RSAPublicKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -331,13 +331,13 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
 
             if (set == null || set.isEmpty()) {
                 throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                        "No Client Bearer Jwt Public key set");
+                        "No Client Bearer Jwt Public key certificate set");
             }
 
-            String encodedKey = set.iterator().next();
-            RSAPublicKey key = pemDecoder.decodeRSAPublicKey(encodedKey);
+            String encodedCert = set.iterator().next();
+            X509Certificate certificate = pemDecoder.decodeX509Certificate(encodedCert);
 
-            return signingManager.newRsaSigningHandler(key);
+            return signingManager.newRsaSigningHandler(certificate.getPublicKey());
 
         } catch (Exception e) {
             logger.error("Unable to get Client Bearer Jwt Public key from repository", e);
