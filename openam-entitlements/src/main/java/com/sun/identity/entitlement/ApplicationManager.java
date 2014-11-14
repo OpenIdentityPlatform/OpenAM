@@ -30,10 +30,8 @@
  */
 package com.sun.identity.entitlement;
 
-import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
@@ -364,14 +362,14 @@ public final class ApplicationManager {
         }
 
         if (!allowed) {
-            throw new EntitlementException(326);
+            throw new EntitlementException(EntitlementException.PERMISSION_DENIED);
         }
 
         Application app = getApplication(adminSubject, realm, name);
 
         if (app != null) {
             if (!app.canBeDeleted()) {
-                throw new EntitlementException(404);
+                throw new EntitlementException(EntitlementException.APP_NOT_CREATED_POLICIES_EXIST);
             }
             EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
                 adminSubject, realm);

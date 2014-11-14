@@ -23,9 +23,9 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.entitlement.Application;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
+import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
@@ -36,6 +36,14 @@ import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestType;
@@ -56,9 +64,9 @@ import org.forgerock.openam.forgerockrest.entitlements.PolicyParser;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.ResourceErrorHandler;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
-import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
-import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.rest.RestEndpointServlet;
@@ -71,18 +79,6 @@ import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.SignatureUtil;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
 
 /**
  * Guice Module for configuring bindings for the AuthenticationRestService classes.
@@ -239,15 +235,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         return new CoreTokenResourceAuthzModule(sessionService, debug, coreTokenResourceEnabled);
     }
 
-    @Provides
-    @Inject
-    @Singleton
-    public ApplicationsResource getApplicationsResource(@Named("frRest") Debug debug,
-            ApplicationManagerWrapper appManager, ApplicationTypeManagerWrapper appTypeManagerWrapper,
-            @Named(ApplicationsResource.APPLICATION_QUERY_ATTRIBUTES) Map<String, QueryAttribute> queryAttributes) {
-        return new ApplicationsResource(debug, appManager, appTypeManagerWrapper, queryAttributes);
-    }
-
     public static Map<Integer, Integer> getEntitlementsErrorHandlers() {
         return new EntitlementsResourceErrorMappingProvider().get();
     }
@@ -302,13 +289,16 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.AUTHENTICATION_ERROR, ResourceException.FORBIDDEN);
             handlers.put(EntitlementException.INVALID_VALUE, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.POLICY_NAME_MISMATCH, ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.APP_RETRIEVAL_ERROR, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.APP_RETRIEVAL_ERROR, ResourceException.NOT_FOUND);
             handlers.put(EntitlementException.UNKNOWN_POLICY_CLASS,         ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.POLICY_CLASS_CAST_EXCEPTION,  ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.POLICY_CLASS_NOT_INSTANTIABLE,ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.POLICY_CLASS_NOT_ACCESSIBLE,  ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.INVALID_PROPERTY_VALUE_UNKNOWN_VALUE, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.POLICY_ALREADY_EXISTS, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.APP_NOT_CREATED_POLICIES_EXIST, ResourceException.CONFLICT);
+            handlers.put(EntitlementException.INVALID_APP_TYPE, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.INVALID_APP_REALM, ResourceException.BAD_REQUEST);
 
             return handlers;
         }
