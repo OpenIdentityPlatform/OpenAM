@@ -65,7 +65,7 @@ public class TokenResponseTypeHandlerTest {
                 redirectUri, scope, refreshToken, nonce, request)).willReturn(accessToken);
 
         //When
-        final Map.Entry<String, Token> tokenEntry = responseTypeHandler.handle(accessToken, tokenType, scope, resourceOwnerId,
+        final Map.Entry<String, Token> tokenEntry = responseTypeHandler.handle(tokenType, scope, resourceOwnerId,
                 clientId, redirectUri, nonce, request);
 
         //Then

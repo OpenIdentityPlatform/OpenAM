@@ -82,9 +82,7 @@ public class AuthorizationTokenIssuer {
         boolean returnAsFragment = false;
 
         final List<String> sortedResponseTypes =
-                Utils.asSortedList(requestedResponseTypes, new KeyStringComparator("token"));
-
-        Token accessToken = null;
+                Utils.asSortedList(requestedResponseTypes, new KeyStringComparator("id_token"));
 
         for (final String responseType : sortedResponseTypes) {
 
@@ -94,14 +92,10 @@ public class AuthorizationTokenIssuer {
 
             final ResponseTypeHandler responseTypeHandler = allowedResponseTypes.get(responseType);
 
-            final Map.Entry<String, Token> token = responseTypeHandler.handle(accessToken, tokenType, validatedScope,
+            final Map.Entry<String, Token> token = responseTypeHandler.handle(tokenType, validatedScope,
                     resourceOwnerId, clientId, redirectUri, nonce, request);
 
             if (token != null) {
-
-                if (token.getKey().equals("access_token")) {
-                    accessToken = token.getValue();
-                }
 
                 if (tokens.containsKey(token.getKey())) {
                     logger.debug("Returning multiple response types with the same url value");
@@ -180,7 +174,7 @@ public class AuthorizationTokenIssuer {
     }
 
     /**
-     * Comparator that takes a given String in its ctor which is moved to the front
+     * Comparator that takes a given String in its ctor which is moved to the end
      * of the list. The order of other elements is undetermined.
      */
     private class KeyStringComparator implements Comparator<String> {
@@ -194,9 +188,9 @@ public class AuthorizationTokenIssuer {
         @Override
         public int compare(String first, String second) {
             if (first.equals(key)) {
-                return -1;
-            } else if (second.equals(key)) {
                 return 1;
+            } else if (second.equals(key)) {
+                return -1;
             } else {
                 return 0;
             }

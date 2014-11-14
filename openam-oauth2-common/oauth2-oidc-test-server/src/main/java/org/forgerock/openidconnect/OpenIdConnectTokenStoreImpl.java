@@ -20,22 +20,21 @@ import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.utils.Utils;
 import org.forgerock.oauth2.TokenStoreImpl;
 import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.AuthorizationCode;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.util.encode.Base64url;
 import org.restlet.Request;
-
-import java.util.List;
 
 /**
  * @since 12.0.0
@@ -67,41 +66,68 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
         final long tokenLifetime = providerSettings.getOpenIdTokenLifetime();
         final long exp = timeInSeconds + tokenLifetime;
 
-        final long iat = timeInSeconds;
-        final long ath = timeInSeconds;
-
         final Request req = request.getRequest();
         final String iss = req.getHostRef().toString() + "/" + req.getResourceRef().getSegments().get(0);
 
-        final String atHash = generateAtHash(algorithm, request, request.getToken(AccessToken.class), providerSettings);
+        final String atHash = generateAtHash(algorithm, request, providerSettings);
+        final String cHash = generateCHash(algorithm, request, providerSettings);
 
-        // todo support acr/amr, should be 0 or one of the space-seperated values from acr_values in the request
+        //todo - if necessary, match test impl. with OpenAMTokenStore.java
         final String acr = null;
         final List<String> amr = null;
 
         return new OpenIdConnectToken(clientSecret, keyPair, algorithm, iss, resourceOwnerId, clientId,
-                authorizationParty, exp, iat, ath, nonce, ops, atHash, acr, amr);
+                authorizationParty, exp, timeInSeconds, timeInSeconds, nonce, ops, atHash, cHash, acr, amr);
     }
 
     /**
-     * Generates at_hash values, by hashing the accessToken using the requests's "alg"
-     * parameter.
+     * For at_hash values, used when token and id_token exist in scope.
      */
     private String generateAtHash(String algorithm, OAuth2Request request,
-                                  Token accessToken, OAuth2ProviderSettings providerSettings)
-            throws ServerException {
+                                  OAuth2ProviderSettings providerSettings) throws ServerException {
 
-        if (request == null || accessToken == null) {
+        final AccessToken accessToken = request.getToken(AccessToken.class);
+
+        if (accessToken == null) {
             return null;
         }
+
+        final String accessTokenValue = ((String) accessToken.getTokenInfo().get("access_token"));
+
+        return generateHash(algorithm, accessTokenValue, providerSettings);
+
+    }
+
+    /**
+     * For c_hash, used when code and id_token exist in scope.
+     */
+    private String generateCHash(String algorithm, OAuth2Request request,
+                                 OAuth2ProviderSettings providerSettings) throws ServerException {
+
+        final AuthorizationCode authorizationCode = request.getToken(AuthorizationCode.class);
+
+        if (authorizationCode == null) {
+            return null;
+        }
+
+        final String codeValue = authorizationCode.getTokenId();
+
+        return generateHash(algorithm, codeValue, providerSettings);
+    }
+
+    /**
+     * Generates hash values, by hashing the valueToEncode using the requests's "alg"
+     * parameter, then returning the base64url encoding of the
+     * leftmost half of the returned bytes. Used for both at_hash and c_hash claims.
+     */
+    private String generateHash(String algorithm, String valueToEncode, OAuth2ProviderSettings providerSettings)
+            throws ServerException {
 
         if (!providerSettings.getSupportedIDTokenSigningAlgorithms().contains(algorithm)) {
             return null;
         }
 
         final JwsAlgorithm alg = JwsAlgorithm.valueOf(algorithm);
-        final String accessTokenValue = ((String) accessToken.getTokenInfo().get("access_token"));
-
 
         MessageDigest digest;
         try {
@@ -110,10 +136,11 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
             throw new ServerException("Algorithm not supported.");
         }
 
-        final byte[] result = digest.digest(accessTokenValue.getBytes(Utils.CHARSET));
+        final byte[] result = digest.digest(valueToEncode.getBytes(Utils.CHARSET));
         final byte[] toEncode = Arrays.copyOfRange(result, 0, result.length / 2);
 
         return Base64url.encode(toEncode);
     }
+
 
 }

@@ -35,7 +35,7 @@ public class NoneResponseTypeHandlerTest {
 
     @Test
     public void handleShouldReturnNull() {
-        assertNull(responseTypeHandler.handle(null, null, null, null, null, null, null, null));
+        assertNull(responseTypeHandler.handle(null, null, null, null, null, null, null));
     }
 
     @Test

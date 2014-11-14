@@ -47,7 +47,7 @@ public class AuthorizationCodeResponseTypeHandler implements ResponseTypeHandler
     /**
      * {@inheritDoc}
      */
-    public Map.Entry<String, Token> handle(Token accessToken, String tokenType, Set<String> scope,
+    public Map.Entry<String, Token> handle(String tokenType, Set<String> scope,
                                            String resourceOwnerId, String clientId, String redirectUri, String nonce,
                                            OAuth2Request request) throws ServerException {
 

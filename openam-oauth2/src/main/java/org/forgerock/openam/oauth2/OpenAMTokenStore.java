@@ -21,6 +21,18 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
+import java.security.KeyPair;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.utils.Utils;
@@ -31,7 +43,6 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.RefreshToken;
-import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -49,18 +60,6 @@ import org.restlet.Request;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.security.KeyPair;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 /**
  * Implementation of the OpenId Connect Token Store which the OpenId Connect Provider will implement.
  *
@@ -118,6 +117,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             throw new ServerException("Could not create token in CTS");
         }
 
+        request.setToken(AuthorizationCode.class, authorizationCode);
+
         return authorizationCode;
     }
 
@@ -147,7 +148,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
-        AccessToken accessToken = request.getToken(AccessToken.class);
+
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
 
@@ -155,8 +156,6 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final long tokenLifetime = providerSettings.getOpenIdTokenLifetime();
         final long exp = timeInSeconds + tokenLifetime;
 
-        final long iat = timeInSeconds;
-        final long ath = timeInSeconds;
         final String realm = realmNormaliser.normalise(request.<String>getParameter("realm"));
 
         final Request req = request.getRequest();
@@ -167,13 +166,14 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Utils.CHARSET);
         final KeyPair keyPair = providerSettings.getServerKeyPair();
 
-        final String atHash = generateAtHash(algorithm, request, accessToken, providerSettings);
+        final String atHash = generateAtHash(algorithm, request, providerSettings);
+        final String cHash = generateCHash(algorithm, request, providerSettings);
 
-        // todo support acr/amr, should be 0 or one of the space-seperated values from acr_values in the request
         final String acr = getAuthenticationContextClassReference(request);
 
-        return new OpenAMOpenIdConnectToken(clientSecret, keyPair, algorithm, iss, resourceOwnerId, clientId,
-                authorizationParty, exp, iat, ath, nonce, ops, atHash, acr, amr, realm);
+        return new OpenAMOpenIdConnectToken(clientSecret, keyPair,
+                algorithm, iss, resourceOwnerId, clientId, authorizationParty, exp, timeInSeconds, timeInSeconds, nonce,
+                ops, atHash, cHash, acr, amr, realm);
     }
 
     private List<String> getAMRFromAuthModules(OAuth2Request request, OAuth2ProviderSettings providerSettings) throws ServerException {
@@ -215,35 +215,66 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     }
 
     /**
-     * Generates at_hash values, by hashing the accessToken using the requests's "alg"
-     * parameter.
+     * For at_hash values, used when token and id_token exist in scope.
      */
     private String generateAtHash(String algorithm, OAuth2Request request,
-                                  Token accessToken, OAuth2ProviderSettings providerSettings)
-            throws ServerException {
+                                  OAuth2ProviderSettings providerSettings) throws ServerException {
 
-        if (request == null || accessToken == null) {
-            logger.message("No at_hash for non-authorization flow.");
+        final AccessToken accessToken = request.getToken(AccessToken.class);
+
+        if (accessToken == null) {
+            logger.message("at_hash generation requires an existing access_token.");
             return null;
         }
 
+        final String accessTokenValue = ((String) accessToken.getTokenInfo().get("access_token"));
+
+        return generateHash(algorithm, accessTokenValue, providerSettings);
+
+    }
+
+    /**
+     * For c_hash, used when code and id_token exist in scope.
+     */
+    private String generateCHash(String algorithm, OAuth2Request request,
+                                 OAuth2ProviderSettings providerSettings) throws ServerException {
+
+        final AuthorizationCode authorizationCode = request.getToken(AuthorizationCode.class);
+
+        if (authorizationCode == null) {
+            logger.message("c_hash generation requires an existing code.");
+            return null;
+        }
+
+        final String codeValue = authorizationCode.getTokenId();
+
+        return generateHash(algorithm, codeValue, providerSettings);
+    }
+
+    /**
+     * Generates hash values, by hashing the valueToEncode using the requests's "alg"
+     * parameter, then returning the base64url encoding of the
+     * leftmost half of the returned bytes. Used for both at_hash and c_hash claims.
+     */
+    private String generateHash(String algorithm, String valueToEncode, OAuth2ProviderSettings providerSettings)
+            throws ServerException {
+
         if (!providerSettings.getSupportedIDTokenSigningAlgorithms().contains(algorithm)) {
-            logger.message("Unsupported signing algorithm requested for at_hash value.");
+            logger.message("Unsupported signing algorithm requested for hash value.");
             return null;
         }
 
         final JwsAlgorithm alg = JwsAlgorithm.valueOf(algorithm);
-        final String accessTokenValue = ((String) accessToken.getTokenInfo().get("access_token"));
 
         MessageDigest digest;
         try {
             digest = MessageDigest.getInstance(alg.getMdAlgorithm());
         } catch (NoSuchAlgorithmException e) {
-            logger.message("Unsupported signing algorithm chosen for at_hash value.");
+            logger.message("Unsupported signing algorithm chosen for hashing.");
             throw new ServerException("Algorithm not supported.");
         }
 
-        final byte[] result = digest.digest(accessTokenValue.getBytes(Utils.CHARSET));
+        final byte[] result = digest.digest(valueToEncode.getBytes(Utils.CHARSET));
         final byte[] toEncode = Arrays.copyOfRange(result, 0, result.length / 2);
 
         return Base64url.encode(toEncode);

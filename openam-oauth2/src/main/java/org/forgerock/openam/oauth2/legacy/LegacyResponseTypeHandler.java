@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
+import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResponseTypeHandler;
@@ -50,7 +51,7 @@ public class LegacyResponseTypeHandler implements ResponseTypeHandler {
         this.cookieExtractor = cookieExtractor;
     }
 
-    public Map.Entry<String, org.forgerock.oauth2.core.Token> handle(org.forgerock.oauth2.core.Token accessToken,
+    public Map.Entry<String, org.forgerock.oauth2.core.Token> handle(
             String tokenType, Set<String> scope, String resourceOwnerId, String clientId, String redirectUri,
             String nonce, OAuth2Request request) {
 
@@ -67,7 +68,7 @@ public class LegacyResponseTypeHandler implements ResponseTypeHandler {
         final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
         data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, cookieExtractor.extract(req, ssoCookieName));
 
-        final CoreToken token = responseType.createToken(accessToken, data);
+        final CoreToken token = responseType.createToken(request.getToken(AccessToken.class), data);
         return new AbstractMap.SimpleEntry<String, org.forgerock.oauth2.core.Token>(responseType.URIParamValue(),
                 new LegacyToken(token));
     }

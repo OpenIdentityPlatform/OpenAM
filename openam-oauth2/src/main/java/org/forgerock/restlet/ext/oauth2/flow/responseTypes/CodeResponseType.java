@@ -67,7 +67,7 @@ public class CodeResponseType implements ResponseType {
         final String nonce = (String) data.get(OAuth2Constants.Custom.NONCE);
 
         try {
-            final Map.Entry<String,Token> tokenEntry = handler.handle(null, null, scope, resourceOwnerId, clientId,
+            final Map.Entry<String,Token> tokenEntry = handler.handle(null, scope, resourceOwnerId, clientId,
                     redirectUri, nonce, requestFactory.create(Request.getCurrent()));
 
             return new LegacyAuthorizationTokenAdapter((AuthorizationCode) tokenEntry.getValue());

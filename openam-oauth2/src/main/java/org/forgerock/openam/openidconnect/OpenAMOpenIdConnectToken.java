@@ -45,12 +45,16 @@ public class OpenAMOpenIdConnectToken extends OpenIdConnectToken {
      * @param ath The authenticated time.
      * @param nonce The nonce.
      * @param ops The ops.
+     * @param atHash The at_hash.
+     * @param cHash The c_hash.
+     * @param acr The acr.
+     * @param amr The amr.
      * @param realm The realm.
      */
     public OpenAMOpenIdConnectToken(byte[] clientSecret, KeyPair keyPair, String algorithm, String iss, String sub,
             String aud, String azp, long exp, long iat, long ath, String nonce, String ops,
-            String atHash, String acr, List<String> amr, String realm) {
-        super(clientSecret, keyPair, algorithm, iss, sub, aud, azp, exp, iat, ath, nonce, ops, atHash, acr, amr);
+            String atHash, String cHash, String acr, List<String> amr, String realm) {
+        super(clientSecret, keyPair, algorithm, iss, sub, aud, azp, exp, iat, ath, nonce, ops, atHash, cHash, acr, amr);
         setRealm(realm);
     }
 

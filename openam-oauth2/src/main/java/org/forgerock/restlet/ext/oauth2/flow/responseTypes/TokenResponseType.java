@@ -72,7 +72,7 @@ public class TokenResponseType implements ResponseType {
         final String redirectUri = (String) data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
 
         try {
-            final Map.Entry<String,Token> tokenEntry = handler.handle(null, tokenType, scope, resourceOwnerId, clientId,
+            final Map.Entry<String,Token> tokenEntry = handler.handle(tokenType, scope, resourceOwnerId, clientId,
                     redirectUri, null, requestFactory.create(Request.getCurrent()));
 
             return new LegacyAccessTokenAdapter((AccessToken) tokenEntry.getValue());

@@ -16,7 +16,6 @@
 
 package org.forgerock.openidconnect;
 
-import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;

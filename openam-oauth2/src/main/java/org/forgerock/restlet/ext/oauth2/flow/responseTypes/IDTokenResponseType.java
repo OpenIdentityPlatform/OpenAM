@@ -66,7 +66,7 @@ public class IDTokenResponseType implements ResponseType {
         final String nonce = (String) data.get(OAuth2Constants.Custom.NONCE);
 
         try {
-            final Map.Entry<String,Token> tokenEntry = handler.handle(accessToken, null, null, resourceOwnerId, clientId,
+            final Map.Entry<String,Token> tokenEntry = handler.handle(null, null, resourceOwnerId, clientId,
                     null, nonce, requestFactory.create(Request.getCurrent()));
 
             return new LegacyJwtTokenAdapter((OpenIdConnectToken) tokenEntry.getValue());

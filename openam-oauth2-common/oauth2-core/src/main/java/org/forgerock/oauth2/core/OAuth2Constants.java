@@ -871,6 +871,7 @@ public class OAuth2Constants {
         public static final String ACR = "acr";
         public static final String AMR = "amr";
         public static final String AT_HASH = "at_hash";
+        public static final String C_HASH = "c_hash";
     }
 
     /**

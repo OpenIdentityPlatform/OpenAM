@@ -65,11 +65,13 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param ath The authenticated time.
      * @param nonce The nonce.
      * @param ops The ops.
+     * @param atHash The at_hash.
+     * @param cHash The c_hash.
      * @param acr The acr.
      * @param amr The amr.
      */
     public OpenIdConnectToken(byte[] clientSecret, KeyPair keyPair, String algorithm, String iss, String sub,
-            String aud, String azp, long exp, long iat, long ath, String nonce, String ops, String atHash, String acr,
+            String aud, String azp, long exp, long iat, long ath, String nonce, String ops, String atHash, String cHash, String acr,
             List<String> amr) {
         super(new HashMap<String, Object>());
         this.clientSecret = clientSecret;
@@ -85,6 +87,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         setNonce(nonce);
         setOps(ops);
         setAtHash(atHash);
+        setCHash(cHash);
         setAcr(acr);
         setAmr(amr);
         setTokenType(OAuth2Constants.JWTTokenParams.JWT_TOKEN);
@@ -184,6 +187,15 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      */
     private void setAtHash(String atHash) {
         set(OAuth2Constants.JWTTokenParams.AT_HASH, atHash);
+    }
+
+    /**
+     * Sets the c_hash.
+     *
+     * @param cHash The c_hash.
+     */
+    private void setCHash(String cHash) {
+        set(OAuth2Constants.JWTTokenParams.C_HASH, cHash);
     }
 
     /**

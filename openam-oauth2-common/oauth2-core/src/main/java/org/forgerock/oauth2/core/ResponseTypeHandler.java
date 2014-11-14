@@ -34,7 +34,6 @@ public interface ResponseTypeHandler {
     /**
      * Handles the creating of a Token instance and storing the Token in the OAuth2 provider {@link TokenStore}.
      *
-     * @param accessToken The access token, used for generating/validating other tokens.
      * @param tokenType The type of the token.
      * @param scope The requested scope.
      * @param resourceOwnerId The resource owner's id.
@@ -47,7 +46,7 @@ public interface ResponseTypeHandler {
      * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
      *          authenticated.
      */
-    Map.Entry<String, Token> handle(Token accessToken, String tokenType, Set<String> scope, String resourceOwnerId, String clientId,
+    Map.Entry<String, Token> handle(String tokenType, Set<String> scope, String resourceOwnerId, String clientId,
             String redirectUri, String nonce, OAuth2Request request) throws ServerException, InvalidClientException;
 
     /**
