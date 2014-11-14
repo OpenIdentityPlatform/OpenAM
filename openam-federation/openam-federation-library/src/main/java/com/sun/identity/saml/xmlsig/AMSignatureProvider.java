@@ -24,7 +24,7 @@
  *
  * $Id: AMSignatureProvider.java,v 1.11 2009/08/29 03:06:47 mallas Exp $
  *
- * Portions Copyrighted 2013-2014 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS.
  */
 
 package com.sun.identity.saml.xmlsig;
@@ -58,6 +58,7 @@ import org.apache.xml.security.utils.ElementProxy;
 import org.apache.xml.security.transforms.Transforms;
 import com.sun.identity.liberty.ws.common.wsse.WSSEConstants;
 import com.sun.identity.liberty.ws.soapbinding.SOAPBindingConstants;
+import javax.xml.transform.TransformerException;
 
 /**
  * <code>SignatureProvider</code> is an interface
@@ -1058,43 +1059,20 @@ public class AMSignatureProvider implements SignatureProvider {
                wsseNS = WSSEConstants.NS_WSSE_WSF11;
             }
 
-            Element wsucontext = org.apache.xml.security.utils.
-                XMLUtils.createDSctx(doc, "wsu", wsuNS);
+            Element wsucontext = org.apache.xml.security.utils.XMLUtils.createDSctx(doc, "wsu", wsuNS);
 
-            NodeList wsuNodes = (NodeList)XPathAPI.selectNodeList(doc,
-                "//*[@wsu:Id]", wsucontext);
+            NodeList wsuNodes = (NodeList) XPathAPI.selectNodeList(doc, "//*[@wsu:Id]", wsucontext);
 
             if ((wsuNodes != null) && (wsuNodes.getLength() != 0)) {
-               for(int i=0; i < wsuNodes.getLength(); i++) {
-                   Element elem = (Element) wsuNodes.item(i);
-                   String id = elem.getAttributeNS(wsuNS, "Id");
-                   if ((id != null) && (id.length() != 0)) {
-                       elem.setIdAttributeNS(wsuNS, "Id", true);
-                   }
-               }
-            }
-            
-            String[] attrs = {"AssertionID", "RequestID", "ResponseID"};
-            for (int j = 0; j < attrs.length; j++) {
-                NodeList aList = (NodeList)XPathAPI.selectNodeList(doc,
-                    "//*[@" + attrs[j]+"]");
-                if ((aList != null) && (aList.getLength() != 0)) {
-                    int len = aList.getLength();
-                    for (int i = 0; i < len; i++) {
-                        Element elem = (Element) aList.item(i);
-                        String id = elem.getAttribute(attrs[j]);
-                        if (id != null && id.length() != 0) {
-                            if (SAMLUtils.debug.messageEnabled()) {
-                                SAMLUtils.debug.message("found " + attrs[j] +
-                                    "=" + id + " element=" +
-                                    XMLUtils.print(elem));
-                            }
-                            elem.setIdAttribute(attrs[j], true);
-                        }
+                for (int i = 0; i < wsuNodes.getLength(); i++) {
+                    Element elem = (Element) wsuNodes.item(i);
+                    String id = elem.getAttributeNS(wsuNS, "Id");
+                    if ((id != null) && (id.length() != 0)) {
+                        elem.setIdAttributeNS(wsuNS, "Id", true);
                     }
                 }
             }
-           
+
             Element nscontext = org.apache.xml.security.utils.
                   XMLUtils.createDSctx (doc,"ds",Constants.SignatureSpecNS); 
             NodeList sigElements = XPathAPI.selectNodeList (doc,  
@@ -1107,12 +1085,44 @@ public class AMSignatureProvider implements SignatureProvider {
             PublicKey key = keystore.getPublicKey (certAlias); 
             Element sigElement = null; 
             //loop       
-            for(int i = 0; i < sigElements.getLength(); i++) {      
+            for (int i = 0; i < sigElements.getLength(); i++) {
                 sigElement = (Element)sigElements.item(i);
 		if (SAMLUtilsCommon.debug.messageEnabled ()) {
 		    SAMLUtilsCommon.debug.message("Sig(" + i + ") = " +
 			XMLUtils.print(sigElement));
 		}
+                Element refElement;
+                try {
+                    refElement = (Element) XPathAPI.selectSingleNode(sigElement, "//ds:Reference[1]", nscontext);
+                } catch (TransformerException te) {
+                    throw new XMLSignatureException(te);
+                }
+                String refUri = refElement.getAttribute("URI");
+                String signedId = null;
+                Element parentElement = (Element) sigElement.getParentNode();
+                if (parentElement != null) {
+                    String idAttrName = null;
+                    if ("Assertion".equals(parentElement.getLocalName())) {
+                        idAttrName = "AssertionID";
+                    } else if ("Response".equals(parentElement.getLocalName())) {
+                        idAttrName = "ResponseID";
+                    } else if ("Request".equals(parentElement.getLocalName())) {
+                        idAttrName = "RequestID";
+                    } else {
+                        throw new UnsupportedOperationException("Enveloping and detached XML signatures are no longer"
+                                + " supported");
+                    }
+                    if (idAttrName != null) {
+                        parentElement.setIdAttribute(idAttrName, true);
+                        signedId = parentElement.getAttribute(idAttrName);
+                    }
+                }
+                //NB: this validation only works with enveloped XML signatures, enveloping and detached signatures are
+                //no longer supported.
+                if (refUri == null || signedId == null || !refUri.substring(1).equals(signedId)) {
+                    SAMLUtilsCommon.debug.error("Signature reference ID does not match with element ID");
+                    throw new XMLSignatureException(SAMLUtilsCommon.bundle.getString("uriNoMatchWithId"));
+                }
                 XMLSignature signature = new XMLSignature (sigElement, "");
                 signature.addResourceResolver (
                     new com.sun.identity.saml.xmlsig.OfflineResolver ());
@@ -1368,59 +1378,24 @@ public class AMSignatureProvider implements SignatureProvider {
                  XMLUtils.createDSctx(doc,"ds",Constants.SignatureSpecNS);
             Element sigElement = (Element) XPathAPI.selectSingleNode(doc,
                                  "//ds:Signature[1]", nscontext);
+            Element refElement;
+            try {
+                refElement = (Element) XPathAPI.selectSingleNode(sigElement, "//ds:Reference[1]", nscontext);
+            } catch (TransformerException te) {
+                throw new XMLSignatureException(te);
+            }
+            String refUri = refElement.getAttribute("URI");
+            String signedId = ((Element) sigElement.getParentNode()).getAttribute(idAttrName);
+            if (refUri == null || signedId == null || !refUri.substring(1).equals(signedId)) {
+                SAMLUtilsCommon.debug.error("Signature reference ID does not match with element ID");
+                throw new XMLSignatureException(SAMLUtilsCommon.bundle.getString("uriNoMatchWithId"));
+            }
             XMLSignature signature = new XMLSignature(sigElement, "");
             signature.addResourceResolver(
                         new com.sun.identity.saml.xmlsig.OfflineResolver());
-            //comment the below code, need future clean-up
-   /*         if (!idAttrName.equals(DEF_ID_ATTRIBUTE)) {
-		// TODO : this only work when doc is the element which 
-		// reference URI pointed to. Need more work, possible
-		// solution is have a customized ResouceResolver
-		Element root = doc.getDocumentElement();
-		String id = root.getAttribute(idAttrName);
-		// register the id for the elment, so it could be found
-		// by Reference object based on URI
-		if (id != null && !id.length() == 0) { 
-		    IdResolver.registerElementById(root, id);
-		}
-	    }
-     */
-           String idValue = doc.getDocumentElement().getAttribute(idAttrName); 
-           Element root = (Element) XPathAPI.selectSingleNode(   
-                doc, "//*[@" + idAttrName + "=\"" + idValue + "\"]");
 
-            if (root == null) {   
-                SAMLUtilsCommon.debug.error("verifyXML: " +
-                    "could not resolv id attribute");
-                throw new XMLSignatureException(  
-                    SAMLUtilsCommon.bundle.getString("invalidIDAttribute"));  
-            }
-            root.setIdAttribute(idAttrName, true);
-            String[] attrs = {"AssertionID", "RequestID", "ResponseID"}; 
-            for ( int j = 0; j < attrs.length; j++) {
-                NodeList aList = (NodeList) XPathAPI.selectNodeList(   
-                                 doc, "//*[@" + attrs[j]+"]");
-                if (aList != null && aList.getLength() != 0) {
-                    int len = aList.getLength();
-                    if (SAMLUtilsCommon.debug.messageEnabled()) {
-                        SAMLUtilsCommon.debug.message ("found "+ attrs[j] +
-                            "=" + len); 
-                    }
+            doc.getDocumentElement().setIdAttribute(idAttrName, true);
 
-                    for (int i = 0; i < len; i++) {
-                        Element elem = (Element) aList.item(i);
-                        String id = elem.getAttribute(attrs[j]);
-                        if (id != null && id.length() != 0) {
-                            if (SAMLUtilsCommon.debug.messageEnabled()) {
-                                SAMLUtilsCommon.debug.message ("found "+
-                                   attrs[j]+ "=" + id + " elment=" +
-                                   XMLUtils.print(elem));
-                            }
-                            elem.setIdAttribute(attrs[j], true);
-                        }
-                    }
-                }
-            }
             KeyInfo ki = signature.getKeyInfo();
             PublicKey pk = this.getX509PublicKey(doc, ki);
             if (pk!=null) {

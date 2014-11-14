@@ -61,8 +61,8 @@ import com.sun.identity.wss.security.WSSConstants;
 import com.sun.identity.wss.security.WSSUtils;
 import com.sun.identity.wss.security.STRTransform;
 import com.sun.identity.wss.security.BinarySecurityToken;
-import com.sun.identity.wss.security.handler.ThreadLocalService;
 import com.iplanet.security.x509.CertUtils;
+import javax.xml.transform.TransformerException;
 
 /**
  * <code>WSSSignatureProvider</code> is a class for signing and 
@@ -626,6 +626,20 @@ public class WSSSignatureProvider extends AMSignatureProvider {
                     WSSUtils.debug.message("Sig(" + i + ") = " +
                         XMLUtils.print(sigElement));
                 }
+                Element refElement;
+                try {
+                    refElement = (Element) XPathAPI.selectSingleNode(sigElement, "//ds:Reference[1]", nscontext);
+                } catch (TransformerException te) {
+                    throw new XMLSignatureException(te);
+                }
+                String refUri = refElement.getAttribute("URI");
+                String signedId = ((Element) sigElement.getParentNode()).getAttribute("AssertionID");
+                //NB: this validation only works with enveloped XML signatures, enveloping and detached signatures are
+                //no longer supported.
+                if (refUri == null || signedId == null || !refUri.substring(1).equals(signedId)) {
+                    WSSUtils.debug.error("Signature reference ID does not match with element ID");
+                    throw new XMLSignatureException(WSSUtils.bundle.getString("uriNoMatchWithId"));
+                }
                 XMLSignature signature = new XMLSignature (sigElement, "");
                 signature.addResourceResolver (
                     new com.sun.identity.saml.xmlsig.OfflineResolver ());
@@ -950,111 +964,7 @@ public class WSSSignatureProvider extends AMSignatureProvider {
      */
     public boolean verifyWSSSignature(Document doc, java.security.Key key,
           String certAlias, String encryptAlias) throws XMLSignatureException {
-        if (doc == null) {
-            WSSUtils.debug.error("WSSSignatureProvider.verifyWSSSignature: " +
-                    "document or key is null.");
-            throw new XMLSignatureException(
-                      WSSUtils.bundle.getString("nullInput"));
-        }
-        
-        if(useSTRTransformation && !isSTRTransformRegistered) {
-           registerSTRTransform();
-        }
-
-        try {
-            Element wsucontext = org.apache.xml.security.utils.
-                    XMLUtils.createDSctx(doc, "wsu", WSSConstants.WSU_NS);
-
-            NodeList wsuNodes = (NodeList)XPathAPI.selectNodeList(doc,
-                    "//*[@wsu:Id]", wsucontext);
-
-            if(wsuNodes != null && wsuNodes.getLength() != 0) {
-               for(int i=0; i < wsuNodes.getLength(); i++) {
-                   Element elem = (Element) wsuNodes.item(i);
-                   String id = elem.getAttributeNS(WSSConstants.WSU_NS, "Id");
-                   if (id != null && id.length() != 0) {
-                       elem.setIdAttribute(id, true);
-                   }
-               }
-            }
-
-            Element nscontext = org.apache.xml.security.utils.
-                  XMLUtils.createDSctx (doc,"ds",Constants.SignatureSpecNS);
-            NodeList sigElements = XPathAPI.selectNodeList (doc,
-                "//ds:Signature", nscontext);
-            int sigElementsLength = sigElements.getLength();
-            if (WSSUtils.debug.messageEnabled()) {
-                WSSUtils.debug.message("WSSSignatureProvider.verifyWSSSignature"
-                      + ": sigElements " + "size = " + sigElements.getLength());
-            }
-            if(sigElementsLength == 0) {
-               return false;
-            }
-                        
-            Element sigElement = null;
-            //loop
-            for(int i = 0; i < sigElements.getLength(); i++) {
-                sigElement = (Element)sigElements.item(i);
-                if (WSSUtils.debug.messageEnabled ()) {
-                    WSSUtils.debug.message("Sig(" + i + ") = " +
-                        XMLUtils.print(sigElement));
-                }
-                if(sigElement.getParentNode().getLocalName().equals("Assertion")) {
-                   continue; 
-                }
-                XMLSignature signature = new XMLSignature (sigElement, "");
-                signature.addResourceResolver (
-                    new com.sun.identity.saml.xmlsig.OfflineResolver ());                
-                if(key != null) {
-                   if(!signature.checkSignatureValue(key)) {
-                       return false;
-                   } else {
-                      continue; 
-                   }
-                }                
-                //check if it's a symmetric key
-                KeyInfo ki = signature.getKeyInfo ();
-                EncryptedKey encKey = ki.itemEncryptedKey(0);
-                if(encKey != null) {                   
-                   Key verificationKey = WSSUtils.getXMLEncryptionManager().
-                           decryptKey(ki.getElement(), encryptAlias);
-                    if(!signature.checkSignatureValue (verificationKey)) {
-                       return false;
-                    } else {
-                       continue;
-                    }
-                }
-                
-                PublicKey pk = this.getX509PublicKey(doc, ki);
-                if (pk!=null) {
-                    X509Certificate cert =
-                            (X509Certificate)keystore.getCertificate(pk);
-                    if(cert != null) {
-                       ThreadLocalService.setClientCertificate(cert);
-                    }
-                    if(!signature.checkSignatureValue (pk)) {
-                        return false;
-                    } else {
-                       continue;
-                    }
-                }
-                
-                if(certAlias != null) {
-                   X509Certificate newcert= 
-                           keystore.getX509Certificate (certAlias); 
-                }
-                
-                if (!signature.checkSignatureValue (key)) {
-                    return false;
-                }
-                return false;                                
-            }
-            return true;
-        } catch (Exception ex) {
-            WSSUtils.debug.error("WSSSignatureProvider: " + 
-                                 "verifyWSSSignature Exception: ", ex);
-            throw new XMLSignatureException (ex.getMessage ());
-        }        
+        throw new UnsupportedOperationException("Enveloping and detached XML signatures are no longer supported");
     }
     
     /**
