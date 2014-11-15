@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>
-            <artifactId>jquery-sortable</artifactId>
+            <artifactId>jquery-nestingSortable</artifactId>
             <version>0.9.12</version>
             <type>js</type>
         </dependency>

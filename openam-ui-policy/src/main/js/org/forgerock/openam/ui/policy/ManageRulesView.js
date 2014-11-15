@@ -148,7 +148,7 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
 
             this.groupCounter++;
 
-            this.$el.find("ol#dropbox").sortable({
+            this.$el.find("ol#dropbox").nestingSortable({
                 group: self.element + 'rule-creation-group' + self.groupCounter,
                 exclude:'.item-button-panel, li.editing',
                 delay: 100,
@@ -274,13 +274,13 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
                     }
 
                     delete result.subContainers;
-                    delete result.sortable;
+                    delete result.nestingSortable;
                     return result;
                 }
 
             });
 
-            self.pickUpItem.sortable({
+            self.pickUpItem.nestingSortable({
                 group: self.element + 'rule-creation-group' + self.groupCounter,
                 drop: false
             });
@@ -411,7 +411,7 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
                 return;
             }
 
-            var rules = this.$el.find('ol#dropbox').sortable('serialize').get(),
+            var rules = this.$el.find('ol#dropbox').nestingSortable('serialize').get(),
                 operatorData = this.$el.find('#operator' + this.idPrefix + '0').data().itemData;
 
             // Removing any obsolete root logicals.

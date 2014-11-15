@@ -35,7 +35,7 @@ require.config({
         spin:           "libs/spin-2.0.1-min",
         jquery:         "libs/jquery-1.11.1-min",
         xdate:          "libs/xdate-0.8-min",
-        sortable:       "libs/jquery-sortable-0.9.12",
+        sortable:       "libs/jquery-nestingSortable-0.9.12",
         doTimeout:      "libs/jquery.ba-dotimeout-1.0-min",
         handlebars:     "libs/handlebars-1.3.0-min",
         moment:         "libs/moment-2.8.1-min",
@@ -78,8 +78,7 @@ require.config({
             exports: "handlebars"
         },
         sortable: {
-            deps: ["jquery"],
-            exports: "sortable"
+            deps: ["jquery"]
         },
         i18next: {
             deps: ["jquery", "handlebars"],
