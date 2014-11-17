@@ -48,7 +48,7 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
             'click  a#addOperator:not(.inactive)':    'addOperator',
             'click  a#clear:not(.inactive)':          'onClear',
             'click  .operator > .item-button-panel > .icon-remove' : 'onDelete',
-            'keyup  .operator > .item-button-panel > .icon-remove' : 'onDelete' 
+            'keyup  .operator > .item-button-panel > .icon-remove' : 'onDelete'
         },
         types: {
             ENVIRONMENT: 'environmentType',
@@ -59,7 +59,7 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
         pickUpItem: null,
         localEntity: {},
         groupCounter: 0,
-        
+
         idPrefix: '',
         property: '',
         properties: '',
@@ -69,7 +69,7 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
             _.extend(this.events, events);
             _.extend(Constants, this.types);
 
-            
+
             this.localEntity = null;
             this.sortingInitialised = false;
 
@@ -84,7 +84,7 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
             var self = this,
                 newRule = null,
                 operators = _.pluck( this.data.operators, 'title' ),
-                buildListItem = null, 
+                buildListItem = null,
                 properties = null;
 
                 buildListItem = function(data, container, parent) {
@@ -134,8 +134,8 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
                 properties = _.clone(this.localEntity);
                 this.localEntity = {type:"AND"};
                 this.localEntity[this.properties] = [properties];
-            } 
-            
+            }
+
             buildListItem(this.localEntity, this.$el.find('ol#dropOffArea'), null);
             this.delegateEvents();
 
@@ -323,7 +323,7 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
         },
 
         showHint:function(state){
-            this.$el.find('#condition-management').toggleClass('show-hint', state);  
+            this.$el.find('#condition-management').toggleClass('show-hint', state);
         },
 
         onClear: function(e) {
@@ -400,7 +400,7 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
         },
 
         getProperties: function() {
-            var properties = {};     
+            var properties = {};
                 properties[this.properties] = this.data[this.properties];
             return properties;
         },
@@ -429,7 +429,7 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
                 } else {
                     this.data.entity[this.property] = null;
                 }
-                
+
             } else if ( operatorData[this.property] === null) {
                 this.data.entity[this.property] = null;
             } else {

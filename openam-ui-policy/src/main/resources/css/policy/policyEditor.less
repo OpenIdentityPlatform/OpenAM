@@ -6,7 +6,6 @@
 @not-color:     #E7D1CB;
 @subject-color: #CCC;
 @grabber-image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAFCAYAAABvsz2cAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACNJREFUeNpiZGBg8AViBhYQ8f///3pGIHEGxAExGFAYAAEGABbSDZWLLysMAAAAAElFTkSuQmCC";
-@active-background-color: #EDFCF5;
 @table-hightlight-bg-color:#D7E9F8;
 @table-rollover-bg-color:#d5d5d5;
 
@@ -63,7 +62,7 @@ html body .ui-jqgrid tr.ui-widget-content{
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 
     &.jqgrow td {
-        
+
         padding: 5px 10px 4px;
         font-size: 13px;
         line-height: 18px;
@@ -100,25 +99,25 @@ html body .ui-jqgrid tr.ui-widget-content{
         border-bottom: 1px solid #bebebe;
         text-decoration: none;
 
-        &.accordion-step-disabled {
-            background: #aaa;
-            cursor:default;
+        &:hover, &:focus{
+            background-color: @table-hightlight-bg-color;
         }
 
-        &:focus:not(.accordion-step-disabled), &:hover:not(.accordion-step-disabled){
-            background-color: #D7E9F8;
-        }
 
-        &.step-active:not(.accordion-step-disabled){
+        &.step-active{
             background-color: #5a646d;
             color:white;
             box-shadow:none;
+
+            &:hover{
+                cursor:default;
+            }
         }
 
     }
 
     .accordion-step {
-        padding: 20px 15px 15px;
+        padding: 15px;
         border-bottom: 1px solid #bebebe;
         display:none;
 
@@ -262,11 +261,14 @@ html body .ui-jqgrid tr.ui-widget-content{
         }
 
         .striped-list {
-            width: 380px;
+            margin-right:0;
 
             .highlight {
                 background: @table-hightlight-bg-color;
                 border-color: rgba(0, 0, 0, 0.2);
+                &:nth-child(odd){
+                    background: darken(@table-hightlight-bg-color, 4%);
+                }
                 [class*="icon-checkbox-"] {
                     color: darken(@table-hightlight-bg-color, 50%);
                 }
@@ -275,8 +277,7 @@ html body .ui-jqgrid tr.ui-widget-content{
 
         .action-name {
             display: inline-block;
-            padding: 0 0 0 8px;
-            width: 200px;
+            padding: 0 8px;
         }
 
         .action-permission {
@@ -389,16 +390,16 @@ html body .ui-jqgrid tr.ui-widget-content{
                 }
             }
             dd {
-               
+
             }
             dd:after {
                 content:' ';
             }
         }
 
-        td[aria-describedby*="_name"], td[aria-describedby*="_resources"], 
+        td[aria-describedby*="_name"], td[aria-describedby*="_resources"],
         td[aria-describedby*="_resourceAttributes"], td[aria-describedby*="_subject"],
-        td[aria-describedby*="_resources"] li, 
+        td[aria-describedby*="_resources"] li,
         td[aria-describedby*="_resourceAttributes"] li, td[aria-describedby*="_subject"] li{
             .ellipsis;
         }
@@ -640,6 +641,7 @@ span.item-button-panel {
     border-top:1px solid #ccc;
 
       &#createdResources {
+          margin-right:0;
           li.editing, li.editing:hover {
               min-height: 36px;
               line-height: 36px;
@@ -650,6 +652,10 @@ span.item-button-panel {
                   transition: width 0.25s ease-out;
               }
           }
+      }
+
+      &#selectedRealms{
+          margin-right:0;
       }
 
       &#attrTypeStatic{
@@ -762,9 +768,10 @@ input[type="text"]:invalid:required{
         margin: 0 10px;
         h1 {
             padding:0 0 10px;
-            span:not(.to-lowercase){
+            span:not(.to-lowercase), a{
                 font-weight:normal;
                 color: #80b7ab;
+                text-decoration:none;
             }
         }
 
@@ -844,7 +851,7 @@ span.realm,.content-bg .policy-header h2 span.realm  {
     line-height: 10px;
     cursor: default;
     &.toplevel{
-        padding: 0 0 0 5px; 
+        padding: 0 0 0 5px;
         bottom: -2px;
     }
 }
@@ -864,12 +871,12 @@ span.realm,.content-bg .policy-header h2 span.realm  {
 
 /*----- Tabs -----*/
 .tabs {
-    .tab-links {  
+    .tab-links {
         a {
             padding: 7px 10px 5px;
             display:block;
             border: 1px solid #ddd;
-            border-radius: 3px 3px 0 0;  
+            border-radius: 3px 3px 0 0;
             font-weight: bold;
             text-decoration: none;
             color:#4c4c4c;
@@ -887,7 +894,7 @@ span.realm,.content-bg .policy-header h2 span.realm  {
             &:hover {
                 background:#fff;
             }
-      
+
         }
 
 
@@ -899,7 +906,7 @@ span.realm,.content-bg .policy-header h2 span.realm  {
                 margin-top: 0;
                 padding-bottom: 7px;
                 cursor: default;
-                
+
             }
         }
     }
@@ -909,7 +916,7 @@ span.realm,.content-bg .policy-header h2 span.realm  {
         background: #fff;
         padding: 0 10px 10px;
         border: 1px solid #ddd;
-       
+
 
         .inactive-tab {
            height: 0;
@@ -930,8 +937,8 @@ span.realm,.content-bg .policy-header h2 span.realm  {
     overflow: visible;
 }
 body{
-    /* This will prevent to sudden shift of content which can sometimes occur 
-     * when navigating between them long views which require a scroll bar and 
+    /* This will prevent to sudden shift of content which can sometimes occur
+     * when navigating between them long views which require a scroll bar and
      * short ones which do not.
      */
     overflow-y: scroll;
@@ -1054,7 +1061,7 @@ body.editing{
         border: 1px solid #ccc;
         background: #eee;
         border-radius: 5px;
-                
+
         ol#pickUpItem {
 
             min-height: 77px;
@@ -1082,7 +1089,7 @@ body.editing{
             li.operator:not(.dragged){
                 margin-top: 14px;
             }
-            
+
 
         }
 
@@ -1236,7 +1243,7 @@ body.editing{
             padding-right: 10px;
             margin-right: 10px;
             float:left;
-            
+
             &:last-of-type{
                 border-right: none;
             }
@@ -1266,7 +1273,7 @@ body.editing{
          div.field-float-selectize {
             float: left;
             min-width: 133px;
-            max-width: 588px;  
+            max-width: 588px;
             margin: 5px 5px 0 5px; // margin-bottom:0; required for clearing
 
         }
@@ -1468,8 +1475,5 @@ section.active-step{
             width:100px;
         }
     }
-    
+
 }
-
-
-

@@ -31,7 +31,6 @@
 define("org/forgerock/openam/ui/common/components/Accordion", function () {
     var Accordion,
         activeStepClass = 'active-step',
-        disabledStepClass = 'accordion-step-disabled',
         headerClass = '.accordion-header',
         stepClass = '.accordion-step',
 
@@ -75,14 +74,12 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
      */
     Accordion.prototype.expandCollapse = function (e) {
         e.preventDefault();
-        
 
         var $this = $(e.target),
-            disabled = $this.hasClass(disabledStepClass),
             $targetStep = $this.next(),
             id = $targetStep.data('stepId');
 
-        if (!disabled && id !== this.getActive()) {
+        if (id !== this.getActive()) {
             this.setActive(id);
             this.$activeSection = $targetStep;
         }
@@ -103,19 +100,9 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
     };
 
     /**
-     * Enables selection of a section of the supplied index.
-     *
-     * @param id section index
-     */
-    Accordion.prototype.enableStep = function (id) {
-        $(this.$headers[id]).removeClass(disabledStepClass);
-    };
-
-    /**
      * Disables selection of steps.
      */
     Accordion.prototype.disableSections = function () {
-        this.$headers.addClass('accordion-step-disabled');
         this.$headers.removeClass('step-active');
     };
 
@@ -127,11 +114,9 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
 
         if (this.$activeSection) {
             collapse(this.$activeSection);
-            this.enableStep(this.activeId);
         }
 
         this.activeId = id;
-        this.enableStep(this.activeId);
 
         this.$activeSection = $(this.$sections[this.activeId]);
         expand(this.$activeSection, init);
