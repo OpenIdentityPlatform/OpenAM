@@ -21,6 +21,7 @@ import com.sun.identity.entitlement.xacml3.core.AdviceExpression;
 import com.sun.identity.entitlement.xacml3.core.AdviceExpressions;
 import com.sun.identity.entitlement.xacml3.core.AttributeAssignmentExpression;
 import com.sun.identity.entitlement.xacml3.core.AttributeValue;
+import com.sun.identity.entitlement.xacml3.core.EffectType;
 import com.sun.identity.entitlement.xacml3.core.ObjectFactory;
 
 import javax.xml.bind.JAXBElement;
@@ -34,8 +35,8 @@ import java.util.Set;
  */
 public class XACMLSchemaFactory {
 
-    private ObjectFactory factory;
-    private ResourceAttributeUtil resourceAttributeUtil;
+    private final ObjectFactory factory;
+    private final ResourceAttributeUtil resourceAttributeUtil;
 
     public XACMLSchemaFactory() {
         factory = new ObjectFactory();
@@ -74,9 +75,14 @@ public class XACMLSchemaFactory {
     public AdviceExpression resourceAttributeToAdviceExpression(ResourceAttribute resourceAttribute)
             throws EntitlementException {
 
+        // A pseudo-urn to use for advice/attribute id
+        final String adviceId = XACMLConstants.JSON_RESOURCE_ATTRIBUTE_ADVICE_ID + ":" + resourceAttribute.getClass()
+                .getName();
+
         AdviceExpression result = new AdviceExpression();
 
         AttributeValue attributeValue = factory.createAttributeValue();
+        attributeValue.setDataType(XACMLConstants.XS_STRING);
 
         // We bypass much of the grief of conversion by getting JSON to do the heavy lifting for us.
         attributeValue.getContent().add(resourceAttributeUtil.toJSON(resourceAttribute));
@@ -84,7 +90,14 @@ public class XACMLSchemaFactory {
 
         AttributeAssignmentExpression attributeAssignmentExpression = factory.createAttributeAssignmentExpression();
         attributeAssignmentExpression.setExpression(jaxbElement);
+        attributeAssignmentExpression.setAttributeId(adviceId + ":" + resourceAttribute.getPropertyName());
         result.getAttributeAssignmentExpression().add(attributeAssignmentExpression);
+
+        // Resource Attributes are returned on successful policy decisions
+        result.setAppliesTo(EffectType.PERMIT);
+
+        // Set an AdviceId to be in strict compliance with the schema
+        result.setAdviceId(adviceId);
 
         return result;
     }

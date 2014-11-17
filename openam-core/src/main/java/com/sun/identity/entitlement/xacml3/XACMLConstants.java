@@ -40,9 +40,9 @@ public interface XACMLConstants {
             = "sun.opensso.privilege.lastModifiedBy";
 
     public static final String XS_STRING
-            = "htp://www.w3.org/2001/XMLSchema#string";
+            = "http://www.w3.org/2001/XMLSchema#string";
     public static final String XS_DATE_TIME
-            = "htp://www.w3.org/2001/XMLSchema#dateTime";
+            = "http://www.w3.org/2001/XMLSchema#dateTime";
 
     public static final String PRIVILEGE_CREATION_DATE
             = "sun.opensso.privilege.creationDate";
@@ -150,5 +150,9 @@ public interface XACMLConstants {
 
     // Used for XACML based debug instances.
     public static final String DEBUG = "Entitlement";
+
+    public static final String JSON_RESOURCE_ATTRIBUTE_ADVICE_ID =
+            "urn:sun:opensso:entitlement:json-resource-attribute";
+
 }
 

@@ -18,6 +18,7 @@ package com.sun.identity.entitlement.xacml3;
 
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ResourceAttribute;
+import com.sun.identity.entitlement.StaticAttributes;
 import com.sun.identity.entitlement.opensso.PolicyResponseProvider;
 import com.sun.identity.entitlement.xacml3.core.AdviceExpression;
 import com.sun.identity.entitlement.xacml3.core.AdviceExpressions;
@@ -35,8 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.fest.assertions.Assertions.*;
-import static org.fest.assertions.Fail.*;
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * Unit tests for {@link com.sun.identity.entitlement.xacml3.XACMLSchemaFactory}.
@@ -110,6 +110,19 @@ public class XACMLSchemaFactoryTest {
         assertEqualAdviceExpressions(aes, expressions);
     }
 
+    @Test
+    public void shouldEnsureAdviceIsForPermitEffect() throws Exception {
+        // Given
+        StaticAttributes testAttribute = new StaticAttributes();
+
+        // When
+        AdviceExpression result = xacmlSchemaFactory.resourceAttributeToAdviceExpression(testAttribute);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getAppliesTo()).isEqualTo(EffectType.PERMIT);
+    }
+
     /**
      * Create a PolicyResponseProvider object
      * @param i Value to stick on the end of various strings
@@ -138,6 +151,7 @@ public class XACMLSchemaFactoryTest {
         AdviceExpression result = new AdviceExpression();
 
         AttributeValue attributeValue = new AttributeValue();
+        attributeValue.setDataType(XACMLConstants.XS_STRING);
 
         // We bypass much of the grief of conversion by getting JSON to do the heavy lifting for us.
         attributeValue.getContent().add(resourceAttributeUtil.toJSON(ra));
@@ -146,7 +160,12 @@ public class XACMLSchemaFactoryTest {
 
         AttributeAssignmentExpression attributeAssignmentExpression = new AttributeAssignmentExpression();
         attributeAssignmentExpression.setExpression(jaxbElement);
+        attributeAssignmentExpression.setAttributeId(XACMLConstants.JSON_RESOURCE_ATTRIBUTE_ADVICE_ID + ":" + ra
+                .getClass().getName() + ":" + ra.getPropertyName());
         result.getAttributeAssignmentExpression().add(attributeAssignmentExpression);
+        result.setAppliesTo(EffectType.PERMIT);
+
+        result.setAdviceId(XACMLConstants.JSON_RESOURCE_ATTRIBUTE_ADVICE_ID + ":" + ra.getClass().getName());
 
         return result;
     }

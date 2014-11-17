@@ -91,8 +91,8 @@ public class XACMLPrivilegeUtils {
     private static final ObjectFactory objectFactory = new ObjectFactory();
 
     // Used in ResourceAttribute serialisation.
-    private static ResourceAttributeUtil resourceAttributeUtil = new ResourceAttributeUtil();
-    private static XACMLSchemaFactory schemaFactory = new XACMLSchemaFactory();
+    private static final ResourceAttributeUtil resourceAttributeUtil = new ResourceAttributeUtil();
+    private static final XACMLSchemaFactory schemaFactory = new XACMLSchemaFactory();
 
     /**
      * Constructs XACMLPrivilegeUtils
