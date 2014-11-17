@@ -43,8 +43,7 @@ public class OrConditionTest {
     @Test
     public void testConstruction() throws Exception {
         IPv4Condition ipc = new IPv4Condition();
-        ipc.setStartIp("192.168.0.1");
-        ipc.setEndIp("192.168.0.2");
+        ipc.setStartIpAndEndIp("192.168.0.1", "192.168.0.2");
 
         SimpleTimeCondition tc = new SimpleTimeCondition();
         tc.setStartTime("08:00");

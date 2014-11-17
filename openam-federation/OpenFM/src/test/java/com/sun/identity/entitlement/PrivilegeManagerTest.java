@@ -213,8 +213,7 @@ public class PrivilegeManagerTest {
         OrSubject os = new OrSubject(subjects);
 
         IPv4Condition ipc = new IPv4Condition();
-        ipc.setStartIp(startIp);
-        ipc.setEndIp(endIp);
+        ipc.setStartIpAndEndIp(startIp, endIp);
         SimpleTimeCondition tc = new SimpleTimeCondition();
         tc.setStartTime("08:00");
         tc.setEndTime("16:00");

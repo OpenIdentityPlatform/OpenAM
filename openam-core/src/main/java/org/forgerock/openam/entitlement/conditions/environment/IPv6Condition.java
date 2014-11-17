@@ -17,10 +17,18 @@
 package org.forgerock.openam.entitlement.conditions.environment;
 
 import com.googlecode.ipv6.IPv6Address;
+import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.utils.ValidateIPaddress;
+
+import java.util.List;
+
+import static com.sun.identity.entitlement.EntitlementException.INVALID_PROPERTY_VALUE;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
 
 /**
  * An <code>EntitlementCondition</code> that can be used to enable/disable an authorization policy
@@ -46,11 +54,31 @@ public class IPv6Condition extends IPvXCondition<IPv6Address> {
     }
 
     /**
+     * JSON deserialization constructor used to ensure fields are set in an order
+     * that allows inter-field validation to pass.
+     *
+     * @throws EntitlementException If any of the provided properties fail validation
+     */
+    @JsonCreator
+    public IPv6Condition(@JsonProperty(START_IP) String startIp,
+                         @JsonProperty(END_IP) String endIp,
+                         @JsonProperty(IP_RANGE) List<String> ipRange,
+                         @JsonProperty(DNS_NAME) List<String> dnsName) throws EntitlementException {
+
+        super(PrivilegeManager.debug, new CoreWrapper(), null, null, IPVersion.IPV6,
+                startIp, endIp, ipRange, dnsName);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    protected IPv6Address stringToIp(String ip) {
-        return IPv6Address.fromString(ip);
+    protected IPv6Address stringToIp(String ip) throws EntitlementException {
+        try {
+            return IPv6Address.fromString(ip);
+        } catch (IllegalArgumentException ex) {
+            throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{"ip", ip});
+        }
     }
 
     /**

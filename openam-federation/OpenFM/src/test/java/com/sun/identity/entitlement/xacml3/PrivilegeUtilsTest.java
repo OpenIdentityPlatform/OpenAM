@@ -102,8 +102,7 @@ public class PrivilegeUtilsTest {
         String startIp = "100.100.100.100";
         String endIp = "200.200.200.200";
         IPv4Condition ipc = new IPv4Condition();
-        ipc.setStartIp(startIp);
-        ipc.setEndIp(endIp);
+        ipc.setStartIpAndEndIp(startIp, endIp);
         conditions.add(ipc);
         OrCondition oc = new OrCondition(conditions);
         AndCondition ac = new AndCondition(conditions);

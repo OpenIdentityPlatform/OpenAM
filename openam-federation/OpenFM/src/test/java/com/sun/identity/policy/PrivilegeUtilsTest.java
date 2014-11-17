@@ -88,8 +88,7 @@ public class PrivilegeUtilsTest {
         subjects.add(us2);
         OrSubject os = new OrSubject(subjects);
         IPv4Condition ipc = new IPv4Condition();
-        ipc.setStartIp("100.100.100.100");
-        ipc.setEndIp("200.200.200.200");
+        ipc.setStartIpAndEndIp("100.100.100.100", "200.200.200.200");
 
         Set<EntitlementCondition> setConditions = new
             HashSet<EntitlementCondition>();

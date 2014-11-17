@@ -307,8 +307,7 @@ class PolicyConditionUpgradeMap {
                                 if (dnsName != null){
                                     ipCondition.setDnsName(new ArrayList<String>(dnsName));
                                 }
-                                ipCondition.setStartIp(startIp);
-                                ipCondition.setEndIp(endIp);
+                                ipCondition.setStartIpAndEndIp(startIp, endIp);
                                 eCondition = ipCondition;
                             } catch (EntitlementException e) {
                                 throw new RuntimeException(e);
@@ -325,8 +324,7 @@ class PolicyConditionUpgradeMap {
                                 if (dnsName != null){
                                     ipCondition.setDnsName(new ArrayList<String>(dnsName));
                                 }
-                                ipCondition.setStartIp(startIp);
-                                ipCondition.setEndIp(endIp);
+                                ipCondition.setStartIpAndEndIp(startIp, endIp);
                                 eCondition = ipCondition;
                             } catch (EntitlementException e) {
                                 throw new RuntimeException(e);

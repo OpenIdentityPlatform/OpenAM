@@ -339,12 +339,6 @@ public final class ConditionConstants {
     public static final String REQUEST_DNS_NAME = "requestDnsName";
 
     /**
-     * <p>Key that is used in {@code IPCondition} to specify the IP version in use. The value assigned to this
-     * key must be either "IPv4" or "IPv6",  (though both values are handled case-insensitively).</p>
-     */
-    public static final String IP_VERSION = "ipVersion";
-
-    /**
      * <p>Key that is used in {@code IPCondition} to define the  IP address values for which a policy applies. The
      * value corresponding to the key has to be a {@code Set} where each element is a {@code String} that conforms to
      * the pattern described here.</p>

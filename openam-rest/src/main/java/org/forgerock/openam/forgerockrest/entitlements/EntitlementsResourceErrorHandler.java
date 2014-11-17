@@ -17,6 +17,7 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.EntitlementException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
@@ -97,7 +98,10 @@ public final class EntitlementsResourceErrorHandler implements ResourceErrorHand
      */
     @Override
     public ResourceException handleError(Request request, EntitlementException error) {
-        Integer resourceErrorType = errorCodeMapping.get(error.getErrorCode());
+
+        EntitlementException errorToHandle =  causeOf(error);
+
+        Integer resourceErrorType = errorCodeMapping.get(errorToHandle.getErrorCode());
         if (resourceErrorType == null) {
             resourceErrorType = ResourceException.INTERNAL_ERROR;
         }
@@ -110,6 +114,30 @@ public final class EntitlementsResourceErrorHandler implements ResourceErrorHand
             }
         }
 
-        return ResourceException.getException(resourceErrorType, error.getMessage(), error);
+        return ResourceException.getException(resourceErrorType, errorToHandle.getMessage(), errorToHandle);
     }
+
+    /**
+     * If the provided exception occurred when deserializing JSON, this method will attempt to extract a more useful
+     * error response than the generic "JSON string is invalid". Otherwise, the provided exception will be returned.
+     *
+     * @param ex The EntitlementException that occurred when attempting to handle the request.
+     * @return The appropriate ResourceException for the provided EntitlementException.
+     */
+    private EntitlementException causeOf(EntitlementException ex) {
+
+        if (ex.getErrorCode() == EntitlementException.INVALID_JSON) {
+            if (ex.getCause() instanceof JsonMappingException) {
+                if (ex.getCause().getCause() instanceof EntitlementException) {
+                    EntitlementException cause = (EntitlementException) ex.getCause().getCause();
+                    if (errorCodeMapping.containsKey(cause.getErrorCode())) {
+                        return cause;
+                    }
+                }
+            }
+        }
+
+        return ex;
+    }
+
 }

@@ -77,8 +77,7 @@ public class AndConditionEvalTest {
             Set<EntitlementCondition> conditions = new 
                     HashSet<EntitlementCondition>();
             IPv4Condition ipc = new IPv4Condition();
-            ipc.setStartIp(START_IP);
-            ipc.setEndIp(END_IP);
+            ipc.setStartIpAndEndIp(START_IP, END_IP);
             conditions.add(ipc);
             cond.setEConditions(conditions);
 

@@ -44,8 +44,7 @@ public class NotConditionTest {
     public void testConstruction() throws Exception {
 
         IPv4Condition ipc = new IPv4Condition();
-        ipc.setStartIp("100.100.100.100");
-        ipc.setEndIp("200.200.200.200");
+        ipc.setStartIpAndEndIp("100.100.100.100", "200.200.200.200");
         NotCondition ac = new NotCondition(ipc);
         NotCondition ac1 = new NotCondition();
         ac1.setState(ac.getState());
@@ -66,11 +65,9 @@ public class NotConditionTest {
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
 
         IPv4Condition ip = new IPv4Condition();
-        ip.setStartIp("192.168.0.1");
-        ip.setEndIp("192.168.0.2");
+        ip.setStartIpAndEndIp("192.168.0.1", "192.168.0.2");
         IPv4Condition ip2 = new IPv4Condition();
-        ip2.setStartIp("192.168.0.5");
-        ip2.setEndIp("192.168.0.6");
+        ip2.setStartIpAndEndIp("192.168.0.5", "192.168.0.6");
 
         conditions.add(ip);
         conditions.add(ip2);
@@ -89,8 +86,7 @@ public class NotConditionTest {
         //given
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
         IPv4Condition ip = new IPv4Condition();
-        ip.setStartIp("192.168.0.1");
-        ip.setEndIp("192.168.0.2");
+        ip.setStartIpAndEndIp("192.168.0.1", "192.168.0.2");
         conditions.add(ip);
         NotCondition myNotCondition = new NotCondition();
 
@@ -106,8 +102,7 @@ public class NotConditionTest {
     public void testSingleSubjectEnforcedRetrieval() throws Exception {
         //given
         IPv4Condition ip = new IPv4Condition();
-        ip.setStartIp("192.168.0.1");
-        ip.setEndIp("192.168.0.2");
+        ip.setStartIpAndEndIp("192.168.0.1", "192.168.0.2");
         NotCondition myNotCondition = new NotCondition(ip);
 
         //when

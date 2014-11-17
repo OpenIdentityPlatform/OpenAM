@@ -22,11 +22,16 @@ package org.forgerock.openam.entitlement.conditions.environment;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.utils.ValidateIPaddress;
+
+import java.util.List;
 import java.util.StringTokenizer;
 
 import static com.sun.identity.entitlement.EntitlementException.*;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
 
 /**
  * An <code>EntitlementCondition</code> that can be used to enable/disable an authorization policy
@@ -52,6 +57,22 @@ public class IPv4Condition extends IPvXCondition<Long> {
     }
 
     /**
+     * JSON deserialization constructor used to ensure fields are set in an order
+     * that allows inter-field validation to pass.
+     *
+     * @throws EntitlementException If any of the provided properties fail validation
+     */
+    @JsonCreator
+    public IPv4Condition(@JsonProperty(START_IP) String startIp,
+                         @JsonProperty(END_IP) String endIp,
+                         @JsonProperty(IP_RANGE) List<String> ipRange,
+                         @JsonProperty(DNS_NAME) List<String> dnsName) throws EntitlementException {
+
+        super(PrivilegeManager.debug, new CoreWrapper(), Long.MAX_VALUE, Long.MAX_VALUE, IPVersion.IPV4,
+                startIp, endIp, ipRange, dnsName);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -71,7 +92,7 @@ public class IPv4Condition extends IPvXCondition<Long> {
                 throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{"ip", ip});
             }
             if (ipElement < 0 || ipElement > 255) {
-                throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{"ipElement", s});
+                throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{"ip", s});
             }
             ipValue = ipValue * 256L + ipElement;
         }

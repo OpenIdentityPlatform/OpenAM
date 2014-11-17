@@ -48,8 +48,7 @@ public class AndConditionTest {
     public void testConstruction() throws Exception {
 
         IPv4Condition ipc = new IPv4Condition();
-        ipc.setStartIp("100.100.100.100");
-        ipc.setEndIp("200.200.200.200");
+        ipc.setStartIpAndEndIp("100.100.100.100", "200.200.200.200");
         SimpleTimeCondition tc = new SimpleTimeCondition();
         tc.setStartTime("08:00");
         tc.setEndTime("16:00");
