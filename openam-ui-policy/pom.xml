@@ -53,6 +53,13 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>jquery-ui</artifactId>
+            <version>1.11.1</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
             <artifactId>jquery-nestingSortable</artifactId>
             <version>0.9.12</version>
             <type>js</type>
@@ -89,7 +96,7 @@
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
-        
+
     </dependencies>
 
     <build>

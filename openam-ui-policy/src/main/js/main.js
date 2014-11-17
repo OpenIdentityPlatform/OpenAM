@@ -39,7 +39,7 @@ require.config({
         doTimeout:      "libs/jquery.ba-dotimeout-1.0-min",
         handlebars:     "libs/handlebars-1.3.0-min",
         moment:         "libs/moment-2.8.1-min",
-        jqueryui:       "libs/jquery-ui-1.10.4.custom.min",
+        jqueryui:       "libs/jquery-ui-1.11.1-min",
         clockPicker:    "libs/jquery-clockpicker.0.0.7.min",
         autosizeInput:  "libs/jquery.autosize.input.min",
         multiselect:    "libs/ui.multiselect-0.3",
@@ -143,8 +143,8 @@ require([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main",
-    "org/forgerock/openam/ui/common/main", 
-    "org/forgerock/openam/ui/policy/main", 
+    "org/forgerock/openam/ui/common/main",
+    "org/forgerock/openam/ui/policy/main",
     "ThemeManager",
     "config/main"
 ], function ($, _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqueryui, multiselect, jqgrid, clockPicker, autosizeInput, selectize, i18nManager, constants, eventManager) {

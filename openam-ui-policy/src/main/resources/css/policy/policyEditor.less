@@ -233,6 +233,7 @@ html body .ui-jqgrid tr.ui-widget-content{
 
         li {
             font-family: monospace;
+            line-height: 1em;
         }
 
         p, li {
@@ -242,9 +243,9 @@ html body .ui-jqgrid tr.ui-widget-content{
             }
         }
 
-        pre {
+        pre, p {
             font-family: monospace;
-            line-height: 0.9em;
+            line-height: 1em;
             display: block;
         }
 
@@ -767,10 +768,10 @@ input[type="text"]:invalid:required{
         padding:0 0 30px;
         margin: 0 10px;
         h1 {
+            font-weight:normal;
             padding:0 0 10px;
-            span:not(.to-lowercase), a{
-                font-weight:normal;
-                color: #80b7ab;
+            span, a{
+                font-weight:bold;
                 text-decoration:none;
             }
         }
@@ -781,9 +782,13 @@ input[type="text"]:invalid:required{
             font-style: italic;
             font-size: 12px;
 
-            span{
+            span {
                 font-weight:normal;
                 color: #999;
+            }
+            a {
+                font-weight:normal;
+                text-decoration:none;
             }
         }
     }

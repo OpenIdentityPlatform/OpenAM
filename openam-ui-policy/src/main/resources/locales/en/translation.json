@@ -270,6 +270,9 @@
       "noStaticAttributes": "There are no Static attributes...",
       "noSubjectAttributes": "There are no Subject attributes...",
 
+      "viewAllApplications": "View all Applications inside",
+      "topLeveRealm": "Top Level Realm",
+
       "buttons": {
         "deleteSelected": "Delete Selected",
         "finish": "Finish",
@@ -302,13 +305,14 @@
     },
 
     "editPolicies": {
+      "editPolicy": "Edit Policy",
       "title": "Create Policy",
       "description": "To configure a Policy, begin with Step 1 and progress through to Step 7. Modifications can be made after the Policy has been created.",
       "step1": "Step 1: Name the Policy",
       "step2": "Step 2: Specify Resources",
       "step3": "Step 3: Select Actions",
       "step4": "Step 4: Define Subject Conditions",
-      "step5": "Step 5: Define Environmental Conditions",
+      "step5": "Step 5: Define Environment Conditions",
       "step6": "Step 6: Specify Response Attributes",
       "step7": "Step 7: Review Configuration and Finish",
       "deleteLogical": "Deleting will also remove any child objects",
@@ -321,10 +325,11 @@
       "referrals": "Referrals",
       "add": "Add New Referral",
       "description": "Referrals enable Applications and Policies to exist in different Realms, and redirect requests to those Realms as required.<br>To create a Referral, click Add New Referral. To edit a Referral, click the Referral name. To delete a Referral, select it, and then click Delete Selected.",
-      "andReferrals": "&amp; referrals"
+      "andReferrals": "&amp; Referrals"
     },
 
     "editReferrals": {
+      "editReferral": "Edit Referral",
       "title": "Create Referral",
       "description": "To configure a Referral, begin with Step 1 and progress through Step 4. Modifications can be made after the Referral has been created.",
       "step1": "Step 1: Name the Referral",
@@ -353,7 +358,7 @@
       "noName": "There is no name...",
       "noSubjectConditions": "There are no Subject Conditions...",
       "noSubjectAttributes": "There are no Subject attributes...",
-      "noEnvironmentConditions": "There are no Environmental Conditions...",
+      "noEnvironmentConditions": "There are no Environment Conditions...",
       "applicationDescription": "Review the Application configuration, and then click Finish to save.",
       "policyDescription": "Review the Policy configuration, and then click Finish to save.",
       "referralDescription": "Review the Referral configuration, and then click Finish to save.",

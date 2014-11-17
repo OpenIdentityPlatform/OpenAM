@@ -31,6 +31,7 @@ define([
     "./login/SessionDelegate",
 
     "./PolicyDelegate",
+    "./PolicyEditorUtils",
 
     "./GenericGridView",
     "./ManageApplicationsView",
@@ -58,4 +59,5 @@ define([
     "./OperatorRulesView",
 
     "./SiteConfigurationDelegate"
+
 ]);

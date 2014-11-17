@@ -45,7 +45,7 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
         reviewTemplate: "templates/policy/ReviewApplicationStepTemplate.html",
         data: {},
         APPLICATION_TYPE: "iPlanetAMWebAgentService",
-        validationFields: ["name", "resources"], 
+        validationFields: ["name", "resources"],
 
         render: function (args, callback) {
 
@@ -187,13 +187,13 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
 
             var obj = { message: JSON.parse(e.responseText).message, type: "error"},
                 invalidResourceText = "Invalid Resource";
-          
+
             if (e.status === 500) {
-               console.error(e.responseJSON, e.responseText, e);    
-               messager.messages.addMessage( obj ); 
+               console.error(e.responseJSON, e.responseText, e);
+               messager.messages.addMessage( obj );
             } else if (e.status === 400 || e.status === 404) {
-                
-                if ( uiUtils.responseMessageMatch( e.responseText, invalidResourceText) ) {  
+
+                if ( uiUtils.responseMessageMatch( e.responseText, invalidResourceText) ) {
                     this.data.options.invalidResource = obj.message.substr(invalidResourceText.length + 1);
                     reviewInfoView.render(this.data, null, this.$el.find('#reviewInfo'), 'templates/policy/ReviewApplicationStepTemplate.html');
                     delete this.data.options.invalidResource;
@@ -208,7 +208,7 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
                 this.data.options.invalidName = true;
                 reviewInfoView.render(this.data, null, this.$el.find('#reviewInfo'), "templates/policy/ReviewApplicationStepTemplate.html");
                 delete this.data.options.invalidName;
-                 messager.messages.addMessage( obj ); 
+                 messager.messages.addMessage( obj );
 
             } else {
                 console.log(e.responseJSON, e.responseText, e);

@@ -218,7 +218,10 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
         exportPolicies: function () {
             this.$el.find("#exportPolicies").attr('href', constants.host + "/openam/xacml"  + this.subrealm + "/policies");
         }
+
     });
+
+
 
     return new ManageApplicationsView();
 });

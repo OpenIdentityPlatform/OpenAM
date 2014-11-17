@@ -51,12 +51,12 @@ define("org/forgerock/openam/ui/policy/SelectRealmsView", [
             _.extend(this.data, args);
             this.data.entity.realms = _.sortBy(this.data.entity.realms);
             self.data.options.selectableRealms = $.extend({}, self.data.options.filteredRealms);
-           
+
             _.each(this.data.entity.realms, function(realm){
-                self.data.options.selectableRealms = _.reject(self.data.options.selectableRealms, 
-                    function(selected) { 
-                        return selected === realm; 
-                    });                             
+                self.data.options.selectableRealms = _.reject(self.data.options.selectableRealms,
+                    function(selected) {
+                        return selected === realm;
+                    });
             });
 
             this.parentRender(function () {
@@ -67,7 +67,7 @@ define("org/forgerock/openam/ui/policy/SelectRealmsView", [
                 self.$el.find('#selectableRealms').selectize({
                     create: false
                 });
-               
+
                 if (callback) {
                     callback();
                 }
@@ -90,11 +90,11 @@ define("org/forgerock/openam/ui/policy/SelectRealmsView", [
                 eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateRealm");
                 this.flashDomItem( this.$el.find('#selectedRealms ul li:eq('+duplicateIndex+')'), 'highlight-warning' );
             } else {
-                this.data.entity.realms.push(newRealm); 
+                this.data.entity.realms.push(newRealm);
                 this.data.options.justAdded = newRealm;
-                this.render(this.data);  
+                this.render(this.data);
             }
-   
+
         },
 
 
