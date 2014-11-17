@@ -29,8 +29,9 @@ define("UserDelegate", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/CookieHelper"
-], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper) {
+    "org/forgerock/commons/ui/common/util/CookieHelper",
+    "org/forgerock/commons/ui/common/util/Mime"
+], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, mime) {
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json");
 
@@ -102,7 +103,7 @@ define("UserDelegate", [
         }
 
         if(objectParam.currentpassword ) {
-            headers[constants.OPENAM_HEADER_PARAM_CUR_PASSWORD] = objectParam.currentpassword;   
+            headers[constants.OPENAM_HEADER_PARAM_CUR_PASSWORD] = mime.encodeHeader(objectParam.currentpassword);
         }
 
         this.serviceCall({url: this.getUserResourceName(oldUserData),
