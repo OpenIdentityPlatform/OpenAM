@@ -62,8 +62,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                     actionsTpl: 'templates/policy/ManagePoliciesGridActionsTemplate.html',
                     gridId: 'policies',
                     initOptions: this.getPolicyGridInitOptions(),
-                    additionalOptions: this.getPolicyGridAdditionalOptions(),
-                    storageKey: 'PE-mng-pols-sel-' + this.data.appName
+                    additionalOptions: this.getPolicyGridAdditionalOptions()
                 }, callback);
 
                 if (this.data.referralsEnabled) {
@@ -74,8 +73,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                         actionsTpl: 'templates/policy/ManageRefsGridActionsTemplate.html',
                         gridId: 'refs',
                         initOptions: this.getRefGridInitOptions(),
-                        additionalOptions: this.getRefGridAdditionalOptions(),
-                        storageKey: 'PE-mng-ref-sel-' + this.data.appName
+                        additionalOptions: this.getRefGridAdditionalOptions()
                     }, callback);
                 }
             });
@@ -177,6 +175,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                     width: 501,
                     height: 230
                 },
+                storageKey: 'PE-mng-pols-sel-' + this.data.appName,
                 // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
                 serializeGridData: function (postedData) {
                     var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name'),
@@ -214,6 +213,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                     width: 501,
                     height: 230
                 },
+                storageKey: 'PE-mng-ref-sel-' + this.data.appName,
                 callback: function () {
                     self.refGridView.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
                         self.refGridView.selectRow(e, rowid, rowdata);

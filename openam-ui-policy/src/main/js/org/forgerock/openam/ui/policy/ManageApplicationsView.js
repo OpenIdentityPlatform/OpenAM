@@ -64,8 +64,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                     actionsTpl: 'templates/policy/ManageAppsGridActionsTemplate.html',
                     gridId: 'apps',
                     initOptions: this.getGridInitOptions(),
-                    additionalOptions: this.getGridAdditionalOptions(),
-                    storageKey: 'PE-mng-apps-sel-' + this.data.realm
+                    additionalOptions: this.getGridAdditionalOptions()
                 }, callback);
             });
         },
@@ -116,6 +115,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                     width: 501,
                     height: 180
                 },
+                storageKey: 'PE-mng-apps-sel-' + this.data.realm,
                 // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
                 serializeGridData: function (postedData) {
                     var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name'),
