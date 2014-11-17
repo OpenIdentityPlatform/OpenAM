@@ -24,10 +24,7 @@
  *
  * $Id: L10NMessageImpl.java,v 1.2 2008/06/25 05:53:04 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.shared.locale;
 
@@ -40,10 +37,8 @@ import java.util.ResourceBundle;
  * <code>java.lang.Exception</code> an provides mechanism to provide resource 
  * bundle for error messages
  */
-public class L10NMessageImpl 
-    extends Exception 
-    implements L10NMessage
-{
+public class L10NMessageImpl extends Exception implements L10NMessage {
+
     private static final long serialVersionUID = -4690604178832156822L;
     private AMResourceBundleCache amCache = AMResourceBundleCache.getInstance();
     private String message;
@@ -54,6 +49,10 @@ public class L10NMessageImpl
 
     public L10NMessageImpl(String msg) {
         super(msg);
+    }
+
+    public L10NMessageImpl(String message, Throwable cause) {
+        super(message, cause);
     }
 
     /**

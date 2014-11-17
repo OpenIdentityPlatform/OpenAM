@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -33,8 +33,6 @@ import org.forgerock.openam.upgrade.UpgradeException;
 
 /**
  * Used to upgrade the iPlanetAMAuthService.
- *
- * @author steve
  */
 public class AuthServiceHelper extends AbstractUpgradeHelper {
     // new modules
@@ -51,14 +49,19 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String ATTR = "iplanet-am-auth-authenticators";
     // other attributes
     private final static String XUI = "openam-xui-interface-enabled";
+    private static final String GOTO_DOMAINS = "iplanet-am-auth-valid-goto-domains";
 
     public AuthServiceHelper() {
         attributes.add(ATTR);
+        attributes.add(GOTO_DOMAINS);
     }
 
     @Override
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl existingAttr, AttributeSchemaImpl newAttr)
             throws UpgradeException {
+        if (GOTO_DOMAINS.equals(newAttr.getName())) {
+            return existingAttr.getI18NKey() != null && !existingAttr.getI18NKey().isEmpty() ? newAttr : null;
+        }
         if (!(newAttr.getName().equals(ATTR))) {
             return newAttr;
         }

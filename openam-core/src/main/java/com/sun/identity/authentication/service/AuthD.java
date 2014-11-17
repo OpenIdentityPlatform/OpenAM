@@ -24,10 +24,7 @@
  *
  * $Id: AuthD.java,v 1.23 2009/11/25 12:02:02 manish_rustagi Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
 
@@ -61,7 +58,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.whitelist.URLPatternMatcher;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
@@ -69,7 +65,6 @@ import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.ServiceConfig;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,11 +76,12 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 
 
 /**
@@ -159,7 +155,6 @@ public class AuthD  {
     public static int revisionNumber;
     private static HashMap idRepoMap = new HashMap();
     private static HashMap orgMap   = new HashMap();
-    private static HashMap orgValidDomains = new HashMap(); 
 
     /**
      * Configured bundle name for auth service
@@ -229,6 +224,8 @@ public class AuthD  {
     public String defaultAuthLevel;
     private Hashtable authMethods = new Hashtable();
     private long defaultSleepTime = 300; /* 5 minutes */
+    private static final RedirectUrlValidator<String> REDIRECT_URL_VALIDATOR =
+            new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
     
     private ServletContext servletContext;
     
@@ -1417,70 +1414,15 @@ public class AuthD  {
         }
         return orgAuthConfig;
     }
-    
-    /**	 
-     * Returns a list of domains defined by iplanet-am-auth-valid-goto-domains	 
-     * in iPlanetAMAuthService plus organization aliases 
-     *	 
-     * @param orgDN organization DN.	 
-     * @return a Set object containing a list of valid domains, null if	 
-     * iplanet-am-auth-valid-goto-domains is empty.	 
-     */	 
-    private Set getValidGotoUrlDomains(String orgDN) {	 
-        Set validGotoUrlDomains = null;	 
-        try {	 
-            OrganizationConfigManager orgConfigMgr =	 
-                    getOrgConfigManager(orgDN);	 
-            ServiceConfig svcConfig = orgConfigMgr.getServiceConfig(	 
-                    ISAuthConstants.AUTH_SERVICE_NAME);	 
-            Map attrs = svcConfig.getAttributes();	 
-            validGotoUrlDomains = (Set)attrs.get(	 
-                    ISAuthConstants.AUTH_GOTO_DOMAINS);	 
-            if (debug.messageEnabled()) {	 
-                debug.message("AuthD.getValidGotoUrlDomains(): " +	 
-                        validGotoUrlDomains);	 
-            }	             
-        } catch(Exception e) {	 
-            debug.error("AuthD.getValidGotoUrlDomains():" + 
-                "Error in getValidGotoUrlDomains : ", e);	 
-        }	 
-        return validGotoUrlDomains;	 
-    }
-    
-    /**	 
-     * Checks whether an input URL is valid in an organization	 
-     *	 
-     * @param url a String representing a URL to be validated	 
-     * @param orgDN organization DN.	 
-     * @return true if input URL is valid, else false.	 
-     */	 
+
+    /**
+     * Checks whether an input URL is valid in an organization.
+     *
+     * @param url The URL to be validated.
+     * @param orgDN The organization DN.
+     * @return <code>true</code> if input URL is valid, <code>false</code> otherwise.
+     */
     public boolean isGotoUrlValid(String url, String orgDN) {
-    	
-    	Set validGotoUrlDomains = null;
-        if ((!orgValidDomains.isEmpty()) && 
-                (orgValidDomains.containsKey(orgDN))) {
-        	validGotoUrlDomains = (Set)orgValidDomains.get(orgDN);
-        } else {
-        	validGotoUrlDomains = getValidGotoUrlDomains(orgDN);
-            synchronized (orgValidDomains) {
-                if (!orgValidDomains.containsKey(orgDN)) {
-                	orgValidDomains.put(orgDN,validGotoUrlDomains);
-                }
-            }           
-        }
-        if (validGotoUrlDomains == null || validGotoUrlDomains.isEmpty()) {	 
-            return true;	 
-        }
-        
-        URLPatternMatcher patternMatcher = new URLPatternMatcher();
-        try{
-            return patternMatcher.match(
-                url, new ArrayList(validGotoUrlDomains), true);
-        }catch (MalformedURLException me) {
-            debug.error("AuthD.isGotoUrlValid():" + 
-                    "Error in validating GotoUrl: " + url, me);	 
-            return false;
-        }
+        return REDIRECT_URL_VALIDATOR.isRedirectUrlValid(url, orgDN);
     }
-    
 }

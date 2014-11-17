@@ -29,7 +29,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011-2013 ForgeRock AS
+    Portions Copyrighted 2011-2014 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -417,7 +417,7 @@
                 <AttributeSchema name="iplanet-am-auth-valid-goto-domains"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a150">
+                                 i18nKey="">
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-pcookie-auth-level"
                                  type="single"

@@ -24,10 +24,7 @@
  *
  * $Id: LogoutViewBean.java,v 1.10 2009/01/16 06:30:13 hengming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.distUI;
@@ -65,6 +62,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 
 
 /**
@@ -340,14 +339,13 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         return AuthClientUtils.addLogoutCookieToURL(
             url,logoutCookie,cookieSupported);
     }
-    
+
     /* Checks if request should use sendRedirect */
     private boolean doSendRedirect(String redirectURL) {
-        return        ((redirectURL != null) && (redirectURL.length() != 0)
-        && (AuthClientUtils.isGenericHTMLClient(clientType))) ;
-        
+        return AuthClientUtils.isGenericHTMLClient(clientType)
+                && REDIRECT_URL_VALIDATOR.isRedirectUrlValid(redirectURL, orgName);
     }
-    
+
     // Check whether the 'goto' query parameter value exists or not
     private boolean isGotoSet() {
         if ((gotoUrl != null) && (gotoUrl.length() != 0)) {
@@ -362,15 +360,6 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         if (isGotoSet()) {
             if (logoutDebug.messageEnabled()) {
                 logoutDebug.message("Redirect to 'goto' URL : " + gotoUrl);
-            }
-            try {
-                URL url = new URL(gotoUrl);
-            } catch (MalformedURLException murle) {
-                if (logoutDebug.warningEnabled()) {
-                    logoutDebug.warning("Invalid gotoURL supplied for LogoutViewBean: "
-                            + gotoUrl);
-                }
-                return false;
             }
             try {
                 if (!SystemProperties.getAsBoolean(Constants.IGNORE_GOTO_DURING_LOGOUT)) {
@@ -520,9 +509,10 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     private static final String bundleName = "amAuthUI";
     private boolean ssoTokenExists = false;
     private final static String DEFAULT_LOGOUT_PAGE = "openam.authentication.distUI.defaultLogoutPage";
+    private static final RedirectUrlValidator<String> REDIRECT_URL_VALIDATOR =
+            new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
     
     static {
         LOGINURL = serviceUri + "/UI/Login";
     }
 }
-
