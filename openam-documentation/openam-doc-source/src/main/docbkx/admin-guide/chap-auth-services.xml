@@ -2031,11 +2031,79 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
     <varlistentry>
      <term>Zero Page Login</term>
      <listitem>
-      <para>Enables the administrator to allow users to authenticate to a single
-      authentication screen using GET request parameters. Enable this with 
-      caution as it can allow credentials to be cached.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam.auth.zero.page.login.enabled</literal></para>
+
+      <indexterm>
+       <primary>Zero page login</primary>
+      </indexterm>
+
+      <para>
+       If enabled, allow users to authenticate using only GET request parameters
+       without showing a login screen.
+       Enable this with caution as browsers can cache
+       and servers can log credentials when they are part of the URL.
+      </para>
+
+      <para>
+       OpenAM always allows HTTP POST requests for zero page login.
+      </para>
+
+      <para>
+       Default: false (disabled)
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>openam.auth.zero.page.login.enabled</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Zero Page Login Referer Whitelist</term>
+     <listitem>
+      <para>
+       List of HTTP Referer URLs for which OpenAM allows zero page login.
+       These URLs are supplied in the HTTP request header,
+       <literal>Referer</literal>, which is designed to
+       allow the client to specify the web page
+       that provided the link to the requested resource.
+      </para>
+
+      <para>
+       If you enable zero page login,
+       include the URLs here for the pages from which to allow zero page login,
+       or leave this list blank to allow zero page login from any Referer.
+      </para>
+
+      <para>
+       This setting applies for both HTTP GET and also HTTP POST requests
+       for zero page login.
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>openam.auth.zero.page.login.referer.whitelist</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Zero Page Login Allowed without Referer?</term>
+     <listitem>
+      <para>
+       If enabled and zero page login is enabled,
+       allow zero page login for requests
+       without an HTTP <literal>Referer</literal> request header.
+      </para>
+
+      <para>
+       Default: true (enabled)
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>openam.auth.zero.page.login.allow.null.referer</literal>
+      </para>
      </listitem>
     </varlistentry>
 

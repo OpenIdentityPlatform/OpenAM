@@ -698,7 +698,68 @@
                  to the value of the 'goto' parameter.</para>
              </listitem>
          </varlistentry>
+
+      <varlistentry>
+       <term>openam.auth.zero.page.login.enabled</term>
+       <listitem>
+        <para>
+         If enabled, allow authentication using only GET request parameters
+         without showing a login screen.
+         Enable this with caution as browsers can cache
+         and servers can log credentials when they are part of the URL.
+        </para>
+
+        <para>
+         OpenAM always allows HTTP POST requests for zero page login.
+        </para>
+
+        <para>
+         Default: false
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>openam.auth.zero.page.login.referer.whitelist</term>
+       <listitem>
+        <para>
+         Space-separated ist of HTTP Referer URLs
+         for which OpenAM allows zero page login.
+         These URLs are supplied in the HTTP request header,
+         <literal>Referer</literal>, which is designed to
+         allow the client to specify the web page
+         that provided the link to the requested resource.
+        </para>
+
+        <para>
+         If you enable zero page login,
+         include the URLs here for the pages from which to allow zero page login,
+         or leave this list blank to allow zero page login from any Referer.
+        </para>
+
+        <para>
+         This setting applies for both HTTP GET and also HTTP POST requests
+         for zero page login.
+        </para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>openam.auth.zero.page.login.allow.null.referer</term>
+       <listitem>
+        <para>
+         If enabled and zero page login is enabled,
+         allow zero page login for requests
+         without an HTTP <literal>Referer</literal> request header.
+        </para>
+
+        <para>
+         Default: true
+        </para>
+       </listitem>
+      </varlistentry>
      </variablelist>
+
      <variablelist xml:id="load-balancer">
          <title>DAS Configuration</title>
          <varlistentry>
