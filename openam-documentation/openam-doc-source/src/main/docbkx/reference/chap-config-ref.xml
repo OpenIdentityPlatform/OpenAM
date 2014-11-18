@@ -2838,8 +2838,13 @@
   <variablelist xml:id="policy-configuration">
    <title>Policy Configuration</title>
 
-   <para>You can change global policy configuration, and the defaults per
-   realm.</para>
+   <para>
+    You can change global policy configuration, and the defaults per realm.
+    The settings visible in OpenAM console are listed first.
+    Settings that must be changed using <command>ssoadm</command>,
+    and are not visible in OpenAM console, are listed next.
+    These are labeled as (<command>ssoadm</command> only).
+   </para>
 
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMPolicyConfigService</literal></para>
@@ -2862,19 +2867,12 @@
      <para>If no, then OpenAM stops evaluating policy as soon as it reaches a
      deny decision.</para>
 
+     <para>
+      Default: false (No)
+     </para>
+
      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-policy-config-continue-evaluation-on-deny-decision</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Advices Handleable by OpenAM</term>
-    <listitem>
-     <para>Lists advice names for which policy agents redirect users to
-     OpenAM for further authentication and authorization</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>sun-am-policy-config-advices-handleable-by-am</literal></para>
     </listitem>
    </varlistentry>
 
@@ -2885,8 +2883,31 @@
      resources whose FQDN matches the DNS alias for the realm even when no
      referral policy exists.</para>
 
+     <para>
+      Default: false (No)
+     </para>
+
      <para><command>ssoadm</command> attribute:
      <literal>sun-am-policy-config-org-alias-mapped-resources-enabled</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Activate Referrals</term>
+    <listitem>
+     <para>
+      If Enabled, OpenAM allows creation and update of referrals,
+      including in the policy editor.
+     </para>
+
+     <para>
+      Default: false (not enabled)
+     </para>
+
+     <para>
+      <command>ssoadm</command> attribute:
+      <literal>openam-referrals-enabled</literal>
+     </para>
     </listitem>
    </varlistentry>
 
@@ -2898,16 +2919,6 @@
 
      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-policy-config-ldap-server</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>LDAP Base DN</term>
-    <listitem>
-     <para>Base DN for policy searches</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-config-ldap-base-dn</literal></para>
     </listitem>
    </varlistentry>
 
@@ -2964,36 +2975,6 @@
    </varlistentry>
 
    <varlistentry>
-    <term>LDAP Organization Search Scope</term>
-    <listitem>
-     <para>Search scope to find organization entries</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-config-ldap-organizations-search-scope</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>LDAP Groups Search Filter</term>
-    <listitem>
-     <para>Search filter to match group entries</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-config-ldap-groups-search-filter</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>LDAP Groups Search Scope</term>
-    <listitem>
-     <para>Search scope to find group entries</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-config-ldap-groups-search-scope</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
     <term>LDAP Users Search Filter</term>
     <listitem>
      <para>Search filter to match user entries</para>
@@ -3014,26 +2995,6 @@
    </varlistentry>
 
    <varlistentry>
-    <term>LDAP Roles Search Filter</term>
-    <listitem>
-     <para>Search filter to match nsRole definition entries</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-config-ldap-roles-search-filter</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>LDAP Roles Search Scope</term>
-    <listitem>
-     <para>Search scope to find nsRole definition entries</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-config-ldap-roles-search-scope</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
     <term>OpenAM Roles Search Scope</term>
     <listitem>
      <para>Search scope to find OpenAM roles entries</para>
@@ -3044,42 +3005,12 @@
    </varlistentry>
 
    <varlistentry>
-    <term>LDAP Organization Search Attribute</term>
-    <listitem>
-     <para>Naming attribute for organization entries</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-config-ldap-organizations-search-attribute</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>LDAP Groups Search Attribute</term>
-    <listitem>
-     <para>Naming attribute for group entries</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-config-ldap-groups-search-attribute</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
     <term>LDAP Users Search Attribute</term>
     <listitem>
      <para>Naming attribute for user entries</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-policy-config-ldap-users-search-attribute</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>LDAP Roles Search Attribute</term>
-    <listitem>
-     <para>Naming attribute for nsRole definition entries</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-config-ldap-roles-search-attribute</literal></para>
     </listitem>
    </varlistentry>
 
@@ -3136,36 +3067,6 @@
    </varlistentry>
 
    <varlistentry>
-    <term>Selected Policy Subjects</term>
-    <listitem>
-     <para>Lists subjects available for policy definition in realms</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-selected-subjects</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Selected Policy Conditions</term>
-    <listitem>
-     <para>Lists conditions available for policy definition in realms</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-selected-conditions</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Selected Policy Referrals</term>
-    <listitem>
-     <para>Lists referral types available for policy definition in realms</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-policy-selected-referrals</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
     <term>Subjects Result Time to Live</term>
     <listitem>
      <para>Maximum minutes OpenAM caches a subject result for evaluating
@@ -3190,10 +3091,197 @@
    </varlistentry>
 
    <varlistentry>
-    <term>Selected Response Providers</term>
+    <term>Advices Handleable by OpenAM (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Lists advice names for which policy agents redirect users to
+     OpenAM for further authentication and authorization</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>sun-am-policy-config-advices-handleable-by-am</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>LDAP Base DN (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Base DN for policy searches</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-config-ldap-base-dn</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>LDAP Organization Search Scope (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Search scope to find organization entries</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-config-ldap-organizations-search-scope</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>LDAP Groups Search Filter (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Search filter to match group entries</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-config-ldap-groups-search-filter</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>LDAP Groups Search Scope (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Search scope to find group entries</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-config-ldap-groups-search-scope</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>LDAP Roles Search Filter (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Search filter to match nsRole definition entries</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-config-ldap-roles-search-filter</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>LDAP Roles Search Scope (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Search scope to find nsRole definition entries</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-config-ldap-roles-search-scope</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>LDAP Organization Search Attribute (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Naming attribute for organization entries</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-config-ldap-organizations-search-attribute</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>LDAP Groups Search Attribute (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Naming attribute for group entries</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-config-ldap-groups-search-attribute</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>LDAP Roles Search Attribute (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Naming attribute for nsRole definition entries</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-config-ldap-roles-search-attribute</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Selected Policy Subjects (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Lists subjects available for policy definition in realms</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-selected-subjects</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Selected Policy Conditions (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Lists conditions available for policy definition in realms</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-selected-conditions</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Selected Policy Referrals (<command>ssoadm</command> only)</term>
+    <listitem>
+     <para>Lists referral types available for policy definition in realms</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-policy-selected-referrals</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Selected Response Providers (<command>ssoadm</command> only)</term>
     <listitem>
      <para>Lists available response providers available for policy
      definition</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
 
      <para><command>ssoadm</command> attribute:
      <literal>sun-am-policy-selected-responseproviders</literal></para>
@@ -3201,10 +3289,14 @@
    </varlistentry>
 
    <varlistentry>
-    <term>Selected Dynamic Response Attributes</term>
+    <term>Selected Dynamic Response Attributes (<command>ssoadm</command> only)</term>
     <listitem>
      <para>Lists dynamic response attributes available for policy
      definition</para>
+
+     <para>
+      This setting is not shown in OpenAM console.
+     </para>
 
      <para><command>ssoadm</command> attribute:
      <literal>sun-am-policy-dynamic-response-attributes</literal></para>

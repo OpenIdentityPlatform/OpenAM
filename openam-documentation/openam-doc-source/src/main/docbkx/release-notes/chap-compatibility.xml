@@ -150,8 +150,8 @@
 
      <listitem>
       <para>
-       The policy service configuration has changed,
-       as seen in the Policy Configuration pages in OpenAM console.
+       The policy service configuration has changed
+       to simplify the Policy Configuration pages in OpenAM console.
        For details see the <citetitle>Reference</citetitle> section,
        <link
         xlink:href="reference#policy-configuration"
