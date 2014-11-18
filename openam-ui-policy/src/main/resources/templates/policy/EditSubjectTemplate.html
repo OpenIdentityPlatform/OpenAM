@@ -1,12 +1,14 @@
 <li class="rule clearfix invalid-rule" id="subject_{{itemID}}" tabindex="0" >
 
-	<div class="item-data float-left">
+	<div class="item-data">
 
 		<div class="field-float-select data-obj" id="typeSelector">
 			<label for="selection" >Type</label>
 			<select id="selection" class="placeholdertext" tabindex="0" >
 				<option value="" selected disabled >{{t "policy.common.select"}}</option>
-				{{#subjects}}<option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{camelCaseToTitle title}}</option>{{/subjects}}
+				{{#subjects}}
+                <option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{t i18nKey}}</option>
+                {{/subjects}}
 			</select>
 		</div>
 

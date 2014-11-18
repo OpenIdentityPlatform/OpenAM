@@ -51,17 +51,14 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
         },
 
         data: {},
-        weekdays:[
-            {value:'mon', title:'Monday'},
-            {value:'tue', title:'Tuesday'},
-            {value:'wed', title:'Wednesday'},
-            {value:'thu', title:'Thursday'},
-            {value:'fri', title:'Friday'},
-            {value:'sat', title:'Saturday'},
-            {value:'sun', title:'Sunday'}
-        ],
-
         mode:'append',
+
+        i18n: {
+            'condition': { 'key': 'policy.conditionTypes.', 'title': '.title', 'props': '.props.' },
+            'weekdays': { 'key': 'policy.common.weekdays.', 'full': '.full', 'short': '.short' }
+        },
+
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
 
         render: function( schema, callback, element, itemID, itemData ) {
             var self = this;
@@ -70,13 +67,19 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             this.data = $.extend(true, [], schema);
             this.data.itemID = itemID;
 
+            this.weekdays = this.getWeekDays();
+
+            _.each(this.data.conditions, function (condition) {
+                condition.i18nKey = self.i18n.condition.key + condition.title + self.i18n.condition.title;
+            });
+
             this.$el.append(uiUtils.fillTemplateWithData("templates/policy/EditEnvironmentTemplate.html", this.data));
 
             this.setElement('#environment_' + itemID );
             this.delegateEvents();
 
             if (itemData) {
-                // Temporay fix, the name attribute is being added by the server after the policy is created.
+                // Temporary fix, the name attribute is being added by the server after the policy is created.
                 // TODO: Serverside solution required
                 delete itemData.name;
                 this.$el.data('itemData',itemData);
@@ -88,13 +91,41 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             if (callback) {callback();}
         },
 
+        getWeekDays: function () {
+            var weekdays = [], i = 0, self = this;
+            _.invoke(self.days, function () {
+                weekdays[i] = {};
+                weekdays[i].title = $.t(self.i18n.weekdays.key + this + self.i18n.weekdays.full);
+                weekdays[i].value = $.t(self.i18n.weekdays.key + this + self.i18n.weekdays.short);
+                i++;
+            });
+            return weekdays;
+        },
+
         createListItem: function(allEnvironments, item){
+            var self = this,
+                itemToDisplay = {},
+                data = item.data().itemData,
+                type,
+                html;
 
             item.focus(); //  Required to trigger changeInput.
             this.data.conditions = allEnvironments;
-            var html = uiUtils.fillTemplateWithData("templates/policy/ListItem.html", {data:item.data().itemData});
+
+            if (data) {
+                type = data.type;
+                _.each(data, function (val, key) {
+                    if (key === 'type') {
+                        itemToDisplay['policy.common.type'] = $.t(self.i18n.condition.key + type + self.i18n.condition.title);
+                    } else {
+                        itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + key] = val;
+                    }
+                });
+            }
+
+            html = uiUtils.fillTemplateWithData('templates/policy/ListItem.html', {data: itemToDisplay});
             item.find('.item-data').html(html);
-            this.setElement('#'+item.attr('id'));
+            this.setElement('#' + item.attr('id'));
             this.delegateEvents();
         },
 
@@ -102,7 +133,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
             e.stopPropagation();
             if($(e.currentTarget).parent().children('label').length === 0){
-                return; // this is a temporay workaround needed for a event leakage
+                return; // this is a temporary workaround needed for a event leakage
             }
             var label = $(e.currentTarget).parent().children('label').data().title,
                 inputGroup = $(e.currentTarget).closest('div.input-group'),
@@ -232,6 +263,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                 selectize    = false,
                 selectedType = e.target.value,
                 delay        = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
+                i18nKey,
                 buildHTML    = function(schemaProps) {
 
                     var count = 0,
@@ -243,9 +275,9 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                         // 'SimpleTime' is a special case and requires its own template. 
                         // This is because the endpoint only describes the inputs as strings, however in order to build a helpful UI we need to do more.
                         returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrTimeDate.html", {
-                            weekdays:self.weekdays,
-                            data:itemData,
-                            id:count
+                            weekdays: self.weekdays,
+                            data: itemData,
+                            id: count
                         });
 
                     } else {
@@ -256,12 +288,13 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
                             returnVal += '\n';
 
+                            i18nKey = self.i18n.condition.key + schema.title + self.i18n.condition.props + key;
+
                             if (value.type === 'string' || value.type === 'number' || value.type === 'integer') {
 
                                 if (value["enum"]) {
-
-                                    returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrEnum.html", {data:value, title:key, selected:itemData[key], id:count});
-
+                                    returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrEnum.html",
+                                        {data: value, title: key, i18nKey: i18nKey, selected: itemData[key], id: count});
                                 } else {
                                     if (key === 'startIp' || key === 'endIp') {
                                        pattern="^(((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d)))((\\.((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){3}|(\\.((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){5})";
@@ -272,20 +305,24 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                                     } else {
                                        pattern = null;
                                     }
-                                    returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html", {data:itemData[key], title:key, id:count, pattern:pattern});
+                                    returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html",
+                                        {data: itemData[key], title: key, i18nKey: i18nKey, id: count, pattern: pattern});
                                 }
 
                             } else if (value.type === 'boolean' ) {
                                 // Ignoring the required property and assumming it defaults to false. See AME-4324
-                                returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrBoolean.html", {data:value, title:key, selected:itemData[key]});
+                                returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrBoolean.html",
+                                    {data: value, title: key, i18nKey: i18nKey, selected: itemData[key]});
 
                             } else if (value.type === 'array' ) {
-                                returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrArray.html", {data:itemData[key], title:key, id:count, tempData:self.weekdays});  
+                                returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrArray.html",
+                                    {data: itemData[key], title: key, i18nKey: i18nKey, id: count, tempData: self.weekdays});
 
                             } else if (value.type === 'object' ) {
                                 // TODO
                                 console.error('TODO : Data type object');
-                                returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html", { title:key, id:count});                      
+                                returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html",
+                                    {title: key, i18nKey: i18nKey, id: count});
 
                             } else {
                                 console.error('Unexpected data type:',key,value);
@@ -340,15 +377,12 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                 this.$el.find('.no-float').fadeOut(500);
                 this.$el.find('.clear-left').fadeOut(500);
 
-                this.$el.find('.field-float-pattern')
+                this.$el.find('.field-float-pattern, .field-float-selectize, .timezone-field')
                     .find('label').removeClass('showLabel')
-                    .next('input') 
-                    .addClass('placeholderText');
+                    .next('input').addClass('placeholderText');
           
-                this.$el.find('.field-float-select select:not(#selection)')
-                    .addClass('placeholderText')
-                    .prev('label')
-                    .removeClass('showLabel');
+                this.$el.find('.field-float-select select:not(#selection)').addClass('placeholderText')
+                    .prev('label').removeClass('showLabel');
 
                 this.$el.removeClass('invalid-rule');
 
@@ -372,35 +406,23 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
                         if(selectize){
                             self.initSelectize();
-                        }  
-
+                        }
                     }
 
                     setTimeout( function() {
-
-                        self.$el.find('.field-float-pattern')
+                        self.$el.find('.field-float-pattern, .field-float-selectize, .timezone-field')
                             .find('label').addClass('showLabel')
-                            .next('input, div input')
-                            .addClass('placeholderText')
-                            .prop('readonly', false);
+                            .next('input, div input').removeClass('placeholderText').prop('readonly', false);
 
-                        self.$el.find('.field-float-select select:not(#selection)')
-                            .removeClass('placeholderText')
-                            .prop('readonly', false)
-                            .prev('label')
-                            .addClass('showLabel');
+                        self.$el.find('.field-float-select select:not(#selection)').removeClass('placeholderText').prop('readonly', false)
+                            .prev('label').addClass('showLabel');
 
                         self.delegateEvents();
-
-
                     }, 10);
                 }, delay);
-
             }
         }
-
     });
 
-    return EditEnvironmentView; 
-
+    return EditEnvironmentView;
 });

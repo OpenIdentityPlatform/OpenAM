@@ -9,10 +9,12 @@
 	<div class="item-data">
 
 		<div class="field-float-select data-obj" id="typeSelector">
-			<label for="selection" >{{t "policy.editPolicies.type"}}</label>
+			<label for="selection" >{{t "policy.common.type"}}</label>
 			<select id="selection" class="placeholdertext" tabindex="0" >
 				<option value="" selected disabled >{{t "policy.common.select"}}</option>
-				{{#conditions}}<option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{camelCaseToTitle title}}</option>{{/conditions}}
+				{{#conditions}}
+                <option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{t i18nKey}}</option>
+                {{/conditions}}
 			</select>
 		</div>
 

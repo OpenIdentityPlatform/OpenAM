@@ -48,11 +48,19 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
         select: null,
         dropbox: null,
 
+        operatorI18nKey: 'policy.operators.',
+
         render: function (args, callback, element, itemID, firstChild) {
+            var self = this;
 
             this.data = $.extend(true, {}, args);
             this.data.itemID = itemID;
             this.data.firstChild = firstChild;
+
+            _.each(this.data.operators, function (operator) {
+                operator.i18nKey = self.operatorI18nKey + operator.title;
+            });
+
             this.setElement(element);
             this.$el.append(uiUtils.fillTemplateWithData("templates/policy/OperatorRulesTemplate.html", this.data));
 

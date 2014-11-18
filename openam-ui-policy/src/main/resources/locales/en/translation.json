@@ -277,6 +277,37 @@
         "deleteSelected": "Delete Selected",
         "finish": "Finish",
         "next": "Next"
+      },
+      "type": "Type",
+      "weekdays": {
+          "Monday": {
+              "short": "mon",
+              "full": "Monday"
+          },
+          "Tuesday": {
+              "short": "tue",
+              "full": "Tuesday"
+          },
+          "Wednesday": {
+              "short": "wed",
+              "full": "Wednesday"
+          },
+          "Thursday": {
+              "short": "thu",
+              "full": "Thursday"
+          },
+          "Friday": {
+              "short": "fri",
+              "full": "Friday"
+          },
+          "Saturday": {
+              "short": "sat",
+              "full": "Saturday"
+          },
+          "Sunday": {
+              "short": "sun",
+              "full": "Sunday"
+          }
       }
     },
 
@@ -317,8 +348,7 @@
       "step7": "Step 7: Review Configuration and Finish",
       "deleteLogical": "Deleting will also remove any child objects",
       "manageRulesDescription": "To define rules, click the Condition or Logical buttons above, enter the relevant options, and then drag the block into place in the rule set above. Each block can be configured both before and after is has been moved. Only rules inside the rule set section will be included in the created policy. To edit a Condition, click the pencil icon, or double-click the item.",
-      "logical": "Logical",
-      "type": "Type"
+      "logical": "Logical"
     },
 
     "manageReferrals": {
@@ -371,22 +401,142 @@
       "resourceDescription": "Create your resources"
     },
 
-    "conditionTypes": {
-
-      "simpleTime": {
-        "startTime": "Start Time",
-        "endTime": "End Time",
-        "startDay": "Start Day",
-        "endDay": "End Day",
-        "startDate": "Start Date",
-        "endDate": "End Date",
-        "enforcementTimeZone": "Time Zone",
-        "enterTimeZone": "Enter Time Zone",
-        "helper": "A time condition must contain one or more of the following values: Time (Start and End), Day (Start and End), Date (Start and End) and/or Time Zone."
+      "operators": {
+          "NOT": "NOT",
+          "OR": "OR",
+          "AND": "AND"
       },
 
-      "legacyFormat": "This condition is in a legacy format, and should be replaced.",
-      "nothingSelected": "Nothing selected"
-    }
+      "subjectTypes": {
+          "AuthenticatedUsers": {
+              "title": "Authenticated Users",
+              "props": {}
+          },
+          "Identity": {
+              "title": "Users & Groups",
+              "props": {
+                  "subjectValues": "Subject Values"
+              }
+          },
+          "JwtClaim": {
+              "title": "Jwt Claim",
+              "props": {
+                  "claimName": "Claim Name",
+                  "claimValue": "Claim Value"
+              }
+          },
+          "NONE": {
+              "title": "Any User",
+              "props": {}
+          }
+      },
+
+      "conditionTypes": {
+          "AMIdentityMembership": {
+              "title": "Identity Membership",
+              "props": {
+                  "amIdentityName": "AM Identity Name"
+              }
+          },
+          "AuthLevel": {
+              "title": "Authentication Level (greater than or equal to)",
+              "props": {
+                  "authLevel": "Authentication Level"
+              }
+          },
+          "AuthScheme": {
+              "title": "Authentication by Module Instance",
+              "props": {
+                  "authScheme": "Authentication Scheme",
+                  "applicationIdleTimeout": "Application Idle Timeout Scheme",
+                  "applicationName": "Application Name"
+              }
+          },
+          "AuthenticateToRealm": {
+              "title": "Authentication to a Realm",
+              "props": {
+                  "authenticateToRealm": "Authenticate to a Realm"
+              }
+          },
+          "AuthenticateToService": {
+              "title": "Authentication by Module Chain",
+              "props": {
+                  "authenticateToService": "Authenticate To Service"
+              }
+          },
+          "IPv4": {
+              "title": "IPv4 Address/DNS Name",
+              "props": {
+                  "ipRange": "IP Range",
+                  "dnsName": "DNS Name",
+                  "startIp": "Start IP",
+                  "endIp": "End IP"
+              }
+          },
+          "IPv6": {
+              "title": "IPv6 Address/DNS Name",
+              "props": {
+                  "ipRange": "IP Range",
+                  "dnsName": "DNS Name",
+                  "startIp": "Start IP",
+                  "endIp": "End IP"
+              }
+          },
+          "LDAPFilter": {
+              "title": "LDAP Filter Condition",
+              "props": {
+                  "ldapFilter": "LDAP Filter"
+              }
+          },
+          "LEAuthLevel": {
+              "title": "Authentication Level (less than or equal to)",
+              "props": {
+                  "authLevel": "Authentication Level"
+              }
+          },
+          "OAuth2Scope": {
+              "title": "OAuth2 Scope",
+              "props": {
+                  "requiredScopes": "Scopes"
+              }
+          },
+          "ResourceEnvIP": {
+              "title": "Resource/Environment/IP Address",
+              "props": {
+                  "resourceEnvIPConditionValue": "Resource/Environment/IP Address"
+              }
+          },
+          "Session": {
+              "title": "Active Session Time",
+              "props": {
+                  "maxSessionTime": "Max Session Time",
+                  "terminateSession": "Terminate Session"
+              }
+          },
+          "SessionProperty": {
+              "title": "Current Session Properties",
+              "props": {
+                  "ignoreValueCase": "Ignore Value Case",
+                  "properties": "Properties"
+              }
+          },
+          "SimpleTime": {
+              "title": "Time (day, date, time, and timezone)",
+              "props": {
+                  "startTime": "Start Time",
+                  "endTime": "End Time",
+                  "startDay": "Start Day",
+                  "endDay": "End Day",
+                  "startDate": "Start Date",
+                  "endDate": "End Date",
+                  "enforcementTimeZone": "Time Zone",
+                  "enterTimeZone": "Enter Time Zone"
+              },
+              "helper": "A time condition must contain one or more of the following values: Time (Start and End), Day (Start and End), Date (Start and End) and/or Time Zone."
+          },
+
+          "legacyFormat": "This condition is in a legacy format, and should be replaced.",
+          "nothingSelected": "Nothing selected"
+      }
   }
 }

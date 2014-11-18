@@ -1,5 +1,5 @@
 <div class="field-float-selectize data-obj">
- 	<label for="selection_{{id}}" data-title="{{title}}">{{camelCaseToTitle title}}</label>
+ 	<label for="selection_{{id}}" data-title="{{title}}">{{t i18nKey}}</label>
     <select multiple id="selection_{{id}}" class="selectize" {{#if dataSource}}{{#each this}}{{#each this}}data-source-{{this.name}}="{{this.name}}"{{/each}}{{/each}}{{/if}}>
         {{#each data}}
 		<option selected value="{{this}}">{{this}}</option>

@@ -794,7 +794,9 @@ input[type="text"]:invalid:required{
     }
 }
 
-
+.selectize-control {
+    margin-top: 11px;
+}
 
 .selectize-control.multi .selectize-input {
 
@@ -1236,7 +1238,7 @@ body.editing{
 
     }
 
-    .item-data{
+    .item-data {
 
         padding: 7px 5px 0 5px;
 
@@ -1249,11 +1251,11 @@ body.editing{
             margin-right: 10px;
             float:left;
 
-            &:last-of-type{
+            &:last-of-type {
                 border-right: none;
             }
 
-            h3{
+            h3 {
                 font-weight: bold;
                 font-size: 11px;
                 line-height: 11px;
@@ -1269,13 +1271,14 @@ body.editing{
 
             }
 
-            &.no-float{
-                float:none;
-                margin:0 0 0 203px;
+            &.no-float {
+                float: none;
+                margin-right: 30px;
             }
         }
 
          div.field-float-selectize {
+            position: relative;
             float: left;
             min-width: 133px;
             max-width: 588px;
@@ -1285,11 +1288,11 @@ body.editing{
 
     }
 
-    li.editing .item-data, ol#pickUpItem li:not(.dragged) .item-data{
+    li.editing .item-data, ol#pickUpItem li:not(.dragged) .item-data {
         padding: 0;
     }
 
-    .field-float-pattern, .field-float-select, .field-float-selectize{
+    .field-float-pattern, .field-float-select, .field-float-selectize {
 
         label {
             font-size:11px;
@@ -1303,25 +1306,32 @@ body.editing{
 
     }
 
-    .field-float-pattern, .field-float-select{
+    .field-float-pattern, .field-float-select {
 
         position:relative;
         margin: 5px;
         float:left;
+        min-height: 41px;
+        min-width: 145px;
 
-        label{
-            position:absolute;
-            top:10px;
-            opacity:0;
+        &.button-field {
+            min-width: 98px;
+        }
 
+        &.date-field {
+            min-width: 112px;
+        }
+
+        label {
+            opacity: 0;
             &.showLabel {
-                top:0;
-                opacity:1;
+                opacity: 1;
             }
         }
 
-        input{
-
+        input {
+            position: absolute;
+            left: 0;
             margin-top: 16px;
             width:133px;
 
@@ -1334,13 +1344,12 @@ body.editing{
             }
         }
 
-        &#typeSelector label{
+        &#typeSelector label {
             top:0;
             opacity:1;
         }
 
         select {
-
             margin-top: 16px;
             margin-bottom: 1px;
             min-width: 177px;
@@ -1359,14 +1368,31 @@ body.editing{
                 box-shadow: none;
             }
 
-            &:invalid{
+            &:invalid {
                 .invalid-background;
                 transition: background 0.3s ease-in-out 0s;
             }
         }
     }
 
+    .field-float-select, .field-float-selectize {
+        label {
+            top: 10px;
+            position: absolute;
+            &.showLabel {
+                top: 0;
+            }
+        }
+    }
 
+    .field-float-pattern {
+        label {
+            margin-top: 10px;
+            &.showLabel {
+                margin-top: 0;
+            }
+        }
+    }
 
 }
 
@@ -1384,6 +1410,8 @@ section.active-step{
 
     margin-top: 16px;
     font-size: 0;
+    width: 99px;
+    position: absolute;
 
     li{
         border:none;
@@ -1430,32 +1458,31 @@ section.active-step{
     }
 }
 
-#condition-management .item-data > div span.inline-right{
+#condition-management .item-data > div span.inline-right {
     padding: 0;
-    margin: 0 4px 4px 0;
     position: absolute;
-    right: 0;
-    bottom: 0;
+    right: 4px;
+    bottom: 1px;
     color: #ddd;
 }
 
-#condition-management .item-data div.field-float-pattern.time-field{
-    min-width:0;
-    input{
-        width:70px;
+#condition-management .item-data div.field-float-pattern.time-field {
+    min-width: 82px;
+    input {
+        width: 70px;
     }
 }
 
-#condition-management .item-data div.field-float-select.day-field{
-    min-width:0;
-    select{
+#condition-management .item-data div.field-float-select.day-field {
+    min-width: 100px;
+    select {
         width:100px;
         min-width:0;
     }
 }
 
-.ruleHelperText{
-    padding: 10px 10px 0 10px;;
+.ruleHelperText {
+    padding: 10px 10px 0;
     p {
         font-size:12px;
     }
