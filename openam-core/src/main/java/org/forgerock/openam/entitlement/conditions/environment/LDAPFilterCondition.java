@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import javax.security.auth.Subject;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -121,9 +122,16 @@ public class LDAPFilterCondition extends EntitlementConditionAdaptor {
         return s;
     }
 
-    @SuppressWarnings("unchecked")
-    public void setLdapFilter(String ldapFilter) {
-        condition.getProperties().put(LDAP_FILTER, Collections.singleton(ldapFilter));
+    @SuppressWarnings("unused") // Set by JSON mapping
+    public void setLdapFilter(String ldapFilter) throws EntitlementException {
+        final Map<String, Set<String>> properties = new HashMap<String, Set<String>>(condition.getProperties());
+        properties.put(LDAP_FILTER, Collections.singleton(ldapFilter));
+        try {
+            condition.setProperties(properties);
+        } catch (PolicyException e) {
+            throw new EntitlementException(EntitlementException.INVALID_PROPERTY_VALUE,
+                    new Object[] { LDAP_FILTER, ldapFilter }, e);
+        }
     }
 
     @SuppressWarnings("unchecked")

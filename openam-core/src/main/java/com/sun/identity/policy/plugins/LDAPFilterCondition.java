@@ -30,42 +30,41 @@
  */
 
 package com.sun.identity.policy.plugins;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
 
-import com.sun.identity.shared.ldap.LDAPv2;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.shared.ldap.LDAPBindRequest;
-import com.sun.identity.shared.ldap.LDAPRequestParser;
-import com.sun.identity.shared.ldap.LDAPSearchRequest;
-
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.policy.ConditionDecision;
 import com.sun.identity.policy.PolicyConfig;
-import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyEvaluator;
-import com.sun.identity.policy.PolicyUtils;
+import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
+import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.policy.SubjectEvaluationCache;
 import com.sun.identity.policy.Syntax;
-
+import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.shared.debug.Debug;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.ldap.LDAPBindRequest;
+import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPEntry;
+import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPReferralException;
+import com.sun.identity.shared.ldap.LDAPRequestParser;
+import com.sun.identity.shared.ldap.LDAPSearchRequest;
+import com.sun.identity.shared.ldap.LDAPSearchResults;
+import com.sun.identity.shared.ldap.LDAPv2;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -97,7 +96,7 @@ public class LDAPFilterCondition implements Condition {
         propertyNames.add(LDAP_FILTER);
     }
 
-    private Map properties;
+    private Map properties = new HashMap();
 
     private String ldapConditionFilter;
     private long policyConfigExpiresAt;
