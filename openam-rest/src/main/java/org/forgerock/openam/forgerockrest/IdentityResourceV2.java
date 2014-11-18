@@ -1187,8 +1187,20 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         } catch (final GeneralAccessDeniedError accessDenied) {
             debug.error("IdentityResource.createInstance() :: Cannot CREATE " + accessDenied);
             handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN));
+        } catch (GeneralFailure generalFailure) {
+            debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
+                    generalFailure);
+            handler.handleError(new BadRequestException("Resource cannot be created: "
+                    + generalFailure.getMessage(), generalFailure));
+        } catch (AccessDenied accessDenied) {
+            debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
+                    accessDenied);
+            handler.handleError(new ForbiddenException("Token is not authorized: "
+                    + accessDenied.getMessage(), accessDenied));
+        }
 
-        } catch (final Exception exception) {
+
+        catch (final Exception exception) {
             debug.error("IdentityResource.createInstance() :: Cannot CREATE! " + exception);
             handler.handleError(new NotFoundException(exception.getMessage(), exception));
         }

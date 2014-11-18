@@ -29,33 +29,30 @@
 package com.sun.identity.idsvcs.opensso;
 
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.idm.IdRepoBundle;
-import com.sun.identity.idsvcs.InvalidToken;
-import com.sun.identity.policy.PolicyException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.service.AMAuthErrorCode;
+import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.common.configuration.AgentConfiguration;
+import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdOperation;
+import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoDuplicateObjectException;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchOpModifier;
 import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdRepoDuplicateObjectException;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.AccountExpired;
+import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.CreateResponse;
 import com.sun.identity.idsvcs.DeleteResponse;
 import com.sun.identity.idsvcs.DuplicateObject;
@@ -63,6 +60,8 @@ import com.sun.identity.idsvcs.GeneralFailure;
 import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.InvalidCredentials;
 import com.sun.identity.idsvcs.InvalidPassword;
+import com.sun.identity.idsvcs.InvalidToken;
+import com.sun.identity.idsvcs.ListWrapper;
 import com.sun.identity.idsvcs.LogResponse;
 import com.sun.identity.idsvcs.LogoutResponse;
 import com.sun.identity.idsvcs.MaximumSessionReached;
@@ -70,45 +69,42 @@ import com.sun.identity.idsvcs.NeedMoreCredentials;
 import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.OrgInactive;
 import com.sun.identity.idsvcs.Token;
+import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.UpdateResponse;
 import com.sun.identity.idsvcs.UserDetails;
 import com.sun.identity.idsvcs.UserInactive;
 import com.sun.identity.idsvcs.UserLocked;
 import com.sun.identity.idsvcs.UserNotFound;
-import com.sun.identity.idsvcs.TokenExpired;
-import com.sun.identity.idsvcs.Attribute;
+import com.sun.identity.log.AMLogException;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
-import com.sun.identity.log.AMLogException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.service.AMAuthErrorCode;
-import com.sun.identity.authentication.service.AuthUtils;
-import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.common.configuration.AgentConfiguration;
-import com.sun.identity.common.configuration.ConfigurationException;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.idsvcs.ListWrapper;
 import com.sun.identity.policy.PolicyEvaluator;
+import com.sun.identity.policy.PolicyException;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-
-
+import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.SMSException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
-import com.sun.identity.shared.ldap.util.DN;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Web Service to provide security based on authentication and authorization
@@ -773,53 +769,9 @@ public class IdentityServicesImpl
 
             // Create the identity, special case of Agents to merge
             // and validate the attributes
-            AMIdentity amIdentity = null;
-            if (objectIdType.equals(IdType.AGENT) ||
-                objectIdType.equals(IdType.AGENTONLY) ||
-                objectIdType.equals(IdType.AGENTGROUP)) {
-                // Get agenttype, serverurl & agenturl
-                String agentType = null, serverUrl = null, agentUrl = null;
-                /*
-                 * To be backward compatible, look for 'AgentType' attribute
-                 * in the attribute map which is passed as a parameter and if
-                 * not present/sent, check if the IdType.AGENTONLY or AGENT
-                 * and then assume that it is '2.2_Agent' type to create 
-                 * that agent under the 2.2_Agent node.
-                 */
-                Set set = idAttrs.get("agenttype");
-                if ((set != null) && !set.isEmpty()) {
-                    agentType = set.iterator().next().toString();
-                    idAttrs.remove("agenttype");
-                } else if (objectIdType.equals(IdType.AGENTONLY) || objectIdType.equals(IdType.AGENT)) {
-                    agentType = "2.2_Agent";
-                } else {
-                    throw new UnsupportedOperationException("Unsupported: Agent Type required for " + idType);
-                }
-                set = idAttrs.get("serverurl");
-                if ((set != null) && !set.isEmpty()) {
-                    serverUrl = set.iterator().next().toString();
-                    idAttrs.remove("serverurl");
-                }
-                set = idAttrs.get("agenturl");
-                if ((set != null) && !set.isEmpty()) {
-                    agentUrl = set.iterator().next().toString();
-                    idAttrs.remove("agenturl");
-                }
-                if (objectIdType.equals(IdType.AGENT) || objectIdType.equals(IdType.AGENTONLY)) {
-                    if ((serverUrl == null) || (serverUrl.isEmpty()) || (agentUrl == null) || (agentUrl.isEmpty())) {
-                        AgentConfiguration.createAgent(getSSOToken(admin), realm, idName, agentType, idAttrs);
-                    } else {
-                        AgentConfiguration.createAgent(
-                                getSSOToken(admin), realm, idName, agentType, idAttrs, serverUrl, agentUrl);
-                    }
-                } else {
-                    if ((serverUrl == null) || (serverUrl.isEmpty()) || (agentUrl == null) || (agentUrl.isEmpty())) {
-                        AgentConfiguration.createAgentGroup(getSSOToken(admin), realm, idName, agentType, idAttrs);
-                    } else {
-                        AgentConfiguration.createAgentGroup(
-                                getSSOToken(admin), realm, idName, agentType, idAttrs, serverUrl, agentUrl);
-                    }
-                }
+            AMIdentity amIdentity;
+            if (isTypeAgent(objectIdType)) {
+                createAgent(idAttrs, objectIdType, idType, idName, realm, admin);
             } else {
                 // Create other identites like User, Group, Role, etc.
                 amIdentity = repo.createIdentity(objectIdType, idName, idAttrs);
@@ -906,11 +858,85 @@ public class IdentityServicesImpl
         } catch (MalformedURLException ex) {
             debug.error("IdentityServicesImpl:create", ex);
             throw new GeneralFailure(ex.getMessage());
+        } catch (UnsupportedOperationException ex) {
+            debug.error("IdentityServicesImpl:create", ex);
+            throw new GeneralFailure(ex.getMessage());
         }
 
         return new CreateResponse();
     }
 
+    private boolean isTypeAgent(IdType objectIdType) {
+        return objectIdType.equals(IdType.AGENT) || objectIdType.equals(IdType.AGENTONLY) ||
+                objectIdType.equals(IdType.AGENTGROUP);
+    }
+
+    /**
+     * To be backward compatible, look for 'AgentType' attribute
+     * in the attribute map which is passed as a parameter and if
+     * not present/sent, check if the IdType.AGENTONLY or AGENT
+     * and then assume that it is '2.2_Agent' type to create
+     * that agent under the 2.2_Agent node.
+     **/
+    private void createAgent(Map<String, Set> idAttrs, IdType objectIdType, String idType, String idName,
+                             String realm, Token admin) throws TokenExpired, SMSException, SSOException,
+            ConfigurationException, IdRepoException, MalformedURLException {
+
+        String agentType, serverUrl = null, agentUrl = null;
+
+        final String AGENT_TYPE = "agenttype";
+        final String SERVER_URL = "serverurl";
+        final String AGENT_URL = "agenturl";
+        final String DEFAULT_AGENT_TYPE = "2.2_Agent";
+
+        Set set = idAttrs.remove(AGENT_TYPE);
+        if (set != null && !set.isEmpty()) {
+            agentType = set.iterator().next().toString();
+        } else if (objectIdType.equals(IdType.AGENTONLY) || objectIdType.equals(IdType.AGENT)) {
+            agentType = DEFAULT_AGENT_TYPE;
+        } else {
+            throw new UnsupportedOperationException("Unsupported: Agent Type required for " + idType);
+        }
+
+        set = idAttrs.remove(SERVER_URL);
+        if (set != null && !set.isEmpty()) {
+            serverUrl = set.iterator().next().toString();
+        }
+
+        set = idAttrs.remove(AGENT_URL);
+        if (set != null && !set.isEmpty()) {
+            agentUrl = set.iterator().next().toString();
+        }
+
+        if (agentType.equals(AgentConfiguration.AGENT_TYPE_WEB) ||
+                agentType.equals(AgentConfiguration.AGENT_TYPE_J2EE)) {
+            if (StringUtils.isBlank(agentUrl)) {
+                throw new MalformedURLException("Agent type requires agenturl to be configured.");
+            } else if (StringUtils.isBlank(serverUrl)) {
+                throw new MalformedURLException("Agent type requires serverurl to be configured.");
+            }
+        }
+
+        final SSOToken adminToken = getSSOToken(admin);
+
+        if (objectIdType.equals(IdType.AGENT) || objectIdType.equals(IdType.AGENTONLY)) {
+            if (StringUtils.isBlank(serverUrl) || StringUtils.isBlank(agentUrl)) {
+                AgentConfiguration
+                        .createAgent(adminToken, realm, idName, agentType, idAttrs);
+            } else {
+                AgentConfiguration
+                        .createAgent(adminToken, realm, idName, agentType, idAttrs, serverUrl, agentUrl);
+            }
+        } else {
+            if (StringUtils.isBlank(serverUrl) || StringUtils.isBlank(agentUrl)) {
+                AgentConfiguration
+                        .createAgentGroup(adminToken, realm, idName, agentType, idAttrs);
+            } else {
+                AgentConfiguration
+                        .createAgentGroup(adminToken, realm, idName, agentType, idAttrs, serverUrl, agentUrl);
+            }
+        }
+    }
 
     /**
      * Retrieves an identity object matching input criteria.
