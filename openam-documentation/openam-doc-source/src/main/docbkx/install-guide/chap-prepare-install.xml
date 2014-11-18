@@ -1171,6 +1171,7 @@ esac
 
  </section>
 
+<!-- OPENAM-4817: Not a supported container for OpenAM 12.0.0
  <section xml:id="prepare-glassfish">
   <title>Preparing GlassFish</title>
 
@@ -1295,55 +1296,58 @@ Command start-domain executed successfully.</computeroutput>
    </orderedlist>
   </section>
  </section>
+-->
 
- <section xml:id="prepare-jboss-5">
-  <title>Preparing OpenAM &amp; JBoss 4 or 5</title>
+<!-- OPENAM-4817: Not a supported container for OpenAM 12.0.0
+  <section xml:id="prepare-jboss-5">
+   <title>Preparing OpenAM &amp; JBoss 4 or 5</title>
 
-  <para>OpenAM must be able to store its configuration between restarts. If
-  you plan to deploy OpenAM as a single archive file, then unpack the .war,
-  edit <filename>WEB-INF/classes/bootstrap.properties</filename> to set the
-  <literal>configuration.dir</literal> property to the location where OpenAM
-  has write access to store its configuration.</para>
+   <para>OpenAM must be able to store its configuration between restarts. If
+   you plan to deploy OpenAM as a single archive file, then unpack the .war,
+   edit <filename>WEB-INF/classes/bootstrap.properties</filename> to set the
+   <literal>configuration.dir</literal> property to the location where OpenAM
+   has write access to store its configuration.</para>
 
-  <screen>
-$ <userinput>mkdir openam</userinput>
-$ <userinput>cd openam</userinput>
-$ <userinput>jar -xf ~/Downloads/openam/${coreWarFile}</userinput>
-$ <userinput>vi WEB-INF/classes/bootstrap.properties</userinput>
-$ <userinput>grep ^config WEB-INF/classes/bootstrap.properties</userinput>
-<computeroutput>configuration.dir=/home/jboss-user/openam</computeroutput>
-  </screen>
+   <screen>
+ $ <userinput>mkdir openam</userinput>
+ $ <userinput>cd openam</userinput>
+ $ <userinput>jar -xf ~/Downloads/openam/${coreWarFile}</userinput>
+ $ <userinput>vi WEB-INF/classes/bootstrap.properties</userinput>
+ $ <userinput>grep ^config WEB-INF/classes/bootstrap.properties</userinput>
+ <computeroutput>configuration.dir=/home/jboss-user/openam</computeroutput>
+   </screen>
 
-  <para>Also, OpenAM .jar libraries that conflict with JBoss libraries must
-  be loaded first. Add a <filename>WEB-INF/jboss-web.xml</filename> to ensure
-  this happens. (If you deploy the exploded .war, you also need to add this
-  file.)</para>
+   <para>Also, OpenAM .jar libraries that conflict with JBoss libraries must
+   be loaded first. Add a <filename>WEB-INF/jboss-web.xml</filename> to ensure
+   this happens. (If you deploy the exploded .war, you also need to add this
+   file.)</para>
 
-  <screen>
-$ <userinput>vi WEB-INF/jboss-web.xml</userinput>
-$ <userinput>cat WEB-INF/jboss-web.xml</userinput>
-<computeroutput>&lt;!DOCTYPE jboss-web PUBLIC
-  &quot;-//JBoss//DTD Web Application 5.0//EN&quot;
-  &quot;http://www.jboss.org/j2ee/dtd/jboss-web_5_0.dtd&quot;&gt;
-&lt;jboss-web&gt;
-  &lt;class-loading java2ClassLoadingCompliance='true'&gt;
-    &lt;loader-repository&gt;
-    jbia.loader:loader=opensso
-    &lt;loader-repository-config&gt;java2ParentDelegation=true&lt;/loader-repository-config&gt;
-    &lt;/loader-repository&gt;
-  &lt;/class-loading&gt;
-&lt;/jboss-web&gt;</computeroutput>
-  </screen>
+   <screen>
+ $ <userinput>vi WEB-INF/jboss-web.xml</userinput>
+ $ <userinput>cat WEB-INF/jboss-web.xml</userinput>
+ <computeroutput>&lt;!DOCTYPE jboss-web PUBLIC
+   &quot;-//JBoss//DTD Web Application 5.0//EN&quot;
+   &quot;http://www.jboss.org/j2ee/dtd/jboss-web_5_0.dtd&quot;&gt;
+ &lt;jboss-web&gt;
+   &lt;class-loading java2ClassLoadingCompliance='true'&gt;
+     &lt;loader-repository&gt;
+     jbia.loader:loader=opensso
+     &lt;loader-repository-config&gt;java2ParentDelegation=true&lt;/loader-repository-config&gt;
+     &lt;/loader-repository&gt;
+   &lt;/class-loading&gt;
+ &lt;/jboss-web&gt;</computeroutput>
+   </screen>
 
-  <para>Repack the .war file that you can then deploy.</para>
+   <para>Repack the .war file that you can then deploy.</para>
 
-  <screen>
-$ <userinput>jar -cf ../openam.war *</userinput>
-  </screen>
+   <screen>
+ $ <userinput>jar -cf ../openam.war *</userinput>
+   </screen>
 
-  <para>Before you deploy OpenAM, update the JVM options as described in
-  <xref linkend="prepare-java" />.</para>
- </section>
+   <para>Before you deploy OpenAM, update the JVM options as described in
+   <xref linkend="prepare-java" />.</para>
+  </section>
+ -->
 
  <section xml:id="prepare-jboss-7">
   <title>Preparing OpenAM &amp; JBoss AS 7 / EAP 6 / WildFly 8</title>
@@ -1755,216 +1759,218 @@ $ <userinput>jar cvf ../openam.war *</userinput>
 
 </section>
 
- <section xml:id="prepare-jetty">
-  <title>Preparing Jetty</title>
+<!-- OPENAM-4817: Not a supported container for OpenAM 12.0.0
+  <section xml:id="prepare-jetty">
+   <title>Preparing Jetty</title>
 
-  <para>When you deploy OpenAM, make sure you start Jetty with enough
-  memory.</para>
+   <para>When you deploy OpenAM, make sure you start Jetty with enough
+   memory.</para>
 
-  <screen>
-$ <userinput>cd /path/to/jetty</userinput>
-$ <userinput>java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</userinput>
-  </screen>
+   <screen>
+ $ <userinput>cd /path/to/jetty</userinput>
+ $ <userinput>java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</userinput>
+   </screen>
 
-  <para>If you are using the embedded version of OpenDJ, the required
-  JVM memory may be higher. For details on the JVM options to use, see
-  <xref linkend="prepare-java" />.</para>
- </section>
+   <para>If you are using the embedded version of OpenDJ, the required
+   JVM memory may be higher. For details on the JVM options to use, see
+   <xref linkend="prepare-java" />.</para>
+  </section>
+-->
 
- <section xml:id="prepare-oracle-weblogic">
-  <title>Preparing Oracle WebLogic</title>
+  <section xml:id="prepare-oracle-weblogic">
+   <title>Preparing Oracle WebLogic</title>
 
-  <para>Before you deploy OpenAM, update the JVM options as described in
-  <xref linkend="prepare-java" />.</para>
+   <para>Before you deploy OpenAM, update the JVM options as described in
+   <xref linkend="prepare-java" />.</para>
 
-  <orderedlist>
-   <para>
-    Next, edit the WebLogic domain configuration
-    to allow basic authentication credentials to be passed back to OpenAM.
-    By default, WebLogic attempts to resolve authentication credentials itself.
-    When you change the WebLogic domain configuration, you make sure that
-    the OpenAM OAuth 2.0 providers receive basic authentication credentials
-    for OAuth 2.0 grants that rely on basic authentication.
-   </para>
-
-   <listitem>
+   <orderedlist>
     <para>
-     Stop the WebLogic server.
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     Edit the WebLogic domain configuration,
-     <filename>/path/to/wlsdomain/config/config.xml</filename>,
-     setting <literal>&lt;enforce-valid-basic-auth-credentials></literal>
-     to <literal>false</literal> in the
-     <literal>&lt;security-configuration</literal> element.
+     Next, edit the WebLogic domain configuration
+     to allow basic authentication credentials to be passed back to OpenAM.
+     By default, WebLogic attempts to resolve authentication credentials itself.
+     When you change the WebLogic domain configuration, you make sure that
+     the OpenAM OAuth 2.0 providers receive basic authentication credentials
+     for OAuth 2.0 grants that rely on basic authentication.
     </para>
 
-     <programlisting language="xml">&lt;security-configuration>
-   &lt;enforce-valid-basic-auth-credentials>false
-   &lt;/enforce-valid-basic-auth-credentials>
-&lt;/security-configuration></programlisting>
-   </listitem>
+    <listitem>
+     <para>
+      Stop the WebLogic server.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      Edit the WebLogic domain configuration,
+      <filename>/path/to/wlsdomain/config/config.xml</filename>,
+      setting <literal>&lt;enforce-valid-basic-auth-credentials></literal>
+      to <literal>false</literal> in the
+      <literal>&lt;security-configuration</literal> element.
+     </para>
+
+      <programlisting language="xml">&lt;security-configuration>
+    &lt;enforce-valid-basic-auth-credentials>false
+    &lt;/enforce-valid-basic-auth-credentials>
+ &lt;/security-configuration></programlisting>
+    </listitem>
+    </orderedlist>
+
+    <orderedlist>
+        <para>Weblogic uses its own classes if a class exists in both the parent
+         and child classloaders by default.
+         To use OpenAM and its classes on WebLogic 11g,
+            create a WebLogic deployment descriptor file <literal>weblogic.xml</literal>
+            and place it in the <literal>/WEB-INF</literal> directory.
+            The descriptor file maps resources defined for OpenAM.
+        </para>
+    <listitem>
+        <para>Create a WebLogic descriptor file, <literal>/WEB-INF/weblogic.xml</literal>.</para>
+        <programlisting language="xml">
+ &lt;?xml version="1.0" encoding="UTF-8"?>
+   &lt;weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app
+      http://xmlns.oracle.com/weblogic/weblogic-web-app/1.3/weblogic-web-app.xsd">
+         &lt;context-root>/openam&lt;/context-root>
+         &lt;container-descriptor>
+            &lt;prefer-web-inf-classes>true&lt;/prefer-web-inf-classes>
+         &lt;/container-descriptor>
+   &lt;/weblogic-web-app></programlisting>
+    </listitem>
+
+    <listitem>
+     <para>
+      Start the WebLogic server.
+     </para>
+    </listitem>
+   </orderedlist>
+
+    <para>
+     When deploying OpenAM on WebLogic 11g (version 10.3.x),
+     use the SOAP with Attachments API for Java (SAAJ) implementation
+     from the Java Runtime Environment, rather than the WebLogic implementation.
+
+     The WebLogic implementation can cause OpenAM to throw exceptions with the
+     message <literal>java.lang.UnsupportedOperationException:
+     This class does not support SAAJ 1.1</literal>,
+     and to fail to authenticate users in some cases.
+
+     No change is necessary when deploying OpenAM on WebLogic 12c.
+    </para>
+
+    <para>
+     To use the Sun/Oracle Java SAAJ implementation,
+     edit the WebLogic start up script for the domain where OpenAM runs, such as
+     <filename>/path/to/weblogic/user_projects/domains/wlsdomain/startWebLogic.sh</filename>.
+
+     Change the following line:
+
+     <programlisting language="shell">${DOMAIN_HOME}/bin/startWebLogic.sh $*</programlisting>
+
+     To set the <literal>javax.xml.soap.MessageFactory</literal> property:
+
+     <programlisting language="shell">${DOMAIN_HOME}/bin/startWebLogic.sh \
+ -Djavax.xml.soap.MessageFactory=\
+ com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</programlisting>
+    </para>
+
+    <para>
+     When using WebLogic 12.1.1 with Java 6,
+     if you plan to use the <command>ssoadm</command> command to configure OpenAM,
+     then make the following change to the start up script,
+     <filename>startWebLogic.sh</filename>,
+     to avoid exceptions and incorrect results.
+     Change the following line:
+    </para>
+
+    <literallayout class="monospaced"
+    >${DOMAIN_HOME}/startWebLogic.sh</literallayout>
+
+    <para>
+     To this:
+    </para>
+
+    <literallayout class="monospaced"
+    >${DOMAIN_HOME}/bin/startWebLogic.sh \
+ -Djavax.xml.soap.MessageFactory=\
+ com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</literallayout>
+
+    <para>
+     Restart WebLogic for the change to take effect.
+    </para>
+  </section>
+
+  <section xml:id="prepare-ibm-websphere">
+   <title>Preparing IBM WebSphere</title>
+
+   <para>Before you deploy OpenAM, use the Administrator console to update
+   JVM options as described in <xref linkend="prepare-java" />.</para>
+
+   <orderedlist>
+    <para>In addition, configure WebSphere to load classes from OpenAM bundled
+    libraries before loading classes from libraries delivered with WebSphere.
+    The following steps must be completed after you deploy OpenAM into
+    WebSphere.</para>
+
+    <listitem>
+     <para>In WebSphere administration console, browse to Application >
+     Application Type > WebSphere enterprise applications > <replaceable>OpenAM
+     Name</replaceable> > Class loading and update detection.</para>
+    </listitem>
+
+    <listitem>
+     <para>Set Class loader order > Classes loaded with local class loader first
+     (parent last).</para>
+    </listitem>
+
+    <listitem>
+     <para>Set WAR class loader policy > Single class loader for application.</para>
+    </listitem>
+
+    <listitem>
+     <para>Save your work.</para>
+    </listitem>
    </orderedlist>
 
    <orderedlist>
-       <para>Weblogic uses its own classes if a class exists in both the parent
-        and child classloaders by default.
-        To use OpenAM and its classes on WebLogic 11g,
-           create a WebLogic deployment descriptor file <literal>weblogic.xml</literal>
-           and place it in the <literal>/WEB-INF</literal> directory.
-           The descriptor file maps resources defined for OpenAM.
-       </para>
-   <listitem>
-       <para>Create a WebLogic descriptor file, <literal>/WEB-INF/weblogic.xml</literal>.</para>
-       <programlisting language="xml">
-&lt;?xml version="1.0" encoding="UTF-8"?>
-  &lt;weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app
-     http://xmlns.oracle.com/weblogic/weblogic-web-app/1.3/weblogic-web-app.xsd">
-        &lt;context-root>/openam&lt;/context-root>
-        &lt;container-descriptor>
-           &lt;prefer-web-inf-classes>true&lt;/prefer-web-inf-classes>
-        &lt;/container-descriptor>
-  &lt;/weblogic-web-app></programlisting>
-   </listitem>
+    <para>Furthermore when using IBM Java, add the JAXP Reference Implementation
+    .jar into the OpenAM .war file before deploying the .war into WebSphere as
+    this required library is missing otherwise.</para>
 
-   <listitem>
-    <para>
-     Start the WebLogic server.
-    </para>
-   </listitem>
-  </orderedlist>
+    <listitem>
+     <para>Unpack the OpenAM .war file.</para>
 
-   <para>
-    When deploying OpenAM on WebLogic 11g (version 10.3.x),
-    use the SOAP with Attachments API for Java (SAAJ) implementation
-    from the Java Runtime Environment, rather than the WebLogic implementation.
+     <screen>
+ $ <userinput>mkdir /tmp/openam</userinput>
+ $ <userinput>cd /tmp/openam/</userinput>
+ $ <userinput>jar -xf ~/Downloads/openam/${coreWarFile}</userinput>
+     </screen>
+    </listitem>
 
-    The WebLogic implementation can cause OpenAM to throw exceptions with the
-    message <literal>java.lang.UnsupportedOperationException:
-    This class does not support SAAJ 1.1</literal>,
-    and to fail to authenticate users in some cases.
+    <listitem>
+     <para>Add the JAXP Reference Implementation .jar in
+     <filename>WEB-INF/lib/</filename>.</para>
 
-    No change is necessary when deploying OpenAM on WebLogic 12c.
-   </para>
+     <screen>
+ $ <userinput>wget http://repo1.maven.org/maven2/com/sun/xml/parsers/jaxp-ri/1.4.5/jaxp-ri-1.4.5.jar</userinput>
+ $ <userinput>mv jaxp-ri-1.4.5.jar WEB-INF/lib/</userinput>
+     </screen>
+    </listitem>
 
-   <para>
-    To use the Sun/Oracle Java SAAJ implementation,
-    edit the WebLogic start up script for the domain where OpenAM runs, such as
-    <filename>/path/to/weblogic/user_projects/domains/wlsdomain/startWebLogic.sh</filename>.
+    <listitem>
+     <para>Pack up the OpenAM .war file to deploy in WebSphere.</para>
 
-    Change the following line:
+     <screen>
+ $ <userinput>jar -cf ../openam.war *</userinput>
+     </screen>
+    </listitem>
 
-    <programlisting language="shell">${DOMAIN_HOME}/bin/startWebLogic.sh $*</programlisting>
+    <listitem>
+     <para>Deploy the new .war file.</para>
 
-    To set the <literal>javax.xml.soap.MessageFactory</literal> property:
-
-    <programlisting language="shell">${DOMAIN_HOME}/bin/startWebLogic.sh \
--Djavax.xml.soap.MessageFactory=\
-com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</programlisting>
-   </para>
-
-   <para>
-    When using WebLogic 12.1.1 with Java 6,
-    if you plan to use the <command>ssoadm</command> command to configure OpenAM,
-    then make the following change to the start up script,
-    <filename>startWebLogic.sh</filename>,
-    to avoid exceptions and incorrect results.
-    Change the following line:
-   </para>
-
-   <literallayout class="monospaced"
-   >${DOMAIN_HOME}/startWebLogic.sh</literallayout>
-
-   <para>
-    To this:
-   </para>
-
-   <literallayout class="monospaced"
-   >${DOMAIN_HOME}/bin/startWebLogic.sh \
--Djavax.xml.soap.MessageFactory=\
-com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</literallayout>
-
-   <para>
-    Restart WebLogic for the change to take effect.
-   </para>
- </section>
-
- <section xml:id="prepare-ibm-websphere">
-  <title>Preparing IBM WebSphere</title>
-
-  <para>Before you deploy OpenAM, use the Administrator console to update
-  JVM options as described in <xref linkend="prepare-java" />.</para>
-
-  <orderedlist>
-   <para>In addition, configure WebSphere to load classes from OpenAM bundled
-   libraries before loading classes from libraries delivered with WebSphere.
-   The following steps must be completed after you deploy OpenAM into
-   WebSphere.</para>
-
-   <listitem>
-    <para>In WebSphere administration console, browse to Application >
-    Application Type > WebSphere enterprise applications > <replaceable>OpenAM
-    Name</replaceable> > Class loading and update detection.</para>
-   </listitem>
-
-   <listitem>
-    <para>Set Class loader order > Classes loaded with local class loader first
-    (parent last).</para>
-   </listitem>
-
-   <listitem>
-    <para>Set WAR class loader policy > Single class loader for application.</para>
-   </listitem>
-
-   <listitem>
-    <para>Save your work.</para>
-   </listitem>
-  </orderedlist>
-
-  <orderedlist>
-   <para>Furthermore when using IBM Java, add the JAXP Reference Implementation
-   .jar into the OpenAM .war file before deploying the .war into WebSphere as
-   this required library is missing otherwise.</para>
-
-   <listitem>
-    <para>Unpack the OpenAM .war file.</para>
-
-    <screen>
-$ <userinput>mkdir /tmp/openam</userinput>
-$ <userinput>cd /tmp/openam/</userinput>
-$ <userinput>jar -xf ~/Downloads/openam/${coreWarFile}</userinput>
-    </screen>
-   </listitem>
-
-   <listitem>
-    <para>Add the JAXP Reference Implementation .jar in
-    <filename>WEB-INF/lib/</filename>.</para>
-
-    <screen>
-$ <userinput>wget http://repo1.maven.org/maven2/com/sun/xml/parsers/jaxp-ri/1.4.5/jaxp-ri-1.4.5.jar</userinput>
-$ <userinput>mv jaxp-ri-1.4.5.jar WEB-INF/lib/</userinput>
-    </screen>
-   </listitem>
-
-   <listitem>
-    <para>Pack up the OpenAM .war file to deploy in WebSphere.</para>
-
-    <screen>
-$ <userinput>jar -cf ../openam.war *</userinput>
-    </screen>
-   </listitem>
-
-   <listitem>
-    <para>Deploy the new .war file.</para>
-
-    <para>In this case the .war file to deploy is
-    <filename>/tmp/openam.war</filename>.</para>
-   </listitem>
-  </orderedlist>
- </section>
-</chapter>
+     <para>In this case the .war file to deploy is
+     <filename>/tmp/openam.war</filename>.</para>
+    </listitem>
+   </orderedlist>
+  </section>
+ </chapter>
