@@ -1003,6 +1003,70 @@
      <para>Hot swap: no</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term>Realm</term>
+    <listitem>
+     <para>
+      Realm where OpenAM starts policy evaluation for this policy agent.
+     </para>
+
+     <para>
+      Default: / (top level realm)
+     </para>
+
+     <para>
+      Edit this property when OpenAM should start policy evaluation
+      in a realm other than the top level realm, <literal>/</literal>,
+      when handling policy decision requests from this policy agent.
+     </para>
+
+     <para>
+      This property is recognized by OpenAM, not the policy agent.
+     </para>
+
+     <para>
+      Property: <literal>org.forgerock.openam.agents.config.policy.evaluation.realm</literal>
+     </para>
+
+     <para>
+      Hot swap: yes
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Application</term>
+    <listitem>
+     <para>
+      Application where OpenAM looks for policies to evaluate
+      for this policy agent.
+     </para>
+
+     <para>
+      Default: <literal>iPlanetAMWebAgentService</literal>
+     </para>
+
+     <para>
+      Edit this property when OpenAM should look for policies
+      that belong to an application other than
+      <literal>iPlanetAMWebAgentService</literal>
+      when handling policy decision requests from this policy agent.
+     </para>
+
+     <para>
+      This property is recognized by OpenAM, not the policy agent.
+     </para>
+
+     <para>
+      Property: <literal>org.forgerock.openam.agents.config.policy.evaluation.application</literal>
+     </para>
+
+     <para>
+      Hot swap: yes
+     </para>
+    </listitem>
+   </varlistentry>
   </variablelist>
  </section>
 
