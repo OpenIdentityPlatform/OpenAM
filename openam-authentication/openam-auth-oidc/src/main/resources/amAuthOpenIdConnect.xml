@@ -87,8 +87,8 @@
                                  validator="RequiredValueValidator"
                                  i18nKey="local_to_jwt_attr_mappings">
                     <DefaultValues>
-                        <Value>sub=uid</Value>
-                        <Value>email=mail</Value>
+                        <Value>uid=sub</Value>
+                        <Value>mail=email</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
