@@ -48,6 +48,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -502,6 +504,95 @@ public class ReferralsResourceTest {
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(mockResultHandler, times(1)).handleError(captor.capture());
         assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.NOT_FOUND);
+    }
+
+    @Test
+    public void subRealmsAreCorrectlyDiscovered() throws EntitlementException {
+
+        //given
+        ReferralsResourceV1 resourceTest = new ReferralsResourceV1(debug);
+        String realm = "/dance";
+        Set<String> realms = new HashSet<String>();
+        realms.add("/dance/with");
+        realms.add("/dance/without");
+        realms.add("/dance/with/me");
+        Set<String> subRealms = new HashSet<String>();
+        subRealms.add("with");
+        subRealms.add("without");
+        subRealms.add("with/me");
+        Set<String> peerRealms = new HashSet<String>();
+
+        //when
+        boolean result = resourceTest.isRealmsValid(realm, realms,subRealms, peerRealms);
+
+        //then
+        assertTrue(result);
+    }
+
+    @Test
+    public void invalidateSubRealmsAreCorrectlyDiscovered() throws EntitlementException {
+
+        //given
+        ReferralsResourceV1 resourceTest = new ReferralsResourceV1(debug);
+        String realm = "/dance";
+        Set<String> realms = new HashSet<String>();
+        realms.add("/dance/with");
+        realms.add("/dance/without");
+        realms.add("/dance/with/me");
+        Set<String> subRealms = new HashSet<String>();
+        subRealms.add("along");
+        subRealms.add("to");
+        subRealms.add("the/tune");
+        Set<String> peerRealms = new HashSet<String>();
+
+        //when
+        boolean result = resourceTest.isRealmsValid(realm, realms,subRealms, peerRealms);
+
+        //then
+        assertFalse(result);
+    }
+
+    @Test
+    public void peerRealmsAreCorrectlyDiscovered() throws EntitlementException {
+        //given
+        ReferralsResourceV1 resourceTest = new ReferralsResourceV1(debug);
+        String realm = "/dance";
+        Set<String> realms = new HashSet<String>();
+        realms.add("/with");
+        realms.add("/me");
+        Set<String> subRealms = new HashSet<String>();
+        Set<String> peerRealms = new HashSet<String>();
+        peerRealms.add("with");
+        peerRealms.add("me");
+        peerRealms.add("dance");
+
+        //when
+        boolean result = resourceTest.isRealmsValid(realm, realms,subRealms, peerRealms);
+
+        //then
+        assertTrue(result);
+    }
+
+    @Test
+    public void invalidPeerRealmsAreCorrectlyDiscovered() throws EntitlementException {
+        //given
+        ReferralsResourceV1 resourceTest = new ReferralsResourceV1(debug);
+        String realm = "/dance";
+        Set<String> realms = new HashSet<String>();
+        realms.add("/along");
+        realms.add("/with");
+        realms.add("/me");
+        Set<String> subRealms = new HashSet<String>();
+        Set<String> peerRealms = new HashSet<String>();
+        peerRealms.add("with");
+        peerRealms.add("me");
+        peerRealms.add("dance");
+
+        //when
+        boolean result = resourceTest.isRealmsValid(realm, realms,subRealms, peerRealms);
+
+        //then
+        assertFalse(result);
     }
 
     @Test

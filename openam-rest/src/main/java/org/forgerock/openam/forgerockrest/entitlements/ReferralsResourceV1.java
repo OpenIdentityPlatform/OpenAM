@@ -15,6 +15,7 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
@@ -23,6 +24,7 @@ import com.sun.identity.entitlement.ReferralPrivilegeManager;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -104,7 +106,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      *
      * This method will NOT allow you to create referrals against applications which do not exist.
      * This method WILL NOT allow you to create referrals pointing to realms which do not exist.
-     * This method WILL NOT allow you to create referrals pointing to a realm's super-realm(s).
+     * This method WILL NOT allow you to create referrals pointing to a realm's super-realm(s), or themselves.
      *
      * This method WILL allow you to create referrals against resources which do not exist in your application,
      * or which are not compliant to your applications resource-pattern.
@@ -488,31 +490,44 @@ public class ReferralsResourceV1 extends RealmAwareResource {
         try {
             final SSOToken callerToken = serverContext.asContext(SSOTokenContext.class).getCallerSSOToken();
             final OrganizationConfigManager ocm = new OrganizationConfigManager(callerToken, realm);
-            final Set<String> tmpSubRealms = ocm.getSubOrganizationNames("*", true); //all subrealms
-            final Set<String> tmpPeerRealms = ocm.getPeerOrganizationNames(); //all peers (including context realm)
+            final Set<String> subRealms = ocm.getSubOrganizationNames("*", true); //all subrealms
+            final Set<String> peerRealms = ocm.getPeerOrganizationNames(); //all peers (including context realm)
 
-            final Set<String> validRealms = new HashSet<String>();
-
-            //the format returned from the ocm has no prefix, so prepend here (unless root context)
-            for (String subRealm : tmpSubRealms) {
-                String fixedRealm = realm.endsWith("/") ? realm + subRealm : realm + "/" + subRealm;
-                if (!fixedRealm.equals(realm)) { //ignore context realm
-                    validRealms.add(fixedRealm);
-                }
+            return isRealmsValid(realm, realms, subRealms, peerRealms);
+        } catch (SMSException e) {
+            if (debug.warningEnabled()) {
+                debug.error("ReferralsResource :: Querying for realm-information failed. ", e);
             }
-
-            for (String peerRealm : tmpPeerRealms) {
-                String fixedRealm = realm.substring(0, realm.lastIndexOf("/")) + peerRealm;
-                if (!peerRealm.equals(fixedRealm)) { //ignore context realm
-                    validRealms.add(fixedRealm);
-                }
+        } catch (SSOException e) {
+            if (debug.warningEnabled()) {
+                debug.error("ReferralsResource :: User SSOToken not valid for querying subrealms. ", e);
             }
-
-            return validRealms.containsAll(realms);
-
-        } catch (Exception e) { //handled in calling method
-            return false;
         }
+
+        return false;
+    }
+
+    boolean isRealmsValid(String realm, Set<String> realms, Set<String> subRealms, Set<String> peerRealms) {
+
+        Set<String> validRealms = new HashSet<String>();
+
+        //the format returned from the ocm has no prefix, so prepend here (unless root context)
+        for (String subRealm : subRealms) {
+            String fixedRealm = realm.endsWith("/") ? realm + subRealm : realm + "/" + subRealm;
+            if (!fixedRealm.equals(realm)) { //ignore context realm
+                validRealms.add(fixedRealm);
+            }
+        }
+
+        for (String peerRealm : peerRealms) {
+            String fixedRealm = realm.substring(0, realm.lastIndexOf("/") + 1) + peerRealm;
+            if (!fixedRealm.equals(realm)) { //ignore context realm
+                validRealms.add(fixedRealm);
+            }
+        }
+
+        return validRealms.containsAll(realms);
+
     }
 
 
