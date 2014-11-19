@@ -132,7 +132,7 @@ public class Cert extends AMLoginModule {
     // this is what appears in the user selectable choice field.
     private String amAuthCert_emailAddrTag; 
     private int amAuthCert_serverPort =389;
-    private static boolean portal_gw_cert_auth_enabled = false;
+    private boolean portal_gw_cert_auth_enabled = false;
     private Set portalGateways = null;
     // HTTP Header name to have clien certificate in servlet request.
     private String certParamName = null;
