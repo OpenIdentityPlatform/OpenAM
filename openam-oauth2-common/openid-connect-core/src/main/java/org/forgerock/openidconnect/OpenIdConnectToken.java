@@ -16,6 +16,14 @@
 
 package org.forgerock.openidconnect;
 
+import static org.forgerock.oauth2.core.Utils.isEmpty;
+
+import java.security.KeyPair;
+import java.security.SignatureException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
@@ -28,14 +36,6 @@ import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.security.KeyPair;
-import java.security.SignatureException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.forgerock.oauth2.core.Utils.isEmpty;
 
 /**
  * Models an OpenId Connect Token.
@@ -53,6 +53,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
     /**
      * Constructs a new OpenIdConnectToken.
      *
+     * @param kid The key id.
      * @param clientSecret The client's secret.
      * @param keyPair The token's signing key pair.
      * @param algorithm The algorithm.
@@ -64,19 +65,19 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param iat The issued at time.
      * @param ath The authenticated time.
      * @param nonce The nonce.
-     * @param ops The ops.
      * @param atHash The at_hash.
      * @param cHash The c_hash.
      * @param acr The acr.
      * @param amr The amr.
      */
-    public OpenIdConnectToken(byte[] clientSecret, KeyPair keyPair, String algorithm, String iss, String sub,
-            String aud, String azp, long exp, long iat, long ath, String nonce, String ops, String atHash, String cHash, String acr,
-            List<String> amr) {
+    public OpenIdConnectToken(String kid, byte[] clientSecret, KeyPair keyPair, String algorithm, String iss,
+            String sub, String aud, String azp, long exp, long iat, long ath, String nonce, String atHash, String cHash,
+            String acr, List<String> amr) {
         super(new HashMap<String, Object>());
         this.clientSecret = clientSecret;
         this.algorithm = algorithm;
         this.keyPair = keyPair;
+        setKid(kid);
         setIss(iss);
         setSub(sub);
         setAud(aud);
@@ -85,7 +86,6 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         setIat(iat);
         setAth(ath);
         setNonce(nonce);
-        setOps(ops);
         setAtHash(atHash);
         setCHash(cHash);
         setAcr(acr);
@@ -106,6 +106,11 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         if (!isEmpty(value)) {
             put(key, value);
         }
+    }
+
+    private void setKid(String kid) {
+        set(OAuth2Constants.CoreTokenParams.ID, kid);
+        set("kid", kid);
     }
 
     /**
@@ -214,16 +219,6 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      */
     private void setAmr(List<String> amr) {
         put(OAuth2Constants.JWTTokenParams.AMR, amr);
-    }
-
-
-    /**
-     * Sets the ops.
-     *
-     * @param ops The ops.
-     */
-    private void setOps(String ops) {
-        set(OAuth2Constants.JWTTokenParams.OPS, ops);
     }
 
     /**

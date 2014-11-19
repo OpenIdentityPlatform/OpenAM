@@ -16,6 +16,16 @@
 
 package org.forgerock.openam.openidconnect;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
@@ -30,18 +40,14 @@ import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.oauth2.OpenAMSettings;
 import org.forgerock.openidconnect.CheckSession;
-
-import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import org.restlet.Request;
 
 /**
  * Defines what is needed to do the OpenID Connect check session endpoint.
@@ -55,6 +61,8 @@ public class CheckSessionImpl implements CheckSession {
     private final OpenAMSettings openAMSettings;
     private final SigningManager signingManager;
     private final ClientRegistrationStore clientRegistrationStore;
+    private final CTSPersistentStore cts;
+    private final TokenAdapter<JsonValue> tokenAdapter;
 
     /**
      * Constructs a new CheckSessionImpl.
@@ -64,6 +72,8 @@ public class CheckSessionImpl implements CheckSession {
         openAMSettings = InjectorHolder.getInstance(OpenAMSettings.class);
         signingManager = InjectorHolder.getInstance(SigningManager.class);
         clientRegistrationStore = InjectorHolder.getInstance(ClientRegistrationStore.class);
+        cts = InjectorHolder.getInstance(CTSPersistentStore.class);
+        tokenAdapter = InjectorHolder.getInstance(Key.get(new TypeLiteral<TokenAdapter<JsonValue>>() { }));
     }
 
     /**
@@ -163,14 +173,16 @@ public class CheckSessionImpl implements CheckSession {
                 return false;
             }
 
-            String sessionID = (String) jwt.getClaimsSet().getClaim(OAuth2Constants.JWTTokenParams.OPS);
-            SSOToken ssoToken = ssoTokenManager.createSSOToken(sessionID);
+            String kid = (String) jwt.getClaimsSet().getClaim("kid");
+            JsonValue idTokenUserSessionToken = tokenAdapter.fromToken(cts.read(kid));
+            String sessionId = idTokenUserSessionToken.get(OAuth2Constants.JWTTokenParams.OPS).asString();
+
+            SSOToken ssoToken = ssoTokenManager.createSSOToken(sessionId);
             return ssoTokenManager.isValidToken(ssoToken);
         } catch (Exception e){
-            logger.error("Unable to get the SSO token in the JWT", e);
+            logger.error("Unable to get the SSO token", e);
             return false;
         }
-
     }
 
     private SignedJwt getIDToken(HttpServletRequest request) {

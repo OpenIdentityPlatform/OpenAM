@@ -21,6 +21,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
@@ -75,9 +76,10 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
         //todo - if necessary, match test impl. with OpenAMTokenStore.java
         final String acr = null;
         final List<String> amr = null;
+        String kid = UUID.randomUUID().toString();
 
-        return new OpenIdConnectToken(clientSecret, keyPair, algorithm, iss, resourceOwnerId, clientId,
-                authorizationParty, exp, timeInSeconds, timeInSeconds, nonce, ops, atHash, cHash, acr, amr);
+        return new OpenIdConnectToken(kid, clientSecret, keyPair, algorithm, iss, resourceOwnerId, clientId,
+                authorizationParty, exp, timeInSeconds, timeInSeconds, nonce, atHash, cHash, acr, amr);
     }
 
     /**

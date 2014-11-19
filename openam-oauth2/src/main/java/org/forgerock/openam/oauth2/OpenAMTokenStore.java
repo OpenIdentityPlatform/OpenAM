@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.oauth2;
 
+import static org.forgerock.json.fluent.JsonValue.*;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -171,9 +173,20 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final String acr = getAuthenticationContextClassReference(request);
 
-        return new OpenAMOpenIdConnectToken(clientSecret, keyPair,
-                algorithm, iss, resourceOwnerId, clientId, authorizationParty, exp, timeInSeconds, timeInSeconds, nonce,
-                ops, atHash, cHash, acr, amr, realm);
+        String kid = UUID.randomUUID().toString();
+
+        try {
+            tokenStore.create(json(object(
+                    field(OAuth2Constants.CoreTokenParams.ID, set(kid)),
+                    field(OAuth2Constants.JWTTokenParams.OPS, set(ops)),
+                    field(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, set(Long.toString(exp))))));
+        } catch (CoreTokenException e) {
+            logger.error("Unable to create id_token user session token", e);
+            throw new ServerException("Could not create token in CTS");
+        }
+
+        return new OpenAMOpenIdConnectToken(kid, clientSecret, keyPair, algorithm, iss, resourceOwnerId, clientId,
+                authorizationParty, exp, timeInSeconds, timeInSeconds, nonce, atHash, cHash, acr, amr, realm);
     }
 
     private List<String> getAMRFromAuthModules(OAuth2Request request, OAuth2ProviderSettings providerSettings) throws ServerException {

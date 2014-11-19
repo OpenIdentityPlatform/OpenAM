@@ -38,8 +38,8 @@ public interface OpenIDConnectProvider {
     /**
      * Destroys a users session.
      *
-     * @param sessionId The user's session id.
+     * @param kid The key id of the id token JWT
      * @throws ServerException If any internal server error occurs.
      */
-    void destroySession(String sessionId) throws ServerException;
+    void destroySession(String kid) throws ServerException;
 }

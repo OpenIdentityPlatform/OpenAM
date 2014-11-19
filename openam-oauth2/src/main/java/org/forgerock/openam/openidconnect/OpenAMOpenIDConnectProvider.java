@@ -18,8 +18,14 @@ package org.forgerock.openam.openidconnect;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.IdentityManager;
 import org.forgerock.openidconnect.OpenIDConnectProvider;
 import org.slf4j.Logger;
@@ -39,17 +45,24 @@ public class OpenAMOpenIDConnectProvider implements OpenIDConnectProvider {
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final SSOTokenManager tokenManager;
     private final IdentityManager identityManager;
+    private final CTSPersistentStore cts;
+    private final TokenAdapter<JsonValue> tokenAdapter;
 
     /**
      * Constructs a new OpenAMOpenIDConnectProvider.
      *
      * @param tokenManager An instance of the SSOTokenManager.
      * @param identityManager An instance of the IdentityManager.
+     * @param cts An instance of the CTSPersistentStore.
+     * @param tokenAdapter An instance of the TokenAdapter to convert CTS tokens into JsonValue.
      */
     @Inject
-    public OpenAMOpenIDConnectProvider(SSOTokenManager tokenManager, IdentityManager identityManager) {
+    public OpenAMOpenIDConnectProvider(SSOTokenManager tokenManager, IdentityManager identityManager,
+            CTSPersistentStore cts, TokenAdapter<JsonValue> tokenAdapter) {
         this.tokenManager = tokenManager;
         this.identityManager = identityManager;
+        this.cts = cts;
+        this.tokenAdapter = tokenAdapter;
     }
 
     /**
@@ -68,10 +81,18 @@ public class OpenAMOpenIDConnectProvider implements OpenIDConnectProvider {
     /**
      * {@inheritDoc}
      */
-    public void destroySession(String sessionId) throws ServerException {
+    public void destroySession(String kid) throws ServerException {
         try {
+            JsonValue idTokenUserSessionToken = tokenAdapter.fromToken(cts.read(kid));
+            cts.delete(kid);
+            String sessionId = idTokenUserSessionToken.get(OAuth2Constants.JWTTokenParams.OPS).asSet(String.class)
+                    .iterator().next();
+
             final SSOToken token = tokenManager.createSSOToken(sessionId);
             tokenManager.destroyToken(token);
+        } catch (CoreTokenException e) {
+            logger.error("Unable to get id_token meta data", e);
+            throw new ServerException("Unable to get id_token meta data");
         } catch (Exception e) {
             logger.error("Unable to get SsoTokenManager", e);
             throw new ServerException("Unable to get SsoTokenManager");
