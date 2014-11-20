@@ -31,6 +31,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.data.Disposition;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -227,6 +228,55 @@ public class XacmlServiceTest {
         verify(importExport).exportXACML(eq("/"), any(Subject.class), listCaptor.capture());
         assertThat(listCaptor.getValue()).containsExactly("test1", "test2");
     }
+
+    @Test
+    public void testDispositionOfRootRealmExport() throws Exception {
+        //given
+        query.add(XacmlService.QUERY_PARAM_STRING, "test1");
+        query.add(XacmlService.QUERY_PARAM_STRING, "test2");
+        PolicySet policySet = new PolicySet();
+        doReturn(policySet).when(importExport).exportXACML(eq("/"), any(Subject.class), any(List.class));
+
+        //when
+        Representation result = service.exportXACML("/");
+        Disposition disposition = result.getDisposition();
+
+        assertThat(disposition.getFilename()).isEqualTo("realm-policies.xml");
+        assertThat(disposition.getType()).isEqualTo(disposition.TYPE_ATTACHMENT);
+    }
+
+    @Test
+    public void testDispositionOfSubRealmExport() throws Exception {
+        //given
+        query.add(XacmlService.QUERY_PARAM_STRING, "test1");
+        query.add(XacmlService.QUERY_PARAM_STRING, "test2");
+        PolicySet policySet = new PolicySet();
+        doReturn(policySet).when(importExport).exportXACML(eq("/"), any(Subject.class), any(List.class));
+
+        //when
+        Representation result = service.exportXACML("/sub");
+        Disposition disposition = result.getDisposition();
+
+        assertThat(disposition.getFilename()).isEqualTo("sub-realm-policies.xml");
+        assertThat(disposition.getType()).isEqualTo(disposition.TYPE_ATTACHMENT);
+    }
+
+    @Test
+    public void testDispositionOfSubSubRealmExport() throws Exception {
+        //given
+        query.add(XacmlService.QUERY_PARAM_STRING, "test1");
+        query.add(XacmlService.QUERY_PARAM_STRING, "test2");
+        PolicySet policySet = new PolicySet();
+        doReturn(policySet).when(importExport).exportXACML(eq("/"), any(Subject.class), any(List.class));
+
+        //when
+        Representation result = service.exportXACML("/sub1/sub2");
+        Disposition disposition = result.getDisposition();
+
+        assertThat(disposition.getFilename()).isEqualTo("sub1-sub2-realm-policies.xml");
+        assertThat(disposition.getType()).isEqualTo(disposition.TYPE_ATTACHMENT);
+    }
+
 
     @Test
     public void testExportXACMLEntitlementException() throws Exception {

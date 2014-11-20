@@ -28,6 +28,8 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
+import org.forgerock.util.annotations.VisibleForTesting;
+import org.restlet.data.Disposition;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.OutputRepresentation;
@@ -52,7 +54,11 @@ import java.util.Map;
  * Provides XACML based services
  */
 public class XacmlService extends ServerResource {
+
     public static final String QUERY_PARAM_STRING = "filter";
+
+    private static final String ROOT_REALM = "/";
+
     private final XACMLExportImport importExport;
     private final AdminTokenAction admin;
     private final Debug debug;
@@ -132,6 +138,17 @@ public class XacmlService extends ServerResource {
     @Get
     public Representation exportXACML() throws ResourceException {
         String realm = RestletRealmRouter.getRealmFromRequest(getRequest());
+        return exportXACML(realm);
+    }
+
+    /**
+     * This version of exportXACML here for testing - it saves trying to mock the static getRealmFromRequest
+     * @param realm The realm
+     * @return Representation object wrapping the converted XACML
+     */
+    @VisibleForTesting
+    Representation exportXACML(String realm) throws ResourceException {
+
         List<String> filters = new ArrayList<String>(
                 Arrays.asList(getQuery().getValuesArray(QUERY_PARAM_STRING)));
 
@@ -144,7 +161,8 @@ public class XacmlService extends ServerResource {
         }
 
         getResponse().setStatus(Status.SUCCESS_OK);
-        return new OutputRepresentation(XACMLServiceEndpointApplication.APPLICATION_XML_XACML3) {
+
+        Representation result = new OutputRepresentation(XACMLServiceEndpointApplication.APPLICATION_XML_XACML3) {
             @Override
             public void write(OutputStream outputStream) throws IOException {
                 try {
@@ -154,6 +172,29 @@ public class XacmlService extends ServerResource {
                 }
             }
         };
+        // OPENAM-4974
+        Disposition disposition = new Disposition();
+        disposition.setType(disposition.TYPE_ATTACHMENT);
+        disposition.setFilename(getPolicyAttachmentFileName(realm));
+        result.setDisposition(disposition);
+
+        return result;
     }
 
+    /**
+     * Figure the name of the attachment file that will be created to contain the policies.  See OPENAM-4974.
+     * File naming agreed with Andy H.
+     *
+     * @param realm The realm
+     * @return A suitable file name, involving the realm in a meaningful way.
+     */
+    private String getPolicyAttachmentFileName(String realm) {
+        String result;
+        if (ROOT_REALM.equals(realm)) {
+            result = "realm-policies";
+        } else {
+            result = realm.substring(1).replace('/', '-') + "-realm-policies";
+        }
+        return result + ".xml";
+    }
 }
