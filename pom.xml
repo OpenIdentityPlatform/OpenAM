@@ -121,8 +121,8 @@
         <opendj.sdk.version>2.6.9</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.3.5</commons.forgerock-util.version>
-        <commons.authfilter.version>1.5.0</commons.authfilter.version>
-        <forgerock.json.version>2.4.1-SNAPSHOT</forgerock.json.version>
+        <commons.authfilter.version>1.5.1</commons.authfilter.version>
+        <forgerock.json.version>2.4.1</forgerock.json.version>
         <forgerock-ui.version>1.1.8-SNAPSHOT</forgerock-ui.version>
         <restlet.version>2.1.7</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -488,11 +488,6 @@
     <dependencyManagement>
         <dependencies>
             <!-- OpenAM project dependencies -->
-            <dependency>
-                <artifactId>openig-core</artifactId>
-                <groupId>org.forgerock.openig</groupId>
-                <version>2.2.0-SNAPSHOT</version>
-            </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-shared</artifactId>
