@@ -1417,7 +1417,7 @@ admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*\
         <entry>realm</entry>
         <entry>None - the only required field to add a realm</entry>
         <entry><para>The name of the realm</para>
-         <para>Example: <literal>testRealm</literal></para></entry>
+         <para>Example: <literal>myRealm</literal></para></entry>
        </row>
        <row>
         <entry>sunOrganizationStatus</entry>
@@ -1472,9 +1472,9 @@ $ <userinput>curl \
  --request POST \
  --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
  --header "Content-Type: application/json" \
- --data '{ "realm": "testRealm" }' \
+ --data '{ "realm": "myRealm" }' \
  https://openam.example.com:8443/openam/json/realms/?_action=create</userinput>
-<computeroutput>{"realmCreated":"/testRealm"}</computeroutput>
+<computeroutput>{"realmCreated":"/myRealm"}</computeroutput>
      </screen>
 
     <para>You can also set the <literal>sunOrganizationAliases</literal> parameter,
@@ -1493,7 +1493,7 @@ $ <userinput>curl \
  --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
  --header "Content-Type: application/json" \
  --data '{ "sunOrganizationStatus": "Active" }' \
- https://openam.example.com:8443/openam/json/realms/testRealm</userinput>
+ https://openam.example.com:8443/openam/json/realms/myRealm</userinput>
      </screen>
 
     <para>
@@ -1517,12 +1517,12 @@ $ <userinput>curl \
    down the correct information and add it using <xref linkend="rest-api-update-realm" /></para>
    
     <para>The following example shows an administrator receiving information about
-    the <literal>testRealm</literal>.</para>
+    a realm called <literal>myRealm</literal>.</para>
 
     <screen>
 $ <userinput>curl \
  --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
- https://openam.example.com:8443/openam/json/realms/testRealm</userinput>
+ https://openam.example.com:8443/openam/json/realms/myRealm</userinput>
 <computeroutput>{
     "serviceNames":[
                   "sunAMAuthHOTPService",
@@ -1589,7 +1589,8 @@ $ <userinput>curl \
    of the JSON representation of the changes to
    <literal>/json/realms/<replaceable>realm-id</replaceable></literal>.</para>
 
-    <para>The following example shows how to update a realm.</para>
+    <para>The following example shows how to update a realm called
+     <literal>myRealm</literal>.</para>
    
      <screen>
 $ <userinput>curl \
@@ -1597,7 +1598,7 @@ $ <userinput>curl \
  --header "iplanetDirectoryPro: AQIC5...Y3MTAx*" \
  --header "Content-Type: application/json" \
  --data '{ "sunOrganizationStatus": "Active" }' \
- https://openam.example.com:8443/openam/json/realms/testRealm</userinput>
+ https://openam.example.com:8443/openam/json/realms/myRealm</userinput>
      </screen>
 
     <para>OpenAM returns the JSON representation of the
@@ -1613,9 +1614,11 @@ $ <userinput>curl \
    <para>OpenAM lets administrators delete a realm by making an HTTP DELETE call to
    <literal>/json/realms/<replaceable>realm-id</replaceable></literal>.</para>
 
-    <para>The following example deletes a realm. The top level realm cannot
-    be deleted. Only administrators should delete realms. The name of the realm
-    is the only field required to delete the realm.</para>
+    <para>The following example deletes a realm called <literal>myRealm</literal>.
+     The top level realm cannot be deleted. Only administrators
+     should delete realms. The name of the realm is the only field required to
+     delete the realm.</para>
+
     <para>Make sure that you do not have any information you need within a realm 
     before deleting it. Once a realm is deleted, the only way to restore it is 
     to return to a backed up deployment of OpenAM.</para>
@@ -1624,7 +1627,7 @@ $ <userinput>curl \
 $ <userinput>curl \
  --request DELETE \
  --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
- https://openam.example.com:8443/openam/json/realms/testRealm</userinput>
+ https://openam.example.com:8443/openam/json/realms/myRealm</userinput>
 <computeroutput>{"success":"true"}</computeroutput>
     </screen>
 

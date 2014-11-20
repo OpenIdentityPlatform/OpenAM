@@ -68,7 +68,7 @@
  
  <para>
   You create new realms to subdivide authentication and authorization,
-  and to delegate management of sub-realms.
+  and to delegate management of subrealms.
   For example, your organization might require separate realms for payroll,
   human resources, and IT management domains and their applications.
  </para>

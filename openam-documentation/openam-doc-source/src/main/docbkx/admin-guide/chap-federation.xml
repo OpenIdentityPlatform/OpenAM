@@ -1021,7 +1021,7 @@ CookieWriterServlet.doGetPost: Redirect to
       <replaceable>realm-name</replaceable> nor
       <replaceable>provider-name</replaceable> can contain slash characters
       (<literal>/</literal>). For example:
-      <literal>/realm/sub-realm/idp</literal>.</para>
+      <literal>/myRealm/mySubrealm/idp</literal>.</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -1435,7 +1435,7 @@ CookieWriterServlet.doGetPost: Redirect to
       <replaceable>realm-name</replaceable> nor
       <replaceable>provider-name</replaceable> can contain slash characters
       (<literal>/</literal>). For example:
-      <literal>/realm/sub-realm/sp</literal>.</para>
+      <literal>/myRealm/mySubrealm/sp</literal>.</para>
      </listitem>
     </varlistentry>
    </variablelist>

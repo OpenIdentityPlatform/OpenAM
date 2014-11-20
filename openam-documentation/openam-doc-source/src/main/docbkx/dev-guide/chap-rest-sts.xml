@@ -665,7 +665,7 @@ https://host.com:443/openam/rest-sts-publish/publish/accounting/accountingsts
  <section xml:id="rest-sts-code-examples">
   <title>REST STS Code Examples</title>
   <para>
-   The code example shows how to programatically publish REST STS instances.
+   The code example shows how to programmatically publish REST STS instances.
   </para>
   <programlisting>
 package org.forgerock.openam.sts.rest;
@@ -1148,14 +1148,14 @@ public class RestSTSConsumer {
     /**
      *
      * @param restSTSInstanceTranslateUrl The full url of the REST STS instance,
-     *        with the translate action specfied. For example, for a REST STS
+     *        with the translate action specified. For example, for a REST STS
      *        instance with a deployment url of instanceId, published to the root
      *        realm, the url would be:
      *        http://amhost.com:8080/openam/rest-sts/instanceId?_action=translate
      *        A REST STS instance published to realm fred with a deployment
      *        url of instanceId2, the url would be:
      *        http://amhost.com:8080/openam/rest-sts/fred/instanceId2?_action=translate
-     *        A REST STS instance published to realm bobo, a sub-realm of fred
+     *        A REST STS instance published to realm bobo, a subrealm of fred
      *        with a deployment url of instanceId3, the url would be:
      *        http://amhost.com:8080/openam/rest-sts/fred/bobo/instanceId3?_action=translate
      * @param stsClientCertHeaderName The header name, configured for the REST STS instance,

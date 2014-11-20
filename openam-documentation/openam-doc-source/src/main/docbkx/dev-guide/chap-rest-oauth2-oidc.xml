@@ -523,17 +523,17 @@ $ <userinput>curl \
 $ <userinput>curl \
  --request DELETE \
  --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*" \
- https://openam.example.com:8443/openam/frrest/oauth2/client/testClient</userinput>
+ https://openam.example.com:8443/openam/frrest/oauth2/client/myClient</userinput>
 <computeroutput>{"success":"true"}</computeroutput>
    </screen>
-   <tip><para>To delete an OAuth 2.0 client from a sub-realm, add the name of the
-    sub-realm in a query parameter named <literal>realm</literal>, as
+   <tip><para>To delete an OAuth 2.0 client from a subrealm, add the name of the
+    subrealm in a query parameter named <literal>realm</literal>, as
     in the following example:</para>
 <para><screen>
 $ <userinput>curl \
  --request DELETE \
  --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*" \
- https://openam.example.com:8443/openam/frrest/oauth2/client/testClient?realm=testRealm</userinput>
+ https://openam.example.com:8443/openam/frrest/oauth2/client/myClient?realm=myRealm</userinput>
 <computeroutput>{"success":"true"}</computeroutput></screen></para>
    </tip>
 

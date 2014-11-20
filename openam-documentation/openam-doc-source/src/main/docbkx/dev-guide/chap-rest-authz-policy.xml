@@ -188,7 +188,8 @@
     To request policy decisions for specific resources,
     perform an HTTP POST using the evaluation action
     to the appropriate path under the URI where OpenAM is deployed,
-    <literal>/json[/<replaceable>realm</replaceable>]/policies?_action=evaluate</literal>,
+    <literal>/json[/<replaceable>realm</replaceable>][/
+     <replaceable>subrealm</replaceable>]/policies?_action=evaluate</literal>,
     where <replaceable>realm</replaceable> optionally specifies the realm.
     The payload for the HTTP POST is a JSON object
     that specifies at least the resources,
@@ -361,7 +362,8 @@ $ <userinput>curl \
     ],
     "application": "iPlanetAMWebAgentService"
  }' \
- https://openam.example.com:8443/openam/json/realm/policies?_action=evaluate</userinput>
+ https://openam.example.com:8443/openam/json/myRealm/policies?_action
+    =evaluate</userinput>
 <computeroutput>[ {
   "resource" : "http://www.example.com:80/do?action=run",
   "actions" : {
@@ -369,7 +371,7 @@ $ <userinput>curl \
   "attributes" : {
   },
   "advices" : {
-    "AuthLevelConditionAdvice" : [ "/realm:3" ]
+    "AuthLevelConditionAdvice" : [ "/myRealm:3" ]
   }
 }, {
   "resource" : "http://www.example.com:80/index.html",
@@ -462,7 +464,7 @@ $ <userinput>curl \
        In the example, the policy that applies
        to <literal>http://www.example.com:80/do?action=run</literal>
        requests that the subject be authenticated
-       in realm <literal>/realm</literal>
+       in realm <literal>/myRealm</literal>
        at an authentication level of at least 3.
       </para>
 
@@ -470,7 +472,7 @@ $ <userinput>curl \
 {
     "advices": {
         "AuthLevelConditionAdvice": [
-            "/realm:3"
+            "/myRealm:3"
         ]
     }
 }
@@ -714,7 +716,7 @@ $ <userinput>curl \
     "name": "realm",
     "properties": {
         "AuthenticateToRealm": [
-            "/realm"
+            "/myRealm"
         ]
     }
 }
@@ -727,7 +729,7 @@ $ <userinput>curl \
    <programlisting language="javascript">
 {
     "AuthenticateToRealmConditionAdvice": [
-        "/realm"
+        "/myRealm"
     ]
 }
    </programlisting>
@@ -997,7 +999,7 @@ $ <userinput>curl \
     "resource": "http://www.example.com/",
     "subject": { "ssoToken": "AQIC5...zE4*" }
  }' \
- https://openam.example.com:8443/openam/json/realm/policies?_action=evaluateTree</userinput>
+ https://openam.example.com:8443/openam/json/myRealm/policies?_action=evaluateTree</userinput>
 <computeroutput>[ {
   "resource" : "http://www.example.com:80/",
   "actions" : {
@@ -1684,7 +1686,7 @@ $ <userinput>curl \
         "subjectName": "Bob Dobbs"
     }
 }' \
- https://openam.example.com:8443/openam/json/realm/policies/example
+ https://openam.example.com:8443/openam/json/myRealm/policies/example
 </userinput>
 <computeroutput>{
   "name" : "example",
@@ -1752,7 +1754,8 @@ $ <userinput>curl \
         "subjectName": "Bob Dobbs"
     }
 }' \
- https://openam.example.com:8443/openam/json/realm/policies?_action=create</userinput>
+ https://openam.example.com:8443/openam/json/myRealm/policies?_action=create
+      </userinput>
 <computeroutput>{
   "name" : "example",
   "active" : true,
@@ -1796,7 +1799,7 @@ $ <userinput>curl \
    <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/realm/policies/example
+ https://openam.example.com:8443/openam/json/myRealm/policies/example
 </userinput>
 <computeroutput>{
   "name" : "example",
@@ -1871,7 +1874,7 @@ $ <userinput>curl \
         "subjectName": "Bob Dobbs"
     }
 }' \
- https://openam.example.com:8443/openam/json/realm/policies/example
+ https://openam.example.com:8443/openam/json/myRealm/policies/example
 </userinput>
 <computeroutput>{
   "name" : "example",
@@ -1925,7 +1928,7 @@ $ <userinput>curl \
          "subjectName": "Bob Dobbs"
      }
  }' \
- https://openam.example.com:8443/openam/json/realm/policies/example
+ https://openam.example.com:8443/openam/json/myRealm/policies/example
 </userinput>
 <computeroutput>{
     "name" : "new-example",
@@ -1978,7 +1981,7 @@ $ <userinput>curl \
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w..." \
  --request DELETE \
- https://openam.example.com:8443/openam/json/realm/policies/example</userinput>
+ https://openam.example.com:8443/openam/json/myRealm/policies/myPolicy</userinput>
 <computeroutput>{}</computeroutput>
    </screen>
   </section>
@@ -1994,7 +1997,8 @@ $ <userinput>curl \
    <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w..." \
- https://openam.example.com:8443/openam/json/realm/policies?_queryFilter=true</userinput>
+ https://openam.example.com:8443/openam/json/myRealm/policies?_queryFilter=true
+   </userinput>
 <computeroutput>{
   "result" : [ ...policies... ],
   "resultCount" : 0,
@@ -2649,7 +2653,7 @@ $ <userinput>curl \
      "condition type",
      ...
   ],
-  "realm": "/realm",
+  "realm": "/myRealm",
   "applicationType": "application type name string",
   "description": "string describing application",
   "resourceComparator": "resource comparator class name",
@@ -3158,9 +3162,9 @@ $ <userinput>curl \
    <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/realm/applications/iPlanetAMWebAgentService</userinput>
+ https://openam.example.com:8443/openam/json/myRealm/applications/myApp</userinput>
 <computeroutput>{
-  "name" : "iPlanetAMWebAgentService",
+  "name" : "myApp",
   "resources" : [ "http://*:*/*", "http://*:*/*?*" ],
   "actions" : {
     "POST" : true,
@@ -3182,7 +3186,7 @@ $ <userinput>curl \
     "daysOfWeek",
     "and"
   ],
-  "realm" : "/",
+  "realm" : "/myRealm",
   "creationDate" : 1398760362341,
   "lastModifiedDate" : 1398760362341,
   "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
@@ -3375,10 +3379,11 @@ $ <userinput>curl \
    <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/realm/applications?_queryFilter=true</userinput>
+ https://openam.example.com:8443/openam/json/myRealm/applications?_queryFilter
+    =true</userinput>
 <computeroutput>{
   "result" : [ {
-    "name" : "iPlanetAMWebAgentService",
+    "name" : "myApp",
     "resources" : [ "http://*:*/*", "http://*:*/*?*" ],
     "actions" : {
       "POST" : true,
@@ -3400,7 +3405,7 @@ $ <userinput>curl \
       "daysOfWeek",
       "and"
     ],
-    "realm" : "/",
+    "realm" : "/myRealm",
     "creationDate" : 1398760362341,
     "lastModifiedDate" : 1398760362341,
     "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
@@ -3802,7 +3807,7 @@ $ <userinput>curl \
    <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/realm/conditiontypes/IP</userinput>
+ https://openam.example.com:8443/openam/json/myRealm/conditiontypes/IP</userinput>
 <computeroutput>{
   "title" : "IP",
   "logical" : false,
@@ -3849,7 +3854,8 @@ $ <userinput>curl \
    <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/realm/conditiontypes/NOT</userinput>
+ https://openam.example.com:8443/openam/json/myRealm/conditiontypes
+    /NOT</userinput>
 <computeroutput>{
   "title" : "NOT",
   "logical" : true,
@@ -3886,7 +3892,7 @@ $ <userinput>curl \
    <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/realm/conditiontypes/OR</userinput>
+ https://openam.example.com:8443/openam/json/myRealm/conditiontypes/OR</userinput>
 <computeroutput>{
   "title" : "OR",
   "logical" : true,
@@ -3937,7 +3943,7 @@ $ <userinput>curl \
    <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/realm/conditiontypes?_queryFilter=true</userinput>
+ https://openam.example.com:8443/openam/json/myRealm/conditiontypes?_queryFilter=true</userinput>
 <computeroutput>{
   "result" : [ ... condition types ... ],
   "resultCount" : 10,

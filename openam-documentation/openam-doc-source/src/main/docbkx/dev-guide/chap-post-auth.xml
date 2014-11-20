@@ -261,11 +261,12 @@ $ <userinput>ssoadm
  --adminid amadmin
  --password-file /tmp/pwd.txt
  --servicename iPlanetAMAuthService
- --realm /realm
+ --realm /myRealm
  --attributevalues iplanet-am-auth-post-login-process-class=
  com.forgerock.openam.examples.SamplePAP</userinput>
 
-<computeroutput>iPlanetAMAuthService under /realm was modified.</computeroutput>
+<computeroutput>iPlanetAMAuthService under /myRealm was
+ modified.</computeroutput>
   </screen>
  </section>
 
@@ -276,10 +277,10 @@ $ <userinput>ssoadm
    To test the sample post authentication plugin,
    login successfully to OpenAM in the scope where the plugin is configured.
    For example, if you configured your plugin for the realm,
-   <literal>/realm</literal>, specify the realm in the login URL.
+   <literal>/myRealm</literal>, specify the realm in the login URL.
   </para>
   
-  <literallayout class="monospaced">http://openam.example.com:8080/openam/UI/Login?realm=realm</literallayout>
+  <literallayout class="monospaced">http://openam.example.com:8080/openam/UI/Login?realm=myRealm</literallayout>
   
   <para>
    Although as a user you do not notice anywhere in the user interface

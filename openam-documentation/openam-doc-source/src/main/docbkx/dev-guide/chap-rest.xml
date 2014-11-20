@@ -1211,7 +1211,7 @@ $ <userinput>curl \
  --request POST \
  --header "Content-Type: application/json" \
  http://openam.example.com:8080/openam/json/sessions/AQIC5...?_action=validate</userinput>
-<computeroutput>{"valid":true,"uid":"demo","realm":"/realm"}</computeroutput>
+<computeroutput>{"valid":true,"uid":"demo","realm":"/myRealm"}</computeroutput>
    </screen>
 
    <para>

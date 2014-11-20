@@ -309,7 +309,7 @@ $ <userinput>cp -r default_fr/* openam_fr/services/ventes/html</userinput>
     <term>Realm</term>
     <listitem>
      <para>Realms can be nested. OpenAM uses the nesting as necessary to look
-     for files specific to a sub-realm before looking in the parent
+     for files specific to a subrealm before looking in the parent
      realm.</para>
      <para>For all realms below the top level realm, OpenAM adds a 
      <filename>services</filename> directory before the realm to the search
@@ -349,69 +349,69 @@ $ <userinput>cp -r default_fr/* openam_fr/services/ventes/html</userinput>
    <title>UI File Lookup</title>
 
    <para>OpenAM looks up <filename>Login.jsp</filename> in the following order
-   for a realm named <literal>realm</literal>, with the browser requesting
+   for a realm named <literal>myRealm</literal>, with the browser requesting
    <literal>en_GB</literal> locale, the platform locale being
    <literal>hu_HU</literal>, and the configuration suffix named
    <literal>o=openam</literal>. The client name used in this example is the
    generic client name <literal>html</literal>.</para>
 
    <programlisting language="none">
-openam_en_GB/services/realm/html/Login.jsp
-openam_en_GB/services/realm/Login.jsp
+openam_en_GB/services/myRealm/html/Login.jsp
+openam_en_GB/services/myRealm/Login.jsp
 openam_en_GB/services/html/Login.jsp
 openam_en_GB/services/Login.jsp
 openam_en_GB/html/Login.jsp
 openam_en_GB/Login.jsp
-openam_en/services/realm/html/Login.jsp
-openam_en/services/realm/Login.jsp
+openam_en/services/myRealm/html/Login.jsp
+openam_en/services/myRealm/Login.jsp
 openam_en/services/html/Login.jsp
 openam_en/services/Login.jsp
 openam_en/html/Login.jsp
 openam_en/Login.jsp
-openam_hu_HU/services/realm/html/Login.jsp
-openam_hu_HU/services/realm/Login.jsp
+openam_hu_HU/services/myRealm/html/Login.jsp
+openam_hu_HU/services/myRealm/Login.jsp
 openam_hu_HU/services/html/Login.jsp
 openam_hu_HU/services/Login.jsp
 openam_hu_HU/html/Login.jsp
 openam_hu_HU/Login.jsp
-openam_hu/services/realm/html/Login.jsp
-openam_hu/services/realm/Login.jsp
+openam_hu/services/myRealm/html/Login.jsp
+openam_hu/services/myRealm/Login.jsp
 openam_hu/services/html/Login.jsp
 openam_hu/services/Login.jsp
 openam_hu/html/Login.jsp
 openam_hu/Login.jsp
-openam/services/realm/html/Login.jsp
-openam/services/realm/Login.jsp
+openam/services/myRealm/html/Login.jsp
+openam/services/myRealm/Login.jsp
 openam/services/html/Login.jsp
 openam/services/Login.jsp
 openam/html/Login.jsp
 openam/Login.jsp
-default_en_GB/services/realm/html/Login.jsp
-default_en_GB/services/realm/Login.jsp
+default_en_GB/services/myRealm/html/Login.jsp
+default_en_GB/services/myRealm/Login.jsp
 default_en_GB/services/html/Login.jsp
 default_en_GB/services/Login.jsp
 default_en_GB/html/Login.jsp
 default_en_GB/Login.jsp
-default_en/services/realm/html/Login.jsp
-default_en/services/realm/Login.jsp
+default_en/services/myRealm/html/Login.jsp
+default_en/services/myRealm/Login.jsp
 default_en/services/html/Login.jsp
 default_en/services/Login.jsp
 default_en/html/Login.jsp
 default_en/Login.jsp
-default_hu_HU/services/realm/html/Login.jsp
-default_hu_HU/services/realm/Login.jsp
+default_hu_HU/services/myRealm/html/Login.jsp
+default_hu_HU/services/myRealm/Login.jsp
 default_hu_HU/services/html/Login.jsp
 default_hu_HU/services/Login.jsp
 default_hu_HU/html/Login.jsp
 default_hu_HU/Login.jsp
-default_hu/services/realm/html/Login.jsp
-default_hu/services/realm/Login.jsp
+default_hu/services/myRealm/html/Login.jsp
+default_hu/services/myRealm/Login.jsp
 default_hu/services/html/Login.jsp
 default_hu/services/Login.jsp
 default_hu/html/Login.jsp
 default_hu/Login.jsp
-default/services/realm/html/Login.jsp
-default/services/realm/Login.jsp
+default/services/myRealm/html/Login.jsp
+default/services/myRealm/Login.jsp
 default/services/html/Login.jsp
 default/services/Login.jsp
 default/html/Login.jsp
@@ -497,7 +497,8 @@ default/Login.jsp
      ]
 }</programlisting>
 
-     <para>For a new realm named <literal>realm1</literal>, the revised <filename>themeConfig.json</filename> file
+     <para>For a new realm named <literal>myRealm</literal>, the revised
+      <filename>themeConfig.json</filename> file
      should look similar to:</para>
 
      <programlisting language="javascript">
@@ -518,9 +519,9 @@ default/Login.jsp
              }
          },
          {
-            "name": "realm1",
-            "path": "path/to/realm1/",
-            "realms": ["realm1.*"],
+            "name": "myRealm",
+            "path": "path/to/myRealm/",
+            "realms": ["myRealm.*"],
             "regex": true,
 
          . . .

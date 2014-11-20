@@ -2030,7 +2030,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>SelectReferralType.jsp</literal></term>
                 <listitem>
-                    <para>Supports the configuration of a referral type for a sub-realm.</para>
+                    <para>Supports the configuration of a referral type for a subrealm.</para>
                 </listitem>
             </varlistentry>
 
@@ -4870,7 +4870,8 @@ to a runtime exception with messages that I think suggest that it needed to be c
    </varlistentry>
 
    <varlistentry>
-    <term>/json[/realm/]policies</term>
+    <term>/json[/<replaceable>realm</replaceable>][/
+     <replaceable>subrealm</replaceable>]/policies</term>
     <listitem>
      <para>Authorization: Supports the management of policies; both for
       requesting policy decisions, and also for administering policy definitions.
