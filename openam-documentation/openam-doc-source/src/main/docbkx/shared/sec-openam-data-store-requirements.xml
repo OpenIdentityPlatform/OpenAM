@@ -56,7 +56,7 @@
 
    <tbody>
     <row>
-     <entry>Embedded OpenDJ</entry>
+     <entry>Embedded OpenDJ (included in OpenAM)</entry>
      <entry>2.6.2</entry>
      <entry>Supported</entry>
      <entry>Supported</entry>

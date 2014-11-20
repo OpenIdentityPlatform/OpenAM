@@ -140,7 +140,7 @@
         <jeePaDocBase>http://openam.forgerock.org/openam-documentation/openam-doc-source/doc</jeePaDocBase>
         <webPaDocBase>http://openam.forgerock.org/openam-documentation/openam-doc-source/doc</webPaDocBase>
 
-        <opendjDocBase>http://docs.forgerock.org/en/opendj/${opendj.server.version}</opendjDocBase>
+        <opendjDocBase>http://docs.forgerock.org/en/opendj/2.6.0</opendjDocBase>
 
         <site-out>${project.build.outputDirectory}/site</site-out>
         <javadocBase>http://openam.forgerock.org/apidocs/</javadocBase>
