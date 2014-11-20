@@ -18,15 +18,13 @@ package com.sun.identity.entitlement;
 
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.utils.JsonValueBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.security.auth.Subject;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-
-import static org.forgerock.json.fluent.JsonValue.*;
 
 /**
  * A policy subject condition that examines claims in a Json Web Token (JWT) subject, such as an OpenID Connect
@@ -45,15 +43,25 @@ public class JwtClaimSubject implements EntitlementSubject {
 
     @Override
     public void setState(final String state) {
-        final JsonValue json = JsonValueBuilder.toJsonValue(state);
-        this.claimName = json.get(CLAIM_FIELD).asString();
-        this.claimValue = json.get(VALUE_FIELD).asString();
+        try {
+            final JSONObject json = new JSONObject(state);
+            this.claimName = json.getString(CLAIM_FIELD);
+            this.claimValue = json.getString(VALUE_FIELD);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public String getState() {
-        return json(object(field(CLAIM_FIELD, claimName),
-                           field(VALUE_FIELD, claimValue))).toString();
+        try {
+            final JSONObject json = new JSONObject();
+            json.put(CLAIM_FIELD, claimName);
+            json.put(VALUE_FIELD, claimValue);
+            return json.toString(2);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
