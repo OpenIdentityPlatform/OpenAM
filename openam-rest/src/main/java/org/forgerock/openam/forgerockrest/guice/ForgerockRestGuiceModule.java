@@ -295,7 +295,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.POLICY_CLASS_NOT_INSTANTIABLE,ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.POLICY_CLASS_NOT_ACCESSIBLE,  ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.INVALID_PROPERTY_VALUE_UNKNOWN_VALUE, ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.POLICY_ALREADY_EXISTS, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.POLICY_ALREADY_EXISTS, ResourceException.CONFLICT);
             handlers.put(EntitlementException.END_IP_BEFORE_START_IP, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.IP_CONDITION_CONFIGURATION_REQUIRED, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.PAIR_PROPERTY_NOT_DEFINED, ResourceException.BAD_REQUEST);

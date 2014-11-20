@@ -104,7 +104,7 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
                 String dn = getPolicyDistinguishedName(realm, name);
 
                 if (SMSEntry.checkIfEntryExists(dn, dsameUserToken)) {
-                    throw new EntitlementException(EntitlementException.POLICY_ALREADY_EXISTS, new Object[]{ name });
+                    throw new EntitlementException(EntitlementException.POLICY_ALREADY_EXISTS);
                 }
 
                 createParentNode(dsameUserToken, realm);
