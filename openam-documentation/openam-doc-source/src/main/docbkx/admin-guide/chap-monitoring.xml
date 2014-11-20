@@ -199,8 +199,6 @@ $ <userinput>ssoadm \
     <secondary>CTS</secondary>
    </indexterm>
 
-  <!-- Current OIDs include the .999 label; will be changed per AME-2750 -->
-
   <para>
    The <link xlink:href="install-guide#chap-cts"
    xlink:role="http://docbook.org/xlink/role/olink">OpenAM Core
@@ -282,10 +280,8 @@ $ <userinput>ssoadm \
     following command would retrieve the cumulative count for CTS
     create operations, over port 8085:</para>
 
-   <!-- Replace 999 with the actual OID label for CTS when AME-2750 is complete -->
-
    <screen>
-# <userinput>snmpget -c public -v 2c :8085 enterprises.36733.1.2.999.3.1.1.1</userinput>
+# <userinput>snmpget -c public -v 2c :8085 enterprises.36733.1.2.3.3.1.1.1</userinput>
    </screen>
 
    <para>
@@ -295,7 +291,7 @@ $ <userinput>ssoadm \
    </para>
 
    <screen>
-# <userinput>snmpwalk -c public -v 2c :8085 enterprises.36733.1.2.999</userinput>
+# <userinput>snmpwalk -c public -v 2c :8085 enterprises.36733.1.2.3</userinput>
    </screen>
 
    <para>
