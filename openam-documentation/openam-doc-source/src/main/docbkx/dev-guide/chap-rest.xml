@@ -428,11 +428,13 @@
          <entry>/sessions</entry>
          <entry>1.1</entry>
         </row>
+        <!-- Not part of the public API at this time
         <row>
          <entry> </entry>
          <entry>/tokens</entry>
          <entry>1.0</entry>
         </row>
+        -->
         <row>
          <entry> </entry>
          <entry>/serverinfo/*</entry>

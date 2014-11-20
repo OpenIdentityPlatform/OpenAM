@@ -5955,6 +5955,31 @@
    </varlistentry>
 
    <varlistentry>
+    <term><literal>org.forgerock.openam.cts.rest.enabled</literal></term>
+    <listitem>
+     <para>
+      Enables access to the CTS REST endpoint <literal>/json/tokens</literal>.
+     </para>
+
+     <para>
+      Even when access to the CTS REST endpoint is enabled,
+      only the OpenAM global administrator has authorization
+      to perform operations against <literal>/json/tokens</literal>.
+     </para>
+
+     <para>
+      Default: false
+     </para>
+
+     <para>
+      After changing this property,
+      you must restart OpenAM or the container in which it runs
+      for the change to take effect.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term><literal>org.forgerock.openam.authentication.accountExpire.days</literal></term>
     <listitem>
      <para>Days until account expiration set after successful authentication

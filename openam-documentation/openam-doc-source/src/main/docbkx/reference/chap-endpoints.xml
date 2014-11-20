@@ -4917,6 +4917,10 @@ to a runtime exception with messages that I think suggest that it needed to be c
      <para>Authorization: Supports the AdminAuthorizationFilter. Access limited
       to the <literal>amadmin</literal> administrative superuser.
      </para>
+
+     <para>
+      Access is disabled by default.
+     </para>
     </listitem>
    </varlistentry>
 
