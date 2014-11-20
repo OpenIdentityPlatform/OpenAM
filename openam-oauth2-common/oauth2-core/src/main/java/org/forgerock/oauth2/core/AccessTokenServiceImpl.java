@@ -139,8 +139,8 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         }
 
         final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", null,
-                refreshToken.getResourceOwnerId(), clientRegistration.getClientId(), null, validatedScope,
-                newRefreshToken == null ? refreshToken : newRefreshToken, null, request);
+                refreshToken.getResourceOwnerId(), clientRegistration.getClientId(), refreshToken.getRedirectUri(),
+                validatedScope, newRefreshToken == null ? refreshToken : newRefreshToken, null, request);
 
         if (newRefreshToken != null) {
             accessToken.addExtraData("refresh_token", newRefreshToken.getTokenId());
