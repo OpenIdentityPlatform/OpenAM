@@ -130,11 +130,8 @@ public class AuthorizationTokenIssuer {
             tokenMap.putAll(additionalData);
         }
 
-        // Only add the scope to the response if not identical to the scope requested by the client
-        if (!Utils.isEmpty(validatedScope) &&
-                (Utils.isEmpty(authorizationScope) || authorizationScope.size() > validatedScope.size())) {
-            tokenMap.put("scope", Utils.joinScope(validatedScope));
-        }
+        // Always echo scope back to the requester even if identical - consistent with access_token endpoint.
+        tokenMap.put("scope", Utils.joinScope(validatedScope));
 
         if (request.getParameter("state") != null) {
             tokenMap.put("state", request.<String>getParameter("state"));
