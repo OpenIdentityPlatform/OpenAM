@@ -40,7 +40,7 @@ import static org.forgerock.openam.utils.CollectionUtils.*;
  */
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")
 public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
-    private static final String REPORT_DATA = "REPORT_DATA";
+    private static final String REPORT_DATA = "%REPORT_DATA%";
     private static final String SERVICE_NAME = "sunAMAuthOAuthService";
     private static final String ACCOUNT_MAPPER_PROPERTY = "org-forgerock-auth-oauth-account-mapper";
     private static final String ATTRIBUTE_MAPPER_PROPERTY = "org-forgerock-auth-oauth-attribute-mapper";
@@ -51,6 +51,7 @@ public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
     private static final String DEFAULT_ATTRIBUTE_MAPPER =
             "org.forgerock.openam.authentication.modules.oauth2.DefaultAttributeMapper";
     private Map<String, Set<String>> affectedRealms = new HashMap<String, Set<String>>();
+    private Map<String, Set<String>> customisedRealms = new HashMap<String, Set<String>>();
     private int moduleCount = 0;
 
     @Inject
@@ -67,7 +68,7 @@ public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
                 ServiceConfig realmConfig = scm.getOrganizationConfig(realm, null);
                 for (String moduleName : (Set<String>) realmConfig.getSubConfigNames()) {
                     ServiceConfig moduleConfig = realmConfig.getSubConfig(moduleName);
-                    Map<String, Set<?>> attributes = moduleConfig.getAttributes();
+                    Map<String, Set<?>> attributes = getAttributes(moduleConfig);
                     check(attributes, ACCOUNT_MAPPER_PROPERTY, DEFAULT_ACCOUNT_MAPPER, realm, moduleName);
                     check(attributes, ATTRIBUTE_MAPPER_PROPERTY, DEFAULT_ATTRIBUTE_MAPPER, realm, moduleName);
                 }
@@ -78,19 +79,29 @@ public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
         }
     }
 
+    private Map<String, Set<?>> getAttributes(ServiceConfig moduleConfig) {
+        return moduleConfig.getAttributes();
+    }
+
     private void check(Map<String, Set<?>> attributes, String property, String value, String realm, String moduleName) {
         if (attributes.get(property).contains(value)) {
-            if (affectedRealms.containsKey(realm)) {
-                affectedRealms.get(realm).add(moduleName);
-            } else {
-                affectedRealms.put(realm, asSet(moduleName));
-            }
+            flagModule(affectedRealms, realm, moduleName);
+        } else {
+            flagModule(customisedRealms, realm, moduleName);
+        }
+    }
+
+    private void flagModule(Map<String, Set<String>> flags, String realm, String moduleName) {
+        if (flags.containsKey(realm)) {
+            flags.get(realm).add(moduleName);
+        } else {
+            flags.put(realm, asSet(moduleName));
         }
     }
 
     @Override
     public boolean isApplicable() {
-        return !affectedRealms.isEmpty();
+        return !affectedRealms.isEmpty() || !customisedRealms.isEmpty();
     }
 
     @Override
@@ -101,10 +112,15 @@ public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
                 ServiceConfig realmConfig = scm.getOrganizationConfig(realm.getKey(), null);
                 for (String moduleName : realm.getValue()) {
                     ServiceConfig moduleConfig = realmConfig.getSubConfig(moduleName);
-                    moduleConfig.replaceAttributeValues(ACCOUNT_MAPPER_PROPERTY, asSet(DEFAULT_ACCOUNT_MAPPER),
-                            asSet(JSON_MAPPER));
-                    moduleConfig.replaceAttributeValues(ATTRIBUTE_MAPPER_PROPERTY, asSet(DEFAULT_ATTRIBUTE_MAPPER),
-                            asSet(JSON_MAPPER));
+                    Map<String, Set<?>> attributes = getAttributes(moduleConfig);
+                    if (attributes.get(ACCOUNT_MAPPER_PROPERTY).contains(DEFAULT_ACCOUNT_MAPPER)) {
+                        moduleConfig.replaceAttributeValues(ACCOUNT_MAPPER_PROPERTY, asSet(DEFAULT_ACCOUNT_MAPPER),
+                                asSet(JSON_MAPPER));
+                    }
+                    if (attributes.get(ATTRIBUTE_MAPPER_PROPERTY).contains(DEFAULT_ATTRIBUTE_MAPPER)) {
+                        moduleConfig.replaceAttributeValues(ATTRIBUTE_MAPPER_PROPERTY, asSet(DEFAULT_ATTRIBUTE_MAPPER),
+                                asSet(JSON_MAPPER));
+                    }
                     moduleCount++;
                 }
             }
@@ -129,14 +145,27 @@ public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
         Map<String, String> tags = new HashMap<String, String>();
         tags.put(LF, delimiter);
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, Set<String>> entry : affectedRealms.entrySet()) {
+        sb.append(getModulesReport("upgrade.oauth2modulesreport.updated", delimiter, affectedRealms));
+        sb.append(getModulesReport("upgrade.oauth2modulesreport.customised", delimiter, customisedRealms));
+        tags.put(REPORT_DATA, sb.toString());
+        return tagSwapReport(tags, "upgrade.oauth2modulesreport");
+    }
+
+    private String getModulesReport(String messageKey, String delimiter, Map<String, Set<String>> flags) {
+        if (flags.isEmpty()) {
+            return "";
+        }
+        Map<String, String> tags = new HashMap<String, String>();
+        tags.put(LF, delimiter);
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Set<String>> entry : flags.entrySet()) {
             sb.append(BUNDLE.getString("upgrade.realm")).append(": ").append(entry.getKey()).append(delimiter);
             for (String module : entry.getValue()) {
                 sb.append(INDENT).append(module).append(delimiter);
             }
         }
         tags.put(REPORT_DATA, sb.toString());
-        return tagSwapReport(tags, "upgrade.oauth2modulesreport");
+        return tagSwapReport(tags, messageKey);
     }
 
 }
