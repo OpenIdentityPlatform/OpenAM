@@ -38,6 +38,7 @@ import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.AuthUtils;
 
+import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.sm.DNMapper;
 
@@ -401,7 +402,7 @@ public class ProxyPolicyEvaluator {
         try {
             Set actionNames = new HashSet();
             actionNames.add("MODIFY");
-            DelegationEvaluatorImpl de = new DelegationEvaluatorImpl();
+            DelegationEvaluator de = new DelegationEvaluatorImpl();
             DelegationPermission permission =
                 new DelegationPermission("/", "iPlanetAMPolicyService",
                     "1.0", "organization", "default",

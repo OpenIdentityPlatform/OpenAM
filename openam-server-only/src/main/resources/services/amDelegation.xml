@@ -325,6 +325,16 @@
                             <Value>READ</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
+                    <SubConfiguration name="RealmResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/realms/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
                     <SubConfiguration name="PolicyResourceRead" id="Permission">
                         <AttributeValuePair>
                             <Attribute name="resource" />
@@ -355,6 +365,26 @@
                             <Value>READ</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
+                    <SubConfiguration name="ReferralsResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/referrals/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ReferralsResourceModify" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/referrals/modify</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
                     <SubConfiguration name="ApplicationResourceRead" id="Permission">
                         <AttributeValuePair>
                             <Attribute name="resource" />
@@ -365,10 +395,60 @@
                             <Value>READ</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <SubConfiguration name="RealmResourceRead" id="Permission">
+                    <SubConfiguration name="ApplicationResourceModify" id="Permission">
                         <AttributeValuePair>
                             <Attribute name="resource" />
-                            <Value>REALM/rest/1.0/realms/read</Value>
+                            <Value>REALM/rest/1.0/applications/modify</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ApplicationTypesResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/applicationtypes/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ConditionTypesResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/conditiontypes/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SubjectTypesResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/subjecttypes/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SubjectAttributesResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/subjectattributes/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="DecisionCombinersResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/decisioncombiners/read</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="actions" />
@@ -376,6 +456,8 @@
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>
+
+
                 <SubConfiguration name="Privileges">
                     <SubConfiguration name="RealmAdmin" id="Privilege">
                         <AttributeValuePair>
@@ -385,19 +467,6 @@
                         <AttributeValuePair>
                             <Attribute name="defaultSubjectInLegacyMode" />
                             <Value>id=Organization Admin Role,ou=role,REALM,amsdkdn=cn=Organization Admin Role,REALM</Value>
-                        </AttributeValuePair>
-                    </SubConfiguration>
-                    <SubConfiguration name="PolicyAdmin" id="Privilege">
-                        <AttributeValuePair>
-                            <Attribute name="listOfPermissions" />
-                            <Value>PolicyAdmin</Value>
-                            <Value>RealmReadOnly</Value>
-                            <Value>DatastoresReadOnly</Value>
-                            <Value>EntitlementAdmin</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="defaultSubjectInLegacyMode" />
-                            <Value>id=Organization Policy Admin Role,ou=role,REALM,amsdkdn=cn=Organization Policy Admin Role,REALM</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="LogAdmin" id="Privilege">
@@ -439,7 +508,38 @@
                             <Value>WSFederationAdmin</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-
+                    <SubConfiguration name="RealmReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>RealmResourceRead</Value>
+                            <Value>RealmReadOnly</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                     <SubConfiguration name="PolicyAdmin" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>PolicyAdmin</Value>
+                            <Value>EntitlementAdmin</Value>
+                            <Value>RealmReadOnly</Value>
+                            <Value>RealmResourceRead</Value>
+                            <Value>DatastoresReadOnly</Value>
+                            <Value>PolicyResourceRead</Value>
+                            <Value>PolicyResourceModify</Value>
+                            <Value>ReferralsResourceRead</Value>
+                            <Value>ReferralsResourceModify</Value>
+                            <Value>ApplicationResourceRead</Value>
+                            <Value>ApplicationResourceModify</Value>
+                            <Value>ApplicationTypesResourceRead</Value>
+                            <Value>SubjectTypesResourceRead</Value>
+                            <Value>ConditionTypesResourceRead</Value>
+                            <Value>DecisionCombinersResourceRead</Value>
+                            <Value>SubjectAttributesResourceRead</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="defaultSubjectInLegacyMode" />
+                            <Value>id=Organization Policy Admin Role,ou=role,REALM,amsdkdn=cn=Organization Policy Admin Role,REALM</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
                     <SubConfiguration name="EntitlementRestAccess" id="Privilege">
                         <AttributeValuePair>
                             <Attribute name="listOfPermissions" />
@@ -464,17 +564,58 @@
                             <Value>PolicyResourceModify</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
+                    <SubConfiguration name="ReferralsReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ReferralsResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ReferralsModifyAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ReferralsResourceModify</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
                     <SubConfiguration name="ApplicationReadAccess" id="Privilege">
                         <AttributeValuePair>
                             <Attribute name="listOfPermissions" />
                             <Value>ApplicationResourceRead</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <SubConfiguration name="RealmReadAccess" id="Privilege">
+                    <SubConfiguration name="ApplicationModifyAccess" id="Privilege">
                         <AttributeValuePair>
                             <Attribute name="listOfPermissions" />
-                            <Value>RealmResourceRead</Value>
-                            <Value>RealmReadOnly</Value>
+                            <Value>ApplicationResourceModify</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ApplicationTypesReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ApplicationTypesResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ConditionTypesReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ConditionTypesResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SubjectTypesReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>SubjectTypesResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="DecisionCombinersReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>DecisionCombinersResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SubjectAttributesReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>SubjectAttributesResourceRead</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>

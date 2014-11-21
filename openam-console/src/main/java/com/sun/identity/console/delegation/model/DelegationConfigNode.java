@@ -30,6 +30,7 @@ package com.sun.identity.console.delegation.model;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.console.base.AMViewBeanBase;
@@ -100,7 +101,7 @@ public class DelegationConfigNode {
             }
         }
 
-        DelegationEvaluatorImpl delegationEvaluator = new DelegationEvaluatorImpl();
+        DelegationEvaluator delegationEvaluator = new DelegationEvaluatorImpl();
         DelegationPermission delegationPermission = getDelegationPermission(
             realmName, action);
         boolean allowed = false;
@@ -195,7 +196,7 @@ public class DelegationConfigNode {
     }
 
     boolean isAllowed(
-        DelegationEvaluatorImpl delegationEvaluator,
+        DelegationEvaluator delegationEvaluator,
         DelegationPermission delegationPermission,
         SSOToken ssoToken,
         String serviceName

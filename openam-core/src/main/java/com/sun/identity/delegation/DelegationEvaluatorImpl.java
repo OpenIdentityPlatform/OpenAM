@@ -113,7 +113,7 @@ public class DelegationEvaluatorImpl implements DelegationEvaluator {
         SSOToken token,
         DelegationPermission permission,
         Map envParameters,
-        boolean bSubResource
+        boolean subTreeMode
     ) throws SSOException, DelegationException {
         EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
             PrivilegeManager.superAdminSubject, "/");
@@ -133,7 +133,7 @@ public class DelegationEvaluatorImpl implements DelegationEvaluator {
             throw (new DelegationException(ide.getMessage()));
         }
 
-        if (!bSubResource) {
+        if (!subTreeMode) {
             return isAllowed(token, permission, envParameters);
         }
 

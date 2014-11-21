@@ -168,23 +168,23 @@ public class RestEndpoints {
                 .forVersion("1.0").to(ApplicationsResource.class);
 
         rootRealmRouter.route("/applicationtypes")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(ApplicationTypesResource.class);
 
         rootRealmRouter.route("/decisioncombiners")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(DecisionCombinersResource.class);
 
         rootRealmRouter.route("/conditiontypes")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(ConditionTypesResource.class);
 
         rootRealmRouter.route("/subjecttypes")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(SubjectTypesResource.class);
 
         rootRealmRouter.route("/subjectattributes")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(SubjectAttributesResourceV1.class);
 
         rootRealmRouter.route("/tokens")

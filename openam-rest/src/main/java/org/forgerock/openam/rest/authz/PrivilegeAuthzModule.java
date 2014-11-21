@@ -146,7 +146,9 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
     private Promise<AuthorizationResult, ResourceException> evaluate(final ServerContext context,
                                                                      final PrivilegeDefinition definition) {
 
-        final RealmContext realmContext = context.asContext(RealmContext.class);
+        // If no realm is specified default to the root realm.
+        final String realm = (context.containsContext(RealmContext.class)) ?
+                context.asContext(RealmContext.class).getRealm() : "/";
         final SubjectContext subjectContext = context.asContext(SubjectContext.class);
         final RouterContext routerContext = context.asContext(RouterContext.class);
 
@@ -155,7 +157,7 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
 
         try {
             final DelegationPermission permissionRequest = permissionFactory.newInstance(
-                    realmContext.getRealm(), REST, VERSION, routerContext.getMatchedUri(),
+                    realm, REST, VERSION, routerContext.getMatchedUri(),
                     definition.getCommonVerb(), actions, Collections.<String, String>emptyMap());
 
             if (evaluator.isAllowed(subjectContext.getCallerSSOToken(), permissionRequest,

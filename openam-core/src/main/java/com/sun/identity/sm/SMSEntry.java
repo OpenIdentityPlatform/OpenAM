@@ -40,6 +40,7 @@ import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
+import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
@@ -175,7 +176,7 @@ public class SMSEntry implements Cloneable {
 
     static Set modifyActionSet = new HashSet(2);
 
-    static DelegationEvaluatorImpl dlgEval;
+    static DelegationEvaluator dlgEval;
 
     static boolean SMSJAXRPCObjectFlg;
 

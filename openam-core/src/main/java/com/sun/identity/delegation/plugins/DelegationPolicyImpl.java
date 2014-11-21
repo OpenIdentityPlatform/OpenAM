@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.StringTokenizer;
 import java.security.AccessController;
 
+import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.shared.ldap.util.DN;
 
@@ -1168,7 +1169,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             "sunAMRealmService", "1.0", "organizationconfig", null,
              action, Collections.EMPTY_MAP);
         // Call DelegationEvaluator to handle super and internal users
-        DelegationEvaluatorImpl evaluator = new DelegationEvaluatorImpl();
+        DelegationEvaluator evaluator = new DelegationEvaluatorImpl();
         return (evaluator.isAllowed(token, de, Collections.EMPTY_MAP));
     }
 }

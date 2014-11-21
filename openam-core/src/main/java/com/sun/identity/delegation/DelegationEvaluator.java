@@ -49,4 +49,27 @@ public interface DelegationEvaluator {
     boolean isAllowed(SSOToken token, DelegationPermission permission,
                       Map<String, Set<String>> envParameters) throws SSOException, DelegationException;
 
+    /**
+     * Returns a boolean value indicating if a user has the specified permission.
+     *
+     * @param token
+     *         SSO token of the user evaluating permission
+     * @param permission
+     *         delegation permission to be evaluated
+     * @param envParameters
+     *         run-time environment parameters
+     * @param subTreeMode
+     *         whether to run in subtree mode or not
+     *
+     * @return the result of the evaluation as a boolean value
+     *
+     * @throws SSOException
+     *         if single-sign-on token invalid or expired
+     * @throws DelegationException
+     *         for any other abnormal condition
+     */
+    boolean isAllowed(SSOToken token, DelegationPermission permission,
+                      Map<String, Set<String>> envParameters, boolean subTreeMode)
+            throws SSOException, DelegationException;
+
 }

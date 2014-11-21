@@ -56,6 +56,7 @@ import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
+import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
@@ -2639,7 +2640,7 @@ public class SessionService {
         try {
             DelegationPermission perm = new DelegationPermission(
                     "/", "*", "*", "*", "*", actions, Collections.EMPTY_MAP);
-            DelegationEvaluatorImpl evaluator = new DelegationEvaluatorImpl();
+            DelegationEvaluator evaluator = new DelegationEvaluatorImpl();
             topLevelAdmin = evaluator.isAllowed(
                     tokenUsedForSearch, perm, Collections.EMPTY_MAP);
         } catch (DelegationException de) {
