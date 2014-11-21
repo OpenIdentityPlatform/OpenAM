@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-log-messages'
@@ -119,6 +119,22 @@
     <term>amRemotePolicy.access</term>
     <listitem>
      <para>Contains data about policies accessed remotely</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>amRest.access</term>
+    <listitem>
+     <para>
+      Contains data about access to REST endpoints
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>amRest.authz</term>
+    <listitem>
+     <para>
+      Contains data about authorizations to access REST endpoints
+     </para>
     </listitem>
    </varlistentry>
    <varlistentry>

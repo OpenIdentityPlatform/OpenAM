@@ -3,7 +3,7 @@
         "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
         >
 
-<logmessages prefix="OAuth2Provider">
+<logmessages prefix="Rest">
     <!-- Token operations -->
     <logmessage name="ATTEMPT_ACCESS" id="1"
                 loglevel="LL_INFO"

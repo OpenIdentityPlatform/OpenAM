@@ -269,6 +269,9 @@
                                             openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/PolicyLogMessageIDs.xml
                                         </include>
                                         <include>
+                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/RestLogMessageIDs.xml
+                                        </include>
+                                        <include>
                                             openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/SessionLogMessageIDs.xml
                                         </include>
 
