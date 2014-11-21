@@ -27,6 +27,7 @@
 require.config({
     paths: {
         sinon: "../test/libs/sinon-1.10.3",
+        jquery: "libs/jquery-1.11.1-min",
         text: "../test/text"
     },
     shim: {

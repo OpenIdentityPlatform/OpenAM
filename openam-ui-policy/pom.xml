@@ -174,7 +174,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/dependency/libs</outputDirectory>
-                            <includeArtifactIds>jquery-sortable,jquery.jqGrid, ui.multiselect</includeArtifactIds>
+                            <includeArtifactIds>jquery-sortable,jquery.jqGrid,ui.multiselect,selectize,jquery-nestingSortable,jquery-ui</includeArtifactIds>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
