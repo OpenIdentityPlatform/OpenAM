@@ -2650,10 +2650,16 @@
    </varlistentry>
 
    <varlistentry>
-    <term>JSON Web Key URL</term>
+    <term>Remote JSON Web Key URL</term>
     <listitem>
-     <para>The URL where the OpenID Connect provider's JSON Web Key can be
-     retrieved.</para>
+     <para>
+      The remote URL where the OpenID Connect provider's JSON Web Key can be retrieved.
+     </para>
+
+     <para>
+      If this setting is not configured, then OpenAM provides a local URL
+      to access the public key of the private key used to sign ID tokens.
+     </para>
 
      <para><command>ssoadm</command> attribute:
      <literal>forgerock-oauth2-provider-jkws-uri</literal></para>

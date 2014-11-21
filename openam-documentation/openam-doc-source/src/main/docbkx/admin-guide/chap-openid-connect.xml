@@ -304,12 +304,17 @@
 
    <listitem>
     <para>
-     The JSON Web Key URL field allows you to set a URL to a
+     The optional Remote JSON Web Key URL field allows you to set a URL to a
      <link
       xlink:show="new"
       xlink:href="https://tools.ietf.org/html/draft-ietf-jose-json-web-key"
      >JSON Web Key set</link>
      with the public key(s) for the provider.
+    </para>
+
+    <para>
+     If this setting is not configured, then OpenAM provides a local URL
+     to access the public key of the private key used to sign ID tokens.
     </para>
    </listitem>
 
@@ -494,9 +499,13 @@ $ <userinput>curl \
 $ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-configuration</userinput>
 <computeroutput>{
     "response_types_supported": [
-    "id_token|org.forgerock.oauth2.reslet.responseTypes.IDTokenResponseType",
-    "token|org.forgerock.oauth2.reslet.responseTypes.TokenResponseType",
-    "code|org.forgerock.oauth2.reslet.responseTypes.CodeResponseType"
+        "token id_token",
+        "code token",
+        "code token id_token",
+        "token",
+        "code id_token",
+        "code",
+        "id_token"
     ],
     "registration_endpoint": "https://openam.example.com:8443/openam/oauth2/connect/register",
     "token_endpoint": "https://openam.example.com:8443/openam/oauth2/access_token",
@@ -504,27 +513,35 @@ $ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-conf
     "version": "3.0",
     "userinfo_endpoint": "https://openam.example.com:8443/openam/oauth2/userinfo",
     "subject_types_supported": [
-    "public"
+        "public"
     ],
     "issuer": "https://openam.example.com:8443/openam",
-    "jwks_uri": "",
+    "jwks_uri": "https://openam.example.com:8443/openam/oauth2/connect/jwk_uri?realm=/",
     "id_token_signing_alg_values_supported": [
-    "HmacSHA256",
-    "HmacSHA512",
-    "HmacSHA384"
+        "HS256",
+        "HS512",
+        "RS256",
+        "HS384"
     ],
     "check_session_iframe": "https://openam.example.com:8443/openam/oauth2/connect/checkSession",
     "claims_supported": [
-    "phone",
-    "email",
-    "address",
-    "openid",
-    "profile"
+        "phone",
+        "email",
+        "address",
+        "openid",
+        "profile"
     ],
     "authorization_endpoint": "https://openam.example.com:8443/openam/oauth2/authorize"
 }</computeroutput>
   </screen>
   </informalexample>
+
+  <para>
+   When the OpenID Provider is configured in a subrealm,
+   then relying parties can get the configuration
+   by passing the realm as a query string parameter, as in
+   <literal>https://openam.example.com:8443/openam/.well-known/openid-configuration?realm=<replaceable>realm-name</replaceable></literal>.
+  </para>
  </section>
 
  <section xml:id="register-openid-connect-clients">
