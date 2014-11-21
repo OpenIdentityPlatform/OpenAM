@@ -43,7 +43,7 @@ public class OpenAMOpenIdConnectToken extends OpenIdConnectToken {
      * @param azp The authorized party.
      * @param exp The expiry time.
      * @param iat The issued at time.
-     * @param ath The authenticated time.
+     * @param authTime The authenticated time.
      * @param nonce The nonce.
      * @param atHash The at_hash.
      * @param cHash The c_hash.
@@ -52,9 +52,9 @@ public class OpenAMOpenIdConnectToken extends OpenIdConnectToken {
      * @param realm The realm.
      */
     public OpenAMOpenIdConnectToken(String kid, byte[] clientSecret, KeyPair keyPair, String algorithm, String iss,
-            String sub, String aud, String azp, long exp, long iat, long ath, String nonce, String atHash, String cHash,
+            String sub, String aud, String azp, long exp, long iat, long authTime, String nonce, String atHash, String cHash,
             String acr, List<String> amr, String realm) {
-        super(kid, clientSecret, keyPair, algorithm, iss, sub, aud, azp, exp, iat, ath, nonce, atHash, cHash, acr, amr);
+        super(kid, clientSecret, keyPair, algorithm, iss, sub, aud, azp, exp, iat, authTime, nonce, atHash, cHash, acr, amr);
         setRealm(realm);
     }
 

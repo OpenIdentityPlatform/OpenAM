@@ -864,7 +864,7 @@ public class OAuth2Constants {
         public static final String AZP = "azp";
         public static final String EXP = "exp";
         public static final String IAT =  "iat";
-        public static final String ATH = "ath";
+        public static final String AUTH_TIME = "auth_time";
         public static final String NONCE = "nonce";
         public static final String OPS = "ops";
         public static final String UPDATED_AT = "updated_at";

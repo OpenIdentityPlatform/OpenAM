@@ -63,7 +63,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param azp The authorized party.
      * @param exp The expiry time.
      * @param iat The issued at time.
-     * @param ath The authenticated time.
+     * @param authTime The authenticated time.
      * @param nonce The nonce.
      * @param atHash The at_hash.
      * @param cHash The c_hash.
@@ -71,7 +71,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param amr The amr.
      */
     public OpenIdConnectToken(String kid, byte[] clientSecret, KeyPair keyPair, String algorithm, String iss,
-            String sub, String aud, String azp, long exp, long iat, long ath, String nonce, String atHash, String cHash,
+            String sub, String aud, String azp, long exp, long iat, long authTime, String nonce, String atHash, String cHash,
             String acr, List<String> amr) {
         super(new HashMap<String, Object>());
         this.clientSecret = clientSecret;
@@ -84,7 +84,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         setAzp(azp);
         setExp(exp);
         setIat(iat);
-        setAth(ath);
+        setAuthTime(authTime);
         setNonce(nonce);
         setAtHash(atHash);
         setCHash(cHash);
@@ -170,10 +170,10 @@ public class OpenIdConnectToken extends JsonValue implements Token {
     /**
      * Sets the authenticated time in seconds.
      *
-     * @param ath The authenticated time.
+     * @param authTime The authenticated time.
      */
-    private void setAth(long ath) {
-        put(OAuth2Constants.JWTTokenParams.ATH, ath);
+    private void setAuthTime(long authTime) {
+        put(OAuth2Constants.JWTTokenParams.AUTH_TIME, authTime);
     }
 
     /**
