@@ -3655,15 +3655,39 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
       <literal>iplanet-am-auth-oauth-user-profile-service</literal></para>
      </listitem>
     </varlistentry>
+
     <varlistentry>
      <term>Scope</term>
      <listitem>
-      <para>Comma separated list of user profile attributes that the application
-      requires. The default value is <literal>email,read_stream</literal>.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-oauth-scope</literal></para>
+      <para>
+       According to
+       <link
+        xlink:href="http://tools.ietf.org/html/rfc6749"
+        xlink:show="new"
+       ><citetitle>The OAuth 2.0 Authorization Framework</citetitle></link>,
+       a space-separated list of user profile attributes
+       that the client application requires.
+       The list depends on the permissions
+       that the resource owner, such as the end user,
+       grants to the client application.
+      </para>
+
+      <para>
+       Some authorization servers use non-standard separators for scopes.
+       Facebook, for example, takes a comma-separated list.
+      </para>
+
+      <para>
+       Default: <literal>email,read_stream</literal> (Facebook example)
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>iplanet-am-auth-oauth-scope</literal>
+      </para>
      </listitem>
     </varlistentry>
+
     <varlistentry>
      <term>Proxy URL</term>
      <listitem>
