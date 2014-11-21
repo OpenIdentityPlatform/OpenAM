@@ -91,13 +91,14 @@ require([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/util/CookieHelper",  
+    "org/forgerock/commons/ui/common/util/CookieHelper",
+    "UserDelegate",
     "config/main",
     "org/forgerock/commons/ui/common/main",
     "org/forgerock/commons/ui/user/main",
     "org/forgerock/openam/ui/common/main",
     "org/forgerock/openam/ui/user/main"
-], function($, _, Backbone, constants,serviceInvoker,uiUtils,cookieHelper) {
+], function($, _, Backbone, constants,serviceInvoker,uiUtils,cookieHelper,userDelegate) {
 
     var 
         conf = {
@@ -116,7 +117,7 @@ require([
 
 
         callParams = {
-            url: host + urlParams.realm +'/serverinfo/*',
+            url: host + userDelegate.cleanRealm(urlParams.realm) + '/serverinfo/*',
             type: "GET",
             headers: {"Cache-Control": "no-cache"}, 
             success: function() {
@@ -140,7 +141,7 @@ require([
                 }
             }
         };
-        
+
     if(urlParams.username) {
         location.href = uiUtils.getCurrentUrlBasePart() + "/"+ constants.context +'/XUI/#forgotPasswordChange/&' + searchParams;
     }
