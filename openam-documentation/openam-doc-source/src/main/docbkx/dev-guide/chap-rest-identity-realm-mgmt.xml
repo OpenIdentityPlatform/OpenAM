@@ -1421,7 +1421,7 @@ admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*\
        </row>
        <row>
         <entry>sunOrganizationStatus</entry>
-        <entry>None</entry>
+        <entry>Active</entry>
         <entry><para>The status of the realm</para>
          <para><literal>Active</literal> or <literal>Inactive</literal></para></entry>
        </row>
@@ -1492,7 +1492,7 @@ $ <userinput>curl \
  --request PUT \
  --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
  --header "Content-Type: application/json" \
- --data '{ "sunOrganizationStatus": "Active" }' \
+ --data '{ }' \
  https://openam.example.com:8443/openam/json/realms/myRealm</userinput>
      </screen>
 
@@ -1590,14 +1590,16 @@ $ <userinput>curl \
    <literal>/json/realms/<replaceable>realm-id</replaceable></literal>.</para>
 
     <para>The following example shows how to update a realm called
-     <literal>myRealm</literal>.</para>
+     <literal>myRealm</literal>. The example command sets the realm's
+     status to Inactive.
+    </para>
    
      <screen>
 $ <userinput>curl \
  --request PUT \
  --header "iplanetDirectoryPro: AQIC5...Y3MTAx*" \
  --header "Content-Type: application/json" \
- --data '{ "sunOrganizationStatus": "Active" }' \
+ --data '{ "sunOrganizationStatus": "Inactive" }' \
  https://openam.example.com:8443/openam/json/realms/myRealm</userinput>
      </screen>
 
