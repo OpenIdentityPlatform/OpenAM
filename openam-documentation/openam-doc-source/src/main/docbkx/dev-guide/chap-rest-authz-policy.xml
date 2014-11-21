@@ -2765,7 +2765,9 @@ $ <userinput>curl \
     <term><literal>"realm"</literal></term>
     <listitem>
      <para>
-      Name of the realm where this application is defined.
+      Name of the realm where this application is defined. You must specify the
+      realm in the application resource JSON even though it can be derived from
+      the URL that is used when creating the application using an HTTP PUT call.
      </para>
     </listitem>
    </varlistentry>
