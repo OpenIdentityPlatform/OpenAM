@@ -166,6 +166,15 @@ public class ApplicationsResource extends RealmAwareResource {
                                 new String[] { wrapp.getApplication().getRealm(), realm });
             }
 
+            String wrappName = wrapp.getName();
+            String newResourceId = request.getNewResourceId();
+            if (wrappName == null) {
+                wrapp.setName(newResourceId);
+            } else if (!wrappName.equals(newResourceId)) {
+                throw new EntitlementException(
+                        EntitlementException.APPLICATION_REQUESTED_RESOURCE_NAMES_MISMATCH_ERROR);
+            }
+
             previousApp = appManager.getApplication(callingSubject, realm, wrapp.getName());
 
             if (previousApp != null) { //return conflict
