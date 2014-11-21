@@ -43,10 +43,7 @@ define("org/forgerock/openam/ui/user/logout/RESTLogoutView", [
             "click #gotoLogin": "gotoLoginViewClick"
         },
         render: function(args, callback) {
-            this.parentRender( function() {
-                    loginHelper.removeSessionCookie();
-                }
-            );
+            this.parentRender(callback);
         },
         gotoLoginViewClick: function(event){
             event.preventDefault();

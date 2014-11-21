@@ -45,7 +45,7 @@ define("config/process/AMConfig", [
             processDescription: function(event, router, conf, sessionManager) {
                 sessionManager.logout(function() {
                     conf.setProperty('loggedUser', null);
-                    eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.logout });
+                    eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.loggedOut });
                     eventManager.sendEvent(constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
                     delete conf.gotoURL;
                 }, function(){
