@@ -490,6 +490,7 @@
                             <Value>AuthenticatedUsers</Value>
                             <Value>Identity</Value>
                             <Value>JwtClaim</Value>
+                            <Value>NONE</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
