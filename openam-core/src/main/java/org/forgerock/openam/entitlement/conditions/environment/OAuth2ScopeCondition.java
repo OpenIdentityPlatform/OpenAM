@@ -59,6 +59,8 @@ public class OAuth2ScopeCondition extends EntitlementConditionAdaptor {
      */
     private static final Pattern VALID_SCOPE_PATTERN = Pattern.compile("[\\x21\\x23-\\x5B\\x5D-\\x7E]+");
 
+    private static final String ATTR_SCOPES = "requiredScopes";
+
     private final Debug debug;
 
     /**
@@ -81,7 +83,7 @@ public class OAuth2ScopeCondition extends EntitlementConditionAdaptor {
         try {
             JSONObject jo = new JSONObject(state);
             setState(jo);
-            JSONArray scopes = jo.getJSONArray("requiredScopes");
+            JSONArray scopes = jo.getJSONArray(ATTR_SCOPES);
             for (int i = 0; i < scopes.length(); i++) {
                 requiredScopes.add(scopes.getString(i));
             }
@@ -151,7 +153,7 @@ public class OAuth2ScopeCondition extends EntitlementConditionAdaptor {
                     if (debug.errorEnabled()) {
                         debug.error("OAuth2ScopeCondition.toScopeSet(): invalid OAuth2 scope, " + scope);
                     }
-                    throw new EntitlementException(INVALID_OAUTH2_SCOPE, new Object[]{scope}, null);
+                    throw new EntitlementException(INVALID_OAUTH2_SCOPE, scope);
                 }
                 scopes.add(scope.trim());
             }
@@ -166,7 +168,7 @@ public class OAuth2ScopeCondition extends EntitlementConditionAdaptor {
         for (String scope : requiredScopes) {
             scopes.put(scope);
         }
-        jo.put("requiredScopes", scopes);
+        jo.put(ATTR_SCOPES, scopes);
         return jo;
     }
 
@@ -190,5 +192,18 @@ public class OAuth2ScopeCondition extends EntitlementConditionAdaptor {
 
     public void setRequiredScopes(Set<String> requiredScopes) {
         this.requiredScopes = requiredScopes;
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        if (requiredScopes == null || requiredScopes.isEmpty()) {
+            throw new EntitlementException(EntitlementException.PROPERTY_VALUE_NOT_DEFINED, ATTR_SCOPES);
+        }
+
+        for (String scope : requiredScopes) {
+            if (!VALID_SCOPE_PATTERN.matcher(scope.trim()).matches()) {
+                throw new EntitlementException(INVALID_OAUTH2_SCOPE, scope);
+            }
+        }
     }
 }

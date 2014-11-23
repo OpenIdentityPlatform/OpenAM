@@ -23,7 +23,6 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.openam.core.CoreWrapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,7 +49,6 @@ import static org.forgerock.openam.entitlement.conditions.environment.ConditionC
 abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditionAdaptor {
 
     protected final Debug debug;
-    private final CoreWrapper coreWrapper;
 
     private List<String> ipRange = new ArrayList<String>();
     private List<T> ipList = new ArrayList<T>();
@@ -66,9 +64,8 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
     /**
      * Constructs a new IPvXCondition instance.
      */
-    protected IPvXCondition(Debug debug, CoreWrapper coreWrapper, T initialStartIp, T initialEndIp, IPVersion version) {
+    protected IPvXCondition(Debug debug, T initialStartIp, T initialEndIp, IPVersion version) {
         this.debug = debug;
-        this.coreWrapper = coreWrapper;
         this.startIp = initialStartIp;
         this.initialStartIp = initialStartIp;
         this.initialEndIp = initialEndIp;
@@ -79,11 +76,11 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
     /**
      * Constructs a new IPvXCondition instance.
      */
-    protected IPvXCondition(Debug debug, CoreWrapper coreWrapper, T initialStartIp, T initialEndIp, IPVersion version,
+    protected IPvXCondition(Debug debug, T initialStartIp, T initialEndIp, IPVersion version,
                             String startIp, String endIp, List<String> ipRange, List<String> dnsName)
             throws EntitlementException {
 
-        this(debug, coreWrapper, initialStartIp, initialEndIp, version);
+        this(debug, initialStartIp, initialEndIp, version);
 
         if (startIp != null || endIp != null) {
             setStartIpAndEndIp(startIp, endIp);
@@ -95,7 +92,7 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
             setDnsName(dnsName);
         }
 
-        validateProperties();
+        validate();
     }
 
     /**
@@ -106,14 +103,6 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
      * @throws EntitlementException If argument is not a string representing an IP value understood by this object.
      */
     protected abstract T stringToIp(String ip) throws EntitlementException;
-
-    /**
-     * Checks if string represents an IP value understood by this object.
-     *
-     * @param ip A String representation of an IP value.
-     * @return <code>True</code> If argument is not a string representing an IP value understood by this object.
-     */
-    protected abstract boolean validateIpAddress(String ip);
 
     /**
      * {@inheritDoc}
@@ -127,7 +116,7 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
             setIpRangesFromJson(jo);
             setDnsNamesFromJson(jo);
             setStartIpAndEndIpFromJson(jo);
-            validateProperties();
+            validate();
 
         } catch (Exception e) {
             debugMessage(e, "Failed to set state");
@@ -259,7 +248,8 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
         return toString();
     }
 
-    protected void validateProperties() throws EntitlementException {
+    @Override
+    public void validate() throws EntitlementException {
 
         if (ipList.isEmpty() && dnsName.isEmpty() && (!isDefinedStartIp(startIp) || !isDefinedEndIp(endIp))) {
             debugWarning("Validation: ipRange, dnsName, or startIp-endIp pair MUST be defined");

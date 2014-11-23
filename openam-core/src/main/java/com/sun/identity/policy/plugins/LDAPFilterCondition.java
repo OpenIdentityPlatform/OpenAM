@@ -167,7 +167,7 @@ public class LDAPFilterCondition implements Condition {
       *
       * @param property name of property for which to find valid values
       * @return <code>Set</code> of valid values for the property.
-      * @throws exception PolicyException if unable to get the Syntax.
+      * @throws PolicyException if unable to get the Syntax.
       */
      public Set getValidValues(String property) throws PolicyException { 
          return (Collections.EMPTY_SET);
@@ -274,8 +274,8 @@ public class LDAPFilterCondition implements Condition {
      * @return <code>true</code> if the user satisifes the <code>
      * ldapConditionFilter</code>
      *
-     * @throws exception SSOException if Single Sign On token is not valid
-     * @throws exception PolicyException if an error occured 
+     * @throws SSOException if Single Sign On token is not valid
+     * @throws PolicyException if an error occured
      */
     private boolean isMember(SSOToken token)
         throws SSOException, PolicyException {
@@ -497,12 +497,12 @@ public class LDAPFilterCondition implements Condition {
      * This condition resets its policy configuration information,
      * perodically. The time period is based on the SUBJECTS_RESULT_TTL
      * defined in the policy config service.
-     * @see #com.sun.identity.policy.PolicyConfig.SUBJECTS_RESULT_TTL
+     * @see com.sun.identity.policy.PolicyConfig#SUBJECTS_RESULT_TTL
      */
 
     private void resetPolicyConfig(Map env) throws PolicyException {
         if (System.currentTimeMillis() > policyConfigExpiresAt) {
-            Map policyConfigParams 
+            Map policyConfigParams
                     = (Map)env.get(PolicyEvaluator.SUN_AM_POLICY_CONFIG);
             setPolicyConfig(policyConfigParams);
         }
@@ -628,7 +628,7 @@ public class LDAPFilterCondition implements Condition {
      * other invalid property.
      * @see #LDAP_FILTER
      */
-    private boolean validateProperties(Map properties) 
+    private boolean validateProperties(Map properties)
             throws PolicyException {
         if ( (properties == null) || ( properties.keySet() == null) ) {
             throw new PolicyException(
@@ -748,5 +748,9 @@ public class LDAPFilterCondition implements Condition {
             }
         }
         return theClone;
+    }
+
+    public void validate() throws PolicyException {
+        validateProperties(properties);
     }
 }

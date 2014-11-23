@@ -248,7 +248,7 @@ public class PrivilegeUtils {
     }
 
     private static EntitlementCondition toEntitlementCondition(Policy policy)
-        throws PolicyException {
+            throws PolicyException, EntitlementException {
         Set conditionNames = policy.getConditionNames();
         Set nConditions = new HashSet();
         for (Object conditionNameObj : conditionNames) {
@@ -351,7 +351,7 @@ public class PrivilegeUtils {
         return entitlements;
     }
 
-    private static EntitlementCondition nConditionsToECondition(Set nConditons) {
+    private static EntitlementCondition nConditionsToECondition(Set nConditons) throws EntitlementException {
         Set<EntitlementCondition> ecSet = new HashSet<EntitlementCondition>();
         for (Object nConditionObj : nConditons) {
             Object[] nCondition = (Object[]) nConditionObj;
@@ -450,7 +450,7 @@ public class PrivilegeUtils {
     }
 
     private static EntitlementCondition mapGenericCondition(
-        Object[] nCondition) {
+        Object[] nCondition) throws EntitlementException {
         try {
             Object objCondition = nCondition[1];
             if (objCondition instanceof com.sun.identity.policy.plugins.PrivilegeCondition) {
@@ -462,6 +462,7 @@ public class PrivilegeUtils {
                     (EntitlementCondition) Class.forName(className).newInstance();
                 Set<String> setValues = props.get(className);
                 ec.setState(setValues.iterator().next());
+                ec.validate();
                 return ec;
             } else if (objCondition instanceof Condition) {
                 Condition cond = (Condition) objCondition;

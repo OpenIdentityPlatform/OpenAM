@@ -25,17 +25,23 @@
  * $Id: AttributeLookupCondition.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
+import org.forgerock.openam.utils.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.security.auth.Subject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * This condition evaluates if a given attribute from subject matches with
@@ -143,7 +149,7 @@ public class AttributeLookupCondition extends EntitlementConditionAdaptor {
         }
 
         return new ConditionDecision(
-            evalValues.contains(evalKey), Collections.EMPTY_MAP);
+            evalValues.contains(evalKey), Collections.<String, Set<String>>emptyMap());
     }
 
     private ConditionDecision getFailedDecision(String prefix, String suffix) {
@@ -158,7 +164,7 @@ public class AttributeLookupCondition extends EntitlementConditionAdaptor {
         Set publicCreds = subject.getPublicCredentials();
         String attrValue = null;
         
-        for (Iterator i = publicCreds.iterator(); 
+        for (Iterator i = publicCreds.iterator();
             i.hasNext() && (attrValue == null); ) {
             Object o = i.next();
             if (o instanceof String) {
@@ -322,4 +328,14 @@ public class AttributeLookupCondition extends EntitlementConditionAdaptor {
         return s;
     }
 
+    @Override
+    public void validate() throws EntitlementException {
+        if (StringUtils.isBlank(key)) {
+            throw new EntitlementException(EntitlementException.PROPERTY_VALUE_NOT_DEFINED, "key");
+        }
+
+        if (value == null) {
+            throw new EntitlementException(EntitlementException.PROPERTY_VALUE_NOT_DEFINED, "value");
+        }
+    }
 }

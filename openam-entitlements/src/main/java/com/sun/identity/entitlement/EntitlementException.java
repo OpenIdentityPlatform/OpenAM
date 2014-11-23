@@ -116,6 +116,7 @@ public class EntitlementException extends Exception {
 
     public static final int PROPERTY_IS_NOT_AN_INTEGER = 800;
     public static final int PROPERTY_IS_NOT_A_SET = 801;
+    public static final int PROPERTY_CONTAINS_BLANK_VALUE = 802;
 
     public static final int INTERNAL_ERROR = 900;
     public static final int REALM_NOT_FOUND = 901;
@@ -141,7 +142,7 @@ public class EntitlementException extends Exception {
      * @param errorCode Error code.
      * @param params Parameters for formatting the message string.
      */
-    public EntitlementException(int errorCode, Object[] params) {
+    public EntitlementException(int errorCode, Object... params) {
         this.errorCode = errorCode;
         this.params = params;
         this.message = getLocalizedMessage(Locale.getDefault());
@@ -172,6 +173,10 @@ public class EntitlementException extends Exception {
         this.errorCode = errorCode;
         this.params = params;
         this.message = getLocalizedMessage(Locale.getDefault());
+    }
+
+    public EntitlementException(int errorCode, Throwable cause, Object...params) {
+        this(errorCode, params, cause);
     }
 
     /**

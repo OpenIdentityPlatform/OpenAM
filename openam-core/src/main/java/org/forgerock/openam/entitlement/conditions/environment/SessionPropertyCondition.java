@@ -120,7 +120,7 @@ public class SessionPropertyCondition extends EntitlementConditionAdaptor {
 
         boolean allowed = true;
         if (debug.messageEnabled()) {
-            debug.message("SessionPropertyCondition.getConditionDecision():entering, ignoreValueCase= "
+            debug.message("SessionPropertyCondition.evaluate():entering, ignoreValueCase= "
                     + ignoreValueCase);
         }
         SSOToken token = (SSOToken) getValue(subject.getPrivateCredentials());
@@ -131,7 +131,7 @@ public class SessionPropertyCondition extends EntitlementConditionAdaptor {
                 Set<String> values = properties.get(name);
 
                 if (debug.messageEnabled()) {
-                    debug.message("SessionPropertyCondition.getConditionDecision():propertyName = " + name
+                    debug.message("SessionPropertyCondition.evaluate():propertyName = " + name
                             + ",conditionValues = " + values);
                 }
 
@@ -147,7 +147,7 @@ public class SessionPropertyCondition extends EntitlementConditionAdaptor {
                     }
 
                     if (debug.messageEnabled()) {
-                        debug.message("SessionPropertyCondition.getConditionDecision():,sessionValue = " + sessionValue
+                        debug.message("SessionPropertyCondition.evaluate():,sessionValue = " + sessionValue
                                 + ",sessionValues = " + sessionValues);
                     }
 
@@ -191,12 +191,12 @@ public class SessionPropertyCondition extends EntitlementConditionAdaptor {
 
             }
         } else {
-            debug.message("SessionPropertyCondition.getConditionDecision():no parameter defined,defaulting allow=true");
+            debug.message("SessionPropertyCondition.evaluate():no parameter defined,defaulting allow=true");
             allowed = true;
         }
 
         if (debug.messageEnabled()) {
-            debug.message("SessionPropertyCondition.getConditionDecision():allowed= " + allowed);
+            debug.message("SessionPropertyCondition.evaluate():allowed= " + allowed);
         }
 
         return new ConditionDecision(allowed, Collections.<String, Set<String>>emptyMap());
@@ -254,5 +254,12 @@ public class SessionPropertyCondition extends EntitlementConditionAdaptor {
 
     public void setProperties(Map<String, Set<String>> properties) {
         this.properties = properties;
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        if (properties == null || properties.isEmpty()) {
+            throw new EntitlementException(EntitlementException.PROPERTY_VALUE_NOT_DEFINED, "properties");
+        }
     }
 }

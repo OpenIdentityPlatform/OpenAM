@@ -26,13 +26,13 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
+import javax.security.auth.Subject;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
 
 /**
  * Interface specification for entitlement <code>EntitlementCondition</code>
@@ -71,6 +71,14 @@ public interface EntitlementCondition {
      * @return state of the object encoded as string
      */
     String getState();
+
+    /**
+     * Checks that this condition is configured correctly. Throws {@link EntitlementException} if not with an
+     * informative message to display to the user creating/updating the policy.
+     *
+     * @throws EntitlementException if the configuration state is not valid.
+     */
+    void validate() throws EntitlementException;
 
     /**
      * Returns condition decision.

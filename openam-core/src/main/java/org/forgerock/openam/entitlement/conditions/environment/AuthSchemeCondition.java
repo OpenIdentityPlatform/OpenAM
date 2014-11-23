@@ -27,7 +27,7 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.time.TimeService;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,17 +83,7 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
      * Constructs a new AuthSchemeCondition instance.
      */
     public AuthSchemeCondition() {
-        this(PrivilegeManager.debug, new EntitlementCoreWrapper(), new TimeService() {
-            @Override
-            public long now() {
-                return System.currentTimeMillis();
-            }
-
-            @Override
-            public long since(long l) {
-                return now() - l;
-            }
-        });
+        this(PrivilegeManager.debug, new EntitlementCoreWrapper(), TimeService.SYSTEM);
     }
 
     /**
@@ -405,5 +395,15 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
 
     private long getApplicationIdleTimeoutInMilliseconds() {
         return applicationIdleTimeout * 60 * 1000;
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        if (authScheme == null || authScheme.isEmpty()) {
+            throw new EntitlementException(EntitlementException.PROPERTY_VALUE_NOT_DEFINED, AUTH_SCHEME);
+        }
+        if (StringUtils.isAnyBlank(authScheme)) {
+            throw new EntitlementException(EntitlementException.PROPERTY_CONTAINS_BLANK_VALUE, AUTH_SCHEME);
+        }
     }
 }

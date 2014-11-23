@@ -31,6 +31,16 @@ import com.sun.identity.entitlement.opensso.OpenSSOPrivilege;
 import com.sun.identity.entitlement.opensso.PolicyCondition;
 import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
 import com.sun.identity.shared.DateUtils;
+import org.forgerock.json.fluent.JsonPointer;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -40,21 +50,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fest.assertions.MapAssert.entry;
-import org.forgerock.json.fluent.JsonPointer;
-import org.forgerock.json.fluent.JsonValue;
-import static org.forgerock.json.fluent.JsonValue.array;
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
-import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
-import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.forgerock.json.fluent.JsonValue.*;
 
 public class JsonPolicyParserTest {
     private static final String POLICY_NAME = "aPolicy";
@@ -285,7 +284,7 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldCorrectlyParseConditionTypes() throws Exception {
         // Given
-        String scope = "cn givenName";
+        String scope = "givenName";
         JsonValue content = buildJson(field("condition",
                 object(field("type", "OAuth2Scope"),
                        field("requiredScopes", array(scope)))));
@@ -320,7 +319,7 @@ public class JsonPolicyParserTest {
     public void shouldParseNestedAndConditions() throws Exception {
         // Given
         // An AND condition containing a single OAuth2Scope condition
-        String scope = "cn givenName";
+        String scope = "givenName";
         JsonValue content = buildJson(field("condition",
                 object(field("type", "AND"),
                        field("conditions",
@@ -343,7 +342,7 @@ public class JsonPolicyParserTest {
     public void shouldParseNestedOrConditions() throws Exception {
         // Given
         // An OR condition containing a single OAuth2Scope condition
-        String scope = "cn givenName";
+        String scope = "givenName";
         JsonValue content = buildJson(field("condition",
                 object(field("type", "OR"),
                         field("conditions",
@@ -366,7 +365,7 @@ public class JsonPolicyParserTest {
     public void shouldParseNotConditions() throws Exception {
         // Given
         // A NOT condition containing an OAuth2Scope condition
-        String scope = "cn givenName";
+        String scope = "givenName";
         JsonValue content = buildJson(field("condition",
                 object(field("type", "NOT"),
                         field("condition", object(field("type", "OAuth2Scope"),

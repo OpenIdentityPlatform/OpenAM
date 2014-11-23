@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.sun.identity.entitlement.EntitlementException.AUTH_LEVEL_NOT_INTEGER;
+import static com.sun.identity.entitlement.EntitlementException.INVALID_PROPERTY_VALUE;
 import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
 
 /**
@@ -297,5 +298,16 @@ public class AuthLevelCondition extends EntitlementConditionAdaptor {
 
     public void setAuthLevel(Integer authLevel) {
         this.authLevel = authLevel;
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        if (authLevel == null) {
+            throw new EntitlementException(PROPERTY_VALUE_NOT_DEFINED, AUTH_LEVEL);
+        }
+
+        if (authLevel < 0) {
+            throw new EntitlementException(INVALID_PROPERTY_VALUE, AUTH_LEVEL, authLevel);
+        }
     }
 }

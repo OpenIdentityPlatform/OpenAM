@@ -35,6 +35,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Utility class for handling Strings
@@ -162,5 +163,24 @@ public final class StringUtils {
      */
     public static boolean isNotBlank(final String s) {
         return (s != null && s.trim().length() > 0);
+    }
+
+    /**
+     * Tests whether any string in the given set is blank.
+     *
+     * @param xs the set of strings.
+     * @return {@code true} if the set is null or empty or if any member of the set is blank.
+     * @see #isBlank(String)
+     */
+    public static boolean isAnyBlank(final Set<String> xs) {
+        if (xs == null || xs.isEmpty()) {
+            return true;
+        }
+        for (String x : xs) {
+            if (isBlank(x)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

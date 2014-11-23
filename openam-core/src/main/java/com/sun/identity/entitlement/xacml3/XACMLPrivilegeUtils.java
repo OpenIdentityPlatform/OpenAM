@@ -1119,7 +1119,7 @@ public class XACMLPrivilegeUtils {
         return es;
     }
 
-    static EntitlementCondition getEntitlementConditionFromPolicy(Policy policy) {
+    static EntitlementCondition getEntitlementConditionFromPolicy(Policy policy) throws EntitlementException {
         if (policy == null) {
             return null;
         }
@@ -1230,7 +1230,7 @@ public class XACMLPrivilegeUtils {
         return es;
     }
 
-    static EntitlementCondition createEntitlementCondition(String dataType, String value) {
+    static EntitlementCondition createEntitlementCondition(String dataType, String value) throws EntitlementException {
         if (dataType == null || value == null) {
             return null;
         }
@@ -1255,6 +1255,7 @@ public class XACMLPrivilegeUtils {
         }
         if (ec != null) {
             ec.setState(value);
+            ec.validate();
         }
         return ec;
     }

@@ -19,9 +19,11 @@ import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.util.Reject;
+
+import javax.security.auth.Subject;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
 
 /**
  * During policy evaluation multiple matching entitlement privileges can contain the same entitlement conditions
@@ -36,9 +38,10 @@ import javax.security.auth.Subject;
 public class CachingEntitlementCondition implements EntitlementCondition {
 
     private static final Debug DEBUG = Debug.getInstance("Entitlement");
-    private EntitlementCondition backingCondition;
+    private final EntitlementCondition backingCondition;
 
     public CachingEntitlementCondition(EntitlementCondition backingCondition) {
+        Reject.ifNull(backingCondition);
         this.backingCondition = backingCondition;
     }
 
@@ -83,15 +86,15 @@ public class CachingEntitlementCondition implements EntitlementCondition {
      * condition is already cached, then it returns the cached result.
      * In case the context is not available for any reason, then the condition will be executed
      *
-     * @param realm {@inheritDoc}
-     * @param subject {@inheritDoc}
+     * @param realm        {@inheritDoc}
+     * @param subject      {@inheritDoc}
      * @param resourceName {@inheritDoc}
-     * @param environment {@inheritDoc}
+     * @param environment  {@inheritDoc}
      * @return {@inheritDoc}
      * @throws EntitlementException {@inheritDoc}
      */
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName,
-            Map<String, Set<String>> environment) throws EntitlementException {
+                                      Map<String, Set<String>> environment) throws EntitlementException {
         String classMethod = "CachingEntitlementCondition.evaluate() ";
         PrivilegeEvaluatorContext context = PrivilegeEvaluatorContext.getCurrent();
         if (context == null) {
@@ -121,5 +124,10 @@ public class CachingEntitlementCondition implements EntitlementCondition {
             context.getConditionDecisionCache().put(cacheKey, result);
             return result;
         }
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        backingCondition.validate();
     }
 }

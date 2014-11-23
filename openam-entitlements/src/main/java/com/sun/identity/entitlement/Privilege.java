@@ -32,6 +32,13 @@
 package com.sun.identity.entitlement;
 
 import com.sun.identity.shared.JSONUtils;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import org.forgerock.openam.entitlement.CachingEntitlementCondition;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.security.auth.Subject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,13 +46,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import org.forgerock.openam.entitlement.CachingEntitlementCondition;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Class representing entitlement privilege
@@ -365,7 +365,7 @@ public abstract class Privilege implements IPrivilege {
 
     protected abstract void init(JSONObject jo);
 
-    public static Privilege getInstance(JSONObject jo) {
+    public static Privilege getInstance(JSONObject jo) throws EntitlementException {
         String className = jo.optString("className");
         try {
             Class clazz = Class.forName(className);
@@ -891,6 +891,10 @@ public abstract class Privilege implements IPrivilege {
             }
             privilege.eSubject = getESubject(jo);
             privilege.eCondition = getECondition(jo);
+            // Validate the privilege condition when creating a new instance
+            if (privilege.eCondition != null) {
+                privilege.eCondition.validate();
+            }
             privilege.eResourceAttributes = getResourceAttributes(jo);
             privilege.init(jo);
 

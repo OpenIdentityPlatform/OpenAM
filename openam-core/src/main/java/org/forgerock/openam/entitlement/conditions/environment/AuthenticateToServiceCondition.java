@@ -24,21 +24,21 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
-import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.utils.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.security.auth.Subject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_SERVICE;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_AUTHENTICATED_TO_SERVICES;
 
-import org.forgerock.openam.core.CoreWrapper;
-import org.json.JSONException;
-import org.json.JSONObject;
+import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
 
 /**
  * An implementation of an {@link com.sun.identity.entitlement.EntitlementCondition} that will check whether the
@@ -47,7 +47,7 @@ import org.json.JSONObject;
  * @since 12.0.0
  */
 public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor {
-
+    private static final String AUTHENTICATE_TO_SERVICE_ATTR = "authenticateToService";
     private final Debug debug;
     private final CoreWrapper coreWrapper;
     private final EntitlementCoreWrapper entitlementCoreWrapper;
@@ -83,9 +83,9 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
         try {
             JSONObject jo = new JSONObject(state);
             setState(jo);
-            authenticateToService = jo.getString("authenticateToService");
+            authenticateToService = jo.getString(AUTHENTICATE_TO_SERVICE_ATTR);
             String realm = coreWrapper.getRealmFromRealmQualifiedData(authenticateToService);
-            realmEmpty = realm == null || realm.length() == 0;
+            realmEmpty = StringUtils.isBlank(realm);
         } catch (JSONException e) {
             debug.message("AuthenticateToServiceCondition: Failed to set state", e);
         }
@@ -106,9 +106,9 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName, Map<String, Set<String>> env)
             throws EntitlementException {
 
-        if (authenticateToService == null) {
+        if (StringUtils.isBlank(authenticateToService)) {
             if (debug.errorEnabled()) {
-                debug.error("AuthenticateToServiceCondition.getConditionDecision(): property value not defined, " +
+                debug.error("AuthenticateToServiceCondition.evaluate(): property value not defined, " +
                 AUTHENTICATE_TO_SERVICE);
             }
             throw new EntitlementException(PROPERTY_VALUE_NOT_DEFINED, new Object[]{AUTHENTICATE_TO_SERVICE}, null);
@@ -119,7 +119,7 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
         if (env.get(REQUEST_AUTHENTICATED_TO_SERVICES) != null) {
             requestAuthnServices.addAll(env.get(REQUEST_AUTHENTICATED_TO_SERVICES));
             if (debug.messageEnabled()) {
-                debug.message("At AuthenticateToServiceCondition.getConditionDecision(): requestAuthnServices "
+                debug.message("At AuthenticateToServiceCondition.evaluate(): requestAuthnServices "
                         + "from request = " + requestAuthnServices);
             }
         } else {
@@ -129,7 +129,7 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
                 requestAuthnServices.addAll(authenticatedServices);
             }
             if (debug.messageEnabled()) {
-                debug.message("At AuthenticateToServiceCondition.getConditionDecision(): requestAuthnServices from "
+                debug.message("At AuthenticateToServiceCondition.evaluate(): requestAuthnServices from "
                         + "ssoToken = " + requestAuthnServices);
             }
         }
@@ -155,13 +155,13 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
             adviceMessages.add(realmAwareService);
             advices.put(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE, adviceMessages);
             if (debug.messageEnabled()) {
-                debug.message("At AuthenticateToServiceCondition.getConditionDecision():authenticateToService not "
+                debug.message("At AuthenticateToServiceCondition.evaluate():authenticateToService not "
                         + "satisfied = " + realmAwareService);
             }
         }
 
         if (debug.messageEnabled()) {
-            debug.message("At AuthenticateToServiceCondition.getConditionDecision():authenticateToService = "
+            debug.message("At AuthenticateToServiceCondition.evaluate():authenticateToService = "
                     + realmAwareService + "," + " requestAuthnServices = " + requestAuthnServices + ", "
                     + " allowed = " + allowed);
         }
@@ -185,7 +185,7 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
     private JSONObject toJSONObject() throws JSONException {
         JSONObject jo = new JSONObject();
         toJSONObject(jo);
-        jo.put("authenticateToService", authenticateToService);
+        jo.put(AUTHENTICATE_TO_SERVICE_ATTR, authenticateToService);
         return jo;
     }
 
@@ -209,5 +209,12 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
 
     public void setAuthenticateToService(String authenticateToService) {
         this.authenticateToService = authenticateToService;
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        if (StringUtils.isBlank(authenticateToService)) {
+            throw new EntitlementException(PROPERTY_VALUE_NOT_DEFINED, AUTHENTICATE_TO_SERVICE);
+        }
     }
 }

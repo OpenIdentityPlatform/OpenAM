@@ -44,18 +44,22 @@ import org.json.JSONObject;
 
 import javax.security.auth.Subject;
 import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
 import static com.sun.identity.entitlement.EntitlementException.*;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+import static java.util.regex.Pattern.compile;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
 
 /**
  * This condition provides the policy framework with the condition decision and advices based on the client's
@@ -64,6 +68,10 @@ import static com.sun.identity.entitlement.EntitlementException.*;
 public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
 
     public static final String ENV_CONDITION_VALUE = "resourceEnvIPConditionValue";
+
+    private static final String KEY_VALUE = "\\s*(\\w+)\\s*=\\s*(\\S+)\\s*";
+    private static final Pattern CONDITION_PATTERN = compile("\\s*IF" + KEY_VALUE + "THEN" + KEY_VALUE,
+            CASE_INSENSITIVE);
 
     private final Debug debug;
     private final String debugName = "ResourceEnvIPCondition";
@@ -98,12 +106,11 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
         Map<String, Set<String>> advices = new HashMap<String, Set<String>>();
         SSOToken token = (SSOToken) subject.getPrivateCredentials().iterator().next();
         try {
-            String adviceStr = getAdviceStrForEnv(env, token);
+            EnvironmentCondition condition = matchEnvironment(env, token);
 
-            if (adviceStr != null && adviceStr.contains("=")) {
-                int index = adviceStr.indexOf("=");
-                String adviceName = adviceStr.substring(0, index);
-                String adviceValue = adviceStr.substring(index + 1);
+            if (condition != null) {
+                String adviceName = condition.adviceName;
+                String adviceValue = condition.adviceValue;
 
                 if (debug.messageEnabled()) {
                     debug.message(localDebugName + "adviceName : " + adviceName + " and adviceValue : " + adviceValue);
@@ -167,8 +174,6 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
                     }
                 }
 
-            } else if (adviceStr != null) {
-                throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{adviceStr});
             } else if (debug.messageEnabled()) {
                 debug.message(localDebugName + "Advice is NULL since there is no matching condition found.");
             }
@@ -183,16 +188,16 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
      * Returns advice messages for Authentication Scheme condition.
      */
     private Set<String> getAdviceMessagesforAuthScheme(String adviceValue, SSOToken token,
-                                                       Map env) throws EntitlementException, SSOException {
+                                                       Map<String, Set<String>> env) throws EntitlementException, SSOException {
         if (debug.messageEnabled()) {
             localDebugName = debugName + ".getAdviceMessagesforAuthScheme(): ";
         }
-        Set adviceMessages = new HashSet();
+        Set<String> adviceMessages = new HashSet<String>();
         Set requestAuthSchemes = null;
         Set requestAuthSchemesIgnoreRealm = null;
         if ((env != null) && (env.get(REQUEST_AUTH_SCHEMES) != null)) {
             try {
-                requestAuthSchemes = (Set) env.get(REQUEST_AUTH_SCHEMES);
+                requestAuthSchemes = env.get(REQUEST_AUTH_SCHEMES);
                 if (debug.messageEnabled()) {
                     debug.message(localDebugName + "requestAuthSchemes from env=" + requestAuthSchemes);
                 }
@@ -252,16 +257,16 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
      * Returns advice messages for Authentication Service condition.
      */
     private Set<String> getAdviceMessagesforAuthService(String adviceValue, SSOToken token,
-                                                        Map env) throws EntitlementException, SSOException {
+                                                        Map<String, Set<String>> env) throws EntitlementException, SSOException {
         if (debug.messageEnabled()) {
             localDebugName = debugName + ".getAdviceMessagesforAuthService(): ";
         }
-        Set adviceMessages = new HashSet();
-        Set requestAuthnServices = new HashSet();
+        Set<String> adviceMessages = new HashSet<String>();
+        Set<String> requestAuthnServices = new HashSet<String>();
         boolean allow = false;
         if ((env != null) && (env.get(REQUEST_AUTHENTICATED_TO_SERVICES) != null)) {
             try {
-                requestAuthnServices = (Set) env.get(REQUEST_AUTHENTICATED_TO_SERVICES);
+                requestAuthnServices = env.get(REQUEST_AUTHENTICATED_TO_SERVICES);
                 if (debug.messageEnabled()) {
                     debug.message(localDebugName + "requestAuthnServices from request = " + requestAuthnServices);
                 }
@@ -292,8 +297,7 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
                 }
 
             } else if ((realm == null) || (realm.length() == 0)) {
-                for (Iterator iter = requestAuthnServices.iterator(); iter.hasNext(); ) {
-                    String requestAuthnService = (String) iter.next();
+                for (String requestAuthnService : requestAuthnServices) {
                     String service = AMAuthUtils.getDataFromRealmQualifiedData(requestAuthnService);
                     if (adviceValue.equals(service)) {
                         allow = true;
@@ -318,14 +322,13 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
     /**
      * Returns advice messages for Authentication Level condition.
      */
-    private Set<String> getAdviceMessagesforAuthLevel(String adviceValue, SSOToken token,
-                                                      Map env) throws EntitlementException, SSOException {
+    private Set<String> getAdviceMessagesforAuthLevel(String authLevel, SSOToken token, Map<String, Set<String>> env)
+            throws EntitlementException, SSOException {
         if (debug.messageEnabled()) {
             localDebugName = debugName + ".getAdviceMessagesforAuthLevel(): ";
         }
-        Set adviceMessages = new HashSet();
+        Set<String> adviceMessages = new HashSet<String>();
         int maxRequestAuthLevel;
-        String authLevel = adviceValue;
         String authRealm;
         int authLevelInt;
         try {
@@ -356,11 +359,11 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
     /**
      * Returns advice messages for Authentication Role condition.
      */
-    private Set<String> getAdviceMessagesforRole(String adviceValue, SSOToken token, Map env) throws SSOException {
+    private Set<String> getAdviceMessagesforRole(String adviceValue, SSOToken token, Map<String, Set<String>> env) throws SSOException {
         if (debug.messageEnabled()) {
             localDebugName = debugName + ".getAdviceMessagesforRole(): ";
         }
-        Set adviceMessages = new HashSet();
+        Set<String> adviceMessages = new HashSet<String>();
         boolean allow = false;
         if (token != null) {
             String userAuthRoleNames = token.getProperty("Role");
@@ -394,11 +397,11 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
     /**
      * Returns advice messages for Authentication User condition.
      */
-    private Set<String> getAdviceMessagesforUser(String adviceValue, SSOToken token, Map env) throws SSOException {
+    private Set<String> getAdviceMessagesforUser(String adviceValue, SSOToken token, Map<String, Set<String>> env) throws SSOException {
         if (debug.messageEnabled()) {
             localDebugName = debugName + ".getAdviceMessagesforUser(): ";
         }
-        Set adviceMessages = new HashSet();
+        Set<String> adviceMessages = new HashSet<String>();
         boolean allow = false;
         if (token != null) {
             String authUserNames = token.getProperty("UserToken");
@@ -433,15 +436,15 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
      * Returns advice messages for Authentication Realm condition.
      */
     private Set<String> getAdviceMessagesforRealm(String adviceValue, SSOToken token,
-                                                  Map env) throws EntitlementException, SSOException {
+                                                  Map<String, Set<String>> env) throws EntitlementException, SSOException {
         if (debug.messageEnabled()) {
             localDebugName = debugName + ".getAdviceMessagesforRealm(): ";
         }
-        Set adviceMessages = new HashSet();
-        Set requestAuthnRealms = new HashSet();
+        Set<String> adviceMessages = new HashSet<String>();
+        Set<String> requestAuthnRealms = new HashSet<String>();
         if ((env != null) && (env.get(REQUEST_AUTHENTICATED_TO_REALMS) != null)) {
             try {
-                requestAuthnRealms = (Set) env.get(REQUEST_AUTHENTICATED_TO_REALMS);
+                requestAuthnRealms = env.get(REQUEST_AUTHENTICATED_TO_REALMS);
                 if (debug.messageEnabled()) {
                     debug.message(localDebugName + "requestAuthnRealms, from request / env = " + requestAuthnRealms);
                 }
@@ -486,7 +489,7 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
         if (debug.messageEnabled()) {
             localDebugName = debugName + ".getAdviceMessagesforRedirectURL(): ";
         }
-        Set adviceMessages = new HashSet();
+        Set<String> adviceMessages = new HashSet<String>();
         Set requestAuthSchemes = null;
         Set requestAuthSchemesIgnoreRealm = null;
         boolean nullRealm = false;
@@ -590,7 +593,7 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
      * Returns the maximum auth level specified for the REQUEST_AUTH_LEVEL
      * property in the environment Map.
      */
-    private int getMaxRequestAuthLevel(Map env, String authRealm, String authLevel) throws EntitlementException {
+    private int getMaxRequestAuthLevel(Map<String, Set<String>> env, String authRealm, String authLevel) throws EntitlementException {
         if (debug.messageEnabled()) {
             localDebugName = debugName + ".getMaxRequestAuthLevel(): ";
         }
@@ -670,9 +673,8 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
                 debug.message(localDebugName + "levels from token= " + levels);
             }
             if ((levels != null) && (!levels.isEmpty())) {
-                Iterator iter = levels.iterator();
-                while (iter.hasNext()) {
-                    String levelString = (String) iter.next();
+                for (final Object level1 : levels) {
+                    String levelString = (String) level1;
                     int level = getAuthLevel(levelString);
                     maxAuthLevel = (level > maxAuthLevel) ? level : maxAuthLevel;
                 }
@@ -725,128 +727,120 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
     }
 
     /**
-     * Returns the advice string that satisfies or matches for the client
+     * Returns the environment condition that satisfies or matches for the client
      * environment parameter, including client's IP Address.
      */
-    private String getAdviceStrForEnv(Map<String, Set<String>> env, SSOToken token) throws EntitlementException,
+    private EnvironmentCondition matchEnvironment(Map<String, Set<String>> env, SSOToken token)
+            throws EntitlementException,
             SSOException {
         if (debug.messageEnabled()) {
-            localDebugName = debugName + ".getAdviceStrForEnv(): ";
+            localDebugName = debugName + ".matchEnvironment(): ";
         }
-        String adviceStr = null;
-        Map<String, String> envConditionsMap = parseEnvironmentConditions();
+
+        EnvironmentCondition matchingCondition = null;
+        final List<EnvironmentCondition> conditions = parseConditions(resourceEnvIPConditionValue);
 
         //Check if all the keys are valid
-        for (Map.Entry<String, String> entry : envConditionsMap.entrySet()) {
-            if (entry.getKey().contains("=")) {
-                StringTokenizer st = new StringTokenizer(entry.getKey(), "=");
-                if (st.countTokens() != 2) {
-                    throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{entry.getKey()});
-                }
+        for (EnvironmentCondition condition : conditions) {
+            final String envParamName = condition.paramName;
+            final String envParamValue = condition.paramValue;
 
-                String envParamName = st.nextToken().trim();
-                String envParamValue = st.nextToken().trim();
-
-                Set<String> envSet = env.get(envParamName);
-                if (!Utils.isEmpty(envSet)) {
-                    for (String strEnv : envSet) {
-                        if ((strEnv != null) && (strEnv.equalsIgnoreCase(envParamValue))) {
-                            adviceStr = entry.getValue();
-                            break;
-                        }
-                    }
-                } else {
-                    String strIP;
-                    Set<String> ipSet = env.get(REQUEST_IP);
-                    if (Utils.isEmpty(ipSet) && token != null) {
-                        strIP = token.getIPAddress().getHostAddress();
-                    } else if (Utils.isEmpty(ipSet)) {
-                        strIP = ipSet.iterator().next();
-                    } else {
-                        throw new EntitlementException(CLIENT_IP_EMPTY);
-                    }
-
-                    long requestIpV4 = 0;
-                    IPv6Address requestIpV6 = null;
-                    if (ValidateIPaddress.isIPv4(strIP)) {
-                        requestIpV4 = stringToIp(strIP);
-                    } else if (ValidateIPaddress.isIPv6(strIP)) {
-                        requestIpV6 = IPv6Address.fromString(strIP);
-                    } else {
-                        if (debug.messageEnabled()) {
-                            debug.message(localDebugName + "invalid strIP : " + strIP);
-                        }
-                        continue;
-                    }
-
-                    int bIndex = envParamValue.indexOf("[");
-                    int lIndex = envParamValue.indexOf("]");
-                    String ipVal = envParamValue.substring(bIndex + 1, lIndex);
-
-                    if (ipVal.contains("-")) {
-                        StringTokenizer stIP = new StringTokenizer(ipVal, "-");
-                        int tokenCnt = stIP.countTokens();
-                        if (tokenCnt > 2) {
-                            throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{ipVal});
-                        }
-
-                        String startIp = stIP.nextToken();
-                        String endIp = startIp;
-                        if (tokenCnt == 2) {
-                            endIp = stIP.nextToken();
-                        }
-
-                        if (ValidateIPaddress.isIPv4(strIP) &&
-                                ValidateIPaddress.isIPv4(startIp) && ValidateIPaddress.isIPv4(endIp)) {
-                            long lStartIP = stringToIp(startIp);
-                            long lEndIP = stringToIp(endIp);
-                            if ((requestIpV4 >= lStartIP) && (requestIpV4 <= lEndIP)) {
-                                adviceStr = entry.getValue();
-                                break;
-                            }
-                        } else if (ValidateIPaddress.isIPv6(strIP) &&
-                                ValidateIPaddress.isIPv6(startIp) && ValidateIPaddress.isIPv6(endIp)) {
-                            IPv6AddressRange ipv6Range = IPv6AddressRange.fromFirstAndLast(IPv6Address.fromString
-                                    (startIp), IPv6Address.fromString(endIp));
-                            if (requestIpV6 != null && ipv6Range.contains(requestIpV6)) {
-                                adviceStr = entry.getValue();
-                                break;
-                            }
-                        } else {
-                            if (debug.errorEnabled()) {
-                                debug.error(debugName + ".getAdviceStrForEnv(): invalid property value, " + strIP);
-                            }
-                            throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{strIP});
-                        }
-
-                    } else if (requestIpV4 != 0 && ValidateIPaddress.isIPv4(ipVal)) {
-                        long longIp = stringToIp(ipVal);
-                        if (requestIpV4 == longIp) {
-                            adviceStr = entry.getValue();
-                            break;
-                        }
-                    } else if (requestIpV6 != null && ValidateIPaddress.isIPv6(ipVal)) {
-                        // treat as single ip address
-                        IPv6Address iPv6AddressIpVal = IPv6Address.fromString(ipVal);
-                        if (iPv6AddressIpVal.compareTo(requestIpV6) == 0) {
-
-                            adviceStr = entry.getValue();
-                            break;
-                        }
-                    } else if (ipVal.contains("*")) {
-                        adviceStr = entry.getValue();
+            Set<String> envSet = env.get(envParamName);
+            if (!Utils.isEmpty(envSet)) {
+                for (String strEnv : envSet) {
+                    if ((strEnv != null) && (strEnv.equalsIgnoreCase(envParamValue))) {
+                        matchingCondition = condition;
                         break;
-                    } else {
-                        throw new EntitlementException(RESOURCE_ENV_NOT_KNOWN, new String[]{ipVal});
                     }
                 }
-
             } else {
-                throw new EntitlementException(RESOURCE_ENV_NOT_KNOWN, new String[]{entry.getKey()});
+                String strIP;
+                Set<String> ipSet = env.get(REQUEST_IP);
+                if (Utils.isEmpty(ipSet) && token != null) {
+                    strIP = token.getIPAddress().getHostAddress();
+                } else if (!Utils.isEmpty(ipSet)) {
+                    strIP = ipSet.iterator().next();
+                } else {
+                    throw new EntitlementException(CLIENT_IP_EMPTY);
+                }
+
+                long requestIpV4 = 0;
+                IPv6Address requestIpV6 = null;
+                if (ValidateIPaddress.isIPv4(strIP)) {
+                    requestIpV4 = stringToIp(strIP);
+                } else if (ValidateIPaddress.isIPv6(strIP)) {
+                    requestIpV6 = IPv6Address.fromString(strIP);
+                } else {
+                    if (debug.messageEnabled()) {
+                        debug.message(localDebugName + "invalid strIP : " + strIP);
+                    }
+                    continue;
+                }
+
+                int bIndex = envParamValue.indexOf("[");
+                int lIndex = envParamValue.indexOf("]");
+                String ipVal = envParamValue.substring(bIndex + 1, lIndex);
+
+                if (ipVal.contains("-")) {
+                    StringTokenizer stIP = new StringTokenizer(ipVal, "-");
+                    int tokenCnt = stIP.countTokens();
+                    if (tokenCnt > 2) {
+                        throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{ipVal});
+                    }
+
+                    String startIp = stIP.nextToken();
+                    String endIp = startIp;
+                    if (tokenCnt == 2) {
+                        endIp = stIP.nextToken();
+                    }
+
+                    if (ValidateIPaddress.isIPv4(strIP) &&
+                            ValidateIPaddress.isIPv4(startIp) && ValidateIPaddress.isIPv4(endIp)) {
+                        long lStartIP = stringToIp(startIp);
+                        long lEndIP = stringToIp(endIp);
+                        if ((requestIpV4 >= lStartIP) && (requestIpV4 <= lEndIP)) {
+                            matchingCondition = condition;
+                            break;
+                        }
+                    } else if (ValidateIPaddress.isIPv6(strIP) &&
+                            ValidateIPaddress.isIPv6(startIp) && ValidateIPaddress.isIPv6(endIp)) {
+                        IPv6AddressRange ipv6Range = IPv6AddressRange.fromFirstAndLast(IPv6Address.fromString
+                                (startIp), IPv6Address.fromString(endIp));
+                        if (requestIpV6 != null && ipv6Range.contains(requestIpV6)) {
+                            matchingCondition = condition;
+                            break;
+                        }
+                    } else {
+                        if (debug.errorEnabled()) {
+                            debug.error(debugName + ".matchEnvironment(): invalid property value, " + strIP);
+                        }
+                        throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{strIP});
+                    }
+
+                } else if (requestIpV4 != 0 && ValidateIPaddress.isIPv4(ipVal)) {
+                    long longIp = stringToIp(ipVal);
+                    if (requestIpV4 == longIp) {
+                        matchingCondition = condition;
+                        break;
+                    }
+                } else if (requestIpV6 != null && ValidateIPaddress.isIPv6(ipVal)) {
+                    // treat as single ip address
+                    IPv6Address iPv6AddressIpVal = IPv6Address.fromString(ipVal);
+                    if (iPv6AddressIpVal.compareTo(requestIpV6) == 0) {
+                        matchingCondition = condition;
+                        break;
+                    }
+                } else if (ipVal.contains("*")) {
+                    matchingCondition = condition;
+                    break;
+                } else {
+                    throw new EntitlementException(RESOURCE_ENV_NOT_KNOWN, new String[]{ipVal});
+                }
             }
+
         }
 
-        return adviceStr;
+        return matchingCondition;
     }
 
     /**
@@ -862,31 +856,13 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
         return ipValue;
     }
 
-    private Map<String, String> parseEnvironmentConditions() {
-        final Map<String, String> envConditionMap = new HashMap<String, String>();
-        final Pattern pattern = Pattern.compile("IF\\s*(.*)\\s*THEN\\s*(.*)", Pattern.CASE_INSENSITIVE);
-        for (String condition : resourceEnvIPConditionValue) {
-            final Matcher matcher = pattern.matcher(condition);
-
-            if (matcher.find() && matcher.groupCount() == 2) {
-                envConditionMap.put(matcher.group(1), matcher.group(2));
-            } else {
-                debug.error(debugName + ".parseEnvironmentConditions(): Condition format invalid: " + condition);
-            }
-        }
-
-        if (debug.messageEnabled()) {
-            debug.message(debugName + ".parseEnvironmentConditions(): " + envConditionMap);
-        }
-        return envConditionMap;
-    }
 
     @Override
     public void setState(String state) {
         try {
             JSONObject jo = new JSONObject(state);
             setState(jo);
-            JSONArray conditionList = jo.getJSONArray("resourceEnvIPConditionValue");
+            JSONArray conditionList = jo.getJSONArray(ENV_CONDITION_VALUE);
             for (int i = 0; i < conditionList.length(); i++) {
                 resourceEnvIPConditionValue.add(conditionList.getString(i));
             }
@@ -927,5 +903,87 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
 
     public void setResourceEnvIPConditionValue(Set<String> resourceEnvIPConditionValue) {
         this.resourceEnvIPConditionValue = resourceEnvIPConditionValue;
+    }
+
+    /**
+     * Parse condition strings of the form {@code IF paramName=paramValue THEN adviceName=adviceValue} into condition
+     * objects. The syntax of the paramValue and adviceValue parts may be further constrained during evaluation.
+     *
+     * @param conditionStrings the set of condition strings passed from the front end.
+     * @return the parsed condition objects.
+     * @throws EntitlementException if any of the conditions is in an invalid format.
+     */
+    static List<EnvironmentCondition> parseConditions(final Set<String> conditionStrings)
+            throws EntitlementException {
+        final List<EnvironmentCondition> conditions =
+                new ArrayList<EnvironmentCondition>(conditionStrings.size());
+
+        for (final String conditionString : conditionStrings) {
+            final Matcher matcher = CONDITION_PATTERN.matcher(conditionString);
+            if (!matcher.matches()) {
+                throw new EntitlementException(EntitlementException.INVALID_PROPERTY_VALUE, ENV_CONDITION_VALUE,
+                        conditionString);
+            }
+
+            conditions.add(new EnvironmentCondition(matcher.group(1), matcher.group(2), matcher.group(3),
+                    matcher.group(4)));
+        }
+
+        return conditions;
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        if (resourceEnvIPConditionValue == null || resourceEnvIPConditionValue.isEmpty()) {
+            throw new EntitlementException(EntitlementException.PROPERTY_VALUE_NOT_DEFINED, ENV_CONDITION_VALUE);
+        }
+
+        parseConditions(resourceEnvIPConditionValue);
+    }
+
+    /**
+     * Represents a parsed resource environment condition consisting of a parameter name and value to test from the
+     * environment, and an advice name and value to return if the condition matches.
+     */
+    static final class EnvironmentCondition {
+        final String paramName;
+        final String paramValue;
+        final String adviceName;
+        final String adviceValue;
+
+        EnvironmentCondition(String paramName, String paramValue, String adviceName, String adviceValue) {
+            this.paramName = paramName;
+            this.paramValue = paramValue;
+            this.adviceName = adviceName;
+            this.adviceValue = adviceValue;
+        }
+
+        @Override
+        public boolean equals(final Object that) {
+            return (this == that) ||
+                    (that instanceof EnvironmentCondition) && this.isEqualTo((EnvironmentCondition) that);
+        }
+
+        public boolean isEqualTo(final EnvironmentCondition that) {
+            // Names are case-sensitive, values are not
+            return this.adviceName.equals(that.adviceName)
+                    && this.adviceValue.equalsIgnoreCase(that.adviceValue)
+                    && this.paramName.equals(that.paramName)
+                    && this.paramValue.equalsIgnoreCase(that.paramValue);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = paramName.hashCode();
+            result = 31 * result + paramValue.toLowerCase().hashCode();
+            result = 31 * result + adviceName.hashCode();
+            result = 31 * result + adviceValue.toLowerCase().hashCode();
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "IF " + paramName + "=" + paramValue + " THEN " + adviceName + "=" + adviceValue;
+        }
     }
 }

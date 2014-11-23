@@ -24,15 +24,19 @@
  *
  * $Id: LogicalCondition.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  */
+/*
+ * Portions Copyrighted 2014 ForgeRock AS.
+ */
 package com.sun.identity.entitlement;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.security.auth.Subject;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONException;
 
 public abstract class LogicalCondition extends EntitlementConditionAdaptor {
     private Set<EntitlementCondition> eConditions;
@@ -264,5 +268,16 @@ public abstract class LogicalCondition extends EntitlementConditionAdaptor {
             code += pConditionName.hashCode();
         }
         return code;
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        if (eConditions == null || eConditions.isEmpty()) {
+            throw new EntitlementException(EntitlementException.PROPERTY_VALUE_NOT_DEFINED, "conditions");
+        }
+
+        for (EntitlementCondition child : eConditions) {
+            child.validate();
+        }
     }
 }

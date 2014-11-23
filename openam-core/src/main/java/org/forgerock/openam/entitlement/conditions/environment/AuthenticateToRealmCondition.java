@@ -19,9 +19,6 @@
 
 package org.forgerock.openam.entitlement.conditions.environment;
 
-import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
-
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.entitlement.ConditionDecision;
@@ -29,6 +26,7 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,6 +36,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_REALM;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_REALM_CONDITION_ADVICE;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_AUTHENTICATED_TO_REALMS;
+
 /**
  * An implementation of an {@link com.sun.identity.entitlement.EntitlementCondition} that will check whether the
  * principal has authenticated to the specified realm.
@@ -45,7 +48,7 @@ import java.util.Set;
  * @since 12.0.0
  */
 public class AuthenticateToRealmCondition extends EntitlementConditionAdaptor {
-
+    private static final String AUTHENTICATE_TO_REALM_ATTR = "authenticateToRealm";
     private final Debug debug;
     private final EntitlementCoreWrapper entitlementCoreWrapper;
 
@@ -77,7 +80,7 @@ public class AuthenticateToRealmCondition extends EntitlementConditionAdaptor {
         try {
             JSONObject jo = new JSONObject(state);
             setState(jo);
-            authenticateToRealm = jo.getString("authenticateToRealm");
+            authenticateToRealm = jo.getString(AUTHENTICATE_TO_REALM_ATTR);
         } catch (JSONException e) {
             debug.message("AuthenticateToRealmCondition: Failed to set state", e);
         }
@@ -98,10 +101,6 @@ public class AuthenticateToRealmCondition extends EntitlementConditionAdaptor {
     @Override
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName, Map<String, Set<String>> env)
             throws EntitlementException {
-
-        if (authenticateToRealm == null) {
-            throw new EntitlementException(PROPERTY_VALUE_NOT_DEFINED, new Object[]{AUTHENTICATE_TO_REALM}, null);
-        }
 
         // We don't care about case of the realm when doing the comparison so use a CaseInsensitiveHashSet
         Set<String> requestAuthnRealms = new CaseInsensitiveHashSet();
@@ -147,7 +146,7 @@ public class AuthenticateToRealmCondition extends EntitlementConditionAdaptor {
     private JSONObject toJSONObject() throws JSONException {
         JSONObject jo = new JSONObject();
         toJSONObject(jo);
-        jo.put("authenticateToRealm", authenticateToRealm);
+        jo.put(AUTHENTICATE_TO_REALM_ATTR, authenticateToRealm);
         return jo;
     }
 
@@ -171,5 +170,12 @@ public class AuthenticateToRealmCondition extends EntitlementConditionAdaptor {
 
     public void setAuthenticateToRealm(String authenticateToRealm) {
         this.authenticateToRealm = authenticateToRealm;
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        if (StringUtils.isBlank(authenticateToRealm)) {
+            throw new EntitlementException(PROPERTY_VALUE_NOT_DEFINED, AUTHENTICATE_TO_REALM);
+        }
     }
 }

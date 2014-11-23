@@ -138,4 +138,13 @@ public class LDAPFilterCondition extends EntitlementConditionAdaptor {
     public String getLdapFilter() {
         return getValue((Collection<String>) condition.getProperties().get(LDAP_FILTER));
     }
+
+    @Override
+    public void validate() throws EntitlementException {
+        try {
+            condition.validate();
+        } catch (PolicyException e) {
+            throw new EntitlementException(EntitlementException.INVALID_VALUE, e.getLocalizedMessage());
+        }
+    }
 }

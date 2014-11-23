@@ -24,13 +24,11 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.utils.ValidateIPaddress;
 
 import java.util.List;
 import java.util.StringTokenizer;
 
-import static com.sun.identity.entitlement.EntitlementException.*;
+import static com.sun.identity.entitlement.EntitlementException.INVALID_PROPERTY_VALUE;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
 
 /**
@@ -43,17 +41,16 @@ public class IPv4Condition extends IPvXCondition<Long> {
      * Constructs a new IPv4Condition instance.
      */
     public IPv4Condition() {
-        this(PrivilegeManager.debug, new CoreWrapper());
+        this(PrivilegeManager.debug);
     }
 
     /**
      * Constructs a new IPv4Condition instance.
      *
      * @param debug A Debug instance.
-     * @param coreWrapper An instance of the CoreWrapper.
      */
-    IPv4Condition(Debug debug, CoreWrapper coreWrapper) {
-        super(debug, coreWrapper, Long.MAX_VALUE, Long.MAX_VALUE, IPVersion.IPV4);
+    IPv4Condition(Debug debug) {
+        super(debug, Long.MAX_VALUE, Long.MAX_VALUE, IPVersion.IPV4);
     }
 
     /**
@@ -68,7 +65,7 @@ public class IPv4Condition extends IPvXCondition<Long> {
                          @JsonProperty(IP_RANGE) List<String> ipRange,
                          @JsonProperty(DNS_NAME) List<String> dnsName) throws EntitlementException {
 
-        super(PrivilegeManager.debug, new CoreWrapper(), Long.MAX_VALUE, Long.MAX_VALUE, IPVersion.IPV4,
+        super(PrivilegeManager.debug, Long.MAX_VALUE, Long.MAX_VALUE, IPVersion.IPV4,
                 startIp, endIp, ipRange, dnsName);
     }
 
@@ -98,13 +95,4 @@ public class IPv4Condition extends IPvXCondition<Long> {
         }
         return ipValue;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean validateIpAddress(String ip) {
-        return ValidateIPaddress.isIPv4(ip);
-    }
-
 }

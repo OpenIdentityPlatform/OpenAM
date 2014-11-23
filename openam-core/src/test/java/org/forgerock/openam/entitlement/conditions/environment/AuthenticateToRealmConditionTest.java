@@ -20,7 +20,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.core.CoreWrapper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -33,7 +32,8 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_REALM_CONDITION_ADVICE;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_AUTHENTICATED_TO_REALMS;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -78,17 +78,13 @@ public class AuthenticateToRealmConditionTest {
     }
 
     @Test(expectedExceptions = EntitlementException.class)
-    public void conditionShouldThrowEntitlementExceptionWhenEvaluatingWithNoAuthenticateToRealmSet()
+    public void conditionShouldThrowEntitlementExceptionWhenValidatingWithNoAuthenticateToRealmSet()
             throws EntitlementException {
 
         //Given
-        String realm = "REALM";
-        Subject subject = new Subject();
-        String resourceName = "RESOURCE_NAME";
-        Map<String, Set<String>> env = new HashMap<String, Set<String>>();
 
         //When
-        condition.evaluate(realm, subject, resourceName, env);
+        condition.validate();
 
         //Then
         //Expected EntitlementException

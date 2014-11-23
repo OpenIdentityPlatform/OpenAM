@@ -38,24 +38,20 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.policy.PolicyException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import javax.security.auth.Subject;
-
 import com.sun.identity.policy.interfaces.Condition;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.sun.identity.entitlement.EntitlementException.UNKNOWN_POLICY_CLASS;
-import static com.sun.identity.entitlement.EntitlementException.POLICY_CLASS_CAST_EXCEPTION;
-import static com.sun.identity.entitlement.EntitlementException.POLICY_CLASS_NOT_INSTANTIABLE;
-import static com.sun.identity.entitlement.EntitlementException.POLICY_CLASS_NOT_ACCESSIBLE;
-import static com.sun.identity.entitlement.EntitlementException.INVALID_PROPERTY_VALUE_UNKNOWN_VALUE;
+import javax.security.auth.Subject;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import static com.sun.identity.entitlement.EntitlementException.*;
 
 /**
  * This condition wraps all OpenSSO policy condition.
@@ -251,5 +247,11 @@ public class PolicyCondition extends  EntitlementConditionAdaptor {
         } catch (PolicyException pe) {
             throw new EntitlementException(INVALID_PROPERTY_VALUE_UNKNOWN_VALUE, new String[]{className}, pe);
         }
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        // Attempt to load the policy condition to validate it
+        getPolicyCondition();
     }
 }

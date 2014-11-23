@@ -24,17 +24,21 @@
  *
  * $Id: StringAttributeCondition.java,v 1.3 2009/08/31 19:48:14 veiming Exp $
  */
-
+/*
+ * Portions Copyrighted 2014 ForgeRock AS.
+ */
 package com.sun.identity.entitlement;
 
+import org.forgerock.openam.utils.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.security.auth.Subject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Condition for evaluating attribute value of string type.
@@ -211,4 +215,14 @@ public class StringAttributeCondition extends EntitlementConditionAdaptor {
         return hc;
     }
 
+    @Override
+    public void validate() throws EntitlementException {
+        if (StringUtils.isBlank(attributeName)) {
+            throw new EntitlementException(EntitlementException.PROPERTY_VALUE_NOT_DEFINED, ATTR_NAME_ATTRIBUTE_NAME);
+        }
+
+        if (value == null) {
+            throw new EntitlementException(EntitlementException.PROPERTY_VALUE_NOT_DEFINED, ATTR_NAME_VALUE);
+        }
+    }
 }

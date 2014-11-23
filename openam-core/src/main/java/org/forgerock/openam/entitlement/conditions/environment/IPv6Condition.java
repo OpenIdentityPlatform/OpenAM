@@ -22,8 +22,6 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.utils.ValidateIPaddress;
 
 import java.util.List;
 
@@ -40,17 +38,16 @@ public class IPv6Condition extends IPvXCondition<IPv6Address> {
      * Constructs a new IPv6Condition instance.
      */
     public IPv6Condition() {
-        this(PrivilegeManager.debug, new CoreWrapper());
+        this(PrivilegeManager.debug);
     }
 
     /**
      * Constructs a new IPv6Condition instance.
      *
      * @param debug A Debug instance.
-     * @param coreWrapper An instance of the CoreWrapper.
      */
-    IPv6Condition(Debug debug, CoreWrapper coreWrapper) {
-        super(debug, coreWrapper, null, null, IPVersion.IPV6);
+    IPv6Condition(Debug debug) {
+        super(debug, null, null, IPVersion.IPV6);
     }
 
     /**
@@ -65,7 +62,7 @@ public class IPv6Condition extends IPvXCondition<IPv6Address> {
                          @JsonProperty(IP_RANGE) List<String> ipRange,
                          @JsonProperty(DNS_NAME) List<String> dnsName) throws EntitlementException {
 
-        super(PrivilegeManager.debug, new CoreWrapper(), null, null, IPVersion.IPV6,
+        super(PrivilegeManager.debug, null, null, IPVersion.IPV6,
                 startIp, endIp, ipRange, dnsName);
     }
 
@@ -79,14 +76,6 @@ public class IPv6Condition extends IPvXCondition<IPv6Address> {
         } catch (IllegalArgumentException ex) {
             throw new EntitlementException(INVALID_PROPERTY_VALUE, new String[]{"ip", ip});
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean validateIpAddress(String ip) {
-        return ValidateIPaddress.isIPv6(ip);
     }
 
 }

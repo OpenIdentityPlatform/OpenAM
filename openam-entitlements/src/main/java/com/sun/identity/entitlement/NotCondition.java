@@ -31,14 +31,15 @@
 
 package com.sun.identity.entitlement;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import javax.security.auth.Subject;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.forgerock.util.Reject;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import javax.security.auth.Subject;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class wrapped on an Entitlement Condition object to provide boolean
@@ -312,5 +313,12 @@ public class NotCondition extends LogicalCondition {
             code += pConditionName.hashCode();
         }
         return code;
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        if (eCondition == null) {
+            throw new EntitlementException(EntitlementException.PROPERTY_VALUE_NOT_DEFINED, "condition");
+        }
     }
 }

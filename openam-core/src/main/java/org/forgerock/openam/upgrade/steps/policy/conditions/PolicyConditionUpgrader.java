@@ -162,7 +162,8 @@ class PolicyConditionUpgrader {
         return conditionUpgradeMap.migrateSubjectCondition(subject.getClassName(), subject, migrationReport);
     }
 
-    private void migrateEnvironmentConditions(Privilege privilege, MigrationReport migrationReport) throws UpgradeException {
+    private void migrateEnvironmentConditions(Privilege privilege, MigrationReport migrationReport)
+            throws UpgradeException, EntitlementException {
 
         if (privilege.getCondition() == null) {
             return;
@@ -189,7 +190,11 @@ class PolicyConditionUpgrader {
         }
     }
 
-    private EntitlementCondition migrateEnvironmentCondition(PolicyCondition condition, MigrationReport migrationReport) {
-        return conditionUpgradeMap.migrateEnvironmentCondition(condition.getClassName(), condition, migrationReport);
+    private EntitlementCondition migrateEnvironmentCondition(PolicyCondition condition, MigrationReport migrationReport)
+            throws EntitlementException {
+        final EntitlementCondition migrated = conditionUpgradeMap.migrateEnvironmentCondition(condition.getClassName(),
+                condition, migrationReport);
+        migrated.validate();
+        return migrated;
     }
 }

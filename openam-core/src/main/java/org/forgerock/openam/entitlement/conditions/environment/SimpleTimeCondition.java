@@ -221,7 +221,8 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
         return toString();
     }
 
-    private void validateProperties() throws EntitlementException {
+    @Override
+    public void validate() throws EntitlementException {
 
         //Check if the required key(s) are defined
         if (startTime == null && startDay == null && startDate == null) {
@@ -230,7 +231,7 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
                         + "defined, " + START_DATE + ", " + START_TIME + ", " + START_DAY);
             }
             throw new EntitlementException(AT_LEAST_ONE_OF_TIME_PROPS_SHOULD_BE_DEFINED,
-                    new String[]{START_DATE + "," + START_TIME + "," + START_DAY});
+                    START_DATE + ", " + START_TIME + ", " + START_DAY);
         }
 
         if (startTime != null && endTime == null) {
@@ -238,14 +239,14 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
                 debug.error("SimpleTimeCondition.validateProperties(): property pair not defined, " + START_TIME + ", "
                         + END_TIME);
             }
-            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, new String[]{START_TIME, END_TIME});
+            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, START_TIME, END_TIME);
         }
         if (startTime == null && endTime != null) {
             if (debug.errorEnabled()) {
                 debug.error("SimpleTimeCondition.validateProperties(): property pair not defined, " + END_TIME + ", "
                         + START_TIME);
             }
-            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, new String[]{END_TIME, START_TIME});
+            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, END_TIME, START_TIME);
         }
 
         if (startDay != null && endDay == null) {
@@ -253,14 +254,14 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
                 debug.error("SimpleTimeCondition.validateProperties(): property pair not defined, " + START_DAY + ", "
                         + END_DAY);
             }
-            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, new String[]{START_DAY, END_DAY});
+            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, START_DAY, END_DAY);
         }
         if (startDay == null && endDay != null) {
             if (debug.errorEnabled()) {
                 debug.error("SimpleTimeCondition.validateProperties(): property pair not defined, " + END_DAY + ", "
                         + START_DAY);
             }
-            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, new String[]{END_DAY, START_DAY});
+            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, END_DAY, START_DAY);
         }
 
         if (startDate != null && endDate == null) {
@@ -268,14 +269,14 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
                 debug.error("SimpleTimeCondition.validateProperties(): property pair not defined, " + START_DATE + ", "
                         + END_DATE);
             }
-            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, new String[]{START_DATE, END_DATE});
+            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, START_DATE, END_DATE);
         }
         if (startDate == null && endDate != null) {
             if (debug.errorEnabled()) {
                 debug.error("SimpleTimeCondition.validateProperties(): property pair not defined, " + END_DATE + ", "
                         + START_DATE);
             }
-            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, new String[]{END_DATE, START_DATE});
+            throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, END_DATE, START_DATE);
         }
 
         if (startDateCal.getTime().getTime() > endDateCal.getTime().getTime()) {
@@ -292,8 +293,6 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
     @Override
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName, Map<String, Set<String>> env)
             throws EntitlementException {
-
-        validateProperties();
 
         boolean allowed = false;
         long currentGmt = timeService.now();

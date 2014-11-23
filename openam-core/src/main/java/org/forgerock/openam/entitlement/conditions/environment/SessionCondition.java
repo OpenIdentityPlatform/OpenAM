@@ -88,17 +88,7 @@ public class SessionCondition extends EntitlementConditionAdaptor {
      * Constructs a new SessionCondition instance.
      */
     public SessionCondition() {
-        this(PrivilegeManager.debug, new CoreWrapper(), new TimeService() {
-            @Override
-            public long now() {
-                return System.currentTimeMillis();
-            }
-
-            @Override
-            public long since(long l) {
-                return now() - l;
-            }
-        });
+        this(PrivilegeManager.debug, new CoreWrapper(), TimeService.SYSTEM);
     }
 
     /**
@@ -240,5 +230,13 @@ public class SessionCondition extends EntitlementConditionAdaptor {
 
     public void setTerminateSession(boolean terminateSession) {
         this.terminateSession = terminateSession;
+    }
+
+    @Override
+    public void validate() throws EntitlementException {
+        if (maxSessionTime < 0L) {
+            throw new EntitlementException(EntitlementException.INVALID_PROPERTY_VALUE, "maxSessionTime",
+                    maxSessionTime);
+        }
     }
 }

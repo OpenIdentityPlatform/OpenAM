@@ -31,7 +31,6 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
@@ -272,6 +271,11 @@ public class ConditionTypesResourceTest {
 
         public String getName() {
             return name;
+        }
+
+        @Override
+        public void validate() throws EntitlementException {
+            // Nothing
         }
     }
 }

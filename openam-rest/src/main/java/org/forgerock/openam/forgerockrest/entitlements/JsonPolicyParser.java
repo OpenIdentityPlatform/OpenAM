@@ -141,6 +141,11 @@ public final class JsonPolicyParser implements PolicyParser {
                 throw new EntitlementException(EntitlementException.MISSING_PRIVILEGE_NAME);
             }
 
+            // Validate the condition if present
+            if (privilege.getCondition() != null) {
+                privilege.getCondition().validate();
+            }
+
             return privilege;
         } catch (UnrecognizedPropertyException ex) {
             throw new EntitlementException(EntitlementException.INVALID_VALUE,
