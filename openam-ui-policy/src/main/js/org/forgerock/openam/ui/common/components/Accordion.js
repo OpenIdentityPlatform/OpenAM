@@ -75,7 +75,7 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
     Accordion.prototype.expandCollapse = function (e) {
         e.preventDefault();
 
-        var $this = $(e.target),
+        var $this = $(e.currentTarget),
             $targetStep = $this.next(),
             id = $targetStep.data('stepId');
 

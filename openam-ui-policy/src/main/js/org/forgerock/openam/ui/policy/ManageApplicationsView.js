@@ -157,15 +157,15 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
         getDefaultFilter: function () {
             var exceptions = '',
-                defaultApplicatons,
+                defaultApplications,
                 returnList = [];
 
-            if (conf.globalData.policyEditorConfig) {
-                defaultApplicatons = conf.globalData.policyEditorConfig.defaultApplicatons;
-                if (defaultApplicatons.config.hideByDefault) {
-                    exceptions = _.difference(defaultApplicatons.defaultApplicatonList, defaultApplicatons.config.exceptThese);
+            if (conf.globalData.policyEditor) {
+                defaultApplications = conf.globalData.policyEditor.defaultApplications;
+                if (defaultApplications.config.hideByDefault) {
+                    exceptions = _.difference(defaultApplications.defaultApplicatonList, defaultApplications.config.exceptThese);
                 } else {
-                    exceptions = defaultApplicatons.config.exceptThese;
+                    exceptions = defaultApplications.config.exceptThese;
                 }
             }
 

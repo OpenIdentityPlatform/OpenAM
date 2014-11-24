@@ -40,13 +40,8 @@ define("org/forgerock/openam/ui/policy/AbstractEditView", [
     "org/forgerock/openam/ui/policy/PolicyDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/components/Accordion",
-    "org/forgerock/openam/ui/policy/ManageSubjectsView",
-    "org/forgerock/openam/ui/policy/ManageEnvironmentsView",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/components/Messages"
-], function (AbstractView, actionsView, resourcesListView, addNewResourceView, responseAttrsStaticView, responseAttrsUserView, reviewInfoView, policyDelegate, uiUtils, Accordion, manageSubjects, manageEnvironments, constants,eventManager, router, messager) {
+    "org/forgerock/openam/ui/policy/HelpLinkView"
+], function (AbstractView, actionsView, resourcesListView, addNewResourceView, responseAttrsStaticView, responseAttrsUserView, reviewInfoView, policyDelegate, uiUtils, Accordion, HelpLink) {
     var AbstractEditView = AbstractView.extend({
         baseTemplate: "templates/policy/BaseTemplate.html",
         events: {
@@ -73,6 +68,14 @@ define("org/forgerock/openam/ui/policy/AbstractEditView", [
                     self.updateFields();
                     self.validateThenRenderReview();
                 }
+            });
+
+            this.addHelpLinks();
+        },
+
+        addHelpLinks: function () {
+            _.each(this.$el.find('.help-link'), function (link) {
+                new HelpLink().render($(link));
             });
         },
 

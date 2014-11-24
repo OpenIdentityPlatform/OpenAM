@@ -311,6 +311,10 @@
       }
     },
 
+      "documentation": {
+         "tooltip": "Click to read more (opens in new tab)"
+      },
+
     "manageApplications": {
       "add": "Add New Application",
       "importPolicies": "Import Policies",

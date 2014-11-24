@@ -93,9 +93,9 @@ html body .ui-jqgrid tr.ui-widget-content{
         padding: 0 0 0 10px;
         background-color: #d5d5d5;
         color: #666;
-        cursor:pointer;
-        font-weight:normal;
-        font-size:100%;
+        cursor: pointer;
+        font-weight: normal;
+        font-size: 100%;
         border-bottom: 1px solid #bebebe;
         text-decoration: none;
 
@@ -103,6 +103,13 @@ html body .ui-jqgrid tr.ui-widget-content{
             background-color: @table-hightlight-bg-color;
         }
 
+        .icon-info {
+            display: none;
+            font-size: 16px;
+            float: right;
+            margin: 7px 7px 0 0;
+            cursor: pointer;
+        }
 
         &.step-active{
             background-color: #5a646d;
@@ -111,6 +118,10 @@ html body .ui-jqgrid tr.ui-widget-content{
 
             &:hover{
                 cursor:default;
+            }
+
+            .icon-info {
+                display: block;
             }
         }
 
@@ -508,6 +519,49 @@ th.ui-state-default.ui-th-column {
     }
 }
 
+span.tooltips {
+    position: relative;
+    display: inline;
+
+    span {
+        position: absolute;
+        width: 0;
+        color: #fff;
+        background-color:#000;
+        background-image:-webkit-linear-gradient(top, #555, #000);
+        text-align: center;
+        visibility: hidden;
+        border-radius: 3px;
+        font-size: 13px;
+        padding: 6px 5px 10px;
+        box-shadow: 0px 1px 3px #666;
+        bottom: 25px;
+        transition:bottom 200ms ease-out, opacity 500ms ease-in;
+
+        &:after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -8px;
+            width: 0; height: 0;
+            border-top: 8px solid #000;
+            border-right: 8px solid transparent;
+            border-left: 8px solid transparent;
+        }
+    }
+
+    &:hover span, &:focus span {
+        width: 120px;
+        margin-left: -65px;
+        visibility: visible;
+        opacity: 0.8;
+        bottom: 30px;
+        left: 50%;
+        z-index: 999;
+    }
+}
+
 span.item-button-panel {
 
     > span {
@@ -521,47 +575,6 @@ span.item-button-panel {
         &:hover, &:focus {
             opacity:1;
             box-shadow: none;
-        }
-
-        &.tooltips {
-            position: relative;
-            display: inline;
-
-            span {
-                position: absolute;
-                width: 0;
-                color: #fff;
-                background-color:#000;
-                background-image:-webkit-linear-gradient(top, #555, #000);
-                text-align: center;
-                visibility: hidden;
-                border-radius: 3px;
-                font-size: 13px;
-                padding: 6px 5px 10px;
-                box-shadow: 0px 1px 3px #666;
-                bottom: 25px;
-                transition:bottom 200ms ease-out, opacity 500ms ease-in;
-
-                &:after {
-                    content: '';
-                    position: absolute;
-                    top: 100%;
-                    left: 50%;
-                    margin-left: -8px;
-                    width: 0; height: 0;
-                    border-top: 8px solid #000;
-                    border-right: 8px solid transparent;
-                    border-left: 8px solid transparent;
-                }
-            }
-
-            &:hover span, &:focus span {
-                visibility: visible;
-                opacity: 0.8;
-                bottom: 30px;
-                left: 50%;
-                z-index: 999;
-            }
         }
     }
 }

@@ -31,7 +31,9 @@ define([
     "./login/SessionDelegate",
 
     "./PolicyDelegate",
+
     "./PolicyEditorUtils",
+    "./HelpLinkView",
 
     "./GenericGridView",
     "./ManageApplicationsView",
