@@ -157,15 +157,21 @@ $ <userinput>curl https://openam.example.com:8443/openam/oauth2/tokeninfo\
    as in the preceding example, with scopes set to <literal>mail</literal> and
    <literal>cn</literal>.</para>
 
-   <para>Both the <literal>/oauth2/authorize</literal> and
-   <literal>/oauth2/access_token</literal> endpoints can take additional
-   parameters. In particular you must specify the realm using the
-   <literal>realm=<replaceable>realm-name</replaceable></literal> parameter if
-   the OpenAM OAuth 2.0 provider is configured for a subrealm rather than /
-   (Top-Level Realm). For example, if the OAuth 2.0 provider is configured
-   for the <literal>/customers</literal> realm, then use
-   <literal>/oauth2/authorize?realm=/customers</literal> and
-   <literal>/oauth2/access_token?realm=/customers</literal>.</para>
+   <para>
+    Both the <literal>/oauth2/authorize</literal> and
+    <literal>/oauth2/access_token</literal> endpoints
+    can take additional parameters.
+    In particular you must specify the realm using
+    the <literal>realm=<replaceable>realm-name</replaceable></literal> parameter
+    if the OpenAM OAuth 2.0 provider is configured for a subrealm
+    rather than / (Top-Level Realm).
+    For example, if the OAuth 2.0 provider is configured
+    for the <literal>/customers</literal> realm,
+    then use <literal>/oauth2/authorize?realm=/customers</literal>
+    and <literal>/oauth2/access_token?realm=/customers</literal>.
+    The realm can be passed either as a URL query string parameter as shown here,
+    or as parameters in the POST data.
+   </para>
 
    <para>The <literal>/oauth2/authorize</literal> endpoint can also take
    <literal>module</literal> and <literal>service</literal> parameters. Use
