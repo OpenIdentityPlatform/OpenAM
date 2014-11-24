@@ -63,7 +63,6 @@ public class EntitlementException extends Exception {
     public static final int POLICY_ALREADY_EXISTS = 217;
     public static final int APPLICATION_ALREADY_EXISTS = 228;
     public static final int APP_RETRIEVAL_ERROR = 248;
-    public static final int APPLICATION_REQUESTED_RESOURCE_NAMES_MISMATCH_ERROR = 249;
     public static final int NO_SUCH_REFERRAL_PRIVILEGE = 263;
 
     public static final int INCONSISTENT_WILDCARDS = 300;
