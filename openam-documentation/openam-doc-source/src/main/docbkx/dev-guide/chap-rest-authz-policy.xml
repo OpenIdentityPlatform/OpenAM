@@ -1706,10 +1706,10 @@ $ <userinput>curl \
     "subjectName" : "Bob Dobbs"
   },
   "lastModifiedBy" :
-   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "lastModified" : "2014-04-24T16:23:34Z",
   "createdBy" :
-   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "creationDate" : "2014-04-24T16:23:34Z"
 }</computeroutput>
    </programlisting>
@@ -1819,10 +1819,10 @@ $ <userinput>curl \
     "subjectName" : "Bob Dobbs"
   },
   "lastModifiedBy" :
-   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "lastModified" : "2014-04-24T16:23:34Z",
   "createdBy" :
-   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "creationDate" : "2014-04-24T16:23:34Z"
 }</computeroutput>
    </programlisting>
@@ -1894,10 +1894,10 @@ $ <userinput>curl \
     "subjectName" : "Bob Dobbs"
   },
   "lastModifiedBy" :
-   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "lastModified" : "2014-04-24T16:44:01Z",
   "createdBy" :
-   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "creationDate" : "2014-04-24T16:23:34Z"
 }</computeroutput>
    </programlisting>
@@ -3388,7 +3388,10 @@ $ <userinput>curl \
 <computeroutput>{
   "result" : [ {
     "name" : "myApp",
-    "resources" : [ "http://*:*/*", "http://*:*/*?*" ],
+    "resources" : [
+      "http://*:*/*",
+      "http://*:*/*?*"
+    ],
     "actions" : {
       "POST" : true,
       "PATCH" : true,
@@ -3399,42 +3402,47 @@ $ <userinput>curl \
       "HEAD" : true
     },
     "conditions" : [
-      "not",
-      "dateRange",
-      "timezone",
-      "timeRange",
-      "or",
-      "dnsName",
-      "ipRange",
-      "daysOfWeek",
-      "and"
+      "AuthenticateToService",
+      "AuthLevelLE",
+      "AuthScheme",
+      "IPv6",
+      "SimpleTime",
+      "OAuth2Scope",
+      "IPv4",
+      "AuthenticateToRealm",
+      "OR",
+      "AMIdentityMembership",
+      "LDAPFilter",
+      "AuthLevel",
+      "SessionProperty",
+      "Session",
+      "NOT",
+      "AND",
+      "ResourceEnvIP"
     ],
-    "realm" : "/myRealm",
-    "creationDate" : 1398760362341,
-    "lastModifiedDate" : 1398760362341,
-    "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
-    "lastModifiedBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
-    "applicationType" : "iPlanetAMWebAgentService",
-    "description" : null,
-    "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
-    "subjects" : [
-      "com.sun.identity.admin.model.IdRepoUserViewSubject",
-      "com.sun.identity.admin.model.NotViewSubject",
-      "com.sun.identity.admin.model.AndViewSubject",
-      "com.sun.identity.admin.model.IdRepoRoleViewSubject",
-      "com.sun.identity.admin.model.OrViewSubject",
-      "com.sun.identity.admin.model.VirtualViewSubject",
-      "com.sun.identity.admin.model.IdRepoGroupViewSubject",
-      "com.sun.identity.admin.model.AttributeViewSubject"
+    "attributeNames" : [
     ],
-    "entitlementCombiner" : "DenyOverride",
-    "saveIndex" : null,
-    "searchIndex" : null,
-    "attributeNames" : [ ]
-  } ],
-  "resultCount" : 1,
-  "pagedResultsCookie" : null,
-  "remainingPagedResults" : -1
+    "realm":"/",
+    "creationDate":1416428109115,
+    "lastModifiedDate":1416428109115,
+    "lastModifiedBy":"id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "subjects":[
+      "JwtClaim",
+      "AuthenticateUsers",
+      "Identity",
+      "NOT",
+      "AND",
+      "OR",
+    ],
+    "description":"The built-in Application used by OpenAM Policy Agents",
+    "createdBy":id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "applicationType":"iPlanetAMWebServices",
+    "entitlementCombiner":"DenyOverride",
+    },
+  ],
+  "resultCount":1,
+  "pagedResultsCookie":null,
+  "remainingPagedResults":0
 }</computeroutput>
    </programlisting>
 
@@ -3491,37 +3499,37 @@ $ <userinput>curl \
 
     <listitem>
      <para>
-      <literal>"name"</literal>
+      <literal>"name"</literal> (string)
      </para>
     </listitem>
 
     <listitem>
      <para>
-      <literal>"description"</literal>
+      <literal>"description"</literal> (string)
      </para>
     </listitem>
 
     <listitem>
      <para>
-      <literal>"applicationName"</literal>
+      <literal>"createdBy"</literal> (string)
      </para>
     </listitem>
 
     <listitem>
      <para>
-      <literal>"createdBy"</literal>
+      <literal>"creationDate"</literal> (date)
      </para>
     </listitem>
 
     <listitem>
      <para>
-      <literal>"lastModifiedBy"</literal>
+      <literal>"lastModifiedBy"</literal> (string)
      </para>
     </listitem>
 
     <listitem>
      <para>
-      <literal>"creationDate"</literal>
+      <literal>"lastModified"</literal> (date)
      </para>
     </listitem>
 
@@ -3531,6 +3539,18 @@ $ <userinput>curl \
      </para>
     </listitem>
    </itemizedlist>
+
+   <para>
+    The String fields only support the <literal>eq</literal> operator, which is
+    implemented using regular expression pattern matching.
+   </para>
+
+   <para>
+    The Date files support the <literal>eq</literal>, <literal>ge</literal>,
+    <literal>gt</literal>, <literal>le</literal>, and <literal>lt</literal>
+    operators. The implementation of <literal>eq</literal> for the Date fields
+    do not use regular expression pattern matching.
+   </para>
 
    <para>
     Filters can be composed of multiple expressions
@@ -3543,6 +3563,22 @@ $ <userinput>curl \
    </para>
 
    <para>
+    Since regular expressions are implemented for some operators, you can specify
+    a filter that can include or exclude specified elements. For example,
+    the following query searches for application names containing 'iPlanet'.
+    The <literal>queryFilter</literal> string is URL-encoded.
+   </para>
+
+   <programlisting>
+$ <userinput>curl --header "iPlanetyDirectoryPro" AQIC5..." \
+https://openam.example.com:443/openam/json/realm/applications?_queryFilter=name%20eq%20%22iPlanet.*%22</userinput>
+   </programlisting>
+
+   <note><para>While some operators use regular expressions as its underlying
+    mechanism, CREST endpoints do not use regular expressions.
+   </para></note>
+
+   <para>
     You can use the query string parameters
     <literal>_prettyPrint=true</literal> to make the output easier to read,
     <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
@@ -3553,6 +3589,7 @@ $ <userinput>curl \
     You can use <literal>_pageSize=<replaceable>integer</replaceable></literal>
     to limit the number of results returned.
    </para>
+
   </section>
  </section>
 
