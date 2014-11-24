@@ -1559,7 +1559,7 @@ $ <userinput>curl \
      <programlisting language="javascript">
 {
     "type": "Policy",
-    "className": "org.forgerock.openam.policy.plugins.OAuth2ScopeCondition",
+    "className": "org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition",
     "name": "oauth2scope",
     "properties": {
         "OAuth2Scope": [
