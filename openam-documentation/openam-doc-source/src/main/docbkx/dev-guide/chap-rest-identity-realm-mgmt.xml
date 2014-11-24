@@ -1389,6 +1389,7 @@ admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*\
      <listitem><para><xref linkend="rest-api-parameters-realm" /></para></listitem>
      <listitem><para><xref linkend="rest-api-create-realm" /></para></listitem>
      <listitem><para><xref linkend="rest-api-read-realm" /></para></listitem>
+     <listitem><para><xref linkend="rest-api-list-realm" /></para></listitem>
      <listitem><para><xref linkend="rest-api-update-realm" /></para></listitem>
      <listitem><para><xref linkend="rest-api-delete-realm" /></para></listitem>
     </itemizedlist>
@@ -1581,7 +1582,49 @@ $ <userinput>curl \
     </computeroutput>
    </screen>
    </section>
-    
+
+  <section xml:id="rest-api-list-realm">
+   <title>Listing Realms</title>
+
+   <para>
+    To list a realm and its subrealms, perform an HTTP GET on the endpoint,
+    setting the <literal>_queryFilter</literal> query string parameter
+    as in the following example, which lists the top-level realm and all of
+    its subrealms:
+   </para>
+
+   <screen>
+    $ <userinput>curl \
+    --header "iPlanetDirectoryPro: AQIC5..." \
+    https://openam.example.com:8443/openam/json/realms?_queryFilter=true</userinput>
+    <computeroutput>{
+     "result" : [ "/", "/myRealm", "/myRealm/myRealmsChildRealm" ],
+     "resultCount" : 3,
+     "pagedResultsCookie" : null,
+     "remainingPagedResults" : -1
+     }</computeroutput>
+   </screen>
+
+   <para>
+    You can start listing realms from below the top-level realm by placing the
+    starting realm name in the URL. The following example lists the realm
+    <literal>myRealm</literal> and all of its subrealms.
+   </para>
+
+   <screen>
+    $ <userinput>curl \
+    --header "iPlanetDirectoryPro: AQIC5..." \
+    https://openam.example.com:8443/openam/json/myRealm/realms?_queryFilter=true</userinput>
+    <computeroutput>{
+     "result" : [ "/myRealm", "/myRealm/myRealmsChildRealm" ],
+     "resultCount" : 2,
+     "pagedResultsCookie" : null,
+     "remainingPagedResults" : -1
+     }</computeroutput>
+   </screen>
+
+  </section>
+
   <section xml:id="rest-api-update-realm">
    <title>Updating Realms</title>
 
