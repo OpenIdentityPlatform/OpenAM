@@ -33,9 +33,8 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/components/Messages"
-], function (AbstractView, uiUtils, router, constants, eventManager, messages) {
+    "org/forgerock/commons/ui/common/main/EventManager"
+], function (AbstractView, uiUtils, router, constants, eventManager) {
     var GenericGridView = AbstractView.extend({
         noBaseTemplate: true,
 
@@ -113,23 +112,20 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
         deleteItems: function (e, promises) {
             var self = this;
 
-            $.when.apply($, promises)
-                .always(function () {
-                    self.handleItemsDelete();
-                })
-                .done(function () {
-                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'deleteSuccess');
-                })
-                .fail(function (xhr) {
-                    messages.messages.addMessage({message: xhr.responseJSON.message, type: 'error'});
-                });
+            $.when.apply($, promises).then(function () {
+                self.handleItemsDelete('deleteSuccess');
+            }, function () {
+                self.handleItemsDelete('deleteFail');
+            });
         },
 
-        handleItemsDelete: function () {
+        handleItemsDelete: function (message, callback) {
             sessionStorage.removeItem(this.storageKey);
             this.selectedItems = [];
             this.grid.trigger('reloadGrid');
             this.reloadGlobalActionsTemplate();
+
+            eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, message);
         },
 
         reloadGlobalActionsTemplate: function () {
