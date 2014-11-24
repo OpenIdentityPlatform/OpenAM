@@ -40,10 +40,12 @@ import static org.forgerock.openam.utils.CollectionUtils.*;
  */
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")
 public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
+
+    public static final String ACCOUNT_MAPPER_PROPERTY = "org-forgerock-auth-oauth-account-mapper";
+    public static final String ATTRIBUTE_MAPPER_PROPERTY = "org-forgerock-auth-oauth-attribute-mapper";
+
     private static final String REPORT_DATA = "%REPORT_DATA%";
     private static final String SERVICE_NAME = "sunAMAuthOAuthService";
-    private static final String ACCOUNT_MAPPER_PROPERTY = "org-forgerock-auth-oauth-account-mapper";
-    private static final String ATTRIBUTE_MAPPER_PROPERTY = "org-forgerock-auth-oauth-attribute-mapper";
     private static final String JSON_MAPPER =
             "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper";
     private static final String DEFAULT_ACCOUNT_MAPPER =

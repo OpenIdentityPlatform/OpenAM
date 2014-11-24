@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,6 +45,7 @@ import java.util.regex.Pattern;
 import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.*;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import static org.forgerock.openam.upgrade.steps.UpgradeOAuth2ProviderStep.ALGORITHM_NAMES;
 
 /**
  * This upgrade step discovers first OAuth2 Client profiles available in OpenAM (across the different realms), and then
@@ -61,8 +63,8 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
     public static final List<String> CHANGED_PROPERTIES = Arrays.asList(
             REDIRECT_URI, SCOPES, DEFAULT_SCOPES, NAME, DESCRIPTION);
     private static final Pattern pattern = Pattern.compile("\\[\\d+\\]=.*");
-    private final Map<String, Map<AgentType, Set<String>>> upgradableConfigs =
-            new HashMap<String, Map<AgentType, Set<String>>>();
+    private final Map<String, Map<AgentType, Map<String, Set<String>>>> upgradableConfigs =
+            new HashMap<String, Map<AgentType, Map<String, Set<String>>>>();
 
     @Inject
     public UpgradeOAuth2ClientStep(final PrivilegedAction<SSOToken> adminTokenAction,
@@ -105,9 +107,9 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
             }
         }
         Set<String> subConfigNames = serviceConfig.getSubConfigNames("*", AgentConfiguration.AGENT_TYPE_OAUTH2);
-        Map<AgentType, Set<String>> map = upgradableConfigs.get(realm);
+        Map<AgentType, Map<String, Set<String>>> map = upgradableConfigs.get(realm);
         if (map == null) {
-            map = new EnumMap<AgentType, Set<String>>(AgentType.class);
+            map = new EnumMap<AgentType, Map<String, Set<String>>>(AgentType.class);
         }
         if (DEBUG.messageEnabled()) {
             DEBUG.message("OAuth2 " + type.name() + " configurations found under realm: " + realm + " : "
@@ -117,8 +119,9 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
             ServiceConfig oauth2Config = serviceConfig.getSubConfig(subConfig);
             Map<String, Set<String>> attrs = oauth2Config.getAttributesWithoutDefaults();
             for (Map.Entry<String, Set<String>> entry : attrs.entrySet()) {
-                if (CHANGED_PROPERTIES.contains(entry.getKey())) {
-                    String value = CollectionHelper.getMapAttr(attrs, entry.getKey());
+                final String attrName = entry.getKey();
+                if (CHANGED_PROPERTIES.contains(attrName)) {
+                    String value = CollectionHelper.getMapAttr(attrs, attrName);
                     if (value == null) {
                         //this doesn't prove anything, let's advance to the next property
                         continue;
@@ -128,39 +131,56 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
                                 DEBUG.message("Discovered OAuth2 " + type.name() + ": " + subConfig + " in realm: "
                                         + realm);
                             }
-                            Set<String> values = map.get(type);
-                            if (values == null) {
-                                values = new HashSet<String>();
-                            }
-                            values.add(subConfig);
-                            map.put(type, values);
-                            upgradableConfigs.put(realm, map);
-                            //we have detected that this config needs to be upgraded, so let's break this loop
-                            break;
+                            addAttributeToMap(map, type, subConfig, attrName, realm);
                         }
+                    }
+                } else if (IDTOKEN_SIGNED_RESPONSE_ALG.equals(attrName)) {
+                    final String value = CollectionHelper.getMapAttr(attrs, attrName);
+                    if (ALGORITHM_NAMES.containsKey(value)) {
+                        addAttributeToMap(map, type, subConfig, attrName, realm);
                     }
                 }
             }
         }
     }
 
+    private void addAttributeToMap(Map<AgentType, Map<String, Set<String>>> map, AgentType type, String subConfig,
+                                   String attrName, String realm) {
+
+        Map<String, Set<String>> configurations = map.get(type);
+        if (configurations == null) {
+            configurations = new HashMap<String, Set<String>>();
+            configurations.put(subConfig, new HashSet<String>());
+            map.put(type, configurations);
+        }
+        configurations.get(subConfig).add(attrName);
+        upgradableConfigs.put(realm, map);
+    }
+
     @Override
     public void perform() throws UpgradeException {
-        for (Map.Entry<String, Map<AgentType, Set<String>>> entry : upgradableConfigs.entrySet()) {
+        for (Map.Entry<String, Map<AgentType, Map<String, Set<String>>>> entry : upgradableConfigs.entrySet()) {
             String realm = entry.getKey();
             try {
                 ServiceConfigManager scm = new ServiceConfigManager(IdConstants.AGENT_SERVICE, getAdminToken());
-                for (Map.Entry<AgentType, Set<String>> changes : entry.getValue().entrySet()) {
+                for (Map.Entry<AgentType, Map<String, Set<String>>> changes : entry.getValue().entrySet()) {
                     AgentType type = changes.getKey();
                     ServiceConfig sc = scm.getOrganizationConfig(realm, type.instanceName);
-                    for (String subConfig : changes.getValue()) {
-                        UpgradeProgress.reportStart("upgrade.oauth2.start", subConfig);
-                        ServiceConfig oauth2Config = sc.getSubConfig(subConfig);
+                    for (Map.Entry<String, Set<String>> subConfig : changes.getValue().entrySet()) {
+                        UpgradeProgress.reportStart("upgrade.oauth2.start", subConfig.getKey());
+                        ServiceConfig oauth2Config = sc.getSubConfig(subConfig.getKey());
                         Map<String, Set<String>> attrs = oauth2Config.getAttributesWithoutDefaults();
-                        for (String propertyName : CHANGED_PROPERTIES) {
-                            Set<String> values = attrs.get(propertyName);
-                            if (values != null) {
-                                attrs.put(propertyName, convertValues(values));
+                        for (String attrName : subConfig.getValue()) {
+                            if (CHANGED_PROPERTIES.contains(attrName)) {
+                                Set<String> values = attrs.get(attrName);
+                                if (values != null) {
+                                    attrs.put(attrName, convertValues(values));
+                                }
+                            } else if (IDTOKEN_SIGNED_RESPONSE_ALG.equals(attrName)) {
+                                String value = CollectionHelper.getMapAttr(attrs, attrName);
+                                if (ALGORITHM_NAMES.containsKey(value)) {
+                                    attrs.put(attrName, Collections.singleton(ALGORITHM_NAMES.get(value)));
+                                }
                             }
                         }
                         oauth2Config.setAttributes(attrs);
@@ -188,10 +208,11 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
     public String getShortReport(String delimiter) {
         int agentCount = 0;
         int groupCount = 0;
-        for (Map<AgentType, Set<String>> entry : upgradableConfigs.values()) {
-            Set<String> tmp = entry.get(AgentType.AGENT);
-            if (tmp != null)
+        for (Map<AgentType, Map<String, Set<String>>> entry : upgradableConfigs.values()) {
+            Map<String, Set<String>> tmp = entry.get(AgentType.AGENT);
+            if (tmp != null) {
                 agentCount += tmp.size();
+            }
             tmp = entry.get(AgentType.GROUP);
             if (tmp != null) {
                 groupCount += tmp.size();
@@ -215,11 +236,11 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
         Map<String, String> tags = new HashMap<String, String>();
         tags.put(LF, delimiter);
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, Map<AgentType, Set<String>>> entry : upgradableConfigs.entrySet()) {
+        for (Map.Entry<String, Map<AgentType, Map<String, Set<String>>>> entry : upgradableConfigs.entrySet()) {
             sb.append(BUNDLE.getString("upgrade.realm")).append(": ").append(entry.getKey()).append(delimiter);
-            for (Map.Entry<AgentType, Set<String>> changes : entry.getValue().entrySet()) {
+            for (Map.Entry<AgentType, Map<String, Set<String>>> changes : entry.getValue().entrySet()) {
                 sb.append(INDENT).append(changes.getKey()).append(delimiter);
-                for (String subConfig : changes.getValue()) {
+                for (String subConfig : changes.getValue().keySet()) {
                     sb.append(INDENT).append(INDENT).append(subConfig).append(delimiter);
                 }
             }

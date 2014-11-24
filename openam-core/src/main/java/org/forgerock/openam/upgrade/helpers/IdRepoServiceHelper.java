@@ -30,11 +30,13 @@ public class IdRepoServiceHelper extends AbstractUpgradeHelper {
 
     private static final String MEMBER_OF_ATTR = "sun-idrepo-ldapv3-config-memberof";
     private static final String MIN_POOL_SIZE = "sun-idrepo-ldapv3-config-connection_pool_min_size";
+    private static final String USER_ATTR = "sun-idrepo-ldapv3-config-user-attributes";
 
     public IdRepoServiceHelper() {
         attributes.add(IdConstants.ID_REPO);
         attributes.add(MEMBER_OF_ATTR);
         attributes.add(MIN_POOL_SIZE);
+        attributes.add(USER_ATTR);
     }
 
     @Override
@@ -53,7 +55,7 @@ public class IdRepoServiceHelper extends AbstractUpgradeHelper {
             }
         }
         //we only want to upgrade the sunIdRepoClass, if it still refers to the old LDAPv3Repo implementation
-        //this also covers the memberof attribute case, since only the default value have changed for it.
+        //this also covers the memberof and user attribute case, since only the default value have changed for it.
         if (oldAttr.getDefaultValues().equals(newAttr.getDefaultValues())) {
             return null;
         }

@@ -17,7 +17,14 @@ package org.forgerock.openam.upgrade.helpers;
 
 import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchemaImpl;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.openam.upgrade.UpgradeException;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
+import static org.forgerock.openam.upgrade.steps.UpgradeOAuth2ProviderStep.ALGORITHM_NAMES;
 
 /**
  * This upgrade helper is used to add new default values to the OAuth2 Provider schema.
@@ -26,22 +33,41 @@ import org.forgerock.openam.upgrade.UpgradeException;
  */
 public class OAuth2ProviderUpgradeHelper extends AbstractUpgradeHelper {
 
-    private static final String SIGNING_ALGORITHMS = "forgerock-oauth2-provider-id-token-signing-algorithms-supported";
-
     public OAuth2ProviderUpgradeHelper() {
-        attributes.add(SIGNING_ALGORITHMS);
+        attributes.add(ID_TOKEN_SIGNING_ALGORITHMS);
+        attributes.add(JKWS_URI);
     }
 
     @Override
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
             throws UpgradeException {
 
-        if (SIGNING_ALGORITHMS.equals(newAttr.getName()) &&
-                !oldAttr.getDefaultValues().equals(newAttr.getDefaultValues())) {
+        if (ID_TOKEN_SIGNING_ALGORITHMS.equals(newAttr.getName())) {
+            final Set<String> oldAlgorithms = oldAttr.getDefaultValues();
+            final Set<String> newAlgorithms = renameAlgorithms(oldAlgorithms);
+            if (!newAlgorithms.contains(JwsAlgorithm.RS256.name())) {
+                newAlgorithms.add(JwsAlgorithm.RS256.name());
+            }
+            if (!oldAlgorithms.equals(newAlgorithms)) {
+                return updateDefaultValues(oldAttr, newAlgorithms);
+            }
+        } else if (JKWS_URI.equals(newAttr.getName()) && !oldAttr.getType().equals(newAttr.getType())) {
             return newAttr;
         }
 
         return null;
+    }
+
+    private Set<String> renameAlgorithms(Set<String> oldAlgorithms) {
+        final Set<String> newAlgorithms = new HashSet<String>();
+        for (String algorithm : oldAlgorithms) {
+            if (ALGORITHM_NAMES.containsKey(algorithm)) {
+                newAlgorithms.add(ALGORITHM_NAMES.get(algorithm));
+            } else {
+                newAlgorithms.add(algorithm);
+            }
+        }
+        return newAlgorithms;
     }
 
 }

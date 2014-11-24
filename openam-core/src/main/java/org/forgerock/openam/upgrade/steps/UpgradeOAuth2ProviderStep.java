@@ -21,6 +21,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
@@ -31,9 +32,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.ID_TOKEN_SIGNING_ALGORITHMS;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 
@@ -47,6 +50,13 @@ import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
  */
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")
 public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
+
+    public static final Map<String, String> ALGORITHM_NAMES = new HashMap<String, String>();
+    static {
+        ALGORITHM_NAMES.put(JwsAlgorithm.HS256.getAlgorithm(), JwsAlgorithm.HS256.name());
+        ALGORITHM_NAMES.put(JwsAlgorithm.HS384.getAlgorithm(), JwsAlgorithm.HS384.name());
+        ALGORITHM_NAMES.put(JwsAlgorithm.HS512.getAlgorithm(), JwsAlgorithm.HS512.name());
+    }
 
     private static final String REPORT_DATA = "%REPORT_DATA%";
     private static final String OAUTH2_PROVIDER = "OAuth2Provider";
@@ -78,10 +88,10 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
             throw new UpgradeException("Unable to create Service Config and Schema Managers.", e);
         }
 
-        findProvidersThatRelyOnDefaults();
+        findUpgradableProviders();
     }
 
-    private void findProvidersThatRelyOnDefaults() throws UpgradeException {
+    private void findUpgradableProviders() throws UpgradeException {
         try {
             final ServiceSchema serviceSchema = ssm.getOrganizationSchema();
             for (String realm : getRealmNames()) {
@@ -91,14 +101,33 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                 final Map<String, Set<String>> withoutValidators = SMSUtils.removeValidators(withDefaults,
                         serviceSchema);
 
-                if (!withoutDefaults.isEmpty() && withoutDefaults.size() < withoutValidators.size()) {
+                if (isProviderRelyingOnDefaults(withoutDefaults, withoutValidators)) {
                     attributesToUpdate.put(realm, withoutValidators);
+                } else if(shouldUpgradeAlgorithmName(withoutDefaults)) {
+                    attributesToUpdate.put(realm, null);
                 }
             }
         } catch (Exception e) {
             DEBUG.error("An error occurred while trying to look for upgradable OAuth2 Providers.", e);
             throw new UpgradeException("Unable to retrieve OAuth2 Providers.", e);
         }
+    }
+
+    private boolean isProviderRelyingOnDefaults(Map<String, Set<String>> withoutDefaults,
+                                                Map<String, Set<String>> withoutValidators) throws UpgradeException {
+        return !withoutDefaults.isEmpty() && withoutDefaults.size() < withoutValidators.size();
+    }
+
+    private boolean shouldUpgradeAlgorithmName(Map<String, Set<String>> attributes) {
+        final Set<String> algorithms = attributes.get(ID_TOKEN_SIGNING_ALGORITHMS);
+        if (algorithms != null) {
+            for (String algorithm : algorithms) {
+                if (ALGORITHM_NAMES.containsKey(algorithm)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -112,7 +141,12 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                 final String realm = entry.getKey();
                 UpgradeProgress.reportStart("upgrade.oauth2.provider.start", realm);
                 final ServiceConfig serviceConfig = scm.getOrganizationConfig(realm, null);
-                serviceConfig.setAttributes(entry.getValue());
+                Map<String, Set<String>> attributes = entry.getValue();
+                if (attributes == null) {
+                    attributes = serviceConfig.getAttributesWithoutDefaults();
+                }
+                renameAlgorithms(attributes);
+                serviceConfig.setAttributes(attributes);
                 UpgradeProgress.reportEnd("upgrade.success");
             }
         } catch (Exception e) {
@@ -121,6 +155,21 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
             throw new UpgradeException("Unable to upgrade OAuth2 Providers.", e);
         }
 
+    }
+
+    private void renameAlgorithms(Map<String, Set<String>> attributes) {
+        final Set<String> algorithms = attributes.get(ID_TOKEN_SIGNING_ALGORITHMS);
+        if (algorithms != null) {
+            final Set<String> newAlgorithms = new HashSet<String>();
+            for (String algorithm : algorithms) {
+                if (ALGORITHM_NAMES.containsKey(algorithm)) {
+                    newAlgorithms.add(ALGORITHM_NAMES.get(algorithm));
+                } else {
+                    newAlgorithms.add(algorithm);
+                }
+            }
+            attributes.put(ID_TOKEN_SIGNING_ALGORITHMS, newAlgorithms);
+        }
     }
 
     @Override

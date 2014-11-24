@@ -106,7 +106,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper"
-                                 type="list" syntax="string" i18nKey="a111">
+                                 type="single" syntax="string" i18nKey="a111">
                         <DefaultValues>
                                 <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
                         </DefaultValues>
@@ -324,7 +324,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper"
-                                 type="list" syntax="string" i18nKey="a111">
+                                 type="single" syntax="string" i18nKey="a111">
                         <DefaultValues>
                                 <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
                         </DefaultValues>
