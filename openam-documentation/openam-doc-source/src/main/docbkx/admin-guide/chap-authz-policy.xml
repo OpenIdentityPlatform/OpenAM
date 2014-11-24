@@ -182,6 +182,14 @@
     that you can manage over the policy REST APIs.
    </para>
 
+   <para>
+    For applications that are not of type <literal>iPlanetAmWebAgentService</literal>,
+    such as CREST applications, you must manage these applications over REST.
+    OpenAM policy agents work with applications of type
+    <literal>iPlanetAmWebAgentService</literal>, so your policy evaluation points (PEPs)
+    should use the REST endpoints for policy decision requests.
+   </para>
+
    <tip>
     <para>
      When you configure a policy agent,

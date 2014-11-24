@@ -350,7 +350,7 @@
     for a user who has access to perform the operation.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request POST \
  --header "iPlanetDirectoryPro: AQIC5..." \
@@ -385,7 +385,7 @@ $ <userinput>curl \
   "advices" : {
   }
 } ]</computeroutput>
-     </screen>
+     </programlisting>
 
    <variablelist>
     <para>
@@ -990,7 +990,7 @@ $ <userinput>curl \
     who wants to access a resource.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request POST \
  --header "iPlanetDirectoryPro: AQIC5...NDU1*" \
@@ -1044,7 +1044,7 @@ $ <userinput>curl \
     "AuthLevelConditionAdvice" : [ "/:3" ]
   }
 } ]</computeroutput>
-  </screen>
+  </programlisting>
 
    <para>
     Notice that OpenAM returns decisions not only for the specified resource,
@@ -1663,7 +1663,7 @@ $ <userinput>curl \
     for a user who has access to perform the operation.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request PUT \
  --header "iPlanetDirectoryPro: AQIC5w..." \
@@ -1712,7 +1712,7 @@ $ <userinput>curl \
    "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "creationDate" : "2014-04-24T16:23:34Z"
 }</computeroutput>
-   </screen>
+   </programlisting>
 
       <para>
        You can use the query string parameters
@@ -1732,7 +1732,7 @@ $ <userinput>curl \
        for a user who has access to perform the operation.
       </para>
 
-      <screen>
+      <programlisting>
 $ <userinput>curl \
  --request POST \
  --header "iPlanetDirectoryPro: AQIC5..." \
@@ -1780,7 +1780,7 @@ $ <userinput>curl \
    "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "creationDate" : "2014-04-29T07:33:54Z"
 }</computeroutput>
-      </screen>
+      </programlisting>
      </section>
 
   <section xml:id="rest-api-authz-policies-read">
@@ -1796,7 +1796,7 @@ $ <userinput>curl \
     for a user who has access to perform the operation.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/myRealm/policies/example
@@ -1825,7 +1825,7 @@ $ <userinput>curl \
    "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "creationDate" : "2014-04-24T16:23:34Z"
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     You can use the query string parameters
@@ -1852,7 +1852,7 @@ $ <userinput>curl \
     for a user who has access to perform the operation.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request PUT \
  --header "iPlanetDirectoryPro: AQIC5w..." \
@@ -1900,13 +1900,13 @@ $ <userinput>curl \
    "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
   "creationDate" : "2014-04-24T16:23:34Z"
 }</computeroutput>
-   </screen>
+   </programlisting>
 
     <tip><para>You can rename a policy by sending a new value in the
      <emphasis>name</emphasis> attribute of the JSON body,
      as shown below.</para>
 
-<screen>
+<programlisting>
 $ <userinput>curl \
  --request PUT \
  --header "iPlanetDirectoryPro: AQIC5w..." \
@@ -1954,7 +1954,7 @@ $ <userinput>curl \
     "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
     "creationDate" : "2014-04-24T16:23:34Z"
 }</computeroutput>
-   </screen></tip>
+   </programlisting></tip>
 
    <para>
     You can use the query string parameters
@@ -1977,13 +1977,13 @@ $ <userinput>curl \
     for a user who has access to perform the operation.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w..." \
  --request DELETE \
  https://openam.example.com:8443/openam/json/myRealm/policies/myPolicy</userinput>
 <computeroutput>{}</computeroutput>
-   </screen>
+   </programlisting>
   </section>
 
   <section xml:id="rest-api-authz-policies-query">
@@ -1994,7 +1994,7 @@ $ <userinput>curl \
     at least the <literal>_queryFilter</literal> query string parameter.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w..." \
  https://openam.example.com:8443/openam/json/myRealm/policies?_queryFilter=true
@@ -2005,7 +2005,7 @@ $ <userinput>curl \
   "pagedResultsCookie" : null,
   "remainingPagedResults" : -1
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     The <literal>_queryFilter</literal> parameter can take
@@ -2161,7 +2161,7 @@ $ <userinput>curl \
     that returns only the first of three policies.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w..." \
  https://openam.example.com:8443/openam/json/policies?_queryFilter=true\&amp;_fields=name\&amp;_pageSize=1</userinput>
@@ -2173,7 +2173,7 @@ $ <userinput>curl \
   "pagedResultsCookie" : null,
   "remainingPagedResults" : 2
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     You can use <literal>_sortKeys=[+-]<replaceable>field</replaceable>[,<replaceable>field</replaceable>...]</literal>
@@ -2186,7 +2186,7 @@ $ <userinput>curl \
     The following example sorts the policy objects by their names.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
   --header "iPlanetDirectoryPro: AQIC5w..." \
  https://openam.example.com:8443/openam/json/policies?_queryFilter=true\&amp;_sortKeys=name</userinput>
@@ -2205,7 +2205,7 @@ $ <userinput>curl \
   "pagedResultsCookie" : null,
   "remainingPagedResults" : 0
 }</computeroutput>
-   </screen>
+   </programlisting>
   </section>
  </section>
 
@@ -2628,6 +2628,8 @@ $ <userinput>curl \
   <para>
    Application definitions set constraints
    for the policies that can be defined for a particular application.
+   The default built-in application is the <literal>iPlanetAMWebAgentService</literal>,
+   which OpenAM policy agents use to allow policy management through the console.
   </para>
 
   <para>
@@ -2923,7 +2925,7 @@ $ <userinput>curl \
     for a user who has access to perform the operation.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request PUT \
  --header "If-None-Match: *" \
@@ -3024,7 +3026,7 @@ $ <userinput>curl \
   "searchIndex" : null,
   "attributeNames" : [ ]
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     You can use the query string parameters
@@ -3045,7 +3047,7 @@ $ <userinput>curl \
     for a user who has access to perform the operation.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request POST \
  --header "iPlanetDirectoryPro: AQIC5..." \
@@ -3145,7 +3147,7 @@ $ <userinput>curl \
   "searchIndex" : null,
   "attributeNames" : [ ]
 }</computeroutput>
-   </screen>
+   </programlisting>
   </section>
 
   <section xml:id="rest-api-authz-applications-read">
@@ -3161,7 +3163,7 @@ $ <userinput>curl \
     for a user who has access to perform the operation.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/myRealm/applications/myApp</userinput>
@@ -3211,7 +3213,7 @@ $ <userinput>curl \
   "searchIndex" : null,
   "attributeNames" : [ ]
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     You can use the query string parameters
@@ -3238,7 +3240,7 @@ $ <userinput>curl \
     for a user who has access to perform the operation.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request PUT \
  --header "iPlanetDirectoryPro: AQIC5..." \
@@ -3338,7 +3340,7 @@ $ <userinput>curl \
   "searchIndex" : null,
   "attributeNames" : [ ]
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     You can use the query string parameters
@@ -3361,13 +3363,13 @@ $ <userinput>curl \
     for a user who has access to perform the operation.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request DELETE \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/applications/crest</userinput>
 <computeroutput>{}</computeroutput>
-   </screen>
+   </programlisting>
   </section>
 
   <section xml:id="rest-api-authz-applications-query">
@@ -3378,7 +3380,7 @@ $ <userinput>curl \
     setting at least the <literal>_queryFilter</literal> query string parameter.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/myRealm/applications?_queryFilter
@@ -3434,7 +3436,7 @@ $ <userinput>curl \
   "pagedResultsCookie" : null,
   "remainingPagedResults" : -1
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     The <literal>_queryFilter</literal> parameter can take
@@ -3559,6 +3561,25 @@ $ <userinput>curl \
 
   <para>
    Application types act as templates for creating applications.
+  </para>
+
+  <para>
+   The default application type that represents web resources
+   is <literal>iPlanetAMWebAgentService</literal>,
+   which defines resources as URL patterns and actions as HTTP methods.
+   OpenAM policy agents use a default application type based on this type,
+   which is called <literal>iPlanetAMWebAgentService</literal>.
+   This is the application type for policies
+   that you edit through OpenAM console.
+  </para>
+
+  <para>
+   OpenAM supports other application types as well, such as CREST types,
+   that you can manage over the policy REST endpoints.
+   If you configure the OpenAM policy agents to work with application types other than
+   <literal>iPlanetAMWebAgentService</literal>, you must ensure that your
+   policy evaluation points (PEPs) work with the REST endpoints for policy
+   decision requests.
   </para>
 
   <para>
@@ -3719,7 +3740,7 @@ $ <userinput>curl \
     for a user who has access to perform the operation.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/applicationtypes/crestPolicyService</userinput>
@@ -3740,7 +3761,7 @@ $ <userinput>curl \
   "applicationClassName" : "com.sun.identity.entitlement.Application"
 }
 </computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     You can use the query string parameters
@@ -3759,7 +3780,7 @@ $ <userinput>curl \
     as in the following example:
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/applicationtypes?_queryFilter=true</userinput>
@@ -3769,7 +3790,7 @@ $ <userinput>curl \
   "pagedResultsCookie" : null,
   "remainingPagedResults" : -1
 }</computeroutput>
-   </screen>
+   </programlisting>
   </section>
  </section>
 
@@ -3806,7 +3827,7 @@ $ <userinput>curl \
     <literal>_prettyPrint=true</literal> to make the output easier to read.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/myRealm/conditiontypes/IP</userinput>
@@ -3825,7 +3846,7 @@ $ <userinput>curl \
     }
   }
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     Notice that the condition type has a title,
@@ -3853,7 +3874,7 @@ $ <userinput>curl \
     as the body of its configuration.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/myRealm/conditiontypes
@@ -3872,7 +3893,7 @@ $ <userinput>curl \
     }
   }
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     The concrete NOT condition therefore takes the following form.
@@ -3891,7 +3912,7 @@ $ <userinput>curl \
     The OR condition takes an array of conditions.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/myRealm/conditiontypes/OR</userinput>
@@ -3910,7 +3931,7 @@ $ <userinput>curl \
     }
   }
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     A corresponding concrete OR condition thus takes the following form.
@@ -3942,7 +3963,7 @@ $ <userinput>curl \
     as in the following example:
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/myRealm/conditiontypes?_queryFilter=true</userinput>
@@ -3952,7 +3973,7 @@ $ <userinput>curl \
   "pagedResultsCookie" : null,
   "remainingPagedResults" : -1
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     You can use the query string parameter
@@ -3994,7 +4015,7 @@ $ <userinput>curl \
     <literal>_prettyPrint=true</literal> to make the output easier to read.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/subjecttypes/User</userinput>
@@ -4010,7 +4031,7 @@ $ <userinput>curl \
     }
   }
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     Notice that the subject type has a title,
@@ -4037,7 +4058,7 @@ $ <userinput>curl \
     as the body of its configuration.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/subjecttypes/AND</userinput>
@@ -4056,7 +4077,7 @@ $ <userinput>curl \
     }
   }
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     The concrete AND subject therefore takes the following form.
@@ -4084,7 +4105,7 @@ $ <userinput>curl \
     as in the following example:
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/subjecttypes/?_queryFilter=true</userinput>
@@ -4094,7 +4115,7 @@ $ <userinput>curl \
   "pagedResultsCookie" : null,
   "remainingPagedResults" : -1
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     You can use the query string parameter
@@ -4124,7 +4145,7 @@ $ <userinput>curl \
    as in the following example:
   </para>
 
-  <screen>
+  <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/decisioncombiners/?_queryFilter=true</userinput>
@@ -4136,7 +4157,7 @@ $ <userinput>curl \
   "pagedResultsCookie" : null,
   "remainingPagedResults" : -1
 }</computeroutput>
-  </screen>
+  </programlisting>
 
   <para>
    You can use the query string parameter
@@ -4147,14 +4168,14 @@ $ <userinput>curl \
    To view an individual decision combiner, perform an HTTP GET on its resource.
   </para>
 
-  <screen>
+  <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/decisioncombiners/DenyOverride</userinput>
 <computeroutput>{
   "title" : "DenyOverride"
 }</computeroutput>
-  </screen>
+  </programlisting>
  </section>
 
  <section xml:id="rest-api-authz-legacy">
@@ -4171,12 +4192,12 @@ $ <userinput>curl \
          xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link>
   </para>
 
-  <screen>
+  <programlisting>
 $ <userinput>curl "https://openam.example.com:8443/openam/identity/authorize?\
 uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html\
 &amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"</userinput>
 <computeroutput>boolean=true</computeroutput>
-  </screen>
+  </programlisting>
 
   <para>
    To indicate access denied, OpenAM returns
@@ -4308,7 +4329,7 @@ uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html\
     <literal>/ws/1/entitlement/decision</literal> as in the following example:
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -4317,7 +4338,7 @@ $ <userinput>curl \
 &amp;application=iPlanetAMWebAgentService\
 &amp;resource=http%3A%2F%2Fwww.example.com%2Findex.html"</userinput>
 <computeroutput>allow</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     If access is denied, the result is <literal>deny</literal>.
@@ -4328,7 +4349,7 @@ $ <userinput>curl \
      <literal>/ws/1/entitlement/decisions</literal> as in the following example:
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -4363,7 +4384,7 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     To request decisions for a given resource,
@@ -4371,7 +4392,7 @@ $ <userinput>curl \
     as in the following example:
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -4392,7 +4413,7 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     To request decisions for all resources underneath a given resource,
@@ -4400,7 +4421,7 @@ $ <userinput>curl \
     as in the following example:
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -4437,7 +4458,7 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-   </screen>
+   </programlisting>
   </section>
  </section>
 
@@ -4470,7 +4491,7 @@ $ <userinput>curl \
     OpenAM.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>cat entitlement.json</userinput>
 <computeroutput>{
     "name": "Example HTTP",
@@ -4533,7 +4554,7 @@ $ <userinput>curl \
  --data-urlencode "privilege.json@entitlement2.json" \
  https://openam.example.com:8443/openam/ws/1/entitlement/privilege</userinput>
 <computeroutput>{"statusCode":201,"body":"Created","statusMessage":"Created"}</computeroutput>
-   </screen>
+   </programlisting>
   </section>
 
  <section xml:id="rest-api-policy-management-read">
@@ -4549,7 +4570,7 @@ $ <userinput>curl \
     shown here in full.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -4607,7 +4628,7 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-   </screen>
+   </programlisting>
   </section>
 
  <section xml:id="rest-api-policy-management-update">
@@ -4618,7 +4639,7 @@ $ <userinput>curl \
     URL-encoded name of the policy.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>cat update.json</userinput>
 <computeroutput>{
     "name": "Example HTTP",
@@ -4650,7 +4671,7 @@ $ <userinput>curl \
  --data-urlencode "privilege.json@update.json" \
  https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTP</userinput>
 <computeroutput>{"statusCode":200,"body":"OK","statusMessage":"OK"}</computeroutput>
-   </screen>
+   </programlisting>
   </section>
 
  <section xml:id="rest-api-policy-management-delete">
@@ -4661,13 +4682,13 @@ $ <userinput>curl \
     the URL-encoded name of the policy.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request DELETE \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
  https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTPS</userinput>
 <computeroutput>{"statusCode":200,"body":"OK","statusMessage":"OK"}</computeroutput>
-   </screen>
+   </programlisting>
   </section>
 
  <section xml:id="rest-api-policy-management-query">
@@ -4677,7 +4698,7 @@ $ <userinput>curl \
     To get the names of policies, use an HTTP GET on the endpoint.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -4692,14 +4713,14 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-   </screen>
+   </programlisting>
 
    <para>
     You can pass a filter query parameter to get only policies
     that match the filter. Make sure you URL encode the filter value.
    </para>
 
-   <screen>
+   <programlisting>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -4714,7 +4735,7 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-   </screen>
+   </programlisting>
   </section>
 
 </chapter>
