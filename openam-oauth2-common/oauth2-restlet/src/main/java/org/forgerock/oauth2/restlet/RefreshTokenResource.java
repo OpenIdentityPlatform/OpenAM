@@ -21,6 +21,7 @@ import org.forgerock.oauth2.core.AccessTokenService;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.restlet.Request;
 import org.restlet.engine.header.Header;
@@ -29,6 +30,8 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 import org.restlet.util.Series;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -39,7 +42,7 @@ import java.util.Map;
  * @since 12.0.0
  */
 public class RefreshTokenResource extends ServerResource {
-
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final OAuth2RequestFactory<Request> requestFactory;
     private final AccessTokenService accessTokenService;
     private final ExceptionHandler exceptionHandler;
@@ -85,6 +88,10 @@ public class RefreshTokenResource extends ServerResource {
             responseHeaders.add(new Header(e.getHeaderName(), e.getHeaderValue()));
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
+        } catch (InvalidGrantException e) {
+            logger.debug("Invalid grant presented for refresh token", e);
+            throw new OAuth2RestletException(e.getStatusCode(), e.getError(), "grant is invalid",
+                    request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));
