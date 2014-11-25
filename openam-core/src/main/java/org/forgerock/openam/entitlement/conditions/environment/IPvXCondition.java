@@ -210,10 +210,12 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
         this.dnsName = dnsName;
     }
 
+    @Deprecated
     public List<String> getIpRange() {
         return ipRange;
     }
 
+    @Deprecated
     public void setIpRange(List<String> ipRanges) throws EntitlementException {
         ipRange.clear();
         ipList.clear();

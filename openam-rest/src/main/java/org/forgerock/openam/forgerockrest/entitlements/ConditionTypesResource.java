@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.inject.Inject;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
@@ -46,6 +47,8 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
+import org.forgerock.openam.entitlement.conditions.environment.IPv6Condition;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlementConditionModule;
@@ -66,9 +69,15 @@ public class ConditionTypesResource implements CollectionResourceProvider {
 
     private final JsonPointer JSON_POINTER_TO_TITLE = new JsonPointer(JSON_OBJ_TITLE);
 
-    private final static ObjectMapper mapper = new ObjectMapper().withModule(new JsonEntitlementConditionModule());
+    private final static ObjectMapper mapper;
     private final Debug debug;
     private final EntitlementRegistry entitlementRegistry;
+
+    static {
+        mapper = new ObjectMapper().withModule(new JsonEntitlementConditionModule());
+        mapper.getSerializationConfig().addMixInAnnotations(IPv4Condition.class, IPvXConditionMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(IPv6Condition.class, IPvXConditionMixin.class);
+    }
 
     /**
      * Guiced constructor.
@@ -265,5 +274,10 @@ public class ConditionTypesResource implements CollectionResourceProvider {
             }
             return null;
         }
+    }
+
+    private abstract class IPvXConditionMixin {
+        //Ignore just for conditiontypes query
+        @JsonIgnore abstract List<String> getIpRange();
     }
 }
