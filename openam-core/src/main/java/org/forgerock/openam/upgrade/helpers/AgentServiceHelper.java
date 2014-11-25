@@ -21,6 +21,8 @@ import com.sun.identity.sm.AttributeSchemaImpl;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.steps.UpgradeOAuth2ClientStep;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG;
+
 /**
  * This service helper implementation ensures that the OAuth2 Client service attributes are using the correct uitype
  * in the upgraded system. As a secondary task this helper also upgrades the default policy cache mode settings for
@@ -39,6 +41,7 @@ public class AgentServiceHelper extends AbstractUpgradeHelper {
         attributes.add(POLICY_CACHE_MODE);
         attributes.add(FETCH_FROM_ROOT);
         attributes.add(ACTION_VALUES);
+        attributes.add(IDTOKEN_SIGNED_RESPONSE_ALG);
     }
 
     @Override
@@ -53,7 +56,7 @@ public class AgentServiceHelper extends AbstractUpgradeHelper {
                 || (FETCH_FROM_ROOT.equals(newAttr.getName()) && oldAttr.getDefaultValues().contains("false"))) {
             //i.e. if the default value has been already updated we return null, to prevent upgrade for this attribute
             return null;
-        } else if (ACTION_VALUES.equals(newAttr.getName())
+        } else if ((ACTION_VALUES.equals(newAttr.getName()) || IDTOKEN_SIGNED_RESPONSE_ALG.equals(newAttr.getName()))
                 && newAttr.getDefaultValues().equals(oldAttr.getDefaultValues())) {
             return null;
         }
