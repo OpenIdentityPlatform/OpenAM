@@ -501,14 +501,32 @@ public class Application implements Cloneable {
     }
 
     /**
-     * Returns resource comparator.
-     * 
-     * @return resource comparator.
+     * Returns resource comparator for this Application, defaulting to the ApplicationType's
+     * resource comparator if none is directly associated with this Application.
+     *
+     * @return resource comparator, which may be null.
      */
     public ResourceName getResourceComparator() {
-        return (resourceComparator == null) ?
-            applicationType.getResourceComparator() : 
-            resourceComparatorInstance;
+        return getResourceComparator(true);
+    }
+
+    /**
+     * Returns resource comparator for this Application.
+     *
+     * @param defaultToAppType if <code>true</code>, will return this Application's ApplicationType
+     *                         resource comparator if none is set on the Application.
+     * @return resource comparator, which may be null.
+     */
+    public ResourceName getResourceComparator(boolean defaultToAppType) {
+        if (resourceComparator == null) {
+            if (defaultToAppType) {
+                return applicationType.getResourceComparator();
+            } else {
+                return null;
+            }
+        } else {
+            return resourceComparatorInstance;
+        }
     }
 
     /**

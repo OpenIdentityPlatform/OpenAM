@@ -883,7 +883,7 @@ public class EntitlementService extends EntitlementConfiguration {
             data.add(CONFIG_SEARCH_INDEX_IMPL + "=" + searchIndexClassName);
         }
 
-        ResourceName recComp = appl.getResourceComparator();
+        ResourceName recComp = appl.getResourceComparator(false);
         if (recComp != null) {
             String resCompClassName = recComp.getClass().getName();
             data.add(CONFIG_RESOURCE_COMP_IMPL + "=" + resCompClassName);

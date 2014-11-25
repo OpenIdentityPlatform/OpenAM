@@ -178,8 +178,9 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         return application.getEntitlementCombiner().getName();
     }
 
-    @JsonIgnore
-    public void setSearchIndex(String classname) {
+    @JsonProperty("searchIndex")
+    public void setSearchIndex(String classname)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
         if (classname == null || classname.isEmpty()) {
             return;
@@ -188,21 +189,25 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         try {
             application.setSearchIndex(Class.forName(classname));
         } catch (ClassNotFoundException e) {
-            debug.warning("SearchIndex class not found, set to null.");
+            debug.warning("SearchIndex class not found.", e);
+            throw e;
         } catch (InstantiationException e) {
-            debug.warning("SearchIndex class unable to instantiate, set to null.");
+            debug.warning("SearchIndex class unable to instantiate.", e);
+            throw e;
         } catch (IllegalAccessException e) {
-            debug.warning("SearchIndex class was illegally accessed, set to null.");
+            debug.warning("SearchIndex class was illegally accessed.", e);
+            throw e;
         }
     }
 
-    @JsonIgnore
+    @JsonProperty("searchIndex")
     public String getSearchIndex() {
         return application.getSearchIndex() == null ? null : application.getSearchIndex().getClass().getCanonicalName();
     }
 
-    @JsonIgnore
-    public void setSaveIndex(String classname) {
+    @JsonProperty("saveIndex")
+    public void setSaveIndex(String classname)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
         if (classname == null || classname.isEmpty()) {
             return;
@@ -211,21 +216,25 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         try {
             application.setSaveIndex(Class.forName(classname));
         } catch (ClassNotFoundException e) {
-            debug.warning("SaveIndex class not found, set to null.");
+            debug.warning("SaveIndex class not found.", e);
+            throw e;
         } catch (InstantiationException e) {
-            debug.warning("SaveIndex class unable to instantiate, set to null.");
+            debug.warning("SaveIndex class unable to instantiate.", e);
+            throw e;
         } catch (IllegalAccessException e) {
-            debug.warning("SaveIndex class was illegally accessed, set to null.");
+            debug.warning("SaveIndex class was illegally accessed.", e);
+            throw e;
         }
     }
 
-    @JsonIgnore
+    @JsonProperty("saveIndex")
     public String getSaveIndex() {
         return application.getSaveIndex() == null ? null : application.getSaveIndex().getClass().getCanonicalName();
     }
 
-    @JsonIgnore
-    public void setResourceComparator(String classname) {
+    @JsonProperty("resourceComparator")
+    public void setResourceComparator(String classname)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
         if (classname == null || classname.isEmpty()) {
             return;
@@ -234,17 +243,21 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         try {
             application.setResourceComparator(Class.forName(classname));
         } catch (ClassNotFoundException e) {
-            debug.warning("ResourceComparator class not found, set to null.");
+            debug.warning("ResourceComparator class not found.", e);
+            throw e;
         } catch (InstantiationException e) {
-            debug.warning("ResourceComparator class unable to instantiate, set to null.");
+            debug.warning("ResourceComparator class unable to instantiate.", e);
+            throw e;
         } catch (IllegalAccessException e) {
-            debug.warning("ResourceComparator class was illegally accessed, set to null.");
+            debug.warning("ResourceComparator class was illegally accessed.", e);
+            throw e;
         }
     }
 
-    @JsonIgnore
+    @JsonProperty("resourceComparator")
     public String getResourceComparator() {
-        return application.getResourceComparator().getClass().getCanonicalName();
+        return application.getResourceComparator(false) == null ? null :
+                application.getResourceComparator(false).getClass().getCanonicalName();
     }
 
     @JsonProperty("attributeNames")

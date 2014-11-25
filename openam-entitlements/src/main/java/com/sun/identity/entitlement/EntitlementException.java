@@ -70,6 +70,7 @@ public class EntitlementException extends Exception {
     public static final int MALFORMED_URL = 302;
     public static final int INVALID_RESOURCE = 303;
     public static final int INVALID_ENTITLEMENT_SUBJECT_CLASS = 310;
+    public static final int INVALID_CLASS = 311;
 
     public static final int INVALID_APP_TYPE = 317;
     public static final int INVALID_APP_REALM = 318;

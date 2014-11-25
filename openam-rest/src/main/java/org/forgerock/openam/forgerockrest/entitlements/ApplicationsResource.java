@@ -214,7 +214,7 @@ public class ApplicationsResource extends RealmAwareResource {
         try {
             return mapper.readValue(jsonValue.toString(), ApplicationWrapper.class);
         } catch (IOException e) {
-            throw new EntitlementException(EntitlementException.INVALID_APPLICATION_CLASS);
+            throw new EntitlementException(EntitlementException.INVALID_CLASS, e.getCause().getMessage());
         }
     }
 
