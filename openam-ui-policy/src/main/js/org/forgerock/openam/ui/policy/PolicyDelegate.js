@@ -94,7 +94,8 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         return obj.serviceCall({
             url: "/applications/" + name,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            type: "DELETE"
+            type: "DELETE",
+            errorsHandlers: obj.ERROR_HANDLERS
         });
     };
 
