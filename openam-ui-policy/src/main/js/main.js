@@ -154,5 +154,13 @@ require([
     window._ = _;
     window.Backbone = Backbone;
 
+    // necessary for requests initiated outside of the frameworks (such as via jqGrid)
+    $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
+        if (jqxhr && jqxhr.responseJSON && jqxhr.responseJSON.code === 401 && settings.contentType !== "application/json") {
+            eventManager.sendEvent(constants.EVENT_UNAUTHORIZED);
+        }
+    });
+
+
     eventManager.sendEvent(constants.EVENT_DEPENDECIES_LOADED);
 });
