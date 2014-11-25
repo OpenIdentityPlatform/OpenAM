@@ -198,6 +198,18 @@ public class XACMLExportImportTest {
         fail("Expected validation exception");
     }
 
+    @Test
+    public void testUndesirablePrivilegeNames() {
+        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary-name")).isFalse();
+        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary+name")).isTrue();
+        assertThat(xacmlExportImport.containsUndesiredCharacters("+")).isTrue();
+        assertThat(xacmlExportImport.containsUndesiredCharacters("+name")).isTrue();
+        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary-name+")).isTrue();
+        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary>name")).isTrue();
+        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary<name")).isTrue();
+        assertThat(xacmlExportImport.containsUndesiredCharacters("ordinary\\name")).isTrue();
+    }
+
     private Privilege privilege(String name) throws EntitlementException {
         return createArbitraryPrivilege(name, now);
     }

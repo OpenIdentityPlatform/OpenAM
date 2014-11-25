@@ -150,6 +150,7 @@ public class ReferralsResourceTest {
 
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
         given(privilegeManager.canFindByName(anyString())).willReturn(true);
+        given(referralWrapper.getName()).willReturn("referralName");
 
         //when
         referralsResource.createInstance(mockServerContext, mockCreateRequest, mockResultHandler);
@@ -161,7 +162,7 @@ public class ReferralsResourceTest {
     }
 
     @Test
-    public void shouldErrorIfCanotCheckThatResourceExists() throws EntitlementException {
+    public void shouldErrorIfCannotCheckThatResourceExists() throws EntitlementException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
@@ -172,6 +173,7 @@ public class ReferralsResourceTest {
 
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
         given(privilegeManager.canFindByName(anyString())).willThrow(new EntitlementException(1));
+        given(referralWrapper.getName()).willReturn("referralName");
 
         //when
         referralsResource.createInstance(mockServerContext, mockCreateRequest, mockResultHandler);
@@ -183,7 +185,7 @@ public class ReferralsResourceTest {
     }
 
     @Test
-    public void shouldBadRequestIfRealmNotAcceptable() throws EntitlementException {
+    public void shouldBadRequestIfRealmNotAcceptable() throws EntitlementException, IOException {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
@@ -214,6 +216,7 @@ public class ReferralsResourceTest {
 
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
         given(privilegeManager.canFindByName(anyString())).willReturn(false);
+        given(referralWrapper.getName()).willReturn("referralName");
 
         //when
         referralsResource.createInstance(mockServerContext, mockCreateRequest, mockResultHandler);
@@ -225,7 +228,51 @@ public class ReferralsResourceTest {
     }
 
     @Test
-    public void shouldInternalErrorIfCannotSaveRefferal() throws EntitlementException {
+    public void shouldBadRequestIfNameContainsInvalidCharacters() throws EntitlementException, IOException {
+
+        //given
+        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        ServerContext mockServerContext = new ServerContext(realmContext);
+        CreateRequest mockCreateRequest = mock(CreateRequest.class);
+        ResultHandler mockResultHandler = mock(ResultHandler.class);
+        Subject subject = new Subject();
+
+        referralsResource = new ReferralsResourceV1(debug) {
+
+            @Override
+            protected ReferralWrapper createReferralWrapper(JsonValue jsonValue) throws IOException {
+                return referralWrapper;
+            }
+
+            @Override
+            protected ReferralPrivilegeManager createPrivilegeManager(String realm, Subject callingSubject) {
+                return privilegeManager;
+            }
+
+            @Override
+            boolean isRequestRealmsValidPeerOrSubrealms(ServerContext serverContext, String realm,
+                                                        Set<String> realms) {
+                return false;
+            }
+        };
+
+        given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
+        given(privilegeManager.canFindByName(anyString())).willReturn(false);
+        given(referralWrapper.getName()).willReturn("referral+name");
+
+        //when
+        referralsResource.createInstance(mockServerContext, mockCreateRequest, mockResultHandler);
+
+        //then
+        ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
+        verify(mockResultHandler, times(1)).handleError(captor.capture());
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.BAD_REQUEST);
+    }
+
+
+    @Test
+    public void shouldInternalErrorIfCannotSaveReferral() throws EntitlementException {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
@@ -641,7 +688,7 @@ public class ReferralsResourceTest {
     }
 
     @Test
-    public void shouldConfictIfIntendedNamedReferralAlreadyExists() throws EntitlementException {
+    public void shouldConflictIfIntendedNamedReferralAlreadyExists() throws EntitlementException {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);

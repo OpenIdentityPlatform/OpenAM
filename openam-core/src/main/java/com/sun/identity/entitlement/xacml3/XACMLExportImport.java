@@ -27,12 +27,15 @@ import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.util.annotations.VisibleForTesting;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -127,6 +130,15 @@ public class XACMLExportImport {
 
         for (ReferralPrivilege referralPrivilege : privilegeSet.getReferralPrivileges()) {
             privilegeValidator.validateReferralPrivilege(referralPrivilege);
+
+            // OPENAM-5031
+            // For the moment, fail the whole import if any single referral is found to have a name which doesn't
+            // suit LDAP.
+            if (containsUndesiredCharacters(referralPrivilege.getName())) {
+                throw new EntitlementException(EntitlementException.INVALID_VALUE,
+                        new Object[] { "referral name " + referralPrivilege.getName() });
+            }
+
             if (rpm.canFindByName(referralPrivilege.getName())) {
                 importSteps.add(referralImportStep(rpm, DiffStatus.UPDATE, referralPrivilege));
             } else {
@@ -135,6 +147,15 @@ public class XACMLExportImport {
         }
 
         for (Privilege privilege : privilegeSet.getPrivileges()) {
+
+            // OPENAM-5031
+            // For the moment, fail the whole import if any single referral is found to have a name which doesn't
+            // suit LDAP.
+            if (containsUndesiredCharacters(privilege.getName())) {
+                throw new EntitlementException(EntitlementException.INVALID_VALUE,
+                        new Object[] { "privilege name " + privilege.getName() });
+            }
+
             privilegeValidator.validatePrivilege(privilege);
             if (pm.canFindByName(privilege.getName())) {
                 importSteps.add(privilegeImportStep(pm, DiffStatus.UPDATE, privilege));
@@ -198,6 +219,33 @@ public class XACMLExportImport {
         if (debug.messageEnabled()) {
             debug.message(MessageFormat.format(PREFIX + format, args));
         }
+    }
+
+    /**
+     * OPENAM-5031: We would have used DN.escapeAttributeValue to encode the incoming string and compare with the
+     * original string - if there are differences then the incoming string contains characters which LDAP requires
+     * quoted.  However ssoadm doesn't include the jar that the DN class ends up in.  In order to avoid the
+     * overhead of adding a whole jar just for one function in one class, this is provided here.  Thus, this
+     * function returns true if the incoming string contains any character which LDAP requires to be quoted.
+     *
+     * @param s The specified string.
+     * @return true if the string contains characters which require quotation for LDAP to work, false otherwise
+     */
+    @VisibleForTesting
+    boolean containsUndesiredCharacters(String s) {
+
+        // This is done with strings rather than characters because the initialisation of the set is much easier.
+        // Otherwise we end up with a Set<Character> being initialised from a List<char>
+        //
+        final String[] DODGY_LDAP_CHARS = { ",", "+", "\"", "\\", "<", ">", ";" };
+        Set<String> dodgyChars = new HashSet<String>(Arrays.asList(DODGY_LDAP_CHARS));
+        for(int i = 0; i < s.length(); i++) {
+            String sub = s.substring(i, i + 1);
+            if (dodgyChars.contains(sub)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

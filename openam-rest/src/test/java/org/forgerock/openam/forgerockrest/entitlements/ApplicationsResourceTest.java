@@ -99,7 +99,7 @@ public class ApplicationsResourceTest {
     private ResultHandler<Resource> mockResultHandler;
     private ApplicationWrapper applicationWrapper;
     private Map<String, QueryAttribute> queryAttributes;
-    private EntitlementsResourceErrorHandler resourceErrorHandler 
+    private EntitlementsResourceErrorHandler resourceErrorHandler
             = new EntitlementsResourceErrorHandler(ForgerockRestGuiceModule.getEntitlementsErrorHandlers());
 
     @BeforeMethod
@@ -280,12 +280,12 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
         given(mockApplication.getRealm()).willReturn("/");
+        given(mockApplication.getName()).willReturn("newApplication");
         doThrow(new EntitlementException(1)).when
                 (applicationManagerWrapper).saveApplication(any(Subject.class), any(Application.class));
 
         //when
         applicationsResource.createInstance(realmContext, mockCreateRequest, mockResultHandler);
-
 
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
@@ -342,6 +342,7 @@ public class ApplicationsResourceTest {
 
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
+        given(mockApplication.getName()).willReturn("newApplication");
         given(mockApplication.getRealm()).willReturn("/");
 
         //when
@@ -349,6 +350,47 @@ public class ApplicationsResourceTest {
 
         //then
         verify(mockResultHandler, times(1)).handleResult(any(Resource.class));
+    }
+
+
+    @Test
+    public void shouldNotCreateApplicationWithInvalidCharactersInName() {
+        //given
+        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "/");
+        CreateRequest mockCreateRequest = mock(CreateRequest.class);
+        ResultHandler mockResultHandler = mock(ResultHandler.class);
+        Subject mockSubject = new Subject();
+        Application mockApplication = mock(Application.class);
+
+        applicationsResource = new ApplicationsResource(
+                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
+
+            @Override
+            protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
+                    throws EntitlementException {
+                return applicationWrapper;
+            }
+
+            @Override
+            protected ApplicationWrapper createApplicationWrapper(Application application,
+                                                                  ApplicationTypeManagerWrapper type) {
+                return applicationWrapper;
+            }
+        };
+
+        given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
+        given(applicationWrapper.getApplication()).willReturn(mockApplication);
+        given(mockApplication.getName()).willReturn("new+application");
+        given(mockApplication.getRealm()).willReturn("/");
+
+        //when
+        applicationsResource.createInstance(realmContext, mockCreateRequest, mockResultHandler);
+
+        // Then
+        ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
+        verify(mockResultHandler).handleError(captor.capture());
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.BAD_REQUEST);
     }
 
     @Test

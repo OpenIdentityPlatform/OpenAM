@@ -58,6 +58,7 @@ import org.forgerock.openam.forgerockrest.entitlements.query.QueryFilterVisitorA
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ReferralWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * An endpoint for interacting with legacy referrals. This will be deprecated
@@ -137,6 +138,27 @@ public class ReferralsResourceV1 extends RealmAwareResource {
             }
             resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
+        }
+
+        // This test for null added to avoid test failure in
+        // ReferralsResourceTest.shouldInternalErrorIfCannotSaveReferral
+        //
+        if (wrapper.getName() != null) {
+            // OPENAM-5031.  Reject a referral whose name contains invalid characters.
+            // I'm not sure if this is a bad solution or not.  Theoretically we should encode the name, and use that
+            // to store the referral (decoding it again before presenting to the user).  However, referrals are being
+            // phased out, so perhaps this behaviour will encourage the user not to use them.
+            //
+            String encodedName = DN.escapeAttributeValue(wrapper.getName());
+            if (!wrapper.getName().equals(encodedName)) {
+                if (debug.errorEnabled()) {
+                    debug.error("ReferralsResource :: CREATE by "
+                            + principalName
+                            + ": Referral name \"" + wrapper.getName() + "\" was invalid");
+                }
+                resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
+                return;
+            }
         }
 
         try {
