@@ -86,7 +86,7 @@ define("config/process/PolicyConfig", [
                     viewManager.showDialog(router.configuration.routes.loginDialog.dialog);
                 }
             }
-        },
+        }
     ];
     return obj;
 });
