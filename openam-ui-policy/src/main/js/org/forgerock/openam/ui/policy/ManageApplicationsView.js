@@ -163,7 +163,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
             if (conf.globalData.policyEditor) {
                 defaultApplications = conf.globalData.policyEditor.defaultApplications;
                 if (defaultApplications.config.hideByDefault) {
-                    exceptions = _.difference(defaultApplications.defaultApplicatonList, defaultApplications.config.exceptThese);
+                    exceptions = _.difference(defaultApplications.defaultApplicationList, defaultApplications.config.exceptThese);
                 } else {
                     exceptions = defaultApplications.config.exceptThese;
                 }
