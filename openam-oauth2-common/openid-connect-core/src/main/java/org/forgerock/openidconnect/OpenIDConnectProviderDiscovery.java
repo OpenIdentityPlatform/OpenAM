@@ -18,7 +18,7 @@ package org.forgerock.openidconnect;
 
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.openidconnect.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -22,6 +22,7 @@ import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +57,8 @@ public class TokenInfoServiceImpl implements TokenInfoService {
     /**
      * {@inheritDoc}
      */
-    public JsonValue getTokenInfo(OAuth2Request request) throws InvalidTokenException, InvalidRequestException,
-            ExpiredTokenException, ServerException, BadRequestException, InvalidGrantException {
+    public JsonValue getTokenInfo(OAuth2Request request) throws InvalidRequestException, NotFoundException,
+            ServerException {
 
         final Map<String, Object> response = new HashMap<String, Object>();
 
@@ -67,18 +68,23 @@ public class TokenInfoServiceImpl implements TokenInfoService {
             logger.error("Missing access token in request");
             throw new InvalidRequestException("Missing access_token");
         } else {
-            AccessToken accessToken = tokenStore.readAccessToken(request, token);
+            AccessToken accessToken;
+            try {
+                accessToken = tokenStore.readAccessToken(request, token);
+            } catch (Exception e) {
+                throw new NotFoundException(NotFoundException.ACCESS_TOKEN);
+            }
 
             if (accessToken == null) {
                 logger.error("Unable to read token from token store for id: " + token);
-                throw new InvalidTokenException();
+                throw new NotFoundException(NotFoundException.ACCESS_TOKEN);
             } else {
 
                 logger.trace("In Validator resource - got token = " + accessToken);
 
                 if (accessToken.isExpired()) {
                     logger.error("Should response and refresh the token");
-                    throw new ExpiredTokenException();
+                    throw new NotFoundException(NotFoundException.ACCESS_TOKEN);
                 }
 
                 final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);

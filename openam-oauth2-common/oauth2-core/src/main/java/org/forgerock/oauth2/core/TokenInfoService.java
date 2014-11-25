@@ -22,6 +22,7 @@ import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 
 /**
@@ -36,13 +37,9 @@ public interface TokenInfoService {
      *
      * @param request The OAuth2 request.
      * @return The token's information.
-     * @throws InvalidTokenException If the access token does not exist on the OAuth2 provider.
      * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
-     * @throws ExpiredTokenException If the access token or refresh token has expired.
      * @throws ServerException If any internal server error occurs.
-     * @throws BadRequestException If the request is malformed.
-     * @throws InvalidGrantException If the given token is not an Access token.
+     * @throws NotFoundException If the token cannot be found or is expired.
      */
-    JsonValue getTokenInfo(OAuth2Request request) throws InvalidTokenException, InvalidRequestException,
-            ExpiredTokenException, ServerException, BadRequestException, InvalidGrantException;
+    JsonValue getTokenInfo(OAuth2Request request) throws InvalidRequestException, NotFoundException, ServerException;
 }

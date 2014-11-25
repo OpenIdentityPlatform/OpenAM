@@ -491,13 +491,26 @@ public class TokenResource implements CollectionResourceProvider {
                 if (debug.errorEnabled()) {
                     debug.error("TokenResource :: READ : No token found with ID, " + resourceId);
                 }
-                throw new NotFoundException("Token Not Found", e);
+                throw new NotFoundException("Could not find valid token with given ID", e);
             }
             if (response == null) {
                 if (debug.errorEnabled()) {
                     debug.error("TokenResource :: READ : No token found with ID, " + resourceId);
                 }
-                throw new NotFoundException("Token Not Found");
+                throw new NotFoundException("Could not find valid token with given ID");
+            }
+
+            JsonValue expireTimeValue = response.get(OAuth2Constants.CoreTokenParams.EXPIRE_TIME);
+            long expireTime;
+            if (expireTimeValue.isNumber()) {
+                expireTime = expireTimeValue.asLong();
+            } else {
+                Set<String> expireTimeSet = (Set<String>) expireTimeValue.getObject();
+                expireTime = Long.parseLong(expireTimeSet.iterator().next());
+            }
+
+            if (System.currentTimeMillis() > expireTime) {
+                throw new NotFoundException("Could not find valid token with given ID");
             }
 
             String grantType = getAttributeValue(response, GRANT_TYPE);
@@ -514,7 +527,7 @@ public class TokenResource implements CollectionResourceProvider {
                     if (debug.errorEnabled()) {
                         debug.error("TokenResource :: READ : No token found with ID, " + resourceId);
                     }
-                    throw new PermanentException(404, "Not Found", null);
+                    throw new NotFoundException("Could not find valid token with given ID");
                 }
                 AMIdentity uid2 = identityManager.getResourceOwnerIdentity(username, realm);
                 if (uid.equals(adminUserId) || uid.equals(uid2)) {

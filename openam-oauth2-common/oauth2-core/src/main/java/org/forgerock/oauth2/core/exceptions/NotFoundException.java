@@ -14,9 +14,7 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openidconnect.exceptions;
-
-import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+package org.forgerock.oauth2.core.exceptions;
 
 /**
  * Thrown when a user cannot be found.
@@ -24,6 +22,8 @@ import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
  * @since 12.0.0
  */
 public class NotFoundException extends OAuth2Exception {
+
+    public static final String ACCESS_TOKEN = "Could not find valid access token with given ID";
 
     /**
      * Constructs a new NotFoundException with the specified message.
