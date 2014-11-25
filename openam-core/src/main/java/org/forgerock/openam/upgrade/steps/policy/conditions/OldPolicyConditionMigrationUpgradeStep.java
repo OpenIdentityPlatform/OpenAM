@@ -17,28 +17,27 @@
 package org.forgerock.openam.upgrade.steps.policy.conditions;
 
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.steps.AbstractUpgradeStep;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.upgrade.UpgradeException;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.steps.AbstractUpgradeStep;
+import org.forgerock.opendj.ldap.ConnectionFactory;
 
 /**
  * <p>Will attempt to migrate old policy conditions to new entitlement conditions.</p>
@@ -53,6 +52,7 @@ import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep {
 
     private static final String ENTITLEMENT_DATA = "%ENTITLEMENT_DATA%";
+
 
     private final Map<String, Set<Privilege>> privilegesToUpgrade = new HashMap<String, Set<Privilege>>();
     private final Map<String, Set<String>> unUpgradablePolicies = new HashMap<String, Set<String>>();
@@ -69,8 +69,7 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
     public OldPolicyConditionMigrationUpgradeStep(PrivilegedAction<SSOToken> adminTokenAction,
             @Named(DataLayerConstants.DATA_LAYER_BINDING) ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
-        this.conditionUpgrader = new PolicyConditionUpgrader(SubjectUtils.createSubject(getAdminToken()),
-                new PolicyConditionUpgradeMap());
+        this.conditionUpgrader = new PolicyConditionUpgrader(new PolicyConditionUpgradeMap());
     }
 
     private PrivilegeManager getPrivilegeManager(String realm) {
@@ -86,10 +85,12 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
      */
     @Override
     public void initialize() throws UpgradeException {
+
         try {
             DEBUG.message("Initializing OldPolicyConditionMigrationStep");
 
             for (String realm : getRealmNames()) {
+
                 PrivilegeManager privilegeManager = getPrivilegeManager(realm);
                 List<Privilege> privileges;
                 try {
@@ -101,7 +102,7 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
 
                     if (conditionUpgrader.isPolicyUpgradable(privilege)) {
                         try {
-                            MigrationReport report = conditionUpgrader.dryRunPolicyUpgrade(realm, privilege);
+                            MigrationReport report = conditionUpgrader.dryRunPolicyUpgrade(privilege);
                             addReport(realm, report);
 
                             addUpgradablePolicy(realm, privilege);
@@ -176,10 +177,13 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
 
         for (Map.Entry<String, Set<Privilege>> entry : privilegesToUpgrade.entrySet()) {
             String realm = entry.getKey();
+            ApplicationManager.clearCache(realm); //ensure reading apps cleanly
 
             PrivilegeManager privilegeManager = getPrivilegeManager(realm);
 
             for (Privilege privilege : entry.getValue()) {
+
+                privilege.getEntitlement().clearCache();
 
                 try {
                     privilegeManager.modify(privilege.getName(), privilege);

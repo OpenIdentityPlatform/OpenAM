@@ -778,6 +778,14 @@ public class Entitlement {
     }
 
     /**
+     * Sets this entitlement's current application to null.
+     * For ensuring that we read the Application fresh from its store next time we access it.
+     */
+    public void clearCache() {
+        this.application = null;
+    }
+
+    /**
      * Returns application for this entitlement.
      *
      * @param adminSubject Admin Subject.

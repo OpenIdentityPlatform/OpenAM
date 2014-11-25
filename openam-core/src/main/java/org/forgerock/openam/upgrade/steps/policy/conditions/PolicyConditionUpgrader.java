@@ -21,14 +21,13 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.LogicalCondition;
 import com.sun.identity.entitlement.LogicalSubject;
+import com.sun.identity.entitlement.NoSubject;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.opensso.PolicyCondition;
 import com.sun.identity.entitlement.opensso.PolicySubject;
-import org.forgerock.openam.upgrade.UpgradeException;
-
-import javax.security.auth.Subject;
 import java.util.HashSet;
 import java.util.Set;
+import org.forgerock.openam.upgrade.UpgradeException;
 
 /**
  * Checks if a policy can be automatically upgraded and performs a dry run of the migration.
@@ -37,17 +36,14 @@ import java.util.Set;
  */
 class PolicyConditionUpgrader {
 
-    private final Subject adminSubject;
     private final PolicyConditionUpgradeMap conditionUpgradeMap;
 
     /**
      * Constructs a new instance of the PolicyConditionUpgrader.
      *
-     * @param adminSubject An instance of the admin subject.
      * @param conditionUpgradeMap An instance of the {@code PolicyConditionUpgradeMap}.
      */
-    PolicyConditionUpgrader(Subject adminSubject, PolicyConditionUpgradeMap conditionUpgradeMap) {
-        this.adminSubject = adminSubject;
+    PolicyConditionUpgrader(PolicyConditionUpgradeMap conditionUpgradeMap) {
         this.conditionUpgradeMap = conditionUpgradeMap;
     }
 
@@ -65,6 +61,10 @@ class PolicyConditionUpgrader {
     private boolean isSubjectConditionUpgradable(EntitlementSubject subject) {
 
         if (subject == null) {
+            return true;
+        }
+
+        if (subject instanceof NoSubject) {
             return true;
         }
 
@@ -113,20 +113,17 @@ class PolicyConditionUpgrader {
      *
      * <p>The given policy will be updated with the migrated conditions.</p>
      *
-     * @param realm The realm.
      * @param policy The policy to upgrade.
      * @return A migration report detailing what migration was performed.
      * @throws EntitlementException If the policy could not be migrated.
      * @throws UpgradeException If the policy could not be migrated.
      */
-    MigrationReport dryRunPolicyUpgrade(String realm, Privilege policy) throws EntitlementException, UpgradeException {
+    MigrationReport dryRunPolicyUpgrade(Privilege policy) throws EntitlementException, UpgradeException {
 
         MigrationReport migrationReport = new MigrationReport(policy.getName());
 
         migrateSubjectConditions(policy, migrationReport);
         migrateEnvironmentConditions(policy, migrationReport);
-
-        policy.validateResourceNames(adminSubject, realm);
 
         return migrationReport;
     }
@@ -137,17 +134,24 @@ class PolicyConditionUpgrader {
             return;
         }
 
+        if (privilege.getSubject() instanceof NoSubject) {
+            return;
+        }
+
         if (privilege.getSubject() instanceof LogicalSubject) {
             LogicalSubject logicalSubject = (LogicalSubject) privilege.getSubject();
             Set<EntitlementSubject> subjects = logicalSubject.getESubjects();
             Set<EntitlementSubject> migratedSubjects = new HashSet<EntitlementSubject>();
             for (EntitlementSubject subject : subjects) {
-                if (!(subject instanceof PolicySubject)) {
+
+                if (subject instanceof NoSubject) {
+                    migratedSubjects.add(subject); //pass this through directly
+                } else if (!(subject instanceof PolicySubject)) {
                     //This should never happen due to check in initialise
                     throw new UpgradeException("Cannot upgrade a subject condition that is not of PolicySubject type!");
+                } else {
+                    migratedSubjects.add(migrateSubjectCondition((PolicySubject) subject, migrationReport));
                 }
-
-                migratedSubjects.add(migrateSubjectCondition((PolicySubject) subject, migrationReport));
             }
             logicalSubject.setESubjects(migratedSubjects);
         } else if (privilege.getSubject() instanceof PolicySubject) {

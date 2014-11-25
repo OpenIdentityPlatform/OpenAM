@@ -28,21 +28,20 @@ import com.sun.identity.entitlement.OrSubject;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.opensso.PolicyCondition;
 import com.sun.identity.entitlement.opensso.PolicySubject;
+import java.util.HashSet;
+import java.util.Set;
+import static org.fest.assertions.Assertions.assertThat;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.mockito.ArgumentCaptor;
+import static org.mockito.BDDMockito.given;
 import org.mockito.Matchers;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import javax.security.auth.Subject;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 
 public class PolicyConditionUpgraderTest {
 
@@ -52,10 +51,9 @@ public class PolicyConditionUpgraderTest {
 
     @BeforeMethod
     public void setUp() {
-        Subject adminSubject = new Subject();
         conditionUpgradeMap = mock(PolicyConditionUpgradeMap.class);
 
-        conditionUpgrader = new PolicyConditionUpgrader(adminSubject, conditionUpgradeMap);
+        conditionUpgrader = new PolicyConditionUpgrader(conditionUpgradeMap);
     }
 
     @DataProvider(name = "isPolicyWithSingleSubjectAndEnvironmentConditionUpgradableDataProvider")
@@ -381,7 +379,7 @@ public class PolicyConditionUpgraderTest {
                 Matchers.<MigrationReport>anyObject())).willReturn(migratedCondition);
 
         //When
-        conditionUpgrader.dryRunPolicyUpgrade("REALM", policy);
+        conditionUpgrader.dryRunPolicyUpgrade(policy);
 
         //Then
         ArgumentCaptor<EntitlementSubject> subjectCaptor = ArgumentCaptor.forClass(EntitlementSubject.class);
@@ -390,7 +388,6 @@ public class PolicyConditionUpgraderTest {
         ArgumentCaptor<EntitlementCondition> conditionCaptor = ArgumentCaptor.forClass(EntitlementCondition.class);
         verify(policy).setCondition(conditionCaptor.capture());
         assertThat(conditionCaptor.getValue()).isEqualTo(migratedCondition);
-        verify(policy).validateResourceNames(Matchers.<Subject>anyObject(), eq("REALM"));
     }
 
     @SuppressWarnings("unchecked")
@@ -419,7 +416,7 @@ public class PolicyConditionUpgraderTest {
 
 
         //When
-        conditionUpgrader.dryRunPolicyUpgrade("REALM", policy);
+        conditionUpgrader.dryRunPolicyUpgrade(policy);
 
         //Then
         ArgumentCaptor<Set> subjectCaptor = ArgumentCaptor.forClass(Set.class);
@@ -427,7 +424,6 @@ public class PolicyConditionUpgraderTest {
         assertThat(subjectCaptor.getValue()).hasSize(2).contains(migratedSubject1, migratedSubject2);
         verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
         verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
-        verify(policy).validateResourceNames(Matchers.<Subject>anyObject(), eq("REALM"));
     }
 
     @SuppressWarnings("unchecked")
@@ -456,7 +452,7 @@ public class PolicyConditionUpgraderTest {
 
 
         //When
-        conditionUpgrader.dryRunPolicyUpgrade("REALM", policy);
+        conditionUpgrader.dryRunPolicyUpgrade(policy);
 
         //Then
         ArgumentCaptor<Set> subjectCaptor = ArgumentCaptor.forClass(Set.class);
@@ -464,7 +460,6 @@ public class PolicyConditionUpgraderTest {
         assertThat(subjectCaptor.getValue()).hasSize(2).contains(migratedSubject1, migratedSubject2);
         verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
         verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
-        verify(policy).validateResourceNames(Matchers.<Subject>anyObject(), eq("REALM"));
     }
 
     @Test
@@ -485,7 +480,7 @@ public class PolicyConditionUpgraderTest {
                 Matchers.<MigrationReport>anyObject())).willReturn(migratedSubject);
 
         //When
-        conditionUpgrader.dryRunPolicyUpgrade("REALM", policy);
+        conditionUpgrader.dryRunPolicyUpgrade(policy);
 
         //Then
         ArgumentCaptor<Set> subjectCaptor = ArgumentCaptor.forClass(Set.class);
@@ -493,7 +488,6 @@ public class PolicyConditionUpgraderTest {
         assertThat(subjectCaptor.getValue()).hasSize(1).contains(migratedSubject);
         verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
         verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
-        verify(policy).validateResourceNames(Matchers.<Subject>anyObject(), eq("REALM"));
     }
 
     @SuppressWarnings("unchecked")
@@ -522,7 +516,7 @@ public class PolicyConditionUpgraderTest {
 
 
         //When
-        conditionUpgrader.dryRunPolicyUpgrade("REALM", policy);
+        conditionUpgrader.dryRunPolicyUpgrade(policy);
 
         //Then
         ArgumentCaptor<Set> conditionsCaptor = ArgumentCaptor.forClass(Set.class);
@@ -530,7 +524,6 @@ public class PolicyConditionUpgraderTest {
         assertThat(conditionsCaptor.getValue()).hasSize(2).contains(migratedCondition1, migratedCondition2);
         verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
         verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
-        verify(policy).validateResourceNames(Matchers.<Subject>anyObject(), eq("REALM"));
     }
 
     @SuppressWarnings("unchecked")
@@ -559,7 +552,7 @@ public class PolicyConditionUpgraderTest {
 
 
         //When
-        conditionUpgrader.dryRunPolicyUpgrade("REALM", policy);
+        conditionUpgrader.dryRunPolicyUpgrade(policy);
 
         //Then
         ArgumentCaptor<Set> conditionCaptor = ArgumentCaptor.forClass(Set.class);
@@ -567,7 +560,6 @@ public class PolicyConditionUpgraderTest {
         assertThat(conditionCaptor.getValue()).hasSize(2).contains(migratedCondition1, migratedCondition2);
         verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
         verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
-        verify(policy).validateResourceNames(Matchers.<Subject>anyObject(), eq("REALM"));
     }
 
     @Test
@@ -588,7 +580,7 @@ public class PolicyConditionUpgraderTest {
                 Matchers.<MigrationReport>anyObject())).willReturn(migratedCondition);
 
         //When
-        conditionUpgrader.dryRunPolicyUpgrade("REALM", policy);
+        conditionUpgrader.dryRunPolicyUpgrade(policy);
 
         //Then
         ArgumentCaptor<Set> conditionCaptor = ArgumentCaptor.forClass(Set.class);
@@ -596,6 +588,5 @@ public class PolicyConditionUpgraderTest {
         assertThat(conditionCaptor.getValue()).hasSize(1).contains(migratedCondition);
         verify(policy, never()).setSubject(Matchers.<EntitlementSubject>anyObject());
         verify(policy, never()).setCondition(Matchers.<EntitlementCondition>anyObject());
-        verify(policy).validateResourceNames(Matchers.<Subject>anyObject(), eq("REALM"));
     }
 }
