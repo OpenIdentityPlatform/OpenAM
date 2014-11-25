@@ -27,7 +27,7 @@
 */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.idm.server;
 
@@ -2191,7 +2191,7 @@ public class IdServicesImpl implements IdServices {
 
                if (nextType.equals(IdType.USER) ||
                    nextType.equals(IdType.AGENT)) {
-                   // try the user or agent's currect realm.
+                   // try the user or agent's correct realm.
                    nextAmsdkDN = nextAmOrgName;
                    nextType = IdType.REALM;
                } else {
@@ -2199,12 +2199,9 @@ public class IdServicesImpl implements IdServices {
                        new OrganizationConfigManager(token, nextAmOrgName);
                    OrganizationConfigManager parentOCM =
                        ocm.getParentOrgConfigManager();
-                   String tmpParentName = parentOCM.getOrganizationName();
-                   String parentName = DNMapper.realmNameToAMSDKName(
-                       tmpParentName);
+                   String parentName = parentOCM.getOrganizationName();
                    if (DEBUG.messageEnabled()) {
                        DEBUG.message("  getServiceAttributesAscending: "
-                           + " tmpParentName=" + tmpParentName
                            + " parentName=" + parentName);
                    }
                    nextType = IdType.REALM;
