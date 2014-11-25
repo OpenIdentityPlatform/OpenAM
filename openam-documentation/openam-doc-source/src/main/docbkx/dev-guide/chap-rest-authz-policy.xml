@@ -204,7 +204,7 @@
         ...,
         "resourceN"
     ],
-    "application": "optional, defaults to iPlanetAMWebAgentService",
+    "application": "defaults to iPlanetAMWebAgentService if not specified",
     "subject": {
         "ssoToken": "SSO token ID string",
         "jwt": "JSON Web Token string",
@@ -263,7 +263,7 @@
      <term><literal>"application"</literal></term>
      <listitem>
       <para>
-       This optional field holds the name of the application,
+       This field holds the name of the application,
        and defaults to <literal>"iPlanetAMWebAgentService"</literal>
        if not specified.
       </para>
@@ -843,7 +843,7 @@ $ <userinput>curl \
    <programlisting language="javascript">
 {
     "resource": "resource string",
-    "application": "optional, defaults to iPlanetAMWebAgentService",
+    "application": "defaults to iPlanetAMWebAgentService if not specified",
     "subject": {
         "ssoToken": "SSO token ID string",
         "jwt": "JSON Web Token string",
@@ -899,7 +899,7 @@ $ <userinput>curl \
      <term><literal>"application"</literal></term>
      <listitem>
       <para>
-       This optional field holds the name of the application,
+       This field holds the name of the application,
        and defaults to <literal>"iPlanetAMWebAgentService"</literal>
        if not specified.
       </para>
