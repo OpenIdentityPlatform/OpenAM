@@ -509,11 +509,6 @@
                 <artifactId>openam-authn-filter-modules</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-authz-filter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
             <!-- Include all Authentication Modules -->
             <dependency>
