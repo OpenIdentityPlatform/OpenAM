@@ -33,7 +33,7 @@ import java.util.Set;
 
 /**
  * A wrapper class around AuthContextLocal.
- *
+ * <p/>
  * Providing a wrapper around these methods allows for easy decoupling and unit testing.
  */
 public class AuthContextLocalWrapper implements AuthenticationContext {
@@ -164,6 +164,11 @@ public class AuthContextLocalWrapper implements AuthenticationContext {
      */
     @Override
     public String getErrorMessage() {
+        String lockoutWarning = authContextLocal.getLockoutMsg();
+        if (lockoutWarning != null) {
+            return authContextLocal.getErrorMessage() + lockoutWarning;
+        }
+
         return authContextLocal.getErrorMessage();
     }
 
