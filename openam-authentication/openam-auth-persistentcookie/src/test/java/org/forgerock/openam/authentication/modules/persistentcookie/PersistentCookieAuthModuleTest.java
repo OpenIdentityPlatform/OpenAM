@@ -16,6 +16,24 @@
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.testng.Assert.*;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.login.LoginException;
+import javax.security.auth.message.MessageInfo;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
@@ -28,31 +46,11 @@ import org.forgerock.jaspi.runtime.JaspiRuntime;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.authentication.modules.common.AMLoginModuleBinder;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.login.LoginException;
-import javax.security.auth.message.MessageInfo;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 public class PersistentCookieAuthModuleTest {
 
@@ -61,6 +59,7 @@ public class PersistentCookieAuthModuleTest {
     private JwtSessionModule jwtSessionModule;
     private AMKeyProvider amKeyProvider;
     private AMLoginModuleBinder amLoginModuleBinder;
+    private CoreWrapper coreWrapper;
 
     @BeforeMethod
     public void setUp() {
@@ -68,8 +67,9 @@ public class PersistentCookieAuthModuleTest {
         jwtSessionModule = mock(JwtSessionModule.class);
         amKeyProvider = mock(AMKeyProvider.class);
         amLoginModuleBinder = mock(AMLoginModuleBinder.class);
+        coreWrapper = mock(CoreWrapper.class);
 
-        persistentCookieAuthModule = new PersistentCookieAuthModule(jwtSessionModule, amKeyProvider) {
+        persistentCookieAuthModule = new PersistentCookieAuthModule(jwtSessionModule, amKeyProvider, coreWrapper) {
             @Override
             protected String getKeyAlias(String orgName) throws SSOException, SMSException {
                 return "KEY_ALIAS";
@@ -331,6 +331,7 @@ public class PersistentCookieAuthModuleTest {
 
         given(ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY)).willReturn("TOKEN_IDLE_TIME");
         given(ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY)).willReturn("TOKEN_MAX_LIFE");
+        given(ssoToken.getProperty("openam-auth-persistent-cookie-domains")).willReturn("");
 
         //When
         Map<String, Object> config = persistentCookieAuthModule.initialize(requestParamsMap, request, response,
@@ -350,7 +351,7 @@ public class PersistentCookieAuthModuleTest {
     public void shouldCallOnLoginSuccessWhenJwtNotValidated() throws AuthenticationException, SSOException {
 
         //Given
-        persistentCookieAuthModule = new PersistentCookieAuthModule(new JwtSessionModule(), amKeyProvider) {
+        persistentCookieAuthModule = new PersistentCookieAuthModule(new JwtSessionModule(), amKeyProvider, coreWrapper) {
             @Override
             protected String getKeyAlias(String orgName) throws SSOException, SMSException {
                 return "KEY_ALIAS";
@@ -394,7 +395,7 @@ public class PersistentCookieAuthModuleTest {
     public void shouldCallOnLoginSuccess() throws AuthenticationException, SSOException {
 
         //Given
-        persistentCookieAuthModule = new PersistentCookieAuthModule(new JwtSessionModule(), amKeyProvider) {
+        persistentCookieAuthModule = new PersistentCookieAuthModule(new JwtSessionModule(), amKeyProvider, coreWrapper) {
             @Override
             protected String getKeyAlias(String orgName) throws SSOException, SMSException {
                 return "KEY_ALIAS";
@@ -588,6 +589,7 @@ public class PersistentCookieAuthModuleTest {
         SSOToken ssoToken = mock(SSOToken.class);
 
         given(ssoToken.getProperty("openam-auth-persistent-cookie-enforce-ip")).willReturn("true");
+        given(ssoToken.getProperty("openam-auth-persistent-cookie-domains")).willReturn("");
 
         //When
         Map<String, Object> config = persistentCookieAuthModule.initialize(Collections.emptyMap(), request, response,

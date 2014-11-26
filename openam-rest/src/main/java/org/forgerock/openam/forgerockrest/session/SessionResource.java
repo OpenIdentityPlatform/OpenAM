@@ -16,6 +16,18 @@
 
 package org.forgerock.openam.forgerockrest.session;
 
+import static org.forgerock.json.fluent.JsonValue.*;
+
+import javax.inject.Inject;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -31,6 +43,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.AdviceContext;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
@@ -51,15 +64,6 @@ import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 import org.forgerock.openam.utils.StringUtils;
-
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.forgerock.json.fluent.JsonValue.*;
 
 /**
  * Represents Sessions that can queried via a REST interface.
@@ -167,7 +171,7 @@ public class SessionResource implements CollectionResourceProvider {
             return;
         }
 
-        internalHandleAction(tokenId, request, handler);
+        internalHandleAction(tokenId, context, request, handler);
     }
 
     protected String getTokenIdFromUrlParam(ActionRequest request) {
@@ -215,7 +219,7 @@ public class SessionResource implements CollectionResourceProvider {
                                ActionRequest request,
                                ResultHandler<JsonValue> handler) {
 
-        internalHandleAction(tokenId, request, handler);
+        internalHandleAction(tokenId, context, request, handler);
     }
 
     /**
@@ -226,6 +230,7 @@ public class SessionResource implements CollectionResourceProvider {
      * @param handler The result handler
      */
     private void internalHandleAction(String tokenId,
+                                      ServerContext context,
                                       ActionRequest request,
                                       ResultHandler<JsonValue> handler) {
 
@@ -233,7 +238,7 @@ public class SessionResource implements CollectionResourceProvider {
         final ActionHandler actionHandler = actionHandlers.get(action);
 
         if (actionHandler != null) {
-            actionHandler.handle(tokenId, request, handler);
+            actionHandler.handle(tokenId, context, request, handler);
 
         } else {
             String message = String.format("Action %s not implemented for this resource", action);
@@ -434,19 +439,60 @@ public class SessionResource implements CollectionResourceProvider {
      */
     private static interface ActionHandler {
 
-        void handle(String tokenId, ActionRequest request, ResultHandler<JsonValue> handler);
+        void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler);
 
     }
 
     /**
      * Handler for 'logout' action
      */
-    private class LogoutActionHandler implements ActionHandler {
+    private final class LogoutActionHandler implements ActionHandler {
+
+        /**
+         * This class serves as a mocked HttpServletResponse, which will be passed to the AuthUtils#logout method,
+         * specifically to handle when the PersistentCookieAuthModule needs to clear an existing session-jwt cookie,
+         * which it does by adding an expired session-jwt cookie to the response. Because the HttpServletResponse is
+         * not available to CREST services, but rather headers in the response are set via the AdviceContext, this
+         * class will take set cookies and translate them into the AdviceContext associated with the current CREST
+         * ServerContext.
+         */
+        private final class CookieCollectingHttpServletResponse extends HttpServletResponseWrapper {
+
+            private static final String SET_COOKIE_HEADER = "Set-Cookie";
+
+            private final AdviceContext adviceContext;
+
+            private CookieCollectingHttpServletResponse(HttpServletResponse response, AdviceContext adviceContext) {
+                super(response);
+                this.adviceContext = adviceContext;
+            }
+
+            @Override
+            public void addCookie(Cookie cookie) {
+                adviceContext.putAdvice(SET_COOKIE_HEADER,
+                        new org.forgerock.caf.http.SetCookieSupport().generateHeader(cookie));
+
+            }
+
+            @Override
+            public void setHeader(String name, String value) {
+                if (SET_COOKIE_HEADER.equals(name)) {
+                    adviceContext.putAdvice(name, value);
+                }
+            }
+
+            @Override
+            public void addHeader(String name, String value) {
+                if (SET_COOKIE_HEADER.equals(name)) {
+                    adviceContext.putAdvice(name, value);
+                }
+            }
+        }
 
         @Override
-        public void handle(String tokenId, ActionRequest request, ResultHandler<JsonValue> handler) {
+        public void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
             try {
-                JsonValue jsonValue = logout(tokenId);
+                JsonValue jsonValue = logout(tokenId, context);
                 handler.handleResult(jsonValue);
             } catch (InternalServerErrorException e) {
                 if (LOGGER.errorEnabled()) {
@@ -463,15 +509,15 @@ public class SessionResource implements CollectionResourceProvider {
          * @param tokenId The id of the Token to invalidate
          * @throws InternalServerErrorException If the tokenId is invalid or could not be used to logout.
          */
-        private JsonValue logout(String tokenId) throws InternalServerErrorException {
+        private JsonValue logout(String tokenId, ServerContext context) throws InternalServerErrorException {
 
             SSOToken ssoToken;
             try {
                 if (tokenId == null) {
                     if (LOGGER.messageEnabled()) {
-                        LOGGER.message("SessionResource.logout() :: Invalid Token Id.");
+                        LOGGER.message("SessionResource.logout() :: Null Token Id.");
                     }
-                    throw new InternalServerErrorException("Invalid Token Id");
+                    throw new InternalServerErrorException("Null Token Id");
                 }
                 ssoToken = ssoTokenManager.createSSOToken(tokenId);
             } catch (SSOException ex) {
@@ -482,10 +528,18 @@ public class SessionResource implements CollectionResourceProvider {
                 }
                 return new JsonValue(map);
             }
-
+            HttpServletResponse httpServletResponse = null;
+            final AdviceContext adviceContext = context.asContext(AdviceContext.class);
+            if (adviceContext == null) {
+                if (LOGGER.warningEnabled()) {
+                    LOGGER.warning("No AdviceContext in ServerContext, and thus no headers can be set in the HttpServletResponse.");
+                }
+            } else {
+                httpServletResponse = new CookieCollectingHttpServletResponse(new UnsupportedResponse(), adviceContext);
+            }
             if (ssoToken != null) {
                 try {
-                    authUtilsWrapper.logout(ssoToken.getTokenID().toString(), null, null);
+                    authUtilsWrapper.logout(ssoToken.getTokenID().toString(), null, httpServletResponse);
                 } catch (SSOException e) {
                     if (LOGGER.errorEnabled()) {
                         LOGGER.error("SessionResource.logout() :: Token ID, " + tokenId +
@@ -512,7 +566,7 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String VALID = "valid";
 
         @Override
-        public void handle(String tokenId, ActionRequest request, ResultHandler<JsonValue> handler) {
+        public void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
             handler.handleResult(validateSession(tokenId));
         }
 
@@ -596,7 +650,7 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String ACTIVE = "active";
 
         @Override
-        public void handle(String tokenId, ActionRequest request, ResultHandler<JsonValue> handler) {
+        public void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
             String refresh = request.getAdditionalParameter("refresh");
             handler.handleResult(isTokenIdValid(tokenId, refresh));
         }
@@ -632,7 +686,7 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String MAX_TIME = "maxtime";
 
         @Override
-        public void handle(String tokenId, ActionRequest request, ResultHandler<JsonValue> handler) {
+        public void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
             handler.handleResult(getMaxTime(tokenId));
         }
 
@@ -662,7 +716,7 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String IDLE_TIME = "idletime";
 
         @Override
-        public void handle(String tokenId, ActionRequest request, ResultHandler<JsonValue> handler) {
+        public void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
             handler.handleResult(getIdleTime(tokenId));
         }
 

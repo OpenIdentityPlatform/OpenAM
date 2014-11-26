@@ -16,10 +16,15 @@
 
 package org.forgerock.openam.core;
 
+import java.security.AccessController;
+import java.util.Collection;
+import java.util.Set;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -27,9 +32,6 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
-
-import java.security.AccessController;
-import java.util.Set;
 
 /**
  * A wrapper around core utility class like, {@link AMAuthUtils} and {@link IdUtils} to facilitate testing.
@@ -228,5 +230,14 @@ public class CoreWrapper {
      */
     public String getRealmFromPolicyAdvice(String advice) {
         return AuthClientUtils.getRealmFromPolicyAdvice(advice);
+    }
+
+    /**
+     * Gets the configured cookie domains for the server.
+     *
+     * @return The configured cookie domains.
+     */
+    public Collection<String> getCookieDomains() {
+        return AuthUtils.getCookieDomains();
     }
 }

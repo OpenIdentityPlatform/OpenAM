@@ -20,6 +20,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenManager;
+import org.forgerock.json.resource.AdviceContext;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import com.sun.identity.idm.AMIdentity;
@@ -212,7 +213,7 @@ public class SessionResourceTest {
         final Map<String, Object> authzContext = new HashMap<String, Object>();
         authzContext.put("tokenId", "SSO_TOKEN_ID");
         final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
-        final ServerContext context = new ServerContext(tokenContext);
+        final ServerContext context = new ServerContext(new AdviceContext(tokenContext));
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
         final SSOTokenID ssoTokenId = mock(SSOTokenID.class);
