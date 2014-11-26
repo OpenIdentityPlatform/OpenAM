@@ -299,20 +299,23 @@ public abstract class EntitlementConfiguration {
     public abstract boolean doesRealmExist();
     
     /**
-     * For the passed in Entitlement environment, update the Map of Policy Configuration values with 
-     * those for the specified sub-realm.
-     * @param environment The Entitlement environment to update with new Policy Configuration values.
-     * @param subRealm The Sub Realm used to lookup the Policy Configuration values.
-     * @return A Map containing the existing Policy Configuration to enable it to be restored.
+     * For the passed in Entitlement environment, update the value associated with the key "am.policy.realmDN".
+     *
+     * @param environment The Entitlement environment to update with new realm DN value.
+     * @param subRealm The Sub Realm whose DN value should be stored in the environment map.
+     * @return The existing realm DN value stored in the environment map to enable it to be restored.
+     * @see #restoreEnvironmentRealmDn
      */
-    public abstract Map updatePolicyConfigForSubRealm(Map<String, Set<String>> environment, String subRealm);
+    public abstract Set<String> updateEnvironmentRealmDn(Map<String, Set<String>> environment, String subRealm);
     
     /**
-     * For the passed in Entitlement environment, replace the existing Policy Configuration with the Map of values
-     * passed in savedPolicyConfig.
-     * @param environment The Entitlement environment to update with the saved Policy Configuration values.
+     * For the passed in Entitlement environment, replace the existing realm DN with the previous value savedRealmDn.
+     *
+     * @param environment The Entitlement environment to update with the saved realm DN value.
+     * @param savedRealmDn The value to assign to the "am.policy.realmDN" key in the environment map.
+     * @see #updateEnvironmentRealmDn
      */
-    public abstract void restoreSavedPolicyConfig(Map<String, Set<String>> environment, Map savedPolicyConfig);
+    public abstract void restoreEnvironmentRealmDn(Map<String, Set<String>> environment, Set<String> savedRealmDn);
 
     /**
      * For letting us know whether or not the Agent monitoring is enabled in core.

@@ -67,6 +67,8 @@ import java.security.Principal;
 import java.util.List;
 import javax.security.auth.Subject;
 
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+
 /**
  * The class <code>PolicyEvaluator</code> evaluates policies
  * and provides policy decisions.
@@ -119,14 +121,11 @@ public class PolicyEvaluator {
             = "sun.am.requestedActions";
 
     /**
-     * Constant used for key to pass the PolicyConfig configuration map 
-     * in the env map, so that Condition(s)  could use 
-     * the <code>PolicyConfig</code> config map, if necessary.
-     * <code>LDAPFilterCondition</code> needs to use PolicyConfig config map
-     *
-     *
+     * Constant used for key to pass the realm DN in the env map, so that Condition(s)
+     * can look up the relevant <code>PolicyConfig</code> config map, if necessary.
+     * <code>LDAPFilterCondition</code> needs to use PolicyConfig config map.
      */
-    public static final String SUN_AM_POLICY_CONFIG = "sun.am.policyConfig";
+    public static final String REALM_DN = "am.policy.realmDN";
 
     public static final String RESULTS_CACHE_SESSION_CAP 
             = "com.sun.identity.policy.resultsCacheSessionCap";
@@ -596,9 +595,8 @@ public class PolicyEvaluator {
         envParameters.put(SUN_AM_ORIGINAL_REQUESTED_RESOURCE,
                 originalResourceNames);
         envParameters.put(SUN_AM_REQUESTED_ACTIONS, actions);
-        envParameters.put(SUN_AM_POLICY_CONFIG,
-            policyManager.getPolicyConfig());
-        
+        envParameters.put(REALM_DN, asSet(policyManager.getOrganizationDN()));
+
         // Fix for OPENAM-811
         String userid = null; 
         Principal principal = token.getPrincipal();
@@ -781,8 +779,7 @@ public class PolicyEvaluator {
         envParameters.put(SUN_AM_ORIGINAL_REQUESTED_RESOURCE, 
                 originalResourceNames);
         envParameters.put(SUN_AM_REQUESTED_ACTIONS, actions);
-        envParameters.put(SUN_AM_POLICY_CONFIG, 
-                policyManager.getPolicyConfig());
+        envParameters.put(REALM_DN, asSet(policyManager.getOrganizationDN()));
 
         return getPolicyDecision(token, resourceName, actionNames,
                 envParameters, new HashSet());
@@ -1029,18 +1026,16 @@ public class PolicyEvaluator {
             PolicyEvaluator pe = new PolicyEvaluator(orgToVisit,
                     serviceTypeName);
             /**
-             * save policy config before passing control down to
-             * sub realm
+             * save current realm DN before passing control down to sub-realm
              */
-            Map savedPolicyConfig =(Map)envParameters.get(SUN_AM_POLICY_CONFIG);
+            Set<String> savedRealmDn = (Set<String>) envParameters.get(REALM_DN);
             // Update env to point to the realm policy config data.
-            envParameters.put(SUN_AM_POLICY_CONFIG, PolicyConfig.
-                getPolicyConfig(orgToVisit));
+            envParameters.put(REALM_DN, asSet(DNMapper.orgNameToDN(orgToVisit)));
             PolicyDecision policyDecision
                     = pe.getPolicyDecision(token, resourceName, actionNames,
                     envParameters,visitedOrgs);
             // restore back the policy config data for the parent realm
-            envParameters.put(SUN_AM_POLICY_CONFIG, savedPolicyConfig);
+            envParameters.put(REALM_DN, savedRealmDn);
             if ( mergedPolicyDecision == null ) {
                 mergedPolicyDecision = policyDecision;
             } else {
@@ -2442,8 +2437,7 @@ public class PolicyEvaluator {
         env.put(SUN_AM_ORIGINAL_REQUESTED_RESOURCE, 
                 originalResourceNames);
         env.put(SUN_AM_REQUESTED_ACTIONS, actions);
-        env.put(SUN_AM_POLICY_CONFIG, 
-                policyManager.getPolicyConfig());
+        env.put(REALM_DN, asSet(policyManager.getOrganizationDN()));
 
         return getPolicyDecision(null, resourceName, actionNames, env,
                 new HashSet());

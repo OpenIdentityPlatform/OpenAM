@@ -61,6 +61,7 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMAuthenticationInstance;
 import com.sun.identity.authentication.config.AMConfigurationException;
+import com.sun.identity.policy.PolicyEvaluator;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.security.AdminTokenAction;
@@ -775,13 +776,9 @@ public class ResourceEnvIPCondition implements Condition {
         if ( (env != null) 
                     && (env.get(REQUEST_AUTH_SCHEMES) != null) ) {
             try {
-                Map policyConfigMap = (Map) env.get("sun.am.policyConfig");
-                if (policyConfigMap != null) {
-                    Set orgSet = (Set) policyConfigMap.get("OrganizationName");
-                    if (orgSet != null) {
-                        Iterator names = orgSet.iterator();
-                        orgName = (String) names.next();
-                    }
+                Set<String> orgSet = (Set<String>) env.get(PolicyEvaluator.REALM_DN);
+                if (orgSet != null) {
+                    orgName = orgSet.iterator().next();
                 }
                 requestAuthSchemes = (Set) env.get(REQUEST_AUTH_SCHEMES);
                 if ( DEBUG.messageEnabled()) {

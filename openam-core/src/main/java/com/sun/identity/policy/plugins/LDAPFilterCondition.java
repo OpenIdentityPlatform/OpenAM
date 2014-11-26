@@ -44,6 +44,7 @@ import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.policy.SubjectEvaluationCache;
 import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.interfaces.Condition;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.LDAPBindRequest;
 import com.sun.identity.shared.ldap.LDAPConnection;
@@ -54,6 +55,7 @@ import com.sun.identity.shared.ldap.LDAPRequestParser;
 import com.sun.identity.shared.ldap.LDAPSearchRequest;
 import com.sun.identity.shared.ldap.LDAPSearchResults;
 import com.sun.identity.shared.ldap.LDAPv2;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -271,11 +273,11 @@ public class LDAPFilterCondition implements Condition {
      *
      * @param token Single Sign On token of the user
      *
-     * @return <code>true</code> if the user satisifes the <code>
+     * @return <code>true</code> if the user satisfies the <code>
      * ldapConditionFilter</code>
      *
      * @throws SSOException if Single Sign On token is not valid
-     * @throws PolicyException if an error occured
+     * @throws PolicyException if an error occurred
      */
     private boolean isMember(SSOToken token)
         throws SSOException, PolicyException {
@@ -494,56 +496,55 @@ public class LDAPFilterCondition implements Condition {
     }
 
     /**
-     * This condition resets its policy configuration information,
-     * perodically. The time period is based on the SUBJECTS_RESULT_TTL
-     * defined in the policy config service.
+     * This condition resets its policy configuration information, periodically.
+     * The time period is based on the SUBJECTS_RESULT_TTL defined in the policy config service.
      * @see com.sun.identity.policy.PolicyConfig#SUBJECTS_RESULT_TTL
      */
+    private void resetPolicyConfig(Map env) throws PolicyException, SSOException {
 
-    private void resetPolicyConfig(Map env) throws PolicyException {
         if (System.currentTimeMillis() > policyConfigExpiresAt) {
-            Map policyConfigParams
-                    = (Map)env.get(PolicyEvaluator.SUN_AM_POLICY_CONFIG);
-            setPolicyConfig(policyConfigParams);
+
+            String realmDn = CollectionHelper.getMapAttr(env, PolicyEvaluator.REALM_DN);
+            if (realmDn == null) {
+                debug.error("LDAPFilterCondition.resetPolicyConfig(): realmDn is null");
+                throw new PolicyException(ResBundleUtils.rbName,
+                        "ldapfiltercondition_resetpolicyconfig_null_realm_dn", null, null);
+            }
+
+            Map policyConfigParams = PolicyConfig.getPolicyConfig(realmDn);
+
+            setPolicyConfig(policyConfigParams, realmDn);
         }
     }
 
     /**
-     * Sets the policy configration parameters used by this
-     * condition.
+     * Sets the policy configuration parameters used by this condition.
      */
-    synchronized private void setPolicyConfig(Map configParams) 
-            throws PolicyException {
+    private synchronized void setPolicyConfig(Map configParams, String realmDn) throws PolicyException {
         if (System.currentTimeMillis() < policyConfigExpiresAt) {
             return;
         }
         if (debug.messageEnabled()) {
-            debug.message("LDAPFilterCondition.setPolicyConfig():"
-                    + "policy config expired, resetting");
+            debug.message("LDAPFilterCondition.setPolicyConfig():policy config expired, resetting");
         }
         if (configParams == null) {
-            debug.error("LDAPFilterCondition.setPolicyConfig():"
-                    + "configParams is null");
-            throw (new PolicyException(ResBundleUtils.rbName, 
-                "ldapfiltercondition_setpolicyconfig_null_policy_config", 
-                null, null));
+            debug.error("LDAPFilterCondition.setPolicyConfig():configParams is null");
+            throw new PolicyException(ResBundleUtils.rbName,
+                "ldapfiltercondition_setpolicyconfig_null_policy_config", null, null);
         }
 
-        String configuredLdapServer = 
-            (String)configParams.get(PolicyConfig.LDAP_SERVER);
+        String configuredLdapServer = (String) configParams.get(PolicyConfig.LDAP_SERVER);
         if (configuredLdapServer == null) {
             debug.error("LDAPFilterCondition.initialize(): failed to get LDAP "
               + "server name. If you enter more than one server name "
               + "in the policy config service's Primary LDAP Server "
               + "field, please make sure the ldap server name is preceded " 
               + "with the local server name.");
-            throw (new PolicyException(ResBundleUtils.rbName,
-                "invalid_ldap_server_host", null, null));
+            throw new PolicyException(ResBundleUtils.rbName, "invalid_ldap_server_host", null, null);
         }
         ldapServer = configuredLdapServer.toLowerCase();
 
-        aliasEnabled = Boolean.valueOf((String) configParams.get(
-            PolicyConfig.USER_ALIAS_ENABLED)).booleanValue();
+        aliasEnabled = Boolean.valueOf((String) configParams.get(PolicyConfig.USER_ALIAS_ENABLED));
 
         authid = (String) configParams.get(PolicyConfig.LDAP_BIND_DN);
         authpw = (String) configParams.get(PolicyConfig.LDAP_BIND_PASSWORD);
@@ -552,10 +553,8 @@ public class LDAPFilterCondition implements Condition {
         }
         baseDN = (String) configParams.get(PolicyConfig.LDAP_USERS_BASE_DN);
 
-        userSearchFilter = (String) configParams.get(
-                              PolicyConfig.LDAP_USERS_SEARCH_FILTER);
-        String scope = (String) configParams.get(
-                              PolicyConfig.LDAP_USERS_SEARCH_SCOPE);
+        userSearchFilter = (String) configParams.get(PolicyConfig.LDAP_USERS_SEARCH_FILTER);
+        String scope = (String) configParams.get(PolicyConfig.LDAP_USERS_SEARCH_SCOPE);
         if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
             userSearchScope = LDAPv2.SCOPE_BASE;
         } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
@@ -564,20 +563,14 @@ public class LDAPFilterCondition implements Condition {
             userSearchScope = LDAPv2.SCOPE_SUB;
         }
 
-        userRDNAttrName = (String) configParams.get(
-                              PolicyConfig.LDAP_USER_SEARCH_ATTRIBUTE);
+        userRDNAttrName = (String) configParams.get(PolicyConfig.LDAP_USER_SEARCH_ATTRIBUTE);
         try {
-            timeLimit = Integer.parseInt(
-                 (String) configParams.get(PolicyConfig.LDAP_SEARCH_TIME_OUT));
-            maxResults = Integer.parseInt(
-                 (String) configParams.get(PolicyConfig.LDAP_SEARCH_LIMIT));
-            minPoolSize = Integer.parseInt(
-                 (String) configParams.get(
-                            PolicyConfig.LDAP_CONNECTION_POOL_MIN_SIZE));
-            maxPoolSize = Integer.parseInt((String) configParams.get(
-                            PolicyConfig.LDAP_CONNECTION_POOL_MAX_SIZE));
+            timeLimit = Integer.parseInt((String) configParams.get(PolicyConfig.LDAP_SEARCH_TIME_OUT));
+            maxResults = Integer.parseInt((String) configParams.get(PolicyConfig.LDAP_SEARCH_LIMIT));
+            minPoolSize = Integer.parseInt((String) configParams.get(PolicyConfig.LDAP_CONNECTION_POOL_MIN_SIZE));
+            maxPoolSize = Integer.parseInt((String) configParams.get(PolicyConfig.LDAP_CONNECTION_POOL_MAX_SIZE));
         } catch (NumberFormatException nfe) {
-            throw (new PolicyException(nfe));
+            throw new PolicyException(nfe);
         }
 
         String ssl = (String) configParams.get(PolicyConfig.LDAP_SSL_ENABLED);
@@ -588,13 +581,9 @@ public class LDAPFilterCondition implements Condition {
         }
 
         // get the organization name
-        Set orgNameSet 
-                = (Set) configParams.get(PolicyManager.ORGANIZATION_NAME);
-        if ((orgNameSet != null) && (!orgNameSet.isEmpty())) {
-            Iterator items = orgNameSet.iterator();
-            orgName = (String) items.next();
+        if (realmDn != null) {
+            orgName = realmDn;
         }
-
 
         if (debug.messageEnabled()) {
             debug.message("LDAPFilterCondition.setPolicyConfig(): "
@@ -613,12 +602,10 @@ public class LDAPFilterCondition implements Condition {
         }
 
         // initialize the connection pool for the ldap server 
-        LDAPConnectionPools.initConnectionPool(ldapServer, 
-                authid, authpw, sslEnabled, minPoolSize, maxPoolSize);
+        LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize);
         connPool = LDAPConnectionPools.getConnectionPool(ldapServer);
 
-        policyConfigExpiresAt = System.currentTimeMillis() 
-                + PolicyConfig.getSubjectsResultTtl(configParams);
+        policyConfigExpiresAt = System.currentTimeMillis() + PolicyConfig.getSubjectsResultTtl(configParams);
     }
 
     /**

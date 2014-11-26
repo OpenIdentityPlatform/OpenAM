@@ -58,6 +58,8 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.utils.CollectionUtils;
+
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,6 +68,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.security.auth.Subject;
+
+import static com.sun.identity.policy.PolicyEvaluator.REALM_DN;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.createApplication;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.createApplicationType;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActionSet;
@@ -1287,56 +1291,44 @@ public class EntitlementService extends EntitlementConfiguration {
     public String getRealmName(String realm) {
         return DNMapper.orgNameToRealmName(realm);
     }
-    
+
     /**
-     * For the passed in Entitlement environment, update the Map of Policy Configuration values with 
-     * those for the specified sub-realm.
-     * @param environment The Entitlement environment to update with new Policy Configuration values.
-     * @param subRealm The Sub Realm used to lookup the Policy Configuration values.
-     * @return A Map containing the existing Policy Configuration to enable it to be restored, may be
-     * null if the Policy Configuration for the Sub Realm could not be loaded.
+     * For the passed in Entitlement environment, update the value associated with the key "am.policy.realmDN".
+     *
+     * @param environment The Entitlement environment to update with new realm DN value.
+     * @param subRealm The Sub Realm whose DN value should be stored in the environment map.
+     * @return The existing realm DN value stored in the environment map to enable it to be restored, may be
+     *         null if the Policy Configuration for the Sub Realm could not be loaded.
+     * @see #restoreEnvironmentRealmDn
      */
-    public Map updatePolicyConfigForSubRealm(Map<String, Set<String>>  environment, String subRealm) {
-        
-        // Use a generic Map because the original
-        // contains a mix of Set's and Map's, allows the
-        // switching of the Policy Config properties
-        Map genericEnv = environment;
-        String orgDN = DNMapper.orgNameToDN(realm);
+    public Set<String> updateEnvironmentRealmDn(Map<String, Set<String>> environment, String subRealm) {
+
+        String orgDN = DNMapper.orgNameToDN(subRealm);
         Map orgConfig = null;
-        Map savedPolicyConfig = null;
+        Set<String> savedRealmDn = null;
         try {
             orgConfig = PolicyConfig.getPolicyConfig(orgDN);
         } catch (PolicyException ex) {
-            PrivilegeManager.debug.error("EntitlementService.updatePolicyConfigForSubRealm: "
+            PrivilegeManager.debug.error("EntitlementService.updateEnvironmentRealmDn: "
                     + "can not get policy config for sub-realm : " + subRealm + " org : " + orgDN, ex);
-}
+        }
         if (orgConfig != null) {
             /**
-             * Save the current policy config before passing control down to
-             * sub realm
-            */
-            savedPolicyConfig = (Map)environment.get(PolicyEvaluator.SUN_AM_POLICY_CONFIG);
+             * Save the realm name for the current policy config before passing control down to sub-realm
+             */
+            savedRealmDn = environment.get(PolicyEvaluator.REALM_DN);
             // Update env to point to the realm policy config data.
-            genericEnv.put(PolicyEvaluator.SUN_AM_POLICY_CONFIG, orgConfig);
+            environment.put(PolicyEvaluator.REALM_DN, CollectionUtils.asSet(orgDN));
         }
         
-        return savedPolicyConfig;
+        return savedRealmDn;
     }
     
     /**
-     * For the passed in Entitlement environment, replace the existing Policy Configuration with the Map of values
-     * passed in savedPolicyConfig.
-     * @param environment The Entitlement environment to update with the saved Policy Configuration values.
-     * @param savedPolicyConfig A Map containing Policy Configuration values
+     * {@inheritDoc}
      */
-    public void restoreSavedPolicyConfig(Map<String, Set<String>>  environment, Map savedPolicyConfig) {
-        
-        // Use a generic Map because the original
-        // contains a mix of Set's and Map's, allows the
-        // switching of the Policy Config properties
-        Map genericEnv = environment;
-        genericEnv.put(PolicyEvaluator.SUN_AM_POLICY_CONFIG, savedPolicyConfig);
+    public void restoreEnvironmentRealmDn(Map<String, Set<String>> environment, Set<String> savedRealmDn) {
+        environment.put(REALM_DN, savedRealmDn);
     }
 
     /**

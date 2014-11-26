@@ -33,8 +33,10 @@ import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.policy.PolicyEvaluator;
 import com.sun.identity.policy.util.PolicyDecisionUtils;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.Utils;
 import org.forgerock.openam.utils.ValidateIPaddress;
@@ -497,14 +499,7 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
         String orgName = "/";
         if ((env != null) && (env.get(REQUEST_AUTH_SCHEMES) != null)) {
             try {
-                Map policyConfigMap = (Map) env.get("sun.am.policyConfig");
-                if (policyConfigMap != null) {
-                    Set orgSet = (Set) policyConfigMap.get("OrganizationName");
-                    if (orgSet != null) {
-                        Iterator names = orgSet.iterator();
-                        orgName = (String) names.next();
-                    }
-                }
+                orgName = CollectionHelper.getMapAttr(env, PolicyEvaluator.REALM_DN, orgName);
                 requestAuthSchemes = (Set) env.get(REQUEST_AUTH_SCHEMES);
                 if (debug.messageEnabled()) {
                     debug.message(localDebugName + "requestAuthSchemes from env= " + requestAuthSchemes + " AND " +
@@ -538,7 +533,7 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
         String schemeInstance = null;
         String authSchemeType = null;
         try {
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+            SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             for (Iterator iter = requestAuthSchemes.iterator(); iter.hasNext(); ) {
                 String requestAuthnScheme = (String) iter.next();
                 schemeInstance = AMAuthUtils.getDataFromRealmQualifiedData(requestAuthnScheme);

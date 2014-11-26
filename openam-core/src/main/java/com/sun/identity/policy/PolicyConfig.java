@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import com.sun.identity.sm.*;
 import com.iplanet.sso.*;
@@ -210,7 +212,7 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
     private static ServiceConfigManager scm = null;
     private static ServiceSchemaManager ssm = null;
     private static PolicyConfig pcm = new PolicyConfig();
-    private static Map attrMap = new HashMap();
+    private static ConcurrentMap<String, Map> attrMap = new ConcurrentHashMap<String, Map>();
     private static Map resourceCompMap = new HashMap();
     private static PolicyCache policyCache;
 
@@ -297,32 +299,30 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
         if (policyCache == null) {
             policyCache = PolicyCache.getInstance();
         }
-        if (!attrMap.containsKey(org)) {
-            ServiceConfig orgConfig = null;
-            try {
-                orgConfig = getServiceConfigManager().getOrganizationConfig(org, null);
-            } catch (SMSException se) {
-                PolicyManager.debug.error("getPolicyConfig: " +
-                                "Unable to get ServiceConfig", se);
-                throw (new PolicyException(se));
-            } catch (SSOException se) {
-                PolicyManager.debug.error("getPolicyConfig: " + 
-                                        "Unable to get ServiceConfig", se);
-                throw (new PolicyException(se));
-            }
-            if (orgConfig != null) {
-                Map orgAttrMap = processOrgAttrMap(orgConfig.getAttributes());
 
-                //Add organizationDN to the map
-                orgAttrMap.put(PolicyConfig.ORG_DN, org);
-                synchronized (attrMap) {
-                    attrMap.put(org, orgAttrMap);
+        Map cachedPolicyConfig = attrMap.get(org);
+
+        if (cachedPolicyConfig == null) {
+            Map newPolicyConfig;
+            try {
+                newPolicyConfig = loadPolicyConfig(org);
+            } catch (SMSException se) {
+                PolicyManager.debug.error("getPolicyConfig: Unable to get ServiceConfig", se);
+                throw new PolicyException(se);
+            } catch (SSOException se) {
+                PolicyManager.debug.error("getPolicyConfig: Unable to get ServiceConfig", se);
+                throw new PolicyException(se);
+            }
+            if (newPolicyConfig != null) {
+                cachedPolicyConfig = attrMap.putIfAbsent(org, newPolicyConfig);
+                // Check for race-condition: Another thread may also have seen the value as missing but finished first
+                if (cachedPolicyConfig == null) {
+                    cachedPolicyConfig = newPolicyConfig;
                 }
             }
         }
-        synchronized(attrMap) {
-            return((Map)attrMap.get(org));
-        }
+
+        return cachedPolicyConfig;
     }
 
     /**
@@ -385,93 +385,79 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
             String orgName, String groupName, String serviceComponent,
             int changeType) {
 
-        Map orgAttrMap = null;
-        ServiceConfig orgConfig = null;
+        Map orgAttrMap;
         try {
-            orgConfig = getServiceConfigManager().getOrganizationConfig(orgName, null);
+            orgAttrMap = loadPolicyConfig(orgName);
         } catch (SMSException se) {
-            PolicyManager.debug.error("orgConfigChanged: " +
-                                "Unable to get org config: " + orgName, se);
+            PolicyManager.debug.error("orgConfigChanged: Unable to get org config: " + orgName, se);
             return;
         } catch (SSOException se) {
-            PolicyManager.debug.error("orgConfigChanged: " +
-                                "Unable to get org config: " + orgName, se);
+            PolicyManager.debug.error("orgConfigChanged: Unable to get org config: " + orgName, se);
             return;
         }
 
-        if (orgConfig != null) {
-            orgAttrMap = processOrgAttrMap(orgConfig.getAttributes());
-        }
-        synchronized (attrMap) {
-            attrMap.put(orgName, orgAttrMap);
-        }
+        attrMap.put(orgName, orgAttrMap);
         if (policyCache != null) {
             policyCache.policyConfigChanged(orgName);
         }
+    }
+
+    private static Map loadPolicyConfig(String orgDn) throws SMSException, SSOException {
+        ServiceConfig orgConfig = getServiceConfigManager().getOrganizationConfig(orgDn, null);
+        if (orgConfig != null) {
+            Map newPolicyConfig = processOrgAttrMap(orgConfig.getAttributes());
+            // Add organizationDN to the map
+            newPolicyConfig.put(PolicyConfig.ORG_DN, orgDn);
+            return newPolicyConfig;
+        }
+        return null;
     }
 
     /**
      * This method converts the attributes map got from organization config
      * into a key-value map. The keys are specified as constants in this class.
      * The service management returns value for each key as a set. This method
-     * converts that to a string for easy access since all the organization
-     * policy configuration attribute values are string.
+     * converts many of these sets to a string for easy access.
      */
+    private static Map processOrgAttrMap(Map<String, Set<String>> orgConfigMap) {
 
-    private static Map processOrgAttrMap(Map orgConfigMap) {
-
-        /**
-         * Its known that the attributes are single type and string value
-         * Process the map to get the string value.
-         * use the ServiceSchemaManager and ServiceSchema to get the
-         * attribute type for processing.
-         */
-
-        Set attrKeys = orgConfigMap.keySet();
         Map orgAttrMap = new HashMap();
-        if ((attrKeys != null) && (!attrKeys.isEmpty())) {
-            Iterator keysIterator = attrKeys.iterator();
-            while ( keysIterator.hasNext() ) {
-                String attrName = (String) keysIterator.next();
-                Set values = (Set) orgConfigMap.get(attrName);
-                if (values == null || values.isEmpty()) {
-                    continue;
-                }
-                if (attrName.equals(SELECTED_SUBJECTS) 
-                        || attrName.equals(SELECTED_REFERRALS) ||
-                            attrName.equals(SELECTED_RESPONSE_PROVIDERS) ||
-                            attrName.equals(SELECTED_DYNAMIC_ATTRIBUTES) ||
-                            attrName.equals(SELECTED_CONDITIONS)) {
-                    orgAttrMap.put(attrName, values);
-                    continue;
-                }
-                if (attrName.equals(LDAP_SERVER)) {
-                    orgAttrMap.put(attrName, CollectionHelper.getServerMapAttr(
-                        orgConfigMap, LDAP_SERVER));
-                    continue;
-                } 
-                Iterator valIterator = values.iterator();
-                while (valIterator.hasNext()) {
-                    String attrValue = (String) valIterator.next();
-                    if (attrName != null && attrValue != null) {
+        for (Map.Entry<String, Set<String>> entry : orgConfigMap.entrySet()) {
+            String attrName = entry.getKey();
+            Set<String> values = entry.getValue();
+            if (values == null || values.isEmpty()) {
+                continue;
+            }
+            if (attrName.equals(SELECTED_SUBJECTS) ||
+                    attrName.equals(SELECTED_REFERRALS) ||
+                    attrName.equals(SELECTED_RESPONSE_PROVIDERS) ||
+                    attrName.equals(SELECTED_DYNAMIC_ATTRIBUTES) ||
+                    attrName.equals(SELECTED_CONDITIONS)) {
+                // TODO: Tighten up generics after these Set<String> values are no longer stored in orgAttrMap
+                orgAttrMap.put(attrName, values);
+                continue;
+            }
+            if (attrName.equals(LDAP_SERVER)) {
+                orgAttrMap.put(attrName, CollectionHelper.getServerMapAttr(orgConfigMap, LDAP_SERVER));
+                continue;
+            }
+            for (String attrValue : values) {
+                if (attrValue != null) {
+                    orgAttrMap.put(attrName, attrValue);
+                   /**
+                    * don't want to expose ldap bind passwd in clear text
+                    * */
+                    if (attrName.equals(LDAP_BIND_PASSWORD)) {
+                        attrValue = PolicyUtils.encrypt(attrValue);
                         orgAttrMap.put(attrName, attrValue);
-                       /**
-                        * don't want to expose ldap bind passwd 
-                        * in clear text
-                          */
-                        if (attrName.equals(LDAP_BIND_PASSWORD)) {
-                            attrValue = PolicyUtils.encrypt(attrValue);
-                            orgAttrMap.put(attrName, attrValue);
-                        }
-                        if (PolicyManager.debug.messageEnabled()) {
-                            PolicyManager.debug.message("Attr Name = " 
-                                   + attrName + ";  Attr Value = " + attrValue);
-                        }
+                    }
+                    if (PolicyManager.debug.messageEnabled()) {
+                        PolicyManager.debug.message("Attr Name = " + attrName + ";  Attr Value = " + attrValue);
                     }
                 }
             }
         }
-        return(orgAttrMap);
+        return orgAttrMap;
     }
 
     /** This function process RESOURCE_COMPARATOR attribute. It processes each 

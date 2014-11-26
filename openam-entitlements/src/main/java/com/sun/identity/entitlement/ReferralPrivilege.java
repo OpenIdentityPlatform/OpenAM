@@ -485,7 +485,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
                             // create subject for sub realm by copying subject for
                             // this realm and clear the public credentials.
                             // this needs to be revisited later if public
-                            // credentials contains realm-independent credentals
+                            // credentials contains realm-independent credentials
                             Subject subjectSubRealm = new Subject(false,
                                 subject.getPrincipals(), new HashSet(),
                                 subject.getPrivateCredentials());
@@ -493,15 +493,15 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
                             // Fix for OPENAM-790
                             // Ensure that the Entitlement environment contains the correct 
                             // Policy Configuration for the realm being evaluated.
-                            Map savedConfig = ec.updatePolicyConfigForSubRealm(environment, rlm);
+                            Set<String> savedRealmDn = ec.updateEnvironmentRealmDn(environment, rlm);
                             
                             List<Entitlement> entitlements = evaluator.evaluate(
                                 rlm,
                                 adminSubject, subjectSubRealm, applicationName,
                                 normalisedResourceName, requestedResourceName, environment, recursive);
                             
-                            if (savedConfig != null) {
-                                ec.restoreSavedPolicyConfig(environment, savedConfig);
+                            if (savedRealmDn != null) {
+                                ec.restoreEnvironmentRealmDn(environment, savedRealmDn);
                             }
                             
                             if (entitlements != null) {

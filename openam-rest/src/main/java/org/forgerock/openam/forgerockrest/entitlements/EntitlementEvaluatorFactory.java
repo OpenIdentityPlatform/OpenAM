@@ -19,12 +19,19 @@ package org.forgerock.openam.forgerockrest.entitlements;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
+import com.sun.identity.sm.DNMapper;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.BatchPolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.TreePolicyRequest;
 
 import javax.security.auth.Subject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static com.sun.identity.policy.PolicyEvaluator.REALM_DN;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 /**
  * Factory delivers up evaluators that call into the entitlements evaluator.
@@ -57,19 +64,26 @@ public class EntitlementEvaluatorFactory implements PolicyEvaluatorFactory {
         @Override
         public List<Entitlement> evaluateBatch(final BatchPolicyRequest request) throws EntitlementException {
             return evaluator.evaluate(request.getRealm(), request.getPolicySubject(),
-                    request.getResources(), request.getEnvironment());
+                    request.getResources(), environmentWithRealmDn(request));
         }
 
         @Override
         public List<Entitlement> evaluateTree(final TreePolicyRequest request) throws EntitlementException {
             return evaluator.evaluate(request.getRealm(), request.getPolicySubject(),
-                    request.getResource(), request.getEnvironment(), TREE_EVALUATION);
+                    request.getResource(), environmentWithRealmDn(request), TREE_EVALUATION);
         }
 
         @Override
         public List<Entitlement> routePolicyRequest(final PolicyRequest request) throws EntitlementException {
             // Delegate to the request to dispatch itself appropriately.
             return request.dispatch(this);
+        }
+
+        private Map<String, Set<String>> environmentWithRealmDn(PolicyRequest request) {
+            Map<String, Set<String>> extendedEnvironment = new HashMap<String, Set<String>>();
+            extendedEnvironment.putAll(request.getEnvironment());
+            extendedEnvironment.put(REALM_DN, asSet(DNMapper.orgNameToDN(request.getRealm())));
+            return extendedEnvironment;
         }
 
     }
