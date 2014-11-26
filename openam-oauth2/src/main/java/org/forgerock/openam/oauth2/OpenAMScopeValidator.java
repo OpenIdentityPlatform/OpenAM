@@ -46,6 +46,9 @@ import org.forgerock.openidconnect.OpenIDTokenIssuer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.security.AccessController;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -71,6 +74,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
     private static final String MULTI_ATTRIBUTE_SEPARATOR = ",";
     private static Map<String, Object> scopeToUserUserProfileAttributes;
     private static final String DEFAULT_TIMESTAMP = "0";
+    private static final DateFormat TIMESTAMP_DATE_FORMAT = new SimpleDateFormat("yyyyMMddhhmmss");
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     static {
@@ -339,12 +343,12 @@ public class OpenAMScopeValidator implements ScopeValidator {
             final String modifyTimestamp = CollectionHelper.getMapAttr(timestamps, modifyTimestampAttributeName);
 
             if (modifyTimestamp != null) {
-                return modifyTimestamp;
+                return Long.toString(TIMESTAMP_DATE_FORMAT.parse(modifyTimestamp).getTime() / 1000);
             } else {
                 final String createTimestamp = CollectionHelper.getMapAttr(timestamps, createdTimestampAttributeName);
 
                 if (createTimestamp != null) {
-                    return createTimestamp;
+                    return Long.toString(TIMESTAMP_DATE_FORMAT.parse(createTimestamp).getTime() / 1000);
                 } else {
                     return DEFAULT_TIMESTAMP;
                 }
@@ -361,6 +365,8 @@ public class OpenAMScopeValidator implements ScopeValidator {
         } catch (SSOException e) {
             logger.warning("Error getting updatedAt attribute",
                     e);
+        } catch (ParseException e) {
+            logger.warning("Error getting updatedAt attribute", e);
         }
 
         return null;
