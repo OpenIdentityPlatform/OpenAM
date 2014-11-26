@@ -50,17 +50,17 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
     private static final String COOKIE = "Cookie";
 
     private final String tokenGenerationServiceEndpoint;
-    private final String crestVersion;
+    private final String crestVersionTokenGenService;
     private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
 
     @Inject
     TokenGenerationServiceConsumerImpl(UrlConstituentCatenator urlConstituentCatenator,
                                        @Named(AMSTSConstants.AM_DEPLOYMENT_URL) String amDeploymentUrl,
                                        @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT) String tokenGenServiceUriElement,
-                                       @Named(AMSTSConstants.CREST_VERSION) String crestVersion,
+                                       @Named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE) String crestVersionTokenGenService,
                                        HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory) {
         tokenGenerationServiceEndpoint = urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, tokenGenServiceUriElement);
-        this.crestVersion = crestVersion;
+        this.crestVersionTokenGenService = crestVersionTokenGenService;
         this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
     }
 
@@ -130,7 +130,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
         try {
             Map<String, String> headerMap = new HashMap<String, String>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionTokenGenService);
             headerMap.put(COOKIE, createAMSessionCookie(callerSSOTokenString));
 
             HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory

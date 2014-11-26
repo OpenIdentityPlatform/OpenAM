@@ -40,13 +40,13 @@ public class UsernameTokenAuthenticationRequestDispatcher implements TokenAuthen
     private static final String USERNAME = "X-OpenAM-Username";
     private static final String PASSWORD = "X-OpenAM-Password";
 
-    private final String crestVersion;
+    private final String crestVersionAuthNService;
     private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
 
     @Inject
-    UsernameTokenAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION) String crestVersion,
+    UsernameTokenAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE) String crestVersionAuthNService,
                                                  HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory) {
-        this.crestVersion = crestVersion;
+        this.crestVersionAuthNService = crestVersionAuthNService;
         this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
     }
 
@@ -55,7 +55,7 @@ public class UsernameTokenAuthenticationRequestDispatcher implements TokenAuthen
         try {
             Map<String, String> headerMap = new HashMap<String, String>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionAuthNService);
             headerMap.put(USERNAME, token.getName());
             headerMap.put(PASSWORD, token.getPassword());
             HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory

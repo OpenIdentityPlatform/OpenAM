@@ -142,11 +142,18 @@ public class TokenOperationFactoryImplTest {
         }
 
         @Provides
-        @Named(AMSTSConstants.CREST_VERSION)
-        String getCrestVersion() {
+        @Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE)
+        String getCrestAuthNVersion() {
+            return "protocol=1.0, resource=1.0";
+        }
+
+        @Provides
+        @Named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)
+        String getCrestUsersServiceVersion() {
             return "protocol=1.0, resource=1.0";
         }
     }
+
     @BeforeTest
     public void getTokenOperationFactory() {
         operationFactory = Guice.createInjector(new MyModule()).getInstance(TokenOperationFactory.class);

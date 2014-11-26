@@ -41,15 +41,15 @@ import javax.inject.Named;
  * reference, and return the json callback state.
  */
 public class CertificateAuthenticationRequestDispatcher implements TokenAuthenticationRequestDispatcher<X509Certificate[]> {
-    private final String crestVersion;
+    private final String crestVersionAuthNService;
     private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
     private final Logger logger;
 
     @Inject
-    public CertificateAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION) String crestVersion,
+    public CertificateAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE) String crestVersionAuthNService,
                                                       HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
                                                       Logger logger) {
-        this.crestVersion = crestVersion;
+        this.crestVersionAuthNService = crestVersionAuthNService;
         this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
         this.logger = logger;
     }
@@ -98,7 +98,7 @@ public class CertificateAuthenticationRequestDispatcher implements TokenAuthenti
         try {
             Map<String, String> headerMap = new HashMap<String, String>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionAuthNService);
             headerMap.put((String)headerKey, base64Certificate);
             HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory
                     .httpURLConnectionWrapper(url)

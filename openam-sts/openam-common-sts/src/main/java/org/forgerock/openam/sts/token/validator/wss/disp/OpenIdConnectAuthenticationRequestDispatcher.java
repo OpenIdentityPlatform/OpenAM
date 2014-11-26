@@ -37,13 +37,13 @@ import java.util.Map;
  * it references the ID Token value with the same header value.
  */
 public class OpenIdConnectAuthenticationRequestDispatcher implements TokenAuthenticationRequestDispatcher<OpenIdConnectIdToken> {
-    private final String crestVersion;
+    private final String crestVersionAuthNService;
     private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
 
     @Inject
-    OpenIdConnectAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION) String crestVersion,
+    OpenIdConnectAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE) String crestVersionAuthNService,
                                                  HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory) {
-        this.crestVersion = crestVersion;
+        this.crestVersionAuthNService = crestVersionAuthNService;
         this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
     }
 
@@ -65,7 +65,7 @@ public class OpenIdConnectAuthenticationRequestDispatcher implements TokenAuthen
         try {
             Map<String, String> headerMap = new HashMap<String, String>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionAuthNService);
             headerMap.put((String)headerKey, token.getTokenValue());
             HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory
                     .httpURLConnectionWrapper(url)

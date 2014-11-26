@@ -162,4 +162,32 @@ public class RestSTSModule extends AbstractModule {
     String getJsonRoot() {
         return "/json";
     }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE)
+    String getSessionServiceVersion() {
+        return "protocol=1.0, resource=1.1";
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE)
+    String getAuthNServiceVersion() {
+        return "protocol=1.0, resource=2.0";
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)
+    String getTokenGenServiceVersion() {
+        return "protocol=1.0, resource=1.0";
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)
+    String getUsersServiceVersion() {
+        return "protocol=1.0, resource=2.0";
+    }
 }

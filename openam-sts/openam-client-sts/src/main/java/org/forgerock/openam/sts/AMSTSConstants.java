@@ -354,10 +354,25 @@ public class AMSTSConstants {
     /**
      * The name of the CREST header identifying the version of a targeted service.
      */
-    public static final String CREST_VERSION_HEADER_KEY = "Accept-API-Version";
+    public static final String CREST_VERSION_HEADER_KEY = SharedSTSConstants.CREST_VERSION_HEADER_KEY;
 
     /**
      * Used in context of a @Named annotation to identify the String identifying the version of targeted CREST services.
      */
-    public static final String CREST_VERSION = "crest_version";
+    public static final String CREST_VERSION_SESSION_SERVICE = "crest_version_session_service";
+
+    /**
+     * Used in context of a @Named annotation to identify the String identifying the version of targeted CREST services.
+     */
+    public static final String CREST_VERSION_AUTHN_SERVICE = "crest_version_authn_service";
+
+    /**
+     * Used in context of a @Named annotation to identify the String identifying the version of targeted CREST services.
+     */
+    public static final String CREST_VERSION_TOKEN_GEN_SERVICE = "crest_version_token_gen_service";
+
+    /**
+     * Used in context of a @Named annotation to identify the String identifying the version of targeted CREST services.
+     */
+    public static final String CREST_VERSION_USERS_SERVICE = "crest_version_users_service";
 }

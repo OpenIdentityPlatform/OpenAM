@@ -49,7 +49,7 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
     private final String realm;
     private final String amRestIdFromSessionUriElement;
     private final String amSessionCookieName;
-    private final String crestVersion;
+    private final String crestVersionUsersService;
     private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
     private final Logger logger;
 
@@ -60,7 +60,7 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
             @Named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT) String idFromSessionUriElement,
             @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String amSessionCookieName,
             @Named(AMSTSConstants.REALM) String realm,
-            @Named(AMSTSConstants.CREST_VERSION) String crestVersion,
+            @Named(AMSTSConstants.CREST_VERSION_USERS_SERVICE) String crestVersionUsersService,
             UrlConstituentCatenator urlConstituentCatenator,
             HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
             Logger logger) {
@@ -69,7 +69,7 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
         this.amRestIdFromSessionUriElement = idFromSessionUriElement;
         this.amSessionCookieName = amSessionCookieName;
         this.realm = realm;
-        this.crestVersion = crestVersion;
+        this.crestVersionUsersService = crestVersionUsersService;
         this.urlConstituentCatenator = urlConstituentCatenator;
         this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
         this.logger = logger;
@@ -102,7 +102,7 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
             Map<String, String> headerMap = new HashMap<String, String>();
             headerMap.put(AMSTSConstants.COOKIE, amSessionCookieName + AMSTSConstants.EQUALS + sessionId);
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionUsersService);
             HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory
                     .httpURLConnectionWrapper(new URL(sessionToUsernameUrl))
                     .setRequestHeaders(headerMap)

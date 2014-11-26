@@ -149,8 +149,26 @@ public class TokenTransformFactoryImplTest {
         }
 
         @Provides
-        @Named(AMSTSConstants.CREST_VERSION)
-        String getCrestVersion() {
+        @Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE)
+        String getCrestVersionAuthNService() {
+            return "protocol=1.0, resource=1.0";
+        }
+
+        @Provides
+        @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE)
+        String getCrestVersionSessionService() {
+            return "protocol=1.0, resource=1.0";
+        }
+
+        @Provides
+        @Named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)
+        String getCrestVersionUsersService() {
+            return "protocol=1.0, resource=1.0";
+        }
+
+        @Provides
+        @Named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)
+        String getCrestVersionTokenGenService() {
             return "protocol=1.0, resource=1.0";
         }
     }

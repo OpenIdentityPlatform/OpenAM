@@ -73,7 +73,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
     private final AuthnContextMapper authnContextMapper;
     private final HttpURLConnectionWrapperFactory connectionWrapperFactory;
-    private final String crestVersion;
+    private final String crestVersionSessionService;
     private final Logger logger;
 
     @Inject
@@ -95,7 +95,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             TokenGenerationServiceConsumer tokenGenerationServiceConsumer,
             AuthnContextMapper authnContextMapper,
             HttpURLConnectionWrapperFactory connectionWrapperFactory,
-            @Named(AMSTSConstants.CREST_VERSION) String crestVersion,
+            @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE) String crestVersionSessionService,
             Logger logger) {
 
         this.amDeploymentUrl = amDeploymentUrl;
@@ -115,7 +115,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         this.tokenGenerationServiceConsumer = tokenGenerationServiceConsumer;
         this.authnContextMapper = authnContextMapper;
         this.connectionWrapperFactory = connectionWrapperFactory;
-        this.crestVersion = crestVersion;
+        this.crestVersionSessionService = crestVersionSessionService;
         this.logger = logger;
     }
 
@@ -175,7 +175,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             try {
                 final AMSessionInvalidator sessionInvalidator =
                         new AMSessionInvalidatorImpl(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement,
-                                amSessionCookieName, urlConstituentCatenator, crestVersion, connectionWrapperFactory, logger);
+                                amSessionCookieName, urlConstituentCatenator, crestVersionSessionService, connectionWrapperFactory, logger);
                 return new AMSAMLTokenProvider(tokenGenerationServiceConsumer, sessionInvalidator,
                         threadLocalAMTokenCache, stsInstanceId, realm, xmlUtilities, authnContextMapper, logger);
             } catch (MalformedURLException e) {

@@ -194,4 +194,9 @@ public class SharedSTSConstants {
 
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String APPLICATION_JSON = "application/json";
+
+    /**
+     * The name of the CREST header identifying the version of a targeted service.
+     */
+    public static final String CREST_VERSION_HEADER_KEY = "Accept-API-Version";
 }
