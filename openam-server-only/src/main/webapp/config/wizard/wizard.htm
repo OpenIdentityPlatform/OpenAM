@@ -359,7 +359,7 @@
         </script>
         <link href="$context/assets/css/Specific/wizard.css" rel="stylesheet" type="text/css" />
 
-        <div id="wizard" style="width:810px;background-color: #FFFFFF">    
+        <div id="wizard" style="width:810px;background-color: #FFFFFF" class="wizard">
             <div style="background-color: #FFFFFF;padding:0">
                 <div class="header">$page.getLocalizedString("configurator.main.title")</div>
                 <div id="title" class="summary">$page.getLocalizedString("configurator.custom.title")</div>
@@ -374,18 +374,18 @@
 
                 <div class="summary">
                     <div class="col1">
-                        <ol id="tabList" start="1" type="1">
-                            <li id="tab1">$page.getLocalizedString("general.tab")</li>                                
+                        <ol id="tabList" class="tabList" start="1" type="1">
+                            <li id="tab1">$page.getLocalizedString("general.tab")</li>
                             <li id="tab2">$page.getLocalizedString("server.tab")</li>
                             <li id="tab3">$page.getLocalizedString("configuration.tab")</li>
                             <li id="tab4">$page.getLocalizedString("user.tab")</li>
                             <li id="tab5">$page.getLocalizedString("site.tab")</li>
                             <li id="tab6">$page.getLocalizedString("agent.tab")</li>
-                            <li id="tab7">$page.getLocalizedString("summary.tab")</li>                            
+                            <li id="tab7">$page.getLocalizedString("summary.tab")</li>
                         </ol>
                         &nbsp;
                     </div>
-                    <div id="tabContents">
+                    <div id="tabContents" class="tabContents">
                         <div id="wizardStep1" class="tabContent" style="display:none"></div>
                         <div id="wizardStep2" class="tabContent" style="display:none"></div>
                         <div id="wizardStep3" class="tabContent" style="display:none"></div>

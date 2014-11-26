@@ -121,7 +121,7 @@
     }
 
     function renderDefaultSummary() {
-        YAHOO.sun.identity.config.options.defaultSummary = new YAHOO.widget.Panel("defaultSummary", { width:"450px", fixedcenter: false, modal: true, close: true, visible:false, constraintoviewport:true });
+        YAHOO.sun.identity.config.options.defaultSummary = new YAHOO.widget.Panel("defaultSummary", { width:"810px", fixedcenter: false, modal: true, close: true, visible:false, constraintoviewport:true });
         YAHOO.sun.identity.config.options.defaultSummary.beforeHideEvent.subscribe(function() {
             YAHOO.util.Dom.removeClass('defaultSummary', 'license-accepted'); 
             document.getElementById("accept-check").checked = false;

@@ -59,14 +59,9 @@ span.currentVersion{
 }
 
 .inner-license{
-    height: 355px;
     overflow: hidden;
     overflow-y: scroll;
     margin:0;
-    padding:10px;
-}
-
-#wizard .inner-license{
     height: 546px;
     padding: 10px 80px;
     font-size: 12px;

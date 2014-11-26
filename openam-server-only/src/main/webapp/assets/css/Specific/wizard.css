@@ -1,25 +1,25 @@
 /* CSS Document */
-#wizard h1{
+.wizard h1{
 	font-size:14px;
 	font-weight:bold;
 	color:#000000;
 }
-#wizard{
+.wizard{
 	font-size:11px;
 	font-family:Arial, Helvetica, sans-serif;
 }
-#tabList {
+.tabList {
 	margin-left: 5px;
 	margin-bottom: 1em;
 	padding-bottom: 1em;
 }
 
-#tablist ol {
+.tablist ol {
 	margin: 0;
 	padding-left:1.2em;
 }
 
-#tabList li {
+.tabList li {
 	/*display: inline;*/
 	/*float: left;*/        
 	padding: 0.5em;		
@@ -48,7 +48,7 @@
 	vertical-align: middle;
 }
 
-#tabContents {
+.tabContents {
 	padding: 0em 1em 0em 0em;				
 }
 
@@ -167,3 +167,15 @@
 	width: 25px;    
 }
 
+#userStoreCustomTypes td {
+    padding-top: 0;
+    padding-bottom: 5px;
+}
+
+#userStoreCustomTypes tr:last-child td {
+    padding-bottom: 0;
+}
+
+#wizardStep4 td {
+    padding-right: 5px;
+}

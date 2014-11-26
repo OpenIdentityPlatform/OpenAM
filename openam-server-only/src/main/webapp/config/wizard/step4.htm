@@ -246,7 +246,7 @@
     <!-- when external config is selected -->
     function enableExternalConfig() {
         userStoreChoice = "external";
-        document.getElementById("ldapv3odsee").checked=true;
+        document.getElementById("ldapv3opends").checked=true;
         document.getElementById("externalConfigSettings").style.display = "";
         document.getElementById("userStoreSettings").style.display = "";
         document.getElementById("activeDirectoryConfigSettings").style.display = "none";
@@ -271,15 +271,19 @@
     <h1>$page.getLocalizedString("step4.title")<img class="pointer" src="$context/assets/images/message.gif"/></h1>
     <p>$page.getLocalizedString("step4.description")</p>
 
-    <input type="radio" id="userStoreDefault" name="userStoreCustom"
-        style="margin-left:1em" value="false" $selectEmbeddedUM 
-        $radioDataTypeDisabled onclick="enableEmbeddedConfig();"/>
-    <span>$page.getLocalizedString("configurator.embedded")</span><br/>
+    <label for="userStoreDefault" style="float:none">
+        <input type="radio" id="userStoreDefault" name="userStoreCustom"
+            style="margin-left:1em" value="false" $selectEmbeddedUM
+            $radioDataTypeDisabled onclick="enableEmbeddedConfig();"/>
+        <span>$page.getLocalizedString("configurator.embedded")</span><br/>
+    </label>
 
-    <input type="radio" id="userStoreCustom" name="userStoreCustom"
-        style="margin-left:1em" value="true" $selectExternalUM
-        $radioDataTypeDisabled onclick="enableExternalConfig();"/>
-    <span>$page.getLocalizedString("configurator.remote")</span>
+    <label for="userStoreCustom" style="float:none">
+        <input type="radio" id="userStoreCustom" name="userStoreCustom"
+            style="margin-left:1em" value="true" $selectExternalUM
+            $radioDataTypeDisabled onclick="enableExternalConfig();"/>
+        <span>$page.getLocalizedString("configurator.remote")</span>
+    </label>
     
     <div id="userStoreModule" style="width:610px;">
         <p id="allfields"><em>*</em>&nbsp;$page.getLocalizedString("required.field.label")</p>
@@ -300,14 +304,22 @@
             <span id="externalConfigSettings" style="display:none">
                 <table class="temp" style="margin-bottom: 0">
                     <tr>
-                        <td valign="top"><label for="userStoreType"><em>*&nbsp;</em>$page.getLocalizedString("store.type.label")</label></td>
+                        <td valign="top"><em>*&nbsp;</em>$page.getLocalizedString("store.type.label")</td>
                         <td>
-                            <input type="radio" id="ldapv3odsee" name="userStoreType" style="margin-left:1em" value="LDAPv3ForODSEE" $selectLDAPv3odsee onclick="setODSEE();"/>&nbsp;$page.getLocalizedString("odsee.ldap.schema")
-                            <input type="radio" id="ldapv3opends" name="userStoreType" style="margin-left:2em" value="LDAPv3ForOpenDS" $selectLDAPv3opends onclick="setOpenDS();"/>&nbsp;$page.getLocalizedString("opends.ldap.schema")<br>
-                            <input type="radio" id="ldapv3ad" name="userStoreType" style="margin-left:1em" value="LDAPv3ForAD" $selectLDAPv3ad onclick="setAD();"/>&nbsp;$page.getLocalizedString("activedirectory.ldap.schema")
-                            <input type="radio" id="ldapv3adforDomainName" name="userStoreType" style="margin-left:1em" value="LDAPv3ForADDC" $selectLDAPv3addc onclick="setADforDomainName();"/>&nbsp;$page.getLocalizedString("activedirectoryfordomainname.ldap.schema")<br>
-                            <input type="radio" id="ldapv3adam" name="userStoreType" style="margin-left:1em" value="LDAPv3ForADAM" $selectLDAPv3adam onclick="setADAM();"/>&nbsp;$page.getLocalizedString("adam.ldap.schema")
-                            <input type="radio" id="ldapv3tivoli" name="userStoreType" style="margin-left:1em" value="LDAPv3ForTivoli" $selectLDAPv3tivoli onclick="setTivoli();"/>&nbsp;$page.getLocalizedString("tivoli.ldap.schema")
+                            <table id="userStoreCustomTypes">
+                                <tr>
+                                    <td><label for="ldapv3opends" style="float:none"><input type="radio" id="ldapv3opends" name="userStoreType" value="LDAPv3ForOpenDS" $selectLDAPv3opends onclick="setOpenDS();"/>&nbsp;$page.getLocalizedString("opends.ldap.schema")</label></td>
+                                    <td><label for="ldapv3odsee" style="float:none"><input type="radio" id="ldapv3odsee" name="userStoreType" value="LDAPv3ForODSEE" $selectLDAPv3odsee onclick="setODSEE();"/>&nbsp;$page.getLocalizedString("odsee.ldap.schema")</label></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="ldapv3adforDomainName" style="float:none"><input type="radio" id="ldapv3adforDomainName" name="userStoreType" value="LDAPv3ForADDC" $selectLDAPv3addc onclick="setADforDomainName();"/>&nbsp;$page.getLocalizedString("activedirectoryfordomainname.ldap.schema")</label></td>
+                                    <td><label for="ldapv3ad" style="float:none"><input type="radio" id="ldapv3ad" name="userStoreType" value="LDAPv3ForAD" $selectLDAPv3ad onclick="setAD();"/>&nbsp;$page.getLocalizedString("activedirectory.ldap.schema")</label><br></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="ldapv3tivoli" style="float:none"><input type="radio" id="ldapv3tivoli" name="userStoreType" value="LDAPv3ForTivoli" $selectLDAPv3tivoli onclick="setTivoli();"/>&nbsp;$page.getLocalizedString("tivoli.ldap.schema")</label></td>
+                                    <td><label for="ldapv3adam" style="float:none"><input type="radio" id="ldapv3adam" name="userStoreType" value="LDAPv3ForADAM" $selectLDAPv3adam onclick="setADAM();"/>&nbsp;$page.getLocalizedString("adam.ldap.schema")</label></td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>            
                 </table>
