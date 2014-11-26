@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
  */
 
 package com.iplanet.dpro.session.service;
@@ -482,6 +483,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
         boolean result = false;
         Socket sock = null;
+        InputStream is = null;
 
         try {
             /*
@@ -495,7 +497,6 @@ public class ClusterStateService extends GeneralTaskRunnable {
             } else {
                 HttpURLConnection connection = null;
                 int responseCode = 0;
-                InputStream is = null;
 
                 try {
                     connection = (HttpURLConnection) info.url.openConnection();
@@ -511,7 +512,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
                             }
                         });
                     }
-
+                    is = connection.getInputStream();
                     responseCode = connection.getResponseCode();
                     readStream(is);
                 } catch (IOException ioe) {
@@ -531,6 +532,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
                     //ignored
                 }
             }
+            IOUtils.closeIfNotNull(is);
         }
         return result;
     }
