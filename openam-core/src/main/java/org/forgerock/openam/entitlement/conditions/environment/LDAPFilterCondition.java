@@ -19,6 +19,16 @@
 
 package org.forgerock.openam.entitlement.conditions.environment;
 
+import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUTATION_FAILED;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.LDAP_FILTER;
+
+import javax.security.auth.Subject;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
@@ -30,16 +40,6 @@ import com.sun.identity.shared.debug.Debug;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import javax.security.auth.Subject;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUTATION_FAILED;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.LDAP_FILTER;
 
 public class LDAPFilterCondition extends EntitlementConditionAdaptor {
 
@@ -61,8 +61,7 @@ public class LDAPFilterCondition extends EntitlementConditionAdaptor {
         try {
             JSONObject jo = new JSONObject(state);
             setState(jo);
-            Map properties = new ObjectMapper().readValue(jo.toString(), Map.class);
-            condition.setProperties(properties);
+            setLdapFilter(jo.optString(LDAP_FILTER, null));
         } catch (Exception e) {
             debug.message("LDAPFilterCondition: Failed to set state", e);
         }
