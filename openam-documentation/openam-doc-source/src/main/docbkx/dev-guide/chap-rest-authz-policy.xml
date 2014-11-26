@@ -60,6 +60,12 @@
 
   <listitem>
    <para>
+    <xref linkend="rest-api-manage-xacml" />
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
     <xref linkend="rest-api-authz-applications" />
    </para>
   </listitem>
@@ -90,10 +96,59 @@
 
   <listitem>
    <para>
-    <xref linkend="rest-api-authz-legacy" />
+    <xref linkend="rest-api-authz-referrals" />
    </para>
   </listitem>
+
  </itemizedlist>
+
+ <para>The chapter also describes how to manage policies using the
+  backwards-compatible, legacy APIs:
+ </para>
+
+ <itemizedlist>
+   <listitem>
+    <para>
+     <xref linkend="rest-api-authz-legacy" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="rest-api-policy-management" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="rest-api-policy-management-create" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="rest-api-policy-management-read" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="rest-api-policy-management-update" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="rest-api-policy-management-delete" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="rest-api-policy-management-query" />
+    </para>
+   </listitem>
+  </itemizedlist>
 
  <section xml:id="rest-api-authz">
   <title>About the REST Policy Endpoints</title>
@@ -4215,6 +4270,563 @@ $ <userinput>curl \
   </programlisting>
  </section>
 
+ <section xml:id="rest-api-authz-referrals">
+  <title>Managing Referrals</title>
+
+  <para>
+   Referrals are represented in JSON. They
+   use standard JSON objects and values
+   (strings, numbers, objects, arrays, <literal>true</literal>,
+   <literal>false</literal>, and <literal>null</literal>) as follows:
+  </para>
+
+  <programlisting language="javascript">
+   {
+     "name": "MyReferral",
+     "description": "Look for policies in two additional subrealms to protect HR pages",
+     "resources": {
+       "iPlanetAMWebAgentService" : [ "http://example.com/hr/*"]
+     },
+     "realms" : ["/MySubrealm", "/MySubrealm/ChildSubrealm"]
+   }
+  </programlisting>
+
+  <variablelist>
+   <para>
+    The values for the fields shown in the example are explained below:
+   </para>
+
+   <varlistentry>
+    <term><literal>"name"</literal></term>
+    <listitem>
+     <para>
+      String matching the name
+      in the URL used when creating the referral by HTTP PUT
+      or in the body when creating the referral by HTTP POST.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>"description"</literal></term>
+    <listitem>
+     <para>
+      String describing the referral.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>"resources"</literal></term>
+    <listitem>
+     <para>
+      The application and resource pattern string
+      to which the referral applies. Each referral applies to a single
+      application, so only a single application and
+      resource pattern should be specified.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>"realms"</literal></term>
+    <listitem>
+     <para>
+      One or more realms to search for policies that might protect
+      the resource.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <section xml:id="rest-api-authz-referrals-create">
+   <title>Creating Referrals</title>
+
+   <para>
+    To create a referral,
+    either perform an HTTP PUT indicating the full path to the resource
+    and the name in the resource matching the name in the path,
+    or perform an HTTP POST with the name to use specified in the resource.
+   </para>
+
+   <para>
+    The HTTP PUT form includes the referral definition as the JSON resource data,
+    with the header <literal>Content-Type: application/json</literal>
+    and uses the <literal>If-None-Match: *</literal> header.
+   </para>
+
+   <para>
+    The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+    for a user who has access to perform the operation.
+   </para>
+
+   <para>
+    The following example creates a referral named <literal>MyReferral</literal>
+    in the top-level realm. The referral causes OpenAM policy evaluation to
+    search for policies defined in the <literal>/MySubrealm</literal> and
+    <literal>/MySubrealm/ChildSubrealms</literal> realms
+    that have application type <literal>iPlanetAMWebAgentService</literal> and
+    protect pages under <literal>http://example.com/hr/</literal>.
+   </para>
+
+
+   <programlisting>
+    $ <userinput>curl \
+    --request PUT \
+    --header "iPlanetDirectoryPro: AQIC5w..." \
+    --header "If-None-Match: *" \
+    --header "Content-Type: application/json" \
+    --data '{
+      "name": "MyReferral",
+      "description": "Look for policies in two additional subrealms to protect HR pages",
+      "resources": {
+        "iPlanetAMWebAgentService" : [ "http://example.com/hr/*"]
+      },
+      "realms" : ["/MySubrealm", "/MySubrealm/ChildSubrealm"]
+    }' \
+    https://openam.example.com:8443/openam/json/referrals/MyReferral
+   </userinput>
+    <computeroutput>{
+     "creationDate" : 1416956012949,
+     "lastModifiedDate" : 1416956012949,
+     "realms" : [ "/MySubrealm", "/MySubrealm/ChildSubrealm" ],
+     "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+     "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+     "resources" : {
+       "iPlanetAMWebAgentService" : [ "http://example.com/hr/*" ]
+     },
+     "name" : "MyReferral"
+    }</computeroutput>
+   </programlisting>
+
+   <para>
+    You can use the query string parameters
+    <literal>_prettyPrint=true</literal> to make the output easier to read,
+    and <literal>_fields=<replaceable>field-name</replaceable>
+    [,<replaceable>field-name</replaceable>...]</literal>
+    to limit the fields returned in the output.
+   </para>
+
+   <para>
+    The HTTP POST form includes the referral definition as the JSON resource data,
+    with the header <literal>Content-Type: application/json</literal>
+    and uses the <literal>_action=create</literal> operation.
+   </para>
+
+   <para>
+    The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+    for a user who has access to perform the operation.
+   </para>
+
+   <programlisting>
+    $ <userinput>curl \
+    --request POST \
+    --header "iPlanetDirectoryPro: AQIC5..." \
+    --header "Content-Type: application/json" \
+    --data '{
+      "name": "MyReferralTwo",
+      "description": "Look for policies in two additional subrealms to protect IT pages",
+      "resources": {
+        "iPlanetAMWebAgentService" : [ "http://example.com/it/*"]
+      },
+      "realms" : ["/MySubrealm", "/MySubrealm/ChildSubrealm"]
+    }' \
+    https://openam.example.com:8443/openam/json/referrals?_action=create
+   </userinput>
+   <computeroutput>
+   {
+     "creationDate" : 1416956884965,
+     "lastModifiedDate" : 1416956884965,
+     "realms" : [ "/MySubrealm", "/MySubrealm/ChildSubrealm" ],
+     "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+     "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+     "resources" : {
+       "iPlanetAMWebAgentService" : [ "http://example.com/it/*" ]
+     },
+     "name" : "MyReferralTwo"
+   }
+   </computeroutput>
+   </programlisting>
+  </section>
+
+  <section xml:id="rest-api-authz-referrals-read">
+   <title>Reading Referrals</title>
+
+   <para>
+    To read a referral definition, perform an HTTP GET
+    specifying the resource name.
+   </para>
+
+   <para>
+    The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+    for a user who has access to perform the operation.
+   </para>
+
+   <programlisting>
+    $ <userinput>curl \
+    --header "iPlanetDirectoryPro: AQIC5..." \
+    https://openam.example.com:8443/openam/json/referrals/MyReferral
+   </userinput>
+   <computeroutput>
+   {
+     "creationDate" : 1416956012949,
+     "lastModifiedDate" : 1416956012949,
+     "realms" : [ "/MySubrealm", "/MySubrealm/ChildSubrealm" ],
+     "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+     "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+     "resources" : {
+       "iPlanetAMWebAgentService" : [ "http://example.com/hr/*" ]
+     },
+     "name" : "MyReferral"
+   }</computeroutput>
+   </programlisting>
+
+   <para>
+    You can use the query string parameters
+    <literal>_prettyPrint=true</literal> to make the output easier to read,
+    and <literal>_fields=<replaceable>field-name</replaceable>
+    [,<replaceable>field-name</replaceable>...]</literal>
+    to limit the fields returned in the output.
+   </para>
+  </section>
+
+  <section xml:id="rest-api-authz-referrals-update">
+   <title>Updating Referrals</title>
+
+   <para>
+    To update a referral, perform an HTTP PUT
+    specifying the resource name
+    with the referral definition as the JSON resource data,
+    and with the header <literal>Content-Type: application/json</literal>.
+    This is essentially the same as creating a referral,
+    but without the <literal>If-None-Match: *</literal> header.
+   </para>
+
+   <para>
+    The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+    for a user who has access to perform the operation.
+   </para>
+
+   <programlisting>
+    $ <userinput>curl \
+    --request PUT \
+    --header "iPlanetDirectoryPro: AQIC5w..." \
+    --header "Content-Type: application/json" \
+    --data '{
+      "name": "MyReferral",
+      "description": "Update referral to protect HR US pages only",
+      "resources": {
+        "iPlanetAMWebAgentService" : [ "http://example.com/hr/us/*"]
+      },
+      "realms" : ["/MySubrealm", "/MySubrealm/ChildSubrealm"]
+    }' \
+    https://openam.example.com:8443/openam/json/referrals/MyReferral
+   </userinput>
+   <computeroutput>
+   {
+     "creationDate" : 1416959024216,
+     "lastModifiedDate" : 1416959024216,
+     "realms" : [ "/MySubrealm", "/MySubrealm/ChildSubrealm" ],
+     "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+     "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+     "resources" : {
+       "iPlanetAMWebAgentService" : [ "http://example.com/hr/us/*" ]
+     },
+     "name" : "MyReferral"
+   }
+   </computeroutput>
+   </programlisting>
+
+   <tip><para>You can rename a referral by sending a new value in the
+    <emphasis>name</emphasis> attribute of the JSON body,
+    as shown below.</para>
+
+    <programlisting>
+     $ <userinput>curl \
+     --request PUT \
+     --header "iPlanetDirectoryPro: AQIC5w..." \
+     --header "Content-Type: application/json" \
+     --data '{
+       "name": "MyReferralHRUS",
+       "description": "Update referral to protect HR US pages only",
+       "resources": {
+         "iPlanetAMWebAgentService" : [ "http://example.com/hr/us/*"]
+       },
+       "realms" : ["/MySubrealm", "/MySubrealm/ChildSubrealm"]
+     }' \
+     https://openam.example.com:8443/openam/json/referrals/MyReferral
+    </userinput>
+    <computeroutput>
+    {
+      "creationDate" : 1416959240491,
+      "lastModifiedDate" : 1416959240491,
+      "realms" : [ "/MySubrealm", "/MySubrealm/ChildSubrealm" ],
+      "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+      "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+      "resources" : {
+        "iPlanetAMWebAgentService" : [ "http://example.com/hr/us/*" ]
+      },
+      "name" : "MyReferralHRUS"
+    }</computeroutput>
+    </programlisting></tip>
+
+   <para>
+    You can use the query string parameters
+    <literal>_prettyPrint=true</literal> to make the output easier to read,
+    and <literal>_fields=<replaceable>field-name</replaceable>
+    [,<replaceable>field-name</replaceable>...]</literal>
+    to limit the fields returned in the output.
+   </para>
+  </section>
+
+  <section xml:id="rest-api-authz-referrals-delete">
+   <title>Deleting Referrals</title>
+
+   <para>
+    To delete a referral, perform an HTTP DELETE
+    specifying the resource name.
+   </para>
+
+   <para>
+    The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+    for a user who has access to perform the operation.
+   </para>
+
+   <programlisting>
+    $ <userinput>curl \
+    --header "iPlanetDirectoryPro: AQIC5w..." \
+    --request DELETE \
+    https://openam.example.com:8443/openam/json/referrals/MyReferralHRUS</userinput>
+    <computeroutput>{}</computeroutput>
+   </programlisting>
+  </section>
+
+  <section xml:id="rest-api-authz-referrals-query">
+   <title>Listing Referrals</title>
+
+   <para>
+    To list referrals, perform an HTTP GET on the endpoint, setting
+    at least the <literal>_queryFilter</literal> query string parameter.
+   </para>
+
+   <programlisting>
+    $ <userinput>curl \
+    --header "iPlanetDirectoryPro: AQIC5w..." \
+    https://openam.example.com:8443/openam/json/referrals?_queryFilter=true
+   </userinput>
+   <computeroutput>
+   {
+     "result" : [ {
+       "creationDate" : 1416956689230,
+       "lastModifiedDate" : 1416956689230,
+       "realms" : [ "/MySubrealm", "/MySubrealm/ChildSubrealm" ],
+       "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+       "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+       "resources" : {
+         "iPlanetAMWebAgentService" : [ "http://example.com/it/*" ]
+       },
+       "name" : "MyReferralOne"
+       }, {
+       "creationDate" : 1416956884965,
+       "lastModifiedDate" : 1416956884965,
+       "realms" : [ "/MySubrealm", "/MySubrealm/ChildSubrealm" ],
+       "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+       "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+       "resources" : {
+         "iPlanetAMWebAgentService" : [ "http://example.com/finance/*" ]
+       },
+       "name" : "MyReferralTwo"
+     } ],
+     "resultCount" : 2,
+     "pagedResultsCookie" : null,
+     "remainingPagedResults" : 2
+   }
+   </computeroutput>
+   </programlisting>
+
+   <para>
+    The <literal>_queryFilter</literal> parameter can take
+    <literal>true</literal> to match every referral,
+    <literal>false</literal> to match no referrals,
+    or a filter of the following form to match field values:
+    <literal><replaceable>field</replaceable> <replaceable>operator</replaceable> <replaceable>value</replaceable></literal>
+    where <replaceable>field</replaceable> represents the field name,
+    <replaceable>operator</replaceable> is the operator code,
+    <replaceable>value</replaceable> is the value to match,
+    and the entire filter is URL encoded.
+    Supported operators are as follows:
+   </para>
+
+   <itemizedlist>
+    <!-- Not supported
+          <listitem>
+           <para>
+            <literal>co</literal>: contains
+           </para>
+          </listitem>
+    -->
+
+    <listitem>
+     <para>
+      <literal>eq</literal>: equals
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>ge</literal>: greater than or equal to
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>gt</literal>: greater than
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>le</literal>: less than or equal to
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>lt</literal>: less than
+     </para>
+    </listitem>
+
+    <!-- Not supported
+          <listitem>
+           <para>
+            <literal>pr</literal>: exists, is present
+           </para>
+
+           <para>
+            Do not set a <replaceable>value</replaceable> when using this operator.
+           </para>
+          </listitem>
+
+          <listitem>
+           <para>
+            <literal>sw</literal>: starts with
+           </para>
+          </listitem>
+    -->
+   </itemizedlist>
+
+   <itemizedlist>
+    <para>
+     The <literal><replaceable>field</replaceable></literal> value
+     can take the following values:
+    </para>
+
+    <listitem>
+     <para>
+      <literal>"name"</literal> (string equality only)
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>"description"</literal> (string equality only)
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>"applicationName"</literal> (string equality only)
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>"createdBy"</literal> (string equality only)
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>"lastModifiedBy"</literal> (string equality only)
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>"creationDate"</literal> (all comparisons are supported;
+      the date is either an
+      <link xlink:show="new"
+            xlink:href="http://www.w3.org/TR/NOTE-datetime">ISO-8601</link>
+      string, or a integer number of seconds from the UNIX epoch)
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>"lastModified"</literal> (all comparisons are supported;
+      the date is either an
+      <link xlink:show="new"
+            xlink:href="http://www.w3.org/TR/NOTE-datetime">ISO-8601</link>
+      string, or a integer number of seconds from the UNIX epoch)
+     </para>
+    </listitem>
+   </itemizedlist>
+
+   <para>
+    Filters can be composed of multiple expressions
+    by a using boolean operator
+    <literal>AND</literal>,
+    <!-- Not supported: <literal>OR</literal>, or <literal>!</literal> (NOT),-->
+    and by using parentheses,
+    <literal>(<replaceable>expression</replaceable>)</literal>,
+    to group expressions.
+    You must URL encode the filter expression
+    in <literal>_queryFilter=<replaceable>filter</replaceable></literal>.
+   </para>
+
+   <para>
+    You can use the query string parameters
+    <literal>_prettyPrint=true</literal> to make the output easier to read,
+    <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+    to limit the fields returned in the output.
+   </para>
+
+   <para>
+    You can use <literal>_pageSize=<replaceable>integer</replaceable></literal>
+    to limit the number of results returned.
+   </para>
+
+   <para>
+    You can use <literal>_sortKeys=[+-]<replaceable>field</replaceable>[,<replaceable>field</replaceable>...]</literal>
+    to sort the results returned,
+    where <replaceable>field</replaceable> represents a field
+    in the JSON referral objects returned.
+    Optionally use the <literal>+</literal> prefix to sort in ascending order
+    (the default),
+    or <literal>-</literal> to sort in descending order.
+    The following example sorts the referrals by their names in descending order.
+   </para>
+
+   <programlisting>
+    $ <userinput>curl \
+    --header "iPlanetDirectoryPro: AQIC5w..." \
+    https://openam.example.com:8443/openam/json/referrals?_queryFilter=true\&amp;_sortKeys=-name</userinput>
+    <computeroutput>
+    {
+      "result" : [ {
+        "name" : "MyReferralTwo"
+       }, {
+         "name" : "MyReferralOne"
+       } ],
+       "resultCount" : 2,
+       "pagedResultsCookie" : null,
+       "remainingPagedResults" : 2
+     }
+    </computeroutput>
+   </programlisting>
+  </section>
+ </section>
+
  <section xml:id="rest-api-authz-legacy">
   <title>Authorization (Legacy API)</title>
 
@@ -4712,7 +5324,7 @@ $ <userinput>curl \
   </section>
 
  <section xml:id="rest-api-policy-management-delete">
-   <title>Deleting Policies</title>
+   <title>Deleting Policies (Legacy API)</title>
 
    <para>
     To delete a policy, use an HTTP DELETE on the endpoint followed by
@@ -4729,7 +5341,7 @@ $ <userinput>curl \
   </section>
 
  <section xml:id="rest-api-policy-management-query">
-   <title>Querying Policies</title>
+   <title>Querying Policies (Legacy API)</title>
 
    <para>
     To get the names of policies, use an HTTP GET on the endpoint.
