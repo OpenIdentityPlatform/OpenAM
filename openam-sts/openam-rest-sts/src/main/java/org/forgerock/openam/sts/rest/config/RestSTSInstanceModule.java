@@ -394,10 +394,37 @@ public class RestSTSInstanceModule extends AbstractModule {
      * All of these will specify the version returned below. If different versions need to be consumed, different strings
      * can be @Named and provided for the various clients.
      */
+
     @Provides
-    @Named(AMSTSConstants.CREST_VERSION)
-    String getCrestVersion() {
-        return "protocol=1.0, resource=1.0";
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE)
+    String getSessionServiceVersion() {
+        return RestSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE)));
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE)
+    String getAuthNServiceVersion() {
+        return RestSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE)));
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)
+    String getTokenGenServiceVersion() {
+        return RestSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)));
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)
+    String getUsersServiceVersion() {
+        return RestSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)));
     }
 }
 

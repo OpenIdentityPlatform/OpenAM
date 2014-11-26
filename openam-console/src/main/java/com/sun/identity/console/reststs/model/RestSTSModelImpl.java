@@ -63,6 +63,7 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
     private static final String OPENAM = "OPENAM";
     private static final String OPENIDCONNECT = "OPENIDCONNECT";
     private static final String X509 = "X509";
+    private static final String REST_STS_PUBLISH_SERVICE_VERSION = "protocol=1.0, resource=1.0";
 
     public RestSTSModelImpl(HttpServletRequest req, Map map) throws AMConsoleException {
         super(req, AMAdminConstants.REST_STS_SERVICE, map);
@@ -343,6 +344,7 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
         connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);
+        connection.setRequestProperty(SharedSTSConstants.CREST_VERSION_HEADER_KEY, REST_STS_PUBLISH_SERVICE_VERSION);
         connection.setRequestProperty(COOKIE, getAdminSessionTokenCookie());
         OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
         writer.write(invocationPayload);
@@ -361,6 +363,7 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
         connection.setDoOutput(true);
         connection.setRequestMethod("DELETE");
         connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);
+        connection.setRequestProperty(SharedSTSConstants.CREST_VERSION_HEADER_KEY, REST_STS_PUBLISH_SERVICE_VERSION);
         connection.setRequestProperty(COOKIE, getAdminSessionTokenCookie());
         connection.connect();
 
@@ -377,6 +380,7 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
         connection.setDoOutput(true);
         connection.setRequestMethod("PUT");
         connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);
+        connection.setRequestProperty(SharedSTSConstants.CREST_VERSION_HEADER_KEY, REST_STS_PUBLISH_SERVICE_VERSION);
         connection.setRequestProperty(COOKIE, getAdminSessionTokenCookie());
         OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
         writer.write(invocationPayload);
