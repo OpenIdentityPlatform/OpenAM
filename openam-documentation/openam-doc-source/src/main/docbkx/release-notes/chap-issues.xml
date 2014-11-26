@@ -55,7 +55,24 @@
   xlink:show="new" xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
   >OpenAM issue tracker</link>.</para>
 
-  <para>TODO</para>
+  <itemizedlist>
+   <listitem>
+    <para>TODO</para>
+   </listitem>
+   <listitem>
+    <para>
+     OPENAM-3964: The class hierarchy for <literal>ResourceName</literal> interfaces
+     has changed in this issue. Previous implementations should still be
+     source-compatible but are not binary-compatible. You must recompile
+     your custom code if you implemented the <literal>ResourceName</literal> interfaces
+     (a<link
+     xlink:show="new"
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3964"
+     >OPENAM-3964</link>).
+    </para>
+   </listitem>
+  </itemizedlist>
+
  </section>
 
  <section xml:id="limitations">
