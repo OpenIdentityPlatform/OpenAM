@@ -145,6 +145,8 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
 
         final String nonce = authorizationCode.getNonce();
         accessToken.addExtraData("nonce", nonce);
+        accessToken.addExtraData(OAuth2Constants.Custom.SSO_TOKEN_ID, authorizationCode.getSessionId());
+
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
 
         // We should report the scope originally consented to and not the scope added to this request

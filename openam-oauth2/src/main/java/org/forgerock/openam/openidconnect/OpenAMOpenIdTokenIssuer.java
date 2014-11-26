@@ -55,18 +55,7 @@ public class OpenAMOpenIdTokenIssuer extends OpenIDTokenIssuer {
      */
     @Override
     protected String getOps(AccessToken accessToken, OAuth2Request request) {
-        return getSsoToken(ServletUtils.getRequest(request.<Request>getRequest()));
+        return accessToken.getSessionId();
     }
 
-    private String getSsoToken(HttpServletRequest request) {
-        if (request.getCookies() != null) {
-            final String cookieName = openAMSettings.getSSOCookieName();
-            for (final Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals(cookieName)) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
 }

@@ -241,6 +241,15 @@ public class AccessToken extends JsonValue implements Token {
     }
 
     /**
+     * Gets the session id used to create the authorisation code
+     *
+     * @return The session id.
+     */
+    public String getSessionId() {
+        return (String) extraData.get(OAuth2Constants.Custom.SSO_TOKEN_ID);
+    }
+
+    /**
      * Gets the resource owner's id.
      *
      * @return The resource owner's id.

@@ -58,9 +58,10 @@ public class OpenAMTokenStoreTest {
         realmNormaliser = mock(RealmNormaliser.class);
         ssoTokenManager = mock(SSOTokenManager.class);
         request = mock(Request.class);
+        CookieExtractor cookieExtractor = mock(CookieExtractor.class);
 
         openAMtokenStore = new OpenAMTokenStore(tokenStore, providerSettingsFactory, clientRegistrationStore,
-                realmNormaliser, ssoTokenManager);
+                realmNormaliser, ssoTokenManager, cookieExtractor);
     }
 
     @Test

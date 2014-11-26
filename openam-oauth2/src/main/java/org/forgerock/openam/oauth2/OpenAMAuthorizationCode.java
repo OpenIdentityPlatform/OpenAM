@@ -61,9 +61,10 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      * @param authModules The list of auth modules used.
      */
     OpenAMAuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
-            long expiryTime, String nonce, String realm, String authModules, String acr) {
+            long expiryTime, String nonce, String realm, String authModules, String acr, String ssoTokenId) {
         super(code, resourceOwnerId, clientId, redirectUri, scope, expiryTime, nonce, authModules, acr);
         setRealm(realm);
+        setSsoTokenId(ssoTokenId);
     }
 
     /**
@@ -91,6 +92,15 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      */
     private void setRealm(String realm) {
         setStringProperty(OAuth2Constants.CoreTokenParams.REALM, realm == null || realm.isEmpty() ? "/" : realm);
+    }
+
+    /**
+     * Sets the token id of the session.
+     *
+     *  @param ssoTokenId The token id of the session.
+     */
+    private void setSsoTokenId(String ssoTokenId) {
+        setStringProperty(OAuth2Constants.Custom.SSO_TOKEN_ID, ssoTokenId);
     }
 
     /**

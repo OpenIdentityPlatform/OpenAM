@@ -297,6 +297,15 @@ public class AuthorizationCode extends JsonValue implements Token {
         return getStringProperty(OAuth2Constants.Custom.NONCE);
     }
 
+    /**
+     * Gets the session id of the authenticating session.
+     *
+     * @return The session id.
+     */
+    public String getSessionId() {
+        return getStringProperty(OAuth2Constants.Custom.SSO_TOKEN_ID);
+    }
+
     protected String getStringProperty(String key) {
         return isDefined(key) ? get(key).asString() : null;
     }

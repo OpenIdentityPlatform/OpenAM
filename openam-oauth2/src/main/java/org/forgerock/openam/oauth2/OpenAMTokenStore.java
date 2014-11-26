@@ -18,6 +18,7 @@ package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.fluent.JsonValue.*;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -35,6 +36,8 @@ import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
+
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.utils.Utils;
@@ -76,6 +79,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
     private final RealmNormaliser realmNormaliser;
     private final SSOTokenManager ssoTokenManager;
+    private final CookieExtractor cookieExtractor;
 
     /**
      * Constructs a new OpenAMTokenStore.
@@ -88,12 +92,13 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Inject
     public OpenAMTokenStore(OAuthTokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
-            SSOTokenManager ssoTokenManager) {
+            SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor) {
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.clientRegistrationStore = clientRegistrationStore;
         this.realmNormaliser = realmNormaliser;
         this.ssoTokenManager = ssoTokenManager;
+        this.cookieExtractor = cookieExtractor;
     }
 
     /**
@@ -106,10 +111,12 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String code = UUID.randomUUID().toString();
         final long expiryTime = (providerSettings.getAuthorizationCodeLifetime() * 1000) + System.currentTimeMillis();
+        final String ssoTokenId = getSsoTokenId(request);
 
         final AuthorizationCode authorizationCode = new OpenAMAuthorizationCode(code, resourceOwnerId, clientId,
                 redirectUri, scope, expiryTime, nonce, realmNormaliser.normalise(request.<String>getParameter("realm")),
-                getAuthModulesFromSSOToken(request), getAuthenticationContextClassReferenceFromRequest(request));
+                getAuthModulesFromSSOToken(request), getAuthenticationContextClassReferenceFromRequest(request),
+                ssoTokenId);
 
         // Store in CTS
         try {
@@ -122,6 +129,11 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         request.setToken(AuthorizationCode.class, authorizationCode);
 
         return authorizationCode;
+    }
+
+    private String getSsoTokenId(OAuth2Request request) {
+        return cookieExtractor.extract(ServletUtils.getRequest(request.<Request>getRequest()),
+                SystemProperties.get("com.iplanet.am.cookie.name"));
     }
 
     private String getAuthModulesFromSSOToken(OAuth2Request request) {
