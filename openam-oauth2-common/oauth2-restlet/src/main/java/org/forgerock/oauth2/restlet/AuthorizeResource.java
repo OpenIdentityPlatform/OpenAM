@@ -26,6 +26,7 @@ import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
+import org.forgerock.openam.xui.XUIState;
 import org.owasp.esapi.ESAPI;
 import org.restlet.Request;
 import org.restlet.representation.Representation;
@@ -55,6 +56,7 @@ public class AuthorizeResource extends ServerResource {
     private final ExceptionHandler exceptionHandler;
     private final OAuth2Representation representation;
     private final Set<AuthorizeRequestHook> hooks;
+    private final XUIState xuiState;
 
     /**
      * Constructs a new AuthorizeResource.
@@ -66,12 +68,14 @@ public class AuthorizeResource extends ServerResource {
      */
     @Inject
     public AuthorizeResource(OAuth2RequestFactory<Request> requestFactory, AuthorizationService authorizationService,
-            ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks) {
+            ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks,
+            XUIState xuiState) {
         this.requestFactory = requestFactory;
         this.authorizationService = authorizationService;
         this.exceptionHandler = exceptionHandler;
         this.representation = representation;
         this.hooks = hooks;
+        this.xuiState = xuiState;
     }
 
     /**
@@ -148,6 +152,7 @@ public class AuthorizeResource extends ServerResource {
         data.put("display_name", ESAPI.encoder().encodeForHTML(displayName));
         data.put("display_description", ESAPI.encoder().encodeForHTML(displayDescription));
         data.put("display_scope", encodeSetForHTML(displayScope));
+        data.put("xui", xuiState.isXUIEnabled());
         return data;
     }
 

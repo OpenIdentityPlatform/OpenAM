@@ -39,14 +39,9 @@ public class XUIFilterTest {
 
     @BeforeMethod
     public void setUp() {
-        filter = new XUIFilter() {
-
-            @Override
-            protected void detectXUIMode() {
-                initialized = true;
-                xuiEnabled = true;
-            }
-        };
+        XUIState xuiState = mock(XUIState.class);
+        when(xuiState.isXUIEnabled()).thenReturn(true);
+        filter = new XUIFilter(xuiState);
         FilterConfig filterConfig = mock(FilterConfig.class);
         ServletContext servletContext = mock(ServletContext.class);
         when(filterConfig.getServletContext()).thenReturn(servletContext);

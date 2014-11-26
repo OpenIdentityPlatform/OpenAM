@@ -21,6 +21,7 @@ import org.forgerock.oauth2.core.AuthorizationToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.xui.XUIState;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.representation.EmptyRepresentation;
@@ -41,6 +42,7 @@ public class AuthorizeResourceTest {
     private AuthorizationService service;
     private AuthorizeRequestHook hook;
     private AuthorizationToken authToken = new AuthorizationToken(Collections.singletonMap("fred", "fred"), false);
+    private XUIState xuiState;
 
     @BeforeMethod
     public void setup() throws Exception {
@@ -51,10 +53,12 @@ public class AuthorizeResourceTest {
         response = mock(Response.class);
         hook = mock(AuthorizeRequestHook.class);
         service = mock(AuthorizationService.class);
+        xuiState = mock(XUIState.class);
 
         when(oauth2RequestFactory.create(request)).thenReturn(o2request);
 
-        resource = new AuthorizeResource(oauth2RequestFactory, service, null, representation, CollectionUtils.asSet(hook));
+        resource = new AuthorizeResource(oauth2RequestFactory, service, null, representation,
+                CollectionUtils.asSet(hook), xuiState);
         resource = spy(resource);
         doReturn(request).when(resource).getRequest();
         doReturn(response).when(resource).getResponse();

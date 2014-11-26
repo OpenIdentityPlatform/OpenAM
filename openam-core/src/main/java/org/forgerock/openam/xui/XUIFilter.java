@@ -33,6 +33,8 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.guava.common.annotations.VisibleForTesting;
+import org.forgerock.guice.core.InjectorHolder;
 
 /**
  * XUIFilter class is a servlet Filter for filtering incoming requests to OpenAM and redirecting them
@@ -41,23 +43,28 @@ import com.sun.identity.sm.ServiceSchemaManager;
  *
  * @author Travis
  */
-public class XUIFilter implements Filter, ServiceListener {
+public class XUIFilter implements Filter {
 
     private String xuiLoginPath;
     private String xuiLogoutPath;
     private String profilePage;
-    protected boolean xuiEnabled;
     protected volatile boolean initialized;
-    private static final String XUI_INTERFACE = "openam-xui-interface-enabled";
-    private static final String SERVICE_NAME = "iPlanetAMAuthService";
-    private static final Debug DEBUG = Debug.getInstance("Configuration");
-    private String listenerID;
     private ServiceSchemaManager scm = null;
+    private XUIState xuiState;
+
+    public XUIFilter() {}
+
+    @VisibleForTesting XUIFilter(XUIState xuiState) {
+        this.xuiState = xuiState;
+    }
 
     /**
      * {@inheritDoc}
      */
     public void init(FilterConfig filterConfig) {
+        if (xuiState == null) {
+            xuiState = InjectorHolder.getInstance(XUIState.class);
+        }
         ServletContext ctx = filterConfig.getServletContext();
         xuiLoginPath = ctx.getContextPath() + "/XUI/#login/";
         xuiLogoutPath = ctx.getContextPath() + "/XUI/#logout/";
@@ -81,15 +88,7 @@ public class XUIFilter implements Filter, ServiceListener {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
-        if (!initialized) {
-            synchronized (this) {
-                if (!initialized) {
-                    detectXUIMode();
-                }
-            }
-        }
-
-        if (xuiEnabled && request.getRequestURI() != null) {
+        if (xuiState.isXUIEnabled() && request.getRequestURI() != null) {
             String query = request.getQueryString();
 
             // prepare query
@@ -115,56 +114,10 @@ public class XUIFilter implements Filter, ServiceListener {
     }
 
     /**
-     * detectXUIMode will detect if XUI is enabled or disabled by inspecting the service
-     */
-    protected void detectXUIMode() {
-        try {
-            SSOToken dUserToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
-            scm = new ServiceSchemaManager(SERVICE_NAME, dUserToken);
-            ServiceSchema schema = scm.getGlobalSchema();
-            Map attrs = schema.getAttributeDefaults();
-            xuiEnabled = Boolean.parseBoolean(CollectionHelper.getMapAttr(attrs, XUI_INTERFACE, ""));
-            if (listenerID == null) {
-                listenerID = scm.addListener(this);
-            }
-            initialized = true;
-        } catch (SMSException smse) {
-            DEBUG.error("Could not get iPlanetAMAuthService", smse);
-        } catch (SSOException ssoe) {
-            DEBUG.error("Could not get iPlanetAMAuthService", ssoe);
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     public void destroy() {
-        if (listenerID != null && scm != null) {
-            scm.removeListener(listenerID);
-        }
+        xuiState.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void organizationConfigChanged(String serviceName, String version,
-                                          String orgName, String groupName, String serviceComponent,
-                                          int type) {
-        // no op
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void globalConfigChanged(String serviceName, String version,
-                                    String groupName, String serviceComponent, int type) {
-        detectXUIMode();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void schemaChanged(String serviceName, String version) {
-        detectXUIMode();
-    }
 }
