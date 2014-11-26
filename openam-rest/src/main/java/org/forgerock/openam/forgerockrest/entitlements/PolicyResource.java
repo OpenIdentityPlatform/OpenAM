@@ -47,7 +47,7 @@ import org.forgerock.util.Reject;
 import javax.inject.Inject;
 import java.util.List;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.*;
 import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 
@@ -153,16 +153,6 @@ public final class PolicyResource implements CollectionResourceProvider {
         try {
             providedName = request.getNewResourceId();
 
-            // OPENAM-5031
-            // This is a bad solution and should be rewritten when we have time.  This code rejects anything in the
-            // name that when encoded differs from the original.  So, for instance "+" becomes "\+".
-            // What we should do is to encode the name for storage purposes, and decode it before presentation to the
-            // user.
-            if (!providedName.equals(DN.escapeAttributeValue(providedName))) {
-                throw new EntitlementException(EntitlementException.INVALID_VALUE,
-                                                new Object[] { "policy name \"" + providedName + "\"" });
-            }
-
             Privilege policy = policyParser.parsePolicy(providedName, request.getContent());
 
             if (isNotBlank(providedName) && !providedName.equals(policy.getName())) {
@@ -170,6 +160,19 @@ public final class PolicyResource implements CollectionResourceProvider {
                 throw new EntitlementException(EntitlementException.POLICY_NAME_MISMATCH);
             }
 
+            if (isBlank(providedName)) {
+                providedName = policy.getName();
+            }
+
+            // OPENAM-5031
+            // This is a bad solution and should be rewritten when we have time.  This code rejects anything in the
+            // name that when encoded differs from the original.  So, for instance "+" becomes "\+".
+            // What we should do is to encode the name for storage purposes, and decode it before presentation to the
+            // user.
+            if (!providedName.equals(DN.escapeAttributeValue(providedName))) {
+                throw new EntitlementException(EntitlementException.INVALID_VALUE,
+                        new Object[]{"policy name \"" + providedName + "\""});
+            }
 
             policyStoreProvider.getPolicyStore(context).create(policy);
             handler.handleResult(policyResource(policy));
