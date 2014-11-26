@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>13.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -237,7 +237,7 @@
                                 <exclude>WEB-INF</exclude>
                                 <exclude>com_sun_web_ui/images</exclude>
                             </excludes>
-                            <targetPath/>
+                            <targetPath />
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
@@ -522,7 +522,7 @@
 
     <properties>
         <!-- By default this property is empty so as not to include the SecurID auth module -->
-        <auth.securID.xml></auth.securID.xml>
+        <auth.securID.xml />
     </properties>
 
     <dependencies>

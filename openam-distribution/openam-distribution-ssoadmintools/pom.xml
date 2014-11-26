@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-distribution</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>13.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -60,8 +60,7 @@
 
                                 <property name="target.resources.dir" value="${project.build.directory}/resources" />
 
-                                <property name="resources.i18n.dir"
-                                          value="${project.basedir}/../../openam-locale/src/main/resources/locale" />
+                                <property name="resources.i18n.dir" value="${project.basedir}/../../openam-locale/src/main/resources/locale" />
 
                                 <tstamp>
                                     <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK" />

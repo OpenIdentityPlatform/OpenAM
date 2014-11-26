@@ -22,13 +22,12 @@
   ~ your own identifying information:
   ~ "Portions Copyrighted [year] [name of copyright owner]"
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>13.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>openam-ui-ria</artifactId>
@@ -174,8 +173,7 @@
                                         <fileset dir="${dependency.dir}" includes="**/*" />
                                       </copy>
 
-                                      <java classname="org.mozilla.javascript.tools.shell.Main"
-                                          failonerror="true">
+                                      <java classname="org.mozilla.javascript.tools.shell.Main" failonerror="true">
                                           <classpath refid="maven.compile.classpath" />
                                           <arg value="${requirejs.dir}/r.js" />
                                           <arg value="-o" />
@@ -187,14 +185,12 @@
                                           <fileset file="${minified.dir}/main.js" />
                                       </concat>
                                       
-                                      <move   file="${minified.dir}/main_with_licenses.js" 
-                                              tofile="${minified.dir}/main.js" />
+                                      <move file="${minified.dir}/main_with_licenses.js" tofile="${minified.dir}/main.js" />
 
                                       <delete dir="${classes.dir}" />
                                       <delete dir="${dependency.dir}" />
 
-                                      <move   file="${minified.dir}" 
-                                              tofile="${classes.dir}" />
+                                      <move file="${minified.dir}" tofile="${classes.dir}" />
 
                                   </target>
                                 </configuration>
