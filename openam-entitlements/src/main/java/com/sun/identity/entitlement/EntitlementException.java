@@ -62,6 +62,7 @@ public class EntitlementException extends Exception {
     public static final int NO_SUCH_POLICY = 203;
     public static final int POLICY_ALREADY_EXISTS = 217;
     public static final int APPLICATION_ALREADY_EXISTS = 228;
+    public static final int APPLICATION_NAME_MISMATCH = 229;
     public static final int APP_RETRIEVAL_ERROR = 248;
     public static final int NO_SUCH_REFERRAL_PRIVILEGE = 263;
 

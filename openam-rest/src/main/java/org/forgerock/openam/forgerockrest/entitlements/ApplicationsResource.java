@@ -54,8 +54,9 @@ import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManag
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
-import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.Reject;
+
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
  * Endpoint for the ApplicationsResource.
@@ -167,24 +168,24 @@ public class ApplicationsResource extends RealmAwareResource {
                                 new String[] { wrapp.getApplication().getRealm(), realm });
             }
 
-            // OPENAM-5031
-            // This is a bad solution and should be rewritten when we have time.  This code rejects anything in the
-            // name that when encoded differs from the original.  So, for instance "+" becomes "\+".
-            // What we should do is to encode the name for storage purposes, and decode it before presentation to the
-            // user.
-            String appName = wrapp.getApplication().getName();
-            if (!appName.equals(DN.escapeAttributeValue(appName))) {
-                throw new EntitlementException(EntitlementException.INVALID_VALUE,
-                        new Object[] { "policy name \"" + appName + "\"" });
+            String wrappName = wrapp.getName();
+            String newResourceId = request.getNewResourceId();
+            if (wrappName == null) {
+                wrapp.setName(newResourceId);
+            }
+            if (isNotBlank(newResourceId) && !newResourceId.equals(wrappName)) {
+                debug.error("ApplicationsResource :: CREATE : Resource name and JSON body name do not match.");
+                throw new EntitlementException(EntitlementException.APPLICATION_NAME_MISMATCH);
             }
 
-            previousApp = appManager.getApplication(callingSubject, realm, appName);
+            previousApp = appManager.getApplication(callingSubject, realm, wrapp.getName());
+
             if (previousApp != null) { //return conflict
                 throw new EntitlementException(EntitlementException.APPLICATION_ALREADY_EXISTS);
             }
 
             appManager.saveApplication(callingSubject, wrapp.getApplication());
-            Application savedApp = appManager.getApplication(callingSubject, realm, appName);
+            Application savedApp = appManager.getApplication(callingSubject, realm, wrapp.getName());
             ApplicationWrapper savedAppWrapper = createApplicationWrapper(savedApp, appTypeManagerWrapper);
 
             final Resource resource = new Resource(savedAppWrapper.getName(),
@@ -201,6 +202,7 @@ public class ApplicationsResource extends RealmAwareResource {
             }
             handler.handleError(resourceErrorHandler.handleError(request, e));
         }
+
     }
 
     /**
