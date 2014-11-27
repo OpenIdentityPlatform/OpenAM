@@ -278,7 +278,6 @@ public class OAuthConf {
         try {
             return tokenServiceUrl
                     + param(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(authServiceURL))
-                    + param(PARAM_SCOPE, OAuthUtil.oAuthEncode(scope))
                     + param(PARAM_CLIENT_SECRET, clientSecret)
                     + param(PARAM_CODE, OAuthUtil.oAuthEncode(code))
                     + param("grant_type", "authorization_code");
