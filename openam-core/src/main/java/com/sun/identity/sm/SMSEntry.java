@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -176,7 +176,12 @@ public class SMSEntry implements Cloneable {
 
     static Set modifyActionSet = new HashSet(2);
 
-    static DelegationEvaluator dlgEval;
+    /**
+     * Avoid loading the DelegationEvaluator unless needed to prevent exceptions in client-side code.
+     */
+    static class DelegationEvaluatorHolder {
+        static final DelegationEvaluator dlgEval = new DelegationEvaluatorImpl();
+    }
 
     static boolean SMSJAXRPCObjectFlg;
 
@@ -1714,13 +1719,8 @@ public class SMSEntry implements Cloneable {
                     serviceName, version, configType, subConfigName, actions,
                     Collections.EMPTY_MAP);
 
-            // If DelegationEvaluator is null, initialize it
-            if (dlgEval == null) {
-                dlgEval = new DelegationEvaluatorImpl();
-            }
-
             // Perform delegation check
-            delPermFlag = dlgEval.isAllowed(token, dlgPerm,
+            delPermFlag = DelegationEvaluatorHolder.dlgEval.isAllowed(token, dlgPerm,
                     Collections.EMPTY_MAP);
             if (!delPermFlag) {
                 // Debug the message
