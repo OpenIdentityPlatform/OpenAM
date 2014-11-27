@@ -538,15 +538,54 @@ assertion=eyAiYWxnIjogIlJTMjU2IiB9.eyAic3ViIjogImp3...
  <section xml:id="configure-oauth2-authz">
   <title>Configuring the OAuth 2.0 Authorization Service</title>
 
-  <para>You configure the OAuth 2.0 authorization service for a particular
-  realm, starting from the Common Tasks page of the OpenAM console. This
-  process also protects the authorization endpoint using a standard
-  policy.</para>
+  <para>
+   You configure the OAuth 2.0 authorization service for a particular realm,
+   starting from the Common Tasks page of the OpenAM console.
+  </para>
 
   <procedure xml:id="common-task-oauth2-authz">
    <title>To Set Up the OAuth 2.0 Authorization Service</title>
 
-   <para>Follow these steps.</para>
+   <para>
+    Follow the steps in this procedure
+    to set up the service with the Common Tasks wizard.
+   </para>
+
+   <para>
+    When you create the service with the Common Tasks wizard,
+    the wizard also creates a standard policy in the top level realm (/)
+    to protect the authorization endpoint.
+    In this configuration OpenAM serves the resources to protect,
+    and no separate application is involved.
+    OpenAM therefore acts both as the policy decision point
+    and also as the policy enforcement point
+    that protects the OAuth 2.0 authorization endpoint.
+   </para>
+
+   <para>
+    There is no requirement to use the wizard
+    or to create the policy in the top level realm.
+    However if you create the OAuth 2.0 authorization service without the wizard,
+    then you must set up the policy independently as well.
+    The policy must appear in an application of type
+    <literal>iPlanetAMWebAgentService</literal>,
+    which is the default in the OpenAM policy editor.
+    When configuring the policy allow all authenticated users
+    to perform HTTP GET and POST requests on the authorization endpoint.
+    The authorization endpoint is described
+    in the <citetitle>Developer's Guide</citetitle> section,
+    <link
+     xlink:href="dev-guide#rest-api-oauth2-client-endpoints"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>OAuth 2.0 Client &amp; Resource Server Endpoints</citetitle></link>.
+    For details on creating policies, see the chapter on
+    <link
+     xlink:href="admin-guide#chap-authz-policy"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>Defining Authorization Policies</citetitle></link>.
+   </para>
 
    <step>
     <para>In the OpenAM console, select Common Tasks &gt; Configure
@@ -595,10 +634,14 @@ assertion=eyAiYWxnIjogIlJTMjU2IiB9.eyAic3ViIjogImp3...
      and then click OAuth2 Provider.
     </para>
 
-    <para>In addition to setting up an OAuth 2.0 authorization service for the
-    realm, OpenAM sets up a policy in the top level realm to protect the
-     authorization endpoint. The policy appears in the list of policies for the
-     realm. Its name is <literal>OAuth2ProviderPolicy</literal>.</para>
+    <para>
+     As mentioned at the outset of this procedure,
+     the wizard sets up a policy in the top level realm
+     to protect the authorization endpoint.
+     The policy appears in
+     the <literal>iPlanetAMWebAgentService</literal> application.
+     Its name is <literal>OAuth2ProviderPolicy</literal>.
+    </para>
    </step>
 
    <step performance="optional">
