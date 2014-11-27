@@ -48,6 +48,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
 
         var url,
             args = {},
+            tokenCookie,
             promise = $.Deferred();
 
         if (configuration.globalData.auth.realm !== "/") {
@@ -56,16 +57,17 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
 
         knownAuth = _.clone(configuration.globalData.auth);
 
-        url = "?" + $.param(args);
-        if(configuration.globalData.auth.additional){
-            if(args.realm){
-                url += configuration.globalData.auth.additional;
-            }
-            else{
-                //if no realm get rid of the 1st char ('&')
-                url += configuration.globalData.auth.additional.substring(1);
-            }
+        if (configuration.globalData.auth.urlParams) {
+            _.extend(args, configuration.globalData.auth.urlParams);
         }
+
+        // In case user has logged in already update session
+        tokenCookie = cookieHelper.getCookie(configuration.globalData.auth.cookieName);
+        if (tokenCookie) {
+            args.sessionUpgradeSSOTokenId = tokenCookie;
+        }
+
+        url = "?" + $.param(args);
 
         obj.serviceCall({
                 type: "POST",
@@ -77,13 +79,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 }
             })
         .done(function (requirements) {
-            // only resolve the auth promise when we know the cookie name
-            var tokenCookie = cookieHelper.getCookie(configuration.globalData.auth.cookieName);
-            if(configuration.loggedUser && tokenCookie && window.location.hash.replace(/^#/, '').match(router.configuration.routes.login.url)){
-                requirements.tokenId = tokenCookie;
-            }
             promise.resolve(requirements);
-
         })
         .fail(function (jqXHR) {
                    // some auth processes might throw an error fail immediately

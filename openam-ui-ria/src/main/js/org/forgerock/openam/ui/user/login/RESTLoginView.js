@@ -172,9 +172,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                         console.log("Auto redirect to " + conf.gotoURL);
                                         router.navigate(conf.gotoURL, {trigger: true});
                                         delete conf.gotoURL;
+                                    } else {
+                                        router.navigate("", {trigger: true});
                                     }
-
-                                    router.navigate("", {trigger: true});
                                 });
                             }
                             else{ 
@@ -314,7 +314,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             //they must be transformed into the 'authIndexType' and 'authIndexValue' params
             _.each(['authlevel','module','service','user'],function(p){
                 if(urlParams[p]){
-                    urlParams.authIndexType = p;
+                    urlParams.authIndexType = ((p === 'authlevel') ? 'level' : p);
                     urlParams.authIndexValue = urlParams[p];
                     //***note special case for authLevel
                     conf.globalData.auth.additional += '&authIndexType=' + ((p === 'authlevel') ? 'level' : p) + '&authIndexValue=' + urlParams[p];
