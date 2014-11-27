@@ -48,6 +48,12 @@
  <para>Make sure you try upgrading OpenAM in a test environment before applying
  the upgrade in your production environment.</para>
 
+ <itemizedlist>
+  <listitem><para><xref linkend="upgrade-server" /></para></listitem>
+  <listitem><para><xref linkend="after-upgrading-from-11" /></para></listitem>
+  <listitem><para><xref linkend="after-upgrading-from-10-1" /></para></listitem>
+ </itemizedlist>
+
  <procedure xml:id="upgrade-server">
   <title>To Upgrade From OpenAM 9.5 or Later</title>
 
@@ -212,6 +218,33 @@ Upgrade Complete.
 
   <step>
    <para>Allow client application traffic to flow to the upgraded site.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="after-upgrading-from-11">
+  <title>To Complete Upgrade from OpenAM 11.0</title>
+
+  <para>
+   After upgrade from OpenAM 11.0.x,
+   all OAuth 2.0 client configurations inherit the default response types:
+  </para>
+
+  <simplelist>
+   <member>code</member>
+   <member>token</member>
+   <member>id_token</member>
+   <member>code token</member>
+   <member>token id_token</member>
+   <member>code id_token</member>
+   <member>code token id_token</member>
+  </simplelist>
+
+  <step>
+   <para>
+    For each OAuth 2.0 client configuration,
+    edit the list of response types to remove any
+    that are not supported or not required.
+   </para>
   </step>
  </procedure>
 
