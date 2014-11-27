@@ -136,11 +136,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                     promise.reject();
                 });
         } else {
-            if(!conf.globalData.auth.urlParams){
-                conf.globalData.auth.urlParams = {};
-            }
-            if(!conf.globalData.auth.urlParams.goto){
-                conf.globalData.auth.urlParams.goto = url;
+            if(url !== constants.CONSOLE_PATH || _.contains(_.map(constants.CONSOLE_USERS,function(u){return u.toLowerCase();}),conf.loggedUser.username.toLowerCase())){
+                if(!conf.globalData.auth.urlParams){
+                    conf.globalData.auth.urlParams = {};
+                }
+                if(!conf.globalData.auth.urlParams.goto){
+                    conf.globalData.auth.urlParams.goto = url;
+                }
             }
             promise.resolve();
         }

@@ -139,15 +139,6 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
 
             };
 
-            // In case user has logged in already update session
-            if (requirements.hasOwnProperty("tokenId")) {
-                sessionDelegate.isSessionValid(requirements.tokenId).done(function (sessionToken) {
-                    if (sessionToken.valid) {
-                        requirements.sessionUpgradeSSOTokenId = requirements.tokenId;
-                    }
-                });
-            }
-
             obj.serviceCall({
                 type: "POST",
                 headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},

@@ -172,13 +172,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                         console.log("Auto redirect to " + conf.gotoURL);
                                         router.navigate(conf.gotoURL, {trigger: true});
                                         delete conf.gotoURL;
-                                    } else {
-                                        _this.renderForm(reqs, urlParams);
-                                        promise.resolve();
                                     }
+
+                                    router.navigate("", {trigger: true});
                                 });
                             }
-                            else{
+                            else{ 
                                 location.href = "#confirmLogin/";
                             }
                         },function(){
