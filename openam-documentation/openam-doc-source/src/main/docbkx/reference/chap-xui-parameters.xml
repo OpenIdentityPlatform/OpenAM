@@ -20,16 +20,16 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock AS
+  !      Copyright 2013-2014 ForgeRock AS
   !
 -->
 <chapter xml:id='chap-xui-parameters'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'
-         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
 
     <title>XUI Configuration Parameters</title>
 
@@ -37,10 +37,14 @@
     file. When OpenAM is installed, this file can be found in the <filename>/path/to/webapps/XUI</filename>
     directory.</para>
 
-    <para>Interface Stability: <link xlink:show="new"
-    xlink:href="admin-guide#interface-stability"
-    xlink:role="http://docbook.org/xlink/role/olink">Internal</link></para>
-    <para>XUI is not supported for production use.</para>
+    <para>
+     Interface Stability:
+     <link
+      xlink:show="new"
+      xlink:href="admin-guide#interface-stability"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     >Evolving</link>
+    </para>
 
     <para>The following table depicts the parameters found in this file. All color codes are standard
     CSS Hex colors. If there is more than one theme, they may inherit parameters from the
