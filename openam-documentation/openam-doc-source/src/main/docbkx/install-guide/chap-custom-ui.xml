@@ -36,17 +36,18 @@
   <primary>UI</primary>
  </indexterm>
 
- <para>When you deploy OpenAM to protect your web-based applications, users
- can be redirected to OpenAM pages for login and logout. ForgeRock provides
- pages localized for English, French, German, Spanish, Japanese, Korean,
- Simplified Chinese, and Traditional Chinese, but you might require additional
- language support for your organization.</para>
+ <para>
+  When you deploy OpenAM to protect your web-based applications,
+  users can be redirected to OpenAM pages for login and logout.
+ </para>
  
- <para>Also, by default the end user pages have ForgeRock styling and branding.
- You likely want to change at least the images to reflect your organization.
- You might want to have different page customizations for different realms as
- well. This chapter address how to get started customizing OpenAM end user
- pages for your organizations and supported locales.</para>
+ <para>
+  The end user pages have ForgeRock styling and branding by default.
+  You likely want to change at least the images to reflect your organization.
+  You might want different customizations for different realms.
+  This chapter addresses how to get started customizing OpenAM end user pages
+  for your organizations and supported locales.
+ </para>
 
  <itemizedlist>
   <para>
@@ -221,6 +222,18 @@
      <para>When testing different options, make sure to clear the browser cache on a regular basis. Otherwise, changes
      that you have made might not be shown in your browser.</para>
 
+     <para>
+      Much of the text supplied in XUI
+      is stored in <filename>translation.json</filename> files for each locale.
+      To customize the English text,
+      edit <filename>XUI/locales/en/translation.json</filename>
+      under the directory where OpenAM is unpacked for deployment.
+      To prepare a translation for a new locale, copy the English file,
+      <filename>XUI/locales/en/translation.json</filename>,
+      to <filename>XUI/locales/<replaceable>new-locale</replaceable>/</filename>
+      and edit the copy changing only the values not the keys,
+      and taking care not to change the JSON structure or to render it invalid.
+     </para>
  </section>
 
  <section xml:id="update-classic-ui">
@@ -244,6 +257,12 @@
        xlink:href="admin-guide#interface-stability"
        xlink:role="http://docbook.org/xlink/role/olink"
       >Deprecated</link>
+     </para>
+
+     <para>
+      Classic UI provides pages localized for English, French, German, Spanish,
+      Japanese, Korean, Simplified Chinese, and Traditional Chinese,
+      but you might require additional language support for your organization.
      </para>
 
      <para>
@@ -421,6 +440,74 @@ $ <userinput>cp -r default_fr/* openam_fr/services/ventes/html</userinput>
    </para>
   </step>
  </procedure>
+
+  <procedure xml:id="customize-ui-elements">
+   <title>To Customize UI Elements</title>
+
+   <para>
+    To customize classic UI elements such as button text on the login screen,
+    follow these steps.
+   </para>
+
+   <step>
+    <para>
+     Unpack the core OpenAM library, <filename>${coreLibrary}</filename>,
+     that contains the text in Java properties files.
+    </para>
+
+    <para>
+     This library is available under <filename>WEB-INF/lib/</filename>
+     where OpenAM is unpacked for deployment.
+     In the following example OpenAM is deployed on Apache Tomcat.
+    </para>
+
+    <screen>
+$ <userinput>mkdir openam-core &amp;&amp; cd openam-core</userinput>
+$ <userinput>jar xf /path/to/tomcat/webapps/openam/WEB-INF/lib/${coreLibrary}</userinput>
+    </screen>
+   </step>
+
+   <step>
+    <para>
+     Edit only property values in the appropriate properties files.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Prepare a new core OpenAM library with your modifications.
+    </para>
+
+    <screen>
+$ <userinput>jar cf ../${coreLibrary} *</userinput>
+    </screen>
+   </step>
+
+   <step>
+    <para>
+     Replace the existing core OpenAM library with your modified version.
+    </para>
+
+    <para>
+     The following example replaces the library only in a deployed OpenAM server.
+    </para>
+
+    <screen>
+$ <userinput>cp ${coreLibrary} /path/to/tomcat/webapps/openam/WEB-INF/lib/</userinput>
+    </screen>
+
+    <para>
+     When preparing for production deployment make the modification
+     in the OpenAM war file, <filename>${coreWarFile}</filename>, instead.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Restart OpenAM or the container in which it runs to load the changes.
+    </para>
+   </step>
+  </procedure>
  </section>
 
  <section xml:id="lookup-for-ui-files">
