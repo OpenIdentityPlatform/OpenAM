@@ -46,28 +46,29 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/components/Messages"
-], function (AbstractEditView, actionsView, resourcesListView, addNewResourceView, responseAttrsStaticView, responseAttrsUserView, reviewInfoView, policyDelegate, uiUtils, Accordion, manageSubjects, manageEnvironments, constants,eventManager, router, messager) {
+
+], function (AbstractEditView, actionsView, resourcesListView, addNewResourceView, responseAttrsStaticView, responseAttrsUserView, reviewInfoView, policyDelegate,
+             uiUtils, Accordion, manageSubjects, manageEnvironments, constants, eventManager, router, messager) {
     var EditPolicyView = AbstractEditView.extend({
         template: "templates/policy/EditPolicyTemplate.html",
         reviewTemplate: "templates/policy/ReviewPolicyStepTemplate.html",
         data: {},
-        validationFields: ["name", "resources"], 
+        validationFields: ["name", "resources"],
 
         render: function (args, callback) {
+
             var self = this,
                 data = self.data,
-                appName = args[0],
-                policyName = args[1],
-                policyPromise = this.getPolicy(policyName),
-                appPromise = policyDelegate.getApplicationByName(appName),
-                allSubjectsPromise = policyDelegate.getSubjectConditions(), // this possibly should be in the parent. We need a means to check if this exsists, and only make this search if it does not
-                allEnvironmentsPromise = policyDelegate.getEnvironmentConditions(),
-                allUserAttributesPromise = policyDelegate.getAllUserAttributes(),
-                identitySubjectUsersPromise  = policyDelegate.getAllIdentity("users"),
-                identitySubjectGroupsPromise = policyDelegate.getAllIdentity("groups");
+                appName =                   args[0],
+                policyName =                args[1],
+                policyPromise =             this.getPolicy(policyName),
+                appPromise =                policyDelegate.getApplicationByName(appName),
+                allSubjectsPromise =        policyDelegate.getSubjectConditions(),
+                allEnvironmentsPromise =    policyDelegate.getEnvironmentConditions(),
+                allUserAttributesPromise =  policyDelegate.getAllUserAttributes();
 
-            $.when(policyPromise, appPromise, allSubjectsPromise, allEnvironmentsPromise, allUserAttributesPromise, identitySubjectUsersPromise, identitySubjectGroupsPromise)
-                .done(function (policy, app, allSubjects, allEnvironments, allUserAttributes, identitySubjectUsers, identitySubjectGroups) {
+            $.when(policyPromise, appPromise, allSubjectsPromise, allEnvironmentsPromise, allUserAttributesPromise)
+                .done(function (policy, app, allSubjects, allEnvironments, allUserAttributes) {
                 var actions = [],
                     subjects = [],
                     conditions = [],
@@ -103,8 +104,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
 
                 data.options.availableEnvironments = _.findByValues(allEnvironments[0].result, 'title', app[0].conditions);
                 data.options.availableSubjects =     _.findByValues(allSubjects[0].result, 'title', app[0].subjects);
-
-                self.identityFix(data.options.availableSubjects,identitySubjectUsers,identitySubjectGroups);
 
                 self.parentRender(function () {
 
@@ -162,7 +161,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             this.data.subjectString =       JSON.stringify(this.data.entity.subject, null, 2);
             this.data.environmentString =   JSON.stringify(this.data.entity.condition, null, 2);
         },
-       
+
         submitForm: function () {
             var policy = this.data.entity,
                 persistedPolicy = _.clone(policy),
@@ -181,7 +180,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             if (this.data.entityName) {
                 policyDelegate.updatePolicy(this.data.entityName, persistedPolicy)
                 .done( function (e) {
-                    console.log(e);
                     router.routeTo(router.configuration.routes.managePolicies, {args: [persistedPolicy.applicationName], trigger: true});
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyUpdated");
                 })
@@ -212,7 +210,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToPersistPolicy");
                 } else {
                     console.error(e.responseJSON, e.responseText, e);
-                    messager.messages.addMessage( obj ); 
+                    messager.messages.addMessage( obj );
                 }
 
             } else if (e.status === 400 || e.status === 404){
@@ -231,31 +229,19 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     this.data.options.invalidName = true;
                     reviewInfoView.render(this.data, null, this.$el.find('#reviewInfo'), this.reviewTemplate);
                     delete this.data.options.invalidName;
-                    messager.messages.addMessage( obj ); 
+                    messager.messages.addMessage( obj );
 
                 } else {
                     console.log(e.responseJSON, e.responseText, e);
-                    messager.messages.addMessage( obj ); 
+                    messager.messages.addMessage( obj );
                 }
 
             } else {
                 console.log(e.responseJSON, e.responseText, e);
-                messager.messages.addMessage( obj ); 
-            }
-        },
-
-        identityFix: function (availableSubjects,identitySubjectUsers,identitySubjectGroups) {
-            // this is a temporary client-side fix as the endpoint as yet does not return any information about the available lookups
-            var identity = _.find(availableSubjects, function(item){
-                    return item.title === "Identity";
-                });
-             if(identity && identity.config.properties.subjectValues) {
-                identity.config.properties.subjectValues.dataSources = [
-                    {name:"users", data:identitySubjectUsers[0].result},
-                    {name:"groups", data:identitySubjectGroups[0].result}
-                ];
+                messager.messages.addMessage( obj );
             }
         }
+
     });
 
     return new EditPolicyView();

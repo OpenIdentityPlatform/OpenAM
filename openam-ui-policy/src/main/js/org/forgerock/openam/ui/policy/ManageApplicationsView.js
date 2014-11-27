@@ -221,7 +221,5 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
     });
 
-
-
     return new ManageApplicationsView();
 });

@@ -77,6 +77,5 @@ define("org/forgerock/openam/ui/policy/PolicyEditorUtils", [
         return new Handlebars.SafeString(result);
     });
 
-
     return obj;
 });

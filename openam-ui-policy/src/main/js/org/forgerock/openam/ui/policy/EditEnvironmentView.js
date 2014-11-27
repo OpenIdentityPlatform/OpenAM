@@ -70,8 +70,10 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             this.weekdays = this.getWeekDays();
 
             _.each(this.data.conditions, function (condition) {
-                condition.i18nKey = self.i18n.condition.key + condition.title + self.i18n.condition.title;
+                condition.i18nKey = $.t(self.i18n.condition.key + condition.title + self.i18n.condition.title);
             });
+
+            this.data.conditions = _.sortBy(this.data.conditions, "i18nKey");
 
             this.$el.append(uiUtils.fillTemplateWithData("templates/policy/EditEnvironmentTemplate.html", this.data));
 
@@ -104,7 +106,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
         createListItem: function(allEnvironments, item){
             var self = this,
-                itemToDisplay = {},
+                itemToDisplay = null,
                 data = item.data().itemData,
                 type,
                 html;
@@ -114,6 +116,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
             if (data) {
                 type = data.type;
+                itemToDisplay = {};
                 _.each(data, function (val, key) {
                     if (key === 'type') {
                         itemToDisplay['policy.common.type'] = $.t(self.i18n.condition.key + type + self.i18n.condition.title);
@@ -152,18 +155,14 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             });
         },
 
-        buttonControlClick: function (e) {
-            if (e.type === 'keyup' && e.keyCode !== 13) {
-                return;
-            }
-
-            var $target = $(e.currentTarget),
-                buttonControl = $target.closest('ul.buttonControl'),
+        buttonControlClick: function(e){
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            var target = $(e.currentTarget),
+                buttonControl = target.closest('ul.buttonControl'),
                 label = buttonControl.prev('label').data().title;
-
-            this.$el.data().itemData[label] = $target.data('val');
+            this.$el.data().itemData[ label ] = e.currentTarget.innerText === "true";
             buttonControl.find('li a').removeClass('selected');
-            $target.addClass('selected');
+            target.addClass('selected');
         },
 
 
@@ -264,7 +263,6 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                 schema       = {},
                 html         = '',
                 returnVal    = '',
-                selectize    = false,
                 selectedType = e.target.value,
                 delay        = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
                 i18nKey,
@@ -276,7 +274,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                     returnVal = '';
 
                     if (itemData.type === "SimpleTime") {
-                        // 'SimpleTime' is a special case and requires its own template. 
+                        // 'SimpleTime' is a special case and requires its own template.
                         // This is because the endpoint only describes the inputs as strings, however in order to build a helpful UI we need to do more.
                         returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrTimeDate.html", {
                             weekdays: self.weekdays,
@@ -346,86 +344,109 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             if (this.$el.data().itemData && this.$el.data().itemData.type === selectedType) {
                 itemData = this.$el.data().itemData;
             } else {
-                itemData.type = schema.title;
-                _.map(schema.config.properties, function(value,key) {
-                    switch (value.type) {
-                        case 'string':
-                            itemData[key] = '';
-                        break;
-                        case 'number':
-                        case 'integer':
-                            itemData[key] = 0;
-                        break;
-                        case 'boolean':
-                            itemData[key] = false;
-                        break;
-                        case 'array':
-                            itemData[key] = [];
-                        break;
-                        case 'object':
-                            itemData[key] = {};
-                        break;
-                        default:
-                            console.error('Unexpected data type:',key,value);
-                        break;
-                    }
-                });
+
+                itemData = self.setDefaultJsonValues(schema);
                 self.$el.data('itemData',itemData);
             }
 
             if (itemData) {
 
                 html = buildHTML(schema.config.properties);
-
-                // all items expect the title selector are contained inside either a no-float or a clear-left
-                this.$el.find('.no-float').fadeOut(500);
-                this.$el.find('.clear-left').fadeOut(500);
-
-                this.$el.find('.field-float-pattern, .field-float-selectize, .timezone-field')
-                    .find('label').removeClass('showLabel')
-                    .next('input').addClass('placeholderText');
-          
-                this.$el.find('.field-float-select select:not(#selection)').addClass('placeholderText')
-                    .prev('label').removeClass('showLabel');
-
-                this.$el.removeClass('invalid-rule');
+                self.animateOut();
 
                 // setTimeout needed to delay transitions.
                 setTimeout( function() {
 
                     self.$el.find('.no-float').remove();
                     self.$el.find('.clear-left').remove();
-
                     self.$el.find('#typeSelector').after( html );
 
-                    if (itemData.type === "SimpleTime") {
-                        self.initClockPickers();
-                        self.initDatePickers();
-                        self.getTimeZones();
-                    } else {
+                    self.initOptions(itemData, schema);
+                    self.animateIn();
 
-                        selectize =  _.find(schema.config.properties, function(item){
-                            return item.type === 'array'; 
-                        });
-
-                        if(selectize){
-                            self.initSelectize();
-                        }
-                    }
-
-                    setTimeout( function() {
-                        self.$el.find('.field-float-pattern, .field-float-selectize, .timezone-field')
-                            .find('label').addClass('showLabel')
-                            .next('input, div input').removeClass('placeholderText').prop('readonly', false);
-
-                        self.$el.find('.field-float-select select:not(#selection)').removeClass('placeholderText').prop('readonly', false)
-                            .prev('label').addClass('showLabel');
-
-                        self.delegateEvents();
-                    }, 10);
                 }, delay);
             }
+        },
+
+        initOptions: function(itemData, schema){
+
+            var selectize = false;
+
+            if (itemData.type === "SimpleTime") {
+                this.initClockPickers();
+                this.initDatePickers();
+                this.getTimeZones();
+            } else {
+
+                selectize =  _.find(schema.config.properties, function(item){
+                    return item.type === 'array';
+                });
+
+                if (selectize) {
+                    this.initSelectize();
+                }
+            }
+        },
+
+        setDefaultJsonValues: function(schema){
+
+            var itemData = {type: schema.title};
+            _.map(schema.config.properties, function(value,key) {
+                switch (value.type) {
+                    case 'string':
+                        itemData[key] = '';
+                    break;
+                    case 'number':
+                    case 'integer':
+                        itemData[key] = 0;
+                    break;
+                    case 'boolean':
+                        itemData[key] = false;
+                    break;
+                    case 'array':
+                        itemData[key] = [];
+                    break;
+                    case 'object':
+                        itemData[key] = {};
+                    break;
+                    default:
+                        console.error('Unexpected data type:',key,value);
+                    break;
+                }
+            });
+
+            return itemData;
+        },
+
+        animateOut: function(){
+            // all items except the title selector are contained inside either a no-float or a clear-left
+            this.$el.find('.no-float').fadeOut(500);
+            this.$el.find('.clear-left').fadeOut(500);
+            this.$el.find('.field-float-pattern, .field-float-selectize, .timezone-field')
+                .find('label').removeClass('showLabel')
+                .next('input').addClass('placeholderText');
+
+            this.$el.find('.field-float-select select:not(#selection)').addClass('placeholderText')
+                .prev('label').removeClass('showLabel');
+
+            this.$el.removeClass('invalid-rule');
+        },
+
+        animateIn: function(){
+            var self = this;
+            setTimeout( function() {
+                self.$el.find('.field-float-pattern, .field-float-selectize, .timezone-field')
+                    .find('label').addClass('showLabel')
+                    .next('input, div input').removeClass('placeholderText').prop('readonly', false);
+
+                self.$el.find('.field-float-select select:not(#selection)').removeClass('placeholderText').prop('readonly', false)
+                    .prev('label').addClass('showLabel');
+
+                self.delegateEvents();
+            }, 10);
         }
+
+
     });
 
     return EditEnvironmentView;

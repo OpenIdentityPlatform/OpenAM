@@ -214,6 +214,7 @@ html body .ui-jqgrid tr.ui-widget-content{
 
             &:hover {
                 background-color: #FFB5B5;
+                color: inherit;
             }
 
         }
@@ -262,7 +263,8 @@ html body .ui-jqgrid tr.ui-widget-content{
 
         &:hover, &:focus{
             background-color: #D7E9F8;
-            box-shadow:none;
+            box-shadow: none;
+            color: #1f6fb1;
         }
 
     }
@@ -863,6 +865,15 @@ html .selectize-dropdown .optgroup-header{
     border-radius: 0;
 }
 
+
+.selectize-dropdown-content > div{
+    border-top: 1px solid #eee;
+
+    &:first-of-type{
+        border-top:none;
+    }
+}
+
 span.realm,.content-bg .policy-header h2 span.realm  {
     font-size: 20px;
     font-weight: bold;
@@ -1293,7 +1304,7 @@ body.editing{
          div.field-float-selectize {
             position: relative;
             float: left;
-            min-width: 133px;
+            min-width: 145px;
             max-width: 588px;
             margin: 5px 5px 0 5px; // margin-bottom:0; required for clearing
 

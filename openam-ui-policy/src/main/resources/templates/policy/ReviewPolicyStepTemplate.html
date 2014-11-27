@@ -8,12 +8,12 @@
         {{#unless advancedMode}}
         {{#if entity.name}}
         <span class="icon-arrow-down2"></span>
-        {{/if}} 
+        {{/if}}
         {{/unless}}
         <div class="advanced-mode">
-            
+
             <p id="reviewName"{{#unless entity.name}} class="invalid"{{/unless}}>{{#if entity.name}}{{entity.name}}{{else}}{{t "policy.summaryReview.noName"}}{{/if}}</p>
-        
+
             {{#if entity.description}}
             <h2>{{t "policy.common.description"}}</h2>
             <p id="reviewDesc">{{entity.description}}</p>
