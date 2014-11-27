@@ -510,40 +510,49 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
      </step>
 
      <step>
-      <para>Under Access Control &gt; <replaceable>realm-name</replaceable> &gt;
-      Policies, click New Policy...</para>
+      <para>
+       Access the policy editor under
+       Access Control > <replaceable>realm-name</replaceable> > Policies.
+      </para>
      </step>
 
      <step>
-      <para>Set Name: Test policy.</para>
+      <para>
+       Choose an application that allows the resource pattern
+       <literal>http://www.example.com/*</literal>,
+       and HTTP GET as an action.
+      </para>
+
+      <para>
+       If no application exists in the realm, add a new application
+       for the resource pattern <literal>http://www.example.com/*</literal>.
+      </para>
      </step>
 
      <step>
-      <para>Click Rules &gt; New... and set the following.</para>
+      <para>
+       Add a new policy with the following characteristics.
+      </para>
 
       <itemizedlist>
-       <listitem><para>Service Type: <literal>URL Policy Agent</literal></para></listitem>
-       <listitem><para>Name: <literal>http://www.example.com/</literal></para></listitem>
-       <listitem><para>Resource Name: <literal>http://www.example.com/</literal></para></listitem>
-       <listitem><para>Actions: allow <literal>GET</literal></para></listitem>
+       <listitem>
+        <para>
+         Resource pattern: <literal>http://www.example.com/*</literal>
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+         Actions: allow <literal>GET</literal>
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+         Subject conditions: <literal>Authenticated Users</literal>
+        </para>
+       </listitem>
       </itemizedlist>
-
-      <para>Then click Finish.</para>
-     </step>
-
-     <step>
-      <para>Click Subjects &gt; New... and set the following.</para>
-
-      <itemizedlist>
-       <listitem><para>Type: <literal>Authenticated Users</literal></para></listitem>
-       <listitem><para>Name: <literal>All authenticated users</literal></para></listitem>
-      </itemizedlist>
-
-      <para>Then click Finish.</para>
-     </step>
-
-     <step>
-      <para>Click OK to save the new Test policy.</para>
      </step>
     </substeps>
    </step>
