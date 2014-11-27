@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock AS
+  !      Copyright 2013-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-dashboard'
@@ -78,7 +78,6 @@
    which can be enabled by logging in to OpenAM Console as administrator
    and making sure that XUI is enabled
    under Configuration > Authentication > Core > XUI Interface > Enabled.
-   OpenAM does not provide a Dashboard out of the box for the classic UI.
   </para>
 
   <para>

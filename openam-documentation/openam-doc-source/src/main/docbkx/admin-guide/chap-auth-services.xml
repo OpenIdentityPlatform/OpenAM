@@ -1637,13 +1637,13 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
         <title>Core - Global Attributes</title>
 
         <para>The Global Attributes includes the list of available modules, LDAP connection
-            settings, authentication process options, and an option to make the XUI the
-            default interface. The Global Attributes are defined in the
+            settings, authentication process options, and an option to disable the XUI
+            and make the classic UI the default end user interface.
+            The Global Attributes are defined in the
             <link xlink:href="reference#authentication-configuration" xlink:show="new"
                   xlink:role="http://docbook.org/xlink/role/olink">
                 <citetitle>Authentication Configuration</citetitle></link> section of the
             OpenAM Reference Guide.</para>
-        <!-- New "XUI Interface" option added to that section of the Reference Guide -->
     </section>
 
     <section xml:id="auth-core-realm-attributes">
@@ -5258,7 +5258,7 @@ ssoadm \
    one occurrence of each.</para>
 
    <note><para>The way you enter parameters depends on whether you are using the
-   classic UI or the XUI. For example, if you want to request that OpenAM end the
+   XUI or the classic UI. For example, if you want to request that OpenAM end the
    user's current session and start a new session in the classic UI, you might enter
    a URL similar to: <literal>http://openam.example.com:8080/openam/UI/Login?locale=fr</literal>.
    Alternatively, for the JavaScript-based XUI, the corresponding URL would be subtly different:

@@ -113,10 +113,6 @@
   You can set this property in OpenAM console under Configuration &gt; Servers
   and Sites &gt; Servers &gt; Server Name &gt; Advanced.</para>
 
-  <para>The XUI is experimental and not supported for production use. The only
-  language locale available for the XUI at this time is US English, in the
-  <filename>/path/to/openam/webapps/XUI/locales</filename> directory.</para>
-
   <para>
    On hosts with pure IPv6 networks, OpenAM configuration has been seen to fail
    while starting the embedded OpenDJ directory server

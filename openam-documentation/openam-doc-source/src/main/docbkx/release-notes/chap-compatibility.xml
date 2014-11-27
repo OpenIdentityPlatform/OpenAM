@@ -238,6 +238,14 @@
     </para>
    </listitem>
 
+   <listitem>
+    <para>
+     Classic (JATO-based) UI is deprecated for end user pages.
+     OpenAM offers the JavaScript-based XUI as a replacement.
+     Classic UI for end user pages is likely to be removed in a future release.
+    </para>
+   </listitem>
+
    <!-- Are any of these deprecated features removed in OpenAM 12.0.0? -->
    <!-- START: Deprecated in OpenAM 11.0.0 -->
    <listitem>

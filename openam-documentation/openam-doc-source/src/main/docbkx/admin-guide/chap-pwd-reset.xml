@@ -127,13 +127,16 @@
  </section>
  
  <section xml:id="forgotten-pwd-reset">
-  <title>Resetting Forgotten Passwords</title>
+  <title>Resetting Forgotten Passwords (Legacy)</title>
   
-  <para>OpenAM can provide self-service password reset for forgotten passwords.
-  To enable self-service password reset, you must configure the password
-  reset service itself, which consists mainly of setting up secret questions,
-  and configuring an SMTP mail server to send reset passwords to the users
-  of the service.</para>
+  <para>
+   OpenAM can provide self-service password reset for forgotten passwords
+   when end user pages are served by the classic UI.
+   To enable self-service password reset, you must configure the password
+   reset service itself, which consists mainly of setting up secret questions,
+   and configuring an SMTP mail server to send reset passwords to the users
+   of the service.
+  </para>
   
   <tip>
    <para>Users must be able to access their mail after the service resets
