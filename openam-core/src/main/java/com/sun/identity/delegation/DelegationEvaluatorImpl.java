@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.delegation;
 
 import com.iplanet.sso.SSOException;
@@ -100,10 +104,8 @@ public class DelegationEvaluatorImpl implements DelegationEvaluator {
     /**
      * Constructor of <code>DelegationEvaluator</code> to get access control
      * permissions for users.
-     *
-     * @throws DelegationException for any abnormal condition
      */
-    public DelegationEvaluatorImpl() throws DelegationException {
+    public DelegationEvaluatorImpl() {
         if (debug.messageEnabled()) {
             debug.message("Instantiated a DelegationEvaluator.");
         }
