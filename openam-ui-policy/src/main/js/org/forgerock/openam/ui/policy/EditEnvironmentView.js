@@ -156,15 +156,16 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
         },
 
         buttonControlClick: function(e){
-            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
-            var target = $(e.currentTarget),
-                buttonControl = target.closest('ul.buttonControl'),
+            if (e.type === 'keyup' && e.keyCode !== 13) {
+                return;
+            }
+            var $target = $(e.currentTarget),
+                buttonControl = $target.closest('ul.buttonControl'),
                 label = buttonControl.prev('label').data().title;
-            this.$el.data().itemData[ label ] = e.currentTarget.innerText === "true";
+            this.$el.data().itemData[label] = $target.data('val');
             buttonControl.find('li a').removeClass('selected');
-            target.addClass('selected');
+            $target.addClass('selected');
         },
-
 
         initDatePickers: function() {
           this.$el.find( "#startDate" ).datepicker({
