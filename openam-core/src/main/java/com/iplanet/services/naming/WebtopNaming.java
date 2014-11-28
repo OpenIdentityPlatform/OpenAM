@@ -1121,7 +1121,7 @@ public class WebtopNaming {
      * @throws URLNotFoundException if the Naming Service can not
      *     find a URL for a specified service
      */
-    public synchronized static URL getNotificationURL()
+    public static URL getNotificationURL()
             throws URLNotFoundException {
         try {
             String url = System.getProperty(Constants.CLIENT_NOTIFICATION_URL,
