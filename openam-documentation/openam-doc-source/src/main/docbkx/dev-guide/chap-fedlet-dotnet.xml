@@ -399,6 +399,19 @@ Hosted entity descriptor was written to idp.xml.</computeroutput>
    <filename>sp.xml</filename> and <filename>sp-extended.xml</filename>
    metadata.</para>
 
+   <para>
+    Before importing <filename>sp-extended.xml</filename>,
+    make a copy called <filename>sp-extended-copy.xml</filename>
+    and set <literal>hosted="0"</literal> in the root element of the copy.
+   </para>
+
+   <para>
+    Use the copy, <filename>sp-extended-copy.xml</filename>,
+    when importing the Fedlet configuration into OpenAM.
+    OpenAM must register the Fedlet
+    as a <emphasis>remote</emphasis> service provider.
+   </para>
+
    <screen>
 $ <userinput>ssoadm \
  import-entity \
@@ -406,10 +419,10 @@ $ <userinput>ssoadm \
  --password-file /tmp/pwd.txt \
  --cot fedlet-cot \
  --meta-data-file sp.xml \
- --extended-data-file sp-extended.xml</userinput>
+ --extended-data-file sp-extended-copy.xml</userinput>
 
 <computeroutput>Import file, sp.xml.
-Import file, sp-extended.xml.</computeroutput>
+Import file, sp-extended-copy.xml.</computeroutput>
    </screen>
 
    <para>You can also perform this step in OpenAM console by selecting
@@ -833,9 +846,24 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
     </step>
 
     <step>
+     <para>
+      Make a copy of <filename>sp-extended.xml</filename>
+      called <filename>sp-extended-copy.xml</filename>
+      and set <literal>hosted="0"</literal> in the root element of the copy.
+     </para>
+
+     <para>
+      Use the copy, <filename>sp-extended-copy.xml</filename>,
+      when importing the Fedlet configuration into OpenAM.
+      OpenAM must register the Fedlet
+      as a <emphasis>remote</emphasis> service provider.
+     </para>
+    </step>
+
+    <step>
      <para>Under Federation > Entity Providers, click Import Entity..., and
      then import the .NET Fedlet configuration using your
-     <filename>sp.xml</filename> and <filename>sp-extended.xml</filename>
+     <filename>sp.xml</filename> and <filename>sp-extended-copy.xml</filename>
      metadata files.</para>
     </step>
    </substeps>
