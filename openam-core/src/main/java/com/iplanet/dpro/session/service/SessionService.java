@@ -103,6 +103,7 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.AccessController;
+import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -133,6 +134,7 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
+import org.forgerock.openam.utils.PerThreadCache;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
@@ -278,7 +280,21 @@ public class SessionService {
 
     public static final String SESSION_SERVICE = "session";
 
-    private static SecureRandom secureRandom = null;
+    private static PerThreadCache<SecureRandom, RuntimeException> secureRandom =
+            new PerThreadCache<SecureRandom, RuntimeException>(Integer.MAX_VALUE) {
+        @Override
+        protected SecureRandom initialValue() {
+            try {
+                try {
+                    return SecureRandom.getInstance("SHA1PRNG", "SUN");
+                } catch (NoSuchProviderException e) {
+                    return SecureRandom.getInstance("SHA1PRNG");
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException("Need SHA1PRNG algorithm to continue");
+            }
+        }
+    };
 
     private static Hashtable<SessionID, InternalSession> sessionTable = null;
 
@@ -678,7 +694,7 @@ public class SessionService {
 
         session.setCreationTime();
         session.setLatestAccessTime();
-        String amCtxId = Long.toHexString(secureRandom.nextLong())
+        String amCtxId = Long.toHexString(secureRandom.getInstanceForCurrentThread().nextLong())
                 + (isSiteEnabled ? thisSessionServerID : sessionServerID);
         session.putProperty(Constants.AM_CTX_ID, amCtxId);
         session.putProperty(Session.lbCookieName,
@@ -693,7 +709,7 @@ public class SessionService {
      * @return emcrypted ID string
      */
     private String generateEncryptedID() {
-        String r = Long.toHexString(secureRandom.nextLong());
+        String r = Long.toHexString(secureRandom.getInstanceForCurrentThread().nextLong());
         // TODO note that this encryptedID string is kept only
         // to make this compatible with older Java SDK clients
         // which knew too much about the structure of the session id
@@ -728,7 +744,7 @@ public class SessionService {
             }
 
             // AME-129, always set a Storage Key regardless of persisting or not.
-            ext.put(SessionID.STORAGE_KEY, String.valueOf(secureRandom.nextLong()));
+            ext.put(SessionID.STORAGE_KEY, String.valueOf(secureRandom.getInstanceForCurrentThread().nextLong()));
 
             String sessionID = SessionID.makeSessionID(encryptedID, ext,
                     httpSessionId);
@@ -1842,13 +1858,6 @@ public class SessionService {
             } else {
                 sessionServiceID = new URL(WebtopNaming.getServerFromID(
                         sessionServerID));
-            }
-
-            // Obtain the secureRandom instance
-            try {
-                secureRandom = SecureRandom.getInstance("SHA1PRNG", "SUN");
-            } catch (NoSuchProviderException e) {
-                secureRandom = SecureRandom.getInstance("SHA1PRNG");
             }
 
             sessionTable = new Hashtable<SessionID, InternalSession>();
