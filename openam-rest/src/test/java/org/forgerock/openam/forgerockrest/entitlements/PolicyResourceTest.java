@@ -126,7 +126,8 @@ public class PolicyResourceTest {
         JsonValue json = new JsonValue("");
         CreateRequest request = mockCreateRequest(id, json);
 
-        given(mockParser.parsePolicy(id, json)).willThrow(new EntitlementException(EntitlementException.INVALID_JSON));
+        given(mockParser.parsePolicy(id, json)).willThrow(new EntitlementException(EntitlementException.INVALID_JSON,
+                "Mock error message"));
 
         // When
         policyResource.createInstance(mockServerContext, request, mockResultHandler);

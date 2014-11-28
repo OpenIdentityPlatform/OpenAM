@@ -76,7 +76,7 @@ public final class JsonPolicyParser implements PolicyParser {
             throws EntitlementException {
 
         if (json == null || json.isNull()) {
-            throw new EntitlementException(EntitlementException.INVALID_JSON);
+            throw new EntitlementException(EntitlementException.INVALID_JSON, "No JSON body provided.");
         }
 
         return parsePrivilege(name, json);
@@ -151,7 +151,7 @@ public final class JsonPolicyParser implements PolicyParser {
             throw new EntitlementException(EntitlementException.INVALID_VALUE,
                     new Object[] { ex.getUnrecognizedPropertyName() });
         } catch (JsonMappingException ex) {
-            throw new EntitlementException(EntitlementException.INVALID_JSON, ex);
+            throw new EntitlementException(EntitlementException.INVALID_JSON, ex, ex.getCause().getMessage());
         } catch (IOException e) {
             throw new EntitlementException(EntitlementException.UNABLE_TO_CREATE_POLICY, e);
         }
