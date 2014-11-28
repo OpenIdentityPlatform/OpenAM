@@ -42,6 +42,7 @@ import org.testng.annotations.Test;
 
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -213,7 +214,7 @@ public class SessionResourceTest {
         final Map<String, Object> authzContext = new HashMap<String, Object>();
         authzContext.put("tokenId", "SSO_TOKEN_ID");
         final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
-        final ServerContext context = new ServerContext(new AdviceContext(tokenContext));
+        final ServerContext context = new ServerContext(new AdviceContext(tokenContext, Collections.<String>emptySet()));
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
         final SSOTokenID ssoTokenId = mock(SSOTokenID.class);
