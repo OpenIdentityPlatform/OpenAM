@@ -637,7 +637,9 @@ public class SampleAuthPrincipal implements Principal, Serializable
   </itemizedlist>
   
   <para>The service configuration file,
-  <filename>amAuthSampleAuth.xml</filename>, is shown below.</para>
+  <filename>amAuthSampleAuth.xml</filename>, is shown below.
+   Save a local copy of this file, which you use when registering the module.
+  </para>
   
   <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!--
@@ -777,7 +779,7 @@ $ <userinput>ssoadm \
  create-svc \
  --adminid amadmin \
  --password-file /tmp/pwd.txt \
- --xmlfile amAuthSampleAuth.xml</userinput>
+ --xmlfile /path/to/amAuthSampleAuth.xml</userinput>
 
 <computeroutput>Service was added.</computeroutput>
 $ <userinput>ssoadm \
