@@ -3732,6 +3732,21 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
      <listitem>
       <para>Class implementing attribute mapping with a multiple value field. Default:
       <literal>org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper</literal></para>
+      <para>Provided implementations are:</para>
+      <simplelist>
+       <member><literal>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</literal></member>
+       <member><literal>org.forgerock.openam.authentication.modules.oidc.JwtAttributeMapper</literal>
+        (can only be used when using the <literal>openid</literal> scope)</member>
+      </simplelist>
+      <tip><para>You can provide string constructor parameters by appending
+       pipe (<literal>|</literal>) separated values.</para>
+      <para>For example, the
+       <literal>org.forgerock.openam.authentication.modules.oidc.JwtAttributeMapper</literal>
+       class can take two constructor parameters: a comma-separated list of
+       attributes and a prefix to apply to their values. Specify these as
+       follows:</para>
+      <para><literal>org.forgerock.openam.authentication.modules.oidc.JwtAttributeMapper|uid,employeeNumber|myPrefix-</literal>
+      </para></tip>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-attribute-mapper</literal></para>
      </listitem>
@@ -4175,18 +4190,17 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
         xlink:href="http://openid.net/specs/openid-connect-core-1_0.html#IDToken"
        >ID Token</link> section of the OpenID Connect Core 1.0 specification
        defines a number of claims included in the ID Token for all flows.
-       Additional claims depend on the scopes
-       requested of the OpenID Connect provider.
+       Additional claims depend on the scopes requested of the OpenID Connect
+       provider.
       </para>
 
       <para>
-       For each item in the map,
-       the key is the local user profile attribute name
-       and the value is the ID Token field name.
+       For each item in the map, the key is the ID Token field name and the
+       value is the local user profile attribute name.
       </para>
 
       <para>
-       Default: <literal>mail=email</literal>, <literal>uid=sub</literal>
+       Default: <literal>email=mail</literal>, <literal>sub=uid</literal>
       </para>
 
       <para>
