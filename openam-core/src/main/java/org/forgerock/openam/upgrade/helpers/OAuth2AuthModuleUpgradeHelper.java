@@ -43,6 +43,13 @@ public class OAuth2AuthModuleUpgradeHelper extends AbstractUpgradeHelper {
             return newAttr;
         }
 
+        // The type of org-forgerock-auth-oauth-attribute-mapper changed from "single" to "list".
+        //
+        if (ATTRIBUTE_MAPPER_PROPERTY.equals(newAttr.getName())
+                && newAttr.getType() != oldAttr.getType()) {
+            return newAttr;
+        }
+
         return null;
     }
 }
