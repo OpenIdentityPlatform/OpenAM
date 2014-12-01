@@ -219,6 +219,11 @@
        xlink:show="new"
        xlink:href="https://console.developers.google.com/project"
        ><citetitle>Google Developers Console</citetitle></link></para>
+      <note><para>You must enable the Google+ API in order to
+       authenticate with Google. To enable the Google+ API,
+       login to the Google Developers Console, select your project,
+       navigate to APIs &amp; auth > APIs, and then set the status of the
+       <literal>Google+ API</literal> to <literal>ON</literal>.</para></note>
      </listitem>
     </varlistentry>
     <varlistentry>
