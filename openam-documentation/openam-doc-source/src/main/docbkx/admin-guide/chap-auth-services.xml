@@ -2645,22 +2645,34 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   
   <section xml:id="hotp-module-conf-hints">
    <title>Hints for the HOTP Authentication Module</title>
-   <para>The HMAC One-Time Password authentication module works together with
-   the Data Store module to retrieve a user's mail address or telephone number
-   to send a one-time password to complete authentication.</para>
-   <para>To use HOTP you set up an authentication chain with the Data Store
-   module as the <literal>requisite</literal> first module, and the HOTP module
-   as the second <literal>requisite</literal> module. When authentication
-   succeeds against the Data Store module, OpenAM passes the Email Address
-   and Telephone Number attributes from the user profile to the HOTP module.
-   For the HOTP module to use either attribute, the Email Address must contain
-   a valid email address, or the Telephone Number must contain a valid
-   SMS telephone number.</para>
-   <para>You can set the HOTP module to automatically generate a password when
-   users begin logging into the system. You can also setup a mobile phone, 
-   mobile carrier, and email attributes for tighter controls over where 
-   the messages are generated and what provider the messages go through to reach
-   the user.</para>
+   <para>The HMAC One-Time Password authentication module works together in an
+    authentication chain with any module that stores the <literal>username</literal>
+    attribute.
+    The module uses the <literal>username</literal> from the <literal>sharedState</literal>
+    set by the previous module in the chain and retrieves the user's email address
+    or telephone number to send a one-time password to the user. The user then
+    enters the password on a Login page and completes the authentication process if
+    successful.
+   </para>
+   <para>
+    For example, to set up HOTP in an authentication chain, you can configure
+    the Data Store module (or any module that stores the user's
+    <literal>username</literal>) as the <literal>requisite</literal> first module,
+    and the HOTP module as the second <literal>requisite</literal> module.
+    When authentication succeeds against the Data Store module, the HOTP module
+    retrieves the Email Address and Telephone Number attributes from the data store
+    based on the <literal>username</literal> value.
+    For the HOTP module to use either attribute, the Email Address must contain
+    a valid email address, or the Telephone Number must contain a valid
+    SMS telephone number.
+   </para>
+   <para>
+    You can set the HOTP module to automatically generate a password when
+    users begin logging into the system. You can also setup mobile phone,
+    mobile carrier, and email attributes for tighter controls over where
+    the messages are generated and what provider the messages go through to
+    reach the user.
+   </para>
    <indexterm>
     <primary>Authentication</primary>
     <secondary>HMAC One-Time Password (HOTP)</secondary>
