@@ -124,7 +124,13 @@ $ <userinput>cp ~/Downloads/openam/${distauthWarFile} \
   <title>To Configure the DAS</title>
  
   <step>
-   <para>Configure the DAS using the agent profile to connect to OpenAM.</para>
+   <para>
+    Configure the DAS using the agent profile to connect to OpenAM. The DAS agent
+    profile can only be configured in the top level realm ("/").
+    If working with sub-realms, you may then define the Realm/DNS alias for the
+    DAS under Access Control &gt; <replaceable>Realm Name</replaceable> &gt; General.
+   </para>
+
    <mediaobject xml:id="figure-das-complete-config">
     <alt>Completed DAS configuration screen</alt>
     <imageobject>
@@ -132,6 +138,7 @@ $ <userinput>cp ~/Downloads/openam/${distauthWarFile} \
     </imageobject>
     <textobject><para>Configure access to OpenAM.</para></textobject>
    </mediaobject>
+
    <para>Most DAS configuration choices require no clarification. Hints for
    equivocal parameters follow.</para>
    <variablelist>
