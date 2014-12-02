@@ -48,7 +48,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.serviceCall = function (args) {
         var realm = conf.globalData.auth.realm;
         if (realm !== "/" && // prevents urls like /openam/json//applicationtypes
-            _.find(["/applications", "/policies", "/referrals"], function (w) { // the only three options which are currently realm "aware"
+            _.find(["/applications", "/policies", "/referrals", "/users"], function (w) { // the only four options which are currently realm "aware"
                 return args.url.indexOf(w) === 0;
             })) {
             args.url = realm + args.url;
@@ -197,16 +197,23 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         });
     };
 
-    obj.getAllIdentity = function (name) {
+    obj.queryIdentities = function (name, query) {
         return obj.serviceCall({
-            url: "/" + name + "?_queryId",
+            url: "/" + name + "?_queryId=" + query + "*",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+        });
+    };
+
+    obj.getUniversalId = function (name, type) {
+        return obj.serviceCall({
+            url: "/" + type + "/" + name + "?_fields=universalid",
+            headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=2.0"}
         });
     };
 
     obj.getAllRealms = function () {
         return obj.serviceCall({
-            url: "/realms?_queryFIlter=true",
+            url: "/realms?_queryFilter=true",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };

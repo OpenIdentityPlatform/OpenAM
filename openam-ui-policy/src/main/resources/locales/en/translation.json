@@ -419,11 +419,14 @@
           "Identity": {
               "title": "Users & Groups",
               "props": {
-                  "subjectValues": "Subject Values"
-              }
+                  "subjectValues": "Subject Values",
+                  "users": "User Subjects",
+                  "groups": "Group Subjects"
+              },
+              "placeholder" : "Search for subjects"
           },
           "JwtClaim": {
-              "title": "Jwt Claim",
+              "title": "OpenID Connect/JWT Claim",
               "props": {
                   "claimName": "Claim Name",
                   "claimValue": "Claim Value"

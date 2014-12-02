@@ -1,6 +1,5 @@
 <li class="rule clearfix invalid-rule" id="environment_{{itemID}}" tabindex="0" >
 
-
 	<span class="item-button-panel">
 		<span tabindex="0" class="icon-pencil"></span>
 		<span tabindex="0" class="icon-remove"></span>
@@ -13,7 +12,7 @@
 			<select id="selection" class="placeholdertext" tabindex="0" >
 				<option value="" selected disabled >{{t "policy.common.select"}}</option>
 				{{#conditions}}
-                <option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{t i18nKey}}</option>
+                <option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{i18nKey}}</option>
                 {{/conditions}}
 			</select>
 		</div>
