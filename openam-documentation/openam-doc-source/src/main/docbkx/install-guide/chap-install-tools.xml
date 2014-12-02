@@ -90,6 +90,7 @@
   <step>
    <para>Make sure OpenAM is installed and running before proceeding.</para>
   </step>
+
   <step>
    <para>Make sure the <literal>JAVA_HOME</literal> environment variable
    is properly set.</para>
@@ -117,8 +118,8 @@ $ <userinput>cd /path/to/openam-tools/admin</userinput>
 $ <userinput>unzip ~/Downloads/openam/${ssoadminZipFile}</userinput>
    </screen>
   </step>
-  <step performance="optional">
 
+  <step performance="optional">
    <para>Optional. Add <literal>--acceptLicense</literal> to the
     <command>java</command> command at the end of the <command>setup</command> or
     <command>setup.bat</command> script to auto-accept the license agreement and
@@ -126,15 +127,47 @@ $ <userinput>unzip ~/Downloads/openam/${ssoadminZipFile}</userinput>
 
     <programlisting language="shell">
 $JAVA_HOME/bin/java -D"load.config=yes" \
-             -D"help.print=$help_print" \
-             -D"path.AMConfig=$path_AMConfig" \
-             -D"path.debug=$path_debug" \
-             -D"path.log=$path_log" \
-             -cp "$CLASSPATH" \
-             com.sun.identity.tools.bundles.Main \
-             --acceptLicense
+                    -D"help.print=$help_print" \
+                    -D"path.AMConfig=$path_AMConfig" \
+                    -D"path.debug=$path_debug" \
+                    -D"path.log=$path_log" \
+                    -cp "$CLASSPATH" com.sun.identity.tools.bundles.Main \
+                    --acceptLicense
     </programlisting>
-     </step>
+  </step>
+
+  <step performance="optional">
+   <para>If you connect to OpenAM over HTTPS and the certificate for the container
+    is not signed by a Certificate Authority (CA), then you must configure a
+    trust store with OpenAM's certificate for the <command>ssoadm</command> tool.
+    Otherwise, the <command>ssoadm</command> tool cannot trust OpenAM and
+    cannot complete the handshake phase of setting up a secure connection.
+   </para>
+
+   <para>
+    Once you have set up your trust store, you must update the <literal>setup.sh</literal>
+    (or <literal>setup.bat</literal> on Windows) scripts so that <command>ssoadm</command>
+    can reference the trust store.
+    The <command>ssoadm</command> by default tries to trust the certificate
+    based on the CA certificates in the Java <literal>cacerts</literal> truststore.
+    The issuer certificate of the
+    configuration data store's server certificate must be included in the
+    truststore.
+   </para>
+
+   <para>To identify the proper trust store,
+    add an additional option to the <command>java</command> command in
+    the script.
+    The following example points to the key
+    store in which Tomcat holds the certificate that it presents
+    when establishing an HTTPS connection.
+   </para>
+
+   <literallayout>
+$ JAVA_HOME/bin/java -D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.jks"
+   </literallayout>
+  </step>
+
   <step performance="optional">
    <para>If you use IBM Java, add
    <literal>-D"amCryptoDescriptor.provider=IBMJCE"</literal> and
@@ -186,14 +219,12 @@ The version of your server instance is: OpenAM <replaceable>version and date</re
    </screen>
 
    <para>After setup, the tools are located under a directory named after the
-   instance of OpenAM.</para>
+   instance of OpenAM. On Windows, these files are .bat scripts.</para>
 
    <screen>
 $ <userinput>ls openam/bin/</userinput>
 <computeroutput>ampassword  amverifyarchive  ssoadm</computeroutput>
    </screen>
-
-   <para>On Windows, these files are .bat scripts.</para>
   </step>
 
   <step performance="optional">
@@ -237,37 +268,41 @@ http://openam.example.com:8080/openam</computeroutput>
   <para>Not all of the sub-commands available through the <command>ssoadm</command>
   command are available on the <literal>ssoadm.jsp</literal> web page.</para>
   </step>
+
   <step performance="optional">
-   <para>If you connect to OpenAM over SSL (HTTPS), the <command>ssoadm</command>
-   by default tries to trust the certificate based on the CA certificates in
-   the Java <literal>cacerts</literal> truststore. This might not work for your
-   deployment.</para>
+   <para>If you connect to OpenAM over HTTPS, the <command>ssoadm</command>
+    by default tries to trust the certificate based on the CA certificates in
+    the Java <literal>cacerts</literal> truststore. This might not work for your
+    deployment.</para>
 
    <para >If the SSL certificate configured for the container where you deployed
-   OpenAM was not signed by a recognized CA then the SSL connection process
-   fails. For example, if you used a self-signed certificate as described in the
-   <citetitle>Administration Guide</citetitle> procedure, <link
-   xlink:href="admin-guide#openam-with-https-on-tomcat"
-   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up OpenAM
-   With HTTPS on Tomcat</citetitle></link>, then the <command>ssoadm</command>
-   command cannot trust that certificate by default. To allow the
-   <command>ssoadm</command> command to trust the certificate, edit the
-   <command>ssoadm</command> (<command>ssoadm.bat</command> on Windows)
-   script as follows.</para>
+    OpenAM was not signed by a recognized CA then the SSL connection process
+    fails. For example, if you used a self-signed certificate as described in the
+    <citetitle>Administration Guide</citetitle> procedure, <link
+     xlink:href="admin-guide#openam-with-https-on-tomcat"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up OpenAM
+     With HTTPS on Tomcat</citetitle></link>, then the <command>ssoadm</command>
+    command cannot trust that certificate by default. To allow the
+    <command>ssoadm</command> command to trust the certificate, edit the
+    <command>ssoadm</command> (<command>ssoadm.bat</command> on Windows)
+    script as follows.</para>
 
-   <para>Add two additional options to the <command>java</command> command in
-   the script to identify the proper trust store and trust store password,
-   depending on how you set up SSL. The following example points to the key
-   store in which Tomcat holds the self-signed certificate that it presents
-   when establishing an HTTPS connection.</para>
+   <para>To identify the proper trust store,
+    add an additional option to the <command>java</command> command in
+    the script.
+    The following example points to the keystore in which Tomcat holds the
+    self-signed certificate that it presents
+    when establishing an HTTPS connection. The issuer certificate of the configuration
+    data store's server certificate must be included in the truststore.
+   </para>
 
-   <literallayout class="monospaced"
-   >-D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.jks"
- -D"javax.net.ssl.trustStorePassword=changeit"</literallayout>
+   <literallayout>
+$ JAVA_HOME/bin/java -D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.jks"
+   </literallayout>
 
    <para>If the <command>ssoadm</command> command cannot access the server
-   key store in this way, set up your own trust store and import the server
-   certificate using the Java <command>keytool</command> command.</para>
+    key store in this way, set up your own trust store and import the server
+    certificate using the Java <command>keytool</command> command.</para>
   </step>
 
   <step>
@@ -339,7 +374,7 @@ $ <userinput>mkdir -p /path/to/openam-tools/config</userinput>
 
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
-   <informalexample><!--?dbfo pgwide="1"?-->
+   <informalexample>
 
    <screen>
 $ <userinput>cd /path/to/openam-tools/config</userinput>
@@ -376,7 +411,11 @@ $ <userinput>unzip ~/Downloads/openam/${ssoconfigZipFile}</userinput>
    <para>
     The ${ssoconfigJarFile} relies on a properties file
     to specify the configuration for the OpenAM server.
-    The following example shows the equivalent of a default configuration.
+    The following example shows the equivalent of a default configuration, which
+    installs OpenAM to run as HTTP.
+   </para>
+   <para>
+    If you want implement HTTPS, see the next step.
    </para>
 
    <screen>
@@ -440,6 +479,49 @@ Creating Web Service Security Agents....Done
 Setting up monitoring authentication file.
 Configuration complete!</computeroutput>
    </screen>
+  </step>
+  <step>
+   <para>
+    To configure HTTPS, you create a properties file and include
+    the <literal>SERVER_URL</literal> property with the HTTPS URL
+    and set the <literal>DIRECTORY_SSL</literal> to <literal>SSL</literal>
+    as follows (the other properties remain the same):
+   </para>
+   <screen>
+$ <userinput>cp sampleconfiguration config.properties</userinput>
+$ <userinput>vi config.properties</userinput>
+$ <userinput>$ grep -v "^#" config.properties | grep -v "^$"</userinput>
+<computeroutput>SERVER_URL=https://openam.example.com:1443
+DEPLOYMENT_URI=/openam
+BASE_DIR=/home/openam/openam
+locale=en_US
+PLATFORM_LOCALE=en_US
+AM_ENC_KEY=
+ADMIN_PWD=password
+AMLDAPUSERPASSWD=secret12
+COOKIE_DOMAIN=.example.com
+ACCEPT_LICENSES=true
+DATA_STORE=embedded
+DIRECTORY_SSL=SSL
+DIRECTORY_SERVER=openam.example.com
+DIRECTORY_PORT=50389
+DIRECTORY_ADMIN_PORT=4444
+DIRECTORY_JMX_PORT=1689
+ROOT_SUFFIX=dc=openam,dc=forgerock,dc=org
+DS_DIRMGRDN=cn=Directory Manager
+DS_DIRMGRPASSWD=password</computeroutput>
+   </screen>
+   <para>
+    Then, when the OpenAM .war file is deployed and the server is running, configure the
+    server to use HTTPS using the ${ssoconfigJarFile} tool with the properties file
+    as follows:
+   </para>
+   <screen>
+java '-Djavax.net.ssl.trustStore=PATH_TO_JKS_TRUSTSTORE' \
+      -jar ${ssoconfigJarFile} \
+      --file config.properties
+   </screen>
+  </step>
 
    <para>
     For additional information about the command-line tool,
@@ -457,17 +539,21 @@ Configuration complete!</computeroutput>
         the user: using the configuration file or using a command-line option.
         You can include an optional <literal>ACCEPT_LICENSES=true</literal> property
         in the ${ssoconfigJarFile} configuration file.
+       </para>
+       <para>
         You can also use the <option>--acceptLicense</option> option with the
         configurator tool on the command line. The configuration file property
         has precedence over the command-line option. The default value is
-        <literal>false</literal>, which always displays the license acceptance screen.</para>
+        <literal>false</literal>, which always displays the license acceptance screen.
+       </para>
 
        <screen>
-$ <userinput>java -jar ${ssoconfigJarFile} --file config.properties \
-       --acceptLicense</userinput>
+$ <userinput>java -jar ${ssoconfigJarFile} \
+  --file config.properties \
+  --acceptLicense</userinput>
        </screen>
    </note>
-  </step>
+
  </procedure>
 
  <!--
