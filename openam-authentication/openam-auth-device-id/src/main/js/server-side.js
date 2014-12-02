@@ -743,7 +743,7 @@ function compareDevicePrintProfiles(attributeConfig, devicePrint, devicePrintPro
 
     /* update profile */
     selectedProfile.selectionCounter = selectedProfile.selectionCounter + 1;
-    selectedProfile.lastSelectedDate = new Date().toISOString();
+    selectedProfile.lastSelectedDate = new Date().getTime();
     selectedProfile.devicePrint = devicePrint;
 
     vals = [];

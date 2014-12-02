@@ -59,10 +59,10 @@ public class ProfilePersisterTest {
 
         Map<String, Object> profileOne = new HashMap<String, Object>();
         profileOne.put("uuid", "UUID1");
-        profileOne.put("lastSelectedDate", new Date(new Date().getTime() - 172800));
+        profileOne.put("lastSelectedDate", new Date().getTime() - 172800);
         Map<String, Object> profileTwo = new HashMap<String, Object>();
         profileTwo.put("uuid", "UUID2");
-        profileTwo.put("lastSelectedDate", new Date(new Date().getTime() - 86400));
+        profileTwo.put("lastSelectedDate", new Date().getTime() - 86400);
 
         List<Map<String, Object>> profiles = new ArrayList<Map<String, Object>>();
         profiles.add(profileOne);
