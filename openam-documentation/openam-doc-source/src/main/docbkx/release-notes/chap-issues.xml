@@ -78,48 +78,74 @@
  <section xml:id="limitations">
   <title>Limitations</title>
 
-  <!-- For OPENAM-1886 TODO: Remove when this is fixed after 10.1.0-Xpress -->
-  <para>When session failover is configured to use external OpenDJ directory
-  servers, OpenAM must access those directory servers through an LDAP load
-  balancer that can fail over connections from OpenAM whenever a directory
-  server goes offline. Otherwise, sessions could continue to persist after
-  users logout of OpenAM.</para>
+  <itemizedlist>
+   <listitem>
+    <!-- For OPENAM-1886 TODO: Remove when this is fixed after 10.1.0-Xpress -->
+    <para><emphasis role="bold">Session Failover with External OpenDJ Servers</emphasis>.
+     When session failover is configured to use external OpenDJ directory
+     servers, OpenAM must access those directory servers through an LDAP load
+     balancer that can fail over connections from OpenAM whenever a directory
+     server goes offline. Otherwise, sessions could continue to persist after
+     users logout of OpenAM.</para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Different OpenAM Version within a Site</emphasis>.
+     Do not run different versions of OpenAM together in the same OpenAM
+     site.</para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Deleting Referral Policy</emphasis>.
+     OpenAM allows you to delete a referral policy
+     even if policies depending on the referral still exist in the target realm.
+     Deleting a referral policy that other policies depend on
+     can cause problems during policy evaluation.
+     You must therefore make sure that no policies
+     depend on any referrals that you delete.
+    </para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Deploying OpenAM on Windows in an IPv6 Network</emphasis>.
+     When deploying OpenAM components on Microsoft Windows in an IPv6 environment,
+     you must use the Java 7 Development Kit on Windows (due to
+     <link xlink:show="new"
+           xlink:href="http://bugs.sun.com/view_bug.do?bug_id=6230761">JDK-6230761</link>,
+     which is fixed only in Java 7).</para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Database Repository Type is Experimental</emphasis>.
+     The Database Repository type of data store is experimental and not
+     supported for production use.</para>
+   </listitem>
+   <listitem>
+    <!-- Fix for OPENAM-1032: Add details to the release notes and documentation of OpenAM (for 875) -->
+    <para><emphasis role="bold">Enforcing Session Quotas with Session Failover</emphasis>.
+     By default OpenAM does not enforce session quotas when running in Site
+     mode without session failover. To work around this behavior, set the server
+     configuration property
+     <literal>openam.session.useLocalSessionsInMultiServerMode=true</literal>.
+     You can set this property in OpenAM console under Configuration &gt; Servers
+     and Sites &gt; Servers &gt; Server Name &gt; Advanced.</para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">OpenAM with Embedded Directory Server in IPv6 Networks</emphasis>.
+     On hosts with pure IPv6 networks, OpenAM configuration has been seen to fail
+     while starting the embedded OpenDJ directory server
+     (<link xlink:show="new"
+            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3008"
+     >OPENAM-3008</link>).
+    </para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">JBoss 6.3 Support for Java 8</emphasis>.
+     As of this writing, JBoss 6.3/AS 7.4.0 does not support Java 8.
+     Until JBoss 6.3 fully supports Java 8, you can use JDK 1.7.0_56
+     (<link xlink:show="new"
+            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4876"
+      >OPENAM-4876</link>).
+    </para>
+   </listitem>
+  </itemizedlist>
 
-  <para>Do not run different versions of OpenAM together in the same OpenAM
-  site.</para>
-
-  <para>
-   OpenAM allows you to delete a referral policy
-   even if policies depending on the referral still exist in the target realm.
-   Deleting a referral policy that other policies depend on
-   can cause problems during policy evaluation.
-   You must therefore make sure that no policies
-   depend on any referrals that you delete.
-  </para>
-
-  <para>When deploying OpenAM components on Microsoft Windows in an IPv6 environment,
-  you must use the Java 7 Development Kit on Windows (due to <link xlink:show="new"
-  xlink:href="http://bugs.sun.com/view_bug.do?bug_id=6230761">JDK-6230761</link>,
-  which is fixed only in Java 7).</para>
-
-  <para>The Database Repository type of data store is experimental and not
-  supported for production use.</para>
-
-  <!-- Fix for OPENAM-1032: Add details to the release notes and documentation of OpenAM (for 875) -->
-  <para>By default OpenAM does not enforce session quotas when running in Site
-  mode without session failover. To work around this behavior, set the server
-  configuration property
-  <literal>openam.session.useLocalSessionsInMultiServerMode=true</literal>.
-  You can set this property in OpenAM console under Configuration &gt; Servers
-  and Sites &gt; Servers &gt; Server Name &gt; Advanced.</para>
-
-  <para>
-   On hosts with pure IPv6 networks, OpenAM configuration has been seen to fail
-   while starting the embedded OpenDJ directory server
-   (<link xlink:show="new"
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3008"
-   >OPENAM-3008</link>).
-  </para>
  </section>
 
  <section xml:id="known-issues">
