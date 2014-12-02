@@ -79,12 +79,12 @@ public class ProfilePersister {
                 removeOldestProfile(profiles);
             }
 
-            Date lastSelectedDate = new Date();
+            long lastSelectedDate = System.currentTimeMillis();
             Map<String, Object> profile = new HashMap<String, Object>();
             profile.put("uuid", uuid);
-            profile.put("name", (name == null || name.isEmpty()) ? generateProfileName(lastSelectedDate) : name);
+            profile.put("name", (name == null || name.isEmpty()) ? generateProfileName(new Date(lastSelectedDate)) : name);
             profile.put("selectionCounter", 1);
-            profile.put("lastSelectedDate", lastSelectedDate.getTime());
+            profile.put("lastSelectedDate", lastSelectedDate);
             profile.put("devicePrint", devicePrint);
 
             profiles.add(profile);
@@ -113,11 +113,12 @@ public class ProfilePersister {
      */
     private void removeOldestProfile(List<Map<String, Object>> profiles) {
         Map<String, Object> oldestProfile = null;
-        Date oldestDate = new Date();
+        long oldestDate = System.currentTimeMillis();
 
         for (Map<String, Object> profile : profiles) {
-            if (((Date) profile.get("lastSelectedDate")).before(oldestDate)) {
-                oldestDate = ((Date) profile.get("lastSelectedDate"));
+            long lastSelectedDate = (Long)profile.get("lastSelectedDate");
+            if (lastSelectedDate < oldestDate) {
+                oldestDate = lastSelectedDate;
                 oldestProfile = profile;
             }
         }
