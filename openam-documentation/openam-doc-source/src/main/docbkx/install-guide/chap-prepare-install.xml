@@ -382,7 +382,7 @@ ds-privilege-name: password-reset</programlisting>
  </section>
 
  <section xml:id="prepare-configuration-store">
-  <title>Preparing a Configuration Data Store</title>
+  <title>Preparing an External Configuration Data Store</title>
 
   <indexterm>
    <primary>Directory service requirements</primary>
@@ -437,7 +437,7 @@ ds-privilege-name: password-reset</programlisting>
   </tip>
 
   <procedure xml:id="install-prepare-opendj-external-config-store">
-    <title>To Install and Prepare the External OpenDJ Directory Server</title>
+    <title>To Install an External OpenDJ Directory Server</title>
 
     <para>
      The following example procedure shows how to prepare a single OpenDJ
@@ -471,7 +471,7 @@ $ <userinput>./setup --cli</userinput>
        <colspec colnum="1" colwidth="1*"/>
        <colspec colnum="2" colwidth="1*"/>
        <thead>
-        <row>
+        <row><?dbfo bgcolor="#EEEEEE" ?>
          <entry>Parameter</entry>
          <entry>Example Inputs</entry>
         </row>
@@ -662,6 +662,10 @@ $ <userinput>bin/ldapmodify \
        definitions manually.</para>
      </note>
 
+     <para>
+      If you are having difficulty successfully adding the <literal>global-aci</literal>
+      attribute, try doing so without any line breaks.
+     </para>
      <screen>
 $ <userinput>bin/dsconfig \
    set-access-control-handler-prop \
@@ -671,7 +675,6 @@ $ <userinput>bin/dsconfig \
     --port 4444 \
     --bindDN "cn=Directory Manager" \
     --bindPassword pwd \
-    --useSSL \
     --trustAll \
     --no-prompt</userinput>
      </screen>
@@ -733,7 +736,7 @@ $ <userinput>bin/ldapmodify \
        <colspec colnum="2" colwidth="1*"/>
 
        <thead>
-        <row>
+        <row><?dbfo bgcolor="#EEEEEE" ?>
          <entry>Attribute</entry>
          <entry>Indexes Required</entry>
         </row>
@@ -767,7 +770,7 @@ $ <userinput>bin/dsconfig \
    --hostname opendj.example.com \
    --bindDN "cn=Directory Manager" \
    --bindPassword password \
-   --backend-name userRoot \
+   --backend-name cfgstore \
    --index-name iplanet-am-user-federation-info-key \
    --set index-type:equality \
    --trustAll \
@@ -1350,9 +1353,12 @@ Command start-domain executed successfully.</computeroutput>
  -->
 
  <section xml:id="prepare-jboss-7">
-  <title>Preparing OpenAM &amp; JBoss AS 7 / EAP 6 / WildFly 8</title>
 
-    <para>Some preparation is required to deploy OpenAM on JBoss AS 7 / EAP 6 / WildFly 8.</para>
+  <!--title>Preparing OpenAM &amp; JBoss AS7 / EAP 6 / WildFly 8</title-->
+  <title>Preparing OpenAM &amp; JBoss AS 7 / EAP 6</title>
+
+  <!--para>Some preparation is required to deploy OpenAM on JBoss AS 7 / EAP 6 / WildFly 8.</para-->
+  <para>Some preparation is required to deploy OpenAM on JBoss AS 7 / EAP 6.</para>
 
     <para>The following instructions provide guidance for both standalone and domain deployments.
     OpenAM must be able to store its configuration between restarts. The procedures listed here are
@@ -1362,18 +1368,18 @@ Command start-domain executed successfully.</computeroutput>
     AS, see the following article on <link xlink:href="https://access.redhat.com/site/articles/112673"
     xlink:show="new"><citetitle>JBoss Enterprise Application Platform Component Details</citetitle></link>.</para>
 
-    <para>
+    <!--para>
      This section also covers workarounds for using OpenAM on WildFly 8.
-    </para>
+    </para-->
 
-    <para>Once JBoss or WildFly has been configured, you can then prepare OpenAM for deployment, by making a few changes
+    <para>Once JBoss has been configured, you can then prepare OpenAM for deployment, by making a few changes
     to the contents of the OpenAM <filename>.war</filename> archive.</para>
 
         <itemizedlist>
             <listitem><para><xref linkend="prep-jboss-710-711" /></para></listitem>
             <listitem><para><xref linkend="prep-jboss-600-601" /></para></listitem>
             <listitem><para><xref linkend="prep-jboss-61x" /></para></listitem>
-            <listitem><para><xref linkend="prep-wildfly-81" /></para></listitem>
+            <!--listitem><para><xref linkend="prep-wildfly-81" /></para></listitem-->
             <listitem><para><xref linkend="prep-jboss-for-openam" /></para></listitem>
             <listitem><para><xref linkend="prep-openam-for-jboss" /></para></listitem>
         </itemizedlist>
@@ -1567,7 +1573,7 @@ $ <userinput>jar cvf ../openam.war *</userinput>
 
         </procedure>
 
- <procedure xml:id="prep-wildfly-81">
+ <!--procedure xml:id="prep-wildfly-81">
   <title>To Prepare WildFly 8</title>
 
   <para>
@@ -1665,7 +1671,7 @@ $ <userinput>jar cf ../openam.war *</userinput>
     by following the steps in <xref linkend="prep-jboss-for-openam" />.
    </para>
   </step>
- </procedure>
+ </procedure-->
 
         <procedure xml:id="prep-jboss-for-openam">
             <title>To Prepare JBoss for OpenAM</title>
