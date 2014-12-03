@@ -1657,7 +1657,6 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
     page before options for Persistent Cookies.</para>
     <variablelist>
     <varlistentry>
-    <term><emphasis>User Profile</emphasis></term>
      <term>User Profile</term>
      <listitem>
       <para>Whether a user profile needs to exist in the user data store,
@@ -1722,12 +1721,38 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
      <term>Alias Search Attribute Name</term>
      <listitem>
       <para>After a user is successfully authenticated, the user's profile is
-      retrieved. OpenAM first searches for the user based on the data store settings. 
-      If that fails to find the user, OpenAM will use the attributes listed here to 
-      lookup the user profile. This setting accepts any data store specific attribute 
-      name.</para>
+       retrieved. OpenAM first searches for the user based on the data store settings.
+       If that fails to find the user, OpenAM will use the attributes listed here to
+       lookup the user profile. This setting accepts any data store specific attribute
+       name.
+      </para>
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-alias-attr-name</literal></para>
+       <literal>iplanet-am-auth-alias-attr-name</literal>
+      </para>
+      <note>
+       <para>
+        If the <literal>Alias Search Attribute Name</literal> property is empty,
+        OpenAM uses the <literal>iplanet-am-auth-user-naming-attr</literal> property
+        from the <literal>iPlanetAmAuthService</literal>.
+        The <literal>iplanet-am-auth-user-naming-attr</literal> property is only
+        configurable through the <command>ssoadm</command> command-line tool and
+        not through the OpenAM console.
+       </para>
+       <screen>
+$ ssoadm get-realm-svc-attrs \
+  --adminid amadmin \
+  --password-file PATH_TO_PWDFILE \
+  --realm REALM \
+  --servicename iPlanetAMAuthService
+
+$ ssoadm set-realm-svc-attrs \
+  --adminid amadmin \
+  --password-file PATH_TO_PWDFILE \
+  --realm REALM \
+  --servicename iPlanetAMAuthService \
+  --attributevalues iplanet-am-auth-user-naming-attr=SEARCH_ATTRIBUTE
+       </screen>
+      </note>
      </listitem>
     </varlistentry>
 
@@ -4412,7 +4437,6 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
 
       <note><para>Unlike the legacy Core Authentication module, the Persistent Cookie module does not
       support the iPSPCookie option described in <xref linkend="authn-from-browser" /></para></note>
-
   </section>
 
   <section xml:id="radius-module-conf-hints">
@@ -4512,8 +4536,6 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
      <literal>sunAMAuthSAEAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
-
-
   </section>
 
   <section xml:id="scripted-module-conf-hints">
@@ -4821,15 +4843,17 @@ ssoadm \
   
   <section xml:id="desktop-module-conf-hints">
    <title>Hints for the Windows Desktop SSO Authentication Module</title>
-   <para>The Windows Desktop SSO module uses Kerberos authentication. The user
-   presents a Kerberos token to OpenAM through the Simple and Protected
-   GSS-API Negotiation Mechanism (SPNEGO) protocol. The Windows Desktop SSO
-   authentication module enables desktop single sign on such that a user who
-   has already authenticated with a Kerberos Key Distribution Center can
-   authenticate to OpenAM without having to provide the login information
-   again. Users might need to set up Integrated Windows Authentication in
-   Internet Explorer to benefit from single sign on when logged on to
-   a Windows desktop.</para>
+   <para>
+    The Windows Desktop SSO module uses Kerberos authentication. The user
+    presents a Kerberos token to OpenAM through the Simple and Protected
+    GSS-API Negotiation Mechanism (SPNEGO) protocol. The Windows Desktop SSO
+    authentication module enables desktop single sign on such that a user who
+    has already authenticated with a Kerberos Key Distribution Center can
+    authenticate to OpenAM without having to provide the login information
+    again. Users might need to set up Integrated Windows Authentication in
+    Internet Explorer to benefit from single sign on when logged on to
+    a Windows desktop.
+   </para>
    <indexterm>
     <primary>Authentication</primary>
     <secondary>Kerberos</secondary>
@@ -4838,7 +4862,7 @@ ssoadm \
     <primary>Authentication</primary>
     <secondary>Windows Desktop SSO</secondary>
    </indexterm>
-   
+
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthWindowsDesktopSSOService</literal></para>
    
@@ -4912,21 +4936,37 @@ ssoadm \
     <varlistentry>
      <term>Search for the user in the realm</term>
      <listitem>
-     <para>Validates the user against the configured data stores. If the user from the
-     Kerberos token is not found, authentication will fail. If an authentication
-     chain is set, the user will be able to authenticate through another module.</para>
+     <para>
+      Validates the user against the configured data stores. If the user from the
+      Kerberos token is not found, authentication will fail. If an authentication
+      chain is set, the user is able to authenticate through another module.
+      This search uses the <literal>Alias Search Attribute Name</literal> from
+      the core realm attributes. See
+      <link xlink:show="new"
+            xlink:href="admin-guide#auth-core-realm-attributes"
+            xlink:role="http://docbook.org/xlink/role/olink">
+       <citetitle>Core - Realm Attributes</citetitle></link> for more information.
+     </para>
      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-windowsdesktopsso-lookupUserInRealm</literal></para>
      </listitem>
     </varlistentry>
    </variablelist>
 
-  <note><para>Note: For Windows 7 and later, you will need to turn off the "Enable
-  Integrated Windows Authentication" option in Internet Explorer. In addition, you
-  will need to add and activate the DisableNTMLPreAuth key to the Windows Registry.
-  For detailed instructions, see the Microsoft KB article on when <link xlink:show="new"
-  xlink:href="http://support.microsoft.com/kb/251404"><citetitle>You cannot post data
-  to a non-NTLM-authenticated Web site</citetitle></link></para></note>
+   <note>
+    <para>
+     For Windows 7 and later, you will need to turn off the "Enable
+
+     Integrated Windows Authentication" option in Internet Explorer. In addition, you
+
+     will need to add and activate the DisableNTMLPreAuth key to the Windows Registry.
+
+     For detailed instructions, see the Microsoft KB article on when
+     <link xlink:show="new"
+           xlink:href="http://support.microsoft.com/kb/251404"><citetitle>You cannot post data
+      to a non-NTLM-authenticated Web site</citetitle></link>.
+    </para>
+   </note>
 
   </section>
   
