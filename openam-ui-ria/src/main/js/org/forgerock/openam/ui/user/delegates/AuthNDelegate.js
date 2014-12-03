@@ -122,10 +122,10 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 obj.handleRequirements(requirements);
                 promise.resolve(requirements);
             },
-            processFailed = function () {
+            processFailed = function (reason) {
                 var failedStage = requirementList.length;
                 obj.resetProcess();
-                promise.reject(failedStage);
+                promise.reject(failedStage, reason);
             },
             goToFailureUrl = function (errorBody) {
                 if (errorBody.detail && errorBody.detail.failureUrl) {
@@ -150,7 +150,8 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                   function (jqXHR) {
                     var oldReqs,errorBody,msg,
                         currentStage = requirementList.length,
-                        responseMessage = jqXHR.responseJSON.message;
+                        responseMessage = jqXHR.responseJSON.message,
+                        failReason = null;
                     if (jqXHR.status === 408) {
                         // we timed out, so let's try again with a fresh session
                         oldReqs = requirementList[0];
@@ -195,11 +196,12 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                                .fail(processFailed);
 
                         } else {
-                            if (errorBody.message === "User Account Locked"){
-                                eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loginFailureLockout");
-                            } else {
-                                processFailed();
+                            if (errorBody.message === "User Account Locked") {
+                                failReason = "loginFailureLockout";
+                            } else if (errorBody.message === "Maximum Sessions Limit Reached.") {
+                                failReason = "maxSessionsLimitOrSessionQuota";
                             }
+                            processFailed(failReason);
                             goToFailureUrl(errorBody);
                         }
                     }

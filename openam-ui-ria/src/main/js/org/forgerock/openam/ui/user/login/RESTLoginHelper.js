@@ -78,12 +78,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                             }
                         }
                     },
-                    function (failedStage) {
+                    function (failedStage, errorMsg) {
                         if (failedStage > 1) {
                             // re-render login form, sending back to the start of the process.
                             viewManager.refresh();
                         }
-                        errorCallback();
+                        errorCallback(errorMsg);
                     });
         
         });

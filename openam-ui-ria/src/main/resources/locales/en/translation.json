@@ -10,6 +10,7 @@
             "CommonMessages" : {
                 "authenticationFailed" : "Login/password combination is invalid.",
                 "loginFailureLockout" : "This user is not active. Contact your system administrator.",
+                "maxSessionsLimitOrSessionQuota": "Maximum sessions limit reached or session quota has exhausted.",
                 "invalidRealm" : "The realm doesn't exist",
                 "serviceUnavailable" : "Service unavailable",
                 "unknown" : "Unknown error. Please contact your Administrator",
