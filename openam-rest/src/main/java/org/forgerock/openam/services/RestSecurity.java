@@ -101,7 +101,7 @@ public class RestSecurity {
         private boolean currentRealmTargetedByOrganizationUpdate(String serviceName, String version, String orgName, int type) {
             return serviceName.equalsIgnoreCase(SERVICE_NAME) &&
                     version.equalsIgnoreCase(SERVICE_VERSION) &&
-                    (ServiceListener.MODIFIED == type) &&
+                    (ServiceListener.MODIFIED == type || ServiceListener.ADDED == type) &&
                     (orgName != null) &&
                     orgName.equals(DNMapper.orgNameToDN(realm));
         }
