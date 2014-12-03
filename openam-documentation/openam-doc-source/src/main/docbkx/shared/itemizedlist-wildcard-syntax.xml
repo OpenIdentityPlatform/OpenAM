@@ -28,8 +28,9 @@
               xsi:schemaLocation="http://docbook.org/ns/docbook
                                   http://docbook.org/xml/5.0/xsd/docbook.xsd">
  <para>
-  A Rule can specify an individual URL or resource name to protect.
-  Alternatively, a Rule can match URLs or resource names by using wildcards.
+  Resource patterns can specify an individual URL or resource name to protect.
+  Alternatively, a resource pattern can match URLs or resource names by using
+  wildcards.
  </para>
  <listitem>
   <para>
@@ -37,10 +38,10 @@
   </para>
 
   <para>
-   These wildcards can be used throughout Rules
+   These wildcards can be used throughout resource patterns
    to match URLs or resource names.
-   For a Rule used to match URLs, wildcards can be employed
-   in the scheme, host, port, path, and query string of the Rule.
+   For a resource pattern used to match URLs, wildcards can be employed to match
+   the scheme, host, port, path, and query string of the resource.
   </para>
  </listitem>
 
@@ -51,8 +52,8 @@
 
   <para>
    For example, <literal>http://www.example.com/*</literal> matches
-   <literal>http://www.example.com/index.html</literal>,
-   <literal>http://www.example.com/</literal>, and also
+   <literal>http://www.example.com/</literal>,
+   <literal>http://www.example.com/index.html</literal>, and also
    <literal>http://www.example.com/company/images/logo.png</literal>.
   </para>
  </listitem>
@@ -72,14 +73,14 @@
  <listitem>
   <para>
    Wildcards do not match <literal>?</literal>.
-   You must explicitly add Rules to match URLs with query strings.
+   You must explicitly add patterns to match URLs with query strings.
   </para>
 
   <!-- The following is very likely to change before 12.0.0,
        meaning wildcards will match 0 or more characters.
        TBC -->
   <para>
-   When used at the end of a rule after a <literal>?</literal> character,
+   When used at the end of a pattern after a <literal>?</literal> character,
    <literal>*</literal> matches one or more characters,
    not zero or more characters.
   </para>
@@ -92,16 +93,16 @@
 
   <para>
    For example, to match everything under
-   <literal>http://www.example.com/</literal> specify three Rules,
+   <literal>http://www.example.com/</literal> specify three patterns,
    one for <literal>http://www.example.com/*</literal>,
    one for <literal>http://www.example.com/*?</literal>, and
    one for <literal>http://www.example.com/*?*</literal>.
   </para>
 
   <para>
-   When defining Rules to match URLs with query strings, know that
-   OpenAM sorts the query string field-value pairs by field name
-   when normalizing URLs, before checking whether a policy matches.
+   When defining patterns to match URLs with query strings, OpenAM sorts the
+   query string field-value pairs alphabetically by field name
+   when normalizing URLs before checking whether a policy matches.
    Therefore the query string
    <literal>?subject=SPBnfm+t5PlP+ISyQhVlplE22A8=&amp;action=get</literal>
    is equivalent to the query string
@@ -126,13 +127,13 @@
   <para>
    <literal>http://www.example.com/path</literal>,
    and <literal>http://www.example.com/path/</literal>
-   are considered distinct resources.
+   are considered two distinct resources.
   </para>
  </listitem>
 
  <listitem>
   <para>
-   Wildcards can be used in protocols, host names, and port numbers.
+   Wildcards can be used to match protocols, host names, and port numbers.
   </para>
 
   <para>
@@ -159,7 +160,8 @@
 
  <listitem>
   <para>
-   Do not mix <literal>*</literal> and <literal>-*-</literal> in the same Rule.
+   Do not mix <literal>*</literal> and <literal>-*-</literal> in the same
+   pattern.
   </para>
  </listitem>
 

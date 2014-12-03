@@ -572,8 +572,8 @@ $ <userinput>mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</user
     <literal>password</literal>.</para>
 
     <para>After login, OpenAM should direct you to the console at
-    <literal>http://openam.example.com:8080/openam/console</literal> and then
-    to the common tasks page.</para>
+    <literal>http://openam.example.com:8080/openam/task/Home</literal> and then
+    to the Common Tasks tab.</para>
 
     <mediaobject xml:id="figure-openam-common-tasks">
      <alt>OpenAM Common Tasks</alt>
@@ -610,8 +610,9 @@ $ <userinput>mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</user
    earlier.</para>
 
    <step>
-    <para>In OpenAM Console, click the Access Control tab, then in the Realms
-    table click the link to / (Top Level Realm).</para>
+    <para>In OpenAM Console, click the Access Control tab,
+     then in the Realms table click the link to
+     <literal>/ (Top Level Realm)</literal>.</para>
 
     <para>OpenAM allows you to organize identities, policies, and policy agent
     profiles into realms as described in the <citetitle>Administration
@@ -622,25 +623,30 @@ $ <userinput>mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</user
    </step>
 
    <step>
-    <para>In the Console page for the top level realm, click the Policies tab,
-    and then click New Policy.</para>
+    <para>In the Console page for the top level realm,
+     click the Policies tab, click
+     <literal>iPlanetAMWebAgentService</literal>, and
+     then click Add New Policy.</para>
+    <para>For more information on the relationship between realms,
+     applications, and policies, see <citetitle>Administration
+      Guide</citetitle> chapter, <link xlink:show="new"
+      xlink:href="admin-guide#what-is-authz"
+      xlink:role="http://docbook.org/xlink/role/olink">
+      <citetitle>About Authorization in OpenAM</citetitle></link>.</para>
    </step>
 
    <step>
     <para>Give your new policy the name <literal>Authenticated users can get
-    Apache HTTP home page</literal>.</para>
+    Apache HTTP home page</literal>, and then click Next.</para>
    </step>
 
    <step>
-    <para>In the Rules table, click New, select URL Policy Agent (with
-    resource name), click Next, and then create a rule for resource
-    <literal>http://www.example.com:8000/</literal> that allows HTTP GET, and
-    then click Finish to save your work.</para>
-
-    <para>
-     Make sure you add the trailing <literal>/</literal> in the rule.
-     Otherwise the policy does not match the HTTP GET.
-    </para>
+    <para>In the Specify Resources step, click
+    <literal>*://*:*/*</literal> to move the pattern to the
+     Create your resources section. Then, replace the
+     asterisks so that the pattern reads:
+     <literal>http://www.example.com:8000/*</literal>, and then click the
+     Add icon.</para>
 
     <mediaobject xml:id="figure-openam-policy-rule">
      <alt>OpenAM Policy Rule</alt>
@@ -652,13 +658,20 @@ $ <userinput>mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</user
      </textobject>
     </mediaobject>
 
-    <para>OpenAM applies this rule to subjects that you specify next.</para>
+    <para>Click Next to proceed.</para>
    </step>
+   <step><para>In the Select Actions step, select the
+    <literal>GET</literal> and
+    <literal>POST</literal> actions,
+    ensure their value is set to <literal>Allow</literal>, and
+    then click Next.</para></step>
 
    <step>
-    <para>In the Subjects table, click New, select Authenticated Users and
-    click Next, then name your rule <literal>All Authenticated Users</literal>,
-    and click Finish to save your work.</para>
+    <para>In the Define Subject Conditions step, click
+     Subject Condition, from the
+     type drop-down choose <literal>Authenticated
+      Users</literal>and then drag the grey block into the green
+     <literal>AND</literal> logical block above.</para>
 
     <mediaobject xml:id="figure-openam-policy-subjects">
      <alt>OpenAM Policy Subjects</alt>
@@ -670,18 +683,38 @@ $ <userinput>mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</user
      </textobject>
     </mediaobject>
 
-    <para>Your policy now specifies who (subject) can perform what actions on
-    what resources (rule). You can ignore Conditions and Response Providers
-    for now.</para>
+    <para>Click Next to proceed.</para>
    </step>
-
    <step>
-    <para>On the Edit Policy page, click OK to save your policy.</para>
-
-    <para>Next you must create a web policy agent profile before installing
-    the agent in Apache HTTP Server to enforce your new policy.</para>
+    <para>In the Define Environment Conditions and
+     Specify Response Attributes steps, click
+     Next.</para>
    </step>
+
+    <step>
+     <para>Review your configuration. It should resemble the following:</para>
+     <mediaobject xml:id="figure-openam-policy-review">
+      <alt>Review OpenAM Policy</alt>
+      <imageobject>
+       <imagedata fileref="images/openam-policy-review.png" format="PNG"/>
+      </imageobject>
+      <textobject>
+       <para>Review the policy, and click Finish to save.</para>
+      </textobject>
+     </mediaobject>
+     <tip><para>If the configuration is not visible, click the
+      <emphasis>maximized</emphasis> link.</para></tip>
+
+     <para>To make changes to the configuration, either click the relevant step,
+      or click the item to jump to the relevant step and make amendments to
+      the configuration.</para>
+
+     <para>When the configuration is completed, click Finish.</para>
+    </step>
   </procedure>
+
+  <para>Next you must create a web policy agent profile before installing
+   the agent in Apache HTTP Server to enforce your new policy.</para>
 
   <procedure xml:id="create-web-policy-agent-profile">
    <title>To Create a Web Policy Agent Profile</title>

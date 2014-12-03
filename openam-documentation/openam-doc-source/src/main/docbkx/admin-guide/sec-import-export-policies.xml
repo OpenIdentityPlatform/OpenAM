@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+
+<section xml:id="script-policy"
+          xmlns='http://docbook.org/ns/docbook'
+          version='5.0' xml:lang='en'
+          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+          xmlns:xlink='http://www.w3.org/1999/xlink'
+          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+  <title>Importing and Exporting Policies</title>
+  <indexterm>
+   <primary>Policy</primary>
+   <secondary>Import, Export</secondary>
+  </indexterm>
+  <para>You can import and export policies to and from files.</para>
+ <para>You can use these files to backup policies, transfer policies between
+  OpenAM instances, or store policy configuration in a version
+  control system such as Git or Subversion.</para>
+ <para>The default, preferred format for importing and
+  exporting OpenAM policies is <link xlink:show="new"
+   xlink:href="http://docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.html">
+<citetitle>eXtensible Access Control Markup Language (XACML) Version 3.0</citetitle></link>.</para>
+<note><para>OpenAM can only import XACML 3.0 files that were either created by
+ an OpenAM instance, or that have had minor manual modifications,
+ due to the reuse of some XACML 3.0 parameters for non-standard
+ information.</para></note>
+<para>You can import and export policies by using the policy editor in
+ the OpenAM console, using the REST API, or with the <command>ssoadm</command>
+ command.</para>
+ <itemizedlist>
+  <listitem>
+   <para>
+    <xref linkend="export-policy-to-xacml-xui"/>
+   </para>
+  </listitem>
+  <listitem>
+    <para><xref linkend="import-policy-in-xacml-xui" /></para>
+   </listitem>
+  <listitem>
+   <para><xref linkend="export-policy-to-xacml-ssoadm" /></para>
+  </listitem>
+  <listitem>
+   <para><xref linkend="import-policy-in-xacml-ssoadm" /></para>
+  </listitem>
+  <listitem>
+   <para><xref linkend="import-policy-in-xml-ssoadm" /></para>
+  </listitem>
+ </itemizedlist>
+
+ <procedure xml:id="export-policy-to-xacml-xui">
+  <title>To Export Policies in XACML Format (OpenAM Console)</title>
+   <step>
+    <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
+     Name</replaceable> &gt; Policies, and then click Export
+    All Policies.</para>
+   </step>
+ </procedure>
+
+ <procedure xml:id="import-policy-in-xacml-xui">
+  <title>To Import Policies in XACML Format (OpenAM Console)</title>
+  <step>
+   <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; Policies, and then click Import
+    Policies.</para>
+  </step>
+  <step>
+   <para>Browse to the XACML format file, select it,
+    and then click Open.</para>
+  </step>
+ </procedure>
+
+  <procedure xml:id="export-policy-to-xacml-ssoadm">
+   <title>To Export Policies in XACML Format (Command Line)</title>
+   <step>
+    <para>Use the <command>ssoadm list-xacml</command> command.</para>
+
+<screen>
+$ <userinput>ssoadm \
+ list-xacml \
+ --realm "/" \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt</userinput>
+<computeroutput><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+ <PolicySet
+  xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+  PolicyCombiningAlgId="urn...rule-combining-algorithm:deny-overrides"
+  Version="2014.11.25.17.41.15.597"
+  PolicySetId="/:2014.11.25.17.41.15.597">
+  <Target />
+  <Policy
+   RuleCombiningAlgId="urn...rule-combining-algorithm:deny-overrides"
+   Version="2014.11.25.17.40.08.067"
+   PolicyId="myPolicy">
+   <Description />
+   <Target>
+    <AnyOf>
+     <AllOf>
+      <Match
+       MatchId="urn...entitlement:json-subject-match">
+       <AttributeValue
+        DataType="urn...entitlement.conditions.subject.AuthenticatedUsers">
+        {}
+       </AttributeValue>
+       <AttributeDesignator
+        MustBePresent="true"
+        DataType="urn...entitlement.conditions.subject.AuthenticatedUsers"
+        AttributeId="urn...entitlement:json-subject"
+        Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" />
+      </Match>
+     </AllOf>
+    </AnyOf>
+    <AnyOf>
+     <AllOf>
+      <Match
+       MatchId="urn...entitlement:resource-match:application:iPlanetAMWebAgentService">
+       <AttributeValue
+        DataType="htp://www.w3.org/2001/XMLSchema#string">
+        http://www.example.com:8000/*?*
+       </AttributeValue>
+       <AttributeDesignator
+        MustBePresent="true"
+        DataType="htp://www.w3.org/2001/XMLSchema#string"
+        AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+        Category="urn...attribute-category:resource" />
+      </Match>
+     </AllOf>
+    </AnyOf>
+    <AnyOf>
+     <AllOf>
+      <Match
+       MatchId="urn...application-match">
+       <AttributeValue
+        DataType="htp://www.w3.org/2001/XMLSchema#string">
+        iPlanetAMWebAgentService
+       </AttributeValue>
+       <AttributeDesignator
+        MustBePresent="false"
+        DataType="htp://www.w3.org/2001/XMLSchema#string"
+        AttributeId="urn...application-id"
+        Category="urn...application-category" />
+      </Match>
+     </AllOf>
+    </AnyOf>
+    <AnyOf>
+     <AllOf>
+      <Match
+       MatchId="urn...entitlement:action-match:application:iPlanetAMWebAgentService">
+       <AttributeValue
+        DataType="htp://www.w3.org/2001/XMLSchema#string">
+        POST
+       </AttributeValue>
+       <AttributeDesignator
+        MustBePresent="true"
+        DataType="htp://www.w3.org/2001/XMLSchema#string"
+        AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+        Category="urn...attribute-category:action" />
+      </Match>
+     </AllOf>
+     <AllOf>
+      <Match
+       MatchId="urn...entitlement:action-match:application:iPlanetAMWebAgentService">
+       <AttributeValue
+        DataType="htp://www.w3.org/2001/XMLSchema#string">
+        GET
+       </AttributeValue>
+       <AttributeDesignator
+        MustBePresent="true"
+        DataType="htp://www.w3.org/2001/XMLSchema#string"
+        AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+        Category="urn...attribute-category:action" />
+      </Match>
+     </AllOf>
+    </AnyOf>
+   </Target>
+   <VariableDefinition
+    VariableId="....entitlement.applicationName">
+    <AttributeValue
+     DataType="htp://www.w3.org/2001/XMLSchema#string">
+     iPlanetAMWebAgentService
+    </AttributeValue>
+   </VariableDefinition>
+   <VariableDefinition
+    VariableId="...privilege.createdBy">
+    <AttributeValue
+     DataType="htp://www.w3.org/2001/XMLSchema#string">
+     id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org
+    </AttributeValue>
+   </VariableDefinition>
+   <VariableDefinition
+    VariableId="...privilege.lastModifiedBy">
+    <AttributeValue
+     DataType="htp://www.w3.org/2001/XMLSchema#string">
+     id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org
+    </AttributeValue>
+   </VariableDefinition>
+   <VariableDefinition
+    VariableId="...privilege.creationDate">
+    <AttributeValue
+     DataType="htp://www.w3.org/2001/XMLSchema#dateTime">
+     2014-11-25T17:40:08.067
+    </AttributeValue>
+   </VariableDefinition>
+   <VariableDefinition
+    VariableId="...privilege.lastModifiedDate">
+    <AttributeValue
+     DataType="htp://www.w3.org/2001/XMLSchema#dateTime">
+     2014-11-25T17:40:08.067
+    </AttributeValue>
+   </VariableDefinition>
+   <Rule
+    Effect="Permit"
+    RuleId="null:permit-rule">
+    <Description>Permit Rule</Description>
+    <Target>
+     <AnyOf>
+      <AllOf>
+       <Match
+        MatchId="urn...entitlement:action-match:application:iPlanetAMWebAgentService">
+        <AttributeValue
+         DataType="htp://www.w3.org/2001/XMLSchema#string">
+         POST
+        </AttributeValue>
+        <AttributeDesignator
+         MustBePresent="true"
+         DataType="htp://www.w3.org/2001/XMLSchema#string"
+         AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+         Category="urn...attribute-category:action" />
+       </Match>
+      </AllOf>
+      <AllOf>
+       <Match
+        MatchId="urn...entitlement:action-match:application:iPlanetAMWebAgentService">
+        <AttributeValue
+         DataType="htp://www.w3.org/2001/XMLSchema#string">
+         GET
+        </AttributeValue>
+        <AttributeDesignator
+         MustBePresent="true"
+         DataType="htp://www.w3.org/2001/XMLSchema#string"
+         AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+         Category="urn...attribute-category:action" />
+       </Match>
+      </AllOf>
+     </AnyOf>
+    </Target>
+    <Condition>
+     <Apply
+      FunctionId="urn...entitlement:json-subject-and-condition-satisfied">
+      <AttributeValue
+       DataType="urn...entitlement.conditions.subject.AuthenticatedUsers"
+       privilegeComponent="entitlementSubject">
+       {}
+      </AttributeValue>
+     </Apply>
+    </Condition>
+   </Rule>
+  </Policy>
+ </PolicySet>]]>
+
+ Policy definitions were returned under realm, /.
+ </computeroutput>
+</screen>
+   </step>
+  </procedure>
+
+ <procedure xml:id="import-policy-in-xacml-ssoadm">
+  <title>To Import Policies in XACML Format (Command Line)</title>
+  <step>
+   <para>Use the <command>ssoadm create-xacml</command> command.</para>
+
+<screen>
+$ <userinput>ssoadm \
+ create-xacml \
+ --realm "/" \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --xmlfile policy.xml</userinput>
+
+ <computeroutput>Policies were created under realm, /.</computeroutput>
+</screen>
+  </step>
+ </procedure>
+
+  <procedure xml:id="import-policy-in-xml-ssoadm">
+   <title>To Import Policies in XML Format (Command Line)</title>
+
+   <para>You can import policies stored in non-XACML XML format. Once imported,
+    the policy can then be exported in the XACML format using either the OpenAM
+    console or the <command>ssoadm list-xacml</command> command.</para>
+
+   <step>
+    <para>To import policies stored in non-XACML XML format, use the
+     <command>ssoadm create-policies</command> command.</para>
+
+<screen>
+$ <userinput>ssoadm \
+ create-policies \
+ --realm "/" \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --xmlfile policy.xml</userinput>
+
+ <computeroutput>Policies were created under realm, /.</computeroutput>
+</screen>
+   </step>
+  </procedure>
+ </section>
