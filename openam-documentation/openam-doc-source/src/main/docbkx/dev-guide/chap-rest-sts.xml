@@ -636,7 +636,7 @@ Realm Name/{deployment_url_element},
 
   <para>
    All published REST STS instances are exposed relative to
-   <literal>/rest-sts</literal>, so if OpenAM were exposed at
+   <literal>/rest-sts</literal>, so if OpenAM is exposed at
    <literal>https://host.com:443/openam</literal>, and the REST STS instance is published
    in a realm called "accounting" with a Deployment URl element of
    <literal>accountingsts</literal>, then the URL would be:
@@ -659,6 +659,18 @@ https://host.com:443/openam/rest-sts-publish/publish/accounting/accountingsts
    This instance could be deleted by performing a DELETE on
    <literal>https://host.com:443/openam/rest-sts-publish/publish/accounting/accountingsts</literal>.
   </para>
+
+  <note>
+   <para>
+    The REST STS Publish and Consume examples are contained within their own maven
+    module (<literal>openam-client-sts</literal>), and the contents of this module
+    are added to the <literal>client-sdk</literal>. To get the examples to work,
+    there are a number of maven dependencies, specified in the
+    <literal>META-INF/maven/org.forgerock.openam/openam/client-sts/pom.xml</literal>
+    file in the <literal>client-sdk.jar</literal>. You should review these
+    dependencies prior to setting up the examples.
+   </para>
+  </note>
 
  </section>
 
