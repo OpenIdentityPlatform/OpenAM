@@ -42,13 +42,17 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.security.auth.login.ConfigFile;
+import org.forgerock.openam.utils.CollectionUtils;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 
@@ -62,7 +66,8 @@ public class AMConfiguration extends Configuration {
      * array of <code>AppConfigurationEntry</code>.
      * TODO : make this a bounded map
      */
-    private static Map jaasConfig = new HashMap();
+    private static final Map<String, AppConfigurationEntry[]> jaasConfig =
+            Collections.synchronizedMap(new HashMap<String, AppConfigurationEntry[]>());
     
     /**
      * Map to hold listeners for a configuration, maps configuration name
@@ -70,15 +75,14 @@ public class AMConfiguration extends Configuration {
      * when config entry is removed from <code>jaasConfig</code>
      * TODO : make this a bounded map.
      */
-    private static Map listenersMap = new HashMap();
+    private static final Map<String, Set<Object>> listenersMap = new ConcurrentHashMap<String, Set<Object>>();
     
-    private static ConfigFile configFile = null;
+    private static ConfigFile configFile = new ConfigFile();
     
     private static Debug debug = Debug.getInstance("amAuthConfig");
     
     private Configuration defConfig = null;
-    private AMAuthenticationManager amAM = null;
-    private static ServiceConfigManager scm = null;
+    private static volatile ServiceConfigManager scm = null;
     
     /**
      * Constructor.
@@ -100,12 +104,8 @@ public class AMConfiguration extends Configuration {
         debug.message("inside AMConfiguration.initialize()");
         // initialize config map, this could also be called to
         // refresh the config map
-        synchronized (jaasConfig) {
-            jaasConfig = new HashMap();
-        }
-        synchronized (listenersMap) {
-            listenersMap = new HashMap();
-        }
+        jaasConfig.clear();
+        listenersMap.clear();
     }
     
     /**
@@ -113,9 +113,8 @@ public class AMConfiguration extends Configuration {
      * AppConfigurationEntry[] could not be reused, Auth will hang.
      * This method is used to create a clone copy of given config entry.
      */
-    private AppConfigurationEntry[] cloneConfigurationEntry(
-        AppConfigurationEntry[] entries,
-        String orgDN) {
+    private AppConfigurationEntry[] cloneConfigurationEntry(AppConfigurationEntry[] entries, String orgDN,
+            AMAuthenticationManager amAM) {
         if (debug.messageEnabled()) {
             debug.message("AMConfiguration.cloneConfigurationEntry, orgDN=" +
             orgDN + ", entries=" + entries);
@@ -178,7 +177,7 @@ public class AMConfiguration extends Configuration {
      * @return Array of <code>AppConfigurationEntry</code> for the
      *         configuration name.
      */
-    private AppConfigurationEntry[] newConfiguration(String name) {
+    private AppConfigurationEntry[] newConfiguration(String name, AMAuthenticationManager amAM) {
         if (debug.messageEnabled()) {
             debug.message("newConfig, name = " + name);
         }
@@ -188,30 +187,24 @@ public class AMConfiguration extends Configuration {
         try {
             switch (type.getIndexType()) {
                 case AMAuthConfigType.USER :
-                    entries = getUserBasedConfig(type.getOrganization(),
-                    type.getIndexName(), name);
+                    entries = getUserBasedConfig(type.getOrganization(), type.getIndexName(), name, amAM);
                     break;
                 case AMAuthConfigType.ORGANIZATION:
-                    entries = getOrgBasedConfig(type.getOrganization(), name,
-                    false);
+                    entries = getOrgBasedConfig(type.getOrganization(), name, false, amAM);
                     break;
                 case AMAuthConfigType.ROLE :
-                    entries = getRoleBasedConfig(type.getOrganization(),
-                    type.getIndexName(), name);
+                    entries = getRoleBasedConfig(type.getOrganization(), type.getIndexName(), name, amAM);
                     break;
                 case AMAuthConfigType.SERVICE :
                     if (type.getIndexName().equals(ISAuthConstants.
                     CONSOLE_SERVICE)) {
-                        entries = getOrgBasedConfig(type.getOrganization(),
-                        name, true);
+                        entries = getOrgBasedConfig(type.getOrganization(), name, true, amAM);
                     } else {
-                        entries = getServiceBasedConfig(type.getOrganization(),
-                        type.getIndexName(), name);
+                        entries = getServiceBasedConfig(type.getOrganization(), type.getIndexName(), name, amAM);
                     }
                     break;
                 case AMAuthConfigType.MODULE :
-                    entries = getModuleBasedConfig(type.getOrganization(),
-                    type.getIndexName(), name);
+                    entries = getModuleBasedConfig(type.getOrganization(), type.getIndexName(), name, amAM);
                     break;
                 default :
                     if (debug.messageEnabled()) {
@@ -225,11 +218,6 @@ public class AMConfiguration extends Configuration {
                     }
                     
                     if (entries == null) {
-                        // try to find it in the ConfigFile,
-                        // make configFile static? TBD
-                        if (configFile == null) {
-                            configFile = new ConfigFile();
-                        }
                         debug.message("Getting configuration from confFile.");
                         entries = configFile.getAppConfigurationEntry(name);
                     }
@@ -258,7 +246,7 @@ public class AMConfiguration extends Configuration {
             jaasConfig.put(name, entries);
         }
         
-        return cloneConfigurationEntry(entries, type.getOrganization());
+        return cloneConfigurationEntry(entries, type.getOrganization(), amAM);
     }
    
     /**
@@ -307,18 +295,18 @@ public class AMConfiguration extends Configuration {
      * @param isConsole <code>true</code> if this is for console service.
      * @return Array of <code>AppConfigurationEntry</code>.
      */
-    private AppConfigurationEntry[] getOrgBasedConfig(
-        String orgDN,
-        String name,
-        boolean isConsole) {
+    private AppConfigurationEntry[] getOrgBasedConfig(String orgDN, String name, boolean isConsole,
+            AMAuthenticationManager amAM) {
         if (debug.messageEnabled()) {
             debug.message("getOrgBasedConfig,  START " + orgDN);
         }
         try {
             if (scm == null) {
                 synchronized(jaasConfig) {
-                    scm = new ServiceConfigManager(
-                    ISAuthConstants.AUTH_SERVICE_NAME, getAdminToken());
+                    if (scm == null) {
+                        scm = new ServiceConfigManager(
+                                ISAuthConstants.AUTH_SERVICE_NAME, getAdminToken());
+                    }
                 }
             }
             ServiceConfig service = scm.getOrganizationConfig(orgDN, null);
@@ -336,8 +324,7 @@ public class AMConfiguration extends Configuration {
             if (debug.messageEnabled()) {
                 debug.message("org auth config = " + configName);
             }
-            AppConfigurationEntry[] ret =
-            parseInstanceConfiguration(orgDN, configName, name);
+            AppConfigurationEntry[] ret = parseInstanceConfiguration(orgDN, configName, name, amAM);
             addServiceListener("iPlanetAMAuthService", name);
             return ret;
         } catch (Exception e) {
@@ -347,14 +334,11 @@ public class AMConfiguration extends Configuration {
         }
     }
     
-    private AppConfigurationEntry[] parseInstanceConfiguration(
-        String orgDN,
-        String config,
-        String name
-    ) throws SMSException, SSOException {
-	AppConfigurationEntry[] entries = null;
+    private AppConfigurationEntry[] parseInstanceConfiguration(String orgDN, String config, String name,
+            AMAuthenticationManager amAM) throws SMSException, SSOException {
+	    AppConfigurationEntry[] entries = null;
         String configName = config.trim();
-        if (configName == null || configName.length() == 0 ||
+        if (configName.length() == 0 ||
         configName.equals(ISAuthConstants.BLANK)) {
             return null;
         }
@@ -363,21 +347,19 @@ public class AMConfiguration extends Configuration {
             if (debug.messageEnabled()) {
                 debug.message("Old DIT with chain config");
             }
-            entries = parseXMLConfig(configName, name);
+            entries = parseXMLConfig(configName, name, amAM);
         }
-	if ((entries == null) || (entries != null && entries.length == 0)) {
+	if (entries == null || entries.length == 0) {
             if (debug.messageEnabled()) {
                 debug.message("New DIT with named service config");
             }
-            entries = getServiceBasedConfig(orgDN, configName, name);
+            entries = getServiceBasedConfig(orgDN, configName, name, amAM);
         }
         return entries;
     }
     
-    private AppConfigurationEntry[] parseXMLConfig(
-        String xmlConfig,
-        String name
-    ) throws SMSException, SSOException {
+    private AppConfigurationEntry[] parseXMLConfig(String xmlConfig, String name, AMAuthenticationManager amAM)
+            throws SMSException, SSOException {
         // parse the auth configuration
         AppConfigurationEntry[] entries =
         AMAuthConfigUtils.parseValues(xmlConfig);
@@ -438,10 +420,8 @@ public class AMConfiguration extends Configuration {
      * @param name Authentication configuration name.
      * @return Array of <code>AppConfigurationEntry</code>.
      */
-    private AppConfigurationEntry[] getUserBasedConfig(
-        String orgDN,
-        String universalId,
-        String name) {
+    private AppConfigurationEntry[] getUserBasedConfig(String orgDN, String universalId, String name,
+            AMAuthenticationManager amAM) {
         if (debug.messageEnabled()) {
             debug.message(
                 "getUserBasedConfig,  START " + orgDN + "|" + universalId);
@@ -461,7 +441,7 @@ public class AMConfiguration extends Configuration {
                         configName);
                 }
                 AppConfigurationEntry[] ret =
-                parseInstanceConfiguration(orgDN, configName, name);
+                parseInstanceConfiguration(orgDN, configName, name, amAM);
                 // TODO add user listener for
                 return ret;
             } else {
@@ -489,10 +469,8 @@ public class AMConfiguration extends Configuration {
      * @param name Authentication configuration name.
      * @return Array of <code>AppConfigurationEntry</code>.
      */
-    private AppConfigurationEntry[] getServiceBasedConfig(
-        String orgDN,
-        String service,
-        String name) {
+    private AppConfigurationEntry[] getServiceBasedConfig(String orgDN, String service, String name,
+            AMAuthenticationManager amAM) {
         if (debug.messageEnabled()) {
             debug.message("ServiceBasedConfig,  START " + orgDN +"|"+ service+
             ", name = " + name);
@@ -518,7 +496,7 @@ public class AMConfiguration extends Configuration {
                 return null;
             }
             
-            AppConfigurationEntry[] ret= parseXMLConfig(xmlConfig, name);
+            AppConfigurationEntry[] ret= parseXMLConfig(xmlConfig, name, amAM);
             
             if (debug.messageEnabled()) {
                 debug.message("serviceBased, add SM listener on " +service);
@@ -547,10 +525,8 @@ public class AMConfiguration extends Configuration {
      * @param name Auth config name.
      * @return Array of <code>AppConfigurationEntry</code>.
      */
-    private AppConfigurationEntry[] getRoleBasedConfig(
-        String orgDN,
-        String roleUniversalId,
-        String name) {
+    private AppConfigurationEntry[] getRoleBasedConfig(String orgDN, String roleUniversalId, String name,
+            AMAuthenticationManager amAM) {
         if (debug.messageEnabled()) {
             debug.message(
                 "RoleBasedConfig,  START " + orgDN +"|"+ roleUniversalId);
@@ -571,8 +547,7 @@ public class AMConfiguration extends Configuration {
                         "Named config for role " + roleUniversalId + " = " +
                     configName);
                 }
-                AppConfigurationEntry[] ret =
-                parseInstanceConfiguration(orgDN, configName, name);
+                AppConfigurationEntry[] ret = parseInstanceConfiguration(orgDN, configName, name, amAM);
                 //TODO add listener for role
                 return ret;
             } else {
@@ -602,10 +577,8 @@ public class AMConfiguration extends Configuration {
      * @param name Authentication configuration name.
      * @return module based authentication configuration.
      */
-    private AppConfigurationEntry[] getModuleBasedConfig(
-        String orgDN,
-        String module,
-        String name) {
+    private AppConfigurationEntry[] getModuleBasedConfig(String orgDN, String module, String name,
+            AMAuthenticationManager amAM) {
         if (debug.messageEnabled()) {
             debug.message("ModuleBasedConfig,  START " + orgDN +"|"+ module +
             ", name = " + name);
@@ -650,7 +623,7 @@ public class AMConfiguration extends Configuration {
      *         for this application, or null if this application has no
      *         configured <code>LoginModules</code>.
      */
-    public synchronized AppConfigurationEntry[] getAppConfigurationEntry(String configName) {
+    public AppConfigurationEntry[] getAppConfigurationEntry(String configName) {
         // this function will read corresponding auth configuration for the
         // specified  configName, and retrieve corresponding module instance
         // attributes for the module instance defined in the options field of
@@ -667,6 +640,7 @@ public class AMConfiguration extends Configuration {
         AMAuthConfigType type = new AMAuthConfigType(configName);
         String orgDN = type.getOrganization();
 
+        AMAuthenticationManager amAM;
         try {
             amAM = new AMAuthenticationManager(getAdminToken(), orgDN);
         } catch (Exception e) {
@@ -678,21 +652,20 @@ public class AMConfiguration extends Configuration {
             return null;
         }
         
-        AppConfigurationEntry[] entry =
-            (AppConfigurationEntry[])jaasConfig.get(configName);
+        AppConfigurationEntry[] entry = jaasConfig.get(configName);
 
         if (entry != null) {
             // already exists in the map
             if (debug.messageEnabled()) {
                 debug.message("getAppConfigurationEntry[], found "+configName);
             }
-            return cloneConfigurationEntry(entry, getOrganization(configName));
+            return cloneConfigurationEntry(entry, getOrganization(configName), amAM);
         } else {
             // new configuration
             if (debug.messageEnabled()) {
                 debug.message("getAppConfigurationEntry[], new " + configName);
             }
-            return newConfiguration(configName);
+            return newConfiguration(configName, amAM);
         }
     }
     
@@ -783,11 +756,9 @@ public class AMConfiguration extends Configuration {
     public void addToListenersMap(String name, Object listener) {
         // put into the sdk listener map
         synchronized (listenersMap) {
-            Set set = (Set) listenersMap.get(name);
+            Set<Object> set = listenersMap.get(name);
             if (set == null) {
-                set = new HashSet();
-                set.add(listener);
-                listenersMap.put(name, set);
+                listenersMap.put(name, CollectionUtils.asSet(listener));
             } else {
                 set.add(listener);
             }
