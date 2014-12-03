@@ -16,14 +16,15 @@
 
 package org.forgerock.openidconnect;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.utils.Utils;
 import org.forgerock.oauth2.TokenStoreImpl;
@@ -76,10 +77,14 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
         //todo - if necessary, match test impl. with OpenAMTokenStore.java
         final String acr = null;
         final List<String> amr = null;
-        String kid = UUID.randomUUID().toString();
+        String kid = null;
+        JsonValue jwks = providerSettings.getJWKSet().get("keys");
+        if (!jwks.isNull() && !jwks.asList().isEmpty()) {
+            kid = jwks.get(0).get("kid").asString();
+        }
 
         return new OpenIdConnectToken(kid, clientSecret, keyPair, algorithm, iss, resourceOwnerId, clientId,
-                authorizationParty, exp, timeInSeconds, timeInSeconds, nonce, atHash, cHash, acr, amr);
+                authorizationParty, exp, timeInSeconds, timeInSeconds, nonce, ops, atHash, cHash, acr, amr);
     }
 
     /**
