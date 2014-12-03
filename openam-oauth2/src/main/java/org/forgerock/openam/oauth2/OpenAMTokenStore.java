@@ -18,12 +18,8 @@ package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.fluent.JsonValue.*;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -34,10 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.utils.Utils;
@@ -162,7 +161,6 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
-
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
 
@@ -185,11 +183,16 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final String acr = getAuthenticationContextClassReference(request);
 
-        String kid = UUID.randomUUID().toString();
+        String kid = null;
+        JsonValue jwks = providerSettings.getJWKSet().get("keys");
+        if (!jwks.isNull() && !jwks.asList().isEmpty()) {
+            kid = jwks.get(0).get("kid").asString();
+        }
+        String opsId = UUID.randomUUID().toString();
 
         try {
             tokenStore.create(json(object(
-                    field(OAuth2Constants.CoreTokenParams.ID, set(kid)),
+                    field(OAuth2Constants.CoreTokenParams.ID, set(opsId)),
                     field(OAuth2Constants.JWTTokenParams.OPS, set(ops)),
                     field(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, set(Long.toString(exp))))));
         } catch (CoreTokenException e) {
@@ -198,7 +201,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         return new OpenAMOpenIdConnectToken(kid, clientSecret, keyPair, algorithm, iss, resourceOwnerId, clientId,
-                authorizationParty, exp, currentTimeInSeconds, currentTimeInSeconds, nonce, atHash, cHash, acr, amr, realm);
+                authorizationParty, exp, currentTimeInSeconds, currentTimeInSeconds, nonce, opsId, atHash, cHash, acr,
+                amr, realm);
     }
 
     private List<String> getAMRFromAuthModules(OAuth2Request request, OAuth2ProviderSettings providerSettings) throws ServerException {
