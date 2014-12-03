@@ -122,7 +122,7 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
 
     private static final String CRYPTO_CACHE_SIZE_PROPERTY_NAME = "amCryptoCacheSize";
     private static final int DEFAULT_CACHE_SIZE = 500;
-    private static final int CACHE_SIZE = Integer.getInteger(CRYPTO_CACHE_SIZE_PROPERTY_NAME, DEFAULT_CACHE_SIZE);
+    public static final int CACHE_SIZE = Integer.getInteger(CRYPTO_CACHE_SIZE_PROPERTY_NAME, DEFAULT_CACHE_SIZE);
 
     /**
      * Stores a per-thread copy of the underlying cipher, fetched from the standard {@link Cipher} implementation,

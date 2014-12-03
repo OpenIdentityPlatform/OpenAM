@@ -48,6 +48,7 @@ import com.iplanet.services.comm.share.NotificationSet;
 import com.iplanet.services.naming.URLNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.util.Crypt;
+import com.iplanet.services.util.JCEEncryption;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -281,7 +282,7 @@ public class SessionService {
     public static final String SESSION_SERVICE = "session";
 
     private static PerThreadCache<SecureRandom, RuntimeException> secureRandom =
-            new PerThreadCache<SecureRandom, RuntimeException>(Integer.MAX_VALUE) {
+            new PerThreadCache<SecureRandom, RuntimeException>(JCEEncryption.CACHE_SIZE) {
         @Override
         protected SecureRandom initialValue() {
             try {
