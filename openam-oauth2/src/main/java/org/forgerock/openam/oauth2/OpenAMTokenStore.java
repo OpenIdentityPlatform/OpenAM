@@ -164,9 +164,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
 
-        final long timeInSeconds = System.currentTimeMillis() / 1000;
-        final long tokenLifetime = providerSettings.getOpenIdTokenLifetime();
-        final long exp = timeInSeconds + tokenLifetime;
+        final long currentTimeInSeconds = System.currentTimeMillis() / 1000;
+        final long tokenLifetimeInSeconds = providerSettings.getOpenIdTokenLifetime();
+        final long exp = (currentTimeInSeconds + tokenLifetimeInSeconds) * 1000;
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter("realm"));
 
@@ -201,7 +201,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         return new OpenAMOpenIdConnectToken(kid, clientSecret, keyPair, algorithm, iss, resourceOwnerId, clientId,
-                authorizationParty, exp, timeInSeconds, timeInSeconds, nonce, opsId, atHash, cHash, acr, amr, realm);
+                authorizationParty, exp, currentTimeInSeconds, currentTimeInSeconds, nonce, opsId, atHash, cHash, acr, amr, realm);
     }
 
     private List<String> getAMRFromAuthModules(OAuth2Request request, OAuth2ProviderSettings providerSettings) throws ServerException {
