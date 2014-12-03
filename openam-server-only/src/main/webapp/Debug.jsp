@@ -27,7 +27,7 @@
 --%>
 
 <%--
-   Portions Copyrighted 2010-2013 ForgeRock Inc
+   Portions Copyrighted 2010-2014 ForgeRock AS.
 --%>
 
 <%@ page pageEncoding="UTF-8" %>
@@ -39,9 +39,9 @@
         com.iplanet.am.util.SystemProperties,
         com.sun.identity.common.DNUtils,
         com.sun.identity.idm.AMIdentity,
-        com.sun.identity.idm.IdRepoException,
         com.sun.identity.idm.IdType,
-        com.sun.identity.idm.IdUtils,
+        com.sun.identity.saml2.common.SAML2Constants,
+        com.sun.identity.saml2.common.SAML2SDKUtils,
         com.sun.identity.shared.debug.Debug,
         com.sun.identity.shared.encode.Hash,
         java.text.MessageFormat,
@@ -49,15 +49,11 @@
         java.util.Enumeration,
         java.util.Collections,
         java.util.HashMap,
-        java.util.HashSet,
         java.util.Iterator,
         java.util.List,
         java.util.Map,
         java.util.MissingResourceException,
         java.util.ResourceBundle,
-        java.util.Set,
-        java.util.StringTokenizer,
-        com.sun.identity.shared.ldap.util.DN,
         org.owasp.esapi.ESAPI"
 %>
 
@@ -65,6 +61,8 @@
     String category = request.getParameter("category");
     String instance = request.getParameter("instance");
     String level = request.getParameter("level");
+    String samlDecryptionEnable = request.getParameter("samlDecryptionButton");
+
     if (!ESAPI.validator().isValidInput("category", category, "HTTPParameterValue", 512, true)
         || !ESAPI.validator().isValidInput("instance", instance, "HTTPParameterValue", 512, true)
         || !ESAPI.validator().isValidInput("level", level, "HTTPParameterValue", 512, true)) {
@@ -112,6 +110,9 @@
         // Make a copy to prevent ConcurrentModificationException
         List<Debug> temp = new ArrayList<Debug>(Debug.getInstances());
         for (Debug debug : temp) {
+            if ("SAML2Decrypt".equalsIgnoreCase(debug.getName())) {
+                continue;
+            }
             instances.add(debug.getName());
         }
         Collections.sort(instances);
@@ -119,6 +120,9 @@
             e.hasMoreElements();
         ) {
             String key = (String)e.nextElement();
+            if ("SAML2Decrypt".equalsIgnoreCase(key)) {
+                continue;
+            }
             String val = rbFiles.getString(key);
             List lst = (List) categories.get(val);
             if (lst == null) {
@@ -139,6 +143,12 @@
         if (!formToken.equals(receivedToken)) {
             out.println("Invalid form token provided!");
             return;
+        }
+
+        if (samlDecryptionEnable != null) {
+            boolean enable = "Turn ON".equals(samlDecryptionEnable);
+            SystemProperties.initializeProperties(SAML2Constants.SAML_DECRYPTION_DEBUG_MODE, Boolean.toString(enable));
+            Debug.getInstance("SAML2Decrypt").setDebug(enable ? Debug.MESSAGE : Debug.ERROR);
         }
     }
 %>
@@ -168,9 +178,9 @@
 <td>
 
 <%
-if ((instance == null || instance.length() == 0) && (category == null || category.length() == 0)
-    || level == null || level.length() == 0
-) {
+    if ((instance == null || instance.length() == 0) && (category == null || category.length() == 0)
+        || level == null || level.length() == 0
+    ) {
 %>
 <form name="frm" action="Debug.jsp" method="POST">
 <table>
@@ -295,6 +305,38 @@ if ((instance == null || instance.length() == 0) && (category == null || categor
 } else {
     if (category != null) {
         out.println(resourceBundle.getString("label-category") + " = " + category);
+        if ("Federation".equalsIgnoreCase(category)) {
+            if (performAction && samlDecryptionEnable == null) {
+                out.println("<br />");
+                out.println(resourceBundle.getString("label-saml-decryption-debug") + ": " +
+                        (SAML2SDKUtils.isSAMLDecryptionDebugEnabled() ? "ON" : "OFF"));
+                out.println("<br />");
+            }
+            else {
+%>
+                <br />
+                <form name="samldecryptiondebug" action="Debug.jsp" method="POST">
+                    <table>
+                        <tr>
+                            <td><%= resourceBundle.getString("label-saml-decryption-debug") %></td>
+                            <td><input type="submit" class="Btn1" name="samlDecryptionButton" value="Turn <%= (SAML2SDKUtils.isSAMLDecryptionDebugEnabled() ? "OFF" : "ON\" onclick=\"return confirm('Enabling this option may result in sensitive data logged to the filesystem. Make sure you disable this option as soon as possible.');") %>" onmouseover="javascript: this.className='Btn1Hov'" onmouseout="javascript: this.className='Btn1'" onblur="javascript: javascript: this.className='Btn1'" onfocus="javascript: this.className='Btn1Hov'" /></td>
+                            <td>
+                                <%
+                                    if (performAction) {
+                                        out.println(resourceBundle.getString("label-saml-decryption-debug-applied"));
+                                    }
+                                %>
+                            </td>
+                        </tr>
+                    </table>
+                    <input type="hidden" name="formToken" value="<%= formToken %>" />
+                    <input type="hidden" name="category" value="<%= category %>" />
+                    <input type="hidden" name="level" value="<%= level %>" />
+                    <input type="hidden" name="do" value="true" />
+                </form>
+<%
+            }
+        }
     } else {
         out.println("Instance" + " = " + instance);
     }
@@ -320,7 +362,7 @@ if ((instance == null || instance.length() == 0) && (category == null || categor
             String mname = (String)i.next();
             out.println( "<li>" + mname + "</li>" );
 
-            if (performAction) {
+            if (performAction && (samlDecryptionEnable == null)) {
                 Debug debug = Debug.getInstance(mname); 
                 debug.setDebug(levelint);
             }
@@ -337,7 +379,7 @@ if ((instance == null || instance.length() == 0) && (category == null || categor
 
     String backURL = "Debug.jsp";
 
-    if (!performAction) {
+    if (!performAction || (performAction && (samlDecryptionEnable != null))) {
         out.println("<form name='frm' method='POST' action='Debug.jsp'>");
         if (category != null) {
             out.println("<input name='category' type='hidden' value='" + category + "' />");

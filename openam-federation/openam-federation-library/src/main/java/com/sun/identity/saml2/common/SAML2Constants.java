@@ -1608,4 +1608,9 @@ public interface SAML2Constants {
      */
     public static final String SP_DO_NOT_WRITE_FEDERATION_INFO =
             "spDoNotWriteFederationInfo";
+
+    /**
+     * Property to determine whether SAML SP Decryption Debug mode has been enabled.
+     */
+    static final String SAML_DECRYPTION_DEBUG_MODE = "openam.saml.decryption.debug.mode";
 } 

@@ -753,8 +753,7 @@ public class XMLUtils {
 	}
         
         try {
-            TransformerFactory tFactory =
-                TransformerFactory.newInstance();
+            TransformerFactory tFactory = TransformerFactory.newInstance();
             Transformer transformer = tFactory.newTransformer();
             transformer.setOutputProperty("omit-xml-declaration", "yes");
             transformer.setOutputProperty("encoding", encoding);

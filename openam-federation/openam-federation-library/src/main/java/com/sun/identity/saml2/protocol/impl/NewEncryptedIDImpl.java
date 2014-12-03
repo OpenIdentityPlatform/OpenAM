@@ -24,6 +24,8 @@
  *
  * $Id: NewEncryptedIDImpl.java,v 1.2 2008/06/25 05:48:00 qcheng Exp $
  *
+ * Portions copyright 2014 ForgeRock AS.
+ *
  */
 
 
@@ -127,12 +129,9 @@ public class NewEncryptedIDImpl extends EncryptedElementImpl
      * @throws SAML2Exception if error occurs.
      */
     public NewID decrypt(Key recipientPrivateKey)
-	throws SAML2Exception {
-	Element el = EncManager.getEncInstance().
-	    decrypt(xmlString, recipientPrivateKey);
-
-	return ProtocolFactory.getInstance().
-	    createNewID(el);
+    throws SAML2Exception {
+        Element el = EncManager.getEncInstance().decrypt(xmlString, recipientPrivateKey);
+        SAML2SDKUtils.decodeXMLToDebugLog("NewEncryptedIDImpl.decrypt: ", el);
+        return ProtocolFactory.getInstance().createNewID(el);
     }
-
 }
