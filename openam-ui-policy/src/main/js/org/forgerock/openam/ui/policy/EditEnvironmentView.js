@@ -133,26 +133,54 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
         },
 
         changeInput: function(e) {
-
             e.stopPropagation();
+
             if($(e.currentTarget).parent().children('label').length === 0){
                 return; // this is a temporary workaround needed for a event leakage
             }
-            var label = $(e.currentTarget).parent().children('label').data().title,
+            var conditionTitle = $(e.currentTarget).parent().children('label').data().title,
                 inputGroup = $(e.currentTarget).closest('div.input-group'),
-                ifPopulated = false;
+                autoFillGroup = $(e.currentTarget).closest('li').find('div.auto-fill-group');
 
-            this.$el.data().itemData[label] = e.currentTarget.value;
+            this.$el.data().itemData[conditionTitle] = e.currentTarget.value;
 
-            inputGroup.find('input, select').each(function(){
-               if(this.value !== ''){
-                  ifPopulated = true;
-               }
+            this.populateInputGroup(inputGroup);
+            this.populateAutoFillGroup(autoFillGroup);
+        },
+
+        populateInputGroup:function(group){
+            var populated = false;
+            group.find('input, select').each(function(){
+                populated = this.value !== '';
             });
 
-            inputGroup.find('input, select').each(function(){
-                $(this).prop('required', ifPopulated);
+            group.find('input, select').each(function(){
+                $(this).prop('required', populated);
             });
+        },
+
+        populateAutoFillGroup: function (group) {
+            var first = group.eq(0),
+                second = group.eq(1),
+                firstVal, firstLabel,
+                secondVal, secondLabel ,
+                data;
+
+            if (first.length && second.length) {
+                firstVal = first.find('input').val();
+                firstLabel = first.find('label').data().title;
+                secondVal = second.find('input').val();
+                secondLabel = second.find('label').data().title;
+                data = this.$el.data().itemData;
+            }
+
+            if (firstVal !== '' && secondVal === '') {
+                data[secondLabel] = data[firstLabel];
+            } else if (firstVal === '' && secondVal !== '') {
+                data[firstLabel] = data[secondLabel];
+            } else if (firstVal === '' && secondVal === '') {
+                data[firstLabel] = data[secondLabel] = '';
+            }
         },
 
         buttonControlClick: function(e){
@@ -270,7 +298,8 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                 buildHTML    = function(schemaProps) {
 
                     var count = 0,
-                        pattern   = null;
+                        pattern   = null,
+                        additionalCssClass;
 
                     returnVal = '';
 
@@ -300,20 +329,25 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                                         {data: value, title: key, i18nKey: i18nKey, selected: itemData[key], id: count});
                                 } else {
                                     if (key === 'startIp' || key === 'endIp') {
-                                       pattern="^(((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d)))((\\.((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){3}|(\\.((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){5})";
-                                    } else if( value.type === 'number' ){
-                                       pattern="[-+]?[0-9]*[.,]?[0-9]+";
-                                    } else if( value.type === 'integer' ){
-                                       pattern="\\d+";
+                                        if (schema.title === 'IPv4') {
+                                            pattern = constants.IPV4_PATTERN;
+                                        } else if (schema.title === 'IPv6') {
+                                            pattern = constants.IPV6_PATTERN;
+                                        }
+                                        additionalCssClass = 'auto-fill-group';
+                                    } else if (value.type === 'number') {
+                                        pattern = "[-+]?[0-9]*[.,]?[0-9]+";
+                                    } else if (value.type === 'integer') {
+                                        pattern = "\\d+";
                                     } else {
-                                       pattern = null;
+                                        pattern = null;
                                     }
                                     returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html",
-                                        {data: itemData[key], title: key, i18nKey: i18nKey, id: count, pattern: pattern});
+                                        {data: itemData[key], title: key, i18nKey: i18nKey, id: count, pattern: pattern, cssClass: additionalCssClass});
                                 }
 
                             } else if (value.type === 'boolean' ) {
-                                // Ignoring the required property and assumming it defaults to false. See AME-4324
+                                // Ignoring the required property and assuming it defaults to false. See AME-4324
                                 returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrBoolean.html",
                                     {data: value, title: key, i18nKey: i18nKey, selected: itemData[key]});
 

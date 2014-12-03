@@ -53,11 +53,11 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
             var self = this,
                 data = self.data,
                 referralName = args[1],
-                referalPromise  = this.getReferral(referralName),
+                referralPromise  = this.getReferral(referralName),
                 appPromise      = policyDelegate.getApplicationByName(args[0]),
                 allRealmsPromise = policyDelegate.getAllRealms();
 
-            $.when(appPromise, referalPromise, allRealmsPromise).done(function(app, referral, allRealms){
+            $.when(appPromise, referralPromise, allRealmsPromise).done(function(app, referral, allRealms){
 
                 if (referralName) {
                     data.entity = referral;
