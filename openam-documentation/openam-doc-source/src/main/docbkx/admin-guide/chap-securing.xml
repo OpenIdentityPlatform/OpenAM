@@ -208,8 +208,8 @@
             <para>Restrict access to URIs that you do not use, and prevent internal
                 endpoints such as <literal>/sessionservice</literal> from being reachable
                 over the Internet.</para>
-            <para>For a full list of endpoints, see the OpenAM Reference Guide
-            Chapter on <link xlink:show="new" xlink:href="reference#chap-endpoints"
+            <para>For a full list of endpoints, see the <citetitle>Reference</citetitle>
+            chapter on <link xlink:show="new" xlink:href="reference#chap-endpoints"
             xlink:role="http://docbook.org/xlink/role/olink">
             <citetitle>Service Endpoints</citetitle></link>.</para>
         </listitem>

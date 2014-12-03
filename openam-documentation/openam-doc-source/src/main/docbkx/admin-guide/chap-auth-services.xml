@@ -1648,7 +1648,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
             <link xlink:href="reference#authentication-configuration" xlink:show="new"
                   xlink:role="http://docbook.org/xlink/role/olink">
                 <citetitle>Authentication Configuration</citetitle></link> section of the
-            OpenAM Reference Guide.</para>
+            <citetitle>Reference</citetitle>.</para>
     </section>
 
     <section xml:id="auth-core-realm-attributes">
