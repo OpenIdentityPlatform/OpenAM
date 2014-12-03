@@ -28,7 +28,10 @@ import org.restlet.Restlet;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.resource.ResourceException;
+import org.restlet.routing.Route;
 import org.restlet.routing.Router;
+import org.restlet.routing.Template;
+import org.restlet.routing.TemplateRoute;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -47,7 +50,6 @@ public class RestletRealmRouter extends Router {
 
     private final RestRealmValidator realmValidator;
     private final CoreWrapper coreWrapper;
-    private final Restlet delegate;
 
     /**
      * Constructs a new RealmRouter instance.
@@ -58,28 +60,15 @@ public class RestletRealmRouter extends Router {
     public RestletRealmRouter(RestRealmValidator realmValidator, CoreWrapper coreWrapper) {
         this.realmValidator = realmValidator;
         this.coreWrapper = coreWrapper;
-        this.delegate = new Delegate(this);
+
+        Restlet delegate = new Delegate(this);
+        TemplateRoute delegateRoute = createRoute("/{subrealm}", delegate, Template.MODE_STARTS_WITH);
+        super.setDefaultRoute(delegateRoute);
     }
 
-    /**
-     * Detaches and reattaches the dynamic realm route to ensure that it is the last route on the router.
-     */
-    private void reattachRealmRoute() {
-        detach(delegate);
-        attach("/{subrealm}", delegate, Router.MODE_BEST_MATCH);
-    }
-
-    /**
-     * Reattaches the dynamic realm route to ensure that it is the last route on the router and then calls
-     * {@code super}.
-     *
-     * @param request {@inheritDoc}
-     * @param response {@inheritDoc}
-     */
     @Override
-    public void handle(Request request, Response response) {
-        reattachRealmRoute();
-        super.handle(request, response);
+    public void setDefaultRoute(Route defaultRoute) {
+        throw new UnsupportedOperationException("Default route is handled internally for realm routing");
     }
 
     /**
