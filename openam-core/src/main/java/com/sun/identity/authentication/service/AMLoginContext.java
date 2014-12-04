@@ -61,9 +61,8 @@ import com.sun.identity.shared.locale.AMResourceBundleCache;
 
 import java.security.Principal;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -79,6 +78,7 @@ import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerAuthSvcImpl;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.openam.utils.StringUtils;
 
 import java.security.AccessController;
 
@@ -103,7 +103,7 @@ import java.security.AccessController;
  */
 public class AMLoginContext {
 
-    static final String LIST_DELIMITER = "|";
+    private static final String LIST_DELIMITER = "|";
     /**
      * AuthThreadManager associated with this AMLoginContext.
      */
@@ -111,32 +111,32 @@ public class AMLoginContext {
     private String exceedRetryLimit = null;
     private static final String BUNDLE_NAME = "amAuth";
 
-    String configName; // jaas configuration name.
-    String orgDN = null;
-    javax.security.auth.login.LoginContext loginContext = null;
-    com.sun.identity.authentication.jaas.LoginContext jaasLoginContext = null;
-    LoginStatus loginStatus;
-    LoginState loginState;
-    AuthContextLocal authContext;
-    Subject subject;
-    IndexType indexType;
-    String indexName;
-    String clientType;
-    boolean pCookieMode = false;
-    String lockoutMsg = null;
-    Set moduleSet = null;
-    String sid = null;
-    boolean accountLocked = false;
-    boolean isFailed = false;
-    boolean internalAuthError = false;
-    boolean processDone = false;
+    private String configName; // jaas configuration name.
+    private String orgDN = null;
+    private javax.security.auth.login.LoginContext loginContext = null;
+    private com.sun.identity.authentication.jaas.LoginContext jaasLoginContext = null;
+    private LoginStatus loginStatus;
+    private LoginState loginState;
+    private AuthContextLocal authContext;
+    private Subject subject;
+    private IndexType indexType;
+    private String indexName;
+    private String clientType;
+    private boolean pCookieMode = false;
+    private String lockoutMsg = null;
+    private Set<String> moduleSet = null;
+    private String sid = null;
+    private boolean accountLocked = false;
+    private boolean isFailed = false;
+    private boolean internalAuthError = false;
+    private boolean processDone = false;
     private int jaasCheck;
     private Thread jaasThread = null;
     private AppConfigurationEntry[] entries = null;
-    Callback[] recdCallback;
+    private Callback[] recdCallback;
 
     private static SsoServerAuthSvcImpl authImpl;
-    static Configuration defaultConfig = null;
+    private static Configuration defaultConfig = null;
     private static AuthD ad;
     private static Debug debug;
 
@@ -148,7 +148,7 @@ public class AMLoginContext {
      * locales. Since we create an AMLoginContext for each user, we can cache
      * the bundle reference in the class
      */
-    ResourceBundle bundle;
+    private ResourceBundle bundle;
 
     static {
         // set the auth configuration programmatically.
@@ -224,7 +224,7 @@ public class AMLoginContext {
      * @param loginParamsMap login parameters HashMap
      * @throws AuthLoginException if execute login fails
      */
-    public void executeLogin(HashMap loginParamsMap) throws AuthLoginException {
+    public void executeLogin(Map<String, Object> loginParamsMap) throws AuthLoginException {
         boolean errorState = false;
         internalAuthError = false;
         processDone = false;
@@ -237,20 +237,21 @@ public class AMLoginContext {
         if (loginState == null || loginParamsMap == null) {
             debug.error("Error: loginState or loginParams is null");
             loginStatus.setStatus(LoginStatus.AUTH_FAILED);
-            loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
+            if (loginState != null) {
+                loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
+            }
             setErrorMsgAndTemplate();
             internalAuthError = true;
             throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_ERROR, null);
-        } else {
-            /*
-             * Lookup resource bundle and locale specific settings based on locale associated with LoginState
-             */
-            String llc = loginState.getLocale();
-            java.util.Locale loc = com.sun.identity.shared.locale.Locale.getLocale(llc);
-            bundle = AMResourceBundleCache.getInstance().getResBundle(BUNDLE_NAME, loc);
-            exceedRetryLimit = AMResourceBundleCache.getInstance()
-                    .getResBundle("amAuthLDAP", loc).getString(ISAuthConstants.EXCEED_RETRY_LIMIT);
         }
+
+        /*
+         * Lookup resource bundle and locale specific settings based on locale associated with LoginState
+         */
+        java.util.Locale loginLocale = com.sun.identity.shared.locale.Locale.getLocale(loginState.getLocale());
+        bundle = AMResourceBundleCache.getInstance().getResBundle(BUNDLE_NAME, loginLocale);
+        exceedRetryLimit = AMResourceBundleCache.getInstance()
+                .getResBundle("amAuthLDAP", loginLocale).getString(ISAuthConstants.EXCEED_RETRY_LIMIT);
         if (debug.messageEnabled()) {
             debug.message("LoginState : " + loginState);
         }
@@ -613,7 +614,7 @@ public class AMLoginContext {
                             debug.message("loginSTate is : " + loginState);
                         }
 
-                        updateLoginState(loginState, indexType, indexName, configName, orgDN);
+                        updateLoginState(indexType, indexName, configName, orgDN);
                         //activate session
                         Object lcInSession;
                         if (isPureJAAS()) {
@@ -1088,7 +1089,7 @@ public class AMLoginContext {
      *
      * @return authentication modules configured for a given organization.
      */
-    public Set getModuleInstanceNames() {
+    public Set<String> getModuleInstanceNames() {
         try {
             LoginState loginState = AuthUtils.getLoginState(authContext);
 
@@ -1203,7 +1204,7 @@ public class AMLoginContext {
     }
 
     /* retrieve login parameters */
-    private void parseLoginParams(HashMap loginParamsMap) {
+    private void parseLoginParams(Map<String, Object> loginParamsMap) {
 
         if (debug.messageEnabled()) {
             debug.message("loginParamsMap is.. :" + loginParamsMap);
@@ -1224,7 +1225,7 @@ public class AMLoginContext {
             }
 
             String locale = (String) loginParamsMap.get("locale");
-            if (locale != null && locale.length() > 0) {
+            if (StringUtils.isNotEmpty(locale)) {
                 loginState.setLocale(locale);
             }
         } catch (Exception e) {
@@ -1346,7 +1347,7 @@ public class AMLoginContext {
 
             this.indexName = AMAuthUtils.getDataFromRealmQualifiedData(compositeAdvice.getModuleName());
             String qualifiedRealm = AMAuthUtils.getRealmFromRealmQualifiedData(compositeAdvice.getModuleName());
-            if ((qualifiedRealm != null) && (qualifiedRealm.length() != 0)) {
+            if (StringUtils.isNotEmpty(qualifiedRealm)) {
                 this.orgDN = DNMapper.orgNameToDN(qualifiedRealm);
                 loginState.setQualifiedOrgDN(this.orgDN);
             }
@@ -1400,7 +1401,7 @@ public class AMLoginContext {
     }
 
     /* update login state with indexType,indexName */
-    void updateLoginState(LoginState loginState, IndexType indexType, String indexName, String configName, String orgDN) {
+    void updateLoginState(IndexType indexType, String indexName, String configName, String orgDN) {
         // set authLevel in LoginState
 
         String authLevel;
@@ -1523,14 +1524,6 @@ public class AMLoginContext {
         return AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_TIMEOUT, AuthUtils.ERROR_TEMPLATE);
     }
 
-    String getModuleErrorTemplate() {
-        String moduleErrorTemplate = loginState.getModuleErrorTemplate();
-        if (debug.messageEnabled()) {
-            debug.message("Error Template is : " + moduleErrorTemplate);
-        }
-        return moduleErrorTemplate;
-    }
-
     /**
      * Returns error template.
      *
@@ -1629,14 +1622,13 @@ public class AMLoginContext {
 
         AMAuthLevelManager levelManager = AMAuthLevelManager.getInstance();
         int maxLevel = Integer.MIN_VALUE;
+
         if (moduleSet == null || moduleSet.isEmpty()) {
             moduleSet = getSuccessModuleSet(orgDN);
         }
-        Iterator mIterator = moduleSet.iterator();
-        while (mIterator.hasNext()) {
-            String moduleName =  (String) mIterator.next();
-            int authLevel = levelManager.getLevelForModule(moduleName,
-                    orgDN, loginState.defaultAuthLevel);
+
+        for (String moduleName : moduleSet) {
+            int authLevel = levelManager.getLevelForModule(moduleName, orgDN, loginState.defaultAuthLevel);
             if (authLevel > maxLevel)  {
                 maxLevel = authLevel;
             }
@@ -1659,10 +1651,10 @@ public class AMLoginContext {
      * retreives all module names which have option REQUIRED , REQUISITE
      * if org.forgerock.openam.authLevel.excludeRequiredOrRequisite is false
      */
-    Set getSuccessModuleSet(String orgDN) {
+    Set<String> getSuccessModuleSet(String orgDN) {
 
         try {
-            Set successModuleSet = loginState.getSuccessModuleSet();
+            Set<String> successModuleSet = loginState.getSuccessModuleSet();
             if (excludeRequiredOrRequisite) {
                 if (debug.messageEnabled()) {
                     debug.message("get success modules excluding REQUIRED or REQUISITE in chain.");
@@ -1687,32 +1679,16 @@ public class AMLoginContext {
     /* constructs a module list string where each module is
      * separated by a "|" e.g module1 | module2 | module3
      */
-    String getModuleString(Set moduleSet) {
+    String getModuleString(Set<String> moduleSet) {
 
-        String moduleList = ISAuthConstants.EMPTY_STRING;
-
-        if ((moduleSet != null) && (!moduleSet.isEmpty())) {
-            Iterator mIterator = moduleSet.iterator();
-            StringBuilder moduleString = new StringBuilder();
-
-            while (mIterator.hasNext()) {
-                String mClassName = (String) mIterator.next();
-                moduleString.append(mClassName).append(LIST_DELIMITER);
-            }
-
-            String mString = moduleString.toString();
-            int i = mString.lastIndexOf(LIST_DELIMITER);
-
-            if (i != -1) {
-                moduleList = mString.substring(0, i);
-            } else {
-                moduleList = mString;
-            }
-        }
+        final String moduleList = moduleSet == null || moduleSet.isEmpty() ?
+                ISAuthConstants.EMPTY_STRING :
+                org.apache.commons.lang.StringUtils.join(moduleSet, LIST_DELIMITER);
 
         if (debug.messageEnabled()) {
             debug.message("ModuleList is : " + moduleList);
         }
+
         return moduleList;
     }
 
@@ -1950,7 +1926,7 @@ public class AMLoginContext {
             return;
         }
 
-        updateLoginState(loginState, indexType, indexName, configName, orgDN);
+        updateLoginState(indexType, indexName, configName, orgDN);
         Subject subject = new Subject();
         Principal userPrincipal = new UserPrincipal(indexName);
         subject.getPrincipals().add(userPrincipal);
@@ -2032,7 +2008,7 @@ public class AMLoginContext {
      * @return set of configured auth module with control flag REQUIRED and
      *         REQUISITE are returned
      */
-    private Set getModuleFromAuthConfiguration(Set moduleListSet, String orgDN) {
+    private Set<String> getModuleFromAuthConfiguration(Set<String> moduleListSet, String orgDN) {
         Configuration config = Configuration.getConfiguration();
         if (configName == null) {
             configName = getConfigName(indexType, indexName, orgDN, loginState.getClientType());
@@ -2042,7 +2018,7 @@ public class AMLoginContext {
             debug.message("configName is : " + configName);
         }
         String moduleName;
-        if ((moduleList != null) && (moduleList.length != 0)) {
+        if (moduleList != null && moduleList.length > 0) {
             if (moduleList.length == 1) {
                 moduleName = (String) moduleList[0].getOptions().get(ISAuthConstants.MODULE_INSTANCE_NAME);
                 moduleListSet.add(moduleName);
@@ -2068,8 +2044,8 @@ public class AMLoginContext {
 
         String moduleList = ISAuthConstants.EMPTY_STRING;
         try {
-            Set failureModuleSet = loginState.getFailureModuleSet();
-            Set moduleSet = getModuleFromAuthConfiguration(failureModuleSet, orgDN);
+            Set<String> failureModuleSet = loginState.getFailureModuleSet();
+            Set<String> moduleSet = getModuleFromAuthConfiguration(failureModuleSet, orgDN);
 
             if (debug.messageEnabled()) {
                 debug.message("ModuleSet is : " + moduleSet);
@@ -2088,13 +2064,8 @@ public class AMLoginContext {
     /* Checks if the control flag matches the JAAS flags,
      * REQUIRED and REQUISITE flags
      */
-    boolean isControlFlagMatchFound(AppConfigurationEntry.LoginModuleControlFlag controlFlag) {
-        boolean isFlagMatchFound = false;
-        if (controlFlag != null) {
-            isFlagMatchFound  = ((controlFlag == AppConfigurationEntry.LoginModuleControlFlag.REQUIRED)
-                    || (controlFlag == AppConfigurationEntry.LoginModuleControlFlag.REQUISITE));
-        }
-        return isFlagMatchFound;
+    boolean isControlFlagMatchFound(LoginModuleControlFlag flag) {
+        return flag == LoginModuleControlFlag.REQUIRED || flag == LoginModuleControlFlag.REQUISITE;
     }
 
     /* Returns the successful list of modules names */
