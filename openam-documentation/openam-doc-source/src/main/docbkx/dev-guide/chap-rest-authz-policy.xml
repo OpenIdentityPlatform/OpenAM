@@ -4074,6 +4074,135 @@ $ <userinput>curl \
   </section>
  </section>
 
+ <section xml:id="rest-api-authz-subject-attributes">
+  <title>Viewing Subject Attributes</title>
+
+  <para>
+   When you define a policy subject condition, the condition can depend on values
+   of subject attributes stored in a user's profile. The list of possible subject
+   attributes that you can use depends on the LDAP User Attributes configured for
+   the Identity data store where OpenAM looks up the user's profile.
+  </para>
+  <para>
+   Subject attributes derive from the list of LDAP user attributes configured
+   for the Identity data store. For more information, see
+   <link xlink:show="new"
+         xlink:href="admin-guide#config-data-store"
+         xlink:role="http://docbook.org/xlink/role/olink">Configuring Data Stores</link>.
+
+  </para>
+  <para>
+   You can get a listing of all subject attribute
+   names using the <literal>/json/subjectattributes/?_action=query</literal>
+   command on the endpoint.
+   There are no restrictions on the search and no pagination cookie is set.
+   The subject
+   attribute names are all returned as one in a "result" array named <literal>applicationTypeNames</literal>.
+  </para>
+
+  <!-- this example requires verification -->
+  <programlisting>
+$ <userinput>curl --request GET \
+  --header "iPlanetDirectoryPro: AQIC…*" \
+  --header "Content-Type: application/json" \
+  http://openam.example.com:8080/openam/json/subjectattributes/?_action=query</userinput>
+<computeroutput>
+{
+ "result": [
+   "sunIdentityServerPPInformalName",
+   "sunIdentityServerPPFacadeGreetSound",
+   "uid",
+   "manager",
+   "sunIdentityServerPPLegalIdentityGender",
+   "sunIdentityServerPPCommonNameMN",
+   "preferredLocale",
+   "iplanet-am-session-get-valid-sessions",
+   "sunIdentityServerPPFacadegreetmesound",
+   "iplanet-am-user-password-reset-question-answer",
+   "telephoneNumber",
+   "employeeNumber",
+   "iplanet-am-user-admin-start-dn",
+   "iplanet-am-user-success-url",
+   "sunIdentityServerPPDemographicsDisplayLanguage",
+   "iplanet-am-user-federation-info",
+   "objectClass",
+   "sunIdentityServerPPDemographicsLanguage",
+   "authorityRevocationList",
+   "sunIdentityServerPPLegalIdentityDOB",
+   "sunIdentityServerPPSignKey",
+   "sunIdentityServerPPEmploymentIdentityOrg",
+   "iplanet-am-session-max-caching-time",
+   "sn",
+   "iplanet-am-session-quota-limit",
+   "sunIdentityServerPPEncryPTKey",
+   "iplanet-am-session-max-session-time",
+   "sunIdentityServerPPCommonNamePT",
+   "sun-fm-saml2-nameid-info",
+   "sunIdentityServerDiscoEntries",
+   "iplanet-am-user-login-status",
+   "sunIdentityServerPPCommonNameCN",
+   "distinguishedName",
+   "iplanet-am-session-max-idle-time",
+   "cn",
+   "sunIdentityServerPPLegalIdentityVATIdType",
+   "iplanet-am-user-password-reset-options",
+   "preferredlanguage",
+   "iplanet-am-user-federation-info-key",
+   "sunIdentityServerPPDemographicsAge",
+   "inetUserHttpURL",
+   "iplanet-am-user-alias-list",
+   "sunIdentityServerPPFacadeNamePronounced",
+   "sunIdentityServerPPEmploymentIdentityJobTitle",
+   "sunIdentityMSISDNNumber",
+   "sunIdentityServerPPMsgContact",
+   "givenName",
+   "sunIdentityServerPPLegalIdentityMaritalStatus",
+   "devicePrintProfiles",
+   "memberOf",
+   "sun-fm-saml2-nameid-infokey",
+   "iplanet-am-session-service-status",
+   "sunIdentityServerPPLegalIdentityVATIdValue",
+   "userPassword",
+   "sunIdentityServerPPFacadeMugShot",
+   "sunIdentityServerPPEmploymentIdentityAltO",
+   "iplanet-am-user-auth-config",
+   "assignedDashboard",
+   "iplanet-am-user-failure-url",
+   "sunAMAuthInvalidAttemptsData",
+   "sunIdentityServerPPLegalIdentityLegalName",
+   "adminRole",
+   "sunIdentityServerPPCommonNameAltCN",
+   "dn",
+   "iplanet-am-session-add-session-listener-on-all-sessions",
+   "userCertificate",
+   "mail",
+   "sunIdentityServerPPLegalIdentityAltIdValue",
+   "iplanet-am-user-password-reset-force-reset",
+   "caCertificate",
+   "sunIdentityServerPPEmergencyContact",
+   "sunIdentityServerPPDemographicsBirthDay",
+   "sunIdentityServerPPFacadeWebSite",
+   "preferredtimezone",
+   "sunIdentityServerPPLegalIdentityAltIdType",
+   "sunIdentityServerPPCommonNameSN",
+   "sunIdentityServerPPAddressCard",
+   "postalAddress",
+   "iplanet-am-session-destroy-sessions",
+   "inetUserStatus",
+   "iplanet-am-auth-configuration",
+   "iplanet-am-user-auth-modules",
+   "iplanet-am-user-account-life",
+   "sunIdentityServerPPDemographicsTimeZone",
+   "sunIdentityServerPPCommonNameFN"
+ ],
+ "resultCount": 85,
+ "pagedResultsCookie": null,
+ "remainingPagedResults": 0
+}
+</computeroutput>
+  </programlisting>
+ </section>
+
  <section xml:id="rest-api-authz-subject-types">
   <title>Viewing Subject Types</title>
 
