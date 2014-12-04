@@ -1931,6 +1931,13 @@
                 <version>3.12.1.GA</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <!-- License: legal/CC-Public-Domain.txt -->
+                <groupId>org.hdrhistogram</groupId>
+                <artifactId>HdrHistogram</artifactId>
+                <version>2.0.3</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
