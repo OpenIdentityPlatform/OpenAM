@@ -280,25 +280,20 @@ public class AMLoginContext {
          * Throw an exception if module-based authentication is disabled and an authentication module other
          * than APPLICATION_MODULE or FEDERATION_MODULE is explicitly requested.
          */
-        String moduleClassName = null;
         if (indexType == IndexType.MODULE_INSTANCE
                 && !loginState.getEnableModuleBasedAuth()
                 && !indexName.equals(ISAuthConstants.APPLICATION_MODULE)) {
+            String moduleClassName = null;
             try {
                 AMAuthenticationManager authManager = new AMAuthenticationManager(
                         AccessController.doPrivileged(AdminTokenAction.getInstance()), orgDN);
                 AMAuthenticationInstance authInstance = authManager.getAuthenticationInstance(indexName);
                 moduleClassName = authInstance.getType();
             } catch (AMConfigurationException amce) {
-                debug.warning("AMLoginContext.executeLogin(): Unable to get authentication config", amce);
+                debug.error("AMLoginContext.executeLogin(): Unable to get authentication config", amce);
             }
-            if (moduleClassName != null && !moduleClassName.equalsIgnoreCase(
-                    ISAuthConstants.FEDERATION_MODULE)) {
-                debug.error("Error: Module Based Auth is not allowed");
-                loginStatus.setStatus(LoginStatus.AUTH_FAILED);
-                loginState.setErrorCode(AMAuthErrorCode.MODULE_BASED_AUTH_NOT_ALLOWED);
-                setErrorMsgAndTemplate();
-                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.MODULE_BASED_AUTH_NOT_ALLOWED, null);
+            if (moduleClassName != null && !moduleClassName.equalsIgnoreCase(ISAuthConstants.FEDERATION_MODULE)) {
+                throwExceptionIfModuleBasedAuthenticationDisabled();
             }
         }
 
@@ -1282,7 +1277,11 @@ public class AMLoginContext {
      * is 1 then start module based authentication.
      * throws Exception if no modules are found
      */
-    boolean processLevel(IndexType indexType, String indexName, String orgDN, String clientType) throws AuthException {
+    boolean processLevel(IndexType indexType, String indexName, String orgDN, String clientType)
+            throws AuthException, AuthLoginException {
+
+        throwExceptionIfModuleBasedAuthenticationDisabled();
+
         indexType= IndexType.LEVEL;
 
         java.util.Locale loc = com.sun.identity.shared.locale.Locale.getLocale(loginState.getLocale());
@@ -1327,6 +1326,11 @@ public class AMLoginContext {
 
         java.util.Locale loc = com.sun.identity.shared.locale.Locale.getLocale(loginState.getLocale());
         CompositeAdvices compositeAdvice = new CompositeAdvices(indexName, orgDN, clientType, loc);
+
+        if (compositeAdvice.getType() == AuthUtils.MODULE) {
+            throwExceptionIfModuleBasedAuthenticationDisabled();
+        }
+
         int numberOfModules = compositeAdvice.getNumberOfAuthModules();
         if (debug.messageEnabled()) {
             debug.message("processCompositeAdvice:number of Modules/Services : " + numberOfModules);
@@ -1379,6 +1383,19 @@ public class AMLoginContext {
                 return false;
             }
 
+        }
+    }
+
+    /*
+     * Throw an exception as module-based authentication is disabled.
+     */
+    private void throwExceptionIfModuleBasedAuthenticationDisabled() throws AuthLoginException {
+        if (!loginState.getEnableModuleBasedAuth()) {
+            debug.error("Error: Module Based Auth is not allowed");
+            loginStatus.setStatus(LoginStatus.AUTH_FAILED);
+            loginState.setErrorCode(AMAuthErrorCode.MODULE_BASED_AUTH_NOT_ALLOWED);
+            setErrorMsgAndTemplate();
+            throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.MODULE_BASED_AUTH_NOT_ALLOWED, null);
         }
     }
 
