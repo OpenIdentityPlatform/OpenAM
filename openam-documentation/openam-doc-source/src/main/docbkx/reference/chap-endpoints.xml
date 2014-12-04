@@ -4364,9 +4364,22 @@ to a runtime exception with messages that I think suggest that it needed to be c
    </varlistentry>
 
    <varlistentry>
+    <term>/json/subjectattributes</term>
+    <listitem>
+     <para>Authorization:
+      Search for all names of available subject attributes to which
+      a policy applies.
+      There are no restrictions on the search and no pagination cookie is set.
+      The subject attribute names are all returned as one
+      in a "result" array named <literal>applicationTypeNames</literal>.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term>/json/subjecttypes</term>
     <listitem>
-     <para>Authorization: describe the JSON representation of subjects that you
+     <para>Authorization: Describe the JSON representation of subjects that you
       can use in policy definitions. Subject types are server-wide, and do not
       differ by realm. Hence, the URI for the subject types API does not contain
       a realm component.
