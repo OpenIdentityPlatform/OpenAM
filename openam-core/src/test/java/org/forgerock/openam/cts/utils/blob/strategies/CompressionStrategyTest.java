@@ -15,9 +15,23 @@
  */
 package org.forgerock.openam.cts.utils.blob.strategies;
 
+import org.HdrHistogram.AbstractHistogram;
+import org.HdrHistogram.AtomicHistogram;
 import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.io.PrintStream;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -63,12 +77,12 @@ public class CompressionStrategyTest {
         compression = new CompressionStrategy();
     }
 
-    @Test (expectedExceptions = IllegalArgumentException.class)
+    @Test (expectedExceptions = NullPointerException.class)
     public void shouldRejectIfNullBlobOnPerform() throws TokenStrategyFailedException {
         compression.perform(null);
     }
 
-    @Test (expectedExceptions = IllegalArgumentException.class)
+    @Test (expectedExceptions = NullPointerException.class)
     public void shouldRejectIfNullBlobOnReverse() throws TokenStrategyFailedException {
         compression.reverse(null);
     }
@@ -81,5 +95,165 @@ public class CompressionStrategyTest {
     @Test
     public void shouldDecompressCompressedContents() throws TokenStrategyFailedException {
         assertThat(compression.reverse(compression.perform(data))).isEqualTo(data);
+    }
+
+    @DataProvider
+    public Object[][] numThreads() {
+        return new Object[][]{
+                { 1 },
+                { 2 },
+                { 5 },
+                { 10 },
+                { 25 },
+                { 50 },
+                { 100 }
+        };
+    }
+
+    /**
+     * Tests performance of CompressionStrategy as a factor of the number of threads.
+     * Disabled by default to avoid slowing down the build.
+     *
+     * @param numThreads the number of threads to concurrently hammer the CompressionStrategy.
+     */
+    @Test(dataProvider = "numThreads", enabled = true)
+    public void testThroughPut(int numThreads) throws Exception {
+        final int TOTAL_ROUNDS = 100000;
+        final int roundsPerThread = TOTAL_ROUNDS / numThreads;
+        // Given
+        final Set<Throwable> errors = Collections.newSetFromMap(new ConcurrentHashMap<Throwable, Boolean>());
+        final MonitoredCompressionStrategy strategy = new MonitoredCompressionStrategy();
+        final Executor executor = Executors.newFixedThreadPool(numThreads);
+
+        final byte[] dataToCompress = JSON_SAMPLE.getBytes(Charset.forName("UTF-8"));
+        final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1);
+
+        // When
+        for (int i = 0; i < numThreads; ++i) {
+            executor.execute(new CompressionTask(barrier, dataToCompress, strategy, errors, roundsPerThread));
+        }
+        // Wait for start
+        barrier.await();
+        // Warmup
+        barrier.await();
+        strategy.reset();
+        barrier.await();
+        // Actual test
+        barrier.await();
+
+        // Then
+        assertThat(errors).isEmpty();
+        strategy.printStats(System.out);
+
+        // See http://hdrhistogram.github.io/HdrHistogram/plotFiles.html
+//        final PrintStream out = new PrintStream(new BufferedOutputStream(new FileOutputStream
+//                (String.format(Locale.US, "/Users/neilmadden/Desktop/CompressionStrategy-%03d.hgrm", numThreads))));
+//        strategy.printStats(out);
+//        out.flush();
+//        out.close();
+    }
+
+    /**
+     * Benchmarking task that compresses and uncompresses some data in a tight loop.
+     */
+    private static class CompressionTask implements Runnable {
+        private static final int WARMUP_ROUNDS = 1000;
+        private final CyclicBarrier barrier;
+        private final byte[] dataToCompress;
+        private final CompressionStrategy strategy;
+        private final Collection<Throwable> errors;
+        private final int rounds;
+
+        CompressionTask(final CyclicBarrier barrier, final byte[] dataToCompress, final CompressionStrategy strategy,
+                final Collection<Throwable> errors, final int rounds) {
+            this.barrier = barrier;
+            this.dataToCompress = dataToCompress;
+            this.strategy = strategy;
+            this.errors = errors;
+            this.rounds = rounds;
+        }
+
+        @Override
+        public void run() {
+            try {
+                // Wait for start
+                barrier.await();
+
+                for (int i = 0; i < WARMUP_ROUNDS; ++i) {
+                    final byte[] compressed = strategy.perform(dataToCompress);
+                    assertThat(compressed.length).isLessThan(dataToCompress.length);
+                    final byte[] decompressed = strategy.reverse(compressed);
+                    assertThat(decompressed).isEqualTo(dataToCompress);
+                }
+
+                barrier.await();
+                // Wait for stats to be reset
+                barrier.await();
+
+                // Try to thwart any attempt by the JIT to eliminate redundant code:
+                boolean b = true;
+                for (int i = 0; i < rounds; ++i) {
+                    final byte[] compressed = strategy.perform(dataToCompress);
+                    final byte[] decompressed = strategy.reverse(compressed);
+                    b &= decompressed.length == dataToCompress.length;
+                }
+
+                barrier.await();
+
+                assertThat(b).isTrue();
+
+            } catch (Exception ex) {
+                errors.add(ex);
+            }
+        }
+    }
+
+    private static final class MonitoredCompressionStrategy extends CompressionStrategy {
+        // Histograms for storing millisecond precision timings: max=10000 (10 seconds), 5 significant digits
+        // Should be slightly less than 2MB total storage per Histogram
+        private final AtomicHistogram performSamples = new AtomicHistogram(10000, 5);
+        private final AtomicHistogram reverseSamples = new AtomicHistogram(10000, 5);
+
+        @Override
+        public byte[] perform(final byte[] data) throws TokenStrategyFailedException {
+            // Cannot use System.nanoTime() as it gives invalid results if thread gets scheduled to
+            // a different CPU during the test (highly likely in the large thread count tests).
+            final long start = System.currentTimeMillis();
+            try {
+                return super.perform(data);
+            } finally {
+                final long end = System.currentTimeMillis();
+                performSamples.recordValue(end - start);
+            }
+        }
+
+        @Override
+        public byte[] reverse(final byte[] data) throws TokenStrategyFailedException {
+            final long start = System.currentTimeMillis();
+            try {
+                return super.reverse(data);
+            } finally {
+                final long end = System.currentTimeMillis();
+                reverseSamples.recordValue(end - start);
+            }
+        }
+
+        void reset() {
+            performSamples.reset();
+            reverseSamples.reset();
+        }
+
+        void printStats(PrintStream out, AbstractHistogram histogram) {
+            histogram.outputPercentileDistribution(out, 1.0);
+        }
+
+        void printStats(PrintStream out) throws InterruptedException {
+            //out.println("Perform:");
+            printStats(out, performSamples);
+            //out.println("Reverse:");
+            //printStats(out, reverseSamples);
+            //out.flush();
+            Thread.sleep(50l);
+        }
     }
 }

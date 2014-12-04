@@ -31,8 +31,6 @@ import java.util.zip.GZIPOutputStream;
  */
 public class CompressionStrategy implements BlobStrategy {
 
-    private final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
     /**
      * Compress the Tokens binary object.
      *
@@ -42,11 +40,11 @@ public class CompressionStrategy implements BlobStrategy {
      */
     @Override
     public byte[] perform(byte[] blob) throws TokenStrategyFailedException {
-        Reject.ifTrue(blob == null);
-        bout.reset();
+        Reject.ifNull(blob);
+        final ByteArrayOutputStream bout = new ByteArrayOutputStream(blob.length);
         try {
-            GZIPOutputStream out = new GZIPOutputStream(bout);
-            out.write(blob, 0, blob.length);
+            final GZIPOutputStream out = new GZIPOutputStream(bout);
+            out.write(blob);
             out.flush();
             out.close();
         } catch (IOException e) {
@@ -64,8 +62,9 @@ public class CompressionStrategy implements BlobStrategy {
      */
     @Override
     public byte[] reverse(byte[] blob) throws TokenStrategyFailedException {
-        Reject.ifTrue(blob == null);
-        bout.reset();
+        Reject.ifNull(blob);
+        final int lengthGuess = blob.length * 2;
+        final ByteArrayOutputStream bout = new ByteArrayOutputStream(lengthGuess);
         try {
             GZIPInputStream inputStream = new GZIPInputStream(new ByteArrayInputStream(blob));
             IOUtils.copy(inputStream, bout);
