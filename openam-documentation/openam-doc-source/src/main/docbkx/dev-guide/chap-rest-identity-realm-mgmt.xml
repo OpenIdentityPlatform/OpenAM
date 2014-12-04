@@ -250,10 +250,14 @@ $ <userinput>curl \
     </screen>
 
    <para>As shown in the examples, OpenAM returns the JSON representation of
-   the profile on successful creation. On failure, OpenAM returns a JSON
-   representation of the error including the
-   <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
-   xlink:show="new">HTTP status code</link>.</para>
+    the profile on successful creation. On failure, OpenAM returns a JSON
+    representation of the error including the
+    <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+    xlink:show="new">HTTP status code</link>. For example,
+    version 2.0 of the CREST <literal>/json/users</literal>, <literal>/json/groups</literal>,
+    and <literal>/json/agents</literal> endpoints return 403 if the user making
+    the request is not authorized to do so.
+   </para>
 
    <para>The same HTTP POST and PUT mechanisms also work for other objects
    such as policy agent profiles and groups.</para>
