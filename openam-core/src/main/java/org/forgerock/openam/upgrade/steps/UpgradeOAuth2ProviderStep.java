@@ -19,6 +19,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
@@ -83,12 +84,14 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
         try {
             scm = new ServiceConfigManager(OAUTH2_PROVIDER, token);
             ssm = new ServiceSchemaManager(OAUTH2_PROVIDER, token);
+            findUpgradableProviders();
+        } catch (ServiceNotFoundException e) {
+            //When upgrading from 10.0.x and before there is no OAuth2 service, so we expect this exception in this case
+            DEBUG.error("OAuth2 Service not found. Nothing to upgrade", e);
         } catch (Exception e) {
             DEBUG.error("An error occurred while trying to create Service Config and Schema Managers.", e);
             throw new UpgradeException("Unable to create Service Config and Schema Managers.", e);
         }
-
-        findUpgradableProviders();
     }
 
     private void findUpgradableProviders() throws UpgradeException {
