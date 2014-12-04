@@ -76,9 +76,12 @@ public class AMConfiguration extends Configuration {
      * TODO : make this a bounded map.
      */
     private static final Map<String, Set<Object>> listenersMap = new ConcurrentHashMap<String, Set<Object>>();
-    
-    private static ConfigFile configFile = new ConfigFile();
-    
+
+    private static enum ConfigFileHolder {
+        INSTANCE;
+        final ConfigFile configFile = new ConfigFile();
+    }
+
     private static Debug debug = Debug.getInstance("amAuthConfig");
     
     private Configuration defConfig = null;
@@ -219,7 +222,7 @@ public class AMConfiguration extends Configuration {
                     
                     if (entries == null) {
                         debug.message("Getting configuration from confFile.");
-                        entries = configFile.getAppConfigurationEntry(name);
+                        entries = ConfigFileHolder.INSTANCE.configFile.getAppConfigurationEntry(name);
                     }
                     
                     if (entries == null) {
