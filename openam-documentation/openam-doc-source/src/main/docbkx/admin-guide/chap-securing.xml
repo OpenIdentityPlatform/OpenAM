@@ -175,8 +175,25 @@
         </listitem>
 
         <listitem>
-            <para>Alternatively, use a reverse proxy in front of OpenAM to allow access only to
-            the necessary URLs. The following figure shows the recommended architecture with a
+            <para>Alternatively, use a reverse proxy in front of OpenAM to allow
+             access only to the necessary URLs.
+             The distributed authentication user interface
+             only exposes the authentication UI, while a reverse proxy can expose
+             those endpoints needed for an application. For example, if you
+             need to expose the OAuth2/OpenID Connect endpoints and REST interface
+             in addition to the authentication UI,
+             then you should implement a reverse proxy. If you only need to expose
+             a login page, then use the DAUI.
+            </para>
+            <para>
+             Also note that the DAUI does not support SAML 2.0, so in applications
+             that require access to SAML 2.0 endpoints, you must implement
+             a reverse proxy.
+            </para>
+
+
+            <para>
+            The following figure shows the recommended architecture with a
             reverse proxy.</para>
 
             <mediaobject xml:id="figure-securing-openam-rp">
