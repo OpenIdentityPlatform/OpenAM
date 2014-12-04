@@ -119,13 +119,13 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                 _this.$el.find("input[type=submit]").prop('disabled', false);
                 if (responseMessage.indexOf("ldap exception") > -1) {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "userAlreadyExists");
+                } else if (responseMessage.indexOf("Identity names may not have a space character" )> -1) {
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "identityNoSpace");
                 } else if (responseCode === 400) {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "selfRegistrationDisabled");
                     _this.$el.find("input[type=submit]").prop('disabled', true);
                 } else if (responseCode === 409) {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "userAlreadyExists");
-                } else if (responseMessage.indexOf("Identity names may not have a space character" )> -1) {
-                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "identityNoSpace");
                 }
             };
 
