@@ -116,7 +116,7 @@ public class CompressionStrategyTest {
      *
      * @param numThreads the number of threads to concurrently hammer the CompressionStrategy.
      */
-    @Test(dataProvider = "numThreads", enabled = true)
+    @Test(dataProvider = "numThreads", enabled = false)
     public void testThroughPut(int numThreads) throws Exception {
         final int TOTAL_ROUNDS = 100000;
         final int roundsPerThread = TOTAL_ROUNDS / numThreads;
