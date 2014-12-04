@@ -31,7 +31,9 @@
 
 package com.sun.identity.authentication.modules.hotp;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Class to hold the authentication modules HOTP configuration settings.
@@ -49,10 +51,22 @@ public class HOTPParams {
     private final String messageSubject;
     private final String messageContent;
     private final String fromAddressAttributeName;
+    private final Set<String> userSearchAttributes;
 
     public HOTPParams(String gatewaySMSImplClass, long codeValidityDuration, String telephoneLdapAttributeName,
             String carrierLdapAttributeName, String emailLdapAttributeName, String codeDelivery, Map<?, ?> config,
             int codeLength, String messageSubject, String messageContent, String fromAddressAttributeName) {
+        this(gatewaySMSImplClass, codeValidityDuration, telephoneLdapAttributeName, carrierLdapAttributeName,
+        emailLdapAttributeName, codeDelivery, config, codeLength, messageSubject, messageContent, fromAddressAttributeName,
+        Collections.EMPTY_SET);
+    }
+    
+    public HOTPParams(final String gatewaySMSImplClass, final long codeValidityDuration,
+            final String telephoneLdapAttributeName, final String carrierLdapAttributeName,
+            final String emailLdapAttributeName, final String codeDelivery, 
+            final Map<?, ?> config, final int codeLength, final String messageSubject,
+            final String messageContent, final String fromAddressAttributeName,
+            final Set<String> userSearchAttributes) {
         this.gatewaySMSImplClass = gatewaySMSImplClass;
         this.codeValidityDuration = codeValidityDuration;
         this.telephoneLdapAttributeName = telephoneLdapAttributeName;
@@ -64,7 +78,8 @@ public class HOTPParams {
         this.messageSubject = messageSubject;
         this.messageContent = messageContent;
         this.fromAddressAttributeName = fromAddressAttributeName;
-    }
+        this.userSearchAttributes = userSearchAttributes;
+    }    
 
     public String getGatewaySMSImplClass() {
         return gatewaySMSImplClass;
@@ -108,5 +123,9 @@ public class HOTPParams {
 
     public String getFromAddressAttributeName() {
         return fromAddressAttributeName;
+    }
+    
+    public Set<String> getUserSearchAttributes() {
+        return Collections.unmodifiableSet(userSearchAttributes);
     }
 }
