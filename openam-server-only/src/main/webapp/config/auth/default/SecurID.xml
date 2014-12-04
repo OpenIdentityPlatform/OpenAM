@@ -13,7 +13,7 @@
 
 
 <ModuleProperties moduleName="SecurID" version="1.0" >
-    <Callbacks length="2" order="1" timeout="120" header="This server uses SecurID Authentication" >
+    <Callbacks length="2" order="1" timeout="120" header="Sign in to OpenAM" >
         <NameCallback>
             <Prompt>Enter Your UserId</Prompt>
         </NameCallback>

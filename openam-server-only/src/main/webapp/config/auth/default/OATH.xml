@@ -29,7 +29,7 @@
 
 
 <ModuleProperties moduleName="OATH" version="1.0">
-    <Callbacks length="2" order="1" timeout="120" header="This server uses OATH Authentication">
+    <Callbacks length="2" order="1" timeout="120" header="Sign in to OpenAM">
         <PasswordCallback>
             <Prompt>One Time Password:</Prompt>
         </PasswordCallback>

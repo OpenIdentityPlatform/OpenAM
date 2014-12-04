@@ -38,7 +38,7 @@
 
 <ModuleProperties moduleName="JDBC" version="1.0" > 
     <Callbacks length="2" order="1" timeout="120" 
-        header="This server uses JDBC Authentication" >
+        header="Sign in to OpenAM" >
         <NameCallback> 
             <Prompt>UserName</Prompt> 
         </NameCallback>
