@@ -32,7 +32,7 @@
             <Prompt>Device Print:</Prompt>
         </NameCallback>
     </Callbacks>
-    <Callbacks length="2" order="2" timeout="600" header="This server uses HOTP authentication" >
+    <Callbacks length="2" order="2" timeout="600" header="Sign in to OpenAM" >
         <PasswordCallback echoPassword="false" >
             <Prompt>Enter OTP Code:</Prompt>
         </PasswordCallback>
