@@ -87,7 +87,7 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
             findUpgradableProviders();
         } catch (ServiceNotFoundException e) {
             //When upgrading from 10.0.x and before there is no OAuth2 service, so we expect this exception in this case
-            DEBUG.error("OAuth2 Service not found. Nothing to upgrade", e);
+            DEBUG.error("OAuth2Provider service not found. Nothing to upgrade", e);
         } catch (Exception e) {
             DEBUG.error("An error occurred while trying to create Service Config and Schema Managers.", e);
             throw new UpgradeException("Unable to create Service Config and Schema Managers.", e);
