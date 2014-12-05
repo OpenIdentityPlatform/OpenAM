@@ -4093,11 +4093,12 @@ $ <userinput>curl \
   </para>
   <para>
    You can get a listing of all subject attribute
-   names using the <literal>/json/subjectattributes/?_action=query</literal>
+   names using the <literal>/json/subjectattributes/?_queryFilter=true</literal>
    command on the endpoint.
    There are no restrictions on the search and no pagination cookie is set.
    The subject
-   attribute names are all returned as one in a "result" array named <literal>applicationTypeNames</literal>.
+   attribute names are all returned as one in a "result" array named
+   <literal>applicationTypeNames</literal>.
   </para>
 
   <!-- this example requires verification -->
@@ -4105,7 +4106,7 @@ $ <userinput>curl \
 $ <userinput>curl --request GET \
   --header "iPlanetDirectoryPro: AQIC…*" \
   --header "Content-Type: application/json" \
-  http://openam.example.com:8080/openam/json/subjectattributes/?_action=query</userinput>
+  http://openam.example.com:8080/openam/json/subjectattributes/?_queryFilter=true</userinput>
 <computeroutput>
 {
  "result": [
