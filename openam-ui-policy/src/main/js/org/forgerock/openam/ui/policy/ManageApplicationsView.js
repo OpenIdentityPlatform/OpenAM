@@ -44,7 +44,6 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
         events: {
             'click .icon-pencil': 'editApplication',
-            'click .icon-file': 'viewPolicies',
             'click #deleteApps': 'deleteApplications',
             'click #importPolicies': 'startImportPolicies',
             'click #exportPolicies': 'exportPolicies',
@@ -77,10 +76,10 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
             return {
                 url: '/openam/json' + this.subrealm + '/applications',
-                colNames: ['', '', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
+                colNames: ['', 'Edit', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
                 colModel: [
                     {name: 'iconChB',           width: 40,  sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
-                    {name: 'actions',           width: 65,  sortable: false, formatter: actionsFormatter, frozen: true, title: false, search: false, hidedlg: true},
+                    {name: 'actions',           width: 65,  sortable: false, formatter: actionsFormatter, frozen: true, search: false, hidedlg: true},
                     {name: 'name',              width: 262, frozen: true, hidedlg: true},
                     {name: 'description',       width: 263, sortable: false},
                     {name: 'resources',         width: 263, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
