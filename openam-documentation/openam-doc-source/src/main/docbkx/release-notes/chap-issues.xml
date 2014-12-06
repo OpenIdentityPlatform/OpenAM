@@ -144,6 +144,20 @@
       >OPENAM-4876</link>).
     </para>
    </listitem>
+   <listitem>
+    <para><emphasis role="bold">Note about HttpServletResponse &amp; HttpServletRequest</emphasis>.
+     The <literal>HttpServletRequest</literal> instance passed to
+     <literal>AMPostAuthProcessInterface#onLogout</literal> will be null.
+     The <literal>HttpServletResponse</literal> instance passed to
+     <literal>AMPostAuthProcessInterface#onLogout</literal> is not the actual
+     <literal>HttpServletResponse</literal> corresponding to the request but a
+     faux instance whose only purpose is to transfer headers back to the actual
+     <literal>HttpServletResponse</literal>
+     (<link xlink:show="new"
+            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4045"
+     >OPENAM-4045</link>).
+    </para>
+   </listitem>
   </itemizedlist>
 
  </section>
