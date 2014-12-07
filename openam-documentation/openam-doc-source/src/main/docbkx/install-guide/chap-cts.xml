@@ -88,6 +88,11 @@
   <section xml:id="cts-config">
     <title>CTS Configuration Parameters</title>
 
+   <indexterm>
+    <primary>Core Token Service</primary>
+    <secondary>configuration parameters</secondary>
+   </indexterm>
+
     <para>If you want to reconfigure an existing implementation of CTS, be prepared. Any reconfiguration
     will orphan any tokens that are currently stored. To keep this from happening, disable client access
     to OpenAM before making any changes. Any changes require a server restart to put them into
@@ -204,8 +209,14 @@
 
   </section>
 
- <section xml:id="cts-schema">
+  <section xml:id="cts-schema">
     <title>CTS Schema and Indexes</title>
+
+   <indexterm>
+    <primary>Core Token Service</primary>
+    <secondary>schema</secondary>
+    <secondary>indexes</secondary>
+   </indexterm>
 
     <para>OpenAM stores volatile CTS token data in an instance of OpenDJ. To make that possible, OpenDJ needs
     the associated configuration store indexes, which allow OpenAM to search CTS token data in an efficient
@@ -393,6 +404,11 @@
   <section xml:id="cts-acis">
     <title>CTS Access Control Instructions</title>
 
+   <indexterm>
+    <primary>Core Token Service</primary>
+    <secondary>access control instructions</secondary>
+   </indexterm>
+
     <para>
      If you bind to the OpenDJ CTS server as a root DN user,
      such <literal>cn=Directory Manager</literal>, you can skip this section.
@@ -431,6 +447,12 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
 
   <section xml:id="cts-opendj-preparation">
    <title>Preparing an OpenDJ Directory Service for CTS</title>
+
+   <indexterm>
+    <primary>Core Token Service</primary>
+    <secondary>preparing OpenDJ</secondary>
+   </indexterm>
+
    <para>The Default Configuration option installs OpenAM with an embedded OpenDJ
    directory server that stores both configuration and CTS data.
    The default option is suitable for OpenAM evaluation purposes, or for single
@@ -456,9 +478,14 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
      applications, consider implementing an external configuration store.
     </para>
 
-
    <procedure xml:id="install-external-opendj">
     <title>To Install the OpenDJ Directory Server for CTS</title>
+
+    <indexterm>
+     <primary>Core Token Service</primary>
+     <secondary>OpenDJ</secondary>
+     <tertiary>installing</tertiary>
+    </indexterm>
 
     <step>
      <para>Prepare your OpenDJ installation, then download and unzip the
@@ -470,7 +497,7 @@ xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/install-guide/#chap-instal
 
      <!-- Why install OpenDJ as root? -->
       <screen>
-$ <userinput>sudo /path/to/opendj/setup --cli</userinput>
+$ <userinput>/path/to/opendj/setup --cli</userinput>
       </screen>
 
       <para>Example options are as follows:</para>
@@ -536,6 +563,13 @@ $ <userinput>sudo /path/to/opendj/setup --cli</userinput>
 
    <procedure xml:id="prepare-external-cts-backend">
     <title>To Prepare the External CTS Store</title>
+
+    <indexterm class="startofrange" id="idx-prepare-opendj">
+     <primary>Core Token Service</primary>
+     <secondary>OpenDJ</secondary>
+     <tertiary>preparing</tertiary>
+    </indexterm>
+
     <step><para>Change to the OpenDJ directory.</para>
 
      <screen>
@@ -695,7 +729,8 @@ $ <userinput>bin/dsconfig \
     <literal>cts-indices.ldif</literal>, and <literal>cts-container.ldif</literal>
     located at
     <literal>/path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha</literal>
-    to a local folder.</para>
+    to a local folder.
+    </para>
 
      <screen>
 $ <userinput>cp /tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-add-schema.ldif .</userinput>
@@ -783,6 +818,13 @@ $ <userinput>bin/start-ds</userinput>
        <para>You have successfully prepared the directory server backend for the
        external CTS store. Next, configure the external CTS store in OpenAM.</para>
       </step>
+
+    <indexterm class="endofrange" startref="idx-prepare-opendj">
+     <primary>Core Token Service</primary>
+     <secondary>OpenDJ</secondary>
+     <tertiary>preparing</tertiary>
+    </indexterm>
+
    </procedure>
 
    <procedure xml:id="configure-cts">
@@ -922,6 +964,12 @@ $ <userinput>bin/start-ds</userinput>
   <section xml:id="cts-replication">
     <title>CTS and OpenDJ Replication</title>
 
+   <indexterm>
+    <primary>Core Token Service</primary>
+    <secondary>OpenAM</secondary>
+    <tertiary>configuring</tertiary>
+   </indexterm>
+
     <para>Replication in this context is the process of copying updates between directory servers to help all servers
     converge to identical copies of directory, token, and session / SAML 2.0 / OAuth 2.0 data. OpenDJ uses advanced
     data replication methods to ensure that directory services remain available in the event of a server crash or
@@ -982,6 +1030,11 @@ $ <userinput>backup \
 
   <section xml:id="cts-token-managing">
     <title>Managing CTS Tokens</title>
+
+   <indexterm>
+    <primary>Core Token Service</primary>
+    <secondary>and OpenDJ replication</secondary>
+   </indexterm>
 
    <para>There are properties associated with token encryption, compression,
     and token cleanup frequency, which are disabled by default.
@@ -1052,6 +1105,12 @@ $ <userinput>backup \
 
   <section xml:id="cts-tuning-considerations">
    <title>CTS Tuning Considerations</title>
+
+   <indexterm>
+    <primary>Core Token Service</primary>
+    <secondary>tuning</secondary>
+   </indexterm>
+
    <para>CTS processes all requests asynchronously in the background, allowing
     callers (that is, those entities that call CTS) to send subsequent requests
     without waiting for a previous request to finish processing.
@@ -1143,6 +1202,12 @@ $ <userinput>backup \
 
   <section xml:id="cts-general-recommend">
    <title>General Recommendations for CTS Configuration</title>
+
+   <indexterm>
+    <primary>Core Token Service</primary>
+    <secondary>configuring</secondary>
+    <tertiary>general recommendations</tertiary>
+   </indexterm>
 
    <para>
     When properly configured, CTS can help your deployment avoid single points

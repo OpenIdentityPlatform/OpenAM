@@ -31,10 +31,12 @@
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing OpenAM Tools</title>
+
  <indexterm>
   <primary>Installing</primary>
   <secondary>Tools (ssoadm, etc.)</secondary>
  </indexterm>
+
  <para>OpenAM tools are found in <filename>.zip</filename> files where you
  unpacked the archive of the entire package, such as
  <filename>~/Downloads/openam</filename>.</para>
@@ -71,6 +73,11 @@
  
  <procedure xml:id="install-openam-admin-tools">
   <title>To Set Up Administration Tools</title>
+
+  <indexterm class="startofrange" id="idx-admin-tools">
+   <primary>administration tools</primary>
+   <secondary>setting up</secondary>
+  </indexterm>
 
   <para>
    The <command>ssoadm</command> administration tool
@@ -344,14 +351,26 @@ $ JAVA_HOME/bin/java -D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.j
    host, but in each case the command should manage only one OpenAM
    server.</para>
   </step>
+
+  <indexterm class="endofrange" startref="idx-admin-tools">
+   <primary>administration tools</primary>
+   <secondary>setting up</secondary>
+  </indexterm>
+
  </procedure>
 
  <procedure xml:id="install-openam-config-tools">
   <title>To Set Up Configuration Tools</title>
+
   <indexterm>
    <primary>Installing</primary>
    <secondary>Silent configuration</secondary>
   </indexterm>
+  <indexterm class="startofrange" id="idx-config-tools">
+   <primary>configuration tools</primary>
+   <secondary>setting up</secondary>
+  </indexterm>
+
   <step>
    <para>Make sure the <literal>JAVA_HOME</literal> environment variable
    is properly set.</para>
@@ -553,6 +572,11 @@ $ <userinput>java -jar ${ssoconfigJarFile} \
   --acceptLicense</userinput>
        </screen>
    </note>
+
+  <indexterm class="endofrange" startref="idx-config-tools">
+   <primary>configuration tools</primary>
+   <secondary>setting up</secondary>
+  </indexterm>
 
  </procedure>
 
