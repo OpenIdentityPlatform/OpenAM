@@ -35,6 +35,7 @@
  <title>Preparing For Installation</title>
 
  <indexterm><primary>Prerequisites</primary></indexterm>
+
  <para>This chapter covers prerequisites for installing OpenAM software,
  including how to prepare your application server to run OpenAM, how to prepare
  directory services to store configuration data, and how to prepare an identity
@@ -49,6 +50,15 @@
 
  <section xml:id="prepare-networking">
   <title>Preparing a Fully-Qualified Domain Name</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>preparing</secondary>
+   <tertiary>fully-qualified domain name</tertiary>
+  </indexterm>
+  <indexterm>
+   <primary>fully-qualified domain name</primary>
+  </indexterm>
 
   <para>OpenAM requires that you provide the fully-qualified domain name (FQDN)
   when you configure it. Before you set up OpenAM, be sure that your system
@@ -81,17 +91,18 @@
      ><citetitle>https://publicsuffix.org/list/effective_tld_names.dat</citetitle></link>
     to ensure that you do not set your cookie to a domain in the list.
   </para>
-
   </important>
-
  </section>
 
  <section xml:id="prepare-java">
   <title>Preparing a Java Environment</title>
 
   <indexterm>
-   <primary>Java requirements</primary>
+   <primary>OpenAM</primary>
+   <secondary>preparing</secondary>
+   <tertiary>Java requirements</tertiary>
   </indexterm>
+
 
   <para>OpenAM software depends on a Java runtime environment. Check the output
   of <command>java -version</command> to make sure your the version is supported
@@ -102,6 +113,11 @@
 
   <section xml:id="prepare-java-sun">
    <title>Settings For Sun/Oracle Java Environments</title>
+
+   <indexterm>
+    <primary>Java requirements</primary>
+    <secondary>Sun/Oracle Java</secondary>
+   </indexterm>
 
    <variablelist>
     <para>When using a Sun or Oracle Java environment set at least the
@@ -140,6 +156,11 @@
   <section xml:id="prepare-java-ibm">
    <title>Settings For IBM Java Environments</title>
 
+   <indexterm>
+    <primary>Java requirements</primary>
+    <secondary>IBM Java</secondary>
+   </indexterm>
+
    <variablelist>
     <para>When using an IBM Java environment set at least the following
     options.</para>
@@ -168,7 +189,11 @@
   <title>Setting Maximum File Descriptors</title>
 
   <indexterm>
-   <primary>Directory service requirements</primary>
+   <primary>OpenDJ</primary>
+   <secondary>maximum file descriptors</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>maximum file descriptors</primary>
   </indexterm>
 
   <para>
@@ -247,7 +272,13 @@ $ <userinput>cat /proc/sys/fs/file-max</userinput>
   <title>Preparing an Identity Repository</title>
 
   <indexterm>
-   <primary>Directory service requirements</primary>
+   <primary>directory service requirements</primary>
+   <secondary>preparing</secondary>
+   <tertiary>Identity repository</tertiary>
+  </indexterm>
+  <indexterm>
+   <primary>Identity repository</primary>
+   <secondary>preparing</secondary>
   </indexterm>
 
   <para>OpenAM stores user identity data in one or more identity repositories.
@@ -385,7 +416,14 @@ ds-privilege-name: password-reset</programlisting>
   <title>Preparing an External Configuration Data Store</title>
 
   <indexterm>
-   <primary>Directory service requirements</primary>
+   <primary>directory service requirements</primary>
+   <secondary>preparing</secondary>
+   <tertiary>external configuration data store</tertiary>
+  </indexterm>
+  <indexterm>
+   <primary>configuration data</primary>
+   <secondary>preparing</secondary>
+   <tertiary>external store</tertiary>
   </indexterm>
 
   <para>
@@ -438,6 +476,12 @@ ds-privilege-name: password-reset</programlisting>
 
   <procedure xml:id="install-prepare-opendj-external-config-store">
     <title>To Install an External OpenDJ Directory Server</title>
+
+   <indexterm class="startofrange" id="idx-ext-opendj">
+    <primary>configuration data</primary>
+    <secondary>external OpenDJ</secondary>
+    <tertiary>installing</tertiary>
+   </indexterm>
 
     <para>
      The following example procedure shows how to prepare a single OpenDJ
@@ -774,31 +818,33 @@ $ <userinput>bin/dsconfig \
    --index-name iplanet-am-user-federation-info-key \
    --set index-type:equality \
    --trustAll \
-   --no-prompt
-     </userinput>
+   --no-prompt</userinput>
      </screen>
     </step>
 
     <step>
      <para>
       Rebuild the indexes using the <literal>rebuild-index</literal> command.
-      You will need to stop the server before rebuilding the indexes.
+      You can stop the server and run <literal>rebuild-index</literal> in offline
+      mode, or you can run <literal>rebuild-index</literal> online
+      using a task as follows:
      </para>
 
      <screen>
-$ <userinput>bin/stop-ds</userinput>
-$ <userinput>bin/rebuild-index --baseDN dc=example,dc=com --rebuildAll</userinput>
+$ <userinput>bin/rebuild-index --port 4444 --hostname opendj.example.com \
+  --bindDN "cn=Directory Manager" --bindPassword password \
+  --baseDN dc=example,dc=com --rebuildAll \
+  --start 0</userinput>
      </screen>
     </step>
 
     <step>
      <para>
-      Verify the indexes. When completed, restart the server.
+      Verify the indexes.
      </para>
 
      <screen>
 $ <userinput>bin/verify-index --baseDN dc=example,dc=com</userinput>
-$ <userinput>bin/start-ds</userinput>
      </screen>
 
      <para>
@@ -815,13 +861,22 @@ $ <userinput>bin/start-ds</userinput>
      </para>
     </step>
    </procedure>
+
+  <indexterm class="endofrange" startref="idx-ext-opendj">
+   <primary>configuration data</primary>
+   <secondary>external OpenDJ</secondary>
+   <tertiary>installing</tertiary>
+  </indexterm>
  </section>
 
  <section xml:id="download-openam-software">
   <title>Obtaining OpenAM Software</title>
+
   <indexterm>
-   <primary>Downloading OpenAM</primary>
+   <primary>OpenAM</primary>
+   <secondary>downloading</secondary>
   </indexterm>
+
   <para>Download OpenAM releases from one of the following locations:</para>
   
    <itemizedlist>
@@ -940,6 +995,11 @@ $ <userinput>unzip ~/Downloads/${coreDirectoryFile}</userinput>
 
  <section xml:id="enable-cors-support">
   <title>Enabling CORS Support</title>
+
+  <indexterm>
+   <primary>cross-origin resource sharing (CORS)</primary>
+   <secondary>enabling</secondary>
+  </indexterm>
 
   <para>
    Cross-origin resource sharing (CORS) allows requests
@@ -1095,6 +1155,11 @@ $ <userinput>jar -cf ../openam.war *</userinput>
 
  <section xml:id="prepare-apache-tomcat">
   <title>Preparing Apache Tomcat</title>
+
+  <indexterm>
+   <primary>Apache Tomcat</primary>
+   <secondary>preparing</secondary>
+  </indexterm>
 
   <para>
    OpenAM examples often use Apache Tomcat as the deployment container.
@@ -1357,6 +1422,11 @@ Command start-domain executed successfully.</computeroutput>
   <!--title>Preparing OpenAM &amp; JBoss AS7 / EAP 6 / WildFly 8</title-->
   <title>Preparing OpenAM &amp; JBoss AS 7 / EAP 6</title>
 
+  <indexterm>
+   <primary>JBoss AS 7/EAP 6</primary>
+   <secondary>preparing</secondary>
+  </indexterm>
+
   <!--para>Some preparation is required to deploy OpenAM on JBoss AS 7 / EAP 6 / WildFly 8.</para-->
   <para>Some preparation is required to deploy OpenAM on JBoss AS 7 / EAP 6.</para>
 
@@ -1477,6 +1547,12 @@ $ <userinput>vi /path/to/jboss7/domain/configuration/domain.xml</userinput>
         <procedure xml:id="prep-jboss-600-601">
             <title>Alternative Method: To Prepare JBoss EAP 6.0.0 and 6.0.1</title>
 
+         <indexterm>
+          <primary>JBoss EAP 6.0.0</primary>
+          <primary>JBoss EAP 6.0.1</primary>
+          <secondary>preparing</secondary>
+         </indexterm>
+
             <para>JBoss EAP 6.0.0 and 6.0.1 are built from JBoss AS 7.1.2 and 7.1.3, respectively. The same techniques
                 described in the <xref linkend="prep-jboss-710-711" /> section work here as well. One alternative
                 method is available, as described in this section.</para>
@@ -1558,6 +1634,12 @@ $ <userinput>jar cvf ../openam.war *</userinput>
 
         <procedure xml:id="prep-jboss-61x">
             <title>To Prepare JBoss EAP 6.1.0 and 6.1.1</title>
+
+         <indexterm>
+          <primary>JBoss EAP 6.1.0</primary>
+          <primary>JBoss EAP 6.1.1</primary>
+          <secondary>preparing</secondary>
+         </indexterm>
 
             <step>
                 <para>For JBoss EAP 6.1.0 / 6.1.1, follow <xref linkend="jboss711-disable-conflicts" />
@@ -1676,6 +1758,11 @@ $ <userinput>jar cf ../openam.war *</userinput>
         <procedure xml:id="prep-jboss-for-openam">
             <title>To Prepare JBoss for OpenAM</title>
 
+         <indexterm>
+          <primary>OpenAM</primary>
+          <secondary>preparing JBoss for</secondary>
+         </indexterm>
+
             <para>The default JBoss settings for JVM do not give sufficient memory to OpenAM. This procedure
                 documents one method that you can use to modify JBoss. Other methods described in <link xlink:show="new"
                xlink:href="http://www.jboss.org/jbossas/docs">
@@ -1721,6 +1808,11 @@ $ <userinput>jar cf ../openam.war *</userinput>
 
         <procedure xml:id="prep-openam-for-jboss">
             <title>To Prepare OpenAM for JBoss</title>
+
+         <indexterm>
+          <primary>JBoss</primary>
+          <secondary>preparing OpenAM for</secondary>
+         </indexterm>
 
             <para>To take full advantage of JBoss with OpenAM, you should make a couple of changes to the
                 OpenAM <filename>war</filename> file. One problem is that JBoss will deploy applications from
@@ -1785,6 +1877,11 @@ $ <userinput>jar cvf ../openam.war *</userinput>
 
   <section xml:id="prepare-oracle-weblogic">
    <title>Preparing Oracle WebLogic</title>
+
+   <indexterm class="startofrange" id="idx-weblogic">
+    <primary>Oracle WebLogic</primary>
+    <secondary>preparing</secondary>
+   </indexterm>
 
    <para>Before you deploy OpenAM, update the JVM options as described in
    <xref linkend="prepare-java" />.</para>
@@ -1904,10 +2001,20 @@ $ <userinput>jar cvf ../openam.war *</userinput>
     <para>
      Restart WebLogic for the change to take effect.
     </para>
+
+   <indexterm class="endofrange" startref="idx-weblogic">
+    <primary>Oracle WebLogic</primary>
+    <secondary>preparing</secondary>
+   </indexterm>
   </section>
 
   <section xml:id="prepare-ibm-websphere">
    <title>Preparing IBM WebSphere</title>
+
+   <indexterm>
+    <primary>IBM WebSphere</primary>
+    <secondary>preparing</secondary>
+   </indexterm>
 
    <para>Before you deploy OpenAM, use the Administrator console to update
    JVM options as described in <xref linkend="prepare-java" />.</para>

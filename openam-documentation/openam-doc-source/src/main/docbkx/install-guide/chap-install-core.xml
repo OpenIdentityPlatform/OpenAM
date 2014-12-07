@@ -40,6 +40,7 @@
   <primary>Installing</primary>
   <secondary>No console</secondary>
  </indexterm>
+
  <para>This chapter covers tasks required for a full install of OpenAM server
  with or without OpenAM Console.</para>
  
@@ -182,6 +183,11 @@
  <procedure xml:id="deploy-openam">
   <title>To Deploy OpenAM</title>
 
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>deploying</secondary>
+  </indexterm>
+
   <para>The <filename><?eval ${coreWarFile}?></filename> file contains OpenAM
   server with OpenAM Console. How you deploy the .war file depends on your web
   application container.</para>
@@ -229,6 +235,12 @@
 
  <procedure xml:id="configure-openam-defaults">
   <title>To Configure OpenAM With Defaults</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>configuring</secondary>
+   <tertiary>defaults</tertiary>
+  </indexterm>
 
   <para>The default configuration option configures the embedded OpenDJ server
   using default ports&#8212;if the ports are already in use, OpenAM uses
@@ -301,9 +313,15 @@
 
  <procedure xml:id="delete-config-start-over">
   <title>To Delete an OpenAM Configuration Before Redeploying</title>
+
   <indexterm>
    <primary>Installing</primary>
    <secondary>Starting over</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>configuring</secondary>
+   <tertiary>starting over</tertiary>
   </indexterm>
 
   <para>If you are unhappy with your configuration and want to start over from
@@ -355,10 +373,13 @@ Using CLASSPATH:
 
  <procedure xml:id="configure-openam-custom">
   <title>To Custom Configure OpenAM</title>
-  <indexterm>
-   <primary>Installing</primary>
-   <secondary>Interactive configuration</secondary>
+
+  <indexterm class="startofrange" id="idx=custom-config">
+   <primary>OpenAM</primary>
+   <secondary>configuring</secondary>
+   <tertiary>custom</tertiary>
   </indexterm>
+
   <step>
    <para>In the initial configuration screen, click
    Create New Configuration under Custom Configuration.</para>
@@ -631,10 +652,27 @@ Using CLASSPATH:
    $HOME corresponds to the user who runs the web container). Prevent other
    users from accessing files in the configuration directory.</para>
   </step>
+
+  <indexterm class="endofrange" startref="idx=custom-config">
+   <primary>OpenAM</primary>
+   <secondary>configuring</secondary>
+   <tertiary>custom</tertiary>
+  </indexterm>
+
  </procedure>
  
  <procedure xml:id="add-servers-to-site">
   <title>To Add a Server to a Site</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>sites</secondary>
+   <tertiary>adding to</tertiary>
+  </indexterm>
+  <indexterm>
+   <primary>sites</primary>
+   <secondary>adding a server</secondary>
+  </indexterm>
   
   <para>High availability requires redundant servers in case of failure.
   With OpenAM, you configure an OpenAM site with multiple servers in a
@@ -699,7 +737,13 @@ Using CLASSPATH:
 
  <procedure xml:id="deploy-coreonly">
   <title>To Deploy OpenAM Core Server (No Console)</title>
-  
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>deploying</secondary>
+   <tertiary>core (no console)</tertiary>
+  </indexterm>
+
   <para>You can deploy OpenAM server without OpenAM console by performing the
   following steps.</para>
 

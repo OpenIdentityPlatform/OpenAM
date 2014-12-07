@@ -31,9 +31,13 @@
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Setting Up OpenAM Session Failover</title>
+
  <indexterm>
   <primary>Installing</primary>
   <secondary>Session failover</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>session failover</primary>
  </indexterm>
 
  <para>
@@ -121,7 +125,12 @@
 
  <procedure xml:id="enable-session-failover">
   <title>To Configure Session Failover After Installation</title>
-  
+
+  <indexterm>
+   <primary>session failover</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+
   <para>
    Session failover requires an OpenAM Site configuration
    with a Core Token Service.

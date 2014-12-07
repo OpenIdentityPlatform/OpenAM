@@ -35,6 +35,10 @@
   <primary>Installing</primary>
   <secondary>Behind the firewall</secondary>
  </indexterm>
+ <indexterm>
+  <primary>distributed authentication</primary>
+  <secondary>installing</secondary>
+ </indexterm>
 
  <para>OpenAM provides a login interface called the <emphasis>distributed authentication
   service (DAS)</emphasis>, deployed within network demilitarized zones
@@ -103,7 +107,12 @@
 
  <procedure xml:id="deploy-distributed-auth-on-tomcat">
   <title>To Deploy the DAS on Tomcat</title>
- 
+
+  <indexterm>
+   <primary>distributed authentication</primary>
+   <secondary>deploying on Tomcat</secondary>
+  </indexterm>
+
   <step>
    <para>Copy the <filename><?eval ${distauthWarFile}?></filename> file into the 
    <filename>webapps/</filename> directory.</para>
@@ -122,7 +131,12 @@ $ <userinput>cp ~/Downloads/openam/${distauthWarFile} \
  
  <procedure xml:id="configure-distributed-auth">
   <title>To Configure the DAS</title>
- 
+
+  <indexterm>
+   <primary>distributed authentication</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+
   <step>
    <para>
     Configure the DAS using the agent profile to connect to OpenAM. The DAS agent
@@ -298,6 +312,12 @@ $ <userinput>cp ~/Downloads/openam/${distauthWarFile} \
 
  <section xml:id="configure-valid-goto-url-resources">
   <title>Configuring Valid goto URL Resources</title>
+
+  <indexterm>
+   <primary>valid goto URL resources</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+
   <para>By default, OpenAM redirects the user to the URL specified in the
    <literal>goto</literal> and <literal>gotoOnFail</literal> query string parameters
    supplied to the authentication interface in the login URL.
@@ -376,6 +396,7 @@ $ <userinput>cp ~/Downloads/openam/${distauthWarFile} \
 
  <procedure xml:id="configure-valid-goto-url-resource">
   <title>To Configure Valid goto URL Resources</title>
+
   <para>
    You can increase security against possible phishing attacks through open redirect
    by specifying a list of valid URL resources using the Valid

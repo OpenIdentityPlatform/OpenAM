@@ -34,17 +34,17 @@
 
  <indexterm>
   <primary>Installing</primary>
-  <secondary>Multiple servers</secondary>
+  <secondary>multiple servers</secondary>
  </indexterm>
 
  <indexterm>
   <primary>Installing</primary>
-  <secondary>Load balancer</secondary>
+  <secondary>load balancer</secondary>
  </indexterm>
 
  <indexterm>
   <primary>Installing</primary>
-  <secondary>Proxy settings</secondary>
+  <secondary>proxy settings</secondary>
  </indexterm>
 
  <para>
@@ -131,6 +131,11 @@
 
  <section xml:id="configure-sites">
   <title>Configuring OpenAM Sites</title>
+
+  <indexterm>
+   <primary>sites</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
 
   <para>
    The most expedient way to configure a server in a site
@@ -372,6 +377,11 @@
 
  <section xml:id="handle-request-headers">
   <title>Handling HTTP Request Headers</title>
+
+  <indexterm>
+   <primary>HTTP request headers</primary>
+   <secondary>handling</secondary>
+  </indexterm>
 
   <para>
    HTTP requests can include information needed for access management,

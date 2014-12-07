@@ -31,7 +31,11 @@
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Removing OpenAM Software</title>
- <indexterm><primary>Uninstalling</primary></indexterm>
+
+ <indexterm>
+  <primary>OpenAM</primary>
+  <secondary>uninstalling</secondary>
+ </indexterm>
 
  <para>
   This chapter shows you how to uninstall OpenAM core software.
