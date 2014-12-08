@@ -404,6 +404,16 @@
      When you upgrade OpenAM, the upgrade tool converts existing referral rules.
     </para>
    </listitem>
+
+   <listitem>
+    <para>
+     The distributed authentication service (DAS) and cross-domain single sign-on
+     (CDSSO) do not support the <literal>iPSPCookie/DProPCookie</literal>
+     query string parameter to set a <literal>DProPCookie</literal> in the
+     user-agent as a mechanism for cookie persistence. Neither DAS nor CDSSO retains
+     <literal>iPSPCookie=yes</literal>.
+    </para>
+   </listitem>
   </itemizedlist>
  </section>
 
