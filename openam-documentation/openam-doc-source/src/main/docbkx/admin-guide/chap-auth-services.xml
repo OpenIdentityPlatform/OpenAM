@@ -1806,8 +1806,16 @@ $ ssoadm set-realm-svc-attrs \
           <literal>openam-auth-pcookie-auth-level</literal></para>
         </listitem>
     </varlistentry>
-
     </variablelist>
+     <note>
+      <para>
+       The distributed authentication service (DAS) and cross-domain single sign-on
+       (CDSSO) do not support the <literal>iPSPCookie/DProPCookie</literal>
+       query string parameter to set a <literal>DProPCookie</literal> in the
+       user-agent as a mechanism for cookie persistence. Neither DAS nor CDSSO retains
+       <literal>iPSPCookie=yes</literal>.
+      </para>
+     </note>
     </section>
 
     <section xml:id="auth-core-account-lockout">
@@ -4301,14 +4309,22 @@ $ ssoadm set-realm-svc-attrs \
     based on requests and a maximum time. It is the preferred method for creating
     a persistent cookie. If you choose this method, be aware that it does not
     interact with the persistent cookie options associated with the Core
-    Authentication module.</para>
-
-   <para>Note that, by default, the persistent cookie is called <literal>session-jwt</literal>.</para>
+    Authentication module.
+    Note that, by default, the persistent cookie is called <literal>session-jwt</literal>.
+   </para>
 
    <indexterm>
     <primary>Cookie</primary>
     <secondary>Persistent</secondary>
    </indexterm>
+
+   <important>
+    <para>
+     If Secure Cookie is enabled (Configuration &gt; Servers and Sites &gt;
+     Servers &gt; <replaceable>URL of your server</replaceable> &gt; Security
+     &gt; Cookies), the Persistent Cookie Module only works over HTTPS.
+    </para>
+   </important>
 
    <para><command>ssoadm</command> service name:
     <literal>iPlanetAMAuthPersistentCookieService</literal></para>
@@ -5433,8 +5449,15 @@ ssoadm \
      Then, to request the cookie, use
      <literal>openam.session.persist_am_cookie=Yes</literal> as one of the
      query string parameters in the login URL.</para>
-     <note><para>Neither the XUI nor the Persistent Cookie
-     module supports the deprecated <literal>iPSPCookie</literal>.</para></note>
+
+     <note>
+      <para>
+       Neither the XUI, Persistent Cookie module, distributed authentication
+       service (DAS), nor cross-domain single sign-on (CDSSO) support the deprecated
+       <literal>iPSPCookie</literal>. Similarly, DAS and CDSSO do not support
+       <literal>DProPCookie</literal>.
+      </para>
+     </note>
     </listitem>
    </varlistentry>
    <varlistentry>
