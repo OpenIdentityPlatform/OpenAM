@@ -31,6 +31,11 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>About Upgrading OpenAM</title>
 
+ <indexterm>
+  <primary>upgrades</primary>
+  <secondary>about</secondary>
+ </indexterm>
+
  <para>This chapter covers common aspects of upgrading an OpenAM deployment,
  whether you are moving to a new maintenance release, upgrading to a new major
  release, or migrating from a legacy release to a newer OpenAM release.</para>
@@ -44,7 +49,12 @@
 
  <section xml:id="upgrade-planning">
   <title>Planning the Upgrade</title>
-  
+
+  <indexterm>
+   <primary>upgrades</primary>
+   <secondary>planning</secondary>
+  </indexterm>
+
   <itemizedlist>
    <para>How much you must do to upgrade OpenAM software depends on the
    magnitude of the differences between the version you currently use and
@@ -90,6 +100,15 @@
  <section xml:id="upgrade-policies">
   <title>Upgrading &amp; Policies</title>
 
+  <indexterm>
+   <primary>upgrades</primary>
+   <secondary>affecting policies</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>policy</primary>
+   <secondary>changes during upgrade</secondary>
+  </indexterm>
+
   <para>
    When upgrading from OpenAM 11 and earlier versions,
    the upgrade process changes how OpenAM represents policies.
@@ -127,6 +146,14 @@
  <section xml:id="upgrade-best-practices">
   <title>Best Practices for Upgrades</title>
 
+  <indexterm>
+   <primary>upgrades</primary>
+   <secondary>best practices</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>best practices</primary>
+  </indexterm>
+
    <para>Be prepared before you begin an upgrade, even if the upgrade is for a
    maintenance release.</para>
 
@@ -152,6 +179,14 @@
 
    <section xml:id="pre-upgrade-backup">
     <title>Back Up the Deployment</title>
+
+    <indexterm>
+     <primary>upgrades</primary>
+     <secondary>and backups</secondary>
+    </indexterm>
+    <indexterm>
+     <primary>backups</primary>
+    </indexterm>
 
     <para>Always back up your deployment before you upgrade, as you must be
     able to roll back should something go wrong during the upgrade
@@ -205,6 +240,14 @@
    <section xml:id="pre-upgrade-customization">
     <title>Apply Customization Before Upgrading</title>
 
+    <indexterm>
+     <primary>upgrades</primary>
+     <secondary>applying customizations</secondary>
+    </indexterm>
+    <indexterm>
+     <primary>customizations</primary>
+    </indexterm>
+
     <para>Before you upgrade OpenAM servers, prepare a .war file that contains
     any customizations you require.</para>
 
@@ -254,7 +297,15 @@
 
    <section xml:id="post-upgrade-rollback">
     <title>Plan for Rollback</title>
-  
+
+    <indexterm>
+     <primary>upgrades</primary>
+     <secondary>planning for rollbacks</secondary>
+    </indexterm>
+    <indexterm>
+     <primary>rollbacks</primary>
+    </indexterm>
+
     <para>Sometimes even a well-planned upgrade operation fails to go smoothly.
     In such cases, you need a plan to roll back smoothly to the pre-upgrade
     version.</para>
