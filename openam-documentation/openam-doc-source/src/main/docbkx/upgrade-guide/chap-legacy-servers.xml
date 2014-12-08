@@ -31,6 +31,11 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Migrating Legacy Servers</title>
 
+ <indexterm>
+  <primary>legacy servers</primary>
+  <secondary>migrating</secondary>
+ </indexterm>
+
  <para>Rather than upgrade legacy servers (OpenAM 9.0, OpenSSO and Sun Access
  Manager servers), you instead migrate from your existing deployment to a new
  deployment.</para>

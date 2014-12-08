@@ -76,4 +76,6 @@
  <xinclude:include href="chap-upgrade-servers.xml" />
  <xinclude:include href="chap-legacy-servers.xml" />
  <xinclude:include href="chap-upgrade-components.xml" />
+
+ <index />
 </book>

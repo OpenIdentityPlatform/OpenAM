@@ -32,6 +32,11 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Upgrading OpenAM Servers</title>
 
+ <indexterm>
+  <primary>OpenAM</primary>
+  <secondary>upgrading</secondary>
+ </indexterm>
+
  <para>This chapter covers upgrade from OpenAM core server 9.5 or later to the
  current version. For other OpenAM components, see <link xlink:show="new"
  xlink:href="upgrade-guide#chap-upgrade-components"
@@ -56,6 +61,11 @@
 
  <procedure xml:id="upgrade-server">
   <title>To Upgrade From OpenAM 9.5 or Later</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>upgrading 9.5 or later</secondary>
+  </indexterm>
 
   <para>Follow these steps to upgrade a site of OpenAM servers (version 9.5 or
   later). During the upgrade process, you must take the OpenAM servers in the
@@ -224,6 +234,11 @@ Upgrade Complete.
  <procedure xml:id="after-upgrading-from-11">
   <title>To Complete Upgrade from OpenAM 11.0</title>
 
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>upgrading 11.0</secondary>
+  </indexterm>
+
   <para>
    After upgrade from OpenAM 11.0.x,
    all OAuth 2.0 client configurations inherit the default response types:
@@ -250,6 +265,11 @@ Upgrade Complete.
 
  <procedure xml:id="after-upgrading-from-10-1">
   <title>To Complete Upgrade from OpenAM 10.1.0 Xpress</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>upgrading 10.1.0 Xpress</secondary>
+  </indexterm>
 
    <para>When upgrading from OpenAM 10.1.0 Xpress, the upgrade tool does not
    change the Dashboard service LDAP schema, although the object IDs used in
