@@ -90,6 +90,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     private final String deploymentUrl;
     private final CookieExtractor cookieExtractor;
     private final PEMDecoder pemDecoder;
+    private final String endpointsRealm;
 
     private ScopeValidator scopeValidator;
 
@@ -106,6 +107,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         super(OAuth2ProviderService.NAME, OAuth2ProviderService.VERSION);
         this.realm = realm;
         this.deploymentUrl = deploymentUrl;
+        this.endpointsRealm = realm.equals("/") ? "" : "?realm=" + realm;
         this.cookieExtractor = cookieExtractor;
         this.pemDecoder = pemDecoder;
         addServiceListener();
@@ -627,42 +629,42 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public String getOpenIDConnectIssuer() {
-        return deploymentUrl;
+        return deploymentUrl + endpointsRealm;
     }
 
     /**
      * {@inheritDoc}
      */
     public String getAuthorizationEndpoint() {
-        return deploymentUrl + "/oauth2/authorize";
+        return deploymentUrl + "/oauth2/authorize" + endpointsRealm;
     }
 
     /**
      * {@inheritDoc}
      */
     public String getTokenEndpoint() {
-        return deploymentUrl + "/oauth2/access_token";
+        return deploymentUrl + "/oauth2/access_token" + endpointsRealm;
     }
 
     /**
      * {@inheritDoc}
      */
     public String getUserInfoEndpoint() {
-        return deploymentUrl + "/oauth2/userinfo";
+        return deploymentUrl + "/oauth2/userinfo" + endpointsRealm;
     }
 
     /**
      * {@inheritDoc}
      */
     public String getCheckSessionEndpoint() {
-        return deploymentUrl + "/oauth2/connect/checkSession";
+        return deploymentUrl + "/oauth2/connect/checkSession" + endpointsRealm;
     }
 
     /**
      * {@inheritDoc}
      */
     public String getEndSessionEndpoint() {
-        return deploymentUrl + "/oauth2/connect/endSession";
+        return deploymentUrl + "/oauth2/connect/endSession" + endpointsRealm;
     }
 
     /**
@@ -676,7 +678,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             }
 
             // http://example.forgerock.com:8080/openam/oauth2/connect/jwk_uri?realm= + realm
-            return deploymentUrl + "/oauth2/connect/jwk_uri?realm=" + realm;
+            return deploymentUrl + "/oauth2/connect/jwk_uri" + endpointsRealm;
         } catch (SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -730,7 +732,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public String getClientRegistrationEndpoint() {
-        return deploymentUrl + "/oauth2/connect/register";
+        return deploymentUrl + "/oauth2/connect/register" + endpointsRealm;
     }
 
     /**
