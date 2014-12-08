@@ -100,6 +100,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 userDelegate.getUserById(user.userid.id, user.userid.realm, successCallback, errorCallback);
             }, function() {
 
+                // Try to remove any cookie that is lingering, as it is apparently no longer valid
+                obj.removeSessionCookie();
+
                 if (!conf.globalData.auth.realm) {
                     conf.globalData.auth.realm = router.configuration.routes.login.defaults[0];
                 }
