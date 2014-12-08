@@ -513,115 +513,274 @@ $ <userinput>cp ${coreLibrary} /path/to/tomcat/webapps/openam/WEB-INF/lib/</user
  <section xml:id="lookup-for-ui-files">
   <title>How OpenAM Looks Up UI Files</title>
 
-
  <indexterm>
   <primary>UI</primary>
   <secondary>End user page lookup</secondary>
  </indexterm>
 
-  <para>This section provides a more complete description of how OpenAM looks
-  up UI files.</para>
+  <para>
+   This section provides a more complete description
+   of how OpenAM looks up UI files.
+  </para>
 
  <note>
   <para>
    Case mismatch can cause failures in the UI lookup for some systems.
    To ensure lookup success and for consistency,
-   use lowercase names for your customized directories except for locale locations.
+   use lowercase names for your customized directories
+   except for locale territories.
    All of the default directories are already lowercase.
   </para>
  </note>
 
+  <para>
+   Locale settings play an important role in how OpenAM looks up UI files.
+   A locale consists of a language and optionally a territory
+   such as <literal>en</literal> to specify the English language,
+   or <literal>en_GB</literal> to specify British English.
+   Locale settings are determined at authentication time,
+   and are then set in the authentication context.
+   To change locales, the user must reauthenticate.
+   OpenAM allows you and also clients to set locale in the ways described below.
+  </para>
+
+  <orderedlist>
+   <para>
+    When finding the UI files that best match the user's locale,
+    OpenAM takes two locale settings into account.
+   </para>
+
+   <listitem>
+    <para>
+     Requested locale
+    </para>
+
+    <para>
+     OpenAM arrives at the requested locale based on
+     an optional <literal>locale</literal> query string parameter,
+     an optional HTTP <literal>Accept-Language</literal> header from the browser,
+     and the Default Locale set in the configuration for OpenAM.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Platform locale
+    </para>
+
+    <para>
+     When OpenAM cannot find a match for the user's requested locale,
+     it tries to use the platform locale,
+     which is the locale for the Java Virtual Machine (JVM) where OpenAM runs.
+    </para>
+
+    <para>
+     If neither the requested locale nor the platform locale result in a match,
+     OpenAM returns the default files that are not localized.
+    </para>
+   </listitem>
+  </orderedlist>
+
   <variablelist>
-   <para>OpenAM uses the following information to look up the UI files.</para>
+   <para>
+    OpenAM uses the following information to look up the UI files.
+   </para>
+
    <varlistentry>
-    <term>Configuration suffix RDN</term>
+    <term>Configuration suffix RDN value</term>
     <listitem>
-     <para>When you set up the OpenAM to store its configuration in a directory
-     server, you provide the distinguished name of the configuration suffix,
-     by default <literal><?eval ${defaultRootSuffix}?></literal>, therefore, the
-     relative distinguished name attribute value is <literal>openam</literal>.</para>
+     <para>
+      When you set up OpenAM to store its configuration in a directory server,
+      you provide the distinguished name of the configuration suffix,
+      by default <literal>${defaultRootSuffix}</literal>.
+      Therefore, the default relative distinguished name attribute value
+      is <literal>openam</literal>.
+     </para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
-    <term>Client (browser) locale language</term>
+    <term>Client locale query string parameter</term>
     <listitem>
-     <para>The client can specify a locale, which can consist of both a
-     language and a territory, such as <literal>en_GB</literal> for British
-     English. The language in this case is <literal>en</literal>.</para>
+     <para>
+      The client can request a locale by using the <literal>locale</literal>
+      query string parameter when performing an HTTP GET on the login page.
+     </para>
+
+     <para>
+      For example, a client can specify <literal>locale=fr</literal>
+      to request the French language.
+     </para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
-    <term>Client (browser) locale territory</term>
+    <term>Client (browser) locale language and territory</term>
     <listitem>
-     <para>If the client local is <literal>en_GB</literal>, then the territory
-     in this case is <literal>GB</literal>.</para>
+     <para>
+      The client can specify a locale
+      by using the HTTP <literal>Accept-Language</literal> header.
+      End users set this behavior by choosing languages and territory settings
+      in their web browser preferences.
+     </para>
+
+     <para>
+      The value of this header can include a list of languages
+      with information about how strongly the user prefers each language.
+      OpenAM uses the first language in the list.
+     </para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
-    <term>Platform locale language</term>
+    <term>Default locale</term>
     <listitem>
-     <para>The platform locale, defined for the platform where OpenAM runs,
-     can also consist of both a language and a territory, such as
-     <literal>hu_HU</literal>. In this example the platform locale language is
-     <literal>hu</literal> for Hungarian.</para>
+     <para>
+      You set the default locale in OpenAM when you install OpenAM core services.
+      You can change the default locale either through OpenAM console under
+      Configuration > Servers and Sites > <replaceable>server-name</replaceable>
+      > General > System > Default Locale,
+      or by setting the server configuration property,
+      <literal>com.iplanet.am.locale</literal>.
+     </para>
+
+     <para>
+      Default locale only affects the requested locale.
+      Do not confuse the Default Locale setting
+      with the locale that OpenAM uses
+      when it cannot find matching UI files for the requested locale.
+     </para>
+
+     <para>
+      Default: <literal>en_US</literal>
+     </para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
-    <term>Platform locale territory</term>
+    <term>Requested locale</term>
     <listitem>
-     <para>If the platform locale is <literal>hu_HU</literal>, the platform
-     locale territory is <literal>HU</literal> for Hungary.</para>
+     <para>
+      OpenAM determines the requested locale based on multiple settings.
+     </para>
+
+     <para>
+      If the <literal>locale</literal> query string parameter is set,
+      OpenAM uses this setting as the requested locale.
+     </para>
+
+     <para>
+      Otherwise, if the client set the <literal>Accept-Language</literal> header,
+      OpenAM uses this setting as the requested locale.
+     </para>
+
+     <para>
+      Otherwise OpenAM uses the default locale as the requested locale.
+     </para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term>Platform locale language and territory</term>
+    <listitem>
+     <para>
+      The locale for the Java Virtual Machine (JVM) where OpenAM runs
+      is the platform locale.
+      Platform locale is the alternative when
+      OpenAM cannot find files for the requested locale.
+     </para>
+
+     <para>
+      By default the JVM uses the system locale.
+      You can, however, set the JVM platform locale when starting Java
+      by using Java system properties.
+      The following example that sets the platform locale
+      to the Hungarian language in Hungary.
+     </para>
+
+     <programlisting language="shell">
+java -Duser.language=hu -Duser.region=HU <replaceable>other options</replaceable>
+     </programlisting>
+
+     <para>
+      See the documentation about your JVM for details.
+     </para>
+
+     <para>
+      If OpenAM cannot find matching UI files either for the requested locale
+      or for the platform locale,
+      it returns UI files that are not localized.
+     </para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term>Realm</term>
     <listitem>
-     <para>Realms can be nested. OpenAM uses the nesting as necessary to look
-     for files specific to a subrealm before looking in the parent
-     realm.</para>
-     <para>For all realms below the top level realm, OpenAM adds a 
-     <filename>services</filename> directory before the realm to the search
-     path.</para>
+     <para>
+      Realms can be nested.
+      OpenAM uses the nesting as necessary to look for files
+      specific to a subrealm before looking in the parent realm.
+     </para>
+
+     <para>
+      For all realms below the top level realm,
+      OpenAM adds a <filename>services</filename> directory
+      to the search path before the realm.
+     </para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Client name</term>
     <listitem>
-     <para>Client names identify the type of client. The default,
-     <literal>html</literal>, is the only client name used unless client
-     detection mode is enabled. When client detection mode is enabled, the
-     client name can be different for mobile clients, for example.</para>
+     <para>
+      Client names identify the type of client.
+      The default, <literal>html</literal>, is the only client name used
+      unless client detection mode is enabled.
+      When client detection mode is enabled,
+      the client name can be different for mobile clients, for example.
+     </para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>File name</term>
     <listitem>
-     <para>File names are not themselves localized. Thus
-     <filename>Login.jsp</filename> has the same name for all locales, for
-     example.</para>
+     <para>
+      File names are not themselves localized.
+      For example, <filename>Login.jsp</filename> has the same name in all locales.
+     </para>
     </listitem>
    </varlistentry>
   </variablelist>
 
-  <para>OpenAM tries first to find the most specific file for the realm and
-  local requested, gradually falling back on less specific alternatives, then
-  on other locales. The first and most specific location as follows.</para>
+  <para>
+   OpenAM tries first to find the most specific file
+   for the realm and locale requested,
+   gradually falling back on less specific alternatives,
+   then on other locales.
+   The first and most specific location is as follows.
+  </para>
 
   <literallayout><replaceable>suffix</replaceable>_<replaceable
-  >client-locale-language</replaceable>_<replaceable
-  >client-locale-territory</replaceable>/services/<replaceable
+  >requested-locale-language</replaceable>_<replaceable
+  >requested-locale-territory</replaceable>/services/<replaceable
   >realm</replaceable>/<replaceable>client-name</replaceable>/<replaceable
   >file-name</replaceable></literallayout>
 
   <example xml:id="example-ui-file-lookup"><?dbfo keep-together="auto"?>
    <title>UI File Lookup</title>
 
-   <para>OpenAM looks up <filename>Login.jsp</filename> in the following order
-   for a realm named <literal>myRealm</literal>, with the browser requesting
-   <literal>en_GB</literal> locale, the platform locale being
-   <literal>hu_HU</literal>, and the configuration suffix named
-   <literal>o=openam</literal>. The client name used in this example is the
-   generic client name <literal>html</literal>.</para>
+   <para>
+    OpenAM looks up <filename>Login.jsp</filename> in the following order
+    for a realm named <literal>myRealm</literal>,
+    with the requested locale being <literal>en_GB</literal>,
+    the platform locale being <literal>hu_HU</literal>,
+    and the configuration suffix named <literal>${defaultRootSuffix}</literal>.
+    The client name used in this example
+    is the generic client name <literal>html</literal>.
+   </para>
 
    <programlisting language="none">
 openam_en_GB/services/myRealm/html/Login.jsp
