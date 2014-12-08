@@ -4288,7 +4288,21 @@
    <varlistentry>
     <term>Default Locale</term>
     <listitem>
-     <para>The locale used when none is requested.</para>
+     <para>
+      The default requested locale when the client does not request a locale
+      either by using the <literal>locale</literal> query string parameter
+      or by setting the HTTP header, <literal>Accept-Language</literal>.
+     </para>
+
+     <para>
+      To set the locale when OpenAM cannot find UI files for the requested locale,
+      set the JVM platform locale instead.
+      For details see the <citetitle>Installation Guide</citetitle> section,
+      <link
+       xlink:href="install-guide#lookup-for-ui-files"
+       xlink:role="http://docbook.org/xlink/role/olink"
+      ><citetitle>How OpenAM Looks Up UI Files</citetitle></link>
+     </para>
 
      <para>property:
      <literal>com.iplanet.am.locale</literal></para>
