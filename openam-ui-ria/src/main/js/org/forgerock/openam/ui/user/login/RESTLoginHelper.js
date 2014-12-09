@@ -97,16 +97,21 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 // keep track of the current realm as a future default value, following logout:
                 router.configuration.routes.login.defaults[0] = user.userid.realm;
                 
-                userDelegate.getUserById(user.userid.id, user.userid.realm, successCallback, errorCallback);
-            }, function() {
+                userDelegate.getUserById(user.userid.id, user.userid.realm, successCallback, function(e) {
 
+                    if (e.responseJSON.code === 404) {
+                        errorCallback("loggedIn");
+                    } else {
+                        errorCallback();
+                    }
+                }, {"Not Found": {status: "404"}});
+            }, function() {
                 // Try to remove any cookie that is lingering, as it is apparently no longer valid
                 obj.removeSessionCookie();
 
                 if (!conf.globalData.auth.realm) {
                     conf.globalData.auth.realm = router.configuration.routes.login.defaults[0];
                 }
-
                 errorCallback();
             }, {"serverError": {status: "503"}, "unauthorized": {status: "401"}});
         } catch(e) {

@@ -40,7 +40,7 @@ define("UserDelegate", [
         return user.resourceName;
     };
 
-    obj.getUserById = function(id, realm, successCallback, errorCallback) {
+    obj.getUserById = function(id, realm, successCallback, errorCallback, errorsHandlers) {
 
         var resourceName = this.cleanRealm(realm) + "/users/" + id;
 
@@ -68,7 +68,8 @@ define("UserDelegate", [
 
                 successCallback(user_cleaned);
             },
-            error: errorCallback
+            error: errorCallback,
+            errorsHandlers: errorsHandlers
         });
     };
 
