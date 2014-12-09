@@ -53,11 +53,17 @@ public class BaseURLResourceNameTest {
     @Test
     public void testSuperResourceMatchCompare() throws Exception {
         match(SUPER_RESOURCE_MATCH, "http://example.com:80/fred/index.html", "http*://*example.com:*/fred", true);
+        match(SUPER_RESOURCE_MATCH, "http://example.com:8080/foo/index.html", "http://example.com:8080/", true);
+        match(SUPER_RESOURCE_MATCH, "http://example.com:8080/foo/index.html", "http://example.com:8080", true);
+        match(SUPER_RESOURCE_MATCH, "http://example.com:8080/foo*", "http://example.com:8080/", true);
     }
 
     @Test
     public void testSubResourceMatchCompare() throws Exception {
         match(SUB_RESOURCE_MATCH, "http://example.com:80/fred", "http*://*example.com:*/fred/devil", true);
+        match(SUB_RESOURCE_MATCH, "http://example.com:8080/", "http://example.com:8080/foo/index.html", true);
+        match(SUB_RESOURCE_MATCH, "http://example.com:8080", "http://example.com:8080/foo/index.html", true);
+        match(SUB_RESOURCE_MATCH, "http://example.com:8080/", "http://example.com:8080/foo*", true);
     }
 
     @Test
