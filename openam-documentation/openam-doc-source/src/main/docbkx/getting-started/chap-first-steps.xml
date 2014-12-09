@@ -60,6 +60,11 @@
  <section xml:id="how-openam-helps-manage-access">
   <title>How OpenAM Helps Manage Access to Resources</title>
 
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>how it manages access</secondary>
+  </indexterm>
+
   <para>OpenAM provides a service called <firstterm>access management</firstterm>,
   which involves managing access to resources available over the network.
   Once you set up OpenAM to manage access, you have a centralized service to
@@ -107,6 +112,14 @@
 
  <section xml:id="software-you-need">
   <title>Software Required To Try Out OpenAM</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>required software</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>required software</primary>
+  </indexterm>
 
   <para>In order to set up OpenAM to protect a web page, you install the
   following software, all of which is freely available. This chapter covers
@@ -163,6 +176,11 @@
  <section xml:id="software-setup">
   <title>Setting Up the Software</title>
 
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>setting up</secondary>
+  </indexterm>
+
   <para>This section includes the following procedures that detail how to
   set up OpenAM to protect a web page.</para>
 
@@ -181,6 +199,15 @@
 
   <procedure xml:id="prepare-etc-hosts">
    <title>To Prepare Your Hosts File</title>
+
+   <indexterm>
+    <primary>OpenAM</primary>
+    <secondary>hosts file</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>hosts file</primary>
+    <secondary>preparing</secondary>
+   </indexterm>
 
    <para>OpenAM requires that you use fully qualified domain names when
    protecting web resources. This is because OpenAM uses <link xlink:show="new"
@@ -215,6 +242,15 @@ $ <userinput>cat /etc/hosts | grep openam</userinput>
 
   <procedure xml:id="install-apache-http">
    <title>To Install Apache HTTP Server</title>
+
+   <indexterm>
+    <primary>OpenAM</primary>
+    <secondary>Apache HTTP server</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Apache HTTP server</primary>
+    <secondary>installing</secondary>
+   </indexterm>
 
    <para>Apache HTTP Server is a popular web server, and one that is well
    supported by OpenAM's web policy agents. Apache HTTP Server might already
@@ -353,6 +389,15 @@ $ <userinput>/path/to/apache/bin/apachectl -k start</userinput>
   <procedure xml:id="install-apache-tomcat">
    <title>To Install Apache Tomcat</title>
 
+   <indexterm>
+    <primary>OpenAM</primary>
+    <secondary>Apache Tomcat</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Apache Tomcat</primary>
+    <secondary>installing</secondary>
+   </indexterm>
+
    <para>OpenAM runs as a Java web application inside an application container.
    Apache Tomcat is one such application container that runs on a variety of
    platforms. The following instructions are loosely based on the
@@ -479,6 +524,11 @@ $ <userinput>/path/to/tomcat/bin/startup.sh</userinput>
   <procedure xml:id="install-openam">
    <title>To Install OpenAM</title>
 
+   <indexterm>
+    <primary>OpenAM</primary>
+    <secondary>installing</secondary>
+   </indexterm>
+
    <para>OpenAM is a web application that you deploy into Apache Tomcat and then
    configure for use.</para>
 
@@ -602,6 +652,16 @@ $ <userinput>mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</user
   <procedure xml:id="configure-policy">
    <title>To Configure a Policy in OpenAM</title>
 
+   <indexterm>
+    <primary>OpenAM</primary>
+    <secondary>policies</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>policies</primary>
+    <secondary>configuring</secondary>
+   </indexterm>
+
+
    <para>OpenAM authenticates users and then makes authorization decisions.
    The authorization decisions are based on access policies that indicate
    who can do what, when, and under what conditions. Follow these steps to
@@ -719,6 +779,16 @@ $ <userinput>mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</user
   <procedure xml:id="create-web-policy-agent-profile">
    <title>To Create a Web Policy Agent Profile</title>
 
+   <indexterm>
+    <primary>OpenAM</primary>
+    <secondary>Web policy agent profiles</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Web policy agent</primary>
+    <secondary>creating profiles</secondary>
+   </indexterm>
+
+
    <para>OpenAM stores profile information about policy agents centrally by
    default. You can then manage the policy agent profile through OpenAM Console.
    The policy agent can retrieve its configuration from its OpenAM profile at
@@ -796,6 +866,15 @@ $ <userinput>mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</user
 
   <procedure xml:id="install-web-policy-agent">
    <title>To Install OpenAM Web Policy Agent</title>
+
+   <indexterm>
+    <primary>OpenAM</primary>
+    <secondary>Web policy agent</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Web policy agent</primary>
+    <secondary>installing</secondary>
+   </indexterm>
 
    <para>OpenAM policy agents enforce policies defined in OpenAM. The agent's
    job is to make sure that users have the right to access resources they
@@ -901,6 +980,11 @@ $ <userinput>tail /path/to/apache/logs/error_log</userinput>
 
  <section xml:id="try-it-out">
   <title>Trying It Out</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>trying it out</secondary>
+  </indexterm>
 
   <orderedlist>
    <para>Now that you have completed <xref linkend="software-setup" />,
