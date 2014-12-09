@@ -100,6 +100,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 userDelegate.getUserById(user.userid.id, user.userid.realm, successCallback, errorCallback);
             }, function() {
 
+                // Try to remove any cookie that is lingering, as it is apparently no longer valid
+                obj.removeSessionCookie();
+
                 if (!conf.globalData.auth.realm) {
                     conf.globalData.auth.realm = router.configuration.routes.login.defaults[0];
                 }
@@ -136,11 +139,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                     promise.reject();
                 });
         } else {
-            if(!conf.globalData.auth.urlParams){
-                conf.globalData.auth.urlParams = {};
-            }
-            if(!conf.globalData.auth.urlParams.goto){
-                conf.globalData.auth.urlParams.goto = url;
+            if(url !== constants.CONSOLE_PATH || _.contains(_.map(constants.CONSOLE_USERS,function(u){return u.toLowerCase();}),conf.loggedUser.username.toLowerCase())){
+                if(!conf.globalData.auth.urlParams){
+                    conf.globalData.auth.urlParams = {};
+                }
+                if(!conf.globalData.auth.urlParams.goto){
+                    conf.globalData.auth.urlParams.goto = url;
+                }
             }
             promise.resolve();
         }
