@@ -188,126 +188,208 @@
 
    <step>
     <para>
-     Select the administrative privileges to delegate for the realm,
-     and then save your work.
+     Select the administrative privileges to delegate for the realm. See
+     <xref linkend="realm-privileges" /> for information about OpenAM
+     privileges.
     </para>
-
-    <variablelist>
-     <para>
-      When using the <command>ssoadm add-privileges</command> command,
-      the privilege names are as follows.
-     </para>
-
-     <varlistentry>
-      <term><literal>AgentAdmin</literal></term>
-      <listitem>
-       <para>
-        Read and write access to all configured Agents
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>ApplicationReadAccess</literal></term>
-      <listitem>
-       <para>
-        REST calls for reading policy applications
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>EntitlementRestAccess</literal></term>
-      <listitem>
-       <para>
-        REST calls for policy evaluation
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>FederationAdmin</literal></term>
-      <listitem>
-       <para>
-        Read and write access to all federation metadata configurations
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>LogAdmin</literal></term>
-      <listitem>
-       <para>
-        Read and write access to all log files
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>LogRead</literal></term>
-      <listitem>
-       <para>
-        Read access to all log files
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>LogWrite</literal></term>
-      <listitem>
-       <para>
-        Write access to all log files
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>PolicyAdmin</literal></term>
-      <listitem>
-       <para>
-        Read and write access only for policy properties
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>PrivilegeRestAccess</literal></term>
-      <listitem>
-       <para>
-        REST calls for managing policies
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>PrivilegeRestReadAccess</literal></term>
-      <listitem>
-       <para>
-        REST calls for reading policies
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>RealmAdmin</literal></term>
-      <listitem>
-       <para>
-        Read and write access to all realm and policy properties
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>RealmReadAccess</literal></term>
-      <listitem>
-       <para>
-        REST calls for reading realms
-       </para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
+    <para>
+     Unless your delegation model requires a high degree of granularity, assign
+     realm administrators the <literal>RealmAdmin</literal> privilege, and assign
+     policy administrators the <literal>PolicyAdmin</literal> privilege.
+    </para>
    </step>
+
+   <step>
+    <para>
+     Save your work.
+    </para>
+   </step>
+
   </procedure>
+
+  <para>
+   The following table describes privileges that you can assign
+   in the OpenAM console or by using the
+   <command>ssoadm add-privileges</command>
+   command:
+  </para>
+
+  <table xml:id="realm-privileges" pgwide="1">
+   <title>OpenAM Privileges</title>
+   <tgroup cols="3">
+    <colspec colnum="1" colwidth="2*"/>
+    <colspec colnum="2" colwidth="3*"/>
+    <colspec colnum="3" colwidth="3*"/>
+    <thead>
+     <row>
+      <entry>Privilege</entry>
+      <entry>
+       Privilege Name to Use With the <command>ssoadm add-privileges</command>
+       Command
+      </entry>
+      <entry>Notes</entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>Read and write access to all realm and policy properties</entry>
+      <entry><literal>RealmAdmin</literal></entry>
+      <entry>
+       Assign this privilege to administrators
+       in order to let them modify or read any part of an OpenAM realm.
+       Use this privilege when you do not require
+       granularity in your delegation model. All other OpenAM
+       privileges are included with this privilege.
+      </entry>
+     </row>
+     <row>
+      <entry>Read and write access to all log files</entry>
+      <entry><literal>LogAdmin</literal></entry>
+      <entry>Subset of the <literal>RealmAdmin</literal> privilege.</entry>
+     </row>
+     <row>
+      <entry>Read access to all log files</entry>
+      <entry><literal>LogRead</literal></entry>
+      <entry>Subset of the <literal>RealmAdmin</literal> privilege.</entry>
+     </row>
+     <row>
+      <entry>Write access to all log files</entry>
+      <entry><literal>LogWrite</literal></entry>
+      <entry>Subset of the <literal>RealmAdmin</literal> privilege.</entry>
+     </row>
+     <row>
+      <entry>Read and write access to all configured agents</entry>
+      <entry><literal>AgentAdmin</literal></entry>
+      <entry>
+       Provides access to centralized agent configuration;
+       subset of the <literal>RealmAdmin</literal> privilege.
+      </entry>
+     </row>
+     <row>
+      <entry>Read and write access to all federation metadata configurations</entry>
+      <entry><literal>FederationAdmin</literal></entry>
+      <entry>Subset of the <literal>RealmAdmin</literal> privilege.</entry>
+     </row>
+     <row>
+      <entry>REST calls for reading realms</entry>
+      <entry><literal>RealmReadAccess</literal></entry>
+      <entry>Subset of the <literal>RealmAdmin</literal> privilege.</entry>
+     </row>
+     <row>
+      <entry>Read and write access only for policy properties, including REST calls</entry>
+      <entry><literal>PolicyAdmin</literal></entry>
+      <entry>
+       Assign this privilege to policy administrators
+       in order to let them modify or read any part of the OpenAM
+       policy configuration. This privilege lets an
+       administrator modify or read all policy components:
+       policies, applications, referrals, subject types,
+       condition types, subject attributes, and decision combiners.
+       All other OpenAM privileges that affect policy components
+       are included with this privilege. Subset of the
+       <literal>RealmAdmin</literal> privilege.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for policy evaluation</entry>
+      <entry><literal>EntitlementRestAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading policies</entry>
+      <entry><literal>PrivilegeRestReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for managing policies</entry>
+      <entry><literal>PrivilegeRestAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading policy referrals</entry>
+      <entry><literal>ReferralsReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for modifying policy referrals</entry>
+      <entry><literal>ReferralsModifyAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading policy applications</entry>
+      <entry><literal>ApplicationReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for modifying policy applications</entry>
+      <entry><literal>ApplicationModifyAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading policy application types</entry>
+      <entry><literal>ApplicationTypesReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading environment conditions</entry>
+      <entry><literal>ConditionTypesReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading subject conditions</entry>
+      <entry><literal>SubjectTypesReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading decision combiners</entry>
+      <entry><literal>DecisionCombinersReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading subject attributes</entry>
+      <entry><literal>SubjectAttributesReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+
  </section>
 
  <section xml:id="realms-agents">
