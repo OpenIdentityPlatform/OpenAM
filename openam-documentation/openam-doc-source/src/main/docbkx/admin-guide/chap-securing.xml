@@ -384,7 +384,7 @@
             <step>
                 <para>You'll also need to change the password for the administrator on the directory server. If you are
                     using OpenDJ, refer to the <link xlink:show="new"
-                    xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide#troubleshoot-reset-admin-passwords"
+                    xlink:href="${opendjDocBase}/admin-guide/#troubleshoot-reset-admin-passwords"
                     ><citetitle>OpenDJ Administration Guide</citetitle> section on Resetting Administrator
                     Passwords</link>. If you are using a different directory server, you will have to refer to the
                 documentation for that server.</para>
@@ -436,7 +436,7 @@
                 has at least CN=Directory Manager  privileges. If you're using OpenDJ, refer to the chapter on
                     <citetitle>Configuring Privileges &amp; Access Control</citetitle> in the
                     <link xlink:show="new"
-                    xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide#chap-privileges-acis">
+                    xlink:href="${opendjDocBase}/admin-guide/#chap-privileges-acis">
                     <citetitle>OpenDJ Administration Guide</citetitle></link>.</para>
             </step>
         </procedure>

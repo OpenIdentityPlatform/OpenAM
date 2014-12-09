@@ -47,8 +47,7 @@
 
  <para>Additional ports may be used, depending on other components of your deployment. If
  you are using external OpenDJ servers, refer to the <link xlink:show="new"
- xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#appendix-ports-used"
- xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Ports Used</citetitle></link>
+ xlink:href="${opendjDocBase}/admin-guide/#appendix-ports-used"><citetitle>Ports Used</citetitle></link>
  appendix of the OpenDJ Administration Guide.</para>
 
  <table xml:id="openam-default-ports">

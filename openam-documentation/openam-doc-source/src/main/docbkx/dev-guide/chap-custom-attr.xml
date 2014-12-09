@@ -117,7 +117,7 @@ $ <userinput>ssoadm \
    <para>If you are using OpenDJ as the identity repository, you can update the
    schema through OpenDJ Control Panel &gt; Schema &gt; Manage Schema, as
    described in the <link xlink:show="new"
-   xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#update-schema"
+   xlink:href="${opendjDocBase}/admin-guide/#update-schema"
    >OpenDJ documentation</link>.</para>
   </tip>
 
