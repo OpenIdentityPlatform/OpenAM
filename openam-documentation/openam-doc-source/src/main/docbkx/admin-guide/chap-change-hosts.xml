@@ -40,7 +40,7 @@
   move an embedded configuration directory from one host to another,
   see the OpenDJ <citetitle>Administration Guide</citetitle> chapter,
   <link xlink:show="new"
-  xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/index/chap-mv-servers.html"
+  xlink:href="${opendjDocBase}/admin-guide/#chap-mv-servers"
   ><citetitle>Moving Servers</citetitle></link>.
  </para>
 

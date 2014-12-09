@@ -71,7 +71,7 @@
    For more information, see the
    <!-- Change this link after AME-3876 is fixed -->
    <link xlink:show="new"
-         xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/install-guide/">
+         xlink:href="${opendjDocBase}/install-guide/">
          <citetitle>OpenDJ Installation Guide</citetitle></link>.</para>
 
   <para>Once you have installed OpenDJ on an external server,
@@ -239,7 +239,7 @@
      To do so, you can use the <command>dsconfig</command>
      command depicted in the <citetitle>OpenDJ Administration Guide</citetitle>
      chapter on <link xlink:show="new"
-     xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#configure-indexes"
+     xlink:href="${opendjDocBase}/admin-guide/#configure-indexes"
      ><citetitle>Configuring a Standard Index</citetitle></link>.
     </para>
 
@@ -248,7 +248,7 @@
      rebuild the indexes with the <command>rebuild-index</command> command
      described in the <citetitle>OpenDJ Administration Guide</citetitle>
      chapter on <link xlink:show="new"
-     xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#rebuild-index"
+     xlink:href="${opendjDocBase}/admin-guide/#rebuild-index"
      ><citetitle>Rebuilding Indexes</citetitle></link>.
     </para>
 
@@ -440,7 +440,7 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
 
     <para>For detailed information on ACIs, with examples showing how you can use the <command>dsconfig</command>,
     as well as various <command>ldap*</command> commands to configure them, see the OpenDJ chapter on
-    <link xlink:show="new" xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#chap-privileges-acis"
+    <link xlink:show="new" xlink:href="${opendjDocBase}/admin-guide/#chap-privileges-acis"
     ><citetitle>Configuring Privileges &amp; Access Control</citetitle></link>.</para>
 
   </section>
@@ -492,7 +492,7 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
      OpenDJ software.
      See the OpenDJ documentation on
       <link xlink:show="new"
-xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/install-guide/#chap-install-cli">
+xlink:href="${opendjDocBase}/install-guide/#chap-install-cli">
       Installing OpenDJ From the Command Line</link>.</para>
 
      <!-- Why install OpenDJ as root? -->
@@ -1345,7 +1345,7 @@ $ <userinput>backup \
     For more information on how this is done
     with OpenDJ, see the OpenDJ documentation on
     <link xlink:show="new"
-          xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#repl-dedicated-servers">
+          xlink:href="${opendjDocBase}/admin-guide/#repl-dedicated-servers">
      <citetitle>Stand-alone Replication Servers</citetitle></link>.
    </para>
   </section>
