@@ -19,6 +19,12 @@
  */
 package org.forgerock.openam.forgerockrest.authn.core;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.inject.Singleton;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
@@ -31,12 +37,6 @@ import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This class is responsible for starting or continuing a login process.
@@ -240,7 +240,15 @@ public class LoginAuthenticator {
         }
         case LEVEL: {
             int i = Integer.parseInt(indexValue);
-            if (i > Integer.parseInt(ssoToken.getProperty("AuthLevel"))) {
+            String authLevelProperty = ssoToken.getProperty("AuthLevel");
+            int authLevel;
+            if (authLevelProperty.contains(":")) {
+                String[] realmAuthLevel = authLevelProperty.split(":");
+                authLevel = Integer.parseInt(realmAuthLevel[1]);
+            } else {
+                authLevel = Integer.parseInt(authLevelProperty);
+            }
+            if (i > authLevel) {
                 upgrade = true;
             }
             break;
