@@ -154,6 +154,17 @@ public final class SystemPropertiesManager {
     }
 
     /**
+     * Returns the property value as a boolean
+     *
+     * @since 13.0.0
+     * @param key the key whose value one is looking for.
+     * @return the boolean value if the key exists; otherwise returns false
+     */
+    public static boolean getAsBoolean(String key) {
+        return Boolean.parseBoolean(get(key));
+    }
+
+    /**
      * Returns property as an integer, returning the default if the property is not set or cannot be parsed as an
      * integer.
      *
