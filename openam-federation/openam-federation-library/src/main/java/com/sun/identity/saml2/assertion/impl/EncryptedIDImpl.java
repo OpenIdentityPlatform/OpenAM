@@ -24,6 +24,8 @@
  *
  * $Id: EncryptedIDImpl.java,v 1.2 2008/06/25 05:47:43 qcheng Exp $
  *
+ * Portions copyright 2014 ForgeRock AS.
+ *
  */
 
 
@@ -126,6 +128,8 @@ public class EncryptedIDImpl extends EncryptedElementImpl implements EncryptedID
     {
         Element el = EncManager.getEncInstance().
             decrypt(xmlString, recipientPrivateKey);
+
+        SAML2SDKUtils.decodeXMLToDebugLog("EncryptedIDImpl.decrypt: ", el);
 
         return AssertionFactory.getInstance().
             createNameID(el);

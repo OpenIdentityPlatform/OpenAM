@@ -24,6 +24,8 @@
  *
  * $Id: SAML2SDKUtils.java,v 1.12 2008/08/31 05:49:48 bina Exp $
  *
+ * Portions copyright 2014 ForgeRock AS.
+ *
  */
 
 
@@ -41,6 +43,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.shared.xml.XMLUtils;
+
 import java.security.SecureRandom;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -50,10 +53,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.soap.SOAPException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
-import javax.xml.soap.SOAPException;
 
 /**
  * The <code>SAML2SDKUtils</code> contains utility methods for SAML 2.0
@@ -66,8 +69,9 @@ public class SAML2SDKUtils {
     // This utility class will be run on client side as well,
     // so DO NOT add any static block which will not run on client side.
     //
-    // The deugging instance
+    // The debugging instances
     public static Debug debug = Debug.getInstance("libSAML2");
+    private static Debug decryptDebug = Debug.getInstance("SAML2Decrypt");
     //  SAML2 Resource bundle
     public static final String BUNDLE_NAME = "libSAML2";
     // The resource bundle for SAML 2.0 implementation.
@@ -803,5 +807,29 @@ public class SAML2SDKUtils {
      */
     public static Boolean booleanValueOf(String value) {
         return new Boolean("true".equalsIgnoreCase(value) || "1".equals(value));
+    }
+
+    /**
+     * If enabled, decodes the provided XML element and prints it out to the decryption debug log.
+     * @param callerName String representing the name of the calling method.
+     * @param xmlElement String representing an XML document with decrypted
+     *                  data.
+     */
+    public static void decodeXMLToDebugLog(String callerName, Element xmlElement) {
+        if (decryptDebug.messageEnabled() && isSAMLDecryptionDebugEnabled()) {
+            String xmlOutput = XMLUtils.print(xmlElement);
+            decryptDebug.message(callerName + "Decrypted xml element node:\n" +
+                ((xmlOutput != null) ? xmlOutput : "NULL"));
+        }
+    }
+
+    /**
+     * Tells whether SAML SP decryption debug mode is enabled.
+     *
+     * @return <code>true</code> if SAML decryption debug mode is enabled, or <code>false</code> otherwise or if the
+     *         property is not found.
+     */
+    public static boolean isSAMLDecryptionDebugEnabled() {
+        return SystemPropertiesManager.getAsBoolean(SAML2Constants.SAML_DECRYPTION_DEBUG_MODE);
     }
 }

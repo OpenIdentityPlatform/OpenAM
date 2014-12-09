@@ -24,6 +24,8 @@
  *
  * $Id: EncryptedAttributeImpl.java,v 1.2 2008/06/25 05:47:43 qcheng Exp $
  *
+ * Portions copyright 2014 ForgeRock AS.
+ *
  */
 
 
@@ -125,6 +127,8 @@ public class EncryptedAttributeImpl implements EncryptedAttribute {
     {
         Element el = EncManager.getEncInstance().
             decrypt(xmlString, recipientPrivateKey);
+
+        SAML2SDKUtils.decodeXMLToDebugLog("EncryptedAttributeImpl.decrypt: ", el);
 
         return AssertionFactory.getInstance().
             createAttribute(el);
