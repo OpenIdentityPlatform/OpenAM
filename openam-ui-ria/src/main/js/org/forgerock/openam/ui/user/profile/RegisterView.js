@@ -118,7 +118,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                     responseCode = JSON.parse(e.responseText).code;
                 _this.$el.find("input[type=submit]").prop('disabled', false);
                 if (responseMessage.indexOf("ldap exception") > -1) {
-                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "userAlreadyExists");
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRegister");
                 } else if (responseMessage.indexOf("Identity names may not have a space character" )> -1) {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "identityNoSpace");
                 } else if (responseCode === 400) {
