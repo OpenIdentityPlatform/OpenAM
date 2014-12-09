@@ -564,7 +564,7 @@ $ <userinput>/path/to/opendj/setup --cli</userinput>
    <procedure xml:id="prepare-external-cts-backend">
     <title>To Prepare the External CTS Store</title>
 
-    <indexterm class="startofrange" id="idx-prepare-opendj">
+    <indexterm class="startofrange" xml:id="idx-prepare-opendj">
      <primary>Core Token Service</primary>
      <secondary>OpenDJ</secondary>
      <tertiary>preparing</tertiary>
@@ -1263,8 +1263,8 @@ $ <userinput>backup \
      </para>
      <note>
       <para>
-       The CTS requires that it talks to a single server to reduce the risk of
-       replication errors.
+       The CTS requires that it talks to a single server or load balancer
+       to reduce the risk of replication errors.
       </para>
      </note>
 
@@ -1284,11 +1284,55 @@ $ <userinput>backup \
       In addition, you can enable token compression as discussed in
       <xref linkend="cts-token-managing" />.
       When enabled, token compression reduces
-      load requirements on the network connection between data stores.
+      load requirements on the network connection between data stores
+      in exchange for processing time compressing tokens.
      </para>
 
     </listitem>
 
+    <listitem>
+     <para>
+      <emphasis role="bold">
+       Prevent random or round-robin load balancing to external CTS stores.
+      </emphasis>
+      No load balancer is needed between OpenAM and an external CTS store.
+      Instead configure multiple directory server replicas
+      in the Connection Strings of the configuration.
+      For details, see <xref linkend="cts-config" />.
+     </para>
+
+     <para>
+      When OpenAM writes to a directory server in the external CTS store,
+      directory server replication pushes the write to other directory servers
+      in the same replication group.
+      When under load operations in an OpenAM server
+      can happen more quickly than the network can push replication updates.
+      Therefore, balancing the LDAP traffic from OpenAM to the CTS store
+      in random or round robin fashion leads to errors
+      where a read operation arrives at a replica
+      before the expected write operation can cross the network.
+     </para>
+
+     <para>
+      For complex deployments
+      you might opt for an external directory service as the CTS store
+      with a load balancer between OpenAM and the directory service.
+      In this case, the choice of load balancing algorithm is important
+      to ensure consistency under load within the CTS layer.
+      High loads with a round-robin or random algorithm
+      cause replication conflicts within the CTS layer,
+      which the CTS layer is unable to resolve.
+      The load balancer <emphasis>must</emphasis> operate only for failover,
+      and not to balance LDAP traffic between directory servers.
+      In other words, the load balancer in front of the external CTS store
+      <emphasis>must</emphasis> use an Active/Passive configuration,
+      whereby the load balancer sends all requests to the same directory server
+      until that server becomes unavailable,
+      and then all requests go to the standby directory server, and so on.
+      Load balancers <emphasis>must not</emphasis> use an Active/Active configuration,
+      as this leads to the type of errors described above.
+     </para>
+    </listitem>
    </itemizedlist>
 
    <para>
