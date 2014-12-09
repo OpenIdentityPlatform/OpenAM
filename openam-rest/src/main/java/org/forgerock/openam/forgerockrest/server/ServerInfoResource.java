@@ -36,6 +36,7 @@ import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -139,6 +140,7 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("domains", cookieDomains);
             result.put("protectedUserAttributes", protectedUserAttributes);
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro"));
+            result.put("secureCookie", CookieUtils.isCookieSecure());
             result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
             result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
             result.put("lang", locale.getLocale().getLanguage());
