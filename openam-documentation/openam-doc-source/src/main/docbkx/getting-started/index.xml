@@ -64,4 +64,6 @@
 
  <xinclude:include href="chap-first-steps.xml" />
  <xinclude:include href="chap-where-to-go-from-here.xml" />
+
+ <index />
 </book>

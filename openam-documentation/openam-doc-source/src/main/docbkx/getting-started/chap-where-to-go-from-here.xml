@@ -33,6 +33,11 @@
          xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Where To Go From Here</title>
 
+ <indexterm>
+  <primary>OpenAM</primary>
+  <secondary>Where to go after install</secondary>
+ </indexterm>
+
  <para>OpenAM can do much more than protect web pages. In addition to being
  the right foundation for building highly available, Internet-scale access
  management services, OpenAM has a rich set of features that make it the right
@@ -42,6 +47,15 @@
 
  <section xml:id="user-self-service-features">
   <title>User Self-Service Features</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>User self-service features</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>User self-service features</primary>
+   <secondary>about</secondary>
+  </indexterm>
 
   <para>The easier it is for users to handle their own registration, to reset
   forgotten passwords, and to access the applications they need without a call
@@ -128,6 +142,15 @@
  <section xml:id="sso-features">
   <title>Single Sign On</title>
 
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>Single sign-on</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Single sign on</primary>
+   <secondary>about</secondary>
+  </indexterm>
+
   <para>Single sign on (SSO) is a core feature of OpenAM. Once you have set up
   OpenAM you protect as many applications in the network domain as you want.
   Simply install policy agents for the additional servers, and add policies
@@ -163,6 +186,15 @@
 
  <section xml:id="federation">
   <title>Standards-Based Federation</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>Standards-based federation</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Standards-based Federation</primary>
+   <secondary>about</secondary>
+  </indexterm>
 
   <para>When you need to federate identities across not just different domains
   but instead across different organizations with separate access management
@@ -230,6 +262,15 @@
  <section xml:id="policy-and-xacml">
   <title>Access Policies</title>
 
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>policies</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>policies</primary>
+   <secondary>accessing</secondary>
+  </indexterm>
+
   <para>In the first chapter of this guide you created an OpenAM access policy
   and saw how it worked. OpenAM can handle large numbers of access policies,
   each of which gives you centralized control over who can access what
@@ -251,6 +292,15 @@
 
  <section xml:id="protect-any-application">
   <title>Protect Any Web Application</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>protecting web apps</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Web applications</primary>
+   <secondary>protecting</secondary>
+  </indexterm>
 
   <para>In the first chapter of the guide you installed a web policy agent to
   enforce OpenAM's authorization decisions on Apache HTTP Server. That web
@@ -291,6 +341,15 @@
 
  <section xml:id="modern-api">
   <title>Modern APIs For Developers</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>APIs</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>APIs</primary>
+   <secondary>about</secondary>
+  </indexterm>
 
   <itemizedlist>
    <para>For client application developers, OpenAM offers REST, Java, and C
@@ -344,6 +403,21 @@
 
  <section xml:id="getting-help">
   <title>Getting Help With Your Project</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>support</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>training</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Support subscriptions</primary>
+  </indexterm>
+  <indexterm>
+   <primary>training</primary>
+  </indexterm>
 
   <para>You can purchase OpenAM support subscriptions and training courses
   from ForgeRock and from consulting partners around the world and in your
