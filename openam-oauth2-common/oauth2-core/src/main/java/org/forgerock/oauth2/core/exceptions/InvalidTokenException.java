@@ -27,6 +27,7 @@ public class InvalidTokenException extends OAuth2Exception {
      * Constructs a new InvalidTokenException with the default message.
      */
     public InvalidTokenException() {
-        super(403, "invalid_token", "The access token provided is expired, revoked, malformed, or invalid for other reasons.");
+        super(401, "invalid_token",
+                "The access token provided is expired, revoked, malformed, or invalid for other reasons.");
     }
 }

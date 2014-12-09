@@ -19,6 +19,7 @@ package org.forgerock.openidconnect;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
@@ -58,5 +59,5 @@ public interface OpenIdConnectClientRegistrationService {
      * @throws InvalidClientMetadata
      */
     JsonValue getRegistration(String clientId, String accessToken, OAuth2Request request)
-            throws InvalidRequestException, InvalidClientMetadata;
+            throws InvalidRequestException, InvalidClientMetadata, InvalidTokenException;
 }

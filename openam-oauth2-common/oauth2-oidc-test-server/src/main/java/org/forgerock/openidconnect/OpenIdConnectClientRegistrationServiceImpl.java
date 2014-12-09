@@ -23,6 +23,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -273,7 +274,8 @@ public class OpenIdConnectClientRegistrationServiceImpl implements OpenIdConnect
         return false;
     }
 
-    public JsonValue getRegistration(String clientId, String accessToken, OAuth2Request request) throws InvalidRequestException, InvalidClientMetadata {
+    public JsonValue getRegistration(String clientId, String accessToken, OAuth2Request request)
+            throws InvalidRequestException, InvalidClientMetadata, InvalidTokenException {
         if (clientId == null) {
             throw new InvalidRequestException();
         }
@@ -282,7 +284,7 @@ public class OpenIdConnectClientRegistrationServiceImpl implements OpenIdConnect
             final Client client = clientDAO.read(clientId, request);
 
             if (!client.getAccessToken().equals(accessToken)) {
-                throw new InvalidRequestException();
+                throw new InvalidTokenException();
             }
 
             //remove the client fields that don't need to be reported.
