@@ -12,13 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2006-2009 Sun Microsystems Inc.
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.shared.resourcename;
 
 import com.sun.identity.shared.debug.Debug;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -65,6 +67,8 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
     protected Debug debug;
     private static String PROTO_DELIMITER = "://";
     private static int PROTO_DELIMITER_SIZE = PROTO_DELIMITER.length();
+    private static final String CURRENT_PATH = ".";
+    private static final String PARENT_PATH = "..";
 
     protected BasePrefixResourceName(Debug debug, T exactMatch, T noMatch, T subResourceMatch, T superResourceMatch,
             T wildcardMatch) {
@@ -681,44 +685,81 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
         int idx = res.indexOf(PROTO_DELIMITER);
         if (idx >= 0) {
             String protoString = res.substring(0, idx + PROTO_DELIMITER_SIZE);
-            String remainingRes = res.substring(idx + PROTO_DELIMITER_SIZE);
-            return protoString + purgeNullPath(remainingRes);
+            String remainingResource = res.substring(idx + PROTO_DELIMITER_SIZE);
+            String hostString = "";
+            String queryString = "";
+            int slashIdx = remainingResource.indexOf('/');
+            if (slashIdx != -1) {
+                hostString = remainingResource.substring(0, slashIdx);
+                remainingResource = remainingResource.substring(slashIdx);
+            }
+            int queryIdx = remainingResource.indexOf('?');
+            if (queryIdx != -1) {
+                queryString = remainingResource.substring(queryIdx);
+                remainingResource = remainingResource.substring(0, queryIdx);
+            }
+            return protoString + hostString + normalizePath(remainingResource) + queryString;
         } else {
-            return purgeNullPath(res);
+            return normalizePath(res);
         }
     }
 
     /**
-     * eliminates the null path (consecutive delimiters) from the resource
+     * Cleanses the URL path, by doing the followings:
+     * <ul>
+     *  <li>Eliminates the null path (consecutive delimiters).</li>
+     *  <li>Removes noop ./ segments from the path.</li>
+     *  <li>Removes ../ segments along with the parent directory from the path.</li>
+     * </ul>
+     *
+     * @param resource The resource that needs to be normalized.
+     * @return The normalized resource URI.
      */
-    private String purgeNullPath(String res) {
-        if ((res == null) || (res.length() == 0)) {
+    private String normalizePath(String resource) {
+        if (resource == null || resource.isEmpty()) {
             return "";
         }
 
-        boolean preceedingDelimiter = false;
-        int len = res.length();
+        int len = resource.length();
 
-        char[] oldchars = res.toCharArray();
-        char[] newchars = new char[len];
+        char[] oldchars = resource.toCharArray();
+        Deque<String> segments = new ArrayDeque<String>();
+        char delimiterChar = delimiter.charAt(0);
 
-        int i = 0;
         int j = 0;
-        while (i < len) {
-            if (oldchars[i] == delimiter.charAt(0)) {
-                if (!preceedingDelimiter) {
-                    newchars[j++] = oldchars[i++];
-                    preceedingDelimiter = true;
+        for (int i = 0; i < len; i++) {
+            if (oldchars[i] == delimiterChar) {
+                if (i != j) {
+                    String segment = new String(oldchars, j, i - j);
+                    if (segment.equals(PARENT_PATH)) {
+                        if (segments.size() > 0) {
+                            segments.removeLast();
+                        }
+                    } else if (!segment.equals(CURRENT_PATH)) {
+                        segments.add(segment);
+                    }
+                    j = i + 1;
                 } else {
-                    i++;
+                    j++;
                 }
-            } else {
-                newchars[j++] = oldchars[i++];
-                preceedingDelimiter = false;
             }
         }
+        if (oldchars[len - 1] != delimiterChar) {
+            segments.add(new String(oldchars, j, len - j));
+        }
+        StringBuilder result = new StringBuilder(resource.length());
 
-        return String.valueOf(newchars, 0, j);
+        for (String segment : segments) {
+            result.append(delimiterChar).append(segment);
+        }
+        if (!resource.startsWith(delimiter)) {
+            result.deleteCharAt(0);
+        }
+        if (resource.endsWith(delimiter)) {
+            result.append(delimiterChar);
+        }
+
+        return result.toString();
     }
 
     /**
