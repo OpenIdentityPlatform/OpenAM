@@ -122,14 +122,14 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     obj.getPolicyByName = function (name) {
         return obj.serviceCall({
-            url: "/policies/" + name,
+            url: "/policies/" + encodeURIComponent(name),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
     obj.updatePolicy = function (name, data) {
         return obj.serviceCall({
-            url: "/policies/" + name,
+            url: "/policies/" + encodeURIComponent(name),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "PUT",
             data: JSON.stringify(data),
@@ -139,7 +139,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     obj.createPolicy = function (data) {
         return obj.serviceCall({
-            url: "/policies/" + data.name,
+            url: "/policies/" + encodeURIComponent(data.name),
             headers: { "If-None-Match": "*", "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "PUT",
             data: JSON.stringify(data),
@@ -149,7 +149,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     obj.deletePolicy = function (name) {
         return obj.serviceCall({
-            url: "/policies/" + name,
+            url: "/policies/" + encodeURIComponent(name),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "DELETE"
         });

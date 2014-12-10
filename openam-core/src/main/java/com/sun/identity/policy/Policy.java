@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyright 2011-2013 ForgeRock, Inc.
+ * Portions Copyright 2011-2014 ForgeRock, AS.
  */
 package com.sun.identity.policy;
 
@@ -1885,12 +1885,6 @@ public class Policy implements Cloneable {
             DEBUG.message("Invalid policy name:" + name);
             throw (new InvalidNameException(ResBundleUtils.rbName,
                 "null_name", null, "", PolicyException.POLICY));
-        } else if ( name.indexOf('/') != -1 ) {
-            DEBUG.message("Invalid policy name:" + name );
-            DEBUG.message("Index Of /:" + name.indexOf('/'));
-            throw (new InvalidNameException(ResBundleUtils.rbName,
-                "illegal_character_/_in_name", null, "", 
-                PolicyException.POLICY));
         }
     }
 
