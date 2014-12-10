@@ -31,7 +31,8 @@ public class BaseURLResourceNameTest {
     public void testWildcardMatchCompare() throws Exception {
         match(WILDCARD_MATCH, "http://example.com:80/fred/index.html", "http*://*example.com:*/fred/*", true);
         match(WILDCARD_MATCH, "http://www.example.com:80/fred/index.html", "http*://*example.com:*/fred/*", true);
-        match(WILDCARD_MATCH, "http://www.google.com:80/asdf/blah/wibble/asdf/blah", "http://www.google.com:80/*/blah/wibble/*/blah", true);
+        match(WILDCARD_MATCH, "http://www.google.com:80/asdf/hello/blah/wibble/asdf/blah",
+                "http://www.google.com:80/*/blah/wibble/*/blah", true);
         match(WILDCARD_MATCH, "http://www.google.com.net", "http://www.google.com*", true);
         match(WILDCARD_MATCH, "http://www.google.com:80/", "http://www.google.com:*", true);
         match(WILDCARD_MATCH, "http://www.google.com.co.uk", "http://www.google.com*", true);
@@ -39,6 +40,8 @@ public class BaseURLResourceNameTest {
         match(WILDCARD_MATCH, "http://www.google.com.co.uk:80/", "http://www.google.com*", true);
         match(WILDCARD_MATCH, "http://www.google.com.co.uk:80/blah", "http://www.google.com*", true);
         match(WILDCARD_MATCH, "http://example.com/index.html", "http*://example.com/index.html", true);
+        match(WILDCARD_MATCH, "http://www.google.com:80/blah?boo=bing", "http://www.google.com:80/*", true);
+        match(WILDCARD_MATCH, "http://www.google.com:80/123/index.html", "http://*.com:80/123/index.html", true);
     }
 
     @Test
@@ -59,6 +62,8 @@ public class BaseURLResourceNameTest {
 
     @Test
     public void testNoMatchCompare() throws Exception {
+        match(NO_MATCH, "http://example.com/private/index.html", "http*://example.com:*/index.html", true);
+        match(NO_MATCH, "http://example.com:80/private/index.html", "http*://example.com:*/index.html", true);
         match(NO_MATCH, "http://example.com:80/private/fred/index.html", "http*://*example.com:*/fred/*", true);
         match(NO_MATCH, "http://hello.world:80/hacked.example.com:80/index.html", "http://*.example.com:80/index.html", true);
         match(NO_MATCH, "https://example.com", "http://ex*mple.com", true);

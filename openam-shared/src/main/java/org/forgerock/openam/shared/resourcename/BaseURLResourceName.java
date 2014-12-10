@@ -48,7 +48,6 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
     private static final String COLON = ":";
     private static final String SCHEME_DELIMITER = "://";
     private static final String SLASH = "/";
-    private static final String FULLSTOP = ".";
     private static final String DEFAULT_WEB_PROTOCOL = "http";
     private static final String SECURE_WEB_PROTOCOL = "https";
     private static final String DEFAULT_PORT = "80";
@@ -91,35 +90,33 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
 
             T schemeMatch = compareBeforeBreakpoint(requestResource, targetResource, SCHEME_DELIMITER);
 
-            if (noMatch.equals(schemeMatch)) {
-                return schemeMatch;
+            if (noMatch.equals(schemeMatch) || subResourceMatch.equals(schemeMatch)) {
+                return noMatch; //subResource of scheme/host/port isn't appropriate
             } else if (firstSlash >= 0 && firstSlash < firstColon) { //no port, or : is part of the path
-                return compareSplit(schemelessRequest, schemelessTarget, SLASH);
+                return super.compare(schemelessRequest, schemelessTarget, wildcardCompare);
             } else if (firstSlash >= 0 && firstSlash > firstColon) { //port, wildcard & path
 
-                T beforeColon;
+                T hostMatch = compareBeforeBreakpoint(schemelessRequest, schemelessTarget, COLON);
 
-                int firstWildcard = schemelessTarget.indexOf(wildcard);
-                if (firstWildcard < firstColon) {
-
-                    String portlessRequest = schemelessRequest.substring(0, schemelessRequest.indexOf(COLON));
-                    String portlessTarget = schemelessTarget.substring(0, schemelessTarget.indexOf(COLON));
-
-                    beforeColon  = compareSplit(portlessRequest, portlessTarget, FULLSTOP);
-                } else {
-                    beforeColon = compareBeforeBreakpoint(schemelessRequest, schemelessTarget, COLON);
-                }
-
-                if (noMatch.equals(beforeColon)) {
-                    return beforeColon;
+                if (noMatch.equals(hostMatch) || subResourceMatch.equals(hostMatch)) {
+                    return noMatch;
                 }
 
                 final String postColonRequest = schemelessRequest.substring(schemelessRequest.indexOf(COLON));
                 final String postColonTarget = schemelessTarget.substring(schemelessTarget.indexOf(COLON));
 
-                T afterColon = compareSplit(postColonRequest, postColonTarget, SLASH);
+                T portMatch = compareBeforeBreakpoint(postColonRequest, postColonTarget, SLASH);
 
-                return wildcardResponseCombiner(beforeColon, afterColon);
+                if (noMatch.equals(portMatch) || subResourceMatch.equals(portMatch)) {
+                    return noMatch;
+                }
+
+                final String postSlashRequest = postColonRequest.substring(postColonRequest.indexOf(SLASH));
+                final String postSlashTarget = postColonTarget.substring(postColonTarget.indexOf(SLASH));
+
+                T pathMatch = super.compare(postSlashRequest, postSlashTarget, wildcardCompare); //for multilevel
+
+                return wildcardResponseCombiner(hostMatch, portMatch, pathMatch);
             } else { //case where firstColon >= 0; port wildcard
                 return compareSplit(schemelessRequest, schemelessTarget, COLON);
             }
@@ -151,15 +148,22 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
      * Ensures that e.g. if a wildcard match was made on the half of a URL, the overall
      * result reflects this rather than the match-type of the latter half of the URL only.
      */
-    private T wildcardResponseCombiner(T firstResult, T secondResult) {
+    private T wildcardResponseCombiner(T... matches) {
+        boolean wildcard = false;
 
-        if (exactMatch.equals(firstResult) && !exactMatch.equals(secondResult)) {
-            return secondResult;
-        } else if (exactMatch.equals(secondResult) && !exactMatch.equals(firstResult)) {
-            return firstResult;
+        for(T match : matches) {
+            if (wildcardMatch.equals(match)) {
+                wildcard = true;
+            } else if (!exactMatch.equals(match)) {
+                return match;
+            }
         }
 
-        return secondResult;
+        if (wildcard) {
+            return wildcardMatch;
+        } else {
+            return exactMatch;
+        }
     }
 
     /**
