@@ -24,8 +24,8 @@
  *
  * $Id: ResourceResultCache.java,v 1.21 2010/01/21 22:18:01 dillidorai Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
-
 
 package com.sun.identity.policy.client;
 
@@ -784,7 +784,6 @@ class ResourceResultCache implements SSOTokenListener {
             String serviceName) throws PolicyException {
 
         PolicyDecision pd = new PolicyDecision();
-        resourceName = resourceComparator.canonicalize(resourceName);
         Iterator resultsIter = resourceResults.iterator();
         boolean processed = false;
         while (!processed && resultsIter.hasNext()) {
