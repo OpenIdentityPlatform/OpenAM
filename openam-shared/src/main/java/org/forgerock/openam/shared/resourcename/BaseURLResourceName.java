@@ -54,6 +54,54 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
     private static final Pattern WILDCARD_HOST_PORT = Pattern.compile("^[^/]+://[^/]+\\*(/)");
 
     /**
+     * Specific comparison for URLs, where a wildcard in the host/port should not match any of the path.
+     *
+     * @param requestResource name of the resource which will be compared
+     * @param targetResource name of the resource which will be compared with
+     * @param wildcardCompare flag for wildcard comparison
+     * @return If a wildcard is in the host/port, separately compares the path/query and scheme/host/port, returning
+     * NO_MATCH if either don't match, WILDCARD_MATCH if the path is an EXACT_MATCH, and otherwise (host etc. must be
+     * WILDCARD_MATCH) returns the match of the path/query.
+     */
+    @Override
+    public T compare(String requestResource, String targetResource, boolean wildcardCompare) {
+        if (!wildcardCompare) {
+            return super.compare(requestResource, targetResource, wildcardCompare);
+        }
+
+        Matcher wildcardHostPort = WILDCARD_HOST_PORT.matcher(targetResource);
+        if (!wildcardHostPort.find()) {
+            return super.compare(requestResource, targetResource, wildcardCompare);
+        }
+
+        String targetSchemeHostPort = targetResource.substring(0, wildcardHostPort.start(1));
+        String targetPath = targetResource.substring(wildcardHostPort.start(1));
+
+        int requestPathIndex = requestResource.indexOf("/", requestResource.indexOf("//") + 2);
+        String requestSchemeHostPort = requestResource.substring(0, requestPathIndex);
+        String requestPath = requestResource.substring(requestPathIndex);
+
+        T schemeHostPortMatch = super.compare(requestSchemeHostPort, targetSchemeHostPort, true);
+        if (noMatch.equals(schemeHostPortMatch)) {
+            return noMatch;
+        }
+
+        T pathMatch = super.compare(requestPath, targetPath, true);
+        if (noMatch.equals(pathMatch)) {
+            return noMatch;
+        }
+
+        // schemeHostPortMatch should now be wildcardMatch given the regex above
+        if (!wildcardMatch.equals(schemeHostPortMatch)) {
+            throw new IllegalStateException("We know the targetSchemeHostPort ends in *, so should be wildcardMatch");
+        }
+        if (exactMatch.equals(pathMatch)) {
+            return wildcardMatch;
+        }
+        return pathMatch;
+    }
+
+    /**
      * This method is used to canonicalize a url string. It removes leading delimiters after the protocol
      * http:////abc becomes http://abc. If port number is provided validates it to be either wildcard
      * a valid integer, if not provided, adds default port 80. Makes sure URL is not malformed, also if query parameters
