@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EntitlementException.java,v 1.2 2009/09/03 17:06:23 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -35,6 +37,8 @@ import java.util.ResourceBundle;
  * Entitlement related exception.
  */
 public class EntitlementException extends Exception {
+
+    public static final int INVALID_PORT = 301;
     private static final String RES_BUNDLE_NAME = "EntitlementException";
 
     private int errorCode;
