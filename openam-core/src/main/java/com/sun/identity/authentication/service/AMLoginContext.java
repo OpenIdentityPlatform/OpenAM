@@ -693,6 +693,7 @@ public class AMLoginContext {
 
             java.util.Locale locale = com.sun.identity.shared.locale.Locale.getLocale(loginState.getLocale());
             loginState.setModuleErrorMessage(me.getL10NMessage(locale));
+            loginState.setErrorMessage(me.getL10NMessage(locale));
             isFailed = true;
             authContext.setLoginException(me);
         } catch (AuthLoginException le) {
