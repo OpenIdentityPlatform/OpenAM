@@ -45,6 +45,48 @@ public class PrefixResourceNameTest {
     }
 
     @Test
+    public void normalizationOnlyAffectsPath() throws Exception {
+        assertThat(resourceName.canonicalize("http://a.b..c:80///ab/cd?index=hello/./world//../"))
+                .isEqualTo("http://a.b..c:80/ab/cd?index=hello/./world//../");
+        assertThat(resourceName.canonicalize("http://a.b.c:80/./ab//cd/../?index=hello/./world//../"))
+                .isEqualTo("http://a.b.c:80/ab/?index=hello/./world//../");
+        assertThat(resourceName.canonicalize("http://a.b.c:80/ab/../cd/.././ab///cd?index=hello/./world//../"))
+                .isEqualTo("http://a.b.c:80/ab/cd?index=hello/./world//../");
+    }
+
+    @Test
+    public void normalizationShouldRemovePathNavigationSegments() throws Exception {
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/../zz"))
+                .isEqualTo("http://w.e.c:80/zz");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/../zz?qq"))
+                .isEqualTo("http://w.e.c:80/zz?qq");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/./../zz"))
+                .isEqualTo("http://w.e.c:80/zz");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/./../zz?qq"))
+                .isEqualTo("http://w.e.c:80/zz?qq");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/bb/cc/../cc/../../bb/../../zz"))
+                .isEqualTo("http://w.e.c:80/zz");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/bb/cc/../cc/../../bb/../../zz?qq"))
+                .isEqualTo("http://w.e.c:80/zz?qq");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/bb/./../bb/.././bb/../../zz"))
+                .isEqualTo("http://w.e.c:80/zz");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/bb/./../bb/.././bb/../../zz?qq"))
+                .isEqualTo("http://w.e.c:80/zz?qq");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/bb/././../bb/././../././../././zz"))
+                .isEqualTo("http://w.e.c:80/zz");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/bb/././../bb/././../././../././zz?qq"))
+                .isEqualTo("http://w.e.c:80/zz?qq");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/../aa/ee.ff"))
+                .isEqualTo("http://w.e.c:80/aa/ee.ff");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/../aa/ee.ff?qq"))
+                .isEqualTo("http://w.e.c:80/aa/ee.ff?qq");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/./.././aa/ee.ff"))
+                .isEqualTo("http://w.e.c:80/aa/ee.ff");
+        assertThat(resourceName.canonicalize("http://w.e.c:80/aa/./.././aa/ee.ff?qq"))
+                .isEqualTo("http://w.e.c:80/aa/ee.ff?qq");
+    }
+
+    @Test
     public void verifyNullMatchBehaviour() {
         assertThat(resourceName.compare(null, null, true)).isEqualTo(ResourceMatch.EXACT_MATCH);
         assertThat(resourceName.compare(null, "abc", true)).isEqualTo(ResourceMatch.NO_MATCH);
