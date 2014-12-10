@@ -19,8 +19,10 @@ package org.forgerock.openam.cts.impl;
 import com.iplanet.am.util.SystemProperties;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.sm.datalayer.api.StoreMode;
 import org.forgerock.openam.utils.ModifiedProperty;
 import org.forgerock.opendj.ldap.DN;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 import javax.inject.Inject;
 
@@ -32,10 +34,10 @@ import javax.inject.Inject;
  * boundary of LDAP concepts within the Core Token Service code.
  */
 public class LDAPConfig {
+
     private final DN defaultCTSRootSuffix;
 
     private ModifiedProperty<String> tokenStoreRootSuffix = new ModifiedProperty<String>();
-
 
     @Inject
     public LDAPConfig(String rootSuffix) {
@@ -43,6 +45,7 @@ public class LDAPConfig {
                 .child("ou=tokens")
                 .child("ou=openam-session")
                 .child("ou=famrecords");
+        update();
     }
 
     /**
@@ -73,5 +76,13 @@ public class LDAPConfig {
      */
     public void update() {
         tokenStoreRootSuffix.set(SystemProperties.get(CoreTokenConstants.CTS_ROOT_SUFFIX));
+    }
+
+    /**
+     * @return the value of the default CTS root suffix
+     */
+    @VisibleForTesting
+    DN getDefaultCTSRootSuffix() {
+        return defaultCTSRootSuffix;
     }
 }
