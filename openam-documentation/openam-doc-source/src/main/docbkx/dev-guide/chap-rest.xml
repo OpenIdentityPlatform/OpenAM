@@ -472,6 +472,11 @@
         </row>
         <row>
          <entry> </entry>
+         <entry>/subjectattributes</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
          <entry>/decisioncombiners</entry>
          <entry>1.0</entry>
         </row>
@@ -1277,15 +1282,15 @@ $ <userinput>curl \
     as shown in the following example:
    </para>
 
-   <screen>
-    $ <userinput>curl \
-    --request POST \
-    --header "Content-Type: application/json" \
-    --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
-    http://openam.example.com:8080/openam/json/sessions/
-    _action=isActive&amp;tokenId=BXCCq...NX*1*</userinput>
-    <computeroutput>{"active":true}</computeroutput>
-   </screen>
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ http://openam.example.com:8080/openam/json/sessions/?_action=isActive&amp;tokenId=BXCCq...NX*1*
+  </userinput>
+<computeroutput>{"active":true}</computeroutput>
+</screen>
 
    <para>
     To check the maximum remaining time (in seconds) of a session,
@@ -1295,15 +1300,15 @@ $ <userinput>curl \
     as shown in the following example:
    </para>
 
-   <screen>
-    $ <userinput>curl \
-    --request POST \
-    --header "Content-Type: application/json" \
-    --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
-    http://openam.example.com:8080/openam/json/sessions/
-    _action=getMaxTime&amp;tokenId=BXCCq...NX*1*</userinput>
-    <computeroutput>{"maxtime":7022}</computeroutput>
-   </screen>
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ http://openam.example.com:8080/openam/json/sessions/?_action=getMaxTime&amp;tokenId=BXCCq...NX*1*
+  </userinput>
+<computeroutput>{"maxtime":7022}</computeroutput>
+</screen>
 
    <para>
     To check the amount of time (in seconds) that a session has been idle,
@@ -1313,15 +1318,15 @@ $ <userinput>curl \
     as shown in the following example:
    </para>
 
-   <screen>
-    $ <userinput>curl \
-    --request POST \
-    --header "Content-Type: application/json" \
-    --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
-    http://openam.example.com:8080/openam/json/sessions/
-    _action=getIdle&amp;tokenId=BXCCq...NX*1*</userinput>
-    <computeroutput>{"idletime":355}</computeroutput>
-   </screen>
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ http://openam.example.com:8080/openam/json/sessions/?_action=getIdle&amp;tokenId=BXCCq...NX*1*
+  </userinput>
+<computeroutput>{"idletime":355}</computeroutput>
+</screen>
 
    <para>
     To reset a session's idle time,
@@ -1332,16 +1337,15 @@ $ <userinput>curl \
     option as shown in the following example:
    </para>
 
-   <screen>
-    $ <userinput>curl \
-    --request POST \
-    --header "Content-Type: application/json" \
-    --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
-    http://openam.example.com:8080/openam/json/sessions/
-    _action=isActive&amp;refresh=true&amp;tokenId=BXCCq...NX*1*</userinput>
-    <computeroutput>{"active":true}</computeroutput>
-   </screen>
-
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ http://openam.example.com:8080/openam/json/sessions/?_action=isActive&amp;refresh=true&amp;tokenId=BXCCq...NX*1*
+  </userinput>
+<computeroutput>{"active":true}</computeroutput>
+</screen>
 
   </section>
 
