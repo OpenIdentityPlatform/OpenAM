@@ -58,8 +58,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
 
 /**
  * Provided as extension points to allow the OpenAM OAuth2 provider to customise the requested scope of authorize,
@@ -137,19 +137,22 @@ public class OpenAMScopeValidator implements ScopeValidator {
 
     private Set<String> validateScopes(Set<String> requestedScopes, Set<String> defaultScopes,
             Set<String> allowedScopes, OAuth2Request request) throws InvalidScopeException, ServerException {
+        Set<String> scopes;
+
         if (requestedScopes == null || requestedScopes.isEmpty()) {
-            return defaultScopes;
+            scopes = defaultScopes;
+        } else {
+            scopes = new HashSet<String>(allowedScopes);
+            scopes.retainAll(requestedScopes);
+            if (requestedScopes.size() > scopes.size()) {
+                Set<String> invalidScopes = new HashSet<String>(requestedScopes);
+                invalidScopes.removeAll(allowedScopes);
+                throw InvalidScopeException.create("Unknown/invalid scope(s): " + invalidScopes.toString(), request);
+            }
         }
 
-        Set<String> scopes = new HashSet<String>(allowedScopes);
-        scopes.retainAll(requestedScopes);
-
-        if (requestedScopes.size() > scopes.size()) {
-            Set<String> invalidScopes = new HashSet<String>(requestedScopes);
-            invalidScopes.removeAll(allowedScopes);
-            final Set<String> responseTypes = Utils.splitResponseType(request.<String>getParameter(RESPONSE_TYPE));
-            throw new InvalidScopeException("Unknown or invalid scope(s): " + invalidScopes.toString(),
-                    Utils.isOAuth2FragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
+        if (scopes == null || scopes.isEmpty()) {
+            throw InvalidScopeException.create("No scope requested and no default scope configured", request);
         }
 
         return scopes;

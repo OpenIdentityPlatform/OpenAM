@@ -24,6 +24,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -103,5 +104,14 @@ public class OpenAMScopeValidatorTest {
 
         // When
         validator.validateAuthorizationScope(client, asSet("a", "b", "d"), request);
+    }
+
+    @Test(expectedExceptions = InvalidScopeException.class)
+    public void shouldThrowExceptionForNoScopes() throws Exception {
+        // Given
+        when(client.getAllowedScopes()).thenReturn(asSet("a", "b", "c"));
+
+        // When
+        validator.validateAuthorizationScope(client, Collections.<String>emptySet(), request);
     }
 }

@@ -17,6 +17,13 @@
 package org.forgerock.oauth2.core.exceptions;
 
 import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.Utils;
+
+import java.util.Set;
+
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.RESPONSE_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
 
 /**
  * Thrown when the requested scope is invalid, unknown, or malformed.
@@ -50,5 +57,16 @@ public class InvalidScopeException extends OAuth2Exception {
      */
     public InvalidScopeException(final String message, final UrlLocation parameterLocation) {
         super(400, "invalid_scope", message, parameterLocation);
+    }
+
+    /**
+     * Creates a new InvalidScopeException by deducing the UrlLocation from the OAuth2Request.
+     * @param message The reason for the exception.
+     * @param request The request from which we can work out what UrlLocation is needed.
+     * @return The created exception.
+     */
+    public static InvalidScopeException create(final String message, final OAuth2Request request) {
+        final Set<String> responseTypes = Utils.splitResponseType(request.<String>getParameter(RESPONSE_TYPE));
+        return new InvalidScopeException(message, Utils.isOAuth2FragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
     }
 }

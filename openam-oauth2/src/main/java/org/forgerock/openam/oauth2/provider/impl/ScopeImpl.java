@@ -137,24 +137,30 @@ public class ScopeImpl implements Scope {
 
     private Set<String> selectValidScopes(Set<String> requestedScopes, Set<String> defaultScopes,
             Set<String> allowedScopes) throws InvalidScopeException, ServerException {
+        Set<String> scopes;
+
         if (requestedScopes == null || requestedScopes.isEmpty()) {
-            return defaultScopes;
+            scopes = defaultScopes;
+        } else {
+            scopes = new HashSet<String>(allowedScopes);
+            scopes.retainAll(requestedScopes);
+
+            if (requestedScopes.size() > scopes.size()) {
+                Set<String> invalidScopes = new HashSet<String>(requestedScopes);
+                invalidScopes.removeAll(allowedScopes);
+                throw invalidScope("Unknown/invalid scope(s): " + invalidScopes.toString());
+            }
         }
 
-        Set<String> scopes = new HashSet<String>(allowedScopes);
-        scopes.retainAll(requestedScopes);
-
-        OAuth2Request request = this.requestFactory.create(Request.getCurrent());
-
-        if (requestedScopes.size() > scopes.size()) {
-            Set<String> invalidScopes = new HashSet<String>(requestedScopes);
-            invalidScopes.removeAll(allowedScopes);
-            final Set<String> responseTypes = Utils.splitResponseType(request.<String>getParameter(RESPONSE_TYPE));
-            throw new InvalidScopeException("Unknown/invalid scope(s): " + invalidScopes.toString(),
-                    Utils.isOAuth2FragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
+        if (scopes == null || scopes.isEmpty()) {
+            throw invalidScope("No scope requested and no default scope configured");
         }
 
         return scopes;
+    }
+
+    private InvalidScopeException invalidScope(String message) {
+        return InvalidScopeException.create(message, this.requestFactory.create(Request.getCurrent()));
     }
 
     /**

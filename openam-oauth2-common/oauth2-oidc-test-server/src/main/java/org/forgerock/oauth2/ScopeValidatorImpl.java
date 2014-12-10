@@ -20,12 +20,16 @@ import org.forgerock.common.UserStore;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.ScopeValidator;
 import org.forgerock.oauth2.core.Token;
+import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openidconnect.OpenIDTokenIssuer;
+import org.restlet.Request;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,6 +38,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.RESPONSE_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
 
 /**
  * @since 12.0.0
@@ -61,42 +68,56 @@ public class ScopeValidatorImpl implements ScopeValidator {
 
     private final UserStore userStore;
     private final OpenIDTokenIssuer openIDTokenIssuer;
+    private final OAuth2RequestFactory<Request> requestFactory;
 
     @Inject
-    public ScopeValidatorImpl(final UserStore userStore, final OpenIDTokenIssuer openIDTokenIssuer) {
+    public ScopeValidatorImpl(final UserStore userStore, final OpenIDTokenIssuer openIDTokenIssuer,
+            final OAuth2RequestFactory<Request> requestFactory) {
         this.userStore = userStore;
         this.openIDTokenIssuer = openIDTokenIssuer;
+        this.requestFactory = requestFactory;
     }
 
-    public Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope, OAuth2Request request) {
-        if (scope == null || scope.isEmpty()) {
-            return clientRegistration.getDefaultScopes();
+    public Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope,
+            OAuth2Request request) throws InvalidScopeException {
+        return validateScopes(scope, clientRegistration.getDefaultScopes(), clientRegistration.getAllowedScopes());
+    }
+
+    public Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope,
+            OAuth2Request request) throws InvalidScopeException {
+        return validateScopes(scope, clientRegistration.getDefaultScopes(), clientRegistration.getAllowedScopes());
+    }
+
+    public Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope,
+            Set<String> tokenScope, OAuth2Request request) throws InvalidScopeException {
+        return validateScopes(requestedScope, tokenScope, tokenScope);
+    }
+
+    private Set<String> validateScopes(Set<String> requestedScopes, Set<String> defaultScopes, Set<String> allowedScopes)
+            throws InvalidScopeException {
+        Set<String> scopes;
+
+        if (requestedScopes == null || requestedScopes.isEmpty()) {
+            scopes = defaultScopes;
+        } else {
+            scopes = new HashSet<String>(allowedScopes);
+            scopes.retainAll(requestedScopes);
+            if (requestedScopes.size() > scopes.size()) {
+                Set<String> invalidScopes = new HashSet<String>(requestedScopes);
+                invalidScopes.removeAll(allowedScopes);
+                throw invalidScope("Unknown/invalid scope(s): " + invalidScopes.toString());
+            }
         }
 
-        Set<String> scopes = new HashSet<String>(clientRegistration.getAllowedScopes());
-        scopes.retainAll(scope);
+        if (scopes == null || scopes.isEmpty()) {
+            throw invalidScope("No scope requested and no default scope configured");
+        }
+
         return scopes;
     }
 
-    public Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope, OAuth2Request request) {
-        if (scope == null || scope.isEmpty()) {
-            return clientRegistration.getDefaultScopes();
-        }
-
-        Set<String> scopes = new HashSet<String>(clientRegistration.getAllowedScopes());
-        scopes.retainAll(scope);
-        return scopes;
-    }
-
-    public Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope, Set<String> tokenScope, OAuth2Request request) {
-
-        if (requestedScope == null || requestedScope.isEmpty()) {
-            return tokenScope;
-        }
-
-        Set<String> scopes = new HashSet<String>(tokenScope);
-        scopes.retainAll(requestedScope);
-        return scopes;
+    private InvalidScopeException invalidScope(String message) {
+        return InvalidScopeException.create(message, this.requestFactory.create(Request.getCurrent()));
     }
 
     public Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request) throws UnauthorizedClientException {
