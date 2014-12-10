@@ -30,21 +30,22 @@
 
 package com.sun.identity.shared.whitelist;
 
-import com.sun.identity.shared.debug.Debug;
-
-/** 
-  * This implementation of <code>ResourceName</code> extends <code>
-  * URLResourceName</code> to add special handling of resources which end 
-  * in delimiter followed by a multi level wildcard. Wildcard card at the end
-  * matches across levels.
+/** This implementation of {@link ResourceName} extends
+  * {@link URLResourceName} to add special handling of resources which end
+  * in delimiter ({@link org.forgerock.openam.shared.resourcename.BaseURLResourceName})
+  * followed by a multi level wildcard. Wildcard card at the end matches across levels.
+  *
   * so <code>http://abc.com/b/c/d/*</code> matches <code>
   * http://abc.com/b/c/d/e/f/g.html</code>
   * while <code>http://abc.com/"*"/d</code> matches only string of type
   * <code>http://abc.com/a/d</code>. So embedded wildcard matches only at that
   * level where specified, while wildcard at the end, matches
   * across levels.
+  *
   * Behaviour of existing URLResourceName was not changed to
   * maintain backward compatibility.
+  *
+  * @see {@see BaseURLResourceName}
   */
 
 public class HttpURLResourceName extends URLResourceName {
@@ -124,10 +125,14 @@ public class HttpURLResourceName extends URLResourceName {
 
             ResourceMatch substring1Res =
                 compare(requestSubstring1, targetSubstring1, wildcardCompare);
-            if ((substring1Res == ResourceMatch.EXACT_MATCH)
-                || (substring1Res == ResourceMatch.WILDCARD_MATCH)) {
-                if ((requestSubstring2 == null) 
-                    || (requestSubstring2.trim().length() == 0)) {
+            if ((substring1Res == ResourceMatch.EXACT_MATCH) || (substring1Res == ResourceMatch.WILDCARD_MATCH)) {
+
+                if (targetSubstring2 != null && targetSubstring2.equals(wildcard) && requestResource.contains("?") &&
+                        ((requestSubstring2 == null) || (requestSubstring2.trim().length() == 0))) {
+                    return ResourceMatch.WILDCARD_MATCH;
+                }
+
+                if ((requestSubstring2 == null) || (requestSubstring2.trim().length() == 0)) {
                     return ResourceMatch.SUB_RESOURCE_MATCH;
                 }
                 if ((targetSubstring2 == null) 
@@ -154,19 +159,12 @@ public class HttpURLResourceName extends URLResourceName {
             return result;
         }
     
-        /* if it is a non-wildcard comparison or the target
-           resource doesn't end with delimiter plus wildcard
-           then use the result from PrefixResourceName.compare()
-        */
-        if ((!wildcardCompare) || 
-            (!targetResource.endsWith(delimiter+wildcard))) {
+        if ((!wildcardCompare) || !targetResource.endsWith(delimiter+wildcard)) {
             return (super.compare(requestResource, targetResource, 
                                   wildcardCompare));
         }
 
-        int strlen = targetResource.length();
-        String substr = targetResource.substring(0, strlen - 2);
-        ResourceMatch res = super.compare(requestResource, substr,
+        ResourceMatch res = super.compare(requestResource, targetResource,
                                           wildcardCompare);
         if ((res == ResourceMatch.EXACT_MATCH) 
              || (res == ResourceMatch.WILDCARD_MATCH) 

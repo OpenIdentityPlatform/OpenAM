@@ -18,12 +18,10 @@
 package org.forgerock.openam.shared.resourcename;
 
 import com.sun.identity.shared.debug.Debug;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -44,24 +42,29 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
     }
 
     protected static Comparator<String> comparator = new QueryParameterComparator();
+
     private static final String QUERY_PARAMETER_DELIMITER = "&";
     private static final String QUERY_PARAMETER_VALUE_DELIMITER = "=";
+    private static final String COLON = ":";
+    private static final String SCHEME_DELIMITER = "://";
+    private static final String SLASH = "/";
+    private static final String FULLSTOP = ".";
     private static final String DEFAULT_WEB_PROTOCOL = "http";
     private static final String SECURE_WEB_PROTOCOL = "https";
     private static final String DEFAULT_PORT = "80";
     private static final String SECURE_PORT = "443";
     private static final Pattern ACCEPTABLE_URLS = Pattern.compile("^(http|https)\\**://.*$");
-    private static final Pattern WILDCARD_HOST_PORT = Pattern.compile("^[^/]+://[^/]*\\*[^/]*(/)");
 
     /**
      * Specific comparison for URLs, where a wildcard in the host/port should not match any of the path.
+     * Strings should be canonicalized prior to entering this comparison, else they will be
+     * compared by the super class' comparison function.
      *
      * @param requestResource name of the resource which will be compared
      * @param targetResource name of the resource which will be compared with
      * @param wildcardCompare flag for wildcard comparison
      * @return If a wildcard is in the host/port, separately compares the path/query and scheme/host/port, returning
-     * NO_MATCH if either don't match, WILDCARD_MATCH if the path is an EXACT_MATCH, and otherwise (host etc. must be
-     * WILDCARD_MATCH) returns the match of the path/query.
+     * NO_MATCH if any don't match. Otherwise returns the match of the port/path/query.
      */
     @Override
     public T compare(String requestResource, String targetResource, boolean wildcardCompare) {
@@ -69,44 +72,140 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
             return super.compare(requestResource, targetResource, wildcardCompare);
         }
 
-        Matcher wildcardHostPort = WILDCARD_HOST_PORT.matcher(targetResource);
-        if (!wildcardHostPort.find()) {
+        String schemelessTarget = targetResource;
+        String schemelessRequest = requestResource;
+
+        if (schemelessTarget.contains(SCHEME_DELIMITER) && schemelessRequest.contains(SCHEME_DELIMITER)) {
+            schemelessTarget = removeSchemeEnsureSlash(schemelessTarget);
+            schemelessRequest = removeSchemeEnsureSlash(schemelessRequest);
+        } else {//urls should be canonicalised before reaching here
             return super.compare(requestResource, targetResource, wildcardCompare);
         }
 
-        String targetSchemeHostPort = targetResource.substring(0, wildcardHostPort.start(1));
-        String targetPath = targetResource.substring(wildcardHostPort.start(1));
+        final int firstColon = schemelessTarget.indexOf(COLON);
+        final int firstSlash = schemelessTarget.indexOf(SLASH);
 
-        int schemeEnd = requestResource.indexOf("//");
-        if (schemeEnd == -1) {
+        if (firstColon == -1) {
             return super.compare(requestResource, targetResource, wildcardCompare);
+        } else {
+
+            T schemeMatch = compareBeforeBreakpoint(requestResource, targetResource, SCHEME_DELIMITER);
+
+            if (noMatch.equals(schemeMatch)) {
+                return schemeMatch;
+            } else if (firstSlash >= 0 && firstSlash < firstColon) { //no port, or : is part of the path
+                return compareSplit(schemelessRequest, schemelessTarget, SLASH);
+            } else if (firstSlash >= 0 && firstSlash > firstColon) { //port, wildcard & path
+
+                T beforeColon;
+
+                int firstWildcard = schemelessTarget.indexOf(wildcard);
+                if (firstWildcard < firstColon) {
+
+                    String portlessRequest = schemelessRequest.substring(0, schemelessRequest.indexOf(COLON));
+                    String portlessTarget = schemelessTarget.substring(0, schemelessTarget.indexOf(COLON));
+
+                    beforeColon  = compareSplit(portlessRequest, portlessTarget, FULLSTOP);
+                } else {
+                    beforeColon = compareBeforeBreakpoint(schemelessRequest, schemelessTarget, COLON);
+                }
+
+                if (noMatch.equals(beforeColon)) {
+                    return beforeColon;
+                }
+
+                final String postColonRequest = schemelessRequest.substring(schemelessRequest.indexOf(COLON));
+                final String postColonTarget = schemelessTarget.substring(schemelessTarget.indexOf(COLON));
+
+                return compareSplit(postColonRequest, postColonTarget, SLASH);
+            } else { //case where firstColon >= 0; port wildcard
+                return compareSplit(schemelessRequest, schemelessTarget, COLON);
+            }
         }
-        int requestPathIndex = requestResource.indexOf("/", schemeEnd + 2);
-        if (requestPathIndex == -1) {
-            return super.compare(requestResource, targetResource, wildcardCompare);
+    }
+
+    /**
+     * Initial recursive component. Calls down to compareBeforeBreakpoint and
+     * compareAfterBreakpoint, which subsequently call back up to compareSplit.
+     */
+    private T compareSplit(String resource, String target, String breakPoint) {
+
+        if (!resource.contains(breakPoint)) {
+            return super.compare(resource, target, true);
         }
 
-        String requestSchemeHostPort = requestResource.substring(0, requestPathIndex);
-        String requestPath = requestResource.substring(requestPathIndex);
+        T firstMatch = compareBeforeBreakpoint(resource, target, breakPoint);
 
-        T schemeHostPortMatch = super.compare(requestSchemeHostPort, targetSchemeHostPort, true);
-        if (noMatch.equals(schemeHostPortMatch)) {
-            return noMatch;
+        if (noMatch.equals(firstMatch) || subResourceMatch.equals(firstMatch)) {
+            return firstMatch;
         }
 
-        T pathMatch = super.compare(requestPath, targetPath, true);
-        if (noMatch.equals(pathMatch)) {
-            return noMatch;
-        }
+        T secondMatch = compareAfterBreakpoint(resource, target, breakPoint);
 
-        // schemeHostPortMatch should now be wildcardMatch given the regex above
-        if (!wildcardMatch.equals(schemeHostPortMatch)) {
-            throw new IllegalStateException("We know the targetSchemeHostPort ends in *, so should be wildcardMatch");
-        }
-        if (exactMatch.equals(pathMatch)) {
+        if (secondMatch.equals(exactMatch) && firstMatch.equals(wildcardMatch)) {
             return wildcardMatch;
+        } else {
+            return secondMatch;
         }
-        return pathMatch;
+    }
+
+    /**
+     * Recursive-component step
+     */
+    private T compareBeforeBreakpoint(String resource, String target, String breakPoint) {
+
+        int firstResourceBreakPoint = resource.indexOf(breakPoint);
+        int firstTargetBreakPoint = target.indexOf(breakPoint);
+
+        if (firstResourceBreakPoint == -1 || firstTargetBreakPoint == -1) {
+            return super.compare(resource, target, true);
+        }
+
+        String resourceSub = resource.substring(0, firstResourceBreakPoint);
+        String targetSub = target.substring(0, firstTargetBreakPoint);
+
+        //for situation such as /asdf/*
+        if (targetSub.endsWith(wildcard)) {
+            return super.compare(resourceSub, targetSub, true);
+        } else {
+            return compareSplit(resourceSub, targetSub, breakPoint);
+        }
+    }
+
+    /**
+     * Recursive-component step
+     */
+    private T compareAfterBreakpoint(String resource, String target, String breakPoint) {
+
+        int firstResourceBreakPoint = resource.indexOf(breakPoint);
+        int firstTargetBreakPoint = target.indexOf(breakPoint);
+
+        if (firstResourceBreakPoint == -1 || firstTargetBreakPoint == -1) {
+            return super.compare(resource, target, true);
+        }
+
+        String resourceSub = resource.substring(firstResourceBreakPoint + breakPoint.length());
+        String targetSub = target.substring(firstTargetBreakPoint + breakPoint.length());
+
+        //for situation such as /asdf/*
+        if (targetSub.endsWith(wildcard)) {
+            return super.compare(resourceSub, targetSub, true);
+        } else {
+            return compareSplit(resourceSub, targetSub, breakPoint);
+        }
+
+    }
+
+    /**
+     *
+     */
+    private String removeSchemeEnsureSlash(String url) {
+        String part = url.substring(url.indexOf(SCHEME_DELIMITER) + SCHEME_DELIMITER.length());
+        if (!part.contains(SLASH)) {
+            return part + SLASH;
+        }
+
+        return part;
     }
 
     /**
@@ -197,6 +296,10 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
         if (hostName.length() != 0) {
             sb.append(":");
             sb.append(port);
+
+            if (hostName.equals(wildcard) && hostAndPort.equals(wildcard) && resource.equals(wildcard)) {
+                sb.append(wildcard);
+            }
         }
 
         if (debug.messageEnabled()) {
