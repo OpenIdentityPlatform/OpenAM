@@ -25,22 +25,24 @@ import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
 import org.forgerock.util.annotations.VisibleForTesting;
 import org.restlet.data.Disposition;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
+import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.AccessController;
@@ -48,7 +50,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+
+import static org.forgerock.json.resource.ResourceException.BAD_REQUEST;
+import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
 
 /**
  * Provides XACML based services
@@ -89,11 +95,9 @@ public class XacmlService extends ServerResource {
 
     /**
      * Expects to receive XACML formatted XML which will be read and imported.
-     * @param entity
-     * @throws org.forgerock.json.resource.ResourceException
      */
     @Post
-    public Representation importXACML(Representation entity) throws ResourceException {
+    public Representation importXACML(Representation entity) {
         String realm = RestletRealmRouter.getRealmFromRequest(getRequest());
         boolean dryRun = "true".equalsIgnoreCase(getQuery().getFirstValue("dryrun"));
         List<ImportStep> steps;
@@ -102,14 +106,17 @@ public class XacmlService extends ServerResource {
             steps = importExport.importXacml(realm, entity.getStream(), getAdminToken(), dryRun);
         } catch (EntitlementException e) {
             debug.warning("Importing XACML to policies failed", e);
-            throw ResourceException.getException(ResourceException.BAD_REQUEST, e.getMessage());
+            throw new ResourceException(new Status(BAD_REQUEST, e, e
+                    .getLocalizedMessage(getRequestLocale()), null, null));
         } catch (IOException e) {
             debug.warning("Reading XACML import failed", e);
-            throw ResourceException.getException(ResourceException.BAD_REQUEST, e.getMessage());
+            throw new ResourceException(new Status(BAD_REQUEST, e, e
+                    .getLocalizedMessage(), null, null));
         }
 
         if (steps.isEmpty()) {
-            throw ResourceException.getException(ResourceException.BAD_REQUEST, "No policies found in XACML document");
+            throw new ResourceException(new Status(BAD_REQUEST,
+                    "No policies found in XACML document", null, null));
         }
 
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
@@ -121,6 +128,14 @@ public class XacmlService extends ServerResource {
         }
         getResponse().setStatus(Status.SUCCESS_OK);
         return new JacksonRepresentation<List<Map<String, String>>>(result);
+    }
+
+    /**
+     * Get the client's preferred locale, or the server default if not specified.
+     */
+    private Locale getRequestLocale() {
+        final HttpServletRequest httpRequest = ServletUtils.getRequest(getRequest());
+        return httpRequest == null ? Locale.getDefault() : httpRequest.getLocale();
     }
 
     /**
@@ -136,7 +151,7 @@ public class XacmlService extends ServerResource {
      * @return XACML of the matching Privileges.
      */
     @Get
-    public Representation exportXACML() throws ResourceException {
+    public Representation exportXACML() {
         String realm = RestletRealmRouter.getRealmFromRequest(getRequest());
         return exportXACML(realm);
     }
@@ -147,7 +162,7 @@ public class XacmlService extends ServerResource {
      * @return Representation object wrapping the converted XACML
      */
     @VisibleForTesting
-    Representation exportXACML(String realm) throws ResourceException {
+    Representation exportXACML(String realm) {
 
         List<String> filters = new ArrayList<String>(
                 Arrays.asList(getQuery().getValuesArray(QUERY_PARAM_STRING)));
@@ -157,7 +172,8 @@ public class XacmlService extends ServerResource {
             policySet = importExport.exportXACML(realm, getAdminToken(), filters);
         } catch (EntitlementException e) {
             debug.warning("Reading Policies failed", e);
-            throw ResourceException.getException(ResourceException.INTERNAL_ERROR, e.getMessage());
+            throw new ResourceException(new Status(INTERNAL_ERROR, e.getLocalizedMessage(getRequestLocale()), null,
+                    null));
         }
 
         getResponse().setStatus(Status.SUCCESS_OK);
@@ -174,7 +190,7 @@ public class XacmlService extends ServerResource {
         };
         // OPENAM-4974
         Disposition disposition = new Disposition();
-        disposition.setType(disposition.TYPE_ATTACHMENT);
+        disposition.setType(Disposition.TYPE_ATTACHMENT);
         disposition.setFilename(getPolicyAttachmentFileName(realm));
         result.setDisposition(disposition);
 

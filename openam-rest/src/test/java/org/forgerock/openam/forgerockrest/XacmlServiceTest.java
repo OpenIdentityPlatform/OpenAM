@@ -23,7 +23,6 @@ import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.forgerockrest.entitlements.StubPrivilege;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.ArgumentCaptor;
@@ -36,6 +35,7 @@ import org.restlet.data.Form;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
+import org.restlet.resource.ResourceException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -52,6 +52,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.forgerock.json.resource.ResourceException.BAD_REQUEST;
+import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
 import static org.mockito.Mockito.*;
 import static com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
 
@@ -161,7 +163,7 @@ public class XacmlServiceTest {
             //then
             fail("Expect exception");
         } catch (ResourceException e) {
-            assertThat(e.getCode()).isEqualTo(ResourceException.BAD_REQUEST);
+            assertThat(e.getStatus().getCode()).isEqualTo(BAD_REQUEST);
         }
     }
 
@@ -180,7 +182,7 @@ public class XacmlServiceTest {
             //then
             fail("Expect exception");
         } catch (ResourceException e) {
-            assertThat(e.getCode()).isEqualTo(ResourceException.BAD_REQUEST);
+            assertThat(e.getStatus().getCode()).isEqualTo(BAD_REQUEST);
             assertThat(e.getMessage()).isEqualTo("No policies found in XACML document");
         }
     }
@@ -201,7 +203,7 @@ public class XacmlServiceTest {
             //then
             fail("Expect exception");
         } catch (ResourceException e) {
-            assertThat(e.getCode()).isEqualTo(ResourceException.BAD_REQUEST);
+            assertThat(e.getStatus().getCode()).isEqualTo(BAD_REQUEST);
             assertThat(e.getMessage()).isEqualTo("JSON Exception.");
         }
     }
@@ -291,7 +293,7 @@ public class XacmlServiceTest {
             //then
             fail("Expect exception");
         } catch (ResourceException e) {
-            assertThat(e.getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+            assertThat(e.getStatus().getCode()).isEqualTo(INTERNAL_ERROR);
             assertThat(e.getMessage()).isEqualTo("JSON Exception.");
         }
     }

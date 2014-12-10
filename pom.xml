@@ -1604,6 +1604,12 @@
                 <version>${restlet.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.slf4j</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
             <!-- Commons Dependencies -->
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
