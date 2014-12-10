@@ -206,11 +206,13 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
                 return exactMatch;
             }
 
-            if (targetResource.startsWith(requestResource + delimiter)) {
+            if (targetResource.startsWith(
+                    (requestResource.endsWith(delimiter)) ? requestResource : requestResource + delimiter)) {
                 return subResourceMatch;
             }
 
-            if (requestResource.startsWith(targetResource + delimiter)) {
+            if (requestResource.startsWith(
+                    (targetResource.endsWith(delimiter)) ? targetResource : targetResource + delimiter)) {
                 return superResourceMatch;
             }
 
@@ -226,7 +228,8 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
         if (tarEnd > tarBegin) {
             // check if requestResource starts with the substr
             if (!(requestResource.startsWith(subString))) {
-                if (subString.startsWith(requestResource + delimiter)) {
+                if (subString.startsWith(
+                        (requestResource.endsWith(delimiter)) ? requestResource : requestResource + delimiter)) {
                     return subResourceMatch;
                 }
                 return noMatch;
