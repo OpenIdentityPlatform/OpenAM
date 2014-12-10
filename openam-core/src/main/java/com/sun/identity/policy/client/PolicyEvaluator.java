@@ -24,10 +24,7 @@
  *
  * $Id: PolicyEvaluator.java,v 1.7 2009/10/21 23:50:46 dillidorai Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS.
  */
 package com.sun.identity.policy.client;
 
@@ -48,6 +45,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.AppSSOTokenProvider;
 import com.sun.identity.log.Logger;
 import com.sun.identity.log.LogRecord;
+import com.sun.identity.policy.interfaces.ResourceName;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -397,6 +395,11 @@ public class PolicyEvaluator {
                     + ":resourceName=" + resourceName 
                     + ":actionName=" + actionNames + ":entering");
         }
+
+        //We need to normalize the resourcename before sending off the policy request to ensure the policy is evaluated
+        //for the correct resource.
+        ResourceName resourceComparator = policyProperties.getResourceComparator(serviceName);
+        resourceName = resourceComparator.canonicalize(resourceName);
 
 	PolicyDecision pd = null;
         try {
