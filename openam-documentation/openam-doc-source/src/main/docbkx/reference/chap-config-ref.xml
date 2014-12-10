@@ -3341,9 +3341,9 @@
    </varlistentry>
 
    <varlistentry>
-    <term>Selected Response Providers (<command>ssoadm</command> only)</term>
+    <term>Selected Response Attribute Providers (<command>ssoadm</command> only)</term>
     <listitem>
-     <para>Lists available response providers available for policy
+     <para>Lists response attribute providers available for policy
      definition</para>
 
      <para>
