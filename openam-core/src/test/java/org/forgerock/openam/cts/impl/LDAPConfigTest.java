@@ -16,6 +16,7 @@
 package org.forgerock.openam.cts.impl;
 
 import com.iplanet.am.util.SystemProperties;
+import org.forgerock.opendj.ldap.DN;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
@@ -23,24 +24,15 @@ import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 
 /**
  * @author robert.wapshott@forgerock.com
  */
 @PrepareForTest(SystemProperties.class)
 public class LDAPConfigTest extends PowerMockTestCase {
-    @Test
-    public void shouldUseSystemPropertiesForNotifyChanges() {
-        // Given
-        PowerMockito.mockStatic(SystemProperties.class);
-        LDAPConfig config = new LDAPConfig("");
-        // When
-        config.update();
-        // Then
-        PowerMockito.verifyStatic();
-        SystemProperties.get(anyString());
-    }
 
     @Test
     public void shouldIndicateHasChanged() {
@@ -49,9 +41,50 @@ public class LDAPConfigTest extends PowerMockTestCase {
         given(SystemProperties.get(anyString())).willReturn("badger");
 
         LDAPConfig config = new LDAPConfig("");
-        // When
-        config.update();
+
         // Then
         assertThat(config.hasChanged()).isTrue();
+    }
+
+    @Test
+    public void shouldIndicateHasNotChanged() {
+        // Given
+        PowerMockito.mockStatic(SystemProperties.class);
+        given(SystemProperties.get(anyString())).willReturn(null);
+
+        LDAPConfig config = new LDAPConfig("");
+
+        // Then
+        assertThat(config.hasChanged()).isFalse();
+    }
+
+    @Test
+    public void shouldReturnDefaultRootSuffix() {
+        // Given
+        PowerMockito.mockStatic(SystemProperties.class);
+        given(SystemProperties.get(anyString())).willReturn(null);
+
+        LDAPConfig config = new LDAPConfig("");
+
+        DN defaultRootSuffix = config.getDefaultCTSRootSuffix();
+        DN returnedRootSuffix = config.getTokenStoreRootSuffix();
+
+        // Then
+        assertEquals(defaultRootSuffix, returnedRootSuffix);
+    }
+
+    @Test
+    public void shouldReturnExternalRootSuffix() {
+        // Given
+        PowerMockito.mockStatic(SystemProperties.class);
+        given(SystemProperties.get(anyString())).willReturn("dc=google,dc=com");
+
+        LDAPConfig config = new LDAPConfig("");
+
+        DN defaultRootSuffix = config.getDefaultCTSRootSuffix();
+        DN returnedRootSuffix = config.getTokenStoreRootSuffix();
+
+        // Then
+        assertNotEquals(defaultRootSuffix, returnedRootSuffix);
     }
 }
