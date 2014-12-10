@@ -279,12 +279,24 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
             throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, END_DATE, START_DATE);
         }
 
-        if (startDateCal.getTime().getTime() > endDateCal.getTime().getTime()) {
-            if (debug.errorEnabled()) {
-                debug.error("SimpleTimeCondition.validateProperties(): START DATE after END DATE");
+        if (startDate != null) {
+            if (startDateCal == null || endDateCal == null) {
+                if (debug.errorEnabled()) {
+                    debug.error("SimpleTimeCondition.validateProperties(): property pair not defined: " +
+                            START_DATE + ", "  + END_DATE + " - cannot generate calendar.");
+                }
+                throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, END_DATE, START_DATE);
+            } else {
+                if (startDateCal.getTime().getTime() > endDateCal.getTime().getTime()) {
+                    if (debug.errorEnabled()) {
+                        debug.error("SimpleTimeCondition.validateProperties(): START DATE after END DATE");
+                    }
+                    throw new EntitlementException(START_DATE_AFTER_END_DATE,
+                            startDateCal.getTime(), endDateCal.getTime());
+                }
             }
-            throw new EntitlementException(START_DATE_AFTER_END_DATE);
         }
+
     }
 
     /**
@@ -330,6 +342,7 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
         if (values != null && values.iterator().hasNext()) {
             return values.iterator().next();
         }
+
         return null;
     }
 
