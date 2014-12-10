@@ -15,10 +15,24 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
+import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
+import static com.sun.identity.shared.xml.XMLUtils.parseAttributeValuePairTags;
+import static org.forgerock.openam.utils.CollectionUtils.transformSet;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.InputStream;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.delegation.DelegationManager;
-import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.ServiceConfig;
@@ -36,21 +50,6 @@ import org.forgerock.util.promise.NeverThrowsException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.InputStream;
-import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
-import static com.sun.identity.shared.xml.XMLUtils.parseAttributeValuePairTags;
-import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 
 /**
  * Upgrade step looks at the delegation XML (amDelegation.xml) and compares it against the current service model to
@@ -121,9 +120,7 @@ public class DelegationConfigUpgradeStep extends AbstractUpgradeStep {
         final NodeList configNodes = delegationDocument.getElementsByTagName(SMSUtils.SUB_CONFIG);
 
         try {
-            final ServiceConfig delegationConfig = configManager.getGlobalConfig(null);
-            permissionsConfig = delegationConfig.getSubConfig(PERMISSIONS);
-            privilegesConfig = delegationConfig.getSubConfig(PRIVILEGES);
+            initConfig();
 
             // Check each permission/privilege config node against the service model.
             for (int idx = 0; idx < configNodes.getLength(); idx++) {
@@ -145,6 +142,16 @@ public class DelegationConfigUpgradeStep extends AbstractUpgradeStep {
             throw new UpgradeException("Failed analysing the delegation delta", smsE);
         }
 
+    }
+
+    /**
+     * Cache gets cleared after #initialize is called but before #perform, so need to re-get the config options each
+     * time.
+     */
+    private void initConfig() throws SMSException, SSOException {
+        final ServiceConfig delegationConfig = configManager.getGlobalConfig(null);
+        permissionsConfig = delegationConfig.getSubConfig(PERMISSIONS);
+        privilegesConfig = delegationConfig.getSubConfig(PRIVILEGES);
     }
 
     /**
@@ -235,6 +242,7 @@ public class DelegationConfigUpgradeStep extends AbstractUpgradeStep {
     @Override
     public void perform() throws UpgradeException {
         try {
+            initConfig();
             if (!newPermissions.isEmpty()) {
                 UpgradeProgress.reportStart(AUDIT_PERM_NEW_START);
                 handleNewPermissions();

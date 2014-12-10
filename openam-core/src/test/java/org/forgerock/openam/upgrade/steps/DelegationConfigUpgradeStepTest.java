@@ -150,9 +150,9 @@ public class DelegationConfigUpgradeStepTest {
         step.perform();
 
         // Then...
-        verify(configManager).getGlobalConfig(null);
-        verify(delegationConfig).getSubConfig("Permissions");
-        verify(delegationConfig).getSubConfig("Privileges");
+        verify(configManager, times(2)).getGlobalConfig(null);
+        verify(delegationConfig, times(2)).getSubConfig("Permissions");
+        verify(delegationConfig, times(2)).getSubConfig("Privileges");
         verify(permissions).getSubConfig("TestPerm1");
         verify(permissions).getSubConfig("TestPerm2");
         verify(privileges).getSubConfig("TestPrivilege1");
@@ -196,9 +196,9 @@ public class DelegationConfigUpgradeStepTest {
         step.perform();
 
         // Then...
-        verify(configManager).getGlobalConfig(null);
-        verify(delegationConfig).getSubConfig("Permissions");
-        verify(delegationConfig).getSubConfig("Privileges");
+        verify(configManager, times(2)).getGlobalConfig(null);
+        verify(delegationConfig, times(2)).getSubConfig("Permissions");
+        verify(delegationConfig, times(2)).getSubConfig("Privileges");
         verify(permissions).getSubConfig("TestPerm1");
         verify(permissions).getSubConfig("TestPerm2");
         verify(privileges).getSubConfig("TestPrivilege1");
@@ -243,9 +243,9 @@ public class DelegationConfigUpgradeStepTest {
         step.perform();
 
         // Then...
-        verify(configManager).getGlobalConfig(null);
-        verify(delegationConfig).getSubConfig("Permissions");
-        verify(delegationConfig).getSubConfig("Privileges");
+        verify(configManager, times(2)).getGlobalConfig(null);
+        verify(delegationConfig, times(2)).getSubConfig("Permissions");
+        verify(delegationConfig, times(2)).getSubConfig("Privileges");
         verify(permissions).getSubConfig("TestPerm1");
         verify(permissions).getSubConfig("TestPerm2");
         verify(privileges, times(2)).getSubConfig("TestPrivilege1");
@@ -286,9 +286,9 @@ public class DelegationConfigUpgradeStepTest {
         step.perform();
 
         // Then...
-        verify(configManager).getGlobalConfig(null);
-        verify(delegationConfig).getSubConfig("Permissions");
-        verify(delegationConfig).getSubConfig("Privileges");
+        verify(configManager, times(2)).getGlobalConfig(null);
+        verify(delegationConfig, times(2)).getSubConfig("Permissions");
+        verify(delegationConfig, times(2)).getSubConfig("Privileges");
         verify(permissions).getSubConfig("TestPerm1");
         verify(permissions).getSubConfig("TestPerm2");
         verify(privileges, times(2)).getSubConfig("TestPrivilege1");
