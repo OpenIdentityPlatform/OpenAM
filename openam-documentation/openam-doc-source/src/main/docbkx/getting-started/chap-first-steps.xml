@@ -197,6 +197,7 @@
   <para>The procedures in this section are written for use on a Linux system.
   If you are running Microsoft Windows, adapt the examples accordingly.</para>
 
+  <?hard-pagebreak?>
   <procedure xml:id="prepare-etc-hosts">
    <title>To Prepare Your Hosts File</title>
 
