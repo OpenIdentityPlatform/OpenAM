@@ -32,19 +32,21 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
+import static com.sun.identity.entitlement.EntitlementException.AUTH_LEVEL_NOT_INTEGER;
+import static com.sun.identity.entitlement.EntitlementException.AUTH_LEVEL_NOT_INT_OR_SET;
+import static com.sun.identity.entitlement.EntitlementException.AUTH_SCHEME_NOT_FOUND;
+import static com.sun.identity.entitlement.EntitlementException.CLIENT_IP_EMPTY;
+import static com.sun.identity.entitlement.EntitlementException.INVALID_PROPERTY_VALUE;
+import static com.sun.identity.entitlement.EntitlementException.PROPERTY_IS_NOT_AN_INTEGER;
+import static com.sun.identity.entitlement.EntitlementException.PROPERTY_IS_NOT_A_SET;
+import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
+import static com.sun.identity.entitlement.EntitlementException.RESOURCE_ENV_NOT_KNOWN;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.policy.PolicyEvaluator;
 import com.sun.identity.policy.util.PolicyDecisionUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.oauth2.core.Utils;
-import org.forgerock.openam.utils.ValidateIPaddress;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,11 +59,25 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.sun.identity.entitlement.EntitlementException.*;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.compile;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
+import javax.security.auth.Subject;
+import org.forgerock.oauth2.core.Utils;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_REALM_CONDITION_ADVICE;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTH_LEVEL;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTH_LEVEL_CONDITION_ADVICE;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AUTH_SCHEME_CONDITION_ADVICE;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_AUTHENTICATED_TO_REALMS;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_AUTHENTICATED_TO_SERVICES;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_AUTH_LEVEL;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_AUTH_SCHEMES;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_IP;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.openam.utils.ValidateIPaddress;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * This condition provides the policy framework with the condition decision and advices based on the client's
@@ -725,7 +741,8 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
      * Returns the environment condition that satisfies or matches for the client
      * environment parameter, including client's IP Address.
      */
-    private EnvironmentCondition matchEnvironment(Map<String, Set<String>> env, SSOToken token)
+    @SuppressWarnings("unchecked")
+    private EnvironmentCondition matchEnvironment(Map env, SSOToken token)
             throws EntitlementException,
             SSOException {
         if (debug.messageEnabled()) {
@@ -740,7 +757,7 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
             final String envParamName = condition.paramName;
             final String envParamValue = condition.paramValue;
 
-            Set<String> envSet = env.get(envParamName);
+            Set<String> envSet = (Set<String>) env.get(envParamName);
             if (!Utils.isEmpty(envSet)) {
                 for (String strEnv : envSet) {
                     if ((strEnv != null) && (strEnv.equalsIgnoreCase(envParamValue))) {
@@ -749,14 +766,30 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
                     }
                 }
             } else {
-                String strIP;
-                Set<String> ipSet = env.get(REQUEST_IP);
-                if (Utils.isEmpty(ipSet) && token != null) {
-                    strIP = token.getIPAddress().getHostAddress();
-                } else if (!Utils.isEmpty(ipSet)) {
-                    strIP = ipSet.iterator().next();
-                } else {
-                    throw new EntitlementException(CLIENT_IP_EMPTY);
+
+                String strIP = null;
+                Object object = env.get(REQUEST_IP);
+                if (object instanceof Set) {
+                    Set ipSet = (Set) object;
+                    if ( ipSet.isEmpty() ) {
+                        if (token != null) {
+                            strIP = token.getIPAddress().getHostAddress();
+                        } else {
+                            throw new EntitlementException(CLIENT_IP_EMPTY);
+                        }
+                    } else {
+                        Iterator names = ipSet.iterator();
+                        strIP = (String) names.next();
+                    }
+                } else if (object instanceof String) {
+                    strIP = (String) object;
+                    if (StringUtils.isBlank(strIP)) {
+                        if (token != null) {
+                            strIP = token.getIPAddress().getHostAddress();
+                        } else {
+                            throw new EntitlementException(CLIENT_IP_EMPTY);
+                        }
+                    }
                 }
 
                 long requestIpV4 = 0;

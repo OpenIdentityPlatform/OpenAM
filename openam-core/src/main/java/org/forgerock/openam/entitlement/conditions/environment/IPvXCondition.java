@@ -21,13 +21,12 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
+import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUTATION_FAILED;
+import static com.sun.identity.entitlement.EntitlementException.END_IP_BEFORE_START_IP;
+import static com.sun.identity.entitlement.EntitlementException.INVALID_PROPERTY_VALUE;
+import static com.sun.identity.entitlement.EntitlementException.IP_CONDITION_CONFIGURATION_REQUIRED;
+import static com.sun.identity.entitlement.EntitlementException.PAIR_PROPERTY_NOT_DEFINED;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import javax.security.auth.Subject;
 import java.net.InetAddress;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -37,9 +36,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import static com.sun.identity.entitlement.EntitlementException.*;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
+import javax.security.auth.Subject;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.DNS_NAME;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.END_IP;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.IP_RANGE;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_DNS_NAME;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_IP;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.START_IP;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Abstract Base Class for {@link IPv4Condition} and {@link IPv6Condition}.
@@ -336,22 +344,27 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
      *            {@code REQUEST_IP} parameter differs depending upon invocation path. It will be a {@code String} when
      *            invoked by the agents, but it will be a {@code Set<String>} when invoked via the DecisionResource
      *            (GET ws/1/entitlement/entitlements).
-     * @return The IP that was used.
+     * @return The IP that was used, can return null if no IP found.
      */
-    public String getRequestIp(Map<String, Set<String>> env) {
+    @SuppressWarnings("unchecked")
+    public String getRequestIp(Map env) {
         String ip = null;
-        Set<String> requestIpSet = env.get(REQUEST_IP);
-        if (requestIpSet != null && !requestIpSet.isEmpty()) {
-            if (requestIpSet.size() > 1) {
-                debugWarning("Environment map {0} cardinality >1. Using first from: {1}", REQUEST_IP, requestIpSet);
+        final Object requestIp = env.get(REQUEST_IP);
+
+        if (requestIp instanceof Set) {
+            Set<String> requestIpSet =  (Set<String>) requestIp;
+            if (!requestIpSet.isEmpty()) {
+                if (requestIpSet.size() > 1) {
+                    debugWarning("Environment map {0} cardinality > 1. Using first from: {1}",
+                            REQUEST_IP, requestIpSet);
+                }
+                ip = requestIpSet.iterator().next();
             }
-            String entry = requestIpSet.iterator().next();
-            if (entry != null) { // Set implementations can permit null values
-                ip = entry;
-            } else {
-                debugWarning("Environment map {0} entry has null value", REQUEST_IP);
-            }
-        } else {
+        } else if (requestIp instanceof String) {
+            ip = (String) requestIp;
+        }
+
+        if (StringUtils.isBlank(ip)) {
             debugWarning("Environment map {0} is null or empty", REQUEST_IP);
         }
         return ip;

@@ -338,9 +338,18 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
         return new ConditionDecision(allowed, Collections.<String, Set<String>>emptyMap(), timeToLive);
     }
 
-    private <T> T getValue(Set<T> values) {
-        if (values != null && values.iterator().hasNext()) {
-            return values.iterator().next();
+    /**
+     * @see PolicyRequestHandler#convertEnvParams
+     */
+    @SuppressWarnings("unchecked")
+    private String getValue(Object value) {
+
+        if (value instanceof String) {
+            return (String) value; //REQUEST_TIME_ZONE
+        } else if (value instanceof Set) { //general case
+            return ((Set<String>) value).iterator().next();
+        } else if (value instanceof Long) { //REQUEST_TIME
+            return String.valueOf(value);
         }
 
         return null;
@@ -502,6 +511,7 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
         jo.put(END_DAY, endDay);
         jo.put(START_DATE, startDate);
         jo.put(END_DATE, endDate);
+        jo.put(ENFORCEMENT_TIME_ZONE, enforcementTimeZone);
         return jo;
     }
 

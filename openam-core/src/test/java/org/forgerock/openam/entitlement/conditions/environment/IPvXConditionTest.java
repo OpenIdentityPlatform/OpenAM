@@ -19,27 +19,31 @@ package org.forgerock.openam.entitlement.conditions.environment;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import javax.security.auth.Subject;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
+import javax.security.auth.Subject;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import static org.fest.assertions.Assertions.assertThat;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.fluent.JsonValue.array;
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_DNS_NAME;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_IP;
 import static org.forgerock.openam.utils.CollectionUtils.asList;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.testng.AssertJUnit.assertEquals;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 public abstract class IPvXConditionTest<T extends Comparable<T>> {
 
@@ -389,6 +393,52 @@ public abstract class IPvXConditionTest<T extends Comparable<T>> {
         // * ipStart and ipEnd
         // * ipRanges with at least one entry
         // * dnsName with at least one entry
+    }
+
+    @Test
+    public void shouldReturnRequestIpValueString() {
+
+        //given
+        String input = "192.168.0.1";
+        Map testMap = new HashMap();
+        testMap.put(REQUEST_IP, input);
+
+        //when
+        String result = condition.getRequestIp(testMap);
+
+        //then
+        assertEquals(input, result);
+    }
+
+    @Test
+    public void shouldReturnRequestIpValueSet() {
+        //given
+        Set<String> input = new HashSet<String>();
+        input.add("192.168.0.1");
+        Map testMap = new HashMap();
+        testMap.put(REQUEST_IP, input);
+
+        //when
+        String result = condition.getRequestIp(testMap);
+
+        //then
+        assertEquals("192.168.0.1", result);
+    }
+
+    @Test
+    public void shouldReturnRequestIpValueSetFirstEntry() {
+        //given
+        Set<String> input = new LinkedHashSet<String>();
+        input.add("192.168.0.1");
+        input.add("192.168.0.2");
+        Map testMap = new HashMap();
+        testMap.put(REQUEST_IP, input);
+
+        //when
+        String result = condition.getRequestIp(testMap);
+
+        //then
+        assertEquals("192.168.0.1", result);
     }
 
 }
