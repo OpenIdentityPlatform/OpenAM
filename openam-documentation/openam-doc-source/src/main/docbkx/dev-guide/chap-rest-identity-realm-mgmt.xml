@@ -1530,18 +1530,18 @@ $ <userinput>curl \
  https://openam.example.com:8443/openam/json/realms/myRealm</userinput>
 <computeroutput>{
     "serviceNames":[
-                  "sunAMAuthHOTPService",
-                  "iPlanetAMAuthConfiguration",
-                  "sunAMAuthFederationService",
-                  "sunIdentityRepositoryService",
-                  "iPlanetAMPolicyConfigService",
-                  "iPlanetAMAuthService",
-                  "iPlanetAMAuthLDAPService",
-                  "sunAMAuthDataStoreService",
-                  "sunAMAuthSAEService",
-                  "sunAMDelegationService",
-                  "sunAMAuthWSSAuthModuleService",
-                  "iPlanetAMAuthOATHService"
+      "sunAMAuthHOTPService",
+      "iPlanetAMAuthConfiguration",
+      "sunAMAuthFederationService",
+      "sunIdentityRepositoryService",
+      "iPlanetAMPolicyConfigService",
+      "iPlanetAMAuthService",
+      "iPlanetAMAuthLDAPService",
+      "sunAMAuthDataStoreService",
+      "sunAMAuthSAEService",
+      "sunAMDelegationService",
+      "sunAMAuthWSSAuthModuleService",
+      "iPlanetAMAuthOATHService"
     ]
 }</computeroutput>
     </screen>
@@ -1558,13 +1558,10 @@ $ <userinput>curl \
     <literal>realms</literal> endpoint.
    </para>
    <screen>
-    <userinput>
-     curl \
-     --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
-     https://openam.example.com:8443/openam/json/realms/toplevelrealm
-    </userinput>
-    <computeroutput>
-     {
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/realms/toplevelrealm</userinput>
+<computeroutput>{
       "serviceNames" : [
        "sunAMAuthFederationService",
        "sunEntitlementIndexes",
@@ -1582,9 +1579,39 @@ $ <userinput>curl \
        "iPlanetAMPolicyService",
        "sunAMAuthSAEService",
        "AgentService" ]
-     }
-    </computeroutput>
+}</computeroutput>
    </screen>
+
+   <para>
+    If the realm you want to read is not an immediate subrealm
+    of the top-level realm,
+    specify its parent realm to the left
+    of <literal>realms</literal> in the URL, and specify
+    the realm's final qualifier to the right of <literal>realms</literal>. For example,
+    to read the <literal>/myRealm/myRealmsChildRealm</literal> realm:
+   </para>
+   <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/myRealm/realms/myRealmsChildRealm</userinput>
+<computeroutput>{
+      "serviceNames" : [
+       "sunAMAuthHOTPService",
+       "iPlanetAMAuthConfiguration",
+       "sunAMAuthFederationService",
+       "sunIdentityRepositoryService",
+       "iPlanetAMPolicyConfigService",
+       "iPlanetAMAuthService",
+       "iPlanetAMAuthLDAPService",
+       "sunAMAuthDataStoreService",
+       "sunAMAuthSAEService",
+       "sunAMDelegationService",
+       "sunAMAuthWSSAuthModuleService",
+       "iPlanetAMAuthOATHService"
+      ]
+}</computeroutput>
+   </screen>
+
    </section>
 
   <section xml:id="rest-api-list-realm">
@@ -1598,15 +1625,15 @@ $ <userinput>curl \
    </para>
 
    <screen>
-    $ <userinput>curl \
-    --header "iPlanetDirectoryPro: AQIC5..." \
-    https://openam.example.com:8443/openam/json/realms?_queryFilter=true</userinput>
-    <computeroutput>{
+ $ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/realms?_queryFilter=true</userinput>
+ <computeroutput>{
      "result" : [ "/", "/myRealm", "/myRealm/myRealmsChildRealm" ],
      "resultCount" : 3,
      "pagedResultsCookie" : null,
      "remainingPagedResults" : -1
-     }</computeroutput>
+ }</computeroutput>
    </screen>
 
    <para>
@@ -1616,16 +1643,16 @@ $ <userinput>curl \
    </para>
 
    <screen>
-    $ <userinput>curl \
-    --header "iPlanetDirectoryPro: AQIC5..." \
-    https://openam.example.com:8443/openam/json/myRealm/realms?_queryFilter=true</userinput>
-    <computeroutput>{
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/myRealm/realms?_queryFilter=true</userinput>
+ <computeroutput>{
      "result" : [ "/myRealm", "/myRealm/myRealmsChildRealm" ],
      "resultCount" : 2,
      "pagedResultsCookie" : null,
      "remainingPagedResults" : -1
-     }</computeroutput>
-   </screen>
+ }</computeroutput>
+ </screen>
 
   </section>
 
@@ -1684,6 +1711,23 @@ $ <userinput>curl \
     failure, OpenAM returns a JSON representation of the error including the
     <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
     xlink:show="new">HTTP status code</link>.</para>
+
+   <para>
+    If the realm you want to delete is not an immediate subrealm
+    of the top-level realm,
+    specify its parent realm to the left
+    of <literal>realms</literal> in the URL, and specify
+    the realm's final qualifier to the
+    right of <literal>realms</literal>. For example,
+    to delete the <literal>/myRealm/myRealmsChildRealm</literal> realm:
+   </para>
+   <screen>
+ $ <userinput>curl \
+ --request DELETE
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/myRealm/realms/myRealmsChildRealm</userinput>
+ <computeroutput>{ "success":"true" }</computeroutput>
+   </screen>
    
    </section>
 
