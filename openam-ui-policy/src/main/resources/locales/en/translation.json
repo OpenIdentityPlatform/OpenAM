@@ -433,7 +433,7 @@
               }
           },
           "NONE": {
-              "title": "Any User",
+              "title": "Never Match",
               "props": {}
           }
       },
