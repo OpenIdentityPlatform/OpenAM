@@ -305,7 +305,7 @@
                           syntax="string"
                           i18nKey="a731">
                       <DefaultValues>
-                          <Value>HS256</Value>
+                          <Value>RS256</Value>
                       </DefaultValues>
                   </AttributeSchema>
                   <!--
