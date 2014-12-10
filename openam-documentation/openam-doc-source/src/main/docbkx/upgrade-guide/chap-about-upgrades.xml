@@ -263,8 +263,8 @@
      server installation, such as the following.</para>
 
      <listitem>
-      <para>Plugin and extensions such as custom authentication modules,
-      response providers, post authentication plugins, SAML 2.0 attribute
+      <para>Plugins and extensions such as custom authentication modules,
+      response attribute providers, post authentication plugins, SAML 2.0 attribute
       mappers, and OAuth 2.0 scope implementations</para>
 
       <para>These are described in the <link xlink:show="new"
