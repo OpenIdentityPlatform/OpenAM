@@ -33,7 +33,7 @@
                     <div class="authn-border"></div>
                     <span class="authn-header">or login with:</span>
                     {{#each socialImplementations}}    
-                        <a href="/openam/XUI/#login{{../../auth.realm}}&service={{authnChain}}" title="{{displayName}}" ><span><img src="{{iconPath}}" /></span></a>
+                        <a href="#login{{../../auth.realm}}&service={{authnChain}}" title="{{displayName}}" ><span><img src="{{iconPath}}" /></span></a>
                     {{/each}}
                 </div>
             {{/if}}
