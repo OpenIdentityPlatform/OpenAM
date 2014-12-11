@@ -30,7 +30,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Class to represent subject result and advices
+ * Class to represent {@link EntitlementSubject} evaluation match result and - if applicable - its advices.
+ *
+ * @supported.all.api
  */
 public class SubjectDecision {
 
@@ -38,28 +40,29 @@ public class SubjectDecision {
     private Map<String, Set<String>> advices;
 
     /**
-     * Constructs an instance of <code>SubjectDecision</code>
-     * @param satisfied boolean result of subject decision
-     * @param advices advice map of subject decision
+     * Constructs an instance of <code>SubjectDecision</code>.
+     *
+     * @param satisfied Result of this <code>SubjectDecision</code>.
+     * @param advices advice map of this <code>SubjectDecision</code>.
      */
-    public SubjectDecision(
-            boolean satisfied,
-            Map<String, Set<String>> advices) {
+    public SubjectDecision(boolean satisfied, Map<String, Set<String>> advices) {
         this.satisfied = satisfied;
         this.advices = advices;
     }
 
     /**
-     * Returns boolean result of subject decsion
-     * @return boolean result of subject decision
+     * Whether this <code>SubjectDecision</code> is satisfied.
+     *
+     * @return <code>true</code> if <code>SubjectDecision</code> is fulfilled.
      */
     public boolean isSatisfied() {
         return satisfied;
     }
 
     /**
-     * Returns advices of subject decsion
-     * @return advices of subject decision
+     * Advices associated with this <code>SubjectDecision</code>.
+     *
+     * @return advices of <code>ConditionDecision</code>.
      */
     Map<String, Set<String>> getAdvices() {
         return advices;

@@ -37,7 +37,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Class to represent condition result and - if applicable - its advices.
+ * Class to represent {@link EntitlementCondition} evaluation match result and - if applicable - its advices.
+ *
+ * @supported.all.api
  */
 public class ConditionDecision {
 
@@ -48,8 +50,8 @@ public class ConditionDecision {
     /**
      * Constructs an instance of <code>ConditionDecision</code>.
      *
-     * @param satisfied Result of condition decision.
-     * @param advices Advice map of condition decision.
+     * @param satisfied result of this <code>ConditionDecision</code>.
+     * @param advices Advice map of this <code>ConditionDecision</code>.
      */
     public ConditionDecision(boolean satisfied, Map<String, Set<String>> advices) {
         this.satisfied = satisfied;
@@ -59,9 +61,9 @@ public class ConditionDecision {
     /**
      * Constructs an instance of <code>ConditionDecision</code>.
      *
-     * @param satisfied Result of condition decision.
-     * @param advices Advice map of condition decision.
-     * @param ttl The TTL of the decision.
+     * @param satisfied Result of this <code>ConditionDecision</code>.
+     * @param advices Advice map of this <code>ConditionDecision</code>.
+     * @param ttl The TTL of this <code>ConditionDecision</code>.
      */
     public ConditionDecision(boolean satisfied, Map<String, Set<String>> advices, long ttl) {
         this(satisfied, advices);
@@ -69,9 +71,9 @@ public class ConditionDecision {
     }
 
     /**
-     * Whether the condition is satisfied.
+     * Whether this <code>ConditionDecision</code> is satisfied.
      *
-     * @return <code>true</code> if condition is fulfilled.
+     * @return <code>true</code> if <code>ConditionDecision</code> is fulfilled.
      */
     public boolean isSatisfied() {
         return satisfied;
@@ -87,26 +89,26 @@ public class ConditionDecision {
     }
 
     /**
-     * Query for a list of advices associated with this condition decision.
+     * Advices associated with this <code>ConditionDecision</code>.
      *
-     * @return advices of condition decision.
+     * @return advices of <code>ConditionDecision</code>.
      */
     public Map<String, Set<String>> getAdvices() {
         return Collections.unmodifiableMap(advices);
     }
 
     /**
-     * Clears the current advices associated with this decision.
+     * Clears the current advices associated with this <code>ConditionDecision</code>.
      */
     public void clearAdvices() {
         advices.clear();
     }
 
     /**
-     * Adds an advice (represented as a ConditionDecision) to this
-     * ConditionDecision.
+     * Adds an advice (from another <code>ConditionDecision</code>) to this <code>ConditionDecision</code>.
      *
-     * @param decision The decision whose advices to add.
+     * @param decision The <code>ConditionDecision</code> whose advices should be added to this
+     *                 <code>ConditionDecision</code>.
      */
     public void addAdvices(ConditionDecision decision) {
         if (decision != null) {
@@ -121,7 +123,7 @@ public class ConditionDecision {
     }
 
     /**
-     * Returns the time to live (TTL) of this decision.
+     * Returns the time to live (TTL) of this <code>ConditionDecision</code>.
      *
      * @return The TTL time in ms.
      */

@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions copyright 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -35,7 +35,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Interface specification for entitlement <code>EntitlementCondition</code>
+ * Encapsulates a Strategy to decide if a {@link com.sun.identity.entitlement.Privilege} applies to a given request.
+ *
+ * @supported.all.api
  */
 public interface EntitlementCondition {
 
@@ -61,14 +63,16 @@ public interface EntitlementCondition {
     void init(Map<String, Set<String>> parameters);
 
     /**
-     * Sets state of the object
-     * @param state State of the object encoded as string
+     * Sets state of this object from a JSON string.
+     *
+     * @param state State of the object encoded as a JSON string
      */
     void setState(String state);
 
     /**
-     * Returns state of the object
-     * @return state of the object encoded as string
+     * Returns state of the object encoded as a JSON string.
+     *
+     * @return state of the object encoded as a JSON string.
      */
     String getState();
 
@@ -83,12 +87,12 @@ public interface EntitlementCondition {
     /**
      * Returns condition decision.
      *
-     * @param realm Realm Name
+     * @param realm Realm Name.
      * @param subject Subject who is under evaluation.
      * @param resourceName Resource name.
      * @param environment Environment parameters.
-     * @return resulting condition decision
-     * @throws EntitlementException if can not get condition decision.
+     * @return resulting condition decision.
+     * @throws EntitlementException if cannot get condition decision.
      */
     ConditionDecision evaluate(
         String realm,
