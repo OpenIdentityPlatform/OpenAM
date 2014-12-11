@@ -2072,7 +2072,7 @@
                     <additionalJOption>${javadoc.options}</additionalJOption>
                     <detectLinks>true</detectLinks>
                     <bottom>
-                        <![CDATA[Copyright &#169; 2010-2013, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]>
+                        <![CDATA[Copyright &#169; 2010-2014, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]>
                     </bottom>
                     <links>
                         <link>http://docs.oracle.com/javase/6/docs/api</link>
@@ -2103,7 +2103,7 @@
                             <goal>aggregate-jar</goal>
                         </goals>
                         <configuration>
-                            <doctitle>OpenAM ${project.version} Public API JavaDoc</doctitle>
+                            <doctitle>OpenAM ${project.version} Public API Javadoc</doctitle>
                             <outputDirectory>${project.build.directory}/site/apidocs</outputDirectory>
                             <finalName>openam-${project.version}-public</finalName>
                             <subpackages>
