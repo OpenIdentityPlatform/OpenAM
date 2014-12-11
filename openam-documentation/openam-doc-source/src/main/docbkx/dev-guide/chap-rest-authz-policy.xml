@@ -29,7 +29,8 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>RESTful Authorization and Policy Management Services</title>
 
@@ -1265,6 +1266,8 @@ $ <userinput>curl \
       in the URL used when creating the policy by HTTP PUT
       or in the body when creating the policy by HTTP POST.
      </para>
+
+
     </listitem>
    </varlistentry>
 
@@ -1717,6 +1720,12 @@ $ <userinput>curl \
     The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
     for a user who has access to perform the operation.
    </para>
+
+   <xinclude:include href="../shared/para-special-characters.xml">
+    <xinclude:fallback>
+     Failed to include para-special-characters
+    </xinclude:fallback>
+   </xinclude:include>
 
    <programlisting>
 $ <userinput>curl \
@@ -2694,6 +2703,12 @@ $ <userinput>curl \
    <literal>false</literal>, and <literal>null</literal>).
   </para>
 
+  <xinclude:include href="../shared/para-special-characters.xml">
+   <xinclude:fallback>
+    Failed to include para-special-characters
+   </xinclude:fallback>
+  </xinclude:include>
+
   <programlisting language="javascript">
 {
   "name": "application name string",
@@ -2979,6 +2994,12 @@ $ <userinput>curl \
     The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
     for a user who has access to perform the operation.
    </para>
+
+   <xinclude:include href="../shared/para-special-characters.xml">
+    <xinclude:fallback>
+     Failed to include para-special-characters
+    </xinclude:fallback>
+   </xinclude:include>
 
    <programlisting>
 $ <userinput>curl \
@@ -4478,6 +4499,12 @@ $ <userinput>curl \
     and the name in the resource matching the name in the path,
     or perform an HTTP POST with the name to use specified in the resource.
    </para>
+
+   <xinclude:include href="../shared/para-special-characters.xml">
+    <xinclude:fallback>
+     Failed to include para-special-characters
+    </xinclude:fallback>
+   </xinclude:include>
 
    <para>
     The HTTP PUT form includes the referral definition as the JSON resource data,
