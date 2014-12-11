@@ -47,7 +47,7 @@ define("config/process/PolicyConfig", [
             ],
             processDescription: function (event, conf) {
                 var realm = conf.globalData.auth.realm;
-                window.location.href = "/openam/realm/RMRealm?RMRealm.tblDataActionHref=" + encodeURIComponent(realm);
+                window.location.href = "../realm/RMRealm?RMRealm.tblDataActionHref=" + encodeURIComponent(realm);
             }
         },
         {
