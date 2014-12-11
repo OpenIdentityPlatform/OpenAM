@@ -35,6 +35,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
+import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -299,6 +300,7 @@ public class TokenResource implements CollectionResourceProvider {
                 uid = getUid(context);
                 if (!uid.equals(adminUserId)) {
                     query.put(USERNAME, uid.getName());
+                    query.put(REALM, DNMapper.orgNameToRealmName(uid.getRealm()));
                 } else {
                     query.put(USERNAME, "*");
                 }
