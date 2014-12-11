@@ -24,7 +24,7 @@
  *
  * $Id: PolicyEvaluator.java,v 1.19 2010/01/14 23:18:35 dillidorai Exp $
  *
- * Portions copyright 2011-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.policy;
 
@@ -73,7 +73,9 @@ import static org.forgerock.openam.utils.CollectionUtils.asSet;
  * The class <code>PolicyEvaluator</code> evaluates policies
  * and provides policy decisions.
  * @supported.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class PolicyEvaluator {
 
     /**

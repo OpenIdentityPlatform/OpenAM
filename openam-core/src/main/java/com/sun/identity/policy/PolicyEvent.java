@@ -24,6 +24,7 @@
  *
  * $Id: PolicyEvent.java,v 1.2 2008/06/25 05:43:44 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -37,7 +38,9 @@ import java.util.Set;
  *  @see com.sun.identity.policy.interfaces.PolicyListener
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class PolicyEvent {
 
     /**

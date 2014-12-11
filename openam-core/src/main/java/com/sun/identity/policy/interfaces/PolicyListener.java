@@ -24,6 +24,7 @@
  *
  * $Id: PolicyListener.java,v 1.2 2008/06/25 05:43:47 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -40,7 +41,9 @@ import com.sun.identity.policy.PolicyEvent;
  * @see 
  * com.sun.identity.policy.PolicyEvaluator#addPolicyListener(PolicyListener)
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public interface PolicyListener {
 
     /**

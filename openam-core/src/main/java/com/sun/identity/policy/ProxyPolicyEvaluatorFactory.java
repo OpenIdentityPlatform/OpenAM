@@ -24,6 +24,7 @@
  *
  * $Id: ProxyPolicyEvaluatorFactory.java,v 1.2 2008/06/25 05:43:44 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -38,7 +39,9 @@ import com.iplanet.am.util.Cache;
  * This is a singleton.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class ProxyPolicyEvaluatorFactory {
 
     private static final int CACHE_SIZE = 100;

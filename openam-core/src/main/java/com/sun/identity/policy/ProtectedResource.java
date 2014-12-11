@@ -24,6 +24,7 @@
  *
  * $Id: ProtectedResource.java,v 1.2 2008/06/25 05:43:44 qcheng Exp $
  *
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 
 
@@ -36,7 +37,9 @@ import java.util.Set;
  * for a given user
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class ProtectedResource {
 
     private String resourceName;

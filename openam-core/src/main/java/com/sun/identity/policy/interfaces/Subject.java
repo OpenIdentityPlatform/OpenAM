@@ -24,6 +24,7 @@
  *
  * $Id: Subject.java,v 1.3 2009/05/05 18:27:47 mrudul_uchil Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -56,7 +57,9 @@ import com.sun.identity.policy.ValidValues;
  * {@link com.sun.identity.policy.PolicyEvaluator PolicyEvaluator}.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0, use {@link com.sun.identity.entitlement.EntitlementSubject}
  */
+@Deprecated
 public interface Subject extends Cloneable {
 
     /**

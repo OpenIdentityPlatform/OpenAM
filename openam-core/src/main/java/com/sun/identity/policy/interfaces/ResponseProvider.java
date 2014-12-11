@@ -24,6 +24,7 @@
  *
  * $Id: ResponseProvider.java,v 1.5 2008/08/19 19:09:16 veiming Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -79,8 +80,9 @@ import java.util.Set;
  * All <code>ResponseProvider</code> implementations should have a public no 
  * argument constructor.
  * @supported.all.api
- *
+ * @deprecated since 12.0.0, use {@link com.sun.identity.entitlement.ResourceAttribute}
  */
+@Deprecated
 public interface ResponseProvider extends Cloneable {
 
     /** 

@@ -24,10 +24,7 @@
  *
  * $Id: ConditionTypeManager.java,v 1.3 2008/06/25 05:43:43 qcheng Exp $
  *
- */
-
-/**
- * Portions copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.policy;
@@ -48,7 +45,9 @@ import com.sun.identity.shared.locale.Locale;
  * </code> objects, and to obtain a factory object for it.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class ConditionTypeManager {
 
     private static String CONDITION = "Condition";

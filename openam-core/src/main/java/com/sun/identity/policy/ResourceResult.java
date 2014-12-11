@@ -24,10 +24,7 @@
  *
  * $Id: ResourceResult.java,v 1.5 2009/10/12 17:53:05 dillidorai Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.policy;
 
@@ -43,7 +40,9 @@ import com.sun.identity.policy.interfaces.ResourceName;
  * Class that encapsulates a tree of resource names, with each node 
  *  having an associated policy decision. 
  * @supported.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class ResourceResult {
 
     /**

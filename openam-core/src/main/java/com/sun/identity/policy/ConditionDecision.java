@@ -24,6 +24,7 @@
  *
  * $Id: ConditionDecision.java,v 1.2 2008/06/25 05:43:43 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -38,7 +39,9 @@ import java.util.HashMap;
  * the evaluation of a condition. 
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class ConditionDecision {
 
     private boolean allowed;

@@ -24,10 +24,7 @@
  *
  * $Id: Policy.java,v 1.9 2010/01/10 01:19:35 veiming Exp $
  *
- */
-
-/*
- * Portions Copyright 2011-2014 ForgeRock, AS.
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.policy;
 
@@ -59,7 +56,9 @@ import com.sun.identity.policy.plugins.OrgReferral;
  * enforcement points only after it is saved in data store. 
  *
  * @supported.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class Policy implements Cloneable {
 
     static final String REFERRAL_POLICY = "referralPolicy";
