@@ -111,7 +111,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
             requirementList.push(requirements);
         } else if (requirements.hasOwnProperty("tokenId")) {
             _.each(configuration.globalData.auth.cookieDomains,function(cookieDomain){
-                cookieHelper.setCookie(configuration.globalData.auth.cookieName, requirements.tokenId, "", "/", cookieDomain);
+                cookieHelper.setCookie(configuration.globalData.auth.cookieName, requirements.tokenId, "", "/", cookieDomain, configuration.globalData.secureCookie);
             });
         }
     };
