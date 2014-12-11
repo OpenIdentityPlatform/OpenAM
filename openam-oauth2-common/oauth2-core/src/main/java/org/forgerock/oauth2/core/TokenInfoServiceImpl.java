@@ -24,8 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.forgerock.oauth2.core.AccessTokenVerifier.HEADER;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.QUERY_PARAM;
 
 /**
  * Service to return the full information of a OAuth2 token.
@@ -37,6 +41,8 @@ public class TokenInfoServiceImpl implements TokenInfoService {
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final TokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final AccessTokenVerifier headerTokenVerifier;
+    private final AccessTokenVerifier queryTokenVerifier;
 
     /**
      * Constructs a new TokenInfoServiceImpl.
@@ -45,9 +51,14 @@ public class TokenInfoServiceImpl implements TokenInfoService {
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      */
     @Inject
-    public TokenInfoServiceImpl(TokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory) {
+    public TokenInfoServiceImpl(TokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
+            @Named(HEADER) AccessTokenVerifier headerTokenVerifier,
+            @Named(QUERY_PARAM) AccessTokenVerifier queryTokenVerifier) {
+
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
+        this.headerTokenVerifier = headerTokenVerifier;
+        this.queryTokenVerifier = queryTokenVerifier;
     }
 
     /**
@@ -56,38 +67,31 @@ public class TokenInfoServiceImpl implements TokenInfoService {
     public JsonValue getTokenInfo(OAuth2Request request) throws InvalidRequestException, NotFoundException,
             ServerException {
 
+        final AccessTokenVerifier.TokenState headerToken = headerTokenVerifier.verify(request);
+        final AccessTokenVerifier.TokenState queryToken = queryTokenVerifier.verify(request);
         final Map<String, Object> response = new HashMap<String, Object>();
 
-        final String token = request.getParameter("access_token");
-
-        if (token == null) {
-            logger.error("Missing access token in request");
-            throw new InvalidRequestException("Missing access_token");
+        if (!headerToken.isValid() && !queryToken.isValid()) {
+            logger.error("Access Token not valid");
+            throw new InvalidRequestException("Access Token not valid");
+        } else if (headerToken.isValid() && queryToken.isValid()) {
+            logger.error("Access Token provided in both query and header in request");
+            throw new InvalidRequestException("Access Token cannot be provided in both query and header");
         } else {
-            AccessToken accessToken;
+            final String token = headerToken.isValid() ? headerToken.getTokenId() : queryToken.getTokenId();
+            final AccessToken accessToken;
             try {
                 accessToken = tokenStore.readAccessToken(request, token);
             } catch (Exception e) {
                 throw new NotFoundException(NotFoundException.ACCESS_TOKEN);
             }
 
-            if (accessToken == null) {
-                logger.error("Unable to read token from token store for id: " + token);
-                throw new NotFoundException(NotFoundException.ACCESS_TOKEN);
-            } else {
+            logger.trace("In Validator resource - got token = " + accessToken);
 
-                logger.trace("In Validator resource - got token = " + accessToken);
-
-                if (accessToken.isExpired()) {
-                    logger.error("Should response and refresh the token");
-                    throw new NotFoundException(NotFoundException.ACCESS_TOKEN);
-                }
-
-                final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
-                final Map<String, Object> scopeEvaluation = providerSettings.evaluateScope(accessToken);
-                response.putAll(accessToken.getTokenInfo());
-                response.putAll(scopeEvaluation);
-            }
+            final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+            final Map<String, Object> scopeEvaluation = providerSettings.evaluateScope(accessToken);
+            response.putAll(accessToken.getTokenInfo());
+            response.putAll(scopeEvaluation);
 
             return new JsonValue(response);
         }

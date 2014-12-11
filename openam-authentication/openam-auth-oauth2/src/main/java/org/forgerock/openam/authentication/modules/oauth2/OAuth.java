@@ -309,7 +309,9 @@ public class OAuth extends AMLoginModule {
                     if (user == null && config.getCreateAccountFlag()) {
                         if (config.getPromptPasswordFlag()) {
                             setUserSessionProperty(PROFILE_SERVICE_RESPONSE, profileSvcResponse);
-                            setUserSessionProperty(OPENID_TOKEN, idToken);
+                            if (config.isOpenIDConnect()) {
+                                setUserSessionProperty(OPENID_TOKEN, idToken);
+                            }
                             return SET_PASSWORD_STATE;
                         } else {
                             authenticatedUser = provisionAccountNow(accountProvider, realm, profileSvcResponse,

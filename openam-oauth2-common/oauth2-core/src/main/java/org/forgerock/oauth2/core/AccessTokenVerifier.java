@@ -34,6 +34,7 @@ public abstract class AccessTokenVerifier {
 
     public static final String HEADER = "header";
     public static final String FORM_BODY = "form-body";
+    public static final String QUERY_PARAM = "query-param";
     protected final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private static final TokenState INVALID_TOKEN = new TokenState(null);
 

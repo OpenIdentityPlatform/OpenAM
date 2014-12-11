@@ -56,6 +56,7 @@ import org.forgerock.oauth2.restlet.AuthorizeRequestHook;
 import org.forgerock.oauth2.restlet.RestletFormBodyAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.RestletHeaderAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.RestletOAuth2RequestFactory;
+import org.forgerock.oauth2.restlet.RestletQueryParameterAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.TokenRequestHook;
 import org.forgerock.openam.oauth2.ClientAuthenticatorImpl;
 import org.forgerock.openam.oauth2.OpenAMClientDAO;
@@ -121,6 +122,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         bind(AccessTokenVerifier.class).to(RestletHeaderAccessTokenVerifier.class);
         bind(AccessTokenVerifier.class).annotatedWith(named(HEADER)).to(RestletHeaderAccessTokenVerifier.class);
         bind(AccessTokenVerifier.class).annotatedWith(named(FORM_BODY)).to(RestletFormBodyAccessTokenVerifier.class);
+        bind(AccessTokenVerifier.class).annotatedWith(named(QUERY_PARAM)).to(RestletQueryParameterAccessTokenVerifier.class);
         bind(OpenIDConnectProvider.class).to(OpenAMOpenIDConnectProvider.class);
         bind(ClientDAO.class).to(OpenAMClientDAO.class);
         bind(OpenIdConnectClientRegistrationService.class).to(OpenAMOpenIdConnectClientRegistrationService.class);
