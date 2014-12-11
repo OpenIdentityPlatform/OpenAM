@@ -50,17 +50,31 @@
    </author>
    <author>
     <personname>
-     <firstname>Peter </firstname><surname>Major</surname>
+     <firstname>David </firstname><surname>Goldsmith</surname>
+    </personname>
+   </author>
+   <author>
+    <personname>
+     <firstname>Gene </firstname><surname>Hirayama</surname>
     </personname>
    </author>
    <author>
     <personname>
      <firstname>Mike </firstname><surname>Jang</surname>
     </personname>
-
-    <xinclude:include href="../shared/affiliation-fr.xml"/>
-
    </author>
+   <author>
+    <personname>
+     <firstname>Chris </firstname><surname>Lee</surname>
+    </personname>
+   </author>
+   <author>
+    <personname>
+     <firstname>Peter </firstname><surname>Major</surname>
+    </personname>
+    <xinclude:include href="../shared/affiliation-fr.xml"/>
+   </author>
+
   </authorgroup>
 
   <xinclude:include href="../legal.xml" />
