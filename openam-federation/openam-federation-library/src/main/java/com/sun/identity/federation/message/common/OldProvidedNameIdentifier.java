@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OldProvidedNameIdentifier.java,v 1.2 2008/06/25 05:46:47 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 
@@ -41,7 +41,9 @@ import com.sun.identity.saml.common.SAMLException;
  * object.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class OldProvidedNameIdentifier extends NameIdentifier {
     
     protected int minorVersion = IFSConstants.FF_11_PROTOCOL_MINOR_VERSION;

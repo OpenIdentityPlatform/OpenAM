@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSNameRegistrationResponse.java,v 1.3 2008/06/25 05:46:45 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message;
@@ -37,28 +37,29 @@ import com.sun.identity.saml.common.SAMLResponderException;
 import com.sun.identity.saml.common.SAMLVersionMismatchException;
 import com.sun.identity.saml.protocol.AbstractResponse;
 import com.sun.identity.saml.protocol.Status;
+import com.sun.identity.saml.protocol.StatusCode;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.saml.protocol.StatusCode;
-import java.io.IOException;
 import java.text.ParseException;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Document;
 
 /**
  * This class has methods to create <code>NameRegistrationResponse</code>
  * object.
  *
- *  @supported.all.api
+ * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 
 public class FSNameRegistrationResponse extends AbstractResponse {
     private String providerId = null;

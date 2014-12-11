@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EncryptableNameIdentifier.java,v 1.4 2008/06/25 05:46:46 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message.common;
@@ -44,7 +44,9 @@ import com.sun.identity.shared.xml.XMLUtils;
  * object.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class EncryptableNameIdentifier {
 
     private java.lang.String _nameQualifier = "";

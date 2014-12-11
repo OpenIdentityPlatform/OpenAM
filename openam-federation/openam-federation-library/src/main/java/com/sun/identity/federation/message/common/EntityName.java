@@ -23,20 +23,21 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EntityName.java,v 1.2 2008/06/25 05:46:46 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message.common;
 
 import java.util.List;
-import com.sun.identity.federation.common.IFSConstants;
 
 /**
  * This class has methods to create <code>EntityName</code>
  * object.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class EntityName {
     protected String uri = null;
     protected List otherElements = null;

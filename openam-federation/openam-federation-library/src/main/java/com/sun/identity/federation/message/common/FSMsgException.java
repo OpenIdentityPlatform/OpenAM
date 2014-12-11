@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSMsgException.java,v 1.2 2008/06/25 05:46:47 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message.common;
@@ -35,8 +35,9 @@ import com.sun.identity.federation.common.FSException;
  * during the federation of an identity.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
-
+@Deprecated
 public class FSMsgException extends FSException {
     
     /**

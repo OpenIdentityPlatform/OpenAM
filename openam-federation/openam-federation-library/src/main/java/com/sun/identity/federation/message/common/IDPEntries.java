@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPEntries.java,v 1.2 2008/06/25 05:46:47 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 
@@ -46,8 +46,9 @@ import com.sun.identity.federation.common.IFSConstants;
  * This class defines methods to set/retrieve multiple Identity Providers.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
-
+@Deprecated
 public class IDPEntries {
     private List idpEntryList = null;
     private List otherElements = null;

@@ -23,27 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAuthnRequest.java,v 1.4 2008/07/08 06:03:37 exu Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message;
-
-import java.util.List;
-import java.util.Date;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.text.ParseException;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Document;
 
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
@@ -52,21 +35,34 @@ import com.sun.identity.federation.message.common.FSMsgException;
 import com.sun.identity.federation.message.common.RequestAuthnContext;
 import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLException;
-import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.common.SAMLResponderException;
+import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.protocol.AbstractRequest;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * The class <code>FSAuthnRequest</code> is used to create , parse
  * <code>AuthnRequest</code> object.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class FSAuthnRequest extends AbstractRequest {
     private List extensions = null;
     private boolean isPassive = false;

@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: RequestAuthnContext.java,v 1.2 2008/06/25 05:46:47 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message.common;
@@ -31,7 +31,6 @@ package com.sun.identity.federation.message.common;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.saml.common.SAMLConstants;
-import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.util.ArrayList;
@@ -50,8 +49,9 @@ import org.w3c.dom.NodeList;
  * Authentication Context as part of the <code>FSAuthnRequest</code>.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
-
+@Deprecated
 public class RequestAuthnContext {
 
     private List authnContextClassRefList = null;

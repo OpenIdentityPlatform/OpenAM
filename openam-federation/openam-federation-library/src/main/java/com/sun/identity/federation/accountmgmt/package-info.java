@@ -23,12 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: package-info.java,v 1.4 2008/06/25 05:46:40 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 /**
  * Defines Federation Account Management API.
  *
  * @supported.api
+ * @deprecated since 12.0.0
  */
 package com.sun.identity.federation.accountmgmt;

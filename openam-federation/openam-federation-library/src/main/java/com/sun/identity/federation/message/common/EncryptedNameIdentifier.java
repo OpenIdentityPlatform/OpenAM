@@ -23,16 +23,11 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EncryptedNameIdentifier.java,v 1.4 2008/06/25 05:46:46 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message.common;
 
-import java.security.Key;
-import java.security.PrivateKey;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import com.sun.identity.federation.common.FSException;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
@@ -41,23 +36,28 @@ import com.sun.identity.federation.key.EncInfo;
 import com.sun.identity.federation.key.KeyUtil;
 import com.sun.identity.federation.meta.IDFFMetaException;
 import com.sun.identity.federation.meta.IDFFMetaManager;
-import com.sun.identity.federation.meta.IDFFMetaUtils;
-import com.sun.identity.federation.services.util.FSServiceUtils;
 import com.sun.identity.liberty.ws.meta.jaxb.ProviderDescriptorType;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.shared.encode.Base64;
-import com.sun.identity.xmlenc.XMLEncryptionManager;
-import com.sun.identity.xmlenc.EncryptionException;
 import com.sun.identity.saml.assertion.NameIdentifier;
-import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.common.SAMLException;
+import com.sun.identity.saml.common.SAMLUtils;
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.xmlenc.EncryptionException;
+import com.sun.identity.xmlenc.XMLEncryptionManager;
+import java.security.Key;
+import java.security.PrivateKey;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * This class <code>EncryptedNameIdentifier</code> represents a
  * <code>EncryptableNameIdentifier</code> in an encrypted form.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class EncryptedNameIdentifier {
     
     /**

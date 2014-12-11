@@ -23,11 +23,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: Extension.java,v 1.2 2008/06/25 05:46:46 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message.common;
 
+import com.sun.identity.federation.common.FSUtils;
+import com.sun.identity.federation.common.IFSConstants;
+import com.sun.identity.shared.encode.URLEncDec;
+import com.sun.identity.shared.xml.XMLUtils;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -40,18 +44,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.identity.federation.common.FSUtils;
-import com.sun.identity.federation.common.IFSConstants;
-import com.sun.identity.federation.message.common.FSMsgException;
-import com.sun.identity.shared.encode.URLEncDec;
-import com.sun.identity.shared.xml.XMLUtils;
-
 /**
  * The class <code>Extension</code> is used to create , parse
  * <code>Extension</code> object.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class Extension {
     private List children = null;
     private Map avpairs = null;

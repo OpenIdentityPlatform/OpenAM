@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FederationException.java,v 1.2 2008/06/25 05:46:41 qcheng Exp $
- *
+ * Portions Copyrights 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.common;
@@ -31,7 +31,9 @@ package com.sun.identity.federation.common;
 /**
  * This class is the public exception class that Federation Manager exposes.
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class FederationException extends java.lang.Exception {
 
     /**

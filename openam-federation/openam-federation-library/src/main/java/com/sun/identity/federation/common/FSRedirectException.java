@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSRedirectException.java,v 1.2 2008/06/25 05:46:40 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 /*
@@ -165,7 +165,9 @@ import java.io.StringWriter;
  * @see java.lang.RuntimeException
  *
  * @supported.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class FSRedirectException extends L10NMessageImpl {
     protected String _message = null;
     protected Throwable rootCause = null;

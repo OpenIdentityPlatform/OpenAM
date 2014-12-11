@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: TruncationTransform.java,v 1.2 2008/06/25 05:47:08 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -40,7 +40,9 @@ import com.sun.identity.liberty.ws.authnsvc.AuthnSvcUtils;
  * number of characters have been obtained.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class TruncationTransform extends Transform {
 
 

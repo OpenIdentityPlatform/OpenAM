@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPProvidedNameIdentifier.java,v 1.2 2008/06/25 05:46:47 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message.common;
@@ -40,7 +40,9 @@ import org.w3c.dom.Element;
  * object provided by the Identity Provider.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class IDPProvidedNameIdentifier extends NameIdentifier {
 
     protected int minorVersion = IFSConstants.FF_11_PROTOCOL_MINOR_VERSION;

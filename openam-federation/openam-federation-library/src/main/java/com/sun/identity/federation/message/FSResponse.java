@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSResponse.java,v 1.2 2008/06/25 05:46:45 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message;
@@ -61,7 +61,9 @@ import com.sun.identity.federation.common.IFSConstants;
  * This class contains methods for creating a Liberty <code>Response</code>.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class FSResponse extends Response {
     protected String id = null;
     

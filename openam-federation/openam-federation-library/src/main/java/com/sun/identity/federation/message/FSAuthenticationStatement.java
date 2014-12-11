@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAuthenticationStatement.java,v 1.2 2008/06/25 05:46:43 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message;
@@ -56,7 +56,9 @@ import org.w3c.dom.NodeList;
  * by a  particular means at a particular time.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 
 public class FSAuthenticationStatement extends AuthenticationStatement {
     
