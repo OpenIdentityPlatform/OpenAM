@@ -24,6 +24,7 @@
  *
  * $Id: SubjectTypeManager.java,v 1.5 2009/01/28 05:35:01 ww203982 Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -49,7 +50,9 @@ import com.sun.identity.shared.ldap.util.DN;
  * </code> objects, and to obtain a factory object for it.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class SubjectTypeManager {
 
     private static String SUBJECT = "Subject";

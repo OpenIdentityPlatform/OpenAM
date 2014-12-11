@@ -24,6 +24,7 @@
  *
  * $Id: ResourceMatch.java,v 1.2 2008/06/25 05:43:45 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -34,7 +35,9 @@ package com.sun.identity.policy;
  * of a resource match with respect to Policy.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class ResourceMatch extends Object {
 
     private String resourceMatch;

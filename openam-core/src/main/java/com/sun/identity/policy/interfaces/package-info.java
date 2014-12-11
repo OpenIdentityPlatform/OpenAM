@@ -24,12 +24,14 @@
  *
  * $Id: package-info.java,v 1.2 2008/06/25 05:43:47 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
 /**
- * Provides interfaces for writing custom Policy plugins for Conditons,
- * Subjects, Referrals ResponseProviders and Resources.
+ * Deprecated interfaces for writing custom Policy plugins for Conditions,
+ * Subjects, Referrals, ResponseProviders and Resources.
  * @supported.api
+ * @deprecated since 12.0.0
  */
 package com.sun.identity.policy.interfaces;

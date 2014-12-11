@@ -24,9 +24,7 @@
  *
  * $Id: Rule.java,v 1.8 2009/11/13 23:52:20 asyhuang Exp $
  *
- */
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.policy;
 
@@ -48,7 +46,9 @@ import java.util.Iterator;
  * a resource and a map containing action names and action values.
  *
  * @supported.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class Rule extends Object implements Cloneable {
 
     /** Empty resource name. */

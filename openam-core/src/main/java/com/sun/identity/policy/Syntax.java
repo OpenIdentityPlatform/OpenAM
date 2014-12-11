@@ -24,6 +24,7 @@
  *
  * $Id: Syntax.java,v 1.3 2008/06/25 05:43:45 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -36,7 +37,9 @@ package com.sun.identity.policy;
  * new values can not be created by users
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public final class Syntax {
 
     /**

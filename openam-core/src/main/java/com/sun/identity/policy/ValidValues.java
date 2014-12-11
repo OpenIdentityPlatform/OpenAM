@@ -24,6 +24,7 @@
  *
  * $Id: ValidValues.java,v 1.2 2008/06/25 05:43:45 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -38,7 +39,9 @@ import java.util.*;
  * search limit exceeded.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class ValidValues {
     /**
      * Code used to indicate a successful search

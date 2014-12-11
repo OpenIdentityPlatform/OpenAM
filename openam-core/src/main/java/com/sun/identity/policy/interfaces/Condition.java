@@ -24,10 +24,7 @@
  *
  * $Id: Condition.java,v 1.7 2009/06/19 22:54:46 mrudul_uchil Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2014 ForgeRock, AS.
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.policy.interfaces;
@@ -78,7 +75,9 @@ import java.util.Set;
  *
  * @see com.sun.identity.policy.ConditionDecision
  * @supported.all.api
+ * @deprecated since 12.0.0, use {@link com.sun.identity.entitlement.EntitlementCondition}
  */
+@Deprecated
 public interface Condition extends Cloneable {
 
     /**

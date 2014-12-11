@@ -24,6 +24,7 @@
  *
  * $Id: ResponseProviderTypeManager.java,v 1.3 2008/06/25 05:43:45 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -46,7 +47,9 @@ import com.sun.identity.shared.locale.Locale;
  * </code> objects, and to obtain a factory object for it.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class ResponseProviderTypeManager {
 
     private static String RESPONSE_PROVIDER = "ResponseProvider";

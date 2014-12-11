@@ -24,6 +24,7 @@
  *
  * $Id: ReferralTypeManager.java,v 1.3 2008/06/25 05:43:44 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -49,7 +50,9 @@ import com.sun.identity.shared.locale.Locale;
  * </code> objects
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class ReferralTypeManager {
 
     private static String REFERRAL = "Referral";

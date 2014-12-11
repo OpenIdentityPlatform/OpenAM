@@ -24,10 +24,7 @@
  *
  * $Id: PolicyDecision.java,v 1.3 2008/06/25 05:43:44 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.policy;
 
@@ -46,7 +43,9 @@ import org.w3c.dom.*;
  * evaluation. 
  *
  * @supported.api
- */ 
+ * @deprecated since 12.0.0
+ */
+@Deprecated
 public class PolicyDecision {
 
     static final String POLICY_DECISION = "PolicyDecision";

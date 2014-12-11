@@ -24,7 +24,7 @@
  *
  * $Id: PolicyManager.java,v 1.19 2010/01/25 23:48:15 veiming Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.policy;
 
@@ -92,7 +92,9 @@ import org.w3c.dom.Document;
  * and privileges to the backend datastore.
  *
  * @supported.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public final class PolicyManager {
 
     /**

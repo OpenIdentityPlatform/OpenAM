@@ -24,10 +24,7 @@
  *
  * $Id: ActionDecision.java,v 1.5 2008/06/25 05:43:43 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.policy;
 
@@ -47,7 +44,9 @@ import org.w3c.dom.*;
  * <code>advice</code>. 
  *
  * @supported.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class ActionDecision {
 
     static final String ACTION_DECISION = "ActionDecision";
