@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SubjectDecision.java,v 1.2 2009/12/22 18:00:25 veiming Exp $
+ *
+ * Portions copyright 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 

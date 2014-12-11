@@ -24,7 +24,7 @@
  *
  * $Id: EntitlementException.java,v 1.2 2009/09/03 17:06:23 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions copyright 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
