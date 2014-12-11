@@ -279,12 +279,24 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
             throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, END_DATE, START_DATE);
         }
 
-        if (startDateCal.getTime().getTime() > endDateCal.getTime().getTime()) {
-            if (debug.errorEnabled()) {
-                debug.error("SimpleTimeCondition.validateProperties(): START DATE after END DATE");
+        if (startDate != null) {
+            if (startDateCal == null || endDateCal == null) {
+                if (debug.errorEnabled()) {
+                    debug.error("SimpleTimeCondition.validateProperties(): property pair not defined: " +
+                            START_DATE + ", "  + END_DATE + " - cannot generate calendar.");
+                }
+                throw new EntitlementException(PAIR_PROPERTY_NOT_DEFINED, END_DATE, START_DATE);
+            } else {
+                if (startDateCal.getTime().getTime() > endDateCal.getTime().getTime()) {
+                    if (debug.errorEnabled()) {
+                        debug.error("SimpleTimeCondition.validateProperties(): START DATE after END DATE");
+                    }
+                    throw new EntitlementException(START_DATE_AFTER_END_DATE,
+                            startDateCal.getTime(), endDateCal.getTime());
+                }
             }
-            throw new EntitlementException(START_DATE_AFTER_END_DATE);
         }
+
     }
 
     /**
@@ -326,10 +338,20 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
         return new ConditionDecision(allowed, Collections.<String, Set<String>>emptyMap(), timeToLive);
     }
 
-    private <T> T getValue(Set<T> values) {
-        if (values != null && values.iterator().hasNext()) {
-            return values.iterator().next();
+    /**
+     * @see PolicyRequestHandler#convertEnvParams
+     */
+    @SuppressWarnings("unchecked")
+    private String getValue(Object value) {
+
+        if (value instanceof String) {
+            return (String) value; //REQUEST_TIME_ZONE
+        } else if (value instanceof Set) { //general case
+            return ((Set<String>) value).iterator().next();
+        } else if (value instanceof Long) { //REQUEST_TIME
+            return String.valueOf(value);
         }
+
         return null;
     }
 
@@ -489,6 +511,7 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
         jo.put(END_DAY, endDay);
         jo.put(START_DATE, startDate);
         jo.put(END_DATE, endDate);
+        jo.put(ENFORCEMENT_TIME_ZONE, enforcementTimeZone);
         return jo;
     }
 

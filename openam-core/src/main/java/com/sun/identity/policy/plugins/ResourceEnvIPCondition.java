@@ -32,39 +32,39 @@
 
 package com.sun.identity.policy.plugins;
 
-import java.util.Set;
+import com.googlecode.ipv6.IPv6Address;
+import com.googlecode.ipv6.IPv6AddressRange;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthenticationInstance;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.authentication.config.AMConfigurationException;
+import com.sun.identity.authentication.util.AMAuthUtils;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.policy.ConditionDecision;
+import com.sun.identity.policy.PolicyEvaluator;
+import com.sun.identity.policy.PolicyException;
+import com.sun.identity.policy.PolicyManager;
+import com.sun.identity.policy.ResBundleUtils;
+import com.sun.identity.policy.Syntax;
+import com.sun.identity.policy.interfaces.Condition;
+import com.sun.identity.policy.util.PolicyDecisionUtils;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.HashSet;
 import java.util.ResourceBundle;
-import java.security.AccessController;
-
-import com.googlecode.ipv6.IPv6Address;
-import com.googlecode.ipv6.IPv6AddressRange;
-import com.sun.identity.policy.interfaces.Condition;
-import com.sun.identity.policy.ConditionDecision;
-import com.sun.identity.policy.PolicyException;
-import com.sun.identity.policy.PolicyManager;
-import com.sun.identity.policy.Syntax;
-import com.sun.identity.policy.util.PolicyDecisionUtils;
-import com.sun.identity.policy.ResBundleUtils;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.util.AMAuthUtils;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.authentication.config.AMAuthenticationInstance;
-import com.sun.identity.authentication.config.AMConfigurationException;
-import com.sun.identity.policy.PolicyEvaluator;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.security.AdminTokenAction;
+import java.util.Set;
+import java.util.StringTokenizer;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.ValidateIPaddress;
 
 
@@ -1114,7 +1114,7 @@ public class ResourceEnvIPCondition implements Condition {
                         Object object = env.get(REQUEST_IP);
                         if (object instanceof Set) {
                             Set ipSet = (Set) object;
-                            if ( (ipSet == null) || (ipSet.isEmpty()) ) {
+                            if ( ipSet.isEmpty() ) {
                                 if (token != null) {
                                     strIP = token.getIPAddress().getHostAddress();
                                 } else {
@@ -1128,7 +1128,7 @@ public class ResourceEnvIPCondition implements Condition {
                             }
                         } else if (object instanceof String) {
                             strIP = (String) object;
-                            if (strIP == null) {
+                            if (StringUtils.isBlank(strIP)) {
                                 if (token != null) {
                                     strIP = token.getIPAddress().getHostAddress();
                                 } else {
