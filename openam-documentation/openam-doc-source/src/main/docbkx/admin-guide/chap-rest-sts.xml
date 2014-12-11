@@ -176,7 +176,7 @@
       pieces of information related to each input token. The default options
       shown in this field are known as a <literal>tuple</literal>, an ordered
       list of elements. Each element is separated with a pipe character:
-      <literal>|</literal>
+      "<literal>|</literal>".
      </para>
      <variablelist>
       <varlistentry>
