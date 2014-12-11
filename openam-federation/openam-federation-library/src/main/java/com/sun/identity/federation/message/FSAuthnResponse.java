@@ -23,36 +23,35 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAuthnResponse.java,v 1.2 2008/06/25 05:46:43 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 
 package com.sun.identity.federation.message;
 
-import com.sun.identity.federation.message.common.FSMsgException;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
-import com.sun.identity.saml.common.SAMLException;
+import com.sun.identity.federation.message.common.FSMsgException;
 import com.sun.identity.saml.common.SAMLConstants;
+import com.sun.identity.saml.common.SAMLException;
 import com.sun.identity.saml.common.SAMLResponderException;
 import com.sun.identity.saml.common.SAMLVersionMismatchException;
 import com.sun.identity.saml.protocol.Response;
 import com.sun.identity.saml.protocol.Status;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager;
-import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.DateUtils;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.xml.XMLUtils;
-import java.io.IOException;
 import java.text.ParseException;
-import java.util.List;
-import java.util.Collections;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Document;
 
 /**
  * The class <code>FSAuthnResponse</code> creates and parses the
@@ -60,7 +59,9 @@ import org.w3c.dom.Document;
  * <code>Response</code>.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 
 public class FSAuthnResponse extends Response {
 

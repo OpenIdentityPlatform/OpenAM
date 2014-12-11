@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAssertion.java,v 1.2 2008/06/25 05:46:43 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 
@@ -62,7 +62,9 @@ import org.w3c.dom.NodeList;
  * This class extends from SAML Assertion.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class FSAssertion extends Assertion {
     
     /**

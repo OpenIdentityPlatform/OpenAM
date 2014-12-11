@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPEntry.java,v 1.2 2008/06/25 05:46:47 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 
@@ -43,7 +43,9 @@ import com.sun.identity.federation.common.IFSConstants;
  * information trusted by the request issuer to authenticate the presenter.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 
 public class IDPEntry {
     public static final int LIB_TYPE_IDP = 0;

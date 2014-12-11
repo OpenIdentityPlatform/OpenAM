@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAssertionArtifact.java,v 1.3 2008/06/25 05:46:43 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message;
@@ -44,7 +44,9 @@ import com.sun.identity.shared.encode.Base64;
  * extending this class.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class FSAssertionArtifact extends AssertionArtifact {
     
     /**

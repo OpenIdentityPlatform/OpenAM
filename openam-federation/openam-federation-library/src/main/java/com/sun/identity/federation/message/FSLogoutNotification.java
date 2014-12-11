@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSLogoutNotification.java,v 1.4 2008/06/25 05:46:44 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message;
@@ -64,7 +64,9 @@ import org.w3c.dom.Document;
  * object.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 
 public class FSLogoutNotification extends AbstractRequest {
     private String providerId;

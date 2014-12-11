@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: UppercaseTransform.java,v 1.2 2008/06/25 05:47:08 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.liberty.ws.authnsvc.protocol;
@@ -36,7 +36,9 @@ import com.sun.identity.liberty.ws.authnsvc.AuthnSvcUtils;
  * uppercase characters.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class UppercaseTransform extends Transform {
 
 

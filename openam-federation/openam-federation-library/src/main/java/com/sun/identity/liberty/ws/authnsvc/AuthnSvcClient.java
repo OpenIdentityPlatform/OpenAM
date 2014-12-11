@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AuthnSvcClient.java,v 1.2 2008/06/25 05:47:05 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -42,7 +42,9 @@ import com.sun.identity.liberty.ws.soapbinding.Message;
  * a method to <code>SASL</code> request to the Authentication Service and
  * receive <code>SASL</code> response.
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class AuthnSvcClient {
 
     /**

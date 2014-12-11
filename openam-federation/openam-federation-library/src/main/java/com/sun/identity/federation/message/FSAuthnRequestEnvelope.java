@@ -23,30 +23,31 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAuthnRequestEnvelope.java,v 1.2 2008/06/25 05:46:43 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.message;
 
+import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.message.common.FSMsgException;
-import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.xml.XMLUtils;
-import java.io.IOException;
 import java.util.List;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Document;
 
 /**
  * This  class defines methods for setting and retrieving attributes and
  * elements associated with a Liberty Authentication Request.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class FSAuthnRequestEnvelope {
     private String assertionConsumerServiceURL = null;
     private List otherElements = null;

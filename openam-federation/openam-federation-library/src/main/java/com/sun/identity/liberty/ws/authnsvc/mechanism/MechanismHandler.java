@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: MechanismHandler.java,v 1.2 2008/06/25 05:47:07 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -39,7 +39,9 @@ import com.sun.identity.liberty.ws.soapbinding.Message;
  * will correspond to one handler implementation which processes incoming
  * SASL request and generates SASL response.
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public interface MechanismHandler {
     /**
      * Generates a SASL response according to the SASL request.

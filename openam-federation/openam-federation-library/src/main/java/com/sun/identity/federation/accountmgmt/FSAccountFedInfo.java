@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAccountFedInfo.java,v 1.4 2008/06/25 05:46:39 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.accountmgmt;
@@ -35,7 +35,9 @@ import com.sun.identity.saml.assertion.NameIdentifier;
 /**
  * This class handles the information of federated user account.
  * @supported.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class FSAccountFedInfo {
 
     /**

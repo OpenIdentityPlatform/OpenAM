@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: GenericTransform.java,v 1.2 2008/06/25 05:47:07 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -34,7 +34,9 @@ package com.sun.identity.liberty.ws.authnsvc.protocol;
  * <code>Transform</code> that doesn't transform.
  * 
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class GenericTransform extends Transform {
 
 

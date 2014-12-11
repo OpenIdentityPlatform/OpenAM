@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSRealmAttributeMapper.java,v 1.2 2008/06/25 05:46:55 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.services;
@@ -43,7 +43,9 @@ import java.util.Map;
  * single sign-on token.
  * </p>
  * @supported.all.api
- */ 
+ * @deprecated since 12.0.0
+ */
+@Deprecated
 public interface FSRealmAttributeMapper {
 
     /**

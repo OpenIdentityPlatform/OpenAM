@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSRemoteException.java,v 1.2 2008/06/25 05:46:40 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.common;
@@ -31,7 +31,9 @@ package com.sun.identity.federation.common;
 /**
  * This class is an extension point for IDFF related exceptions.
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class FSRemoteException extends Exception {
     /**
      * Creates an <code>FSRemoteException</code> with no message.

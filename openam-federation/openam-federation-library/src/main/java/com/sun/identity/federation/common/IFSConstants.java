@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IFSConstants.java,v 1.12 2008/08/29 04:57:15 exu Exp $
- *
+ * Portions Copyrights 2014 ForgeRock AS
  */
 
 
@@ -34,7 +34,9 @@ import com.sun.identity.cot.COTConstants;
  * This interface represents a collection of common constants used by
  * the classes in Federation Service.  
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public interface IFSConstants {
     /**
      * HTTPS URL prefix 

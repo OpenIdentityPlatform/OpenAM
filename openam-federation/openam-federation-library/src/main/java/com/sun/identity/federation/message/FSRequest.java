@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSRequest.java,v 1.3 2008/06/25 05:46:45 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 /**
@@ -66,7 +66,9 @@ import com.sun.identity.shared.xml.XMLUtils;
  * It extends from the abstract base class <code>AbstractRequest</code>.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
+@Deprecated
 public class FSRequest extends Request {
     /*
      * data members

@@ -23,13 +23,14 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: package-info.java,v 1.2 2008/06/25 05:47:06 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 /**
  * Provides classes to manage liberty authentication service.
  *
  * @supported.api
+ * @deprecated since 12.0.0
  */
 package com.sun.identity.liberty.ws.authnsvc;
 

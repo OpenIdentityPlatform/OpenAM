@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSRealmIDPProxy.java,v 1.2 2008/06/25 05:46:55 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 
@@ -38,7 +38,9 @@ import javax.servlet.http.HttpServletResponse;
  * This interface <code>FSRealmIDPProxy</code> is used to find a preferred 
  * Identity Authenticating provider to proxy the authentication request.
  * @supported.all.api
- */ 
+ * @deprecated since 12.0.0
+ */
+@Deprecated
 public interface FSRealmIDPProxy {
 
     /**

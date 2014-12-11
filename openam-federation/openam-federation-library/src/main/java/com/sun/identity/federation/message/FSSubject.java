@@ -23,34 +23,32 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSSubject.java,v 1.2 2008/06/25 05:46:45 qcheng Exp $
- *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 
 package com.sun.identity.federation.message;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import com.sun.identity.saml.common.SAMLConstants;
-import com.sun.identity.saml.common.SAMLUtils;
-import com.sun.identity.saml.common.SAMLException;
+import com.sun.identity.federation.common.FSUtils;
+import com.sun.identity.federation.common.IFSConstants;
+import com.sun.identity.federation.message.common.FSMsgException;
+import com.sun.identity.federation.message.common.IDPProvidedNameIdentifier;
 import com.sun.identity.saml.assertion.NameIdentifier;
 import com.sun.identity.saml.assertion.Subject;
 import com.sun.identity.saml.assertion.SubjectConfirmation;
-
-import com.sun.identity.federation.message.common.IDPProvidedNameIdentifier;
-import com.sun.identity.federation.common.IFSConstants;
-import com.sun.identity.federation.message.common.FSMsgException;
-import com.sun.identity.federation.common.FSUtils;
+import com.sun.identity.saml.common.SAMLConstants;
+import com.sun.identity.saml.common.SAMLException;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This class has methods to create <code>Subject</code> object.
  *
  * @supported.all.api
+ * @deprecated since 12.0.0
  */
-
+@Deprecated
 public class FSSubject extends Subject {
     protected IDPProvidedNameIdentifier _idpNameIdentifier;
     
