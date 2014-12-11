@@ -74,7 +74,6 @@ define("config/process/AMConfig", [
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
                     }
                 }
-                             
             }
         }
     ];
