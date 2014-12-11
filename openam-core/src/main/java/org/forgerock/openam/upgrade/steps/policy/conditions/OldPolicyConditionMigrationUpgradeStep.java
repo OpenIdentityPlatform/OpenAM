@@ -91,6 +91,10 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
 
             for (String realm : getRealmNames()) {
 
+                if (!realm.startsWith("/")) {
+                    realm = "/" + realm;
+                }
+
                 PrivilegeManager privilegeManager = getPrivilegeManager(realm);
                 List<Privilege> privileges;
                 try {
