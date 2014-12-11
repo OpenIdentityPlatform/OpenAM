@@ -25,6 +25,7 @@
 package org.forgerock.openam.forgerockrest.server;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.util.CookieUtils;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.client.AuthClientUtils;
@@ -139,6 +140,7 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("domains", cookieDomains);
             result.put("protectedUserAttributes", protectedUserAttributes);
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro"));
+            result.put("secureCookie", CookieUtils.isCookieSecure());
             result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
             result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
             result.put("lang", locale.getLocale().getLanguage());
