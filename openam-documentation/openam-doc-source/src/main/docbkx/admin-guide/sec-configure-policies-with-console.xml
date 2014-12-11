@@ -30,8 +30,7 @@
           xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
           xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
-          xmlns:xlink='http://www.w3.org/1999/xlink'
-          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+          xmlns:xlink='http://www.w3.org/1999/xlink'>
 
     <title>Configuring Policies by Using the OpenAM Console</title>
 
@@ -210,10 +209,24 @@
          </listitem>
         </varlistentry>
         <varlistentry>
-         <term>Any User</term>
+         <term>Never Match</term>
          <listitem>
-          <para>A catch-all that covers any user, whether authenticated or
-           anonymous.</para>
+          <para>
+           Never match any subject, with the result not that access is denied,
+           but instead that the policy itself does not match
+           and therefore cannot be evaluated in order to allow access.
+          </para>
+
+          <para>
+           If you do not set a subject condition, "Never Match" is the default.
+           In other words,
+           you must set a subject condition for the policy to apply.
+          </para>
+
+          <para>
+           To match regardless of the subject, configure a subject condition
+           that is <literal>NOT</literal> "Never Match".
+          </para>
          </listitem>
         </varlistentry>
        </variablelist>
