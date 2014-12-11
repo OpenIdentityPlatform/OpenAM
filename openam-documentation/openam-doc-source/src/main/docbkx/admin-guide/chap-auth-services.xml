@@ -40,7 +40,12 @@
  
  <section xml:id="what-is-authn">
   <title>About Authentication in OpenAM</title>
-  <indexterm><primary>Authentication</primary></indexterm>
+
+  <indexterm>
+   <primary>Authentication</primary>
+   <secondary>about</secondary>
+  </indexterm>
+
   <para>Access management is about controlling access to resources. OpenAM
   plays a role similar to border control at an international airport. Instead
   of having each and every airline company deal with access to each
@@ -85,6 +90,7 @@
    <primary>Authentication</primary>
    <secondary>Chains</secondary>
   </indexterm>
+
   <para>OpenAM allows you to configure authentication processes and then customize
   how they are applied. OpenAM uses <firstterm>authentication
   modules</firstterm> to handle different ways of authenticating. Basically,
@@ -131,6 +137,7 @@
    <primary>Authentication</primary>
    <secondary>Levels</secondary>
   </indexterm>
+
   <para>With OpenAM, you can further set <firstterm>authentication
   levels</firstterm> per module, with higher levels being used typically
   to allow access to more restricted resources. The OpenAM SPIs also let you
@@ -159,6 +166,16 @@
  <section xml:id="configure-social-authn">
   <title>Configuring Social Authentication</title>
 
+  <indexterm>
+   <primary>Authentication</primary>
+   <secondary>social</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+  <indexterm>
+   <primary>Social Authentication</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+
   <para>OpenAM allows delegation of authentication to any third party
    OpenID Connect 1.0 server that implements the <link
     xlink:show="new"
@@ -179,20 +196,26 @@
    providers on the OpenAM login screen, as shown below.</para>
 
   <figure xml:id="figure-login-with-social-logos">
-  <title>Login Screen With Social Authentication Logos.</title>
-  <mediaobject>
-   <alt>Login screen with social authentication logos.</alt>
-   <imageobject>
-    <imagedata fileref="images/login-with-social-authentication.png" format="PNG" />
-   </imageobject>
-   <textobject><para>The login screen displays additional logos after you configure
-    the <emphasis>Social Authentication Implementations</emphasis> service.</para>
-   </textobject>
-  </mediaobject>
+   <title>Login Screen With Social Authentication Logos</title>
+   <mediaobject>
+    <alt>Login screen with social authentication logos.</alt>
+    <imageobject>
+     <imagedata fileref="images/login-with-social-authentication.png" format="PNG" />
+    </imageobject>
+    <textobject><para>The login screen displays additional logos after you configure
+     the <emphasis>Social Authentication Implementations</emphasis> service.</para>
+    </textobject>
+   </mediaobject>
   </figure>
 
   <section xml:id="social-authn-wizard-pre-populated">
    <title>Configuring Pre-Populated Social Authentication Providers</title>
+
+   <indexterm>
+    <primary>Social Authentication</primary>
+    <secondary>pre-populating providers</secondary>
+   </indexterm>
+
    <para>OpenAM provides wizards to quickly enable authentication with
     Facebook, Google and Microsoft. Most settings are pre-populated,
     only a <emphasis>Client ID</emphasis> and <emphasis>Client
@@ -201,6 +224,7 @@
    <para>To obtain a <emphasis>Client ID</emphasis> and <emphasis>Client
     Secret</emphasis> you should register an application with the
     third party provider, at the following links:</para>
+
    <variablelist>
     <varlistentry>
      <term>Facebook</term>
@@ -237,8 +261,15 @@
     </varlistentry>
    </variablelist>
 
-   <procedure xml:id="howto-social-authn-wizard-pre-populated"><title>To
-    Configure Pre-Populated Social Authentication Providers</title>
+   <procedure xml:id="howto-social-authn-wizard-pre-populated">
+    <title>To Configure Pre-Populated Social Authentication Providers</title>
+
+    <indexterm>
+     <primary>Social Authentication</primary>
+     <secondary>pre-populating providers</secondary>
+     <tertiary>configuring</tertiary>
+    </indexterm>
+
     <para>Once you have registered an application and obtained credentials from
      the social authentication provider, follow the steps below to configure
      authentication with the provider.</para>
@@ -269,7 +300,6 @@
       </step>
      </substeps>
 
-
      <figure xml:id="figure-google-authn-wizard">
       <title>The Configure Google Authentication Wizard</title>
       <mediaobject>
@@ -281,6 +311,7 @@
         Client Secret (twice), and confirm the Redirect URL.</para></textobject>
       </mediaobject>
      </figure>
+
      <para>On completion, the wizard displays a message confirming
       the successful creation of a new Authentication Module and an
       Authentication Chain for the provider, and either the creation of a new
@@ -299,6 +330,13 @@
 
   <section xml:id="social-authn-wizard-custom">
    <title>Configuring Custom Social Authentication Providers</title>
+
+   <indexterm>
+    <primary>Social Authentication</primary>
+    <secondary>custon providers</secondary>
+    <tertiary>configuring</tertiary>
+   </indexterm>
+
    <para>OpenAM provides a wizard to quickly enable authentication with
     any third party provider that supports the <link xlink:show="new"
      xlink:href="http://openid.net/specs/openid-connect-discovery-1_0.html">
@@ -307,8 +345,9 @@
     provider to obtain a <emphasis>Client ID</emphasis>, <emphasis>Client
      Secret</emphasis>, and the <emphasis>OpenID Discovery URL</emphasis>.</para>
 
-   <procedure xml:id="howto-social-authn-wizard-custom"><title>To Configure
-    Custom Social Authentication Providers</title>
+   <procedure xml:id="howto-social-authn-wizard-custom">
+    <title>To Configure Custom Social Authentication Providers</title>
+
     <para>Once you have registered an application and obtained your
      credentials from the social authentication provider,
      follow the steps below to configure authentication with the provider.</para>
@@ -360,6 +399,7 @@
         confirm the Redirect URL.</para></textobject>
       </mediaobject>
      </figure>
+
      <para>On completion, the wizard displays a message confirming
       the successful creation of a new Authentication Module and an
       Authentication Chain for the provider, and either the creation of a new
@@ -378,6 +418,13 @@
 
   <section xml:id="social-authn-implementations-service">
    <title>Configuring the Social Authentication Implementations service</title>
+
+   <indexterm>
+    <primary>Social Authentication</primary>
+    <secondary>implementations service</secondary>
+    <tertiary>configuring</tertiary>
+   </indexterm>
+
    <para>You can add logos to the login page to allow users to authenticate
     using configured social authentication providers.</para>
    <para>Wizards are provided to configure common social authentication
@@ -393,8 +440,9 @@
    or created manually, see <xref linkend="configure-authn-modules" /> and
     <xref linkend="configure-authn-chains" />.</para>
 
-   <procedure xml:id="howto-social-authn-implementations"><title>To Configure
-    Social Authentication Implementations</title>
+   <procedure xml:id="howto-social-authn-implementations">
+    <title>To Configure Social Authentication Implementations</title>
+
     <para>Once you have created an Authentication Chain containing an OAuth
      2.0 / OpenID Connect Authentication Module, follow the steps below to add a logo for the
      authentication provider to the login screen.</para>
@@ -469,14 +517,18 @@
    <para>An icon now appears on the OpenAM login screen,
     allowing users to authenticate with the third party
     authentication provider.</para>
-
   </section>
-
  </section>
  
  <section xml:id="configure-authn-modules">
   <title>Configuring Authentication Modules</title>
-  
+
+  <indexterm>
+   <primary>Authentication</primary>
+   <secondary>modules</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+
   <para>The OpenAM console provides two places where the OpenAM administrator
   can configure authentication modules.</para>
   
@@ -503,14 +555,19 @@
     
   <section xml:id="ad-module-conf-hints">
    <title>Hints for the Active Directory Authentication Module</title>
+
+   <indexterm class="startofrange" id="idx-auth-hints-ad">
+    <primary>Authentication</primary>
+    <secondary>Active Directory module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Active Directory authentication</primary>
+   </indexterm>
+
    <para>OpenAM connects to Active Directory over Lightweight Directory Access
    Protocol (LDAP). OpenAM provides separate Active Directory and LDAP
    modules to support the use of both Active Directory and
    another directory service in an authentication chain.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>Active Directory</secondary>
-   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthADService</literal></para>
@@ -689,15 +746,30 @@
      <literal>sunAMAuthADAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
+
+   <indexterm class="endofrange" startref="idx-auth-hints-ad">
+    <primary>Authentication</primary>
+    <secondary>Active Directory</secondary>
+   </indexterm>
   </section>
   
   <section xml:id="adaptive-auth-module-conf-hints">
    <title>Hints for the Adaptive Risk Authentication Module</title>
+
+   <indexterm class="startofrange" id="idx-auth-hints-adaptive-risk">
+    <primary>Authentication</primary>
+    <secondary>Adaptive risk module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Adaptive risk authentication</primary>
+   </indexterm>
+
    <para>The Adaptive Risk module is designed to assess risk during
    authentication so that OpenAM can determine whether to require the
    user to complete further authentication steps. After configuring the
    Adaptive Risk module, insert it in your authentication chain with criteria
    set to sufficient as shown in the following example.</para>
+
    <mediaobject xml:id="figure-adaptive-auth-module">
     <alt>Including the Adaptive Risk module in an authentication chain</alt>
     <imageobject>
@@ -707,6 +779,7 @@
     continues to the next module in the chain should the Adaptive Risk module
     return failure.</para></textobject>
    </mediaobject>
+
    <para>In the example authentication chain shown, OpenAM has users
    authenticate first using the LDAP module providing a user ID and password
    combination. Upon success, OpenAM calls the Adaptive Risk module. The
@@ -725,10 +798,6 @@
    post-authentication processing by editing the authentication chain to add
    <literal>org.forgerock.openam.authentication.modules.adaptive.Adaptive</literal>
    to the list of post authentication plugins.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>Adaptive risk</secondary>
-   </indexterm>
 
    <para>
     When the Adaptive Risk module relies on the client IP address,
@@ -1225,10 +1294,25 @@
      </listitem>
     </varlistentry>
    </variablelist>
+
+   <indexterm class="endofrange" startref="idx-auth-hints-adaptive-risk">
+    <primary>Authentication</primary>
+    <secondary>Adaptive risk module</secondary>
+   </indexterm>
+
   </section>
   
   <section xml:id="anon-module-conf-hints">
    <title>Hints for the Anonymous Authentication Module</title>
+
+   <indexterm class="startofrange" id="idx-auth-hints-anonymous">
+    <primary>Authentication</primary>
+    <secondary>Anonymous module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Anonymous authentication</primary>
+   </indexterm>
+
     <para>This module lets you configure and track anonymous users, who can log in
      to your application or web site without login credentials.
      Typically, you would provide such users with very limited access,
@@ -1243,11 +1327,6 @@
      </para>
       <para><command>ssoadm</command> service name:
           <literal>iPlanetAMAuthAnonymousService</literal></para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>Anonymous</secondary>
-   </indexterm>
-
 
    <variablelist>
     <varlistentry>
@@ -1339,10 +1418,25 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
       <note><para>You can configure the Anonymous Authentication Module using the
           OpenAM Console by clicking <literal>Configuration</literal> &gt;
           <literal>Authentication</literal> &gt; <literal>Anonymous</literal>.</para></note>
+
+   <indexterm class="endofrange" startref="idx-auth-hints-anonymous">
+    <primary>Authentication</primary>
+    <secondary>Anonymous module</secondary>
+   </indexterm>
+
   </section>
   
   <section xml:id="cert-module-conf-hints">
    <title>Hints for the Certificate Authentication Module</title>
+
+   <indexterm class="startofrange" id="idx-auth-cert">
+    <primary>Authentication</primary>
+    <secondary>X509 certificate-based module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>X509 Certificate-based authentication</primary>
+   </indexterm>
+
    <para>X.509 digital certificates can enable secure authentication without
    the need for user names and passwords or other credentials. Certificate
    authentication can be handy to manage authentication by applications.
@@ -1367,10 +1461,6 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
    <literal>cn=Barbara Jensen</literal>, then you can use <literal>CN=Barbara
    Jensen</literal> from the Subject DN to search for the entry with
    <literal>cn=Barbara Jensen</literal> in the directory.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>X509 certificate based</secondary>
-   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthCertService</literal></para>
@@ -1593,21 +1683,28 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
      <literal>iplanet-am-auth-cert-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
+
+   <indexterm class="endofrange" startref="idx-auth-cert">
+    <primary>Authentication</primary>
+    <secondary>X509 certificate-based module</secondary>
+   </indexterm>
   </section>
 
   <section xml:id="core-module-conf-hints">
    <title>Hints for the Core Authentication Module</title>
-   <para>The Core module is a meta-module.</para>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Core module</secondary>
+   </indexterm>
+
+   <para>The Core authentication module is a meta-module.</para>
    <para>The Core module lets you set up the list of modules available,
    and specify what types of client applications can authenticate with which
    modules. It also lets you configure connection pools for access to
    directory servers, and whether to retain objects used during authentication
    for use during logout. Furthermore, the Core module lets you set defaults
    used when configuring authentication in a particular realm.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>Core</secondary>
-   </indexterm>
    
       <itemizedlist>
       <para>The Core Authentication module is divided into seven sections:</para>
@@ -1639,7 +1736,17 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
    <literal>iPlanetAMAuthService</literal></para>
 
     <section xml:id="auth-core-global">
-        <title>Core - Global Attributes</title>
+     <title>Core - Global Attributes</title>
+
+     <indexterm>
+      <primary>Authentication</primary>
+      <secondary>Core</secondary>
+      <tertiary>global attributes</tertiary>
+     </indexterm>
+     <indexterm>
+      <primary>Core authentication</primary>
+      <secondary>global attributes</secondary>
+     </indexterm>
 
         <para>The Global Attributes includes the list of available modules, LDAP connection
             settings, authentication process options, and an option to disable the XUI
@@ -1652,7 +1759,18 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
     </section>
 
     <section xml:id="auth-core-realm-attributes">
-    <title>Core - Realm Attributes</title>
+     <title>Core - Realm Attributes</title>
+
+     <indexterm>
+      <primary>Authentication</primary>
+      <secondary>Core</secondary>
+      <tertiary>realm attributes</tertiary>
+     </indexterm>
+     <indexterm>
+      <primary>Core authentication</primary>
+      <secondary>realm attributes</secondary>
+     </indexterm>
+
     <para>This section of the Core Authentication module is on the Realm Attributes section
     page before options for Persistent Cookies.</para>
     <variablelist>
@@ -1761,6 +1879,17 @@ $ ssoadm set-realm-svc-attrs \
 
     <section xml:id="auth-core-persistent-cookie">
      <title>Core - Persistent Cookie (Legacy)</title>
+
+     <indexterm>
+      <primary>Authentication</primary>
+      <secondary>Core</secondary>
+      <tertiary>persistent cookie (legacy)</tertiary>
+     </indexterm>
+     <indexterm>
+      <primary>Core authentication</primary>
+      <secondary>persistent cookie (legacy)</secondary>
+     </indexterm>
+
      <para>This section of the Core Authentication module covers the Persistent Cookie options.</para>
 
      <note><para>Two methods are available in OpenAM to configure persistent cookies. The options described
@@ -1819,9 +1948,20 @@ $ ssoadm set-realm-svc-attrs \
     </section>
 
     <section xml:id="auth-core-account-lockout">
-          <title>Core - Account Lockout</title>
-          <para>This section of the Core Authentication module
-          includes details on how account lockouts can be configured.</para>
+     <title>Core - Account Lockout</title>
+
+     <indexterm>
+      <primary>Authentication</primary>
+      <secondary>Core</secondary>
+      <tertiary>account lockout</tertiary>
+     </indexterm>
+     <indexterm>
+      <primary>Core authentication</primary>
+      <secondary>account lockout</secondary>
+     </indexterm>
+
+     <para>This section of the Core Authentication module
+      includes details on how account lockouts can be configured.</para>
 
     <variablelist>
     <varlistentry>
@@ -1959,7 +2099,18 @@ $ ssoadm set-realm-svc-attrs \
     </section>
 
     <section xml:id="auth-core-general">
-          <title>Core - General</title>
+     <title>Core - General</title>
+
+     <indexterm>
+      <primary>Authentication</primary>
+      <secondary>Core</secondary>
+      <tertiary>general</tertiary>
+     </indexterm>
+     <indexterm>
+      <primary>Core authentication</primary>
+      <secondary>general</secondary>
+     </indexterm>
+
           <para>This section of the Core Authentication module includes general options.</para>
 
     <variablelist>
@@ -2048,7 +2199,18 @@ $ ssoadm set-realm-svc-attrs \
     </section>
 
     <section xml:id="auth-core-security">
-          <title>Core - Security</title>
+     <title>Core - Security</title>
+
+     <indexterm>
+      <primary>Authentication</primary>
+      <secondary>Core</secondary>
+      <tertiary>security</tertiary>
+     </indexterm>
+     <indexterm>
+      <primary>Core authentication</primary>
+      <secondary>security</secondary>
+     </indexterm>
+
           <para>This section of the Core Authentication module
               includes basic security options.</para>
 
@@ -2149,7 +2311,18 @@ $ ssoadm set-realm-svc-attrs \
     </section>
 
     <section xml:id="auth-core-post-auth">
-          <title>Core - Post Authentication Processing</title>
+     <title>Core - Post Authentication Processing</title>
+
+     <indexterm>
+      <primary>Authentication</primary>
+      <secondary>Core</secondary>
+      <tertiary>post authentication processing</tertiary>
+     </indexterm>
+     <indexterm>
+      <primary>Core authentication</primary>
+      <secondary>post authentication processing</secondary>
+     </indexterm>
+
           <para>This section of the Core Authentication module
               specifies options for post authentication processing.</para>
 
@@ -2252,11 +2425,18 @@ $ ssoadm set-realm-svc-attrs \
     </varlistentry>
    </variablelist>
    </section>
-
   </section>
   
   <section xml:id="datastore-module-conf-hints">
    <title>Hints for the Data Store Authentication Module</title>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Data store module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Data store authentication</primary>
+   </indexterm>
 
    <para>The Data Store authentication module allows a login using the Identity
    Repository of the realm to authenticate users. Using the Data Store module
@@ -2292,6 +2472,14 @@ $ ssoadm set-realm-svc-attrs \
 
   <section xml:id="device-id-match-hints">
    <title>Hints for the Device ID (Match) Authentication Module</title>
+
+   <indexterm class="startofrange" id="idx-auth-hints-deviceid-match">
+    <primary>Authentication</primary>
+    <secondary>Device ID (Match) module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Device ID (Match) authentication</primary>
+   </indexterm>
 
    <para>The Device ID (Match) module provides device fingerprinting functionality
     for risk-based authentication. The Device ID (Match) works together with other
@@ -2591,10 +2779,23 @@ $ ssoadm set-realm-svc-attrs \
     </mediaobject>
    </figure>
 
+   <indexterm class="endofrange" startref="idx-auth-hints-deviceid-match">
+    <primary>Authentication</primary>
+    <secondary>Device ID (Match) module</secondary>
+   </indexterm>
+
   </section>
 
   <section xml:id="device-id-save-hints">
    <title>Hints for the Device ID (Save) Module</title>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Device ID (Save) module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Device ID (Save) authentication</primary>
+   </indexterm>
 
    <para>The Device ID (Save) module auto-saves the device
     profile rather than presenting a Save screen to the user each time a device
@@ -2652,14 +2853,19 @@ $ ssoadm set-realm-svc-attrs \
 
   <section xml:id="federation-module-conf-hints">
    <title>Hints for the Federation Authentication Module</title>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Federation module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Federation authentication</primary>
+   </indexterm>
+
    <para>The Federation authentication module is used by a service provider
    to create a user session after validating single sign-on protocol messages.
    This authentication module is used by the SAML, SAMLv2, ID-FF, and
    WS-Federation protocols.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>Federation</secondary>
-   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthFederationService</literal></para>
@@ -2678,6 +2884,15 @@ $ ssoadm set-realm-svc-attrs \
   
   <section xml:id="hotp-module-conf-hints">
    <title>Hints for the HOTP Authentication Module</title>
+
+   <indexterm class="startofrange" id="idx-auth-hints-hotp">
+    <primary>Authentication</primary>
+    <secondary>HMAC One-Time Password (HOTP) module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>HMAC One-Time Password (HOTP) authentication</primary>
+   </indexterm>
+
    <para>The HMAC One-Time Password authentication module works together in an
     authentication chain with any module that stores the <literal>username</literal>
     attribute.
@@ -2706,10 +2921,6 @@ $ ssoadm set-realm-svc-attrs \
     the messages are generated and what provider the messages go through to
     reach the user.
    </para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>HMAC One-Time Password (HOTP)</secondary>
-   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthHOTPService</literal></para>
@@ -2850,17 +3061,24 @@ $ ssoadm set-realm-svc-attrs \
      </listitem>
     </varlistentry>
    </variablelist>
+
+   <indexterm class="endofrange" startref="idx-auth-hints-hotp">
+    <primary>Authentication</primary>
+    <secondary>HMAC One-Time Password (HOTP) module</secondary>
+   </indexterm>
   </section>
   
   <section xml:id="http-module-conf-hints">
    <title>Hints for the HTTP Basic Authentication Module</title>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>HTTP Basic module</secondary>
+   </indexterm>
+
    <para>HTTP basic authentication takes a user name and password from HTTP
    authentication and tries authentication against the backend module in OpenAM,
    depending on what you configure as the Backend Module Name.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>HTTP Basic</secondary>
-   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthHTTPBasicService</literal></para>
@@ -2888,12 +3106,17 @@ $ ssoadm set-realm-svc-attrs \
   
   <section xml:id="jdbc-module-conf-hints">
    <title>Hints for the JDBC Authentication Module</title>
-   <para>The Java Database Connectivity (JDBC) module lets OpenAM connect to
-   a database such as MySQL or Oracle DB to authenticate users.</para>
+
    <indexterm>
     <primary>Authentication</primary>
-    <secondary>JDBC</secondary>
+    <secondary>JDBC module</secondary>
    </indexterm>
+   <indexterm>
+    <primary>JDBC authentication</primary>
+   </indexterm>
+
+   <para>The Java Database Connectivity (JDBC) module lets OpenAM connect to
+   a database such as MySQL or Oracle DB to authenticate users.</para>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthJDBCService</literal></para>
@@ -3001,14 +3224,19 @@ $ ssoadm set-realm-svc-attrs \
   
   <section xml:id="ldap-module-conf-hints">
    <title>Hints for the LDAP Authentication Module</title>
+
+   <indexterm class="startofrange" id="idx-auth-hints-ldap">
+    <primary>Authentication</primary>
+    <secondary>LDAP module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>LDAP authentication</primary>
+   </indexterm>
+
    <para>OpenAM connects to directory servers using Lightweight Directory
    Access Protocol (LDAP). To build an easy-to-manage, high performance, pure
    Java, open source directory service, try
    <link xlink:href="http://opendj.org">OpenDJ</link> directory services.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>LDAP</secondary>
-   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthLDAPService</literal></para>
@@ -3235,6 +3463,11 @@ $ ssoadm set-realm-svc-attrs \
      <literal>iplanet-am-auth-ldap-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
+
+   <indexterm class="endofrange" startref="idx-auth-hints-ldap">
+    <primary>Authentication</primary>
+    <secondary>LDAP module</secondary>
+   </indexterm>
   </section>
 
   <!--section xml:id="membership-module-conf-hints">
@@ -3297,15 +3530,20 @@ $ ssoadm set-realm-svc-attrs \
 
   <section xml:id="msisdn-module-conf-hints">
    <title>Hints for the MSISDN Authentication Module</title>
+
+   <indexterm class="startofrange" id="idx-auth-hints-msisdn">
+    <primary>Authentication</primary>
+    <secondary>MSISDN module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>MSISDN authentication</primary>
+   </indexterm>
+
    <para>The Mobile Station Integrated Services Digital Network (MSISDN)
    authentication module enables non-interactive authentication using a mobile
    subscriber ISDN associated with a terminal such as a mobile phone.
    The module checks the subscriber ISDN against the value found on a user's
    entry in an LDAP directory service.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>MSISDN</secondary>
-   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthMSISDNService</literal></para>
@@ -3442,10 +3680,25 @@ $ ssoadm set-realm-svc-attrs \
      <literal>sunAMAuthMSISDNAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
+
+   <indexterm class="endofrange" startref="idx-auth-hints-msisdn">
+    <primary>Authentication</primary>
+    <secondary>MSISDN module</secondary>
+   </indexterm>
+
   </section>
   
   <section xml:id="OATH-module-conf-hints">
    <title>Hints for the OATH Module</title>
+
+   <indexterm class="startofrange" id="idx-auth-hints-oath">
+    <primary>Authentication</primary>
+    <secondary>Open Authentication (OATH) module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Open Authentication (OATH) authentication</primary>
+   </indexterm>
+
    <para>The Open Authentication (OATH) module provides a more secure method for users to 
       access their accounts with the help of a device, such as their mobile phone or 
       Yubikey. Users can log into OpenAM and update their information more securely from
@@ -3459,10 +3712,6 @@ $ ssoadm set-realm-svc-attrs \
       module for those already using HOTP prior to the 10.1.0 release. The OATH module includes 
       HOTP authentication and Time-Based One-Time Password (TOTP) authentication. Both types
       of authentication require an OATH compliant device that can provide the OTP.</para>
-   <indexterm>
-   <primary>Authentication</primary>
-   <secondary>Open Authentication (OATH)</secondary>
-   </indexterm>
    
    <para> HOTP authentication generates the OTP every time the user requests a new OTP
       on their device. The device tracks the number of times the user requests a new OTP, called
@@ -3615,7 +3864,15 @@ $ ssoadm set-realm-svc-attrs \
   </section>  
 
   <section xml:id="oauth2-module-conf-hints">
-   <title>Hints for the OAuth 2.0 / OpenID Connect Authentication Module</title>
+   <title>Hints for the OAuth 2.0/OpenID Connect Authentication Module</title>
+
+   <indexterm class="startofrange" id="idx-auth-hints-oauth2-oidc">
+    <primary>Authentication</primary>
+    <secondary>OAuth 2.0/OpenID Connect 1.0 module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>OAuth 2.0/OpenID Connection 1.0</primary>
+   </indexterm>
 
    <para>The OAuth 2.0 / OpenID Connect authentication module lets OpenAM
     authenticate clients of OAuth resource servers. References in this section
@@ -3780,8 +4037,11 @@ $ ssoadm set-realm-svc-attrs \
     <varlistentry>
      <term>Attribute Mapper</term>
      <listitem>
-      <para>Class implementing attribute mapping with a multiple value field. Default:
-      <literal>org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper</literal></para>
+      <para>List of fully qualified class names for implementations that map
+       attributes from the OAuth 2.0 authorization server or OpenID Connect
+       provider to OpenAM profile attributes.
+       Default:
+      <literal>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</literal></para>
       <para>Provided implementations are:</para>
       <simplelist>
        <member><literal>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</literal></member>
@@ -4044,10 +4304,24 @@ $ ssoadm set-realm-svc-attrs \
       </tbody>
      </tgroup>
     </table>
+
+   <indexterm class="endofrange" classref="idx-auth-hints-oauth2-oidc">
+    <primary>Authentication</primary>
+    <secondary>OAuth 2.0/OpenID Connect 1.0 module</secondary>
+   </indexterm>
+
   </section>
 
   <section xml:id="oidc-module-conf-hints">
    <title>Hints for the OpenID Connect id_token bearer Module</title>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>OpenID Connect id_token Bearer module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>OpenID Connect id_token Bearer module</primary>
+   </indexterm>
 
    <para>
     The OpenID Connect id_token bearer module lets OpenAM rely on
@@ -4250,7 +4524,7 @@ $ ssoadm set-realm-svc-attrs \
       </para>
 
       <para>
-       Default: <literal>email=mail</literal>, <literal>sub=uid</literal>
+       Default: <literal>mail=email</literal>, <literal>uid=sub</literal>
       </para>
 
       <para>
@@ -4305,6 +4579,11 @@ $ ssoadm set-realm-svc-attrs \
 
   <section xml:id="persistent-cookie">
    <title>Hints for the Persistent Cookie Module</title>
+
+   <indexterm>
+    <primary>Persistent Cookie module</primary>
+   </indexterm>
+
    <para>The Persistent Cookie module supports the configuration of cookie lifetimes,
     based on requests and a maximum time. It is the preferred method for creating
     a persistent cookie. If you choose this method, be aware that it does not
@@ -4312,11 +4591,6 @@ $ ssoadm set-realm-svc-attrs \
     Authentication module.
     Note that, by default, the persistent cookie is called <literal>session-jwt</literal>.
    </para>
-
-   <indexterm>
-    <primary>Cookie</primary>
-    <secondary>Persistent</secondary>
-   </indexterm>
 
    <important>
     <para>
@@ -4457,12 +4731,17 @@ $ ssoadm set-realm-svc-attrs \
 
   <section xml:id="radius-module-conf-hints">
    <title>Hints for the RADIUS Authentication Module</title>
-   <para>The Remote Authentication Dial-In User Service (RADIUS) module lets
-   OpenAM authenticate users against RADIUS servers.</para>
+
    <indexterm>
     <primary>Authentication</primary>
-    <secondary>RADIUS</secondary>
+    <secondary>RADIUS module</secondary>
    </indexterm>
+   <indexterm>
+    <primary>RADIUS module</primary>
+   </indexterm>
+
+   <para>The Remote Authentication Dial-In User Service (RADIUS) module lets
+   OpenAM authenticate users against RADIUS servers.</para>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthRadiusService</literal></para>
@@ -4528,17 +4807,22 @@ $ ssoadm set-realm-svc-attrs \
   
   <section xml:id="sae-module-conf-hints">
    <title>Hints for the SAE Authentication Module</title>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Secure Attribute Exchange (SAE) module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Secure Attribute Exchange (SAE) module</primary>
+   </indexterm>
+
    <para>The Secure Attribute Exchange (SAE) module lets OpenAM authenticate
    a user who has already authenticated with an entity that can vouch for
    the user to OpenAM, so that OpenAM creates a session for the user.
    This module is useful in virtual federation, where an existing entity
    instructs the local OpenAM instance to use federation protocols to transfer
    authentication and attribute information to a partner application.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>Secure Attribute Exchange (SAE)</secondary>
-   </indexterm>
-   
+
    <para><command>ssoadm</command> attribute:
    <literal>sunAMAuthSAEService</literal></para>
 
@@ -4557,14 +4841,17 @@ $ ssoadm set-realm-svc-attrs \
   <section xml:id="scripted-module-conf-hints">
    <title>Hints for Scripted Authentication Modules</title>
 
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Scripted Authentication module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Scripted authentication module</primary>
+   </indexterm>
+
    <para>
     This section covers what to configure for scripted authentication modules.
    </para>
-
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>Scripted authentication</secondary>
-   </indexterm>
 
    <para>
     A scripted authentication module runs scripts to authenticate a user.
@@ -4851,7 +5138,7 @@ ssoadm \
    </variablelist>
   </section>
 
-  <xinclude:include href="../shared/securid/section-auth-services.xml${skipSecurID}">
+  <xinclude:include href="../shared/securid/section-auth-services.xml">
    <xinclude:fallback>
     <!-- Module not present in nightly builds -->
    </xinclude:fallback>
@@ -4859,6 +5146,18 @@ ssoadm \
   
   <section xml:id="desktop-module-conf-hints">
    <title>Hints for the Windows Desktop SSO Authentication Module</title>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Windows Desktop SSO module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Windows Desktop SSO module</primary>
+   </indexterm>
+   <indexterm>
+    <primary>Kerberos</primary>
+   </indexterm>
+
    <para>
     The Windows Desktop SSO module uses Kerberos authentication. The user
     presents a Kerberos token to OpenAM through the Simple and Protected
@@ -4870,14 +5169,6 @@ ssoadm \
     Internet Explorer to benefit from single sign on when logged on to
     a Windows desktop.
    </para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>Kerberos</secondary>
-   </indexterm>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>Windows Desktop SSO</secondary>
-   </indexterm>
 
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthWindowsDesktopSSOService</literal></para>
@@ -4972,31 +5263,32 @@ ssoadm \
    <note>
     <para>
      For Windows 7 and later, you will need to turn off the "Enable
-
      Integrated Windows Authentication" option in Internet Explorer. In addition, you
-
      will need to add and activate the DisableNTMLPreAuth key to the Windows Registry.
-
      For detailed instructions, see the Microsoft KB article on when
      <link xlink:show="new"
            xlink:href="http://support.microsoft.com/kb/251404"><citetitle>You cannot post data
       to a non-NTLM-authenticated Web site</citetitle></link>.
     </para>
    </note>
-
   </section>
   
   <section xml:id="winnt-module-conf-hints">
    <title>Hints for the Windows NT Authentication Module</title>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Windows NT module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>WIndows NT module</primary>
+   </indexterm>
+
    <para>The Windows NT module lets OpenAM authenticate against a Microsoft
    Windows NT server.</para>
    <para>This module requires that you install a Samba client in a 
    <filename>bin</filename> directory under the OpenAM configuration directory
    such as <filename>$HOME/openam/openam/bin</filename>.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>Windows NT</secondary>
-   </indexterm>
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthNTService</literal></para>
@@ -5040,13 +5332,18 @@ ssoadm \
   
   <section xml:id="wss-module-conf-hints">
    <title>Hints for the WSSAuth Authentication Module</title>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Web Service Security (WSSAuth) module</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Web Service Security (WSSAuth) module</primary>
+   </indexterm>
+
    <para>The Web Service Security (WSSAuth) module lets OpenAM validate a
    user name, password combination received as an authentication token in
    a request from a Web Service Client to a Web Service Provider.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>WSSAuth</secondary>
-   </indexterm>
 
    <xinclude:include href="../shared/note-old-sts.xml" />
    
@@ -5118,7 +5415,7 @@ ssoadm \
   <title>Configuring Authentication Chains</title>
    <indexterm>
     <primary>Authentication</primary>
-    <secondary>Chains</secondary>
+    <secondary>chains</secondary>
    </indexterm>
   <para>Once you have configured authentication modules, and added the modules
   to the list of module instances, you can configure authentication chains.
@@ -5325,7 +5622,12 @@ ssoadm \
 
  <section xml:id="authn-from-browser">
   <title>Authenticating To OpenAM</title>
-  
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>authenticating to</secondary>
+  </indexterm>
+
   <para>This section explains how to connect to OpenAM for user authentication
   by adding parameters to the login URL when testing your configuration.</para>
   
@@ -5521,6 +5823,11 @@ ssoadm \
  <section xml:id="session-upgrade">
   <title>Authentication Levels &amp; Session Upgrade</title>
 
+  <indexterm>
+   <primary>Authentication levels</primary>
+   <secondary>and session upgrade</secondary>
+  </indexterm>
+
   <para>
    As shown in <xref linkend="configure-authn-modules" />,
    authentication modules are configured with an authentication level.
@@ -5590,8 +5897,10 @@ ssoadm \
 
  <section xml:id="configure-account-lockout">
   <title>Configuring Account Lockout</title>
+
   <indexterm>
    <primary>Account lockout</primary>
+   <secondary>configuring</secondary>
   </indexterm>
 
   <itemizedlist>
@@ -5656,8 +5965,13 @@ ssoadm \
 
  <section xml:id="configure-session-quotas">
   <title>Configuring Session Quotas</title>
+
   <indexterm>
    <primary>Session quotas</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Exhaustion actions</primary>
   </indexterm>
 
   <para>OpenAM lets you limit the number of active sessions for a user by
@@ -5791,6 +6105,11 @@ ssoadm \
 
  <section xml:id="configure-valid-goto-url-resources">
   <title>Configuring Valid goto URL Resources</title>
+
+  <indexterm>
+   <primary>Valid goto URL resources</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
 
   <para>
    By default, OpenAM redirects the user to the URL specified in the
