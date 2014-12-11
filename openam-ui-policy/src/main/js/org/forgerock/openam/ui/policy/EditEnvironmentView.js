@@ -135,17 +135,33 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
         changeInput: function(e) {
             e.stopPropagation();
 
-            if($(e.currentTarget).parent().children('label').length === 0){
+            var $control = $(e.currentTarget),
+                propTitle,
+                inputGroup,
+                autoFillGroup;
+
+            if ($control.parent().children('label').length === 0) {
                 return; // this is a temporary workaround needed for a event leakage
             }
-            var conditionTitle = $(e.currentTarget).parent().children('label').data().title,
-                inputGroup = $(e.currentTarget).closest('div.input-group'),
-                autoFillGroup = $(e.currentTarget).closest('li').find('div.auto-fill-group');
 
-            this.$el.data().itemData[conditionTitle] = e.currentTarget.value;
+            propTitle = $control.parent().children('label').data().title;
+            inputGroup = $control.closest('div.input-group');
+            autoFillGroup = $control.closest('li').find('div.auto-fill-group');
+
+            this.$el.data().itemData[propTitle] = e.currentTarget.value;
 
             this.populateInputGroup(inputGroup);
             this.populateAutoFillGroup(autoFillGroup);
+
+            if (propTitle === 'enforcementTimeZone') {
+                this.handleTimeZone(e.currentTarget.value);
+            }
+        },
+
+        handleTimeZone: function (currentVal) {
+            if (!_.find(this.data.timezones, function (zone) { return zone === currentVal; })) {
+                this.$el.data().itemData.enforcementTimeZone = 'GMT';
+            }
         },
 
         populateInputGroup:function(group){
@@ -196,18 +212,20 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
         },
 
         initDatePickers: function() {
-          this.$el.find( "#startDate" ).datepicker({
-            numberOfMonths: 2,
-            onClose: function( selectedDate ) {
-              $( "#endDate" ).datepicker( "option", "minDate", selectedDate );
-            }
-          });
-          this.$el.find("#endDate" ).datepicker({
-            numberOfMonths: 2,
-            onClose: function( selectedDate ) {
-              $( "#startDate" ).datepicker( "option", "maxDate", selectedDate );
-            }
-          });
+            this.$el.find("#startDate").datepicker({
+                numberOfMonths: 2,
+                dateFormat: 'yy:mm:dd',
+                onClose: function (selectedDate) {
+                    $("#endDate").datepicker("option", "minDate", selectedDate);
+                }
+            });
+            this.$el.find("#endDate").datepicker({
+                numberOfMonths: 2,
+                dateFormat: 'yy:mm:dd',
+                onClose: function (selectedDate) {
+                    $("#startDate").datepicker("option", "maxDate", selectedDate);
+                }
+            });
         },
 
         initClockPickers: function() {
@@ -233,12 +251,14 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
         },
 
         getTimeZones: function(){
-
             var self = this,
+                defaultTimeZone = 'GMT',
                 setTimeZones = function(){
                     self.$el.find('#enforcementTimeZone').autocomplete({
                         source: self.data.timezones
-                    });
+                    }).val(defaultTimeZone).trigger('autocompleteselect');
+
+                    self.$el.data().itemData.enforcementTimeZone = defaultTimeZone;
                 };
 
             if (self.data.timezones) {
