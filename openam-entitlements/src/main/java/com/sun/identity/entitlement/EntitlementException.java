@@ -24,7 +24,7 @@
  *
  * $Id: EntitlementException.java,v 1.2 2009/09/03 17:06:23 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions copyright 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -35,6 +35,8 @@ import java.util.ResourceBundle;
 
 /**
  * Entitlement related exception.
+ *
+ * @supported.all.api
  */
 public class EntitlementException extends Exception {
     public static final String RES_BUNDLE_NAME = "EntitlementException";
@@ -126,7 +128,6 @@ public class EntitlementException extends Exception {
     private String message;
     private Object[] params;
 
-    
     /**
      * Creates an entitlement exception.
      *
@@ -210,7 +211,7 @@ public class EntitlementException extends Exception {
     }
 
     /**
-     * Returns localized exception message.
+     * Returns localized exception message using the errorCode as key.
      *
      * @param locale Locale of the message.
      * @return localized exception message.
@@ -218,7 +219,6 @@ public class EntitlementException extends Exception {
     public String getLocalizedMessage(Locale locale) {
         ResourceBundle rb = ResourceBundle.getBundle(RES_BUNDLE_NAME, locale);
         String msg = rb.getString(Integer.toString(errorCode));
-        return (params != null) ? MessageFormat.format(msg, params) :
-            msg;
+        return (params != null) ? MessageFormat.format(msg, params) : msg;
     }
 }

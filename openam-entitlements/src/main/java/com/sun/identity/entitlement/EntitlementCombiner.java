@@ -24,7 +24,7 @@
  *
  * $Id: EntitlementCombiner.java,v 1.4 2009/12/07 19:46:45 veiming Exp $
  *
- * Portions copyright 2010-2013 ForgeRock AS.
+ * Portions copyright 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -38,8 +38,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This is the base class for entitlement combiner. >code>DenyOverride</code>
- * extends this class.
+ * Encapsulates a Strategy for combining the results of two {@link com.sun.identity.entitlement.Entitlement}s.
+ * Across the system, these can also be referred to as "decision combiners"; for example, the set of registered
+ * EntitlementCombiners can be retrieved from the <code>/json/decisioncombiners</code> REST endpoint.
+ *
+ * This is the base class and is, for example, extended by {@link com.sun.identity.entitlement.DenyOverride}.
  *
  * <code>init</code> needs to be called after it is created.
  */
@@ -166,8 +169,9 @@ public abstract class EntitlementCombiner {
     }
 
     /**
-     * Merges action values. The action values of the second entitlement
-     * is merged to first entitlement.
+     * Sets the action values of the first entitlement to be the union of all action values from the first and second
+     * entitlements; if a particular action value is contained in both entitlements, then the two values are combined
+     * (using the implementation-dependent) {@link #combine} method) before being added to the first entitlement.
      *
      * @param e1 Entitlement.
      * @param e2 Entitlement.
@@ -211,11 +215,10 @@ public abstract class EntitlementCombiner {
     }
 
     /**
-     * Merges advices. The advices of the second entitlement
-     * is merged to first entitlement.
+     * Sets the advices of the first entitlement to be the union of all advices from the first and second entitlements.
      *
-     * @param e1 Entitlement
-     * @param e2 Entitlement
+     * @param e1 Entitlement.
+     * @param e2 Entitlement.
      */
     protected void mergeAdvices(Entitlement e1, Entitlement e2) {
         Map<String, Set<String>> result = new HashMap<String, Set<String>>();
@@ -253,8 +256,8 @@ public abstract class EntitlementCombiner {
     }
 
     /**
-     * Merges attributes. The attributes of the second entitlement
-     * is merged to first entitlement.
+     * Sets the attributes of the first entitlement to be the union of all attributes from the first and second
+     * entitlements.
      *
      * @param e1 Entitlement
      * @param e2 Entitlement
@@ -295,8 +298,7 @@ public abstract class EntitlementCombiner {
     }
 
     /**
-     * Merges time to live values. The lowest of the TTL values is set as the
-     * TTL.
+     * Merges time to live values. The lowest of the TTL values is set as the TTL.
      *
      * @param e1 Entitlement
      * @param e2 Entitlement
@@ -317,20 +319,18 @@ public abstract class EntitlementCombiner {
     }
 
     /**
-     * Returns <code>trie</code> if this entitlement combiner is working
-     * on sub tree evaluation.
+     * Returns <code>true</code> if this entitlement combiner is working on sub tree evaluation.
      *
-     * @return <code>trie</code> if this entitlement combiner is working
-     * on sub tree evaluation.
+     * @return <code>true</code> if this entitlement combiner is working on sub tree evaluation.
      */
     protected boolean isRecursive() {
         return isRecursive;
     }
 
     /**
-     * Returns root entitltlement.
+     * Returns the entitlement which will act as the root for sub tree evaluations.
      *
-     * @return root entitltlement.
+     * @return root entitlement for sub tree evaluations.
      */
     protected Entitlement getRootE() {
         return rootE;
@@ -355,8 +355,7 @@ public abstract class EntitlementCombiner {
     }
 
     /**
-     * Returns entitlements which is the result of combining a set of
-     * entitlement.
+     * Returns entitlements which are the result of combining a set of entitlements.
      *
      * @return entitlement results.
      */
@@ -375,8 +374,7 @@ public abstract class EntitlementCombiner {
 
     /**
      * Returns <code>true</code> if policy decision can also be determined.
-     * This method is called by dervived classed. #isDone method shall be
-     * set if this returns true.
+     * This method is called by derived classes. #isDone method shall be set if this returns true.
      *
      * @return <code>true</code> if policy decision can also be determined.
      */

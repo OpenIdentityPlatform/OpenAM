@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions copyright 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -36,7 +36,13 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 /**
- * Interface specification for entitlement <code>ResourceAttribute</code>
+ * Encapsulates a Strategy to derive attributes to be returned with a particular
+ * {@link com.sun.identity.entitlement.Entitlement} when evaluating {@link com.sun.identity.entitlement.Privilege}s.
+ *
+ * For example, these may be statically defined ({@link com.sun.identity.entitlement.StaticAttributes})
+ * or derived from the {@link Subject}'s account details ({@link com.sun.identity.entitlement.UserAttributes}).
+ *
+ * @supported.all.api
  */
 public interface ResourceAttribute {
 
@@ -69,9 +75,8 @@ public interface ResourceAttribute {
      * @param subject Subject who is under evaluation.
      * @param resourceName Resource name.
      * @param environment Environment parameters.
-     * @return applicable resource attributes
-     * @throws com.sun.identity.entitlement.EntitlementException
-     * if can not get condition decision
+     * @return applicable resource attributes.
+     * @throws EntitlementException if a condition decision cannot be reached.
      */
     Map<String, Set<String>> evaluate(
         Subject adminSubject,
@@ -82,32 +87,38 @@ public interface ResourceAttribute {
         throws EntitlementException;
 
     /**
-     * Sets OpenSSO policy response provider name of the object
-     * @param pResponseProviderName response provider name as used in OpenSSO
-     *        policy, this is relevant only when StaticAttributes was created
-     *        from OpenSSO policy Subject
+     * Sets OpenSSO policy response provider name of the object.
+     *
+     * @param pResponseProviderName response provider name as used in OpenSSO policy, this is relevant only
+     *        when StaticAttributes was created from OpenSSO policy Subject
+     *
+     * @deprecated
      */
+    @Deprecated
     void setPResponseProviderName(String pResponseProviderName);
 
     /**
      * Returns OpenSSO policy response provider name of the object
-     * @return response provider name as used in OpenSSO policy,
-     * this is relevant only when StaticAttributes was created from
-     * OpenSSO policy Subject
+     *
+     * @return response provider name as used in OpenSSO policy, this is relevant only when StaticAttributes
+     *         were created from OpenSSO policy Subject
+     *
+     * @deprecated
      */
+    @Deprecated
     String getPResponseProviderName();
 
     /**
-     * Returns the state of this object.
+     * Returns state of the object encoded as a JSON string.
      *
-     * @return state of this object.
+     * @return state of the object encoded as a JSON string.
      */
     String getState();
 
     /**
-     * Sets the state of the object.
+     * Sets state of this object from a JSON string.
      *
-     * @param s state of the object.
+     * @param state State of the object encoded as a JSON string
      */
-    void setState(String s);
+    void setState(String state);
 }

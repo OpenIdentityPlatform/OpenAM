@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions copyright 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -36,20 +36,24 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 /**
- * Interface specifiction for privilige subject
- * @author ddorai
+ * Encapsulates a Strategy to decide if a {@link com.sun.identity.entitlement.Privilege} applies to a given
+ * {@link Subject}.
+ *
+ * @supported.all.api
  */
 public interface EntitlementSubject {
 
     /**
-     * Sets state of the object
-     * @param state State of the object encoded as string
+     * Sets state of this object from a JSON string.
+     *
+     * @param state State of the object encoded as a JSON string
      */
     void setState(String state);
 
     /**
-     * Returns state of the object
-     * @return state of the object encoded as string
+     * Returns state of the object encoded as a JSON string.
+     *
+     * @return state of the object encoded as a JSON string.
      */
     String getState();
 
@@ -58,8 +62,8 @@ public interface EntitlementSubject {
      * These values will be used by the authorization engine to obtain the
      * applicable policies for a given <class>Subject</class>.
      *
-     * @return a maps of key-value pairs that will be used for indexing the
-     * entitlements that contain this <class>EntitlementSubject</class>
+     * @return a map of key-value pairs that will be used for indexing the
+     * entitlements that contain this <class>EntitlementSubject</class>.
      */
     Map<String, Set<String>> getSearchIndexAttributes();
 
@@ -69,21 +73,18 @@ public interface EntitlementSubject {
      * these attributes in the <class>Subject</class> for the <class>
      * EntitlementSubject</class>'s consumption.
      *
-     * @return a set of attributes that would be required by the <class>
-     * EntitlementSubject</class>'s implementation
+     * @return a set of attributes that would be required by the <class>EntitlementSubject</class>'s implementation.
      */
-    Set <String> getRequiredAttributeNames();
+    Set<String> getRequiredAttributeNames();
 
     /**
-     * Returns <code>SubjectDecision</code> of
-     * <code>EntitlementSubject</code> evaluation
+     * Returns <code>SubjectDecision</code> of <code>EntitlementSubject</code> evaluation.
      *
      * @param realm Realm name.
-     * @param subject EntitlementSubject who is under evaluation.
+     * @param subject Subject who is under evaluation.
      * @param resourceName Resource name.
      * @param environment Environment parameters.
-     * @return <code>SubjectDecision</code> of
-     * <code>EntitlementSubject</code> evaluation
+     * @return <code>SubjectDecision</code> of <code>Subject</code> evaluation.
      * @throws EntitlementException if any errors occur.
      */
     SubjectDecision evaluate(
