@@ -26,27 +26,40 @@
 
 define("org/forgerock/openam/ui/dashboard/TrustedDevicesDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration"
-], function(constants, AbstractDelegate, conf) {
+], function(constants, configuration, AbstractDelegate, conf) {
 
-    var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json/users/');
+    var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json');
 
    obj.getTrustedDevices = function() {
+       var realm = this.cleanRealm(configuration.globalData.auth.realm);
        return obj.serviceCall({
-            url: conf.loggedUser.uid + '/devices/trusted/?_queryId=*',
+            url: realm + '/users/' + conf.loggedUser.uid + '/devices/trusted/?_queryId=*',
             headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
    obj.deleteTrustedDevice = function(id) {
+       var realm = this.cleanRealm(configuration.globalData.auth.realm);
        return obj.serviceCall({
-           url: conf.loggedUser.uid + '/devices/trusted/' + id,
+           url: realm + '/users/' + conf.loggedUser.uid + '/devices/trusted/' + id,
            type: "DELETE",
            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
        });
     };
 
+
+    obj.cleanRealm = function(realm) {
+        if(realm.charAt(0) !== "/"){
+            realm = "/" + realm;
+        }
+        if(realm === "/"){
+            realm = "";
+        }
+        return realm;
+    };
 
     return obj;
 });

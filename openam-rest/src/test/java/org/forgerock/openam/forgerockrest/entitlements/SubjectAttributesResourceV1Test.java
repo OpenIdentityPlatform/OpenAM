@@ -56,7 +56,7 @@ public class SubjectAttributesResourceV1Test {
     public void shouldPerformQueryForSubjectAttributes() throws EntitlementException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         Subject mockSubject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
@@ -83,7 +83,7 @@ public class SubjectAttributesResourceV1Test {
     public void shouldReturnNoResultWhenNoAttributes() throws EntitlementException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         Subject mockSubject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
@@ -105,7 +105,7 @@ public class SubjectAttributesResourceV1Test {
     public void shouldErrorWhenAttributeRetrievalFails() throws EntitlementException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         Subject mockSubject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);

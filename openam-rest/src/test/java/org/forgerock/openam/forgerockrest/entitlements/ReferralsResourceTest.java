@@ -93,7 +93,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -113,7 +113,7 @@ public class ReferralsResourceTest {
     public void shouldBadRequestIfJsonUnreadable() {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -142,7 +142,7 @@ public class ReferralsResourceTest {
     public void shouldConflictIfResourceExists() throws EntitlementException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -165,7 +165,7 @@ public class ReferralsResourceTest {
     public void shouldErrorIfCannotCheckThatResourceExists() throws EntitlementException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -189,7 +189,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -232,7 +232,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -276,7 +276,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -300,7 +300,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         DeleteRequest mockDeleteRequest = mock(DeleteRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -323,7 +323,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         DeleteRequest mockDeleteRequest = mock(DeleteRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -347,7 +347,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         QueryRequest mockQueryRequest = mock(QueryRequest.class);
         QueryResultHandler mockQueryResultHandler = mock(QueryResultHandler.class);
@@ -370,7 +370,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         QueryRequest mockQueryRequest = mock(QueryRequest.class);
         QueryResultHandler mockQueryResultHandler = mock(QueryResultHandler.class);
@@ -403,7 +403,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -428,7 +428,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         DeleteRequest mockDeleteRequest = mock(DeleteRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -449,7 +449,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         ReadRequest mockReadRequest = mock(ReadRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -471,7 +471,7 @@ public class ReferralsResourceTest {
     public void shouldPerformRead() throws EntitlementException {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         ReadRequest mockReadRequest = mock(ReadRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -494,7 +494,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -535,7 +535,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -647,7 +647,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -692,7 +692,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -719,7 +719,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
@@ -746,7 +746,7 @@ public class ReferralsResourceTest {
 
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
         UpdateRequest mockUpdateRequest = mock(UpdateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);

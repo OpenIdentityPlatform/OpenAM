@@ -77,8 +77,9 @@ define("UserDelegate", [
      * Checks if logged in and returns users id
      */
     obj.getProfile = function(successCallback, errorCallback, errorsHandlers) {
+        var realm = this.cleanRealm(configuration.globalData.auth.realm);
         obj.serviceCall({
-            url: "/users?_action=idFromSession",
+            url: realm + "/users?_action=idFromSession",
             data: "{}",
             type: "POST",
             headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},

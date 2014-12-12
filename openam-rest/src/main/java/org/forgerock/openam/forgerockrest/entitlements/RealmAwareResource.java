@@ -45,11 +45,11 @@ public abstract class RealmAwareResource extends SubjectAwareResource {
 
         final RealmContext rc = context.asContext(RealmContext.class);
 
-        if (rc.getRealm().equals(EMPTY)) {
+        if (rc.getResolvedRealm().equals(EMPTY)) {
             return ROOT;
         }
 
-        return rc.getRealm();
+        return rc.getResolvedRealm();
     }
 
 }

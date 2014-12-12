@@ -103,7 +103,7 @@ public class RealmResource implements CollectionResourceProvider {
             final ResultHandler<Resource> handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        String realmPath = realmContext.getRealm();
+        String realmPath = realmContext.getResolvedRealm();
 
         Resource resource;
         String parentRealm;
@@ -248,7 +248,7 @@ public class RealmResource implements CollectionResourceProvider {
             final ResultHandler<Resource> handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        String realmPath = realmContext.getRealm();
+        String realmPath = realmContext.getResolvedRealm();
 
         boolean recursive = false;
         Resource resource;
@@ -338,7 +338,7 @@ public class RealmResource implements CollectionResourceProvider {
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
         final RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realmPath = realmContext.getRealm();
+        final String realmPath = realmContext.getResolvedRealm();
 
         try {
 
@@ -391,7 +391,7 @@ public class RealmResource implements CollectionResourceProvider {
             final ResultHandler<Resource> handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        String realmPath = realmContext.getRealm();
+        String realmPath = realmContext.getResolvedRealm();
 
         Resource resource;
         JsonValue jval;
@@ -669,7 +669,7 @@ public class RealmResource implements CollectionResourceProvider {
             final ResultHandler<Resource> handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        String realmPath = realmContext.getRealm();
+        String realmPath = realmContext.getResolvedRealm();
 
         final JsonValue realmDetails = request.getContent();
         Resource resource;

@@ -65,7 +65,7 @@ public class DecisionCombinersResourceTest {
     public void shouldThrowErrorWthInvalidCondition() throws JsonMappingException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -90,7 +90,7 @@ public class DecisionCombinersResourceTest {
     public void testSuccessfulJsonificationAndQuery() throws JsonMappingException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -114,7 +114,7 @@ public class DecisionCombinersResourceTest {
     public void testSuccessfulJsonificationAndReadAndNamePropertyRemoved() throws JsonMappingException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject mockSubject = new Subject();

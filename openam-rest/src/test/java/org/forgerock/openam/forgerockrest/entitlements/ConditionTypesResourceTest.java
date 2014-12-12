@@ -71,7 +71,7 @@ public class ConditionTypesResourceTest {
     public void shouldThrowErrorWthInvalidCondition() throws JsonMappingException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -96,7 +96,7 @@ public class ConditionTypesResourceTest {
     public void testSuccessfulJsonificationAndQuery() throws JsonMappingException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -122,7 +122,7 @@ public class ConditionTypesResourceTest {
     public void testSuccessfulJsonificationAndReadAndNamePropertyRemoved() throws JsonMappingException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -156,7 +156,7 @@ public class ConditionTypesResourceTest {
     public void testSuccessfulJsonificationAndLogicalIsCorrect() throws JsonMappingException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject mockSubject = new Subject();

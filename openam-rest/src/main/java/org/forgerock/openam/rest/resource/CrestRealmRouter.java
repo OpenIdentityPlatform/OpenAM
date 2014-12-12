@@ -18,9 +18,12 @@ package org.forgerock.openam.rest.resource;
 
 import static org.forgerock.json.resource.RoutingMode.STARTS_WITH;
 
+import javax.inject.Inject;
+import java.net.URI;
+import java.util.List;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -31,12 +34,6 @@ import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.router.VersionedRouter;
-
-import javax.inject.Inject;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.util.List;
 
 /**
  * A CREST request handler which will route to resource endpoints, dynamically handling realm URI parameters.
@@ -80,70 +77,60 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
      */
     @Override
     protected ServerContext transformContext(ServerContext context) throws ResourceException {
-        String realm;
-
-        realm = getRealmFromPolicyAdvice(context);
-
-        if (realm == null) {
-            realm = getRealmFromURI(context);
-        }
-
-        if (realm == null) {
-            realm = getRealmFromQueryString(context);
-        }
-
-        if (realm == null) {
-            realm = getRealmFromServerName(context);
-        }
 
         RealmContext realmContext;
         if (context.containsContext(RealmContext.class)) {
             realmContext = context.asContext(RealmContext.class);
-            realmContext.addSubRealm(realm);
         } else {
-            realmContext = new RealmContext(context, realm);
+            realmContext = new RealmContext(context);
         }
 
-        // Check that the path references an existing realm
-        return validateRealm(realmContext);
+        boolean handled = getRealmFromURI(context, realmContext);
+        if (!handled) {
+            handled = getRealmFromQueryString(context, realmContext);
+        }
+        if (!handled) {
+            getRealmFromServerName(context, realmContext);
+        }
+        return realmContext;
     }
 
-    private String getRealmFromPolicyAdvice(ServerContext context) {
-        List<String> advice = context.asContext(HttpContext.class).getParameter(AuthClientUtils.COMPOSITE_ADVICE);
-        if (advice == null || advice.size() != 1) {
-            return null;
-        }
-
-        try {
-            String decodedXml = URLDecoder.decode(advice.get(0), "UTF-8");
-            return coreWrapper.getRealmFromPolicyAdvice(decodedXml);
-        } catch (UnsupportedEncodingException uee) {
-            //Empty catch
-        }
-        return null;
-    }
-
-    private String getRealmFromURI(ServerContext context) {
+    private boolean getRealmFromURI(ServerContext context, RealmContext realmContext) throws BadRequestException {
         if (context.containsContext(RouterContext.class)) {
-            return context.asContext(RouterContext.class).getUriTemplateVariables().get("realm");
+            String subRealm = context.asContext(RouterContext.class).getUriTemplateVariables().get("realm");
+            subRealm = validateRealm(realmContext.getResolvedRealm(), subRealm);
+            if (subRealm != null) {
+                realmContext.addSubRealm(subRealm, subRealm);
+                return true;
+            }
         }
-        return null;
+        return false;
     }
 
-    private String getRealmFromQueryString(ServerContext context) {
+    private boolean getRealmFromQueryString(ServerContext context, RealmContext realmContext)
+            throws BadRequestException {
         List<String> realm = context.asContext(HttpContext.class).getParameter("realm");
         if (realm == null || realm.size() != 1) {
-            return null;
+            return false;
         }
-        return realm.get(0);
+        String subRealm = validateRealm(realmContext.getResolvedRealm(), realm.get(0));
+        if (subRealm != null) {
+            realmContext.addSubRealm(subRealm, subRealm);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private String getRealmFromServerName(ServerContext context) throws InternalServerErrorException {
+    private boolean getRealmFromServerName(ServerContext context, RealmContext realmContext)
+            throws InternalServerErrorException, BadRequestException {
         String serverName = URI.create(context.asContext(HttpContext.class).getPath()).getHost();
         try {
             SSOToken adminToken = coreWrapper.getAdminToken();
             String orgDN = coreWrapper.getOrganization(adminToken, serverName);
-            return coreWrapper.convertOrgNameToRealmName(orgDN);
+            String realmPath = validateRealm(coreWrapper.convertOrgNameToRealmName(orgDN));
+            realmContext.addDnsAlias(serverName, realmPath);
+            return true;
         } catch (IdRepoException e) {
             throw new InternalServerErrorException(e);
         } catch (SSOException e) {
@@ -151,24 +138,46 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
         }
     }
 
-    private ServerContext validateRealm(RealmContext realmContext) throws BadRequestException {
-        if (!realmValidator.isRealm(realmContext.getRealm())) {
+    private String validateRealm(String realmPath) throws BadRequestException {
+        String resolvedRealm = realmPath;
+        if (!realmValidator.isRealm(resolvedRealm)) {
             try {
                 SSOToken adminToken = coreWrapper.getAdminToken();
                 //Need to strip off leading '/' from realm otherwise just generates a DN based of the realm value, which is wrong
-                String realm = realmContext.getRealm();
+                String realm = resolvedRealm;
                 if (realm.startsWith("/")) {
                     realm = realm.substring(1);
                 }
                 String orgDN = coreWrapper.getOrganization(adminToken, realm);
-                return new RealmContext(realmContext.getParent(), coreWrapper.convertOrgNameToRealmName(orgDN));
+                return coreWrapper.convertOrgNameToRealmName(orgDN);
             } catch (IdRepoException e) {
                 //Empty catch, fall through to throw exception
             } catch (SSOException e) {
                 //Empty catch, fall through to throw exception
             }
-            throw new BadRequestException("Invalid realm, " + realmContext.getRealm());
+            throw new BadRequestException("Invalid realm, " + resolvedRealm);
         }
-        return realmContext;
+        return realmPath;
+    }
+
+    private String validateRealm(String realmPath, String subRealm) throws BadRequestException {
+        if (subRealm == null || subRealm.isEmpty()) {
+            return null;
+        }
+        if (realmPath.endsWith("/")) {
+            realmPath = realmPath.substring(0, realmPath.length() - 1);
+        }
+        if (!subRealm.startsWith("/")) {
+            subRealm = "/" + subRealm;
+        }
+        if (subRealm.endsWith("/")) {
+            subRealm = subRealm.substring(0, subRealm.length() - 1);
+        }
+        String validatedRealm = validateRealm(realmPath + subRealm);
+        if (!realmValidator.isRealm(realmPath + subRealm)) {
+            return validatedRealm;
+        } else {
+            return subRealm;
+        }
     }
 }

@@ -53,14 +53,15 @@ public class PrivilegePolicyStoreProviderTest {
         // Given
         SubjectContext subjectContext = mock(SubjectContext.class);
         Subject subject = new Subject();
-        String realm = "test realm";
+        String realm = "/test realm";
         given(subjectContext.getCallerSubject()).willReturn(subject);
-        ServerContext serverContext = new RealmContext(subjectContext, realm);
+        RealmContext context = new RealmContext(subjectContext);
+        context.addSubRealm(realm, realm);
         PrivilegeManager manager = mock(PrivilegeManager.class);
         given(mockFactory.getPrivilegeManager(realm, subject)).willReturn(manager);
 
         // When
-        PolicyStore store = testProvider.getPolicyStore(serverContext);
+        PolicyStore store = testProvider.getPolicyStore(context);
 
         // Then
         verify(mockFactory).getPrivilegeManager(realm, subject);
