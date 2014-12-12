@@ -44,24 +44,21 @@
  require further distinctions for policy evaluation. This chapter explains how
  to customize policy evaluation for deployments with particular requirements
  not met by built-in OpenAM functionality.</para>
- 
- <!-- Inspired by the sample plugin provided with OpenAM and Sam's wiki work at
-      https://wikis.forgerock.org/confluence/display/openam/Install+Custom+Policy+Plug-in -->
- 
+
  <para>
-  This chapter shows how to build sample plugins,
-  and how to configure OpenAM to use one of the plugins.
+  This chapter shows how to build and use a custom policy plugin
+  that implements a subject condition, an environment condition,
+  and resource attributes.
  </para>
 
  <section xml:id="about-sample-policy-plugins">
-  <title>About the Sample Plugins</title>
+  <title>About the Sample Plugin</title>
   
   <para>
-   The OpenAM policy framework lets you build plugins
-   to extend subjects, conditions, and response providers for policies,
-   and also extend referrals for policy delegation.
+   The OpenAM policy framework lets you build plugins that extend
+   subject conditions, environment conditions, and resource attributes.
    The <link xlink:href="https://github.com/markcraig/openam-policy-eval-sample"
-   xlink:show="new">sample policy evaluation plugin source</link>
+   xlink:show="new">sample policy plugin source</link>
    is available online.
    Get a local clone so that you can read the source and try the sample on your system.
    In the sources you find the following files.
@@ -83,45 +80,70 @@
    </varlistentry>
 
    <varlistentry>
-    <term><filename>src/main/java/org/forgerock/openam/examples/SampleCondition.java</filename></term>
+    <term><filename>src/main/java/org/forgerock/openam/examples/SampleAttributeType.java</filename></term>
     <listitem>
      <para>
-      Extends the <literal>Condition</literal> interface,
-      and shows an implementation of a condition
-      to base the policy decision on the length of the user name
+      Extends the <literal>com.sun.identity.entitlement.ResourceAttribute</literal> interface,
+      and shows an implementation of a resource attribute provider
+      to send an attribute with the response.
      </para>
     </listitem>
    </varlistentry>
 
    <varlistentry>
-    <term><filename>src/main/java/org/forgerock/openam/examples/SampleReferral.java</filename></term>
+    <term><filename>src/main/java/org/forgerock/openam/examples/SampleConditionType.java</filename></term>
     <listitem>
      <para>
-      Extends the <literal>Referral</literal> interface,
-      and shows an implementation of a policy referral for delegation
+      Extends the <literal>com.sun.identity.entitlement.EntitlementCondition</literal> interface,
+      and shows an implementation of a condition that is the length of the user name.
+     </para>
+
+     <para>
+      A condition influences whether the policy applies for a given access request.
+      If the condition is fulfilled,
+      then OpenAM includes the policy in the set of policies to evaluate
+      in order to respond to a policy decision request.
      </para>
     </listitem>
    </varlistentry>
 
    <varlistentry>
-    <term><filename>src/main/java/org/forgerock/openam/examples/SampleResponseProvider.java</filename></term>
+    <term><filename>src/main/java/org/forgerock/openam/examples/SampleSubjectType.java</filename></term>
     <listitem>
      <para>
-      Extends the <literal>ResponseProvider</literal> interface,
-      and shows an implementation of a response provider
-      to send an attribute from the user profile with the response
+      Extends the <literal>com.sun.identity.entitlement.EntitlementSubject</literal> interface,
+      and shows an implementation that defines a user to whom the policy applies.
+     </para>
+
+     <para>
+      A subject, like a condition, influences whether the policy applies.
+      If the subject matches in the context of a given access request,
+      then the policy applies.
      </para>
     </listitem>
    </varlistentry>
 
    <varlistentry>
-    <term><filename>src/main/java/org/forgerock/openam/examples/SampleSubject.java</filename></term>
+    <term><filename>src/main/java/org/forgerock/openam/examples/SampleEntitlementModule.java</filename></term>
+    <term><filename>src/main/resources/META-INF/services/org.forgerock.openam.entitlement.EntitlementModule</filename></term>
     <listitem>
      <para>
-      Extends the <literal>Subject</literal> interface,
-      and shows an implementation
-      that defines the users to whom the policy applies,
-      in this case all authenticated users
+      These files serve to register the plugin with OpenAM.
+     </para>
+
+     <para>
+      The Java class, <literal>SampleEntitlementModule</literal>, implements the
+      <literal>org.forgerock.openam.entitlement.EntitlementModule</literal> interface.
+      In the sample,
+      this class registers "SampleAttribute", "SampleCondition", and "SampleSubject".
+     </para>
+
+     <para>
+      The services file,
+      <filename>org.forgerock.openam.entitlement.EntitlementModule</filename>,
+      holds the fully qualified class name of the <literal>EntitlementModule</literal>
+      that registers the custom implementations.
+      In this case, <literal>org.forgerock.openam.entitlement.EntitlementModule</literal>.
      </para>
     </listitem>
    </varlistentry>
@@ -145,7 +167,7 @@ $ <userinput>mvn install</userinput>
 
 ...
 
-[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ openam-policy-eval-sample
+[INFO] --- maven-jar-plugin:2.3.2:jar (default-jar) @ openam-policy-eval-sample
 [INFO] Building jar: .../target/openam-policy-eval-sample-1.0.0-SNAPSHOT.jar
 [INFO]
 
@@ -154,9 +176,9 @@ $ <userinput>mvn install</userinput>
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 3.827s
-[INFO] Finished at: Mon Nov 25 19:07:15 CET 2013
-[INFO] Final Memory: 21M/228M
+[INFO] Total time: 1.480s
+[INFO] Finished at: Tue Dec 09 11:45:54 CET 2014
+[INFO] Final Memory: 16M/257M
 [INFO] ------------------------------------------------------------------------</computeroutput>
    </screen>
   </step>
@@ -184,139 +206,364 @@ $ <userinput>cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</userin
   <title>Configuring a Sample Policy Plugin</title>
   
   <para>
-   This section shows how to configure the sample custom policy condition.
-   Configuration involves defining the strings that describe the policy condition,
-   and plugging the policy condition into the <literal>iPlanetAMPolicyService</literal>,
-   and then restarting OpenAM to be able to add the condition to your policies.</para>
-  
-  <para>
-   You need to update two files under your OpenAM deployment
-   where the strings describing your plugin are included as properties values.
+   This section shows how to edit OpenAM policy editor settings
+   to allow policy administrators to configure policies
+   that use the custom subject condition and custom environment condition.
   </para>
 
   <procedure xml:id="configure-the-sample-policy-plugin">
    <title>To Configure the Sample Policy Plugin</title>
+
+   <para>
+    OpenAM policy editor retrieves resources from the JSON file
+    <filename>policyEditor/locales/<replaceable>locale</replaceable>/translation.json</filename>,
+    where the default <replaceable>locale</replaceable> is <literal>en</literal>.
+    The file is located under the directory where the OpenAM war file
+    is unpacked for deployment,
+    such as <filename>/path/to/tomcat/webapps/openam</filename>.
+   </para>
+
    <step>
     <para>
-     Extract <filename>amPolicy.properties</filename>,
-     <filename>amPolicyConfig.properties</filename>,
-     and if necessary the localized versions of this file
-     from <filename>${coreLibrary}</filename>
-     to <filename>WEB-INF/classes/</filename> where OpenAM is deployed.
-     For example, if OpenAM is deployed under
-     <filename>/path/to/tomcat/webapps/openam</filename>,
-     then you could run the following commands.
+     Open the <filename>translation.json</filename> file for editing.
     </para>
 
-    <screen>
-     $ <userinput>cd /path/to/tomcat/webapps/openam/WEB-INF/classes/</userinput>
-     $ <userinput>jar -xvf ../lib/${coreLibrary} amPolicy.properties \
-     amPolicyConfig.properties</userinput>
-     <computeroutput>inflated: amPolicyConfig.properties
-      inflated: amPolicy.properties</computeroutput>
-    </screen>
+    <para>
+     If your editor does not perform JSON syntax checking,
+     then use a service such as
+     <link xlink:show="new" xlink:href="http://jsonlint.com" />
+     to make sure your edits result in valid JSON.
+    </para>
    </step>
 
    <step>
     <para>
-     In <filename>amPolicy.properties</filename> add this property:
+     In the <literal>policy.subjectTypes</literal> object,
+     add an object defining the strings for the policy editor to use
+     when displaying the custom subject condition.
     </para>
 
-    <literallayout class="monospaced">samplecondition-policy-name=Sample Condition</literallayout>
+    <programlisting language="javascript">
+"subjectTypes": {
+  "SampleSubject": {
+    "title": "Sample Subject",
+    "props": {
+      "name": "Name"
+    }
+  },
+    </programlisting>
    </step>
 
    <step>
     <para>
-     In <filename>amPolicyConfig.properties</filename> add this property:</para>
+     In the <literal>policy.conditionTypes</literal> object,
+     add an object defining the strings for the policy editor to use
+     when displaying the custom environment condition.
+    </para>
 
-    <literallayout class="monospaced">x100=Sample Condition</literallayout>
-   </step>
-
-   <step>
-    <para>Add the schema that describes your plugin to OpenAM.</para>
-
-    <screen>
-     $ <userinput>ssoadm \
-     add-plugin-schema \
-     --adminid amadmin \
-     --password-file /tmp/pwd.txt \
-     --servicename iPlanetAMPolicyService \
-     --interfacename Condition \
-     --pluginname SampleCondition \
-     --i18nname amPolicy \
-     --i18nkey samplecondition-policy-name \
-     --classname org.forgerock.openam.examples.SampleCondition</userinput>
-
-     <computeroutput>Plug-in schema, Condition was added to service, iPlanetAMPolicyService.</computeroutput>
-    </screen>
+    <programlisting language="javascript">
+"conditionTypes": {
+  "SampleCondition": {
+    "title": "Sample Condition",
+    "props": {
+      "nameLength": "Min. username length"
+    }
+  },
+    </programlisting>
    </step>
 
    <step>
     <para>
-     Set the choice values of the schema to include your plugin
-     with other policy conditions in the policy service.
-    </para>
-
-    <screen>
-     $ <userinput>ssoadm \
-     set-attr-choicevals \
-     --adminid amadmin \
-     --password-file /tmp/pwd.txt \
-     --servicename iPlanetAMPolicyConfigService \
-     --schematype Organization \
-     --attributename iplanet-am-policy-selected-conditions \
-     --add \
-     --choicevalues "x100=SampleCondition" </userinput>
-
-     <computeroutput>Choice Values were set.</computeroutput>
-    </screen>
-   </step>
-
-   <step>
-    <para>
-     Set the plugin policy condition as one of the default attributes
-     of the policy service.
-    </para>
-
-    <screen>
-     $ <userinput>ssoadm \
-     add-attr-defs \
-     --adminid amadmin \
-     --password-file /tmp/pwd.txt \
-     --servicename iPlanetAMPolicyConfigService \
-     --schematype Organization \
-     --attributevalues "iplanet-am-policy-selected-conditions=SampleCondition"</userinput>
-
-     <computeroutput>Schema attribute defaults were added.</computeroutput>
-    </screen>
-   </step>
-
-   <step>
-    <para>
-     After completing configuration, restart OpenAM or the container in which it runs.
+     When satisfied the JSON is correct, save the file.
     </para>
 
     <para>
-     In OpenAM Console, browse to Access Control &gt; <replaceable>Realm
-     Name</replaceable> &gt; Policies &gt; <replaceable>Policy Name</replaceable>
-     &gt; Conditions &gt; New.
-     Notice in the list of conditions that you can now apply your Sample Condition.
+     Your custom policy plugin can now be used for new policy applications.
     </para>
-
-    <mediaobject xml:id="figure-sample-condition">
-     <alt>Sample Condition in list of conditions</alt>
-     <imageobject>
-      <imagedata fileref="images/sample-condition.png" format="PNG"/>
-     </imageobject>
-     <textobject>
-      <para>
-       The sample condition you added is present in the list of conditions.
-      </para>
-     </textobject>
-    </mediaobject>
    </step>
   </procedure>
 
+  <para>
+   In order to use your custom policy plugin with an existing policy application,
+   see <xref linkend="add-custom-policy-impl-to-existing-apps" />.
+  </para>
+ </section>
+
+ <section xml:id="add-custom-policy-impl-to-existing-apps">
+  <title>Adding Custom Policy Implementations to Existing Policy Applications</title>
+
+  <para>
+   In order to use your custom policy in existing applications,
+   you must update the applications.
+   Note that you cannot update an application that already has policies configured.
+   When there are already policies configured for an application,
+   you must instead first delete the policies, and then update the application.
+  </para>
+
+  <para>
+   The following example updates
+   the <literal>iPlanetAMWebAgentService</literal> application
+   in the top level realm of a fresh installation.
+  </para>
+
+  <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "X-OpenAM-Username: amadmin" \
+ --header "X-OpenAM-Password: password" \
+ --header "Content-Type: application/json" \
+ --data "{}" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+<computeroutput>{"tokenId":"AQIC5wM2...","successUrl":"/openam/console"}</computeroutput>
+
+$ <userinput>curl \
+ --request PUT \
+ --header "iPlanetDirectoryPro: AQIC5wM2..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "name": "iPlanetAMWebAgentService",
+    "resources": [
+        "*://*:*/*?*",
+        "*://*:*/*"
+    ],
+    "actions": {
+        "POST": true,
+        "PATCH": true,
+        "GET": true,
+        "DELETE": true,
+        "OPTIONS": true,
+        "HEAD": true,
+        "PUT": true
+    },
+    "description": "The built-in Application used by OpenAM Policy Agents.",
+    "realm": "/",
+    "conditions": [
+        "AuthenticateToService",
+        "AuthLevelLE",
+        "AuthScheme",
+        "IPv6",
+        "SimpleTime",
+        "OAuth2Scope",
+        "IPv4",
+        "AuthenticateToRealm",
+        "OR",
+        "AMIdentityMembership",
+        "LDAPFilter",
+        "AuthLevel",
+        "SessionProperty",
+        "Session",
+        "NOT",
+        "AND",
+        "ResourceEnvIP",
+        "SampleCondition"
+    ],
+    "resourceComparator": null,
+    "applicationType": "iPlanetAMWebAgentService",
+    "subjects": [
+        "JwtClaim",
+        "AuthenticatedUsers",
+        "Identity",
+        "NOT",
+        "AND",
+        "NONE",
+        "OR",
+        "SampleSubject"
+    ],
+    "attributeNames": [],
+    "saveIndex": null,
+    "searchIndex": null,
+    "entitlementCombiner": "DenyOverride"
+}' https://openam.example.com:8443/openam/json/applications/iPlanetAMWebAgentService</userinput>
+  </screen>
+
+  <para>
+   Notice that the command adds "SampleCondition" to "conditions",
+   and "SampleSubject" to "subjects".
+  </para>
+ </section>
+
+ <section xml:id="trying-sample-policy-plugin">
+  <title>Trying the Sample Subject and Environment Conditions</title>
+
+  <para>
+   Using OpenAM policy editor, create a policy
+   in the "iPlanetAMWebAgentService" of the top level realm
+   that allows HTTP GET access to "http://www.example.com:80/*"
+   and that makes use of the custom subject and environment conditions.
+  </para>
+
+  <para>
+   The following listing shows a JSON representation of the policy.
+  </para>
+
+  <programlisting language="javascript">
+{
+    "name": "Sample Policy",
+    "active": true,
+    "description": "Try sample policy plugin",
+    "resources": [
+        "http://www.example.com:80/*"
+    ],
+    "applicationName": "iPlanetAMWebAgentService",
+    "actionValues": {
+        "GET": true
+    },
+    "subject": {
+        "type": "SampleSubject",
+        "name": "demo"
+    },
+    "condition": {
+        "type": "SampleCondition",
+        "nameLength": 4
+    }
+}
+  </programlisting>
+
+  <para>
+   With the policy in place, authenticate
+   both as a user who can request policy decisions
+   and also as a user trying to access a resource.
+   Both of these calls return "tokenId" values
+   for use in the policy decision request.
+  </para>
+
+  <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "X-OpenAM-Username: amadmin" \
+ --header "X-OpenAM-Password: password" \
+ --header "Content-Type: application/json" \
+ --data "{}" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+
+<computeroutput>{"tokenId":"AQIC5wM2LY4Sfcw...","successUrl":"/openam/console"}</computeroutput>
+
+$ <userinput>curl \
+ --request POST \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Content-Type: application/json" \
+ --data "{}" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+
+<computeroutput>{"tokenId":"AQIC5wM2LY4Sfcy...","successUrl":"/openam/console"}</computeroutput>
+  </screen>
+
+  <para>
+   Use the administrator token ID as the header of the policy decision request,
+   and the user token Id as the subject "ssoToken" value.
+  </para>
+
+  <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5wM2LY4Sfcw..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "subject": {
+      "ssoToken": "AQIC5wM2LY4Sfcy..."},
+    "resources": [
+        "http://www.example.com:80/index.html"
+    ],
+    "application": "iPlanetAMWebAgentService"
+ }' \
+ https://openam.example.com:8443/openam/json/policies?_action=evaluate</userinput>
+<computeroutput>
+[
+   {
+       "resource": "http://www.example.com:80/index.html",
+       "actions": {
+           "GET": true
+       },
+       "attributes": {},
+       "advices": {}
+   }
+]
+   </computeroutput>
+  </screen>
+
+  <para>
+   Notice that the "actions" are set in accordance with the policy.
+  </para>
+ </section>
+
+ <section xml:id="trying-custom-policy-resource-attributes">
+  <title>Trying the Sample Resource Attributes</title>
+
+  <para>
+   The sample custom policy plugin can
+   have OpenAM return an attribute with the policy decision.
+   In order to make this work, update your policy to return a "test" attribute.
+  </para>
+
+  <screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "iPlanetDirectoryPro: AQIC5wM2LY4Sfcw..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "name": "Sample Policy",
+    "active": true,
+    "description": "Try sample policy plugin",
+    "resources": [
+        "http://www.example.com:80/*"
+    ],
+    "applicationName": "iPlanetAMWebAgentService",
+    "actionValues": {
+        "GET": true
+    },
+    "subject": {
+        "type": "SampleSubject",
+        "name": "demo"
+    },
+    "condition": {
+        "type": "SampleCondition",
+        "nameLength": 4
+    },
+    "resourceAttributes": [
+        {
+            "type": "SampleAttribute",
+            "propertyName": "test"
+        }
+    ]
+}' http://openam.example.com:8088/openam/json/policies/Sample%20Policy</userinput>
+  </screen>
+
+  <para>
+   When you now request the same policy decision as before,
+   OpenAM returns the "test" attribute that you configured in the policy.
+  </para>
+
+  <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5wM2LY4Sfcw..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "subject": {
+      "ssoToken": "AQIC5wM2LY4Sfcy..."},
+    "resources": [
+        "http://www.example.com:80/index.html"
+    ],
+    "application": "iPlanetAMWebAgentService"
+ }' \
+ http://openam.example.com:8080/openam/json/policies?_action=evaluate</userinput>
+<computeroutput>
+[
+    {
+        "resource": "http://www.example.com/profile",
+        "actions": {
+            "GET": true
+        },
+        "attributes": {
+            "test": [
+                "sample"
+            ]
+        },
+        "advices": {}
+    }
+]</computeroutput>
+  </screen>
  </section>
 
  <section xml:id="extend-ssoadm-classpath">
@@ -331,8 +578,8 @@ $ <userinput>cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</userin
    <literal>CLASSPATH</literal> environment variable before running the
    <command>ssoadm</command> command.
    <screen>
-    $ <userinput>export CLASSPATH=<replaceable>/path/to/jarfile</replaceable>:$CLASSPATH</userinput>
-    $ <userinput>ssoadm ...</userinput>
+$ <userinput>export CLASSPATH=<replaceable>/path/to/jarfile</replaceable>:$CLASSPATH</userinput>
+$ <userinput>ssoadm ...</userinput>
    </screen>
   </para>
  </section>
