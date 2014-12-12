@@ -122,9 +122,19 @@
        provided in OpenAM out of the box.
        Custom conditions developed for your deployment
        do not map to any of the newer conditions provided.
-       In that case you must migrate your custom conditions,
-       and then configure your policies to use them.
-       <!-- Q: How to migrate custom conditions? A: Pending OPENAM-4015. -->
+       In that case you must implement your custom conditions
+       by implementing the newer service provider interfaces,
+       and then replace your existing policies to use them.
+      </para>
+
+      <para>
+       To see how to implement a custom policy plugin,
+       see the <citetitle>Developer's Guide</citetitle> chapter,
+       <link
+        xlink:href="dev-guide#chap-policy-spi"
+        xlink:show="new"
+        xlink:role="http://docbook.org/xlink/role/olink"
+       ><citetitle>Customizing Policy Evaluation</citetitle></link>.
       </para>
      </listitem>
 
