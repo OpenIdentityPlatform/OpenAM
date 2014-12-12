@@ -222,6 +222,10 @@
    <indexterm>
     <primary>Core Token Service</primary>
     <secondary>schema</secondary>
+   </indexterm>
+
+   <indexterm>
+    <primary>Core Token Service</primary>
     <secondary>indexes</secondary>
    </indexterm>
 
@@ -564,7 +568,7 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
    <procedure xml:id="prepare-run-ext-cts-script">
     <title>To Prepare and Run the External OpenDJ CTS Install Script</title>
 
-    <indexterm class="startofrange" id="idx-cts-install-script">
+    <indexterm>
      <primary>Core Token Service</primary>
      <secondary>OpenDJ</secondary>
      <tertiary>install script</tertiary>
@@ -604,12 +608,6 @@ chmod u+x cts-setup.sh
 ./cts-setup.sh
      </screen>
     </step>
-
-    <indexterm class="endofrange" startref="idx-cts-install-script">
-     <primary>Core Token Service</primary>
-     <secondary>OpenDJ</secondary>
-     <tertiary>install script</tertiary>
-    </indexterm>
    </procedure>
 
    <procedure xml:id="configure-cts">

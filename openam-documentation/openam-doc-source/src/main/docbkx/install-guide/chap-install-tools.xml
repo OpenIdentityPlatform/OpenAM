@@ -74,7 +74,7 @@
  <procedure xml:id="install-openam-admin-tools">
   <title>To Set Up Administration Tools</title>
 
-  <indexterm class="startofrange" id="idx-admin-tools">
+  <indexterm>
    <primary>administration tools</primary>
    <secondary>setting up</secondary>
   </indexterm>
@@ -351,12 +351,6 @@ $ JAVA_HOME/bin/java -D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.j
    host, but in each case the command should manage only one OpenAM
    server.</para>
   </step>
-
-  <indexterm class="endofrange" startref="idx-admin-tools">
-   <primary>administration tools</primary>
-   <secondary>setting up</secondary>
-  </indexterm>
-
  </procedure>
 
  <procedure xml:id="install-openam-config-tools">
@@ -366,7 +360,7 @@ $ JAVA_HOME/bin/java -D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.j
    <primary>Installing</primary>
    <secondary>Silent configuration</secondary>
   </indexterm>
-  <indexterm class="startofrange" id="idx-config-tools">
+  <indexterm class="startofrange" xml:id="idx-config-tools">
    <primary>configuration tools</primary>
    <secondary>setting up</secondary>
   </indexterm>
@@ -542,6 +536,9 @@ java '-Djavax.net.ssl.trustStore=PATH_TO_JKS_TRUSTSTORE' \
    </screen>
   </step>
 
+ </procedure>
+
+
    <para>
     For additional information about the command-line tool,
     see the reference documentation for
@@ -549,7 +546,7 @@ java '-Djavax.net.ssl.trustStore=PATH_TO_JKS_TRUSTSTORE' \
      xlink:show="new"
      xlink:href="reference#man-configurator-jar-1"
      xlink:role="http://docbook.org/xlink/role/olink"
-    ><command>configurator.jar</command></link>.
+     ><command>configurator.jar</command></link>.
    </para>
 
    <note>
@@ -577,8 +574,6 @@ $ <userinput>java -jar ${ssoconfigJarFile} \
    <primary>configuration tools</primary>
    <secondary>setting up</secondary>
   </indexterm>
-
- </procedure>
 
  <!--
  <procedure xml:id="install-openam-diagnostic-tool">
