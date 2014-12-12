@@ -200,7 +200,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
             // build resource
             result.put("id", amIdentity.getName());
-            result.put("realm", com.sun.identity.sm.DNMapper.orgNameToRealmName(amIdentity.getRealm()));
+            result.put("realm", getRelativeRealm(context, amIdentity));
             result.put("dn", amIdentity.getUniversalId());
             result.put("successURL", ssotok.getProperty(ISAuthConstants.SUCCESS_URL,false));
             result.put("fullLoginURL", ssotok.getProperty(ISAuthConstants.FULL_LOGIN_URL,false));
@@ -216,6 +216,27 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo", ex);
             handler.handleError(new ForbiddenException("Cannot retrieve id from session.", ex));
         }
+    }
+
+    private String getRelativeRealm(ServerContext context, AMIdentity amIdentity) {
+        RealmContext realmContext = context.asContext(RealmContext.class);
+
+        String relativeRealm = realmContext.getRelativeRealm();
+
+        /*
+        Check the scenario when a user with an active session is redirected back to the XUI without the relative realm
+        in the URI path. The XUI will fail to get the users profile unless we can determine what is the relative realm
+        based from the users realm and the base realm from the realm context.
+         */
+        if ("/".equals(relativeRealm)) {
+            String userRealm = com.sun.identity.sm.DNMapper.orgNameToRealmName(amIdentity.getRealm());
+            String baseRealm = realmContext.getBaseRealm();
+            if (userRealm.startsWith(baseRealm)) {
+                return userRealm.substring(baseRealm.length());
+            }
+        }
+
+        return relativeRealm;
     }
 
     /**
@@ -608,7 +629,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                                  final ResultHandler<JsonValue> handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getRealm();
+        final String realm = realmContext.getResolvedRealm();
         RestSecurity restSecurity = getRestSecurity(realm);
 
         final String action = request.getAction();
@@ -1022,7 +1043,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         if ("changePassword".equalsIgnoreCase(action)) {
 
             RealmContext realmContext = context.asContext(RealmContext.class);
-            final String realm = realmContext.getRealm();
+            final String realm = realmContext.getResolvedRealm();
 
             JsonValue value = request.getContent();
 
@@ -1113,7 +1134,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                                final ResultHandler<Resource> handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getRealm();
+        final String realm = realmContext.getResolvedRealm();
 
         // anyone can create an account add
         Token admin = new Token();
@@ -1359,7 +1380,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             final ResultHandler<Resource> handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getRealm();
+        final String realm = realmContext.getResolvedRealm();
 
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));

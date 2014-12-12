@@ -1508,6 +1508,9 @@ public class AuthClientUtils {
 
         boolean noQueryParam=false;
         String realm = getRealmFromPolicyAdvice(requestHash);
+        if (realm == null) {
+            realm = getRealmFromAttribute(request);
+        }
         String orgParam = getOrgParam(requestHash);
         if (realm != null) {
             //Policy Advice has precedence over GET parameter
@@ -1533,6 +1536,10 @@ public class AuthClientUtils {
         }
 
         return (orgDN);
+    }
+
+    private static String getRealmFromAttribute(HttpServletRequest request) {
+        return (String) request.getAttribute(ISAuthConstants.REALM_PARAM);
     }
 
     /**

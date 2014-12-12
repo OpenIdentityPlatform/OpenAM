@@ -65,7 +65,7 @@ public class ApplicationTypesResourceTest {
     public void undefinedSubjectShouldFail() {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject subject = null;
@@ -88,7 +88,7 @@ public class ApplicationTypesResourceTest {
     public void readShouldFailOnInvalidApplicationType() {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject subject = new Subject();
@@ -110,7 +110,7 @@ public class ApplicationTypesResourceTest {
     public void shouldReadInstanceCorrectly() throws IllegalAccessException, InstantiationException {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject subject = new Subject();

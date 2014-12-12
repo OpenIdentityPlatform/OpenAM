@@ -22,13 +22,22 @@ import static org.forgerock.json.fluent.JsonValue.object;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -40,8 +49,6 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.RootContext;
-import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.servlet.HttpServletAdapter;
@@ -53,16 +60,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class CrestRealmRouterTest {
 
@@ -95,12 +92,6 @@ public class CrestRealmRouterTest {
         given(realmValidator.isRealm(anyString())).willReturn(true);
     }
 
-    private Context ctx() {
-        SecurityContext securityContext = new SecurityContext(new RootContext(), "",
-                Collections.<String, Object>emptyMap());
-        return new ServerContext(securityContext);
-    }
-
     @DataProvider(name = "data")
     private Object[][] dataProvider() {
         return new Object[][]{
@@ -116,7 +107,7 @@ public class CrestRealmRouterTest {
             String expectedRealm, CollectionResourceProvider expectedProvider) throws Exception {
 
         //Given
-        HttpServletRequest request = setUpRequest("openam.example.com", uriRealm, null, null, resource);
+        HttpServletRequest request = setUpRequest("openam.example.com", uriRealm, null, resource);
         HttpServletResponse response = setUpResponse();
         SSOToken adminToken = mock(SSOToken.class);
         setUpServer(adminToken);
@@ -129,37 +120,33 @@ public class CrestRealmRouterTest {
         verify(expectedProvider).readInstance(contextCaptor.capture(), eq(resourceName),
                 Matchers.<ReadRequest>anyObject(), Matchers.<ResultHandler<Resource>>anyObject());
         RealmContext realmContext = contextCaptor.getValue().asContext(RealmContext.class);
-        assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
+        assertThat(realmContext.getResolvedRealm()).isEqualTo(expectedRealm);
     }
 
     @DataProvider(name = "realmRoutingDataProvider")
     private Object[][] realmRoutingDataProvider() {
         return new Object[][]{
                 //http://openam.example.com:8080/openam/json/users/demo
-                {"openam.example.com", "", null, null, "/"},
+                {"openam.example.com", "", null, "/"},
                 //http://alias.example.com:8080/openam/json/users/demo
-                {"alias.example.com", "", null, null, "/otherRealm"},
+                {"alias.example.com", "", null, "/otherRealm"},
                 //http://openam.example.com:8080/openam/json/users/demo?realm=/realm
-                {"openam.example.com", "", "/realm", null, "/realm"},
+                {"openam.example.com", "", "/realm", "/realm"},
                 //http://openam.example.com:8080/openam/json/users/demo?realm=/realmAlias
-                {"openam.example.com", "", "/realmAlias", null, "/realm"},
+                {"openam.example.com", "", "/realmAlias", "/realm"},
                 //http://openam.example.com:8080/openam/json/realm/users/demo
-                {"openam.example.com", "/realm", null, null, "/realm"},
+                {"openam.example.com", "/realm", null, "/realm"},
                 //http://openam.example.com:8080/openam/json/realmAlias/users/demo
-                {"openam.example.com", "/realmAlias", null, null, "/realm"},
-                //http://openam.example.com:8080/openam/json/users/demo?sunamcompositeadvice=REALM_ADVICE
-                {"openam.example.com", "", null, "REALM_ADVICE", "/realm"},
-                //http://openam.example.com:8080/openam/json/users/demo?sunamcompositeadvice=REALM_ALIAS_ADVICE
-                {"openam.example.com", "", null, "REALM_ALIAS_ADVICE", "/realm"},
+                {"openam.example.com", "/realmAlias", null, "/realm"},
         };
     }
 
     @Test(dataProvider = "realmRoutingDataProvider")
-    public void shouldRouteToRealm(String hostname, String uriRealm, String queryRealm, String queryAdvice,
-            String expectedRealm) throws Exception {
+    public void shouldRouteToRealm(String hostname, String uriRealm, String queryRealm, String expectedRealm)
+            throws Exception {
 
         //Given
-        HttpServletRequest request = setUpRequest(hostname, uriRealm, queryRealm, queryAdvice);
+        HttpServletRequest request = setUpRequest(hostname, uriRealm, queryRealm);
         HttpServletResponse response = setUpResponse();
         SSOToken adminToken = mock(SSOToken.class);
         setUpServer(adminToken);
@@ -178,21 +165,19 @@ public class CrestRealmRouterTest {
                 Matchers.<ResultHandler<Resource>>anyObject());
         ServerContext serverContext = contextCaptor.getValue();
         RealmContext realmContext = serverContext.asContext(RealmContext.class);
-        assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
+        final String relativeRealm = realmContext.getResolvedRealm();
+        assertThat(relativeRealm).isEqualTo(expectedRealm);
     }
 
-    private HttpServletRequest setUpRequest(String hostname, String uriRealm, String queryRealm, String queryAdvice) {
-        return setUpRequest(hostname, uriRealm, queryRealm, queryAdvice, "/users/demo");
+    private HttpServletRequest setUpRequest(String hostname, String uriRealm, String queryRealm) {
+        return setUpRequest(hostname, uriRealm, queryRealm, "/users/demo");
     }
 
-    private HttpServletRequest setUpRequest(String hostname, String uriRealm, String queryRealm, String queryAdvice,
-            String resource) {
+    private HttpServletRequest setUpRequest(String hostname, String uriRealm, String queryRealm, String resource) {
 
         String queryParam = "";
         if (queryRealm != null) {
             queryParam += "?realm=" + queryRealm;
-        } else if (queryAdvice != null) {
-            queryParam += "?sunamcompositeadvice=" + queryAdvice;
         }
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -207,9 +192,6 @@ public class CrestRealmRouterTest {
         given(request.getParameterMap()).willReturn(parameterMap);
         if (queryRealm != null) {
             parameterMap.put("realm", new String[]{queryRealm});
-        }
-        if (queryAdvice != null) {
-            parameterMap.put("sunamcompositeadvice", new String[]{queryAdvice});
         }
 
         return request;
@@ -234,9 +216,6 @@ public class CrestRealmRouterTest {
         given(realmValidator.isRealm("/realmAlias")).willReturn(false);
         given(coreWrapper.getOrganization(adminToken, "realmAlias")).willReturn("REALM_DN");
         given(coreWrapper.convertOrgNameToRealmName("REALM_DN")).willReturn("/realm");
-
-        given(coreWrapper.getRealmFromPolicyAdvice("REALM_ADVICE")).willReturn("/realm");
-        given(coreWrapper.getRealmFromPolicyAdvice("REALM_ALIAS_ADVICE")).willReturn("/realmAlias");
     }
 
     private void routeRequest(RequestHandler requestHandler, HttpServletRequest request,

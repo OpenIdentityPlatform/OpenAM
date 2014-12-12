@@ -101,9 +101,7 @@ public class RestletRealmRouterTest {
                 {"query", false},
                 {"query", true},
                 {"uri", false},
-                {"uri", true},
-                {"policy", false},
-                {"policy", true},
+                {"uri", true}
         };
     }
 
@@ -131,17 +129,13 @@ public class RestletRealmRouterTest {
 
         if ("query".equalsIgnoreCase(realmLocation)) {
             //set up query string
+            setUpServerName(request, adminToken, "/");
             setUpQueryString(request, realm);
         }
 
         if ("uri".equalsIgnoreCase(realmLocation)) {
             //set up uri
             setUpUri(request, realm);
-        }
-
-        if ("policy".equalsIgnoreCase(realmLocation)) {
-            //set up policy advice
-            setUpPolicyAdvice(request, realm);
         }
 
         //set up validate realm
@@ -181,8 +175,8 @@ public class RestletRealmRouterTest {
         given(request.getHostRef()).willReturn(reference);
         given(reference.getHostDomain()).willReturn("HOST_DOMAIN");
 
-        given(coreWrapper.getOrganization(adminToken, "HOST_DOMAIN")).willReturn("REALM_DN");
-        given(coreWrapper.convertOrgNameToRealmName("REALM_DN")).willReturn("/" + realm);
+        given(coreWrapper.getOrganization(adminToken, "HOST_DOMAIN")).willReturn("REALM_HOST_DN");
+        given(coreWrapper.convertOrgNameToRealmName("REALM_HOST_DN")).willReturn(realm.equals("/") ? realm : "/" + realm);
     }
 
     private void setUpQueryString(Request request, String realm) {
@@ -196,15 +190,6 @@ public class RestletRealmRouterTest {
     private void setUpUri(Request request, String realm) {
         request.getAttributes().put("realm", "/");
         request.getAttributes().put("subrealm", realm);
-    }
-
-    private void setUpPolicyAdvice(Request request, String realm) {
-        Reference reference = mock(Reference.class);
-        given(request.getResourceRef()).willReturn(reference);
-        Form queryForm = mock(Form.class);
-        given(reference.getQueryAsForm()).willReturn(queryForm);
-        given(queryForm.getFirstValue(AuthClientUtils.COMPOSITE_ADVICE)).willReturn("ADVICE");
-        given(coreWrapper.getRealmFromPolicyAdvice(anyString())).willReturn("/" + realm);
     }
 
     private void setUpRealmValidator(String realm, boolean isRealmAlias, SSOToken adminToken) throws IdRepoException, SSOException {

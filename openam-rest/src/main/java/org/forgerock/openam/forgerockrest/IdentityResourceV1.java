@@ -603,7 +603,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                                  final ResultHandler<JsonValue> handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getRealm();
+        final String realm = realmContext.getResolvedRealm();
         RestSecurity restSecurity = getRestSecurity(realm);
 
         final String action = request.getAction();
@@ -1054,7 +1054,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final ResultHandler<Resource> handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getRealm();
+        final String realm = realmContext.getResolvedRealm();
 
         // anyone can create an account add
         Token admin = new Token();
@@ -1135,7 +1135,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                                final ResultHandler<Resource> handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getRealm();
+        final String realm = realmContext.getResolvedRealm();
 
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
@@ -1272,7 +1272,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final QueryResultHandler handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getRealm();
+        final String realm = realmContext.getResolvedRealm();
 
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
@@ -1313,7 +1313,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             final ResultHandler<Resource> handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getRealm();
+        final String realm = realmContext.getResolvedRealm();
 
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
@@ -1411,7 +1411,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         admin.setId(getCookieFromServerContext(context));
 
         RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getRealm();
+        final String realm = realmContext.getResolvedRealm();
 
         final JsonValue jVal = request.getContent();
         final String rev = request.getRevision();

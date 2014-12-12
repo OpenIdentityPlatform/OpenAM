@@ -207,7 +207,7 @@ public class PolicyResourceEvaluationTest {
      * @return the server context hierarchy
      */
     private ServerContext buildContextStructure(final String realm) {
-        return new ServerContext(new RealmContext(subjectContext, realm));
+        return new ServerContext(new RealmContext(subjectContext));
     }
 
     /**

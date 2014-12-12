@@ -73,7 +73,7 @@ public class SubjectTypesResourceTest {
     public void shouldThrowErrorWthInvalidCondition() throws JsonMappingException {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -98,7 +98,7 @@ public class SubjectTypesResourceTest {
     public void testSuccessfulJsonificationAndQuery() throws JsonMappingException {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -124,7 +124,7 @@ public class SubjectTypesResourceTest {
     public void testSuccessfulJsonificationAndReadAndSubjectNamePropertyRemoved() throws JsonMappingException {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject mockSubject = new Subject();
@@ -158,7 +158,7 @@ public class SubjectTypesResourceTest {
     public void testSuccessfulJsonificationAndLogicalIsCorrect() throws JsonMappingException {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        RealmContext realmContext = new RealmContext(mockSubjectContext);
         ServerContext mockServerContext = new ServerContext(realmContext);
 
         Subject mockSubject = new Subject();

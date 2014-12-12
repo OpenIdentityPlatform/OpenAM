@@ -18,7 +18,6 @@ package org.forgerock.openam.rest.authz;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.delegation.DelegationEvaluator;
-import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.delegation.DelegationPermissionFactory;
@@ -148,7 +147,7 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
 
         // If no realm is specified default to the root realm.
         final String realm = (context.containsContext(RealmContext.class)) ?
-                context.asContext(RealmContext.class).getRealm() : "/";
+                context.asContext(RealmContext.class).getResolvedRealm() : "/";
         final SubjectContext subjectContext = context.asContext(SubjectContext.class);
         final RouterContext routerContext = context.asContext(RouterContext.class);
 

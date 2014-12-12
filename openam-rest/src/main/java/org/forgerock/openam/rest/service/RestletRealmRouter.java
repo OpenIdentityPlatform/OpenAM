@@ -22,6 +22,7 @@ import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.openam.utils.StringUtils;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -50,6 +51,8 @@ public class RestletRealmRouter extends Router {
 
     private final RestRealmValidator realmValidator;
     private final CoreWrapper coreWrapper;
+    private final Delegate delegate;
+    private final TemplateRoute delegateRoute;
 
     /**
      * Constructs a new RealmRouter instance.
@@ -61,8 +64,8 @@ public class RestletRealmRouter extends Router {
         this.realmValidator = realmValidator;
         this.coreWrapper = coreWrapper;
 
-        Restlet delegate = new Delegate(this);
-        TemplateRoute delegateRoute = createRoute("/{subrealm}", delegate, Template.MODE_STARTS_WITH);
+        delegate = new Delegate(this);
+        delegateRoute = createRoute("/{subrealm}", delegate, Template.MODE_STARTS_WITH);
         super.setDefaultRoute(delegateRoute);
     }
 
@@ -82,20 +85,21 @@ public class RestletRealmRouter extends Router {
      */
     @Override
     protected void doHandle(Restlet next, Request request, Response response) {
-        String realm;
-
-        realm = getRealmFromPolicyAdvice(request);
-
-        if (realm == null) {
-            realm = getRealmFromURI(request);
-        }
-
-        if (realm == null) {
-            realm = getRealmFromQueryString(request);
-        }
+        String realm = getRealmFromURI(request);
 
         if (realm == null) {
             realm = getRealmFromServerName(request);
+        }
+
+        if (next != delegateRoute) {
+            if (StringUtils.isEmpty((String) request.getAttributes().get("subrealm"))) {
+                String subrealm = getRealmFromQueryString(request);
+                if (realm == null) {
+                    realm = subrealm;
+                } else if (subrealm != null && !subrealm.isEmpty()) {
+                    realm += realm.endsWith("/") ? subrealm.substring(1) : subrealm;
+                }
+            }
         }
 
         request.getAttributes().put(REALM, realm);
@@ -107,21 +111,6 @@ public class RestletRealmRouter extends Router {
         validateRealm(request, realm);
 
         super.doHandle(next, request, response);
-    }
-
-    private String getRealmFromPolicyAdvice(Request request) {
-        String advice = request.getResourceRef().getQueryAsForm().getFirstValue(AuthClientUtils.COMPOSITE_ADVICE);
-        if (advice == null) {
-            return null;
-        }
-
-        try {
-            String decodedXml = URLDecoder.decode(advice, "UTF-8");
-            return coreWrapper.getRealmFromPolicyAdvice(decodedXml);
-        } catch (UnsupportedEncodingException uee) {
-            //Empty catch
-        }
-        return null;
     }
 
     private String getRealmFromURI(Request request) {

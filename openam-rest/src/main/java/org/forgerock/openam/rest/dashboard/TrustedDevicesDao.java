@@ -140,7 +140,7 @@ public class TrustedDevicesDao {
      * @return The user's realm.
      */
     private String getRealm(Context context) {
-        return context.asContext(RealmContext.class).getRealm();
+        return context.asContext(RealmContext.class).getResolvedRealm();
     }
 
     /**

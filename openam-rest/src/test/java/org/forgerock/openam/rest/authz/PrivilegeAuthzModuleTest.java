@@ -132,7 +132,8 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 
-        final ServerContext context = new RealmContext(subjectContext, "/abc");
+        final RealmContext context = new RealmContext(subjectContext);
+        context.addSubRealm("abc", "abc");
         final ReadRequest request = Requests.newReadRequest("/policies/123");
         router.handleRead(context, request, handler);
 
@@ -163,7 +164,8 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 
-        final ServerContext context = new RealmContext(subjectContext, "/abc");
+        final RealmContext context = new RealmContext(subjectContext);
+        context.addSubRealm("abc", "abc");
         final QueryRequest request = Requests.newQueryRequest("/policies");
         final QueryResultHandler handler = mock(QueryResultHandler.class);
         router.handleQuery(context, request, handler);
@@ -195,7 +197,8 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 
-        final ServerContext context = new RealmContext(subjectContext, "/abc");
+        final RealmContext context = new RealmContext(subjectContext);
+        context.addSubRealm("abc", "abc");
         final CreateRequest request = Requests.newCreateRequest("/policies", JsonValue.json(new Object()));
         router.handleCreate(context, request, handler);
 
@@ -226,7 +229,8 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 
-        final ServerContext context = new RealmContext(subjectContext, "/abc");
+        final RealmContext context = new RealmContext(subjectContext);
+        context.addSubRealm("abc", "abc");
         final UpdateRequest request = Requests.newUpdateRequest("/policies/123", JsonValue.json(new Object()));
         router.handleUpdate(context, request, handler);
 
@@ -257,7 +261,8 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 
-        final ServerContext context = new RealmContext(subjectContext, "/abc");
+        final RealmContext context = new RealmContext(subjectContext);
+        context.addSubRealm("abc", "abc");
         final DeleteRequest request = Requests.newDeleteRequest("/policies/123");
         router.handleDelete(context, request, handler);
 
@@ -288,7 +293,8 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 
-        final ServerContext context = new RealmContext(subjectContext, "/abc");
+        final RealmContext context = new RealmContext(subjectContext);
+        context.addSubRealm("abc", "abc");
         final PatchRequest request = Requests.newPatchRequest("/policies/123", PatchOperation.add("abc", "123"));
         router.handlePatch(context, request, handler);
 
@@ -319,7 +325,8 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 
-        final ServerContext context = new RealmContext(subjectContext, "/abc");
+        final RealmContext context = new RealmContext(subjectContext);
+        context.addSubRealm("abc", "abc");
         final ActionRequest request = Requests.newActionRequest("/policies", "evaluate");
         router.handleAction(context, request, jsonHandler);
 
@@ -350,7 +357,8 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 
-        final ServerContext context = new RealmContext(subjectContext, "/abc");
+        final RealmContext context = new RealmContext(subjectContext);
+        context.addSubRealm("abc", "abc");
         final ActionRequest request = Requests.newActionRequest("/policies", "blowup");
         router.handleAction(context, request, jsonHandler);
 
@@ -371,7 +379,7 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 
-        final ServerContext context = new RealmContext(subjectContext, "/abc");
+        final ServerContext context = new RealmContext(subjectContext);
         final ActionRequest request = Requests.newActionRequest("/policies", "unknownAction");
         router.handleAction(context, request, jsonHandler);
 
@@ -401,7 +409,8 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 
-        final ServerContext context = new RealmContext(subjectContext, "/abc");
+        final RealmContext context = new RealmContext(subjectContext);
+        context.addSubRealm("abc", "abc");
         final CreateRequest request = Requests.newCreateRequest("/policies", JsonValue.json(new Object()));
         router.handleCreate(context, request, handler);
 

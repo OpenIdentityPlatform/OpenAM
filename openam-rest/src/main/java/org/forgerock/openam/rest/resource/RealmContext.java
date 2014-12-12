@@ -18,6 +18,7 @@ package org.forgerock.openam.rest.resource;
 
 import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.util.Pair;
 
 /**
  * A CREST Context for holding realm information from the Request.
@@ -26,39 +27,61 @@ import org.forgerock.json.resource.ServerContext;
  */
 public class RealmContext extends ServerContext {
 
-    private String realm;
+    private Pair<String, String> dnsAliasRealm;
+    private Pair<String, String> relativeRealmPath = Pair.of("/", "/");
 
     /**
-     * Constructs a new RealmContext instance with the realm.
+     * Constructs a new empty RealmContext instance.
      *
      * @param parent The parent context.
-     * @param realm The realm.
      */
-    public RealmContext(Context parent, String realm) {
+    public RealmContext(Context parent) {
         super(parent);
-        this.realm = realm;
     }
 
     /**
-     * Gets the realm.
+     * Gets the full resolved realm path.
      *
-     * @return The realm.
+     * @return The resolved realm path.
      */
-    public String getRealm() {
-        return realm;
+    public String getResolvedRealm() {//TODO rename to getAbsoluteRealm or getAbsoluteRealmPath?
+        StringBuilder resolvedRealm = new StringBuilder();
+        if (dnsAliasRealm != null) {
+            final String dnsAlias = dnsAliasRealm.getSecond();
+            if(!dnsAlias.equals("/")) {
+                resolvedRealm.append(dnsAlias);
+            }
+        }
+        resolvedRealm.append(relativeRealmPath.getSecond());
+        String realmPath = resolvedRealm.toString();
+        if (!"/".equals(realmPath) && realmPath.endsWith("/")) {
+            realmPath = realmPath.substring(0, realmPath.length() - 1);
+        }
+        return realmPath;
     }
 
-    /**
-     * <p>Adds the sub-realm portion to the realm in the context.</p>
-     *
-     * <p>If the sub-realm is {@code null} or empty, no action is taken. If the sub-realm contains a leading or trailing
-     * backslash, they will be stripped before appending to the current realm value.</p>
-     *
-     * @param subrealm The sub-realm to add to the realm context.
-     */
-    public void addSubRealm(String subrealm) {
+    public void addDnsAlias(String dnsAlias, String realmPath) {
+        dnsAliasRealm = Pair.of(dnsAlias, realmPath);
+    }
+
+    public void addSubRealm(String realm, String realmPath) {
+        if ("/".equals(relativeRealmPath.getSecond())) { //Could be a realm alias or a realm path
+            if (!realmPath.startsWith("/")) {
+                realmPath = "/" + realmPath;
+            }
+            if (realmPath.endsWith("/")) {
+                realmPath = realmPath.substring(0, realmPath.length() - 1);
+            }
+            relativeRealmPath = Pair.of(realm, realmPath);
+        } else { //Is not a realm alias, it must be a realm path
+            String a = getRealm(relativeRealmPath.getSecond(), realm);
+            relativeRealmPath = Pair.of(a, a);
+        }
+    }
+
+    private String getRealm(String realm, String subrealm) {
         if (subrealm == null || subrealm.isEmpty()) {
-            return;
+            return realm;
         }
         if (subrealm.startsWith("/")) {
             subrealm = subrealm.substring(1);
@@ -67,6 +90,17 @@ public class RealmContext extends ServerContext {
             subrealm = subrealm.substring(0, subrealm.length() - 1);
         }
 
-        realm = realm.equals("/") ? realm + subrealm : realm + "/" + subrealm;
+        return realm.equals("/") ? realm + subrealm : realm + "/" + subrealm;
+    }
+
+    public String getBaseRealm() {
+        if (dnsAliasRealm.getSecond().equals("/")) {
+            return relativeRealmPath.getSecond();
+        }
+        return dnsAliasRealm.getSecond();
+    }
+
+    public String getRelativeRealm() {
+        return relativeRealmPath.getSecond();
     }
 }

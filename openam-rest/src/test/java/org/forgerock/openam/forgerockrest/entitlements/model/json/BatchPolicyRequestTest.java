@@ -100,7 +100,7 @@ public class BatchPolicyRequestTest {
     }
 
     private ServerContext buildContextStructure(final String realm) {
-        return new ServerContext(new RealmContext(subjectContext, realm));
+        return new ServerContext(new RealmContext(subjectContext));
     }
 
 }
