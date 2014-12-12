@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,20 +22,22 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, location */
+/*global define */
 
-define("org/forgerock/openam/ui/common/util/Constants", [
-    "org/forgerock/commons/ui/common/util/Constants"
-], function (commonConstants) {
-    
-    var context = location.pathname.substring(1,location.pathname.indexOf('XUI')-1);
+define("org/forgerock/openam/ui/common/util/RealmHelper", [
+], function () {
+    var obj = {};
 
-    commonConstants.context = context;
-    commonConstants.THEME_CONFIG_PATH = 'themeConfig.json';
-    commonConstants.CONSOLE_PATH = '/' + commonConstants.context + '/console';
-    commonConstants.CONSOLE_USERS = ['amadmin']; 
-    commonConstants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword";
-    commonConstants.BASE_PATH = "";
-    
-    return commonConstants;
+    obj.cleanRealm = function(realm) {
+        if(typeof realm === "string" && realm.charAt(0) !== "/"){
+            realm = "/" + realm;
+        }
+        if((typeof realm !== "string") || realm === "/"){
+            realm = "";
+        }
+        return realm;
+    };
+
+
+    return obj;
 });

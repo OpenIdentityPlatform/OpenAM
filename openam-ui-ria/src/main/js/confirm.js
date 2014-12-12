@@ -92,13 +92,13 @@ require([
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/CookieHelper",
-    "UserDelegate",
+    "org/forgerock/openam/ui/common/util/RealmHelper",
     "config/main",
     "org/forgerock/commons/ui/common/main",
     "org/forgerock/commons/ui/user/main",
     "org/forgerock/openam/ui/common/main",
     "org/forgerock/openam/ui/user/main"
-], function($, _, Backbone, constants,serviceInvoker,uiUtils,cookieHelper,userDelegate) {
+], function($, _, Backbone, constants,serviceInvoker,uiUtils,cookieHelper,realmHelper) {
 
     var 
         conf = {
@@ -117,7 +117,7 @@ require([
 
 
         callParams = {
-            url: host + userDelegate.cleanRealm(urlParams.realm) + '/serverinfo/*',
+            url: host + realmHelper.cleanRealm(urlParams.realm) + '/serverinfo/*',
             type: "GET",
             headers: {"Cache-Control": "no-cache"}, 
             success: function() {

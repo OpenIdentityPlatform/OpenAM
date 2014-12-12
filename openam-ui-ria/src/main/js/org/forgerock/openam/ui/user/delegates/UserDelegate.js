@@ -30,11 +30,11 @@ define("UserDelegate", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/CookieHelper",
-    "org/forgerock/commons/ui/common/util/Mime"
-], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, mime) {
+    "org/forgerock/commons/ui/common/util/Mime",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, mime, realmHelper) {
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json");
-
 
     obj.getUserResourceName = function (user) {
         return user.resourceName;
@@ -42,7 +42,7 @@ define("UserDelegate", [
 
     obj.getUserById = function(id, realm, successCallback, errorCallback, errorsHandlers) {
 
-        var resourceName = this.cleanRealm(realm) + "/users/" + id;
+        var resourceName = realmHelper.cleanRealm(realm) + "/users/" + id;
 
         obj.serviceCall({
             url: resourceName,
@@ -77,7 +77,7 @@ define("UserDelegate", [
      * Checks if logged in and returns users id
      */
     obj.getProfile = function(successCallback, errorCallback, errorsHandlers) {
-        var realm = this.cleanRealm(configuration.globalData.auth.realm);
+        var realm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
         obj.serviceCall({
             url: realm + "/users?_action=idFromSession",
             data: "{}",
@@ -131,7 +131,7 @@ define("UserDelegate", [
     };
 
     obj.doAction = function(action, postData, successCallback, errorCallback, errorsHandlers) {
-        var realm = this.cleanRealm(configuration.globalData.auth.realm);
+        var realm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
 
         return obj.serviceCall({
             url: realm + "/users?_action=" + action,
@@ -145,17 +145,6 @@ define("UserDelegate", [
             errorsHandlers: errorsHandlers
         });
     };
-
-    obj.cleanRealm = function(realm) {
-        if(realm.charAt(0) !== "/"){
-            realm = "/" + realm;
-        }
-        if(realm === "/"){
-            realm = "";
-        }
-        return realm;
-    };
-
 
     return obj;
 });

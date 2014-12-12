@@ -32,8 +32,9 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], function(constants, AbstractDelegate, configuration, eventManager, uiUtils) {
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function(constants, AbstractDelegate, configuration, eventManager, uiUtils, realmHelper) {
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context ),
         lastKnownRealm = "/";
@@ -75,10 +76,8 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
         }
 
         if (lastKnownRealm !== configuration.globalData.auth.realm) {
-            lastKnownRealm = configuration.globalData.auth.realm;
-            if(lastKnownRealm === "/"){
-                lastKnownRealm = "";
-            }   
+            lastKnownRealm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
+
             return obj.serviceCall({
                 type: "GET",
                 headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
@@ -98,6 +97,3 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
     
     return obj;
 });
-
-
-
