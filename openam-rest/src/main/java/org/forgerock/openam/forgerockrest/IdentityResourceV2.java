@@ -232,7 +232,11 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             String userRealm = com.sun.identity.sm.DNMapper.orgNameToRealmName(amIdentity.getRealm());
             String baseRealm = realmContext.getBaseRealm();
             if (userRealm.startsWith(baseRealm)) {
-                return userRealm.substring(baseRealm.length());
+                String realm = userRealm.substring(baseRealm.length());
+                if (!realm.startsWith("/")) {
+                    realm = "/" + realm;
+                }
+                return realm;
             }
         }
 
