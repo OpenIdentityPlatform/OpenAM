@@ -104,6 +104,22 @@
                                 <include>js/browserVersion.js</include>
                             </includes>
                         </resource>
+                        <resource>
+                            <!-- Copy all licenses into the legal-notices directory. -->
+                            <directory>${basedir}/../license</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>legal-notices</targetPath>
+                        </resource>
+                        <resource>
+                            <!-- Copy all third-party licences too. -->
+                            <directory>${basedir}/../legal</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>legal-notices</targetPath>
+                        </resource>
                     </webResources>
                 </configuration>
             </plugin>

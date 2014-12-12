@@ -65,6 +65,13 @@
         </fileSet>
         <fileSet>
             <outputDirectory></outputDirectory>
+            <directory>${project.basedir}/../../legal</directory>
+            <includes>
+                <include>**/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory></outputDirectory>
             <directory>${project.basedir}/../src/main/amserver/diagnostics</directory>
             <includes>
                 <include>ssodtool.*</include>

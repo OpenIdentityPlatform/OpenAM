@@ -106,6 +106,13 @@
             </includes>
         </fileSet>
         <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.basedir}/../../legal</directory>
+            <includes>
+                <include>**/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <outputDirectory></outputDirectory>
             <directory>${project.basedir}/../src/main/amserver/scripts/tools</directory>
             <includes>

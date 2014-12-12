@@ -197,6 +197,10 @@
                 <include>fmConfigurationService_zh_TW.properties</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${basedir}/../../legal</directory>
+        </fileSet>
     </fileSets>
 
     <!-- Single Files -->
