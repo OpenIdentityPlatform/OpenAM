@@ -76,7 +76,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 };
 
             return {
-                url: '/openam/json' + this.subrealm + '/applications',
+                url: '/' + constants.context + '/json' + this.subrealm + '/applications',
                 colNames: ['', '', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
                 colModel: [
                     {name: 'iconChB',           width: 40,  sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
@@ -216,7 +216,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
         },
 
         exportPolicies: function () {
-            this.$el.find("#exportPolicies").attr('href', constants.host + "/openam/xacml"  + this.subrealm + "/policies");
+            this.$el.find("#exportPolicies").attr('href', constants.host + "/" + constants.context + "/xacml"  + this.subrealm + "/policies");
         }
 
     });
