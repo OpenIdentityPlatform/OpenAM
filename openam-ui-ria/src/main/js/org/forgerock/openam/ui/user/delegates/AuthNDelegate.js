@@ -196,11 +196,20 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                                .fail(processFailed);
 
                         } else {
-                            if (errorBody.message === "User Account Locked") {
-                                failReason = "loginFailureLockout";
-                            } else if (errorBody.message === "Maximum Sessions Limit Reached.") {
-                                failReason = "maxSessionsLimitOrSessionQuota";
+                            switch (errorBody.message) {
+                                case "User Account Locked":
+                                    failReason = "loginFailureLockout";
+                                break;
+                                case "Maximum Sessions Limit Reached.":
+                                    failReason = "maxSessionsLimitOrSessionQuota";
+                                break;
+                                case " Your password has expired. Please contact service desk to reset your password":
+                                    failReason = "loginFailureLockout";
+                                break;
+                                default: 
+                                    failReason = "authenticationFailed";
                             }
+
                             processFailed(failReason);
                             goToFailureUrl(errorBody);
                         }

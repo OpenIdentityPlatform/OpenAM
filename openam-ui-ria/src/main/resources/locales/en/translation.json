@@ -9,7 +9,7 @@
         "messages" : {
             "CommonMessages" : {
                 "authenticationFailed" : "Login/password combination is invalid.",
-                "loginFailureLockout" : "This user is not active. Contact your system administrator.",
+                "loginFailureLockout" : "Your password has expired. Please contact service desk to reset your password",
                 "maxSessionsLimitOrSessionQuota": "Maximum sessions limit reached or session quota has exhausted.",
                 "invalidRealm" : "The realm doesn't exist",
                 "serviceUnavailable" : "Service unavailable",
