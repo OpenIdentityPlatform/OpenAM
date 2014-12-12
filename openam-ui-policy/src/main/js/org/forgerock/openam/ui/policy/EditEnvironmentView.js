@@ -277,31 +277,60 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
         },
 
-        initSelectize: function() {
-
+        initSelectize: function () {
             var self = this,
-                title = '';
-
-            this.$el.find('.selectize').each(function(){
-
-                $(this).selectize({
+                title = '',
+                itemData,
+                keyValPair,
+                options = {
                     plugins: ['restore_on_backspace'],
                     delimiter: ',',
                     persist: false,
-                    create: function(input) {
+                    create: function (input) {
                         return {
                             value: input,
                             text: input
                         };
                     },
-                    onChange: function(value){
+                    onItemRemove: function (value) {
                         title = this.$input.parent().find('label')[0].dataset.title;
-                        if(title !== ''){
-                             self.$el.data().itemData[title] = value;
+                        itemData = self.$el.data().itemData;
+
+                        if (title !== '' && this.$wrapper.hasClass('object-prop')) {
+                            keyValPair = value.split(':');
+                            delete itemData[title][keyValPair[0]];
+                        }
+                    },
+                    onItemAdd: function (value) {
+                        title = this.$input.parent().find('label')[0].dataset.title;
+                        itemData = self.$el.data().itemData;
+
+                        if (title !== '' && this.$wrapper.hasClass('object-prop')) {
+                            keyValPair = value.split(':');
+                            itemData[title][keyValPair[0]] = _.uniq(_.compact(keyValPair[1].split(',')));
+                        }
+                    },
+                    onChange: function (value) {
+                        title = this.$input.parent().find('label')[0].dataset.title;
+                        itemData = self.$el.data().itemData;
+
+                        if (title !== '' && !this.$wrapper.hasClass('object-prop')) {
+                            itemData[title] = value;
                         }
                     }
-                });
+                };
 
+            this.$el.find('.selectize').each(function () {
+                var $this = $(this);
+
+                if ($this.hasClass('object-prop')) {
+                    options.delimiter = ';';
+                    options.createFilter = function (text) {
+                        return (/^\w+:(?:\w+,?)+$/).test(text);
+                    };
+                }
+
+                $this.selectize(options);
             });
         },
 
@@ -373,13 +402,11 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
                             } else if (value.type === 'array' ) {
                                 returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrArray.html",
-                                    {data: itemData[key], title: key, i18nKey: i18nKey, id: count, tempData: self.weekdays});
+                                    {data: itemData[key], title: key, i18nKey: i18nKey, id: count});
 
                             } else if (value.type === 'object' ) {
-                                // TODO
-                                console.error('TODO : Data type object');
-                                returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html",
-                                    {title: key, i18nKey: i18nKey, id: count});
+                                returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrObject.html",
+                                    {data: itemData[key], title: key, i18nKey: i18nKey, id: count});
 
                             } else {
                                 console.error('Unexpected data type:',key,value);
@@ -434,7 +461,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             } else {
 
                 selectize =  _.find(schema.config.properties, function(item){
-                    return item.type === 'array';
+                    return item.type === 'array' || item.type === 'object';
                 });
 
                 if (selectize) {
