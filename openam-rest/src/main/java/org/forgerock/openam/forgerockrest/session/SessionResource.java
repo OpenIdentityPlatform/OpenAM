@@ -16,18 +16,6 @@
 
 package org.forgerock.openam.forgerockrest.session;
 
-import static org.forgerock.json.fluent.JsonValue.*;
-
-import javax.inject.Inject;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -64,6 +52,18 @@ import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 import org.forgerock.openam.utils.StringUtils;
+
+import javax.inject.Inject;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.forgerock.json.fluent.JsonValue.*;
 
 /**
  * Represents Sessions that can queried via a REST interface.
@@ -152,14 +152,14 @@ public class SessionResource implements CollectionResourceProvider {
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
         final String cookieName = SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro");
 
-        String tokenId = getTokenIdFromHeader(context, cookieName);
+        String tokenId = getTokenIdFromUrlParam(request);
 
         if (tokenId == null) {
-            tokenId = getTokenIdFromCookie(context, cookieName);
+            tokenId = getTokenIdFromHeader(context, cookieName);
         }
 
         if (tokenId == null) {
-            tokenId = getTokenIdFromUrlParam(request);
+            tokenId = getTokenIdFromCookie(context, cookieName);
         }
 
         // Should any of these actions in the future be allowed to function without an SSO token, this
