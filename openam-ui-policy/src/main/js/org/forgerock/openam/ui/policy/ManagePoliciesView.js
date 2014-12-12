@@ -82,7 +82,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         getPolicyGridInitOptions: function () {
             var self = this;
             return {
-                url: '/openam/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/policies',
+                url: '/' + constants.context + '/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/policies',
                 colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified', 'Actions', 'Resources', 'Resource Attributes', 'Subject'],
                 colModel: [
 
@@ -126,7 +126,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         getRefGridInitOptions: function () {
             var self = this;
             return {
-                url: '/openam/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/referrals',
+                url: '/' + constants.context + '/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/referrals',
                 colNames: ['', 'Name', 'Resources', 'Realms', 'Created', 'Last Modified', 'Created By', 'ModifiedBy'],
                 colModel: [
                     {name: 'iconChB',        width: 40,  sortable: false, formatter: this.refGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},

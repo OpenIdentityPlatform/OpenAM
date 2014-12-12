@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/policy/SiteConfigurationDelegate", [
         });
 
         obj.serviceCall({
-            serviceUrl: constants.host + "/openam/json",
+            serviceUrl: constants.host + "/" + constants.context + "/json",
             url: "/serverinfo/*",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         }).done(function (info) {

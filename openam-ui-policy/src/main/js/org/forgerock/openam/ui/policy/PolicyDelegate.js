@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate"
 ], function (conf, constants, AbstractDelegate) {
 
-    var obj = new AbstractDelegate(constants.host + "/openam/json");
+    var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json");
 
     obj.ERROR_HANDLERS = {
         "Bad Request":              { status: "400" },
@@ -221,7 +221,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.importPolicies = function (data) {
         var subrealm = conf.globalData.auth.realm !== "/" ? conf.globalData.auth.realm : "";
         return obj.serviceCall({
-            serviceUrl: constants.host + "/openam",
+            serviceUrl: constants.host + "/" + constants.context,
             url: "/xacml" + subrealm +"/policies",
             type: "POST",
             data: data,
