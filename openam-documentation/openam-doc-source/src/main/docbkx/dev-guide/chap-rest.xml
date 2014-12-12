@@ -1122,7 +1122,16 @@ $ <userinput>curl https://openam.example.com:8443/openam/json/serverinfo/*</user
             "displayName": "Facebook",
             "valid": true
         }
-    ]
+    ],
+    "referralsEnabled": "false",
+    "zeroPageLogin": {
+        "enabled": false,
+        "refererWhitelist": [
+            ""
+        ],
+        "allowedWithoutReferer": true
+    },
+    "FQDN": "openam.example.com"
 }</computeroutput>
 </screen>
  </section>
