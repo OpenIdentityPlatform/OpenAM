@@ -1,0 +1,8 @@
+<div class="field-float-selectize data-obj">
+ 	<label for="selection_{{id}}" data-title="{{title}}">{{t i18nKey}}</label>
+    <select multiple id="selection_{{id}}" class="selectize object-prop" {{#if dataSource}}data-source="{{dataSource}}"{{/if}}>
+        {{#each data}}
+		<option selected value="{{@key}}:{{this}}">{{@key}}:{{this}}</option>
+		{{/each}}
+    </select>
+</div>

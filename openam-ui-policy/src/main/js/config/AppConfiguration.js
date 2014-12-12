@@ -105,6 +105,7 @@ define("config/AppConfiguration", function () {
                         "templates/policy/ConditionAttrString.html",
                         "templates/policy/ConditionAttrBoolean.html",
                         "templates/policy/ConditionAttrArray.html",
+                        "templates/policy/ConditionAttrObject.html",
                         "templates/policy/ListItem.html",
                         "templates/policy/LegacyListItem.html",
                         "templates/policy/ManageAppsGridCellActionsTemplate.html",
