@@ -200,15 +200,7 @@ public class CoreWrapper {
      * @throws SSOException If the {@code getOrganization} fails.
      */
     public String getOrganization(SSOToken adminToken, String orgIdentifier) throws IdRepoException, SSOException {
-        String org;
-
-        try {
-            org = IdUtils.getOrganization(adminToken, orgIdentifier);
-        } catch (IdRepoException e) {
-            org = "/";
-        }
-
-        return org;
+        return IdUtils.getOrganization(adminToken, orgIdentifier);
     }
 
     /**
