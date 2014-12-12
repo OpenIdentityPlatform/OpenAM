@@ -178,9 +178,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 sessionDelegate.logout(tokenCookie).then(function () {
                     obj.removeSessionCookie();
 
-                    if (conf.globalData.auth.fullLoginURL) {
-                        window.location.hash += obj.filterUrlParams(_this.getLoginUrlParams());
-                    }
                     successCallback();
                     return true;
 
