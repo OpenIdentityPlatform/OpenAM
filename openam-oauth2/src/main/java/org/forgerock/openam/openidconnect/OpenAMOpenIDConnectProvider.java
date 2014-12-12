@@ -81,16 +81,16 @@ public class OpenAMOpenIDConnectProvider implements OpenIDConnectProvider {
     /**
      * {@inheritDoc}
      */
-    public void destroySession(String kid) throws ServerException {
+    public void destroySession(String opsId) throws ServerException {
         try {
-            final Token kidToken = cts.read(kid);
+            final Token opsToken = cts.read(opsId);
 
-            if (kidToken == null) {
+            if (opsToken == null) {
                 throw new CoreTokenException("Unable to find id_token");
             }
 
-            JsonValue idTokenUserSessionToken = tokenAdapter.fromToken(kidToken);
-            cts.delete(kid);
+            JsonValue idTokenUserSessionToken = tokenAdapter.fromToken(opsToken);
+            cts.delete(opsId);
             String sessionId = idTokenUserSessionToken.get(OAuth2Constants.JWTTokenParams.OPS).asSet(String.class)
                     .iterator().next();
 

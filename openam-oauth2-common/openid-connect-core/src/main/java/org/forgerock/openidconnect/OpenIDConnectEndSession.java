@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.slf4j.Logger;
@@ -63,8 +64,8 @@ public class OpenIDConnectEndSession {
         SignedJwt jwt = jwtReconstruction.reconstructJwt(idToken, SignedJwt.class);
 
         JwtClaimsSet claims = jwt.getClaimsSet();
-        String kid = (String) claims.getClaim("kid");
+        String opsId = (String) claims.getClaim(OAuth2Constants.JWTTokenParams.OPS);
 
-        openIDConnectProvider.destroySession(kid);
+        openIDConnectProvider.destroySession(opsId);
     }
 }
