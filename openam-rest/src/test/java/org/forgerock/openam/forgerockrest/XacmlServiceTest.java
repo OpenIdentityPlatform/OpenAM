@@ -17,41 +17,68 @@
 package org.forgerock.openam.forgerockrest;
 
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.xacml3.XACMLExportImport;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
+import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
 import org.forgerock.openam.forgerockrest.entitlements.StubPrivilege;
+import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.Server;
 import org.restlet.data.Disposition;
 import org.restlet.data.Form;
+import org.restlet.data.Protocol;
+import org.restlet.data.Reference;
 import org.restlet.data.Status;
+import org.restlet.engine.adapter.HttpRequest;
+import org.restlet.engine.adapter.ServerCall;
 import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.ext.servlet.internal.ServletCall;
 import org.restlet.representation.Representation;
+import org.restlet.resource.ResourceException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.forgerock.json.resource.ResourceException.BAD_REQUEST;
+import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
 import static org.mockito.Mockito.*;
 import static com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
 
@@ -84,7 +111,7 @@ public class XacmlServiceTest {
         this.debug = mock(Debug.class);
         this.adminTokenAction = mock(AdminTokenAction.class);
         doAnswer(ssoTokenAnswer).when(adminTokenAction).run();
-        this.service = new XacmlService(importExport, adminTokenAction, debug);
+        this.service = new XacmlServiceTestWrapper(importExport, adminTokenAction, this.debug, null, null);
         this.request = mock(Request.class);
         doReturn(REQUEST_ATTRIBUTES).when(request).getAttributes();
         this.response = mock(Response.class);
@@ -161,7 +188,7 @@ public class XacmlServiceTest {
             //then
             fail("Expect exception");
         } catch (ResourceException e) {
-            assertThat(e.getCode()).isEqualTo(ResourceException.BAD_REQUEST);
+            assertThat(e.getStatus().getCode()).isEqualTo(BAD_REQUEST);
         }
     }
 
@@ -180,7 +207,7 @@ public class XacmlServiceTest {
             //then
             fail("Expect exception");
         } catch (ResourceException e) {
-            assertThat(e.getCode()).isEqualTo(ResourceException.BAD_REQUEST);
+            assertThat(e.getStatus().getCode()).isEqualTo(BAD_REQUEST);
             assertThat(e.getMessage()).isEqualTo("No policies found in XACML document");
         }
     }
@@ -201,7 +228,7 @@ public class XacmlServiceTest {
             //then
             fail("Expect exception");
         } catch (ResourceException e) {
-            assertThat(e.getCode()).isEqualTo(ResourceException.BAD_REQUEST);
+            assertThat(e.getStatus().getCode()).isEqualTo(BAD_REQUEST);
             assertThat(e.getMessage()).isEqualTo("JSON Exception.");
         }
     }
@@ -277,7 +304,6 @@ public class XacmlServiceTest {
         assertThat(disposition.getType()).isEqualTo(disposition.TYPE_ATTACHMENT);
     }
 
-
     @Test
     public void testExportXACMLEntitlementException() throws Exception {
         //given
@@ -291,7 +317,7 @@ public class XacmlServiceTest {
             //then
             fail("Expect exception");
         } catch (ResourceException e) {
-            assertThat(e.getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+            assertThat(e.getStatus().getCode()).isEqualTo(INTERNAL_ERROR);
             assertThat(e.getMessage()).isEqualTo("JSON Exception.");
         }
     }
