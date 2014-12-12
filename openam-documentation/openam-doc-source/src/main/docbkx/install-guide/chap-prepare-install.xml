@@ -477,7 +477,7 @@ ds-privilege-name: password-reset</programlisting>
   <procedure xml:id="install-prepare-opendj-external-config-store">
     <title>To Install an External OpenDJ Directory Server</title>
 
-   <indexterm class="startofrange" id="idx-ext-opendj">
+   <indexterm class="startofrange" xml:id="idx-ext-opendj">
     <primary>configuration data</primary>
     <secondary>external OpenDJ</secondary>
     <tertiary>installing</tertiary>
@@ -1549,6 +1549,10 @@ $ <userinput>vi /path/to/jboss7/domain/configuration/domain.xml</userinput>
 
          <indexterm>
           <primary>JBoss EAP 6.0.0</primary>
+          <secondary>preparing</secondary>
+         </indexterm>
+
+         <indexterm>
           <primary>JBoss EAP 6.0.1</primary>
           <secondary>preparing</secondary>
          </indexterm>
@@ -1637,6 +1641,9 @@ $ <userinput>jar cvf ../openam.war *</userinput>
 
          <indexterm>
           <primary>JBoss EAP 6.1.0</primary>
+          <secondary>preparing</secondary>
+         </indexterm>
+         <indexterm>
           <primary>JBoss EAP 6.1.1</primary>
           <secondary>preparing</secondary>
          </indexterm>
@@ -1878,7 +1885,7 @@ $ <userinput>jar cvf ../openam.war *</userinput>
   <section xml:id="prepare-oracle-weblogic">
    <title>Preparing Oracle WebLogic</title>
 
-   <indexterm class="startofrange" id="idx-weblogic">
+   <indexterm class="startofrange" xml:id="idx-weblogic">
     <primary>Oracle WebLogic</primary>
     <secondary>preparing</secondary>
    </indexterm>

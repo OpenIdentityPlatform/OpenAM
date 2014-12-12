@@ -651,6 +651,9 @@
   <indexterm>
    <primary>Policy agents</primary>
    <secondary>security token service client</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Policy agents</primary>
    <secondary>configuring</secondary>
   </indexterm>
 

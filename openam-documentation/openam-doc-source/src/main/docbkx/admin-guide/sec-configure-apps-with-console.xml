@@ -160,17 +160,40 @@
              click Finish.</para>
         </step>
     </procedure>
- <para>To make use of the new application and any policies it contains,
-  you must perform one of the following procedures:
+
   <itemizedlist>
+   <para>
+    To make use of the new application and any policies it contains,
+    you must perform one of the following procedures:
+   </para>
+
    <listitem>
     <para>Configure a policy agent to use the application for
-     policy decisions. See
-     <xref linkend="agent-realm-application-for-policy-decisions"/>.</para>
+     policy decisions.
+    </para>
+
+    <para>
+     For details see the procedure
+     <link
+      xlink:href="admin-guide#agent-realm-application-for-policy-decisions"
+      xlink:show="new"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>To Specify the Realm and Application for Policy Decisions</citetitle></link>.
+    </para>
    </listitem>
    <listitem>
-    <para>Create a referral to the realm the application is
-     in. See <xref linkend="create-referral-xui"/>.</para>
+    <para>
+     Create a referral to the realm the application is in.
+    </para>
+
+    <para>
+     For details see the procedure
+     <link
+      xlink:href="admin-guide#create-referral-xui"
+      xlink:show="new"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>To Enable Referrals in the Policy Editor</citetitle></link>.
+    </para>
    </listitem>
-  </itemizedlist></para>
+  </itemizedlist>
 </section>

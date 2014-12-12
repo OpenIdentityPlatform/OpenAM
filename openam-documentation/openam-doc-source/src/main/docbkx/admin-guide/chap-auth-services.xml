@@ -556,7 +556,7 @@
   <section xml:id="ad-module-conf-hints">
    <title>Hints for the Active Directory Authentication Module</title>
 
-   <indexterm class="startofrange" id="idx-auth-hints-ad">
+   <indexterm class="startofrange" xml:id="idx-auth-hints-ad">
     <primary>Authentication</primary>
     <secondary>Active Directory module</secondary>
    </indexterm>
@@ -756,7 +756,7 @@
   <section xml:id="adaptive-auth-module-conf-hints">
    <title>Hints for the Adaptive Risk Authentication Module</title>
 
-   <indexterm class="startofrange" id="idx-auth-hints-adaptive-risk">
+   <indexterm class="startofrange" xml:id="idx-auth-hints-adaptive-risk">
     <primary>Authentication</primary>
     <secondary>Adaptive risk module</secondary>
    </indexterm>
@@ -1305,7 +1305,7 @@
   <section xml:id="anon-module-conf-hints">
    <title>Hints for the Anonymous Authentication Module</title>
 
-   <indexterm class="startofrange" id="idx-auth-hints-anonymous">
+   <indexterm class="startofrange" xml:id="idx-auth-hints-anonymous">
     <primary>Authentication</primary>
     <secondary>Anonymous module</secondary>
    </indexterm>
@@ -1429,7 +1429,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   <section xml:id="cert-module-conf-hints">
    <title>Hints for the Certificate Authentication Module</title>
 
-   <indexterm class="startofrange" id="idx-auth-cert">
+   <indexterm class="startofrange" xml:id="idx-auth-cert">
     <primary>Authentication</primary>
     <secondary>X509 certificate-based module</secondary>
    </indexterm>
@@ -2473,7 +2473,7 @@ $ ssoadm set-realm-svc-attrs \
   <section xml:id="device-id-match-hints">
    <title>Hints for the Device ID (Match) Authentication Module</title>
 
-   <indexterm class="startofrange" id="idx-auth-hints-deviceid-match">
+   <indexterm class="startofrange" xml:id="idx-auth-hints-deviceid-match">
     <primary>Authentication</primary>
     <secondary>Device ID (Match) module</secondary>
    </indexterm>
@@ -2885,7 +2885,7 @@ $ ssoadm set-realm-svc-attrs \
   <section xml:id="hotp-module-conf-hints">
    <title>Hints for the HOTP Authentication Module</title>
 
-   <indexterm class="startofrange" id="idx-auth-hints-hotp">
+   <indexterm class="startofrange" xml:id="idx-auth-hints-hotp">
     <primary>Authentication</primary>
     <secondary>HMAC One-Time Password (HOTP) module</secondary>
    </indexterm>
@@ -3225,7 +3225,7 @@ $ ssoadm set-realm-svc-attrs \
   <section xml:id="ldap-module-conf-hints">
    <title>Hints for the LDAP Authentication Module</title>
 
-   <indexterm class="startofrange" id="idx-auth-hints-ldap">
+   <indexterm class="startofrange" xml:id="idx-auth-hints-ldap">
     <primary>Authentication</primary>
     <secondary>LDAP module</secondary>
    </indexterm>
@@ -3531,7 +3531,7 @@ $ ssoadm set-realm-svc-attrs \
   <section xml:id="msisdn-module-conf-hints">
    <title>Hints for the MSISDN Authentication Module</title>
 
-   <indexterm class="startofrange" id="idx-auth-hints-msisdn">
+   <indexterm class="startofrange" xml:id="idx-auth-hints-msisdn">
     <primary>Authentication</primary>
     <secondary>MSISDN module</secondary>
    </indexterm>
@@ -3691,7 +3691,7 @@ $ ssoadm set-realm-svc-attrs \
   <section xml:id="OATH-module-conf-hints">
    <title>Hints for the OATH Module</title>
 
-   <indexterm class="startofrange" id="idx-auth-hints-oath">
+   <indexterm class="startofrange" xml:id="idx-auth-hints-oath">
     <primary>Authentication</primary>
     <secondary>Open Authentication (OATH) module</secondary>
    </indexterm>
@@ -3866,7 +3866,7 @@ $ ssoadm set-realm-svc-attrs \
   <section xml:id="oauth2-module-conf-hints">
    <title>Hints for the OAuth 2.0/OpenID Connect Authentication Module</title>
 
-   <indexterm class="startofrange" id="idx-auth-hints-oauth2-oidc">
+   <indexterm class="startofrange" xml:id="idx-auth-hints-oauth2-oidc">
     <primary>Authentication</primary>
     <secondary>OAuth 2.0/OpenID Connect 1.0 module</secondary>
    </indexterm>
@@ -4305,7 +4305,7 @@ $ ssoadm set-realm-svc-attrs \
      </tgroup>
     </table>
 
-   <indexterm class="endofrange" classref="idx-auth-hints-oauth2-oidc">
+   <indexterm class="endofrange" startref="idx-auth-hints-oauth2-oidc">
     <primary>Authentication</primary>
     <secondary>OAuth 2.0/OpenID Connect 1.0 module</secondary>
    </indexterm>

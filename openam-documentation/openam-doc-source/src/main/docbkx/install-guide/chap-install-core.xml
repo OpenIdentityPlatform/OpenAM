@@ -374,7 +374,7 @@ Using CLASSPATH:
  <procedure xml:id="configure-openam-custom">
   <title>To Custom Configure OpenAM</title>
 
-  <indexterm class="startofrange" id="idx=custom-config">
+  <indexterm>
    <primary>OpenAM</primary>
    <secondary>configuring</secondary>
    <tertiary>custom</tertiary>
@@ -651,13 +651,8 @@ Using CLASSPATH:
    <filename>$HOME/openam</filename>, where
    $HOME corresponds to the user who runs the web container). Prevent other
    users from accessing files in the configuration directory.</para>
-  </step>
 
-  <indexterm class="endofrange" startref="idx=custom-config">
-   <primary>OpenAM</primary>
-   <secondary>configuring</secondary>
-   <tertiary>custom</tertiary>
-  </indexterm>
+  </step>
 
  </procedure>
  
