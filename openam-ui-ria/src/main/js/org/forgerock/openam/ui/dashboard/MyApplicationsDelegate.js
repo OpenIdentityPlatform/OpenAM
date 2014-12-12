@@ -28,8 +28,9 @@ define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/main/Configuration"
-], function(constants, configuration, AbstractDelegate, conf) {
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function(constants, configuration, AbstractDelegate, conf, realmHelper) {
 
     var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json');
 
@@ -47,7 +48,7 @@ define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
 
     obj.getMyApplications = function() {
         var self = this,
-            realm = this.cleanRealm(configuration.globalData.auth.realm);
+            realm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
         return obj.serviceCall({
             url: realm + "/dashboard/assigned",
             headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"},
@@ -60,7 +61,7 @@ define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
 
     obj.getAvailableApplications = function() {
         var self = this,
-            realm = this.cleanRealm(configuration.globalData.auth.realm);
+            realm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
         return obj.serviceCall({
             url: realm + "/dashboard/available",
             headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"},
@@ -69,16 +70,6 @@ define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
             return self.sortApps(apps);
         });
 
-    };
-
-    obj.cleanRealm = function(realm) {
-        if(realm.charAt(0) !== "/"){
-            realm = "/" + realm;
-        }
-        if(realm === "/"){
-            realm = "";
-        }
-        return realm;
     };
 
     return obj;
