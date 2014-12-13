@@ -108,7 +108,7 @@ printf 'objectclass: top\n' >> $T/add-cts-entries.ldif
 printf 'objectclass: organizationalUnit\n' >> $T/add-cts-entries.ldif
 printf 'ou: admins\n' >> $T/add-cts-entries.ldif
 printf '\n' >>$T/add-cts-entries.ldif
-printf "dn: uid=openam,$CTS_DN\n" >> $T/add-cts-entries.ldif
+printf "dn: uid=openam,ou=admins,$CTS_DN\n" >> $T/add-cts-entries.ldif
 printf 'objectclass: top\n' >> $T/add-cts-entries.ldif
 printf 'objectclass: person\n' >> $T/add-cts-entries.ldif
 printf 'objectclass: organizationalPerson\n' >> $T/add-cts-entries.ldif
