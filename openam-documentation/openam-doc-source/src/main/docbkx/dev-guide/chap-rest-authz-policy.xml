@@ -1614,10 +1614,12 @@ $ <userinput>curl \
       as in the following example:
      </para>
 
+     <!-- Added a linefeed to fit on a PDF page -->
      <programlisting language="javascript">
 {
     "type": "Policy",
-    "className": "org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition",
+    "className": "org.forgerock.openam.entitlement.conditions.environment
+      .OAuth2ScopeCondition",
     "name": "oauth2scope",
     "properties": {
         "OAuth2Scope": [
