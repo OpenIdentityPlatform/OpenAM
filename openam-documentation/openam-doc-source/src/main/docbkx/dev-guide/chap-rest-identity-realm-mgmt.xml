@@ -1482,7 +1482,11 @@ $ <userinput>curl \
 <computeroutput>{"realmCreated":"/myRealm"}</computeroutput>
      </screen>
 
-    <para>You can also set the <literal>sunOrganizationAliases</literal> parameter,
+   <note><para>Do not use the names of OpenAM REST endpoints as the name of a realm.
+    The OpenAM REST endpoint names that should not be used includes: "users",
+    "groups", "realms", "policies" and "applications".</para></note>
+
+   <para>You can also set the <literal>sunOrganizationAliases</literal> parameter,
     but it can only be assigned to one realm (usually the top level realm). Before
     setting this parameter, make sure it is not already assigned elsewhere. If you 
     replace remove it from another realm, you will lose your configuration.</para>

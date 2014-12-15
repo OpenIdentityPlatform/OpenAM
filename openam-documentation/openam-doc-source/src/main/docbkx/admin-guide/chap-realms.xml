@@ -122,6 +122,10 @@
      click New to open the New Realm page, where you configure the realm.
     </para>
 
+    <note><para>Do not use the names of OpenAM REST endpoints as the name of a realm.
+     The OpenAM REST endpoint names that should not be used includes: "users",
+     "groups", "realms", "policies" and "applications".</para></note>
+
     <para>
      If you configure the realm to be inactive,
      then users cannot use it to authenticate

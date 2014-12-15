@@ -481,6 +481,16 @@
          <entry>1.0</entry>
         </row>
         <row>
+         <entry> </entry>
+         <entry>/subjectattributes</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry>/xacml</entry>
+         <entry>/policies</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
          <entry>/frrest</entry>
          <entry>/token</entry>
          <entry>1.0</entry>
@@ -490,6 +500,7 @@
          <entry>/client</entry>
          <entry>1.0</entry>
         </row>
+
        </tbody>
       </tgroup>
      </table>
