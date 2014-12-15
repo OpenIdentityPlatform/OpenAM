@@ -79,7 +79,7 @@ public class DebugImpl implements IDebug {
         if(SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_LEVEL) != null) {
             setDebug(SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_LEVEL));
         } else {
-            setDebug(DebugLevel.OFF);
+            setDebug(DebugLevel.ON);
         }
 
         this.debugFileProvider = debugFileProvider;

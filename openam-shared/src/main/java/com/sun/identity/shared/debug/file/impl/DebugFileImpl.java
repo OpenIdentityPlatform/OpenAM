@@ -59,9 +59,9 @@ import java.util.ResourceBundle;
 public class DebugFileImpl implements DebugFile {
 
     //static
-    private static String debugPrefix;
+    private static String debugPrefix = "";
 
-    private static String debugSuffix;
+    private static String debugSuffix = "";
 
     private static int rotationInterval = -1;
 
