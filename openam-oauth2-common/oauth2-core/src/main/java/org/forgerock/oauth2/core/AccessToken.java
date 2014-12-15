@@ -364,7 +364,9 @@ public class AccessToken extends JsonValue implements Token {
     }
 
     /**
-     * Adds additional data to the Access Token.
+     * <p>Adds additional data to the Access Token.</p>
+     *
+     * <p>If the value is {@code null} then this method will ensure that the key is not present in the map.</p>
      *
      * @param key The key.
      * @param value The value.
@@ -372,6 +374,8 @@ public class AccessToken extends JsonValue implements Token {
     public void addExtraData(String key, String value) {
         if (value != null) {
             extraData.put(key, value);
+        } else {
+            extraData.remove(key);
         }
     }
 
