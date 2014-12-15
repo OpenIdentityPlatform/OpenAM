@@ -37,8 +37,6 @@
  
  <xinclude:include href="../shared/para-requirements-support.xml" />
 
- <para>TODO: Update for release</para>
-
  <xinclude:include href="../shared/sec-openam-os-requirements.xml" />
 
  <section xml:id="java-requirements">
