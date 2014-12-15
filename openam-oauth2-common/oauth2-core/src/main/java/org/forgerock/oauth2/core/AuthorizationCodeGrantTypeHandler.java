@@ -148,6 +148,7 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
         accessToken.addExtraData(OAuth2Constants.Custom.SSO_TOKEN_ID, authorizationCode.getSessionId());
 
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
+        accessToken.addExtraData(OAuth2Constants.Custom.SSO_TOKEN_ID, null);
 
         // We should report the scope originally consented to and not the scope added to this request
         if (authorizationScope != null && !authorizationScope.isEmpty()) {
