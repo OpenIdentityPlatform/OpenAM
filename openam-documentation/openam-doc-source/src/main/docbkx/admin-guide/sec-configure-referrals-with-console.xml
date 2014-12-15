@@ -79,11 +79,14 @@
   <step>
    <para>Provide a name for the referral, and then click Next.</para>
 
-   <xinclude:include href="../shared/para-special-characters.xml">
-    <xinclude:fallback>
-     Failed to include para-special-characters
-    </xinclude:fallback>
-   </xinclude:include>
+   <para>
+    Do not use special characters within policy, application or referral names
+    (for example, "my+referral") using the Policy Editor or REST endpoints as
+    OpenAM returns a 400 Bad Request error.
+    The special characters are: double quotes ("), plus sign (+), comma (,),
+    less than (&lt;), equals (=), greater than (&gt;), backslash (\), and
+    null (\u0000).
+   </para>
   </step>
 
   <step>
