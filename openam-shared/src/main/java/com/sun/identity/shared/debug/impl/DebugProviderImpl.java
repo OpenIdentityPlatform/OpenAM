@@ -22,34 +22,58 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: DebugProviderImpl.java,v 1.3 2008/06/25 05:53:01 qcheng Exp $
+ * $Id: DebugProviderImpl.java,v 1.4 2009/03/07 08:01:53 veiming Exp $
  *
+ */
+
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.shared.debug.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.sun.identity.shared.debug.IDebug;
 import com.sun.identity.shared.debug.IDebugProvider;
+import com.sun.identity.shared.debug.file.DebugFileProvider;
+import com.sun.identity.shared.debug.file.impl.DebugFileProviderImpl;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Default debug provider implementation.
  */
 public class DebugProviderImpl implements IDebugProvider {
-    private Map debugMap = new HashMap();
-    
+    private DebugFileProvider debugFileProvider;
+
+    private Map<String, IDebug> debugMap = new HashMap<String, IDebug>();
+
+    /**
+     * Default constructor
+     * {@link com.sun.identity.shared.debug.file.impl.DebugFileProviderImpl} would be debug file provider used by
+     * every debug logs
+     */
+    public DebugProviderImpl() {
+        this(new DebugFileProviderImpl());
+    }
+
+    /**
+     * Constructor with a debug file provider
+     *
+     * @param debugFileProvider debug file provider used by every debug logs
+     */
+    public DebugProviderImpl(DebugFileProvider debugFileProvider) {
+        this.debugFileProvider = debugFileProvider;
+    }
+
     public synchronized IDebug getInstance(String debugName) {
-        IDebug debug = (IDebug)getDebugMap().get(debugName);
+
+        IDebug debug = debugMap.get(debugName);
         if (debug == null) {
-            debug = new DebugImpl(debugName);
-            getDebugMap().put(debugName, debug);
+            debug = new DebugImpl(debugName, debugFileProvider);
+            debugMap.put(debugName, debug);
         }
         return debug;
     }
 
-    private Map getDebugMap() {
-        return debugMap;
-    }
 }
