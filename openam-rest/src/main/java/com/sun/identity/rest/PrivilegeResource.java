@@ -241,7 +241,7 @@ public class PrivilegeResource extends ResourceBase {
                 try {
                     sf = new SearchFilter(attrName,
                         Long.parseLong(f.substring(idx + 1)),
-                        SearchFilter.Operator.EQUAL_OPERATOR);
+                        SearchFilter.Operator.EQUALS_OPERATOR);
                 } catch (NumberFormatException e) {
                     String[] param = {f};
                     throw new EntitlementException(328, param);
@@ -265,7 +265,7 @@ public class PrivilegeResource extends ResourceBase {
                 try {
                     sf = new SearchFilter(attrName,
                         Long.parseLong(f.substring(idx + 1)),
-                        SearchFilter.Operator.EQUAL_OPERATOR);
+                        SearchFilter.Operator.EQUALS_OPERATOR);
                 } catch (NumberFormatException e) {
                     String[] param = {f};
                     throw new EntitlementException(328, param);

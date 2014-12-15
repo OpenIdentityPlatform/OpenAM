@@ -57,8 +57,6 @@ import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.Reject;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-
 /**
  * Endpoint for the ApplicationsResource.
  *
@@ -567,7 +565,7 @@ public class ApplicationsResource extends RealmAwareResource {
         @Override
         public Set<SearchFilter> visitEqualsFilter(Set<SearchFilter> filters, JsonPointer field,
                                                    Object valueAssertion) {
-            filters.add(comparison(field.leaf(), SearchFilter.Operator.EQUAL_OPERATOR, valueAssertion));
+            filters.add(comparison(field.leaf(), SearchFilter.Operator.EQUALS_OPERATOR, valueAssertion));
             return filters;
         }
 
@@ -581,21 +579,22 @@ public class ApplicationsResource extends RealmAwareResource {
         @Override
         public Set<SearchFilter> visitGreaterThanOrEqualToFilter(Set<SearchFilter> filters, JsonPointer field,
                                                                  Object valueAssertion) {
-            // Treat as greater-than (both are >= in the underlying implementation)
-            return visitGreaterThanFilter(filters, field, valueAssertion);
+            filters.add(comparison(field.leaf(), SearchFilter.Operator.GREATER_THAN_OR_EQUAL_OPERATOR, valueAssertion));
+            return filters;
         }
 
         @Override
         public Set<SearchFilter> visitLessThanFilter(Set<SearchFilter> filters, JsonPointer field,
                                                      Object valueAssertion) {
-            filters.add(comparison(field.leaf(), SearchFilter.Operator.LESSER_THAN_OPERATOR, valueAssertion));
+            filters.add(comparison(field.leaf(), SearchFilter.Operator.LESS_THAN_OPERATOR, valueAssertion));
             return filters;
         }
 
         @Override
         public Set<SearchFilter> visitLessThanOrEqualToFilter(Set<SearchFilter> filters, JsonPointer field,
                                                               Object valueAssertion) {
-            return visitLessThanFilter(filters, field, valueAssertion);
+            filters.add(comparison(field.leaf(), SearchFilter.Operator.LESS_THAN_OR_EQUAL_OPERATOR, valueAssertion));
+            return filters;
         }
 
     }

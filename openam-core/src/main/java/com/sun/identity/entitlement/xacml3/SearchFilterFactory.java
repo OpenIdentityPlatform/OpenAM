@@ -32,8 +32,8 @@ public class SearchFilterFactory {
 
     public SearchFilterFactory() {
         operatorMap = new HashMap<String, SearchFilter.Operator>();
-        operatorMap.put("=", SearchFilter.Operator.EQUAL_OPERATOR);
-        operatorMap.put("<", SearchFilter.Operator.LESSER_THAN_OPERATOR);
+        operatorMap.put("=", SearchFilter.Operator.EQUALS_OPERATOR);
+        operatorMap.put("<", SearchFilter.Operator.LESS_THAN_OPERATOR);
         operatorMap.put(">", SearchFilter.Operator.GREATER_THAN_OPERATOR);
     }
 

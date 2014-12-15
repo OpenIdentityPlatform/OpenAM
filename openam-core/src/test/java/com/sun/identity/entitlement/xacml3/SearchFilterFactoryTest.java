@@ -37,7 +37,7 @@ public class SearchFilterFactoryTest {
     public void shouldParseEquals() throws EntitlementException {
         String filter = "badger=mammal";
         SearchFilter result = factory.getFilter(filter);
-        assertThat(result.getOperator()).isEqualTo(SearchFilter.Operator.EQUAL_OPERATOR);
+        assertThat(result.getOperator()).isEqualTo(SearchFilter.Operator.EQUALS_OPERATOR);
     }
 
     @Test

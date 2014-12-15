@@ -1150,13 +1150,11 @@ public class ApplicationsResourceTest {
     @DataProvider(name = "SupportedQueryOperators")
     public static Object[][] supportedQueryOperators() {
         return new Object[][] {
-                { "eq", SearchFilter.Operator.EQUAL_OPERATOR },
-                // Treat >= and > as both greater-than-or-equals as that is all the search filters support
+                { "eq", SearchFilter.Operator.EQUALS_OPERATOR},
                 { "gt", SearchFilter.Operator.GREATER_THAN_OPERATOR },
-                { "ge", SearchFilter.Operator.GREATER_THAN_OPERATOR },
-                // Same for <= and <.
-                { "lt", SearchFilter.Operator.LESSER_THAN_OPERATOR },
-                { "le", SearchFilter.Operator.LESSER_THAN_OPERATOR }
+                { "ge", SearchFilter.Operator.GREATER_THAN_OR_EQUAL_OPERATOR },
+                { "lt", SearchFilter.Operator.LESS_THAN_OPERATOR},
+                { "le", SearchFilter.Operator.LESS_THAN_OR_EQUAL_OPERATOR}
         };
     }
 

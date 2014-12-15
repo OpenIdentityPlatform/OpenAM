@@ -110,11 +110,11 @@ public class MetaDataTest {
         PrivilegeManager privilegMgr = PrivilegeManager.getInstance("/",
             SubjectUtils.createSubject(adminToken));
 
-        test(privilegMgr, SearchFilter.Operator.EQUAL_OPERATOR, creationDate,
+        test(privilegMgr, SearchFilter.Operator.EQUALS_OPERATOR, creationDate,
             "equals test", false);
         test(privilegMgr, SearchFilter.Operator.GREATER_THAN_OPERATOR,
             creationDate -1, "greater than test", true);
-        test(privilegMgr, SearchFilter.Operator.LESSER_THAN_OPERATOR,
+        test(privilegMgr, SearchFilter.Operator.LESS_THAN_OPERATOR,
             creationDate +1, "lesser than test", true);
     }
 

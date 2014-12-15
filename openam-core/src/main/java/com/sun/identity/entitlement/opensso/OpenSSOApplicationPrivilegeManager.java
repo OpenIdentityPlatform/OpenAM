@@ -496,7 +496,7 @@ public class OpenSSOApplicationPrivilegeManager extends
         long filterLong = filter.getNumericValue();
         SearchFilter.Operator operator = filter.getOperator();
 
-        if (operator == SearchFilter.Operator.EQUAL_OPERATOR) {
+        if (operator == SearchFilter.Operator.EQUALS_OPERATOR) {
             return (filterLong == value);
         }
         if (operator == SearchFilter.Operator.GREATER_THAN_OPERATOR) {

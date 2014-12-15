@@ -31,7 +31,7 @@ public enum AttributeType {
     STRING {
         @Override
         public SearchFilter getFilter(String field, SearchFilter.Operator operator, Object value) {
-            if (operator != SearchFilter.Operator.EQUAL_OPERATOR) {
+            if (operator != SearchFilter.Operator.EQUALS_OPERATOR) {
                 throw new UnsupportedOperationException("Only equality supported for string attributes");
             }
             return new SearchFilter(field, value.toString());

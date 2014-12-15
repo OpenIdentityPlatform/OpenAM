@@ -36,8 +36,14 @@ package com.sun.identity.entitlement.util;
  * of names.
  */
 public class SearchFilter {
-    public static enum Operator
-        {EQUAL_OPERATOR, GREATER_THAN_OPERATOR, LESSER_THAN_OPERATOR};
+
+    public static enum Operator {
+        LESS_THAN_OPERATOR,
+        LESS_THAN_OR_EQUAL_OPERATOR,
+        EQUALS_OPERATOR,
+        GREATER_THAN_OPERATOR,
+        GREATER_THAN_OR_EQUAL_OPERATOR
+    }
 
     private String attrName;
     private String value;
@@ -55,7 +61,7 @@ public class SearchFilter {
     public SearchFilter(String attrName, String value) {
         this.attrName = attrName;
         this.value = value;
-        this.operator = Operator.EQUAL_OPERATOR;
+        this.operator = Operator.EQUALS_OPERATOR;
     }
 
     /**
@@ -67,8 +73,8 @@ public class SearchFilter {
      * @param value Search filter.
      * @param operator Operator. Can be one of these
      * <ul>
-     * <li>SearchFilter.EQUAL_OPERATOR</li>
-     * <li>SearchFilter.LESSER_THAN_OPERATOR</li>
+     * <li>SearchFilter.EQUALS_OPERATOR</li>
+     * <li>SearchFilter.LESS_THAN_OPERATOR</li>
      * <li>SearchFilter.GREATER_THAN_OPERATOR</li>
      * </ul>
      */
@@ -124,16 +130,30 @@ public class SearchFilter {
             return "(ou=" + attrName + "=" + value +")";
         }
 
-        String op = null;
-        if (operator == Operator.LESSER_THAN_OPERATOR) {
-            op = "<=";
-        } else if (operator == Operator.GREATER_THAN_OPERATOR) {
-            op = ">=|";
-        } else {
-            op = "=";
-        }
+        /*
+         * We store numeric policy meta-data such as creationDate and lastModifiedDate as value-key pairs under 'ou'.
+         * All entries are stored twice; once with a "|" prefix added to the value-key and once without it.
+         * We use the pipe prefixed entry with >= and the non-prefixed entry with <=. Filtering fails to operate
+         * correctly if we do not pair up the operator with the pipe filter prefix in this way.
+         *
+         * Also, since LDAP does not support < or > natively, we need to invert >= and <=.
+         */
 
-        return "(ou" + op + Long.toString(longValue) + "=" + attrName + ")";
+        String attrValue = Long.toString(longValue) + "=" + attrName;
+
+        switch (operator) {
+            case LESS_THAN_OPERATOR:
+                return "(!(ou>=|" + attrValue + "))";
+            case LESS_THAN_OR_EQUAL_OPERATOR:
+                return "(ou<=" + attrValue + ")";
+            case GREATER_THAN_OPERATOR:
+                return "(!(ou<=" + attrValue + "))";
+            case GREATER_THAN_OR_EQUAL_OPERATOR:
+                return "(ou>=|" + attrValue + ")";
+            case EQUALS_OPERATOR:
+            default:
+                return "(ou=" + attrValue + ")";
+        }
     }
 
     @Override

@@ -31,7 +31,12 @@
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.entitlement.util.SearchFilter.Operator;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.util.annotations.VisibleForTesting;
+
+import static org.forgerock.openam.utils.StringUtils.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
@@ -46,55 +51,45 @@ import java.util.regex.Pattern;
 import javax.security.auth.Subject;
 
 /**
- * Application Manager handles addition, deletion and listing of applications
- * for each realm.
+ * Application Manager handles addition, deletion and listing of applications for each realm.
  */
 public final class ApplicationManager {
     private static final Debug DEBUG = Debug.getInstance("Entitlement");
 
-    private static Map<String, Set<Application>> applications =
-        new ConcurrentHashMap<String, Set<Application>>();
-    private static final ReentrantReadWriteLock readWriteLock =
-        new ReentrantReadWriteLock();
+    private static Map<String, Set<Application>> applications =  new ConcurrentHashMap<String, Set<Application>>();
+    private static final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
     private ApplicationManager() {
     }
 
-
     /**
      * Returns the application names in a realm.
      *
-     * @param adminSubject Admin Subject who has the rights to access
-     *        configuration datastore.
+     * When performing the search using the Subject {@link PrivilegeManager#superAdminSubject},
+     * the provided filters must not contain {@link Operator#LESS_THAN_OR_EQUAL_OPERATOR }
+     * or  {@link Operator#GREATER_THAN_OR_EQUAL_OPERATOR } as these are not supported by LDAP.
+     *
+     * @param adminSubject Admin Subject who has the rights to access configuration datastore.
      * @param realm Realm name.
      * @param filters Search Filters
      * @return application names in a realm.
      */
-    public static Set<String> search(
-        Subject adminSubject,
-        String realm,
-        Set<SearchFilter> filters
-    ) throws EntitlementException {
+    public static Set<String> search(Subject adminSubject, String realm, Set<SearchFilter> filters)
+            throws EntitlementException {
+
         if (adminSubject == PrivilegeManager.superAdminSubject) {
-            EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-                adminSubject, realm);
+            EntitlementConfiguration ec = EntitlementConfiguration.getInstance(adminSubject, realm);
             return ec.searchApplicationNames(adminSubject, filters);
         }
 
         // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
         ApplicationPrivilegeManager apm =
-            ApplicationPrivilegeManager.getInstance(realm,
-            PrivilegeManager.superAdminSubject);
-        Set<String> applNames = apm.getApplications(
-            ApplicationPrivilege.Action.READ);
+            ApplicationPrivilegeManager.getInstance(realm, PrivilegeManager.superAdminSubject);
+        Set<String> applNames = apm.getApplications(ApplicationPrivilege.Action.READ);
         return filterApplicationNames(realm, applNames, filters);
     }
 
-    private static Set<String> filterApplicationNames(
-        String realm,
-        Set<String> applNames,
-        Set<SearchFilter> filters
-    ) {
+    private static Set<String> filterApplicationNames(String realm, Set<String> applNames, Set<SearchFilter> filters) {
         Set<String> results = new HashSet<String>();
 
         if ((filters != null) && !filters.isEmpty()) {
@@ -108,8 +103,7 @@ public final class ApplicationManager {
                         }
                     }
                 } catch (EntitlementException ex) {
-                    PrivilegeManager.debug.error(
-                        "ApplicationManager.fitlerApplicationNames", ex);
+                    PrivilegeManager.debug.error("ApplicationManager.fitlerApplicationNames", ex);
                 }
             }
         } else {
@@ -119,38 +113,31 @@ public final class ApplicationManager {
         return results;
     }
 
-    private static boolean match(Set<SearchFilter> filters, Application app) {
-        for (SearchFilter f : filters) {
-            String filterName = f.getName();
-            if (filterName.equals(Application.NAME_ATTRIBUTE))  {
-                if (!match(app.getName(), f.getValue())) {
+    @VisibleForTesting
+    static boolean match(Set<SearchFilter> filters, Application app) {
+        for (SearchFilter filter : filters) {
+            if (Application.NAME_ATTRIBUTE.equals(filter.getName()))  {
+                if (!match(app.getName(), filter.getValue())) {
                     return false;
                 }
-            } else if (filterName.equals(Application.DESCRIPTION_ATTRIBUTE)) {
-                if (!match(app.getDescription(), f.getValue())) {
+            } else if (Application.DESCRIPTION_ATTRIBUTE.equals(filter.getName())) {
+                if (!match(app.getDescription(), filter.getValue())) {
                     return false;
                 }
-            } else if (filterName.equals(Application.CREATED_BY_ATTRIBUTE)) {
-                if (!match(app.getCreatedBy(), f.getValue())) {
+            } else if (Application.CREATED_BY_ATTRIBUTE.equals(filter.getName())) {
+                if (!match(app.getCreatedBy(), filter.getValue())) {
                     return false;
                 }
-            } else if (filterName.equals(
-                Application.LAST_MODIFIED_BY_ATTRIBUTE)) {
-                if (!match(app.getLastModifiedBy(), f.getValue())) {
+            } else if (Application.LAST_MODIFIED_BY_ATTRIBUTE.equals(filter.getName())) {
+                if (!match(app.getLastModifiedBy(), filter.getValue())) {
                     return false;
                 }
-            } else if (filterName.equals(Application.CREATION_DATE_ATTRIBUTE)){
-                if (!match(app.getCreationDate(), f.getNumericValue(),
-                    f.getOperator())
-                ) {
+            } else if (Application.CREATION_DATE_ATTRIBUTE.equals(filter.getName())) {
+                if (!match(app.getCreationDate(), filter.getNumericValue(), filter.getOperator())) {
                     return false;
                 }
-            } else if (filterName.equals(
-                Application.LAST_MODIFIED_DATE_ATTRIBUTE)
-            ){
-                if (!match(app.getLastModifiedDate(), f.getNumericValue(),
-                    f.getOperator())
-                ) {
+            } else if (Application.LAST_MODIFIED_DATE_ATTRIBUTE.equals(filter.getName())){
+                if (!match(app.getLastModifiedDate(), filter.getNumericValue(), filter.getOperator())) {
                     return false;
                 }
             }
@@ -158,28 +145,26 @@ public final class ApplicationManager {
         return true;
     }
 
-    private static boolean match(
-        long value,
-        long pattern,
-        SearchFilter.Operator op
-    ) {
-        if (op.equals(SearchFilter.Operator.EQUAL_OPERATOR)) {
-            return (value == pattern);
+    private static boolean match(long value, long pattern, Operator operator) {
+        switch (operator) {
+            case EQUALS_OPERATOR:
+                return value == pattern;
+            case GREATER_THAN_OPERATOR:
+                return value > pattern;
+            case GREATER_THAN_OR_EQUAL_OPERATOR:
+                return value >= pattern;
+            case LESS_THAN_OPERATOR:
+                return value < pattern;
+            case LESS_THAN_OR_EQUAL_OPERATOR:
+                return value <= pattern;
+            default:
+                return false;
         }
-        if (op.equals(SearchFilter.Operator.GREATER_THAN_OPERATOR)) {
-            return (value > pattern);
-        }
-        if (op.equals(SearchFilter.Operator.LESSER_THAN_OPERATOR)) {
-            return (value < pattern);
-        }
-
-        return false;
     }
 
-
     private static boolean match(String value, String strPattern) {
-        if ((strPattern != null) && (strPattern.length() > 0)) {
-            if ((value == null) || (value.trim().length() == 0)) {
+        if (isNotEmpty(strPattern)) {
+            if (isBlank(value)) {
                 return strPattern.equals("*");
             }
             value = value.toLowerCase();
@@ -206,8 +191,6 @@ public final class ApplicationManager {
 
         return true;
     }
-
-
 
     /**
      * Returns the application names in a realm.
