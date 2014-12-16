@@ -355,6 +355,48 @@
     </para>
    </listitem>
 
+   <listitem>
+    <para>
+     The XUI, now the default for end-user pages, handles DNS/realm alias
+     differently from the classic UI, which was the default in previous OpenAM
+     versions.
+     With the classic UI, the realm alias is specified both in the host name and
+     the URI path. With the XUI, the host name alone specifies the realm. The XUI
+     evaluates a realm specified in the path of the URL as a subrealm of the
+     realm specified by the host name alias.
+    </para>
+    <para>
+     For example, with the classic UI, you could authenticate to a realm,
+     <literal>realm1</literal> using the DNS alias
+     <literal>realm1.example.com:8080</literal>
+     and the realm query parameter, <literal>realm=realm1</literal>, as follows:
+    </para>
+    <programlisting>
+http://realm1.example.com:8080/openam/UI/Login?realm=realm1
+    </programlisting>
+    <para>
+     With XUI, you do not include a realm in the URI if it has already been
+     mapped as now any URI realm is additive and specifies a subrealm of the
+     DNS alias realm.
+     For example, using the following URL indicates that you are attempting
+     to authenticate to <literal>/realm1/realm1</literal> (that is, the sub-realm,
+     <literal>realm1</literal> under the realm, <literal>realm1</literal>).
+    </para>
+    <programlisting>
+http://realm1.example.com:8080/openam/XUI/#Login/realm1
+    </programlisting>
+    <para>
+     As another example, if you have a sub-realm called <literal>test</literal> under
+     <literal>/realm1</literal> and make a request to:
+    </para>
+    <programlisting>
+http://realm1.example.com:8080/openam/XUI/#Login/test
+    </programlisting>
+    <para>
+     The request authenticates to <literal>/realm1/test</literal>.
+     Note also that the use of URI realm is preferred over realm as a query parameter.
+    </para>
+   </listitem>
   </itemizedlist>
  </section>
 
