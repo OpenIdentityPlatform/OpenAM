@@ -65,7 +65,8 @@ public class AuthenticationServiceV2 extends AuthenticationServiceV1 {
         } else if (exception instanceof RestAuthException) {
             final RestAuthException rae = (RestAuthException)exception;
             org.forgerock.json.resource.ResourceException cause =
-                    org.forgerock.json.resource.ResourceException.getException(rae.getStatusCode(), rae.getMessage());
+                    org.forgerock.json.resource.ResourceException.getException(
+                    rae.getStatusCode(), getLocalizedMessage(rae));
 
             if (rae.getFailureUrl() != null) {
                 cause.setDetail(json(object(field("failureUrl", rae.getFailureUrl()))));

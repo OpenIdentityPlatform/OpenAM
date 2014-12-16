@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.forgerockrest.authn.restlet;
 
+import com.sun.identity.authentication.spi.AuthLoginException;
 import junit.framework.Assert;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.RestAuthenticationHandler;
@@ -26,7 +27,10 @@ import org.json.JSONException;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.data.ClientInfo;
+import org.restlet.data.Language;
 import org.restlet.data.MediaType;
+import org.restlet.data.Preference;
 import org.restlet.data.Status;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
@@ -43,11 +47,15 @@ import static org.mockito.Mockito.when;
 public class AuthenticationServiceV1Test {
 
     private AuthenticationServiceV1 authServiceV1;
+    private ClientInfo clientInfo;
 
     @BeforeMethod
     public void setUp() throws Exception {
         authServiceV1 = new AuthenticationServiceV1(mock(RestAuthenticationHandler.class));
         Request request = new Request();
+        clientInfo = new ClientInfo();
+        clientInfo.setAcceptedLanguages(Collections.singletonList(new Preference<Language>(Language.ENGLISH)));
+        request.setClientInfo(clientInfo);
         authServiceV1.init(mock(Context.class), request, new Response(request));
     }
 
@@ -109,5 +117,45 @@ public class AuthenticationServiceV1Test {
         Assert.assertEquals(jsonRep.getJsonObject().get("errorMessage"), "Invalid Password!!");
         Assert.assertEquals(jsonRep.getJsonObject().has("failureUrl"), true);
         Assert.assertEquals(jsonRep.getJsonObject().get("failureUrl"), "http://localhost:8080");
+    }
+
+    @Test
+    public void shouldReturnFrenchErrorMessageFromException() throws IOException, JSONException {
+        // given
+        AuthLoginException exception = new AuthLoginException("amAuth", "120", null);
+        clientInfo.setAcceptedLanguages(Collections.singletonList(new Preference<Language>(Language.FRENCH_FRANCE)));
+
+        // when
+        String message = authServiceV1.getLocalizedMessage(exception);
+
+        // then
+        assertEquals(message, "L\u2019authentification sur module n\u2019est pas autoris\u00e9e.");
+    }
+
+    @Test
+    public void shouldReturnFrenchErrorMessageFromCause() throws IOException, JSONException {
+        // given
+        AuthLoginException ale = new AuthLoginException("amAuth", "120", null);
+        RestAuthException exception = new RestAuthException(401, ale);
+        clientInfo.setAcceptedLanguages(Collections.singletonList(new Preference<Language>(Language.FRENCH_FRANCE)));
+
+        // when
+        String message = authServiceV1.getLocalizedMessage(exception);
+
+        // then
+        assertEquals(message, "L\u2019authentification sur module n\u2019est pas autoris\u00e9e.");
+    }
+
+    @Test
+    public void shouldReturnErrorMessageWithoutTemplate() throws IOException, JSONException {
+        // given
+        AuthLoginException ale = new AuthLoginException("amAuth", "119", null);
+        RestAuthException exception = new RestAuthException(401, ale);
+
+        // when
+        String message = authServiceV1.getLocalizedMessage(exception);
+
+        // then
+        assertEquals(message, "Invalid Auth Level.");
     }
 }

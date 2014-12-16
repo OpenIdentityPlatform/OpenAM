@@ -16,18 +16,23 @@
 
 package org.forgerock.openam.forgerockrest.authn.restlet;
 
+import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+
+import com.sun.identity.shared.locale.L10NMessage;
+import com.sun.identity.shared.locale.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
@@ -37,7 +42,9 @@ import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseExcep
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.Reject;
 import org.json.JSONException;
+import org.restlet.data.Language;
 import org.restlet.data.MediaType;
+import org.restlet.data.Preference;
 import org.restlet.data.Status;
 import org.restlet.engine.header.Header;
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -309,12 +316,12 @@ public class AuthenticationServiceV1 extends ServerResource {
             if (authException.getFailureUrl() != null) {
                 rep.put("failureUrl", authException.getFailureUrl());
             }
-            rep.put("errorMessage", exception.getMessage());
+            rep.put("errorMessage", getLocalizedMessage(exception));
 
         } else if (exception == null) {
             rep.put("errorMessage", status.getDescription());
         } else {
-            rep.put("errorMessage", exception.getMessage());
+            rep.put("errorMessage", getLocalizedMessage(exception));
         }
 
         if (representation == null) {
@@ -323,5 +330,42 @@ public class AuthenticationServiceV1 extends ServerResource {
         getResponse().setStatus(status);
 
         return representation;
+    }
+
+    /**
+     * Get the localized message for the requested language if the given exception or its cause
+     * is an instance of <code>L10NMessage</code>.
+     *
+     * @param exception The exception that contains the localized message.
+     *
+     * @return The localized message.
+     */
+    protected String getLocalizedMessage(Exception exception) {
+        final List<Preference<Language>> languages = getClientInfo().getAcceptedLanguages();
+        String message = null;
+        L10NMessage localizedException = null;
+        if (exception instanceof L10NMessage) {
+            localizedException = (L10NMessage)exception;
+        } else if (exception.getCause() instanceof L10NMessage) {
+            localizedException = (L10NMessage)exception.getCause();
+        }
+        if (localizedException != null) {
+            for (Preference<Language> language : languages) {
+                message = localizedException.getL10NMessage(Locale.getLocale(language.toString()));
+                if (message == null) {
+                    continue;
+                }
+                // Old UI used a jsp template to display the error message, which we need to strip off here
+                int delimiterIndex = message.indexOf(AuthClientUtils.MSG_DELIMITER);
+                if (delimiterIndex > -1) {
+                    message = message.substring(0, delimiterIndex);
+                }
+                break;
+            }
+        }
+        if (message == null) {
+            message = exception.getMessage();
+        }
+        return message;
     }
 }
