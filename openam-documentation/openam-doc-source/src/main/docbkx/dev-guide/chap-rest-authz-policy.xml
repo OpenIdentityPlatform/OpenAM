@@ -37,119 +37,8 @@
  <indexterm><primary>REST API</primary></indexterm>
 
  <para>This chapter shows how to use the OpenAM RESTful interfaces for authorization
-  and policy management and covers the following topics:
+  and policy management.
  </para>
-
- <itemizedlist>
-  <listitem>
-   <para>
-    <xref linkend="rest-api-authz" />
-   </para>
-  </listitem>
-
-  <listitem>
-   <para>
-    <xref linkend="rest-api-authz-policy-decisions" />
-   </para>
-  </listitem>
-
-  <listitem>
-   <para>
-    <xref linkend="rest-api-authz-policies" />
-   </para>
-  </listitem>
-
-  <listitem>
-   <para>
-    <xref linkend="rest-api-manage-xacml" />
-   </para>
-  </listitem>
-
-  <listitem>
-   <para>
-    <xref linkend="rest-api-authz-applications" />
-   </para>
-  </listitem>
-
-  <listitem>
-   <para>
-    <xref linkend="rest-api-authz-application-types" />
-   </para>
-  </listitem>
-
-  <listitem>
-   <para>
-    <xref linkend="rest-api-authz-condition-types" />
-   </para>
-  </listitem>
-
-  <listitem>
-   <para>
-    <xref linkend="rest-api-authz-subject-types" />
-   </para>
-  </listitem>
-
-  <listitem>
-   <para>
-    <xref linkend="rest-api-authz-decision-combiners" />
-   </para>
-  </listitem>
-
-  <listitem>
-   <para>
-    <xref linkend="rest-api-authz-referrals" />
-   </para>
-  </listitem>
-
- </itemizedlist>
-
- <para>The chapter also describes how to manage policies using the
-  backwards-compatible, legacy APIs:
- </para>
-
- <itemizedlist>
-   <listitem>
-    <para>
-     <xref linkend="rest-api-authz-legacy" />
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     <xref linkend="rest-api-policy-management" />
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     <xref linkend="rest-api-policy-management-create" />
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     <xref linkend="rest-api-policy-management-read" />
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     <xref linkend="rest-api-policy-management-update" />
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     <xref linkend="rest-api-policy-management-delete" />
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     <xref linkend="rest-api-policy-management-query" />
-    </para>
-   </listitem>
-  </itemizedlist>
 
  <section xml:id="rest-api-authz">
   <title>About the REST Policy Endpoints</title>
@@ -167,7 +56,7 @@
    <listitem>
     <para>
      Under <literal>/json[/<replaceable>realm</replaceable>]/policies</literal>,
-     you find the newer JSON-based APIs.
+     you find the newer JSON-based APIs for policy management and evaluation.
     </para>
    </listitem>
    <listitem>
@@ -193,9 +82,22 @@
    </listitem>
    <listitem>
     <para>
+     Under <literal>/json/subjectattributes</literal> you find a JSON-based API
+     for viewing subjects' attributes you can use when defining response
+     attributes in policies.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
      Under <literal>/json/decisioncombiners</literal> you find a JSON-based API
      for viewing implementations you can use when defining policies
      to specify how to combine results when multiple policies apply.
+    </para>
+   </listitem>
+     <listitem>
+    <para>
+     Under <literal>/json[/<replaceable>realm</replaceable>]/referrals</literal>
+     you find a JSON-based API for managing policy referrals.
     </para>
    </listitem>
    <listitem>
@@ -215,15 +117,15 @@
   <para>
    You can request policy decisions from OpenAM
    by using the REST APIs described in this section.
-   OpenAM evaluates the request
+   OpenAM evaluates requests
    based on the context and the policies configured,
-   and returns decision that indicate what actions are allowed or denied,
+   and returns decisions that indicate what actions are allowed or denied,
    as well as any attributes or advice
    for the resources specified.
   </para>
 
   <para>
-   To request a decision for specific resources,
+   To request decisions for specific resources,
    see <xref linkend="rest-api-authz-policy-decision-concrete" />.
   </para>
 
@@ -246,7 +148,9 @@
     to the appropriate path under the URI where OpenAM is deployed,
     <literal>/json[/<replaceable>realm</replaceable>][/
      <replaceable>subrealm</replaceable>]/policies?_action=evaluate</literal>,
-    where <replaceable>realm</replaceable> optionally specifies the realm.
+    where <replaceable>realm</replaceable> and
+    <replaceable>subrealm</replaceable>
+    optionally specifies the realm.
     The payload for the HTTP POST is a JSON object
     that specifies at least the resources,
     and takes the following form.
@@ -325,7 +229,7 @@
       </para>
 
       <para>
-       For more on available applications,
+       For more on applications,
        see <xref linkend="rest-api-authz-applications" />.
       </para>
      </listitem>
@@ -351,12 +255,21 @@
         <listitem>
          <para>
           The value is the SSO token ID string for the subject,
-          returned for example on successful authentication as described in,
+          returned for example on successful authentication as described in
           <link
            xlink:show="new"
            xlink:href="dev-guide#rest-api-auth-json"
            xlink:role="http://docbook.org/xlink/role/olink"
           ><citetitle>REST APIs for Authentication &amp; Logout</citetitle></link>.
+         </para>
+        </listitem>
+       </varlistentry>
+
+       <varlistentry>
+        <term>"jwt"</term>
+        <listitem>
+         <para>
+          The value is a JWT string.
          </para>
         </listitem>
        </varlistentry>
@@ -370,14 +283,6 @@
         </listitem>
        </varlistentry>
 
-       <varlistentry>
-        <term>"jwt"</term>
-        <listitem>
-         <para>
-          The value is a JWT string.
-         </para>
-        </listitem>
-       </varlistentry>
       </variablelist>
 
       <para>
@@ -418,19 +323,19 @@ $ <userinput>curl \
     ],
     "application": "iPlanetAMWebAgentService"
  }' \
- https://openam.example.com:8443/openam/json/myRealm/policies?_action
+ https://openam.example.com:8443/openam/json/policies?_action
     =evaluate</userinput>
 <computeroutput>[ {
-  "resource" : "http://www.example.com:80/do?action=run",
+  "resource" : "http://www.example.com/do?action=run",
   "actions" : {
   },
   "attributes" : {
   },
   "advices" : {
-    "AuthLevelConditionAdvice" : [ "/myRealm:3" ]
+    "AuthLevelConditionAdvice" : [ "3" ]
   }
 }, {
-  "resource" : "http://www.example.com:80/index.html",
+  "resource" : "http://www.example.com/index.html",
   "actions" : {
     "POST" : false,
     "GET" : true
@@ -446,7 +351,7 @@ $ <userinput>curl \
    <variablelist>
     <para>
      In the JSON list of decisions returned for each resource,
-     OpenAM includes a these fields.
+     OpenAM includes these fields.
     </para>
 
     <varlistentry>
@@ -457,10 +362,7 @@ $ <userinput>curl \
       </para>
 
       <para>
-       Notice that the resources are normalized.
-       In the example, the request does not explicitly specify port 80,
-       but the response does show the port number.
-       Notice also that the decisions returned are not guaranteed
+       The decisions returned are not guaranteed
        to be in the same order as the resources were requested.
       </para>
      </listitem>
@@ -490,7 +392,7 @@ $ <userinput>curl \
      <listitem>
       <para>
        A map of attribute names to their values,
-       if any resource attributes are returned
+       if any response attributes are returned
        according to applicable policies.
       </para>
 
@@ -520,7 +422,6 @@ $ <userinput>curl \
        In the example, the policy that applies
        to <literal>http://www.example.com:80/do?action=run</literal>
        requests that the subject be authenticated
-       in realm <literal>/myRealm</literal>
        at an authentication level of at least 3.
       </para>
 
@@ -528,7 +429,7 @@ $ <userinput>curl \
 {
     "advices": {
         "AuthLevelConditionAdvice": [
-            "/myRealm:3"
+            "3"
         ]
     }
 }
@@ -569,23 +470,29 @@ $ <userinput>curl \
    </programlisting>
 
    <para>
-    The "advices" returned depend on policy conditions.
-    This section shows examples of the many different types
+    The "advices" returned depend on policy conditions. For more
+    information about OpenAM policy conditions, see
+    <xref linkend="rest-api-authz-policies" />.
+   </para>
+   <para>
+    This section shows examples of the different types
     of policy decision advice
     and the conditions that cause OpenAM to return the advice.
    </para>
 
    <para>
-    An "AttributeLookup" condition failure can result in advice
-    showing the value and attribute expected.
-    For example, failure against a policy with the following condition:
+    <literal>"AuthLevel"</literal>
+    and
+    <literal>"LEAuthLevel"</literal>
+    condition failures can result in advice
+    showing the expected or maximum possible authentication level.
+    For example, failure against the following condition:
    </para>
 
    <programlisting language="javascript">
 {
-    "type": "AttributeLookup",
-    "key": "postaladdress",
-    "value": "33 New Montgomery St."
+    "type": "AuthLevel",
+    "authLevel": 2
 }
    </programlisting>
 
@@ -595,186 +502,53 @@ $ <userinput>curl \
 
    <programlisting language="javascript">
 {
-    "com.sun.identity.entitlement.AttributeLookupCondition": [
-        "33 New Montgomery St.=postaladdress"
+    "AuthLevelConditionAdvice": [
+        "2"
     ]
 }
    </programlisting>
 
    <para>
-    A "DNSName" condition failure can result in advice
-    showing the domain name mask.
-    For example, the following condition:
+    An
+    <literal>"AuthScheme"</literal>
+    condition failure can result in advice
+    showing one or more required authentication modules.
+    For example, failure against the following condition:
    </para>
-
    <programlisting language="javascript">
 {
-    "type": "DNSName",
-    "domainNameMask": "*.example.org"
-}
-   </programlisting>
-
-   <para>
-    Leads to this advice:
-   </para>
-
-   <programlisting language="javascript">
-{
-    "com.sun.identity.entitlement.DNSNameCondition": [
-        "requestDnsName=*.example.org"
-    ]
-}
-   </programlisting>
-
-   <para>
-    An "IP" condition failure can result in advice
-    showing the request IP address range allowed.
-    For example, the following condition:
-   </para>
-
-   <programlisting language="javascript">
-{
-    "type": "IP",
-    "startIp": "127.0.0.1",
-    "endIp": "127.0.1.255"
-}
-   </programlisting>
-
-   <para>
-    Leads to this advice:
-   </para>
-
-   <programlisting language="javascript">
-{
-    "com.sun.identity.entitlement.IPCondition": [
-        "requestIp=127.0.0.1-127.0.1.255"
-    ]
-}
-   </programlisting>
-
-   <para>
-    A "NumericAttribute" condition failure can result in advice
-    showing the expectations about the attribute value,
-    where the operator is one of <literal>&lt; &lt;= = >= ></literal>.
-    For example, the following condition:
-   </para>
-
-   <programlisting language="javascript">
-{
-    "type": "NumericAttribute",
-    "attributeName": "gidNumber",
-    "operator": "LESS_THAN",
-    "value": "1000"
-}
-   </programlisting>
-
-   <para>
-    Leads to this advice:
-   </para>
-
-   <programlisting language="javascript">
-{
-    "com.sun.identity.entitlement.NumericAttributeCondition": [
-        "gidNumber&lt;1000.0"
-    ]
-}
-   </programlisting>
-
-   <para>
-    A "StringAttribute" condition failure can result in advice
-    showing the expectation about the value of the attribute.
-    For example, the following condition:
-   </para>
-
-   <programlisting language="javascript">
-{
-    "type": "StringAttribute",
-    "attributeName": "location",
-    "caseSensitive": false,
-    "value": "Bristol"
-}
-   </programlisting>
-
-   <para>
-    Leads to this advice:
-   </para>
-
-   <programlisting language="javascript">
-{
-    "com.sun.identity.entitlement.StringAttributeCondition": [
-        "location=Bristol"
-    ]
-}
-   </programlisting>
-
-   <para>
-    If "caseSensitive" in the policy condition is true,
-    then OpenAM appends <literal>(casesensitive)</literal> to the value
-    in the advice.
-   </para>
-
-   <para>
-    A "Time" condition evaluation returns advice
-    showing the window during which the condition is satisfied.
-    If the condition is satisfied, then
-    "timeToLive" specifies the time in milliseconds until the end of the window.
-    "maxTime" specifies the date in milliseconds at the end of the window.
-    If the condition is not satisfied, then
-    "timeToLive" specifies the time in milliseconds until the start of the window.
-    "maxTime" specifies the date in milliseconds at the start of the window.
-    For example, given the following condition:
-   </para>
-
-   <programlisting language="javascript">
-{
-    "type": "Time",
-    "startTime": "10:00",
-    "endTime": "16:30"
-}
-   </programlisting>
-
-   <para>
-    The following example shows advice returned:
-   </para>
-
-   <programlisting language="javascript">
-{
-    "maxTime": [
-        "1410273000000"
+    "type": "AuthScheme",
+    "authScheme": [
+        "HOTP"
     ],
-    "timeToLive": [
-        "19648817"
+    "applicationName": "iPlanetAMWebAgentService",
+    "applicationIdleTimeout": 10
+}
+   </programlisting>
+
+   <para>
+    Leads to this advice:
+   </para>
+
+   <programlisting language="javascript">
+{
+    "AuthSchemeConditionAdvice": [
+        "HOTP"
     ]
 }
    </programlisting>
 
    <para>
-    If it is necessary to authenticate again,
-    OpenAM can return the following advice:
+    An
+    <literal>"AuthenticateToRealm"</literal>
+    condition failure can result in advice
+    showing the name of the realm to which authentication
+    is required. For example, failure against the following condition:
    </para>
-
    <programlisting language="javascript">
 {
-    "ForceAuth": [
-        "true"
-    ]
-}
-   </programlisting>
-
-   <para>
-    Failure against a policy with the following condition:
-   </para>
-
-   <programlisting language="javascript">
-{
-    "type": "Policy",
-    "className": "com.sun.identity.policy.plugins.AuthenticateToRealmCondition",
-    "name": "realm",
-    "properties": {
-        "AuthenticateToRealm": [
-            "/myRealm"
-        ]
-    }
+    "type": "AuthenticateToRealm",
+    "authenticateToRealm": "MyRealm"
 }
    </programlisting>
 
@@ -791,19 +565,16 @@ $ <userinput>curl \
    </programlisting>
 
    <para>
-    Failure against a policy with the following condition:
+    An
+    <literal>"AuthenticateToService"</literal>
+    condition failure can result in advice
+    showing the name of the required authentication chain.
+    For example, failure against the following condition:
    </para>
-
    <programlisting language="javascript">
 {
-    "type": "Policy",
-    "className": "com.sun.identity.policy.plugins.AuthenticateToServiceCondition",
-    "name": "Require MyAuthnChain",
-    "properties": {
-        "AuthenticateToService": [
-            "MyAuthnChain"
-        ]
-    }
+    "type": "AuthenticateToService",
+    "authenticateToService": "MyAuthnChain"
 }
    </programlisting>
 
@@ -820,19 +591,19 @@ $ <userinput>curl \
    </programlisting>
 
    <para>
-    Failure against a policy with the following condition:
+    A
+    <literal>"ResourceEnvIP"</literal>
+    condition failure can result in advice
+    showing that indicates corrective action to be taken
+    to resolve the problem. The advice varies, depending on what the condition
+    tests. For example, failure against the following condition:
    </para>
-
    <programlisting language="javascript">
 {
-    "type": "Policy",
-    "className": "com.sun.identity.policy.plugins.AuthLevelCondition",
-    "name": "AuthnLevelAtLeast5",
-    "properties": {
-        "AuthLevel": [
-            "5"
-        ]
-    }
+    "type": "ResourceEnvIP",
+    "resourceEnvIPConditionValue": [
+        "IF IP=[127.0.0.12] THEN authlevel=4"
+    ]
 }
    </programlisting>
 
@@ -843,25 +614,22 @@ $ <userinput>curl \
    <programlisting language="javascript">
 {
     "AuthLevelConditionAdvice": [
-        "5"
+        "4"
     ]
 }
    </programlisting>
 
    <para>
-    Failure against a policy with the following condition:
+    Failure against a different type of
+    <literal>"ResourceEnvIP"</literal>
+    condition such as the following:
    </para>
-
    <programlisting language="javascript">
 {
-    "type": "Policy",
-    "className": "com.sun.identity.policy.plugins.AuthSchemeCondition",
-    "name": "RequireHOTP",
-    "properties": {
-        "AuthScheme": [
-            "HOTP"
-        ]
-    }
+    "type": "ResourceEnvIP",
+    "resourceEnvIPConditionValue": [
+        "IF IP=[127.0.0.11] THEN service=MyAuthnChain"
+    ]
 }
    </programlisting>
 
@@ -871,11 +639,80 @@ $ <userinput>curl \
 
    <programlisting language="javascript">
 {
-    "AuthSchemeConditionAdvice": [
-        "HOTP"
+    "AuthenticateToServiceConditionAdvice": [
+        "MyAuthnChain"
     ]
 }
    </programlisting>
+
+   <para>
+    A
+    <literal>"Session"</literal>
+    condition failure can result in advice
+    showing that access has been denied because
+    the user's session has been active
+    longer than allowed by the condition.
+    The advice will also show if the the user's session
+    was terminated and reauthentication is required.
+    For example, failure against the following condition:
+   </para>
+   <programlisting language="javascript">
+{
+    "type": "Session",
+    "maxSessionTime": "10",
+    "terminateSession": false
+}
+   </programlisting>
+
+   <para>
+    Leads to this advice:
+   </para>
+
+   <programlisting language="javascript">
+{
+    "SessionConditionAdvice": [
+        "deny"
+    ]
+}
+   </programlisting>
+
+   <para>
+    When policy evaluation denials occur against the following conditions,
+    OpenAM does not return any advice:
+    <itemizedlist>
+     <listitem>
+      <para>
+       <literal>IPv4</literal>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <literal>IPv6</literal>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <literal>LDAPFilter</literal>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <literal>OAuth2Scope</literal>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <literal>SessionProperty</literal>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <literal>SimpleTime</literal>
+      </para>
+     </listitem>
+    </itemizedlist>
+   </para>
+
   </section>
 
   <section xml:id="rest-api-authz-policy-decision-subtree">
@@ -961,7 +798,7 @@ $ <userinput>curl \
       </para>
 
       <para>
-       For more on available applications,
+       For more on applications,
        see <xref linkend="rest-api-authz-applications" />.
       </para>
      </listitem>
@@ -998,6 +835,15 @@ $ <userinput>curl \
        </varlistentry>
 
        <varlistentry>
+        <term>"jwt"</term>
+        <listitem>
+         <para>
+          The value is a JWT string.
+         </para>
+        </listitem>
+       </varlistentry>
+
+       <varlistentry>
         <term>"claims"</term>
         <listitem>
          <para>
@@ -1006,14 +852,6 @@ $ <userinput>curl \
         </listitem>
        </varlistentry>
 
-       <varlistentry>
-        <term>"jwt"</term>
-        <listitem>
-         <para>
-          The value is a JWT string.
-         </para>
-        </listitem>
-       </varlistentry>
       </variablelist>
 
       <para>
@@ -1055,9 +893,9 @@ $ <userinput>curl \
     "resource": "http://www.example.com/",
     "subject": { "ssoToken": "AQIC5...zE4*" }
  }' \
- https://openam.example.com:8443/openam/json/myRealm/policies?_action=evaluateTree</userinput>
+ https://openam.example.com:8443/openam/json/policies?_action=evaluateTree</userinput>
 <computeroutput>[ {
-  "resource" : "http://www.example.com:80/",
+  "resource" : "http://www.example.com/",
   "actions" : {
     "GET" : true,
     "OPTIONS" : true,
@@ -1068,7 +906,7 @@ $ <userinput>curl \
   "advices" : {
   }
 }, {
-  "resource" : "http://www.example.com:80/*",
+  "resource" : "http://www.example.com/*",
   "actions" : {
     "POST" : false,
     "PATCH" : false,
@@ -1084,7 +922,7 @@ $ <userinput>curl \
   "advices" : {
   }
 }, {
-  "resource" : "http://www.example.com:80/*?*",
+  "resource" : "http://www.example.com/*?*",
   "actions" : {
     "POST" : false,
     "PATCH" : false,
@@ -1097,7 +935,7 @@ $ <userinput>curl \
   "attributes" : {
   },
   "advices" : {
-    "AuthLevelConditionAdvice" : [ "/:3" ]
+    "AuthLevelConditionAdvice" : [ "3" ]
   }
 } ]</computeroutput>
   </programlisting>
@@ -1111,7 +949,7 @@ $ <userinput>curl \
    <variablelist>
     <para>
      In the JSON list of decisions returned for each resource,
-     OpenAM includes a these fields.
+     OpenAM includes these fields.
     </para>
 
     <varlistentry>
@@ -1122,9 +960,8 @@ $ <userinput>curl \
       </para>
 
       <para>
-       Notice that the resources are normalized.
-       In the example, the request does not explicitly specify port 80,
-       but the response does show the port number.
+       The decisions returned are not guaranteed
+       to be in the same order as the resources were requested.
       </para>
      </listitem>
     </varlistentry>
@@ -1152,7 +989,7 @@ $ <userinput>curl \
      <listitem>
       <para>
        A map of attribute names to their values,
-       if any resource attributes are returned
+       if any response attributes are returned
        according to applicable policies.
       </para>
 
@@ -1183,11 +1020,16 @@ $ <userinput>curl \
        requests that the subject be authenticated
        at an authentication level of at least 3.
       </para>
+      <para>
+       Notice that with the <literal>"advices"</literal> field
+       present, no <literal>"advices"</literal> appear in the
+       JSON response.
+      </para>
 
       <programlisting language="javascript">
 {
     "advices": {
-        "AuthLevelConditionAdvice": [ "/:3" ]
+        "AuthLevelConditionAdvice": [ "3" ]
     }
 }
       </programlisting>
@@ -1245,9 +1087,6 @@ $ <userinput>curl \
        {
            "type": "User",
            "propertyName": "profile attribute",
-           "propertyValues": [
-               "profile attribute", ...
-           ]
        },
    ]
 }
@@ -1333,7 +1172,7 @@ $ <userinput>curl \
     <term><literal>"subject"</literal></term>
     <listitem>
      <para>
-      Specifies the subjects to which the policy applies,
+      Specifies the subject conditions to which the policy applies,
       where subjects can be combined by using the built-in types
       <literal>"AND"</literal>, <literal>"OR"</literal>,
       and <literal>"NOT"</literal>,
@@ -1345,133 +1184,110 @@ $ <userinput>curl \
       with <literal>"type"</literal> set to the name of the implementation
       (using a short name for all registered subject implementations),
       and also other fields depending on the implementation.
-      The subject types registered by default include the following.
+      The subject types registered by default include the following:
      </para>
 
      <itemizedlist>
       <listitem>
        <para>
-        <literal>"AnyUser"</literal>, meaning any authenticated user.
+        <literal>"AuthenticatedUsers"</literal>,
+        meaning any user that has successfully authenticated to OpenAM.
        </para>
-      </listitem>
-
-      <listitem>
-       <para>
-        <literal>"Attribute"</literal> to specify attributes
-        of the subject's profile as in the following example:
-       </para>
-
        <programlisting language="javascript">
 {
-   "subject": {
-       "type": "Attribute",
-       "id": "mail",
-       "value": "test@example.com"
-   }
+    "type": "AuthenticatedUsers"
 }
        </programlisting>
       </listitem>
 
       <listitem>
        <para>
-        <literal>"Group"</literal> to specify a particular group
-         as in the following example:
+        <literal>"Identity"</literal>
+        to specify one or more users from an OpenAM identity repository:
        </para>
 
        <programlisting language="javascript">
 {
-   "subject": {
-       "type": "Group",
-       "id": "id=HR Managers,ou=group,dc=openam,dc=forgerock,dc=org"
-   }
+   "type": "Identity",
+   "subjectValues": [
+       "uid=scarter,ou=People,dc=example,dc=com",
+       "uid=ahall,ou=People,dc=example,dc=com"
+   ]
 }
        </programlisting>
-      </listitem>
 
-      <listitem>
        <para>
-        <literal>"NONE"</literal>, meaning no subject.
-       </para>
-      </listitem>
-
-      <listitem>
-       <para>
-        <literal>"Role"</literal> to specify a particular OpenAM role
-        as in the following example:
+        You can also use the
+        <literal>"Identity"</literal>
+        subject type to specify one or more groups from an identity repository:
        </para>
 
        <programlisting language="javascript">
 {
-   "subject": {
-       "type": "Role",
-       "id": "id=admins,ou=role,dc=openam,dc=forgerock,dc=org"
-   }
+    "type": "Identity",
+    "subjectValues": [
+        "cn=HR Managers,ou=Groups,dc=example,dc=com"
+    ]
 }
        </programlisting>
+
       </listitem>
 
       <listitem>
        <para>
-        <literal>"User"</literal> to specify a particular user
-        as in the following example:
+        <literal>"JwtClaim"</literal>
+        to specify a claim in a
+        user's JSON web token (JWT).
        </para>
-
        <programlisting language="javascript">
 {
-   "subject": {
-       "type": "User",
-       "id": "id=bob,ou=user,dc=openam,dc=forgerock,dc=org"
-   }
+    "type": "JwtClaim",
+    "claimName": "sub",
+    "claimValue": "scarter"
 }
-       </programlisting>
+      </programlisting>
       </listitem>
+
+      <listitem>
+       <para>
+        <literal>"NONE"</literal>,
+        meaning never match any subject. The result is not that access is denied, but
+        rather that the policy itself does not match and therefore cannot be
+        evaluated in order to allow access.
+       </para>
+      </listitem>
+
      </itemizedlist>
 
      <para>
-      <literal>"Policy"</literal> subject types can be used
-      to correspond to the subject configured for policies
-      as in the following example:
-     </para>
-
-     <programlisting language="javascript">
-{
-   "type": "Policy",
-   "name": "All authenticated users",
-   "className": "com.sun.identity.policy.plugins.AuthenticatedUsers",
-   "values": []
-}
-     </programlisting>
-
-     <para>
       The following example defines the subject
-      either as Bob Dobbs or as a member of the HR Managers group.
+      either as the user Sam Carter from an OpenAM identity repository,
+      or as a user with a JWT claim with a subject claim with the value
+      scarter:
      </para>
 
      <programlisting language="javascript">
-{
-   "subject": {
-       "type": "OR",
-       "subjects": [
-           {
-               "subject": {
-                   "type": "User",
-                   "id": "id=bob,ou=user,dc=openam,dc=forgerock,dc=org"
-               }
-           },
-           {
-               "subject": {
-                   "type": "Group",
-                   "id": "id=HR Managers,ou=group,dc=openam,dc=forgerock,dc=org"
-               }
-           }
-       ]
-   }
+"subject": {
+    "type": "OR",
+    "subjects": [
+       {
+           "type": "Identity",
+           "subjectValues": [
+               "uid=scarter,ou=People,dc=example,dc=com"
+           ]
+       },
+       {
+           "type": "JwtClaim",
+           "claimName": "sub",
+           "claimValue": "scarter"
+       }
+   ]
 }
      </programlisting>
 
      <para>
-      To read a subject type description,
-      or to list available subject types,
+      To read a single subject type description,
+      or to list all the available subject types,
       see <xref linkend="rest-api-authz-subject-types" />.
      </para>
     </listitem>
@@ -1481,7 +1297,7 @@ $ <userinput>curl \
     <term><literal>"condition"</literal></term>
     <listitem>
      <para>
-      Specifies additional conditions, where conditions can be combined
+      Specifies environment conditions, where conditions can be combined
       by using the built-in types <literal>"AND"</literal>,
       <literal>"OR"</literal>, and <literal>"NOT"</literal>,
       and where condition implementations are pluggable.
@@ -1496,144 +1312,341 @@ $ <userinput>curl \
      </para>
 
      <itemizedlist>
+
+      <listitem>
+      <para>
+       <literal>"AMIdentityMembership"</literal>
+       to specify a list of OpenAM users and groups.
+      </para>
+      <programlisting language="javascript">
+{
+    "type": "AMIdentityMembership",
+    "amIdentityName": [
+        "id=scarter,ou=People,dc=example,dc=com"
+    ]
+}
+      </programlisting>
+      </listitem>
+
       <listitem>
        <para>
-        <literal>"AttributeLookup"</literal> to specify
-         a value to match in the resource as in the following example:
+        <literal>"AuthLevel"</literal>
+        to specify the authentication level.
        </para>
-
        <programlisting language="javascript">
 {
-   "type": "AttributeLookup",
-   "key": "postaladdress",
-   "value": "33 New Montgomery St."
+    "type": "AuthLevel",
+    "authLevel": 2
 }
        </programlisting>
       </listitem>
 
       <listitem>
        <para>
-        <literal>"DNSName"</literal> to specify domain names
-        where the request originated as in the following example:
+        <literal>"AuthScheme"</literal>
+        to specify the authentication module used to authenticate and
+        the application name, and to set a timeout for application
+        authentication.
        </para>
-
        <programlisting language="javascript">
 {
-   "type": "DNSName",
-   "domainNameMask": "*.example.com"
+    "type": "AuthScheme",
+    "authScheme": [
+        "DataStore"
+    ],
+    "applicationName": "iPlanetAMWebAgentService",
+    "applicationIdleTimeout": 10
 }
        </programlisting>
       </listitem>
 
       <listitem>
        <para>
-        <literal>"IP"</literal> to specify an IP address range
-        as in the following example:
+        <literal>"AuthenticateToRealm"</literal>
+        to specify the realm to which the user authenticated.
        </para>
-
        <programlisting language="javascript">
 {
-   "type": "IP",
+    "type": "AuthenticateToRealm",
+    "authenticateToRealm": "MyRealm"
+}
+       </programlisting>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"AuthenticateToService"</literal>
+        to specify the authentication chain that was used
+        to authenticate.
+       </para>
+       <programlisting language="javascript">
+{
+    "type": "AuthenticateToService",
+    "authenticateToService": "MyAuthnChain"
+}
+       </programlisting>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"IPv4"</literal>
+        or
+        <literal>"IPv6"</literal>
+        to specify an IP address range from which
+        the request originated.
+       </para>
+       <programlisting language="javascript">
+{
+   "type": "IPv4",
    "startIp": "127.0.0.1",
    "endIp": "127.0.0.255"
 }
        </programlisting>
-      </listitem>
 
-      <listitem>
        <para>
-        <literal>"NumericAttribute"</literal> to specify a value or range
-        for a numeric attribute from the subject's user profile
-        as in the following example:
+        You can also use the
+        <literal>"IPv4"</literal>
+        and
+        <literal>"IPv6"</literal>
+        conditions with the
+        <literal>"dnsName"</literal>
+        field to specify domain names from which the request originated. Omit
+        <literal>"startIp"</literal>
+        and
+        <literal>"endIp"</literal>
+        when using
+        <literal>"dnsName"</literal>.
        </para>
-
        <programlisting language="javascript">
 {
-   "type": "NumericAttribute",
-   "attributeName": "gidNumber",
-   "operator": "LESS_THAN",
-   "value": "1000"
-}
-       </programlisting>
-
-       <para>
-        <literal>"operator"</literal> is optional, but if used
-        it must be one of the following comparison operators:
-        <literal>LESS_THAN</literal>,
-        <literal>LESS_THAN_OR_EQUAL</literal>,
-        <literal>EQUAL</literal>,
-        <literal>GREATER_THAN_OR_EQUAL</literal>, or
-        <literal>GREATER_THAN</literal>.
-        Note that using symbols such as &lt;, &lt;=,=,&gt;=, or &gt; is not
-        supported.
-        If not specified, then OpenAM checks for equality (<literal>EQUAL</literal>).
-       </para>
-      </listitem>
-
-      <listitem>
-       <para>
-        <literal>"StringAttribute"</literal> to specify a value
-        for a string-valued attribute from the subject's user profile
-        as in the following example:
-       </para>
-
-       <programlisting language="javascript">
-{
-    "type": "StringAttribute",
-    "attributeName": "location",
-    "caseSensitive": false,
-    "value": "Bristol"
+    "type": "IPv4",
+    "dnsName": [
+        "*.example.com"
+    ]
 }
        </programlisting>
       </listitem>
 
       <listitem>
        <para>
-        <literal>"Time"</literal> to specify a time range,
-        where type is the only required field in the following example:
+        <literal>"LDAPFilter"</literal>
+        to specify an LDAP search filter. The user's entry is tested
+        against the search filter in the directory configured in the
+        Policy Configuration Service.
+       </para>
+       <programlisting language="javascript">
+{
+    "type": "LDAPFilter",
+    "ldapFilter": "(&amp;(c=US)(preferredLanguage=en-us))"
+}
+       </programlisting>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"LEAuthLevel"</literal>
+        to specify a maximum acceptable authentication level.
+       </para>
+       <programlisting language="javascript">
+{
+    "type": "LEAuthLevel",
+    "authLevel": 2
+}
+       </programlisting>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"OAuth2Scope"</literal>
+        to specify a list of attributes that
+        must be present in the user profile.
+       </para>
+       <programlisting language="javascript">
+{
+    "type": "OAuth2Scope",
+    "requiredScopes": [
+        "name",
+        "address",
+        "email"
+    ]
+}
+       </programlisting>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"ResourceEnvIP"</literal>
+        to specify a complex condition such as whether the user is making a
+        request from a given host and has authenticated with a given
+        authentication level. For example:
+       </para>
+       <programlisting language="javascript">
+{
+    "type": "ResourceEnvIP",
+    "resourceEnvIPConditionValue": [
+        "IF IP=[127.168.10.*] THEN authlevel=4"
+    ]
+}
+       </programlisting>
+       <para>
+        Entries must take the form of one or more IF...ELSE statements.
+        If the IF statement is true,
+        the THEN statement must also be true for the condition to be fulfilled.
+        The IF statement can specify either IP to match the user's IP address,
+        or dnsName to match their DNS name.
+        The IP address can be IPv4 or IPv6 format, or a hybrid of the two, and
+        can include wildcard characters.
+       </para>
+       <para>
+         The available parameters for the THEN statement are as follows:
+       </para>
+
+       <variablelist>
+        <varlistentry>
+         <term>
+          <literal>module</literal>
+         </term>
+         <listitem>
+          <para>
+           The module that was used to authenticate the user,
+           for example DataStore.
+          </para>
+         </listitem>
+        </varlistentry>
+
+        <varlistentry>
+         <term>
+          <literal>service</literal>
+         </term>
+         <listitem>
+          <para>
+           The authentication chain that was used to authenticate the user.
+          </para>
+         </listitem>
+        </varlistentry>
+
+        <varlistentry>
+         <term>
+          <literal>authlevel</literal>
+         </term>
+         <listitem>
+          <para>
+           The minimum required authentication level.
+          </para>
+         </listitem>
+        </varlistentry>
+
+        <varlistentry>
+         <term>
+          <literal>role</literal>
+         </term>
+         <listitem>
+          <para>
+           The role of the authenticated user.
+          </para>
+         </listitem>
+        </varlistentry>
+
+        <varlistentry>
+         <term>
+          <literal>user</literal>
+         </term>
+         <listitem>
+          <para>
+           The name of the authenticated user.
+          </para>
+         </listitem>
+        </varlistentry>
+
+        <varlistentry>
+         <term>
+          <literal>redirectURL</literal>
+         </term>
+         <listitem>
+          <para>
+           The URL from which the user was redirected.
+          </para>
+         </listitem>
+        </varlistentry>
+
+        <varlistentry>
+         <term>
+          <literal>realm</literal>
+         </term>
+         <listitem>
+          <para>
+           The realm to which the user authenticated.
+          </para>
+         </listitem>
+        </varlistentry>
+
+       </variablelist>
+
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"Session"</literal>
+        to specify how long the user's session has been active,
+        and to terminate the session if deemed too old,
+        such that the user must authenticate again.
+       </para>
+       <programlisting language="javascript">
+{
+    "type": "Session",
+    "maxSessionTime": "10",
+    "terminateSession": false
+}
+       </programlisting>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"SessionProperty"</literal>
+        to specify attributes set in the user's session.
+       </para>
+       <programlisting language="javascript">{
+    "type": "SessionProperty",
+    "ignoreValueCase": true,
+    "properties": {
+        "CharSet": [
+            "UTF-8"
+        ],
+        "clientType": [
+            "genericHTML"
+        ]
+    }
+}
+       </programlisting>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"SimpleTime"</literal>
+        to specify a time range, where
+        <literal>"type"</literal>
+        is the only required field.
        </para>
 
        <programlisting language="javascript">
 {
-    "type": "Time",
-    "startTime": "08:30",
-    "endTime": "17:30",
-    "startDay": "MONDAY",
-    "endDay": "FRIDAY",
-    "startDate": "01/01/2014",
-    "endDate": "12/31/2014",
-    "enforcementTimeZone": "GMT-8"
+    "type": "SimpleTime",
+    "startTime": "07:00",
+    "endTime": "19:00",
+    "startDay": "mon",
+    "endDay": "fri",
+    "startDate": "2015:01:01",
+    "endDate": "2015:12:31",
+    "enforcementTimeZone": "GMT+0:00"
 }
        </programlisting>
       </listitem>
      </itemizedlist>
 
      <para>
-      <literal>"Policy"</literal> condition types can be used
-      to correspond to the conditions configured for policies
-      as in the following example:
-     </para>
-
-     <!-- Added a linefeed to fit on a PDF page -->
-     <programlisting language="javascript">
-{
-    "type": "Policy",
-    "className": "org.forgerock.openam.entitlement.conditions.environment
-      .OAuth2ScopeCondition",
-    "name": "oauth2scope",
-    "properties": {
-        "OAuth2Scope": [
-            "openid profile"
-        ]
-    }
-}
-     </programlisting>
-
-     <para>
       The following example defines the condition as
       neither Saturday or Sunday, nor certain client IP addresses.
      </para>
-
      <programlisting language="javascript">
 {
     "type": "NOT",
@@ -1641,13 +1654,13 @@ $ <userinput>curl \
         "type": "OR",
         "conditions": [
             {
-                "type": "Time",
-                "startDay": "SATURDAY",
-                "endDay": "SUNDAY",
-                "enforcementTimeZone": "GMT"
+                "type": "SimpleTime",
+                "startDay": "sat",
+                "endDay": "sun",
+                "enforcementTimeZone": "GMT+8:00"
             },
             {
-                "type": "IP",
+                "type": "IPv4",
                 "startIp": "192.168.0.1",
                 "endIp": "192.168.0.255"
             }
@@ -1657,8 +1670,8 @@ $ <userinput>curl \
      </programlisting>
 
       <para>
-       To read a condition type description,
-       or to list available condition types,
+       To read a single condition type description,
+       or to list all the available condition types,
        see <xref linkend="rest-api-authz-condition-types" />.
       </para>
      </listitem>
@@ -1668,11 +1681,12 @@ $ <userinput>curl \
     <term><literal>"resourceAttributes"</literal></term>
     <listitem>
      <para>
-      List of resource attributes to return with decisions,
-      where resource attribute implementations are pluggable.
+      List of attributes to return with decisions. These attributes
+      are known as <firstterm>response attributes</firstterm>.
      </para>
 
-     <para>The default implementations provide
+     <para>The response attribute provider is pluggable.
+      The default implementation provides
       for statically defined attributes
       and for attributes retrieved from user profiles.
      </para>
@@ -1684,9 +1698,10 @@ $ <userinput>curl \
       <literal>"Static"</literal> for statically defined attributes
       or <literal>"User"</literal> for attributes from the user profile),
       <literal>"propertyName"</literal> set to the attribute names.
-      In the current implementation,
-      <literal>"propertyValues"</literal> also holds attribute names
-      rather than attribute values.
+      For static attributes, <literal>"propertyValues"</literal>
+      holds the attribute values.
+      For user attributes, <literal>"propertyValues"</literal>
+      is not used; the property values are determined at evaluation time.
      </para>
     </listitem>
    </varlistentry>
@@ -1748,28 +1763,32 @@ $ <userinput>curl \
         "GET": true
     },
     "subject": {
-        "type": "User",
-        "subjectName": "Bob Dobbs"
+        "type": "Identity",
+        "subjectValues": [
+            "uid=scarter,ou=People,dc=example,dc=com"
+        ]
     }
 }' \
- https://openam.example.com:8443/openam/json/myRealm/policies/example
+ https://openam.example.com:8443/openam/json/policies/example
 </userinput>
 <computeroutput>{
   "name" : "example",
   "active" : true,
   "description" : "Example Policy",
-  "resources" : [
-    "http://www.example.com:80/*",
-    "http://www.example.com:80/*?*"
-  ],
   "applicationName" : "iPlanetAMWebAgentService",
   "actionValues" : {
     "POST" : false,
     "GET" : true
   },
+  "resources" : [
+    "http://www.example.com:80/*",
+    "http://www.example.com:80/*?*"
+  ],
   "subject" : {
-    "type" : "User",
-    "subjectName" : "Bob Dobbs"
+   "type": "Identity",
+    "subjectValues": [
+      "uid=scarter,ou=People,dc=example,dc=com"
+    ]
   },
   "lastModifiedBy" :
   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
@@ -1816,28 +1835,32 @@ $ <userinput>curl \
         "GET": true
     },
     "subject": {
-        "type": "User",
-        "subjectName": "Bob Dobbs"
+        "type": "Identity",
+        "subjectValues": [
+            "uid=scarter,ou=People,dc=example,dc=com"
+        ]
     }
 }' \
- https://openam.example.com:8443/openam/json/myRealm/policies?_action=create
+ https://openam.example.com:8443/openam/json/policies?_action=create
       </userinput>
 <computeroutput>{
   "name" : "example",
   "active" : true,
   "description" : "Example Policy",
-  "resources" : [
-    "http://www.example.com:80/*",
-    "http://www.example.com:80/*?*"
-  ],
   "applicationName" : "iPlanetAMWebAgentService",
   "actionValues" : {
     "POST" : false,
     "GET" : true
   },
+  "resources" : [
+    "http://www.example.com:80/*",
+    "http://www.example.com:80/*?*"
+  ],
   "subject" : {
-    "type" : "User",
-    "subjectName" : "Bob Dobbs"
+    "type": "Identity",
+    "subjectValues": [
+      "uid=scarter,ou=People,dc=example,dc=com"
+    ]
   },
   "lastModifiedBy" :
    "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
@@ -1865,24 +1888,26 @@ $ <userinput>curl \
    <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/myRealm/policies/example
+ https://openam.example.com:8443/openam/json/policies/example
 </userinput>
 <computeroutput>{
   "name" : "example",
   "active" : true,
   "description" : "Example Policy",
-  "resources" : [
-    "http://www.example.com:80/*",
-    "http://www.example.com:80/*?*"
-  ],
   "applicationName" : "iPlanetAMWebAgentService",
   "actionValues" : {
     "POST" : false,
     "GET" : true
   },
+  "resources" : [
+    "http://www.example.com:80/*",
+    "http://www.example.com:80/*?*"
+  ],
   "subject" : {
-    "type" : "User",
-    "subjectName" : "Bob Dobbs"
+    "type": "Identity",
+    "subjectValues": [
+      "uid=scarter,ou=People,dc=example,dc=com"
+    ]
   },
   "lastModifiedBy" :
   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
@@ -1936,28 +1961,32 @@ $ <userinput>curl \
         "GET": true
     },
     "subject": {
-        "type": "User",
-        "subjectName": "Bob Dobbs"
+        "type": "Identity",
+        "subjectValues": [
+            "uid=scarter,ou=People,dc=example,dc=com"
+        ]
     }
 }' \
- https://openam.example.com:8443/openam/json/myRealm/policies/example
+ https://openam.example.com:8443/openam/json/policies/example
 </userinput>
 <computeroutput>{
   "name" : "example",
   "active" : true,
   "description" : "Updated example policy",
-  "resources" : [
-    "http://www.example.com:80/*",
-    "http://www.example.com:80/*?*"
-  ],
   "applicationName" : "iPlanetAMWebAgentService",
   "actionValues" : {
     "POST" : true,
     "GET" : true
   },
+  "resources" : [
+    "http://www.example.com:80/*",
+    "http://www.example.com:80/*?*"
+  ],
   "subject" : {
-    "type" : "User",
-    "subjectName" : "Bob Dobbs"
+    "type": "Identity",
+    "subjectValues": [
+      "uid=scarter,ou=People,dc=example,dc=com"
+    ]
   },
   "lastModifiedBy" :
   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
@@ -1990,28 +2019,32 @@ $ <userinput>curl \
          "GET": true
      },
      "subject": {
-         "type": "User",
-         "subjectName": "Bob Dobbs"
+         "type": "Identity",
+         "subjectValues": [
+             "uid=scarter,ou=People,dc=example,dc=com"
+         ]
      }
  }' \
- https://openam.example.com:8443/openam/json/myRealm/policies/example
+ https://openam.example.com:8443/openam/json/policies/example
 </userinput>
 <computeroutput>{
     "name" : "new-example",
     "active" : true,
     "description" : "Renamed example policy",
-    "resources" : [
-        "http://www.example.com:80/*",
-        "http://www.example.com:80/*?*"
-    ],
     "applicationName" : "iPlanetAMWebAgentService",
     "actionValues" : {
         "POST" : true,
         "GET" : true
     },
+    "resources" : [
+        "http://www.example.com:80/*",
+        "http://www.example.com:80/*?*"
+    ],
     "subject" : {
-        "type" : "User",
-        "subjectName" : "Bob Dobbs"
+        "type": "Identity",
+        "subjectValues": [
+            "uid=scarter,ou=People,dc=example,dc=com"
+        ]
     },
     "lastModifiedBy" :
     "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
@@ -2047,7 +2080,7 @@ $ <userinput>curl \
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w..." \
  --request DELETE \
- https://openam.example.com:8443/openam/json/myRealm/policies/myPolicy</userinput>
+ https://openam.example.com:8443/openam/json/policies/myPolicy</userinput>
 <computeroutput>{}</computeroutput>
    </programlisting>
   </section>
@@ -2057,13 +2090,13 @@ $ <userinput>curl \
 
    <para>
     To list policy definitions, perform an HTTP GET on the endpoint, setting
-    at least the <literal>_queryFilter</literal> query string parameter.
+    the <literal>_queryFilter</literal> query string parameter.
    </para>
 
    <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w..." \
- https://openam.example.com:8443/openam/json/myRealm/policies?_queryFilter=true
+ https://openam.example.com:8443/openam/json/policies?_queryFilter=true
    </userinput>
 <computeroutput>{
   "result" : [ ...policies... ],
@@ -2082,7 +2115,7 @@ $ <userinput>curl \
     where <replaceable>field</replaceable> represents the field name,
     <replaceable>operator</replaceable> is the operator code,
     <replaceable>value</replaceable> is the value to match,
-    and the entire filter is URL encoded.
+    and the entire filter is URL-encoded.
     Supported operators are as follows:
    </para>
 
@@ -2276,63 +2309,72 @@ $ <userinput>curl \
  </section>
 
  <section xml:id="rest-api-manage-xacml">
-  <title>Managing Entitlements through REST</title>
+  <title>XACML 3.0 Export and Import</title>
 
   <para>
-   OpenAM's entitlements engine supports the ability to import
+   OpenAM supports the ability to export policies to
    eXtensible Access Control Markup Language (XACML) 3.0-based
-   formatted policies as well as export OpenAM entitlements to XACML 3.0 format
+   formatted policy sets
    through its <literal>/xacml/policies</literal> REST endpoint.
+   You can also import XACML 3.0 policy sets back into OpenAM by using the
+   same endpoint.
    The endpoint's functionally is identical to that of the
    <!--  Update when AME-4741 -->
    <literal>ssoadm</literal> <literal>import-xacml</literal> and
    <literal>export-xacml</literal> commands.
    For more information, see
-   <link xlink:show="new" xlink:href="admin-guide#managing-entitlements-cli"
-         xlink:role="http://docbook.org/xlink/role/olink">Managing Entitlements on the Command Line</link>
+   <link xlink:show="new" xlink:href="admin-guide#script-policy"
+         xlink:role="http://docbook.org/xlink/role/olink">Importing and Exporting Policies</link>
   </para>
 
+  <note>
+   <para>
+   OpenAM can only import XACML 3.0 policy sets that were either created by an
+   OpenAM instance, or that have had minor manual modifications,
+   due to the reuse of some XACML 3.0 parameters for non-standard information.
+   </para>
+  </note>
+
   <para>
-   OpenAM runs its imports and exports by mapping the XACML 3.0 policy
-   elements to OpenAM privileges (i.e., entitlements) and vice-versa. The
+   When exporting OpenAM policies to XACML 3.0 policy sets, OpenAM maps its
+   policies to XACML 3.0 policy elements. The
    mappings are as follows:
   </para>
 
   <!-- Consider a new table format -->
   <table xml:id="xacml-mappings">
-   <title>Entitlements to XACML Mappings</title>
+   <title>OpenAM Policies to XACML Mappings</title>
    <tgroup cols="2">
     <colspec colnum="1" colwidth="1*"/>
     <colspec colnum="2" colwidth="1*"/>
     <thead>
      <row>
+      <entry>OpenAM Policy</entry>
       <entry>XACML Policy</entry>
-      <entry>OpenAM Privilege</entry>
      </row>
     </thead>
     <tbody>
      <row>
+      <entry>Policy Name</entry>
       <entry>Policy ID</entry>
-      <entry>Privilege Name</entry>
      </row>
      <row>
       <entry>Description</entry>
-      <entry>Privilege Description</entry>
+      <entry>Description</entry>
      </row>
      <row>
-      <entry>Version</entry>
       <entry>Current Time (yyyy.MM.dd.HH.mm.ss.SSS)</entry>
+      <entry>Version</entry>
      </row>
      <row>
-      <entry>entitlement excluded resource names</entry>
       <entry>xacml rule target</entry>
+      <entry>entitlement excluded resource names</entry>
      </row>
      <row>
-      <entry>Rule Combining Algorithm ID</entry>
       <entry>Rule Deny Overrides</entry>
+      <entry>Rule Combining Algorithm ID</entry>
      </row>
      <row>
-      <entry>Target</entry>
       <entry>
        <para>Any of:
         <itemizedlist>
@@ -2351,9 +2393,9 @@ $ <userinput>curl \
         </itemizedlist>
        </para>
       </entry>
+      <entry>Target</entry>
      </row>
      <row>
-      <entry>Variable Definitions</entry>
       <entry>
        <para>Any of:
         <itemizedlist>
@@ -2378,13 +2420,14 @@ $ <userinput>curl \
        </itemizedlist>
        </para>
       </entry>
+      <entry>Variable Definitions</entry>
      </row>
      <row>
-      <entry>Rules</entry>
       <entry>
        Single Level Permit/Deny Actions converted
        to Policy Rules
       </entry>
+      <entry>Rules</entry>
      </row>
     </tbody>
    </tgroup>
@@ -2397,133 +2440,43 @@ $ <userinput>curl \
    </para>
   </note>
 
-
-  <section xml:id="xacml-import">
-   <title>XACML Import</title>
-
-   <para>
-    OpenAM supports the import of XACML 3.0-based policy sets into
-    OpenAM entitlements using the REST <literal>/xacml/policies</literal>
-    endpoint.
-    To test an import, OpenAM provides a dry-run feature that runs an import
-    without saving the changes to the database. The dry-run feature provides a
-    summary of the import so that you can troubleshoot any potential mismatches
-    prior to the actual import.
-   </para>
-   <para>
-    You can import a XACML policy using an HTTP POST request for the root realm
-    or a specific realm at the following endpoints:
-   </para>
-
-   <programlisting>
-http://openam.example.com:8080/openam/xacml/policies
-http://openam.example.com:8080/openam/xacml/{realm}/policies
-
-where {realm} is the name of the specific realm
-   </programlisting>
-
-   <procedure xml:id="procedure-xacml-import">
-    <title>To Import a XACML 3.0 Policy</title>
-    <step>
-     <para>You can do a dry-run using the <literal>dryrun=true</literal> query to
-      test the import. The dry-run option outputs in JSON format and displays the status
-      of each import policy, where "U" indicates "Updated"; "A" for "Added". The
-      dry-run does not actually update to the database. When you are ready for an
-      actual import, you need to re-run the command
-      without the <literal>dryrun=true</literal> query.
-     </para>
-     <programlisting>
-$ <userinput>curl \
-  --request POST \
-  --header "iPlanetDirectoryPro: AQIC5..." \
-  --header "Content-Type: application/xml" \
-  --data @xacml-policy.xml
-  http://openam.example.com:8080/openam/xacml/policies?dryrun=true</userinput>
-<computeroutput>[
- {
-   "status":"U",
-   "name":"testHelpDeskreferralpolicy"
- },
- {
-   "status":"U",
-   "name":"test_Referral"
- },
- {
-   "status":"U",
-   "name":"testexternalreferralpolicy"
- },
- {
-   "status":"U",
-   "name":"testregexternalreferralpolicy"
- }
-]</computeroutput>
-     </programlisting>
-    </step>
-    <step>
-     <para>
-Use the <literal>/xacml/policies</literal> endpoint to import a XACML policy:
-     </para>
-     <programlisting>
-$ <userinput>curl \
-  --request POST \
-  --header "iPlanetDirectoryPro: AQIC5..." \
-  --header "Content-Type: application/xml" \
-  --data @xacml-policy.xml
-  http://openam.example.com:8080/openam/xacml/policies</userinput>
-     </programlisting>
-    </step>
-    <step>
-     <para>You can import a XACML policy into a realm as follows:</para>
-     <programlisting>
-$ <userinput>curl \
-  --request POST \
-  --header "iPlanetDirectoryPro: AQIC5..." \
-  --header "Content-Type: application/xml" \
-  --data @xacml-policy.xml
-  http://openam.example.com:8080/openam/xacml/{realm}/policies</userinput>
-     </programlisting>
-    </step>
-   </procedure>
-
-  </section>
-
   <section xml:id="xacml-export">
-   <title>XACML Export</title>
+   <title>Exporting from OpenAM to XACML</title>
    <para>
-    OpenAM supports the export of its entitlement policies into XACML 3.0 format.
+    OpenAM supports exporting policies into XACML 3.0 format.
 
-    OpenAM only exports a PolicySet that contains policy definitions. No other
-    types can be included in the PolicySet, such as sub-policySet or rules.
-    The PolicySet mapping is as follows:
+    OpenAM only exports a policy set that contains policy definitions. No other
+    types can be included in the policy set, such as sub-policy sets or rules.
+    The policy set mapping is as follows:
    </para>
 
    <table xml:id="xacml-export-mappings">
-    <title>PolicySet Mappings</title>
+    <title>Policy Set Mappings</title>
     <tgroup cols="2">
      <colspec colnum="1" colwidth="1*"/>
      <colspec colnum="2" colwidth="2*"/>
      <thead>
       <row>
-       <entry>XACML</entry>
        <entry>OpenAM</entry>
+       <entry>XACML</entry>
       </row>
      </thead>
      <tbody>
       <row>
-       <entry>PolicySet ID</entry>
        <entry>Realm:&lt;timestamp>(yyyy.MM.dd.HH.mm.ss.SSS)</entry>
+       <entry>PolicySet ID</entry>
       </row>
       <row>
-       <entry>Version</entry>
        <entry>Current Time (yyyy.MM.dd.HH.mm.ss.SSS)</entry>
+       <entry>Version</entry>
       </row>
       <row>
-       <entry>Policy Combining Algorithm ID</entry>
        <entry>Deny Overrides</entry>
+       <entry>Policy Combining Algorithm ID</entry>
       </row>
       <row>
-       <entry>Target</entry>
        <entry>No targets defined</entry>
+       <entry>Target</entry>
       </row>
      </tbody>
     </tgroup>
@@ -2539,7 +2492,7 @@ $ <userinput>curl \
 http://openam.example.com:8080/openam/xacml/policies
 http://openam.example.com:8080/openam/xacml/{realm}/policies
 
-  where {realm} is the name of the specific realm
+  where {realm} is the name of a specific realm
    </programlisting>
 
    <para>
@@ -2553,7 +2506,7 @@ http://openam.example.com:8080/openam/xacml/{realm}/policies
      The search filters follow the standard
      guidelines for LDAP searches as they are applied to the
      entitlements index in the LDAP configuration backend, located at:
-     <literal>ou=default,ou=OrganizationalConfig,ou=1.0,ou=sunEntitlement Indexes,
+     <literal>ou=default,ou=OrganizationalConfig,ou=1.0,ou=sunEntitlementIndexes,
       ou=services,dc=openam,dc=forgerock,dc=org</literal>.
     </para>
    </listitem>
@@ -2566,6 +2519,11 @@ http://openam.example.com:8080/openam/xacml/{realm}/policies
     <programlisting>
 [attribute name][operator][attribute value]
     </programlisting>
+    <para>
+     If you specify multiple search filters, they are logically ANDed: the
+     search results meet the criteria specified in all the
+     search filters.
+    </para>
 
     <table xml:id="export-search-filter-format">
      <title>XACML Export Search Filter Format</title>
@@ -2686,6 +2644,96 @@ $ <userinput>curl \
     </step>
    </procedure>
   </section>
+
+  <section xml:id="xacml-import">
+   <title>Importing from XACML to OpenAM</title>
+
+   <para>
+    OpenAM supports the import of XACML 3.0-based policy sets into
+    OpenAM policies using the REST <literal>/xacml/policies</literal>
+    endpoint.
+    To test an import, OpenAM provides a dry-run feature that runs an import
+    without saving the changes to the database. The dry-run feature provides a
+    summary of the import so that you can troubleshoot any potential mismatches
+    prior to the actual import.
+   </para>
+   <para>
+    You can import a XACML policy using an HTTP POST request for the root realm
+    or a specific realm at the following endpoints:
+   </para>
+
+   <programlisting>
+http://openam.example.com:8080/openam/xacml/policies
+http://openam.example.com:8080/openam/xacml/{realm}/policies
+
+where {realm} is the name of a specific realm
+   </programlisting>
+
+   <procedure xml:id="procedure-xacml-import">
+    <title>To Import a XACML 3.0 Policy</title>
+    <step>
+     <para>You can do a dry run using the <literal>dryrun=true</literal> query to
+      test the import. The dry-run option outputs in JSON format and displays the status
+      of each import policy, where "U" indicates "Updated"; "A" for "Added". The
+      dry-run does not actually update to the database. When you are ready for an
+      actual import, you need to re-run the command
+      without the <literal>dryrun=true</literal> query.
+     </para>
+     <programlisting>
+$ <userinput>curl \
+  --request POST \
+  --header "iPlanetDirectoryPro: AQIC5..." \
+  --header "Content-Type: application/xml" \
+  --data @xacml-policy.xml
+  http://openam.example.com:8080/openam/xacml/policies?dryrun=true</userinput>
+<computeroutput>[
+ {
+   "status":"U",
+   "name":"testHelpDeskreferralpolicy"
+ },
+ {
+   "status":"U",
+   "name":"test_Referral"
+ },
+ {
+   "status":"U",
+   "name":"testexternalreferralpolicy"
+ },
+ {
+   "status":"U",
+   "name":"testregexternalreferralpolicy"
+ }
+]</computeroutput>
+     </programlisting>
+    </step>
+    <step>
+     <para>
+Use the <literal>/xacml/policies</literal> endpoint to import a XACML policy:
+     </para>
+     <programlisting>
+$ <userinput>curl \
+  --request POST \
+  --header "iPlanetDirectoryPro: AQIC5..." \
+  --header "Content-Type: application/xml" \
+  --data @xacml-policy.xml
+  http://openam.example.com:8080/openam/xacml/policies</userinput>
+     </programlisting>
+    </step>
+   </procedure>
+   <tip>
+     <para>You can import a XACML policy into a realm as follows:</para>
+     <programlisting>
+$ <userinput>curl \
+  --request POST \
+  --header "iPlanetDirectoryPro: AQIC5..." \
+  --header "Content-Type: application/xml" \
+  --data @xacml-policy.xml
+  http://openam.example.com:8080/openam/xacml/{realm}/policies</userinput>
+     </programlisting>
+   </tip>
+
+  </section>
+
  </section>
 
  <section xml:id="rest-api-authz-applications">
@@ -2727,7 +2775,7 @@ $ <userinput>curl \
      "condition type",
      ...
   ],
-  "realm": "/myRealm",
+  "realm": "the realm in which the application is defined",
   "applicationType": "application type name string",
   "description": "string describing application",
   "resourceComparator": "resource comparator class name",
@@ -2817,20 +2865,28 @@ $ <userinput>curl \
 
      <simplelist>
       <member><literal>"AND"</literal></member>
-      <member><literal>"AttributeLookup"</literal></member>
-      <member><literal>"DNSName"</literal></member>
-      <member><literal>"IP"</literal></member>
-      <member><literal>"NOT"</literal></member>
-      <member><literal>"NumericAttribute"</literal></member>
       <member><literal>"OR"</literal></member>
-      <member><literal>"Policy"</literal></member>
-      <member><literal>"StringAttribute"</literal></member>
-      <member><literal>"Time"</literal></member>
+      <member><literal>"NOT"</literal></member>
+      <member><literal>"AMIdentityMembership"</literal></member>
+      <member><literal>"AuthLevel"</literal></member>
+      <member><literal>"AuthScheme"</literal></member>
+      <member><literal>"AuthenticateToRealm"</literal></member>
+      <member><literal>"AuthenticateToService"</literal></member>
+      <member><literal>"IPv4"</literal></member>
+      <member><literal>"IPv6"</literal></member>
+      <member><literal>"LDAPFilter"</literal></member>
+      <member><literal>"LEAuthLevel"</literal></member>
+      <member><literal>"OAuth2Scope"</literal></member>
+      <member><literal>"ResourceEnvIP"</literal></member>
+      <member><literal>"Session"</literal></member>
+      <member><literal>"SessionProperty"</literal></member>
+      <member><literal>"SimpleTime"</literal></member>
      </simplelist>
 
      <para>
       For more on condition types,
-      see <xref linkend="rest-api-authz-condition-types" />.
+      see <xref linkend="rest-api-authz-policies" /> and
+      <xref linkend="rest-api-authz-condition-types" />.
      </para>
     </listitem>
    </varlistentry>
@@ -2898,21 +2954,18 @@ $ <userinput>curl \
 
      <simplelist>
       <member><literal>"AND"</literal></member>
-      <member><literal>"AnyUser"</literal></member>
-      <member><literal>"Attribute"</literal></member>
-      <member><literal>"Group"</literal></member>
+      <member><literal>"OR"</literal></member>
+      <member><literal>"NOT"</literal></member>
+      <member><literal>"AuthenticatedUsers"</literal></member>
+      <member><literal>"Identity"</literal></member>
       <member><literal>"JwtClaim"</literal></member>
       <member><literal>"NONE"</literal></member>
-      <member><literal>"NOT"</literal></member>
-      <member><literal>"OR"</literal></member>
-      <member><literal>"Policy"</literal></member>
-      <member><literal>"Role"</literal></member>
-      <member><literal>"User"</literal></member>
      </simplelist>
 
      <para>
       For more on subject types,
-      see <xref linkend="rest-api-authz-subject-types" />.
+      see <xref linkend="rest-api-authz-policies" /> and
+      <xref linkend="rest-api-authz-subject-types" />.
      </para>
     </listitem>
    </varlistentry>
@@ -2957,9 +3010,9 @@ $ <userinput>curl \
     <term><literal>"attributeNames"</literal></term>
     <listitem>
      <para>
-      Class names of implementations for getting attributes such as
-      <literal>"com.sun.identity.entitlement.StaticAttributes"</literal>,
-      and <literal>"com.sun.identity.entitlement.UserAttributes"</literal>.
+      A list of attribute names such as
+      <literal>cn</literal>.
+      The list is used to aid policy indexing and lookup.
      </para>
     </listitem>
    </varlistentry>
@@ -3010,7 +3063,7 @@ $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  --header "Content-Type: application/json" \
  --data '{
-    "name": "crest",
+    "name": "myApplication",
     "resources": [
         "http://www.example.com:8080/*",
         "http://www.example.com:8080/*?*"
@@ -3025,38 +3078,45 @@ $ <userinput>curl \
         "ACTION": true
     },
     "conditions": [
-        "not",
-        "dateRange",
-        "timezone",
-        "timeRange",
-        "or",
-        "dnsName",
-        "ipRange",
-        "daysOfWeek",
-        "and"
+        "AND",
+        "OR",
+        "NOT",
+        "AMIdentityMembership",
+        "AuthLevel",
+        "AuthScheme",
+        "AuthenticateToRealm",
+        "AuthenticateToService",
+        "IPv4",
+        "IPv6",
+        "LDAPFilter",
+        "LEAuthLevel",
+        "OAuth2Scope",
+        "ResourceEnvIP",
+        "Session",
+        "SessionProperty",
+        "SimpleTime"
     ],
     "realm": "/",
-    "applicationType": "crestPolicyService",
-    "description": "An example application for Common REST",
+    "applicationType": "iPlanetAMWebAgentService",
+    "description": "An example application",
     "resourceComparator": "com.sun.identity.entitlement.URLResourceName",
     "subjects": [
-        "com.sun.identity.admin.model.IdRepoUserViewSubject",
-        "com.sun.identity.admin.model.NotViewSubject",
-        "com.sun.identity.admin.model.IdRepoRoleViewSubject",
-        "com.sun.identity.admin.model.AndViewSubject",
-        "com.sun.identity.admin.model.VirtualViewSubject",
-        "com.sun.identity.admin.model.OrViewSubject",
-        "com.sun.identity.admin.model.IdRepoGroupViewSubject",
-        "com.sun.identity.admin.model.AttributeViewSubject"
+        "AND",
+        "OR",
+        "NOT",
+        "AuthenticatedUsers",
+        "Identity",
+        "JwtClaim"
     ],
     "entitlementCombiner": "DenyOverride",
     "saveIndex": null,
     "searchIndex": null,
     "attributeNames": []
-}' \
- https://openam.example.com:8443/openam/json/applications/crest</userinput>
+}
+' \
+ https://openam.example.com:8443/openam/json/applications/myApplication</userinput>
 <computeroutput>{
-  "name" : "crest",
+  "name" : "myApplication",
   "resources" : [
     "http://www.example.com:8080/*",
     "http://www.example.com:8080/*?*"
@@ -3070,34 +3130,40 @@ $ <userinput>curl \
     "READ" : true,
     "ACTION" : true
   },
-  "conditions" : [
-   "not",
-   "dateRange",
-   "timezone",
-   "timeRange",
-   "or",
-   "dnsName",
-   "ipRange",
-   "daysOfWeek",
-   "and"
+  "conditions": [
+    "AND",
+    "OR",
+    "NOT",
+    "AMIdentityMembership",
+    "AuthLevel",
+    "AuthScheme",
+    "AuthenticateToRealm",
+    "AuthenticateToService",
+    "IPv4",
+    "IPv6",
+    "LDAPFilter",
+    "LEAuthLevel",
+    "OAuth2Scope",
+    "ResourceEnvIP",
+    "Session",
+    "SessionProperty",
+    "SimpleTime"
   ],
   "realm" : "/",
   "creationDate" : 1398761708295,
   "lastModifiedDate" : 1398761708295,
   "createdBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
   "lastModifiedBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
-  "applicationType" : "crestPolicyService",
-  "description" : "An example application for Common REST",
+  "applicationType" : "iPlanetAMWebAgentService",
+  "description" : "An example application",
   "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
   "subjects" : [
-   "com.sun.identity.admin.model.IdRepoUserViewSubject",
-   "com.sun.identity.admin.model.NotViewSubject",
-   "com.sun.identity.admin.model.AndViewSubject",
-   "com.sun.identity.admin.model.IdRepoRoleViewSubject",
-   "com.sun.identity.admin.model.OrViewSubject",
-   "com.sun.identity.admin.model.VirtualViewSubject",
-   "com.sun.identity.admin.model.IdRepoGroupViewSubject",
-   "com.sun.identity.admin.model.AttributeViewSubject"
+    "AND",
+    "OR",
+    "NOT",
+    "AuthenticatedUsers",
+    "Identity",
+    "JwtClaim"
   ],
   "entitlementCombiner" : "DenyOverride",
   "saveIndex" : null,
@@ -3131,7 +3197,7 @@ $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  --header "Content-Type: application/json" \
  --data '{
-    "name": "crest",
+    "name": "myApplication",
     "resources": [
         "http://www.example.com:8080/*",
         "http://www.example.com:8080/*?*"
@@ -3146,29 +3212,35 @@ $ <userinput>curl \
         "ACTION": true
     },
     "conditions": [
-        "not",
-        "dateRange",
-        "timezone",
-        "timeRange",
-        "or",
-        "dnsName",
-        "ipRange",
-        "daysOfWeek",
-        "and"
+        "AND",
+        "OR",
+        "NOT",
+        "AMIdentityMembership",
+        "AuthLevel",
+        "AuthScheme",
+        "AuthenticateToRealm",
+        "AuthenticateToService",
+        "IPv4",
+        "IPv6",
+        "LDAPFilter",
+        "LEAuthLevel",
+        "OAuth2Scope",
+        "ResourceEnvIP",
+        "Session",
+        "SessionProperty",
+        "SimpleTime"
     ],
     "realm": "/",
-    "applicationType": "crestPolicyService",
-    "description": "An example application for Common REST",
+    "applicationType": "iPlanetAMWebAgentService",
+    "description": "An example application",
     "resourceComparator": "com.sun.identity.entitlement.URLResourceName",
     "subjects": [
-        "com.sun.identity.admin.model.IdRepoUserViewSubject",
-        "com.sun.identity.admin.model.NotViewSubject",
-        "com.sun.identity.admin.model.IdRepoRoleViewSubject",
-        "com.sun.identity.admin.model.AndViewSubject",
-        "com.sun.identity.admin.model.VirtualViewSubject",
-        "com.sun.identity.admin.model.OrViewSubject",
-        "com.sun.identity.admin.model.IdRepoGroupViewSubject",
-        "com.sun.identity.admin.model.AttributeViewSubject"
+        "AND",
+        "OR",
+        "NOT",
+        "AuthenticatedUsers",
+        "Identity",
+        "JwtClaim"
     ],
     "entitlementCombiner": "DenyOverride",
     "saveIndex": null,
@@ -3177,7 +3249,7 @@ $ <userinput>curl \
 }' \
  https://openam.example.com:8443/openam/json/applications/?_action=create</userinput>
 <computeroutput>{
-  "name" : "crest",
+  "name" : "myApplication",
   "resources" : [
     "http://www.example.com:8080/*",
     "http://www.example.com:8080/*?*"
@@ -3191,34 +3263,40 @@ $ <userinput>curl \
     "READ" : true,
     "ACTION" : true
   },
-  "conditions" : [
-   "not",
-   "dateRange",
-   "timezone",
-   "timeRange",
-   "or",
-   "dnsName",
-   "ipRange",
-   "daysOfWeek",
-   "and"
+  "conditions": [
+    "AND",
+    "OR",
+    "NOT",
+    "AMIdentityMembership",
+    "AuthLevel",
+    "AuthScheme",
+    "AuthenticateToRealm",
+    "AuthenticateToService",
+    "IPv4",
+    "IPv6",
+    "LDAPFilter",
+    "LEAuthLevel",
+    "OAuth2Scope",
+    "ResourceEnvIP",
+    "Session",
+    "SessionProperty",
+    "SimpleTime"
   ],
   "realm" : "/",
   "creationDate" : 1398762452667,
   "lastModifiedDate" : 1398762452667,
   "createdBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
   "lastModifiedBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
-  "applicationType" : "crestPolicyService",
-  "description" : "An example application for Common REST",
+  "applicationType" : "iPlanetAMWebAgentService",
+  "description" : "An example application",
   "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
   "subjects" : [
-   "com.sun.identity.admin.model.IdRepoUserViewSubject",
-   "com.sun.identity.admin.model.NotViewSubject",
-   "com.sun.identity.admin.model.AndViewSubject",
-   "com.sun.identity.admin.model.IdRepoRoleViewSubject",
-   "com.sun.identity.admin.model.OrViewSubject",
-   "com.sun.identity.admin.model.VirtualViewSubject",
-   "com.sun.identity.admin.model.IdRepoGroupViewSubject",
-   "com.sun.identity.admin.model.AttributeViewSubject"
+    "AND",
+    "OR",
+    "NOT",
+    "AuthenticatedUsers",
+    "Identity",
+    "JwtClaim"
   ],
   "entitlementCombiner" : "DenyOverride",
   "saveIndex" : null,
@@ -3244,10 +3322,13 @@ $ <userinput>curl \
    <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/myRealm/applications/myApp</userinput>
+ https://openam.example.com:8443/openam/json/applications/myApplication</userinput>
 <computeroutput>{
-  "name" : "myApp",
-  "resources" : [ "http://*:*/*", "http://*:*/*?*" ],
+  "name" : "myApplication",
+  "resources" : [
+    "http://www.example.com:8080/*",
+    "http://www.example.com:8080/*?*"
+  ],
   "actions" : {
     "POST" : true,
     "PATCH" : true,
@@ -3257,18 +3338,26 @@ $ <userinput>curl \
     "PUT" : true,
     "HEAD" : true
   },
-  "conditions" : [
-    "not",
-    "dateRange",
-    "timezone",
-    "timeRange",
-    "or",
-    "dnsName",
-    "ipRange",
-    "daysOfWeek",
-    "and"
+  "conditions": [
+    "AND",
+    "OR",
+    "NOT",
+    "AMIdentityMembership",
+    "AuthLevel",
+    "AuthScheme",
+    "AuthenticateToRealm",
+    "AuthenticateToService",
+    "IPv4",
+    "IPv6",
+    "LDAPFilter",
+    "LEAuthLevel",
+    "OAuth2Scope",
+    "ResourceEnvIP",
+    "Session",
+    "SessionProperty",
+    "SimpleTime"
   ],
-  "realm" : "/myRealm",
+  "realm" : "/",
   "creationDate" : 1398760362341,
   "lastModifiedDate" : 1398760362341,
   "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
@@ -3277,14 +3366,12 @@ $ <userinput>curl \
   "description" : null,
   "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
   "subjects" : [
-    "com.sun.identity.admin.model.IdRepoUserViewSubject",
-    "com.sun.identity.admin.model.NotViewSubject",
-    "com.sun.identity.admin.model.AndViewSubject",
-    "com.sun.identity.admin.model.IdRepoRoleViewSubject",
-    "com.sun.identity.admin.model.OrViewSubject",
-    "com.sun.identity.admin.model.VirtualViewSubject",
-    "com.sun.identity.admin.model.IdRepoGroupViewSubject",
-    "com.sun.identity.admin.model.AttributeViewSubject"
+    "AND",
+    "OR",
+    "NOT",
+    "AuthenticatedUsers",
+    "Identity",
+    "JwtClaim"
   ],
   "entitlementCombiner" : "DenyOverride",
   "saveIndex" : null,
@@ -3324,7 +3411,7 @@ $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  --header "Content-Type: application/json" \
  --data '{
-    "name": "crest",
+    "name": "myApplication",
     "resources": [
         "http://www.example.com:8080/*",
         "http://www.example.com:8080/*?*"
@@ -3339,38 +3426,24 @@ $ <userinput>curl \
         "ACTION": false
     },
     "conditions": [
-        "not",
-        "dateRange",
-        "timezone",
-        "timeRange",
-        "or",
-        "dnsName",
-        "ipRange",
-        "daysOfWeek",
-        "and"
+        "SimpleTime"
     ],
     "realm": "/",
-    "applicationType": "crestPolicyService",
-    "description": "An read-only example application for Common REST",
+    "applicationType": "iPlanetAMWebAgentService",
+    "description": "Updated application with fewer conditions and subjects",
     "resourceComparator": "com.sun.identity.entitlement.URLResourceName",
     "subjects": [
-        "com.sun.identity.admin.model.IdRepoUserViewSubject",
-        "com.sun.identity.admin.model.NotViewSubject",
-        "com.sun.identity.admin.model.IdRepoRoleViewSubject",
-        "com.sun.identity.admin.model.AndViewSubject",
-        "com.sun.identity.admin.model.VirtualViewSubject",
-        "com.sun.identity.admin.model.OrViewSubject",
-        "com.sun.identity.admin.model.IdRepoGroupViewSubject",
-        "com.sun.identity.admin.model.AttributeViewSubject"
+        "AuthenticatedUsers",
+        "JwtClaim"
     ],
     "entitlementCombiner": "DenyOverride",
     "saveIndex": null,
     "searchIndex": null,
     "attributeNames": []
 }' \
- https://openam.example.com:8443/openam/json/applications/crest</userinput>
+ https://openam.example.com:8443/openam/json/applications/myApplication</userinput>
 <computeroutput>{
-  "name" : "crest",
+  "name" : "myApplication",
   "resources" : [
     "http://www.example.com:8080/*",
     "http://www.example.com:8080/*?*"
@@ -3385,33 +3458,19 @@ $ <userinput>curl \
     "ACTION" : false
   },
   "conditions" : [
-   "not",
-   "dateRange",
-   "timezone",
-   "timeRange",
-   "or",
-   "dnsName",
-   "ipRange",
-   "daysOfWeek",
-   "and"
+    "SimpleTime"
   ],
   "realm" : "/",
   "creationDate" : 1398762194628,
   "lastModifiedDate" : 1398762194628,
   "createdBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
   "lastModifiedBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
-  "applicationType" : "crestPolicyService",
-  "description" : "An read-only example application for Common REST",
+  "applicationType" : "iPlanetAMWebAgentService",
+  "description" : "Updated application with fewer conditions and subjects",
   "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
   "subjects" : [
-   "com.sun.identity.admin.model.IdRepoUserViewSubject",
-   "com.sun.identity.admin.model.NotViewSubject",
-   "com.sun.identity.admin.model.AndViewSubject",
-   "com.sun.identity.admin.model.IdRepoRoleViewSubject",
-   "com.sun.identity.admin.model.OrViewSubject",
-   "com.sun.identity.admin.model.VirtualViewSubject",
-   "com.sun.identity.admin.model.IdRepoGroupViewSubject",
-   "com.sun.identity.admin.model.AttributeViewSubject"
+    "AuthenticatedUsers",
+    "JwtClaim"
   ],
   "entitlementCombiner" : "DenyOverride",
   "saveIndex" : null,
@@ -3445,7 +3504,7 @@ $ <userinput>curl \
 $ <userinput>curl \
  --request DELETE \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/applications/crest</userinput>
+ https://openam.example.com:8443/openam/json/applications/myApplication</userinput>
 <computeroutput>{}</computeroutput>
    </programlisting>
   </section>
@@ -3455,20 +3514,20 @@ $ <userinput>curl \
 
    <para>
     To list application definitions, perform an HTTP GET on the endpoint,
-    setting at least the <literal>_queryFilter</literal> query string parameter.
+    setting the <literal>_queryFilter</literal> query string parameter.
    </para>
 
    <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/myRealm/applications?_queryFilter
-    =true</userinput>
+ https://openam.example.com:8443/openam/json/applications?_queryFilter=true
+   </userinput>
 <computeroutput>{
   "result" : [ {
-    "name" : "myApp",
+    "name" : "myApplication",
     "resources" : [
-      "http://*:*/*",
-      "http://*:*/*?*"
+      "http://www.example.com:8080/*",
+      "http://www.example.com:8080/*?*"
     ],
     "actions" : {
       "POST" : true,
@@ -3480,23 +3539,7 @@ $ <userinput>curl \
       "HEAD" : true
     },
     "conditions" : [
-      "AuthenticateToService",
-      "AuthLevelLE",
-      "AuthScheme",
-      "IPv6",
-      "SimpleTime",
-      "OAuth2Scope",
-      "IPv4",
-      "AuthenticateToRealm",
-      "OR",
-      "AMIdentityMembership",
-      "LDAPFilter",
-      "AuthLevel",
-      "SessionProperty",
-      "Session",
-      "NOT",
-      "AND",
-      "ResourceEnvIP"
+      "SimpleTime"
     ],
     "attributeNames" : [
     ],
@@ -3506,13 +3549,9 @@ $ <userinput>curl \
     "lastModifiedBy":"id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
     "subjects":[
       "JwtClaim",
-      "AuthenticateUsers",
-      "Identity",
-      "NOT",
-      "AND",
-      "OR",
+      "AuthenticateUsers"
     ],
-    "description":"The built-in Application used by OpenAM Policy Agents",
+    "description":"Updated application with fewer conditions and subjects",
     "createdBy":id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
     "applicationType":"iPlanetAMWebServices",
     "entitlementCombiner":"DenyOverride",
@@ -3529,11 +3568,12 @@ $ <userinput>curl \
     <literal>true</literal> to match every policy,
     <literal>false</literal> to match no policies,
     or a filter of the following form to match field values:
-    <literal><replaceable>field</replaceable> <replaceable>operator</replaceable> <replaceable>value</replaceable></literal>
+    <literal><replaceable>field</replaceable> <replaceable>operator</replaceable>
+    <replaceable>value</replaceable></literal>
     where <replaceable>field</replaceable> represents the field name,
     <replaceable>operator</replaceable> is the operator code,
     <replaceable>value</replaceable> is the value to match,
-    and the entire filter is URL encoded.
+    and the entire filter is URL-encoded.
     Supported operators are as follows:
    </para>
 
@@ -3648,8 +3688,8 @@ $ <userinput>curl \
    </para>
 
    <programlisting>
-$ <userinput>curl --header "iPlanetyDirectoryPro" AQIC5..." \
-https://openam.example.com:443/openam/json/realm/applications?_queryFilter=name%20eq%20%22iPlanet.*%22</userinput>
+$ <userinput>curl --header "iPlanetDirectoryPro" AQIC5..." \
+https://openam.example.com:8443/openam/json/applications?_queryFilter=name%20eq%20%22iPlanet.*%22</userinput>
    </programlisting>
 
    <note><para>While some operators use regular expressions as its underlying
@@ -3691,10 +3731,6 @@ https://openam.example.com:443/openam/json/realm/applications?_queryFilter=name%
   <para>
    OpenAM supports other application types as well, such as CREST types,
    that you can manage over the policy REST endpoints.
-   If you configure the OpenAM policy agents to work with application types other than
-   <literal>iPlanetAMWebAgentService</literal>, you must ensure that your
-   policy evaluation points (PEPs) work with the REST endpoints for policy
-   decision requests.
   </para>
 
   <para>
@@ -3764,27 +3800,6 @@ https://openam.example.com:443/openam/json/realm/applications?_queryFilter=name%
     }
 }
      </programlisting>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term><literal>"resourceComparator"</literal></term>
-    <listitem>
-     <para>
-      Class name of the resource comparator implementation used
-      in the context of this application.
-     </para>
-
-     <para>
-      The following implementations are available:
-     </para>
-
-     <simplelist>
-      <member><literal>"com.sun.identity.entitlement.ExactMatchResourceName"</literal></member>
-      <member><literal>"com.sun.identity.entitlement.PrefixResourceName"</literal></member>
-      <member><literal>"com.sun.identity.entitlement.RegExResourceName"</literal></member>
-      <member><literal>"com.sun.identity.entitlement.URLResourceName"</literal></member>
-     </simplelist>
     </listitem>
    </varlistentry>
 
@@ -3891,7 +3906,7 @@ $ <userinput>curl \
 
    <para>
     To list application types, perform an HTTP GET on the endpoint,
-    setting at least the <literal>_queryFilter</literal> query string parameter
+    setting the <literal>_queryFilter</literal> query string parameter
     as in the following example:
    </para>
 
@@ -3910,25 +3925,25 @@ $ <userinput>curl \
  </section>
 
  <section xml:id="rest-api-authz-condition-types">
-  <title>Viewing Condition Types</title>
+  <title>Viewing Environment Condition Types</title>
 
   <para>
-   Condition types describe the JSON representation
-   of conditions that you can use in policy definitions.
+   Environment condition types describe the JSON representation
+   of environment conditions that you can use in policy definitions.
   </para>
 
   <para>
-   Condition types are server-wide, and do not differ by realm.
+   Environment condition types are server-wide, and do not differ by realm.
    Hence the URI for the condition types API
    does not contain a realm component,
    but is <literal>/json/conditiontypes</literal>.
   </para>
 
   <section xml:id="rest-api-authz-condition-types-read">
-   <title>Reading Condition Types</title>
+   <title>Reading Environment Condition Types</title>
 
    <para>
-    To read a condition type, perform an HTTP GET
+    To read a environment condition type, perform an HTTP GET
     specifying the resource name.
    </para>
 
@@ -3945,9 +3960,9 @@ $ <userinput>curl \
    <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/myRealm/conditiontypes/IP</userinput>
+ https://openam.example.com:8443/openam/json/conditiontypes/IPv4</userinput>
 <computeroutput>{
-  "title" : "IP",
+  "title" : "IPv4",
   "logical" : false,
   "config" : {
     "type" : "object",
@@ -3957,6 +3972,12 @@ $ <userinput>curl \
       },
       "endIp" : {
         "type" : "string"
+      },
+      "dnsName" : {
+        "type" : "array",
+        "items" : {
+          "type" : "string"
+        }
       }
     }
   }
@@ -3964,27 +3985,29 @@ $ <userinput>curl \
    </programlisting>
 
    <para>
-    Notice that the condition type has a title,
+    Notice that the environment condition type has a title,
     a "logical" field
     that indicates whether the type is a logical operator or takes a predicate,
     and a configuration specification.
     The configuration specification in this case indicates
-    that an IP condition has two properties, "startIp" and "endIp",
-    each of which take a string value.
-    In other words, a concrete IP condition specification
-    is represented in a policy definition as in the following example:
+    that an IPv4 environment condition has two properties, "startIp" and "endIp",
+    that each take a single string value, and a third property, "dnsName," that
+    takes an array of string values.
+    In other words, a concrete IP environment condition specification
+    without a DNS name constraint
+    could be represented in a policy definition as in the following example:
    </para>
 
    <programlisting language="javascript">
 {
-   "type": "IP",
+   "type": "IPv4",
    "startIp": "127.0.0.1",
    "endIp": "127.0.0.255"
 }
    </programlisting>
 
    <para>
-    The configuration is what differs the most across condition types.
+    The configuration is what differs the most across environment condition types.
     The NOT condition, for example, takes a single condition object
     as the body of its configuration.
    </para>
@@ -3992,7 +4015,7 @@ $ <userinput>curl \
    <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/myRealm/conditiontypes
+ https://openam.example.com:8443/openam/json/conditiontypes
     /NOT</userinput>
 <computeroutput>{
   "title" : "NOT",
@@ -4030,7 +4053,7 @@ $ <userinput>curl \
    <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/myRealm/conditiontypes/OR</userinput>
+ https://openam.example.com:8443/openam/json/conditiontypes/OR</userinput>
 <computeroutput>{
   "title" : "OR",
   "logical" : true,
@@ -4070,10 +4093,10 @@ $ <userinput>curl \
   </section>
 
   <section xml:id="rest-api-authz-condition-types-query">
-   <title>Listing Condition Types</title>
+   <title>Listing Environment Condition Types</title>
 
    <para>
-    To list all condition types, perform an HTTP GET on the endpoint,
+    To list all environment condition types, perform an HTTP GET on the endpoint,
     setting the query string parameter, <literal>_queryFilter=true</literal>,
     as in the following example:
    </para>
@@ -4081,12 +4104,12 @@ $ <userinput>curl \
    <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/myRealm/conditiontypes?_queryFilter=true</userinput>
+ https://openam.example.com:8443/openam/json/conditiontypes?_queryFilter=true</userinput>
 <computeroutput>{
   "result" : [ ... condition types ... ],
-  "resultCount" : 10,
+  "resultCount" : 18,
   "pagedResultsCookie" : null,
-  "remainingPagedResults" : -1
+  "remainingPagedResults" : 0
 }</computeroutput>
    </programlisting>
 
@@ -4097,156 +4120,26 @@ $ <userinput>curl \
   </section>
  </section>
 
- <section xml:id="rest-api-authz-subject-attributes">
-  <title>Viewing Subject Attributes</title>
-
-  <para>
-   When you define a policy subject condition, the condition can depend on values
-   of subject attributes stored in a user's profile. The list of possible subject
-   attributes that you can use depends on the LDAP User Attributes configured for
-   the Identity data store where OpenAM looks up the user's profile.
-  </para>
-  <para>
-   Subject attributes derive from the list of LDAP user attributes configured
-   for the Identity data store. For more information, see
-   <link xlink:show="new"
-         xlink:href="admin-guide#config-data-store"
-         xlink:role="http://docbook.org/xlink/role/olink">Configuring Data Stores</link>.
-
-  </para>
-  <para>
-   You can get a listing of all subject attribute
-   names using the <literal>/json/subjectattributes/?_queryFilter=true</literal>
-   command on the endpoint.
-   There are no restrictions on the search and no pagination cookie is set.
-   The subject
-   attribute names are all returned as one in a "result" array named
-   <literal>applicationTypeNames</literal>.
-  </para>
-
-  <!-- this example requires verification -->
-  <programlisting>
-$ <userinput>curl --request GET \
-  --header "iPlanetDirectoryPro: AQIC…*" \
-  --header "Content-Type: application/json" \
-  http://openam.example.com:8080/openam/json/subjectattributes/?_queryFilter=true</userinput>
-<computeroutput>
-{
- "result": [
-   "sunIdentityServerPPInformalName",
-   "sunIdentityServerPPFacadeGreetSound",
-   "uid",
-   "manager",
-   "sunIdentityServerPPLegalIdentityGender",
-   "sunIdentityServerPPCommonNameMN",
-   "preferredLocale",
-   "iplanet-am-session-get-valid-sessions",
-   "sunIdentityServerPPFacadegreetmesound",
-   "iplanet-am-user-password-reset-question-answer",
-   "telephoneNumber",
-   "employeeNumber",
-   "iplanet-am-user-admin-start-dn",
-   "iplanet-am-user-success-url",
-   "sunIdentityServerPPDemographicsDisplayLanguage",
-   "iplanet-am-user-federation-info",
-   "objectClass",
-   "sunIdentityServerPPDemographicsLanguage",
-   "authorityRevocationList",
-   "sunIdentityServerPPLegalIdentityDOB",
-   "sunIdentityServerPPSignKey",
-   "sunIdentityServerPPEmploymentIdentityOrg",
-   "iplanet-am-session-max-caching-time",
-   "sn",
-   "iplanet-am-session-quota-limit",
-   "sunIdentityServerPPEncryPTKey",
-   "iplanet-am-session-max-session-time",
-   "sunIdentityServerPPCommonNamePT",
-   "sun-fm-saml2-nameid-info",
-   "sunIdentityServerDiscoEntries",
-   "iplanet-am-user-login-status",
-   "sunIdentityServerPPCommonNameCN",
-   "distinguishedName",
-   "iplanet-am-session-max-idle-time",
-   "cn",
-   "sunIdentityServerPPLegalIdentityVATIdType",
-   "iplanet-am-user-password-reset-options",
-   "preferredlanguage",
-   "iplanet-am-user-federation-info-key",
-   "sunIdentityServerPPDemographicsAge",
-   "inetUserHttpURL",
-   "iplanet-am-user-alias-list",
-   "sunIdentityServerPPFacadeNamePronounced",
-   "sunIdentityServerPPEmploymentIdentityJobTitle",
-   "sunIdentityMSISDNNumber",
-   "sunIdentityServerPPMsgContact",
-   "givenName",
-   "sunIdentityServerPPLegalIdentityMaritalStatus",
-   "devicePrintProfiles",
-   "memberOf",
-   "sun-fm-saml2-nameid-infokey",
-   "iplanet-am-session-service-status",
-   "sunIdentityServerPPLegalIdentityVATIdValue",
-   "userPassword",
-   "sunIdentityServerPPFacadeMugShot",
-   "sunIdentityServerPPEmploymentIdentityAltO",
-   "iplanet-am-user-auth-config",
-   "assignedDashboard",
-   "iplanet-am-user-failure-url",
-   "sunAMAuthInvalidAttemptsData",
-   "sunIdentityServerPPLegalIdentityLegalName",
-   "adminRole",
-   "sunIdentityServerPPCommonNameAltCN",
-   "dn",
-   "iplanet-am-session-add-session-listener-on-all-sessions",
-   "userCertificate",
-   "mail",
-   "sunIdentityServerPPLegalIdentityAltIdValue",
-   "iplanet-am-user-password-reset-force-reset",
-   "caCertificate",
-   "sunIdentityServerPPEmergencyContact",
-   "sunIdentityServerPPDemographicsBirthDay",
-   "sunIdentityServerPPFacadeWebSite",
-   "preferredtimezone",
-   "sunIdentityServerPPLegalIdentityAltIdType",
-   "sunIdentityServerPPCommonNameSN",
-   "sunIdentityServerPPAddressCard",
-   "postalAddress",
-   "iplanet-am-session-destroy-sessions",
-   "inetUserStatus",
-   "iplanet-am-auth-configuration",
-   "iplanet-am-user-auth-modules",
-   "iplanet-am-user-account-life",
-   "sunIdentityServerPPDemographicsTimeZone",
-   "sunIdentityServerPPCommonNameFN"
- ],
- "resultCount": 85,
- "pagedResultsCookie": null,
- "remainingPagedResults": 0
-}
-</computeroutput>
-  </programlisting>
- </section>
-
  <section xml:id="rest-api-authz-subject-types">
-  <title>Viewing Subject Types</title>
+  <title>Viewing Subject Condition Types</title>
 
   <para>
    Subject types describe the JSON representation
-   of subjects that you can use in policy definitions.
+   of subject conditions that you can use in policy definitions.
   </para>
 
   <para>
-   Subject types are server-wide, and do not differ by realm.
+   Subject condition types are server-wide, and do not differ by realm.
    Hence the URI for the subject types API
    does not contain a realm component,
    but is <literal>/json/subjecttypes</literal>.
   </para>
 
   <section xml:id="rest-api-authz-subject-types-read">
-   <title>Reading Subject Types</title>
+   <title>Reading Subject Condition Types</title>
 
    <para>
-    To read a subject type, perform an HTTP GET
+    To read a subject condition type, perform an HTTP GET
     specifying the resource name.
    </para>
 
@@ -4263,15 +4156,18 @@ $ <userinput>curl --request GET \
    <programlisting>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/subjecttypes/User</userinput>
+ https://openam.example.com:8443/openam/json/subjecttypes/Identity</userinput>
 <computeroutput>{
-  "title" : "User",
+  "title" : "Identity",
   "logical" : false,
   "config" : {
     "type" : "object",
     "properties" : {
-      "id" : {
-        "type" : "string"
+      "subjectValues" : {
+        "type" : "array",
+        "items" : {
+          "type" : "string"
+        }
       }
     }
   }
@@ -4284,22 +4180,24 @@ $ <userinput>curl \
     that indicates whether the type is a logical operator or takes a predicate,
     and a configuration specification.
     The configuration specification in this case indicates
-    that a User subject has one property,
-    an "Id", which takes a string value.
-    In other words, a concrete User subject specification
+    that an Identity subject condition has one property,
+    "subjectValues", which takes an array of string values.
+    In other words, a concrete Identity subject condition specification
     is represented in a policy definition as in the following example:
    </para>
 
    <programlisting language="javascript">
 {
-   "type": "User",
-   "id": "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
+   "type": "Identity",
+   "subjectValues": [
+       "uid=scarter,ou=People,dc=example,dc=com"
+   ]
 }
    </programlisting>
 
    <para>
-    The configuration is what differs the most across subject types.
-    The AND condition, for example, takes an array of subject objects
+    The configuration is what differs the most across subject condition types.
+    The AND condition, for example, takes an array of subject condition objects
     as the body of its configuration.
    </para>
 
@@ -4325,7 +4223,7 @@ $ <userinput>curl \
    </programlisting>
 
    <para>
-    The concrete AND subject therefore takes the following form.
+    The concrete AND subject condition therefore takes the following form.
    </para>
 
    <programlisting language="javascript">
@@ -4342,10 +4240,10 @@ $ <userinput>curl \
   </section>
 
   <section xml:id="rest-api-authz-subject-types-query">
-   <title>Listing Subject Types</title>
+   <title>Listing Subject Condition Types</title>
 
    <para>
-    To list all subject types, perform an HTTP GET on the endpoint,
+    To list all subject condition types, perform an HTTP GET on the endpoint,
     setting the query string parameter, <literal>_queryFilter=true</literal>,
     as in the following example:
    </para>
@@ -4356,9 +4254,9 @@ $ <userinput>curl \
  https://openam.example.com:8443/openam/json/subjecttypes/?_queryFilter=true</userinput>
 <computeroutput>{
   "result" : [ ... subject types ... ],
-  "resultCount" : 10,
+  "resultCount" : 8,
   "pagedResultsCookie" : null,
-  "remainingPagedResults" : -1
+  "remainingPagedResults" : 0
 }</computeroutput>
    </programlisting>
 
@@ -4367,6 +4265,49 @@ $ <userinput>curl \
     <literal>_prettyPrint=true</literal> to make the output easier to read.
    </para>
   </section>
+ </section>
+
+<section xml:id="rest-api-authz-subject-attributes">
+  <title>Viewing Subject Attributes</title>
+
+  <para>
+   When you define a policy subject condition, the condition can depend on values
+   of subject attributes stored in a user's profile. The list of possible subject
+   attributes that you can use depends on the LDAP User Attributes configured for
+   the Identity data store where OpenAM looks up the user's profile.
+  </para>
+  <para>
+   Subject attributes derive from the list of LDAP user attributes configured
+   for the Identity data store. For more information, see
+   <link xlink:show="new"
+         xlink:href="admin-guide#config-data-store"
+         xlink:role="http://docbook.org/xlink/role/olink">Configuring Data Stores</link>.
+
+  </para>
+  <para>
+   You can get a listing of all subject attribute
+   names using the <literal>/json/subjectattributes/?_queryFilter=true</literal>
+   command on the endpoint.
+   There are no restrictions on the search and no pagination cookie is set.
+   The subject
+   attribute names are all returned as one in a "result" array.
+  </para>
+
+  <programlisting>
+$ <userinput>curl \
+  --request GET \
+  --header "iPlanetDirectoryPro: AQIC5..." \
+  --header "Content-Type: application/json" \
+  https://openam.example.com:8443/openam/json/subjectattributes/?_queryFilter=true</userinput>
+<computeroutput>
+{
+ "result" : [ ... subject attribute types ... ],
+ "resultCount": 87,
+ "pagedResultsCookie": null,
+ "remainingPagedResults": 0
+}
+</computeroutput>
+  </programlisting>
  </section>
 
  <section xml:id="rest-api-authz-decision-combiners">
@@ -4400,7 +4341,7 @@ $ <userinput>curl \
   } ],
   "resultCount" : 1,
   "pagedResultsCookie" : null,
-  "remainingPagedResults" : -1
+  "remainingPagedResults" : 0
 }</computeroutput>
   </programlisting>
 
@@ -4473,10 +4414,8 @@ $ <userinput>curl \
     <term><literal>"resources"</literal></term>
     <listitem>
      <para>
-      The application and resource pattern string
-      to which the referral applies. Each referral applies to a single
-      application, so only a single application and
-      resource pattern should be specified.
+      The application and resource pattern strings
+      to which the referral applies.
      </para>
     </listitem>
    </varlistentry>
@@ -4765,7 +4704,7 @@ $ <userinput>curl \
 
    <para>
     To list referrals, perform an HTTP GET on the endpoint, setting
-    at least the <literal>_queryFilter</literal> query string parameter.
+    the <literal>_queryFilter</literal> query string parameter.
    </para>
 
    <programlisting>
@@ -4812,7 +4751,7 @@ $ <userinput>curl \
     where <replaceable>field</replaceable> represents the field name,
     <replaceable>operator</replaceable> is the operator code,
     <replaceable>value</replaceable> is the value to match,
-    and the entire filter is URL encoded.
+    and the entire filter is URL-encoded.
     Supported operators are as follows:
    </para>
 
