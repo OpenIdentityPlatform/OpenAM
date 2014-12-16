@@ -30,13 +30,22 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Administration Interfaces &amp; Tools</title>
 
+ <indexterm>
+  <primary>Administration tools</primary>
+ </indexterm>
+
  <para>This chapter provides a brief introduction to the web-based OpenAM
  console. It also lists and describes each command line interface (CLI)
  administration tool.</para>
  
  <section xml:id="openam-console-overview">
   <title>OpenAM Web-Based Console</title>
-  <indexterm><primary>Console overview</primary></indexterm>
+
+  <indexterm>
+   <primary>Admin Console</primary>
+   <secondary>overview</secondary>
+  </indexterm>
+
   <para>After you install OpenAM, login to the web-based console as OpenAM
   Administrator, <literal>amadmin</literal> with the password you set during
   installation. Navigate to a URL such as
@@ -66,10 +75,10 @@
   you do not have access to the administrative console. Your access is limited
   to a configuration page with your account information.</para>
   
-  <mediaobject xml:id="figure-console-as-bjensen">
+  <mediaobject xml:id="figure-console-non-admin-user">
    <alt>How the console looks to an end user</alt>
    <imageobject>
-    <imagedata fileref="images/console-as-bjensen.png" format="PNG" />
+    <imagedata fileref="images/console-non-admin-user.png" format="PNG" />
    </imageobject>
    <textobject><para>OpenAM console directs an end user to a page where she
    can view and update her account information.</para></textobject>
@@ -97,10 +106,17 @@
  
  <section xml:id="openam-cli-overview">
   <title>OpenAM Command-Line Tools</title>
+
+  <indexterm>
+   <primary>command-line tools</primary>
+   <secondary>overview</secondary>
+  </indexterm>
+
   <para>The script tools in the following list have <literal>.bat</literal>
   versions for use on Microsoft Windows.</para>
-  <indexterm><primary>Command line tools overview</primary></indexterm>
+
   <indexterm><primary>Silent installation</primary></indexterm>
+
   <variablelist>
    <para>You can install the following OpenAM command-line tools.</para>
    <varlistentry>
@@ -126,7 +142,7 @@
     </listitem>
    </varlistentry>
    <varlistentry>
-    <term><command><?eval ${configJarFile}?></command></term>
+    <term><command>${configJarFile}</command></term>
     <listitem>
      <para>This executable .jar file lets you perform a silent installation of an OpenAM
      server with a configuration file. For example, the <command>java -jar configurator.jar -f
@@ -224,6 +240,12 @@
 
  <section xml:id="openam-ssoadm-jsp-overview">
   <title>OpenAM ssoadm.jsp</title>
+
+  <indexterm>
+   <primary>ssoadm.jsp</primary>
+   <secondary>enabling</secondary>
+  </indexterm>
+
   <para>You can use the <command>ssoadm.jsp</command> page to access a large
   subset of the configuration capabilities of the <command>ssoadm</command>
   command. Yet, <command>ssoadm.jsp</command> is disabled by default to prevent
