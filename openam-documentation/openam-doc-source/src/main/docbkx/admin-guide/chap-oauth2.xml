@@ -32,9 +32,10 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Managing OAuth 2.0 Authorization</title>
+
  <indexterm>
   <primary>Authorization</primary>
-  <secondary>Configuring</secondary>
+  <secondary>OAuth 2.0</secondary>
  </indexterm>
  <indexterm>
   <primary>OAuth 2.0</primary>
@@ -47,6 +48,11 @@
  
  <section xml:id="about-oauth2-support">
   <title>About OAuth 2.0 Support in OpenAM</title>
+
+  <indexterm>
+   <primary>OAuth 2.0</primary>
+   <secondary>about</secondary>
+  </indexterm>
 
   <para>RFC 6749, <link xlink:href="http://tools.ietf.org/html/rfc6749"
   xlink:show="new"><citetitle>The OAuth 2.0 Authorization Framework</citetitle></link>,
@@ -74,6 +80,11 @@
 
   <section xml:id="openam-oauth2-authz-server">
    <title>OpenAM as OAuth 2.0 Authorization Server</title>
+
+   <indexterm>
+    <primary>OpenAM</primary>
+    <secondary>as an OAuth 2.0 authorization server</secondary>
+   </indexterm>
 
    <para>OpenAM can function as an OAuth 2.0 <firstterm>authorization
    server</firstterm>. In this role, OpenAM authenticates resource owners and
@@ -121,6 +132,12 @@
 
    <section xml:id="oauth2-implicit">
     <title>OAuth 2.0 Implicit Grant</title>
+
+    <indexterm>
+     <primary>OAuth 2.0</primary>
+     <secondary>implicit grant</secondary>
+    </indexterm>
+
     <para>The implicit grant is designed for clients implemented to run inside
     the resource-owner user agent. Instead of providing an authorization code
     that the client must use to retrieve an access token, OpenAM returns the
@@ -160,6 +177,12 @@
 
    <section xml:id="oauth2-client-cred">
     <title>OAuth 2.0 Client Credentials Grant</title>
+
+    <indexterm>
+     <primary>OAuth 2.0</primary>
+     <secondary>client credentials grant</secondary>
+    </indexterm>
+
     <para>The client credentials grant uses client credentials as an
     authorization grant. This grant makes sense when the client is also the
     resource owner, for example. The following sequence diagram shows the
@@ -177,6 +200,11 @@
 
    <section xml:id="oauth2-jwt-bearer">
     <title>JWT Bearer Profile</title>
+
+    <indexterm>
+     <primary>OAuth 2.0</primary>
+     <secondary>JWT bearer profile</secondary>
+    </indexterm>
 
     <para>
      The Internet-Draft,
@@ -336,9 +364,10 @@ assertion=eyAiYWxnIjogIlJTMjU2IiB9.eyAic3ViIjogImp3...
 
    <section xml:id="oauth2-saml2-bearer">
     <title>SAML 2.0 Bearer Assertion Profiles</title>
+
     <indexterm>
-     <primary>Federation</primary>
-     <secondary>OAuth 2.0</secondary>
+     <primary>OAuth 2.0</primary>
+     <secondary>SAML 2.0 bearer assertion profiles</secondary>
     </indexterm>
 
     <para>The Internet-Draft, <link xlink:show="new"
@@ -412,6 +441,12 @@ assertion=eyAiYWxnIjogIlJTMjU2IiB9.eyAic3ViIjogImp3...
 
    <section xml:id="oauth2-endpoints">
     <title>OpenAM OAuth 2.0 Endpoints</title>
+
+    <indexterm>
+     <primary>OAuth 2.0</primary>
+     <secondary>endpoints</secondary>
+    </indexterm>
+
     <xinclude:include href="../shared/variablelist-oauth2-endpoints.xml" />
 
     <para>
@@ -429,6 +464,15 @@ assertion=eyAiYWxnIjogIlJTMjU2IiB9.eyAic3ViIjogImp3...
 
   <section xml:id="openam-oauth2-client">
    <title>OpenAM as OAuth 2.0 Client &amp; Resource Server Solution</title>
+
+   <indexterm>
+    <primary>OAuth 2.0</primary>
+    <secondary>OpenAM as OAuth 2.0 client</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>OAuth2 2.0</primary>
+    <secondary>resource server solution</secondary>
+   </indexterm>
 
    <para>OpenAM can function as an OAuth 2.0 client for installations where the
    web resources are protected by OpenAM. To configure OpenAM as an OAuth 2.0
@@ -475,6 +519,11 @@ assertion=eyAiYWxnIjogIlJTMjU2IiB9.eyAic3ViIjogImp3...
 
   <section xml:id="oauth2-byo-client">
    <title>Using Your Own Client &amp; Resource Server</title>
+
+   <indexterm>
+    <primary>OAuth 2.0</primary>
+    <secondary>using own client &amp; resource server</secondary>
+   </indexterm>
 
    <para>OpenAM returns bearer tokens as described in RFC 6750, <link
    xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6750"
@@ -545,6 +594,12 @@ assertion=eyAiYWxnIjogIlJTMjU2IiB9.eyAic3ViIjogImp3...
 
   <procedure xml:id="common-task-oauth2-authz">
    <title>To Set Up the OAuth 2.0 Authorization Service</title>
+
+   <indexterm>
+    <primary>OAuth 2.0</primary>
+    <secondary>authorization service</secondary>
+    <tertiary>configuring</tertiary>
+   </indexterm>
 
    <para>
     Follow the steps in this procedure
@@ -890,10 +945,17 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
 
   <para>You can adjust global defaults in the OpenAM console under Configuration
   &gt; Global &gt; OAuth2 Provider.</para>
+
  </section>
 
  <section xml:id="register-oauth2-client">
-  <title>Registering OAuth 2.0 Clients With the Authorization Service</title>
+  <title>Registering OAuth 2.0 Clients with the Authorization Service</title>
+
+  <indexterm>
+   <primary>OAuth 2.0</primary>
+   <secondary>authorization service</secondary>
+   <tertiary>registering clients</tertiary>
+  </indexterm>
 
   <para>You register an OAuth 2.0 client with the OpenAM OAuth 2.0 authorization
   service by creating and configuring an OAuth 2.0 Client agent profile.</para>
@@ -903,6 +965,12 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
 
   <procedure xml:id="create-oauth2-client-profile">
    <title>To Create an OAuth 2.0 Client Agent Profile</title>
+
+   <indexterm>
+    <primary>OAuth 2.0</primary>
+    <secondary>client agent profile</secondary>
+    <tertiary>creating</tertiary>
+   </indexterm>
 
    <step>
     <para>Use either of these two facilities.</para>
@@ -929,6 +997,12 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
 
   <procedure xml:id="configure-oauth2-client-profile">
    <title>To Configure an OAuth 2.0 Client Agent Profile</title>
+
+   <indexterm>
+    <primary>OAuth 2.0</primary>
+    <secondary>client agent profile</secondary>
+    <tertiary>configuring</tertiary>
+   </indexterm>
 
    <para>After initially registering or creating a client agent profile as
    necessary.</para>
@@ -964,6 +1038,12 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
 
  <section xml:id="oauth2-manage-tokens">
   <title>Managing OAuth 2.0 Tokens</title>
+
+  <indexterm>
+   <primary>OAuth 2.0</primary>
+   <secondary>tokens</secondary>
+   <tertiary>managing</tertiary>
+  </indexterm>
 
   <para>OpenAM exposes a RESTful API that lets administrators read, list, and
   delete OAuth 2.0 tokens. OAuth 2.0 clients can also manage their own tokens.
@@ -1025,6 +1105,12 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
 
   <section xml:id="oauth2-client-plus-authz">
   <title>Configuring OpenAM as Authorization Server &amp; Client</title>
+
+   <indexterm>
+    <primary>OAuth 2.0</primary>
+    <secondary>OpenAM as authorization server &amp; client</secondary>
+    <tertiary>configuring</tertiary>
+   </indexterm>
 
   <para>
    This section takes a high-level look at how to set up OpenAM
@@ -1471,8 +1557,18 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
  </section>
 
   <section xml:id="oauth2-sp-and-authz">
-  <title>Configuring OpenAM as Both SAML 2.0 Service Provider &amp; OAuth 2.0
-  Authorization Server</title>
+  <title>Configuring OpenAM as a SAML Service Provider &amp; OAuth2 Authorization Server</title>
+
+   <indexterm>
+    <primary>OAuth 2.0</primary>
+    <secondary>OpenAM as authorization server</secondary>
+    <tertiary>configuring</tertiary>
+   </indexterm>
+   <indexterm>
+    <primary>SAML 2.0</primary>
+    <secondary>OpenAM as server provider</secondary>
+    <tertiary>configuring</tertiary>
+   </indexterm>
 
   <para>As described in <xref linkend="oauth2-saml2-bearer" />, OpenAM as
   OAuth 2.0 authorization server can handle the profile where a SAML 2.0
@@ -1495,6 +1591,12 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
 
   <procedure xml:id="configure-oauth2-sp-and-authz">
    <title>To Get an Access Token From SAML 2.0 Web SSO</title>
+
+   <indexterm>
+    <primary>SAML 2.0</primary>
+    <secondary>OpenAM as server provider</secondary>
+    <tertiary>getting access token</tertiary>
+   </indexterm>
 
    <itemizedlist>
     <para>For this scenario to work, the following conditions must be met.</para>
@@ -1711,6 +1813,12 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
 
   <section xml:id="oauth2-user-consent">
    <title>User Consent Management</title>
+
+   <indexterm>
+    <primary>OAuth 2.0</primary>
+    <secondary>user consent</secondary>
+   </indexterm>
+
    <para>
     Users of OAuth 2.0 clients can now manage their OAuth 2.0 tokens
     on their user pages via the OpenAM console.
@@ -1737,12 +1845,17 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
      </textobject>
     </mediaobject>
    </figure>
-
   </section>
+
  </section>
 
  <section xml:id="oauth2-security-considerations">
   <title>Security Considerations</title>
+
+  <indexterm>
+   <primary>OAuth2 2.0</primary>
+   <secondary>security considerations</secondary>
+  </indexterm>
 
   <para>OAuth 2.0 messages involve credentials and access tokens that allow
   the bearer to retrieve protected resources. Therefore, do not let an attacker
