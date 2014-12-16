@@ -152,9 +152,6 @@ Copyright: Copyright 2001-2006 Stephen Colebourne
 Version: jsr305-1.3.9.jar
 Copyright: Copyright (C) 2005, University of Maryland
 
-Version: jsslutils-1.0.5.jar
-Copyright:  Copyright 1999-2007 The Apache Software Foundation
-
 Version: jstl-1.1.2.jar
 Copyright: Copyright 1999-2004 The Apache Software Foundation.
 
@@ -242,6 +239,12 @@ Copyright: Copyright 2000-2013 The Apache Software Foundation
 Version: xmltooling-1.3.2-1.jar
 Copyright: Copyright 2008 Members of the EGEE Collaboration.
            Copyright 2008 University Corporation for Advanced Internet Development, Inc.
+
+Version: woodstox-core-asl-4.2.0.jar
+Copyright: © 2006 Codehaus Foundation. Original design by Andreas Viklund
+
+Version: wss4j-1.6.13.jar
+Copyright: Copyright 2004-2013 The Apache Software Foundation
 
 ==================
 Full license text:
@@ -350,6 +353,12 @@ Copyright: Copyright 2014 ForgeRock AS.,
            Copyright (c) 2004, Mikael Grev, MiG InfoCom AB.,
            Copyright (c) 2006-2008 Sun Microsystems Inc. All Rights Reserved
 
+Version: jquery-nestingSortable-0.9.12.js
+Copyright: Copyright (c) 2012 Jonas von Andrian
+
+Version: jsslutils-1.0.5.jar
+Copyright: Copyright (c) 2008-2010, The University of Manchester, United Kingdom. All rights reserved.
+
 ==================
 Full license text:
 ==================
@@ -373,9 +382,6 @@ Common Public License Version 1.0 (CPL)
 ***************************************************************************
 
 Version: wsdl4j-1.6.3.jar
-Copyright: Copyright IBM Corp 2001, 2006
-
-Version: wss4j-1.6.13.jar
 Copyright: Copyright IBM Corp 2001, 2006
 
 ==================
@@ -620,9 +626,6 @@ Copyright: Copyright (c) 2005, 2014 jQuery Foundation, Inc.
 Version: jquery-clockpicker.0.0.7.min.js
 Copyright: Copyright 2014 Wang Shenwei.
 
-Version: jquery-nestingSortable-0.9.12.js
-Copyright: Copyright (c) 2012 Jonas von Andrian
-
 Version: jquery-ui-1.11.1-min.js
 Copyright: Copyright (c) 2005, 2014 jQuery Foundation, Inc.
 
@@ -640,6 +643,7 @@ Copyright: Copyright (c) 2010 Maxim Vasiliev
 
 Version: lodash-2.4.1-min.js
 Copyright: Copyright 2012-2014 The Dojo Foundation
+           Copyright (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative (from Underscore.js 1.5.2)
 
 Version: moment-2.8.1-min.js
 Copyright: Copyright Tim Wood, Iskren Chernev, Moment.js
@@ -1039,9 +1043,6 @@ Copyright: Copyright 2005-2012 Restlet S.A.S.
 Version: webservices-rt-2009-29-07.jar
 Copyright: Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
 
-Version: woodstox-core-asl-4.2.0.jar
-Copyright: Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
-
 Version: xsdlib-20060615.jar
 Copyright: Copyright (c) 2001-2013 Oracle and/or its affiliates. All rights reserved.
 
@@ -1240,6 +1241,9 @@ Copyright: Copyright 2014 ForgeRock AS.,
            Copyright © 2010 ApexIdentity Inc. All rights reserved.,
            Copyright (c) 2004, Mikael Grev, MiG InfoCom AB.,
            Copyright (c) 2006-2008 Sun Microsystems Inc. All Rights Reserved
+
+Version: javax.mail-1.5.1.jar
+Copyright: Copyright (c) 1997-2010 Oracle and/or its affiliates. All rights reserved.
 
 ==================
 Full license text:
