@@ -2218,7 +2218,7 @@ $ <userinput>curl \
       <literal>"creationDate"</literal> (all comparisons are supported;
       the date is either an
       <link xlink:show="new"
-            xlink:href="http://sources.forgerock.org/action/jira-issue.do?key=ISO-8601"
+            xlink:href="http://www.w3.org/TR/NOTE-datetime"
       >ISO-8601</link> string,
       or a integer number of seconds from the UNIX epoch)
      </para>
@@ -2229,7 +2229,7 @@ $ <userinput>curl \
       <literal>"lastModified"</literal> (all comparisons are supported;
       the date is either an
       <link xlink:show="new"
-            xlink:href="http://sources.forgerock.org/action/jira-issue.do?key=ISO-8601"
+            xlink:href="http://www.w3.org/TR/NOTE-datetime"
       >ISO-8601</link> string,
       or a integer number of seconds from the UNIX epoch)
      </para>
