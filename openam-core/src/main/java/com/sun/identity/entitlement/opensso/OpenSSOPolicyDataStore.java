@@ -56,6 +56,7 @@ import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -231,6 +232,38 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
         }
     }
 
+    /**
+     * Attempts to find a legacy policy with the given policy name. As a legacy policy with multiple rules will be
+     * translated into multiple Privilege objects named {@code policy1_rule1}, we may not be able to find the legacy
+     * policy with the same name. In this case, we repeatedly strip off {@code _XXX} suffixes from the policy name to
+     * try to find the matching legacy policy. If we still cannot find such a policy, then we return {@code null}.
+     *
+     * @param adminToken the SSOToken to use when querying to see if a policy exists.
+     * @param realm the realm in which the policy exists.
+     * @param policyName the initial name of the policy.
+     * @return the DN of the matching legacy policy, or {@code null} if no match was found.
+     */
+    private String findLegacyPolicyDn(SSOToken adminToken, String realm, String policyName) {
+        String dn = getPolicyDistinguishedName(realm, policyName);
+        int idx = policyName.length();
+        while (!SMSEntry.checkIfEntryExists(dn, adminToken)) {
+            debug("Unable to find policy with name %s using DN %s", policyName, dn);
+            idx = policyName.lastIndexOf('_', idx-1);
+            if (idx >= 0) {
+                dn = getPolicyDistinguishedName(realm, policyName.substring(0, idx));
+            } else {
+                return null;
+            }
+        }
+        return dn;
+    }
+
+    private static void debug(final String format, final Object...args) {
+        if (PrivilegeManager.debug.messageEnabled()) {
+            PrivilegeManager.debug.message(String.format(Locale.US, "OpenSSOPolicyDataStore: " + format, args));
+        }
+    }
+
     public ReferralPrivilege getReferral(
         Subject adminSubject,
         String realm,
@@ -317,26 +350,32 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
             ApplicationPrivilege.Action.MODIFY)) {
             throw new EntitlementException(326);
         }
-        
-        String dn = getPolicyDistinguishedName(realm, name);
 
-        if (!SMSEntry.checkIfEntryExists(dn, dsameUserToken)) {
-            Object[] params = {name};
-            throw new EntitlementException(203, params);
-        }
         try {
             String[] logParams = {DNMapper.orgNameToRealmName(realm),
                 name};
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
                 "ATTEMPT_REMOVE_PRIVILEGE", logParams, subject);
-            SMSEntry s = new SMSEntry(dsameUserToken, dn);
-            s.delete();
+
+            // Remove from privilege index store first
+            PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
+                    dsameUserSubject, realm);
+            pis.delete(name);
+
+            // Only remove from legacy policy store if the policy still exists. This can happen if an old policy
+            // had multiple rules (= multiple privileges in new store) and one of the new privileges for that policy
+            // has been deleted, which deletes the entire legacy policy.
+
+            String dn = findLegacyPolicyDn(dsameUserToken, realm, name);
+            if (dn != null) {
+                SMSEntry s = new SMSEntry(dsameUserToken, dn);
+                s.delete();
+            } else {
+                debug("Unable to find legacy policy for privilege %s in realm %s", name, realm);
+            }
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
                 "SUCCEEDED_REMOVE_PRIVILEGE", logParams, subject);
 
-            PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
-                dsameUserSubject, realm);
-            pis.delete(name);
         } catch (SSOException ex) {
             String[] logParams = {DNMapper.orgNameToRealmName(realm),
                 name, ex.getMessage()};
