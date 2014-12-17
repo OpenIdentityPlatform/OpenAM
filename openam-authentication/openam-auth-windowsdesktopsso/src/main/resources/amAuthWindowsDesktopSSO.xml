@@ -26,10 +26,8 @@
 
     $Id: amAuthWindowsDesktopSSO.xml,v 1.4 2008/06/25 05:45:41 qcheng Exp $
 
--->
 
-<!--
-   Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2014 ForgeRock AS
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -97,6 +95,12 @@
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kerberos-realms-trusted"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a107">
+                    <DefaultValues/>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-principal-name"
                         type="single"
@@ -150,6 +154,12 @@
                             <Value>0</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kerberos-realms-trusted"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a107">
+                        <DefaultValues/>
+                    </AttributeSchema>                    
                 </SubSchema>
             </Organization>
         </Schema>

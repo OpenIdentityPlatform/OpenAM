@@ -24,9 +24,6 @@
  *
  * $Id: WindowsDesktopSSO.java,v 1.7 2009/07/28 19:40:45 beomsuk Exp $
  *
- */
-
-/**
  * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
@@ -54,6 +51,7 @@ import java.security.PrivilegedExceptionAction;
 import java.security.PrivilegedActionException;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -92,6 +90,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
     private static final int LOOKUPUSER = 5;
     private static final int AUTHLEVEL = 6;
     private static final int SUBJECT   = 7;
+    
+    private static final String ACCEPTED_REALMS_ATTR = ISAuthConstants.AUTH_ATTR_PREFIX 
+            + "windowsdesktopsso-kerberos-realms-trusted";
         
     private static Hashtable configTable = new Hashtable();
     private Principal userPrincipal = null;
@@ -107,6 +108,10 @@ public class WindowsDesktopSSO extends AMLoginModule {
     private boolean lookupUserInRealm = false;
     
     private Debug debug = Debug.getInstance(amAuthWindowsDesktopSSO);
+    
+    private Set<String> trustedKerberosRealms = Collections.EMPTY_SET;
+    
+    private static final String REALM_SEPARATOR = "@";
 
     /**
      * Constructor
@@ -184,7 +189,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
 
         // authenticate the user with the kerberos token
         try {
-            authenticateToken(kerberosToken);
+            authenticateToken(kerberosToken, trustedKerberosRealms);
             if (debug.messageEnabled()){
                 debug.message("WindowsDesktopSSO kerberos authentication passed succesfully.");
             }
@@ -197,7 +202,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
                          debug.message("Credential expired. Re-establish credential...");	 
                  serviceLogin();	 
                  try {   
-                     authenticateToken(kerberosToken);  
+                     authenticateToken(kerberosToken, trustedKerberosRealms);  
                      if (debug.messageEnabled()){
                        debug.message("Authentication succeeded with new cred.");    
                            result = ISAuthConstants.LOGIN_SUCCEED;
@@ -219,7 +224,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
                debug.message("Credential expired. Re-establish credential...");
                serviceLogin();
                    try {
-                   authenticateToken(kerberosToken);
+                   authenticateToken(kerberosToken, trustedKerberosRealms);
                    if (debug.messageEnabled()){
                        debug.message("Authentication succeeded with new cred.");
                            result = ISAuthConstants.LOGIN_SUCCEED; 
@@ -245,7 +250,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
         return result;
     }
 
-    private void authenticateToken(final byte[] kerberosToken) 
+    private void authenticateToken(final byte[] kerberosToken, final Set<String> trustedRealms) 
             throws AuthLoginException, GSSException, Exception {
 
         debug.message("In authenticationToken ...");
@@ -276,13 +281,21 @@ public class WindowsDesktopSSO extends AMLoginModule {
                         debug.message("Context established !");
                     }
                     GSSName user = context.getSrcName();
+                    final String userPrincipalName = user.toString();
+                    for (final String trustedRealm : trustedRealms) {
+                        if (!isTokenTrusted(userPrincipalName, trustedRealm)) {
+                            debug.error("Kerberos token for " + userPrincipalName + " not trusted");
+                            final String[] data = {userPrincipalName};
+                            throw new AuthLoginException(amAuthWindowsDesktopSSO, "untrustedToken", data);
+                        }
+                    }
                     
                     // Check if the user account from the Kerberos ticket exists 
                     // in the realm. The "Alias Search Attribute Names" will be used to
                     // perform the search.
                     if (lookupUserInRealm) {
                         String org = getRequestOrg();
-                        String userValue = getUserName(user.toString());
+                        String userValue = getUserName(userPrincipalName);
                         String userName = searchUserAccount(userValue, org);
                         if (userName != null && !userName.isEmpty()) {
                             storeUsernamePasswd(userValue, null);
@@ -300,7 +313,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
                                 + "User authenticated: " + user.toString());
                     }
                     if (user != null) {
-                        setPrincipal(user.toString());
+                        setPrincipal(userPrincipalName);
                     }
                 }
                 context.dispose();
@@ -339,6 +352,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
         authLevel = null;
         options = null;
         confIndex = null;
+        trustedKerberosRealms = Collections.EMPTY_SET;
     }
 
     private void setPrincipal(String user) {
@@ -348,7 +362,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
     private String getUserName(String user) {
         String userName = user;
         if (!returnRealm) {
-            int index = user.indexOf("@");
+            int index = user.indexOf(REALM_SEPARATOR);
             if (index != -1) {
                 userName = user.toString().substring(0, index);
             }
@@ -506,7 +520,8 @@ public class WindowsDesktopSSO extends AMLoginModule {
         returnRealm = 
             Boolean.valueOf(getMapAttr(options,RETURNREALM)).booleanValue();
         lookupUserInRealm = 
-            Boolean.valueOf(getMapAttr(options,LOOKUPUSER)).booleanValue();    
+            Boolean.valueOf(getMapAttr(options,LOOKUPUSER)).booleanValue();
+        trustedKerberosRealms = getAcceptedKerberosRealms(options);
 
         if (debug.messageEnabled()){
             debug.message("WindowsDesktopSSO params: \n" + 
@@ -516,6 +531,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
                 "\nkdc server: " + kdcServer +
                 "\ndomain principal: " + returnRealm +
                 "\nLookup user in realm:" + lookupUserInRealm +
+                "\nAccepted Kerberos realms: " + trustedKerberosRealms +    
                 "\nauth level: " + authLevel);
         }
 
@@ -763,5 +779,28 @@ public class WindowsDesktopSSO extends AMLoginModule {
     private static Set<String> addToSet(Set<String> set, String attribute) {
         set.add(attribute);
         return set;
+    }
+    
+    private static Set<String> getAcceptedKerberosRealms(Map options) {
+        Set<String> result = Collections.EMPTY_SET;
+        final Object tmp = options.get(ACCEPTED_REALMS_ATTR);
+        if (tmp != null) {
+            result = Collections.unmodifiableSet((Set<String>)tmp);
+        }
+        return result;
+    }    
+    
+    private static boolean isTokenTrusted(final String UPN, final String realm) {
+        boolean trusted = false;
+        if (UPN != null ) {
+            final int param_index = UPN.indexOf(REALM_SEPARATOR);
+            if (param_index != -1) {
+                final String realmPart = UPN.substring(param_index + 1);
+                if (realmPart.equalsIgnoreCase(realm)) {
+                    trusted = true;
+                }
+            }
+        }
+        return trusted;
     }
 }
