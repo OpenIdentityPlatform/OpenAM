@@ -219,146 +219,137 @@ $ <userinput>curl https://openam.example.com:8443/openam/oauth2/tokeninfo\
 $ <userinput>curl \
  --request POST \
  --user "myClientID:password" \
- --data "grant_type=password&amp;username=demo&amp;password=changeit&amp;scope=cn%20mail" \
+ --data "grant_type=password&amp;username=demo&amp;password=changeit&amp;scope=cn" \
  https://openam.example.com:8443/openam/oauth2/access_token</userinput>
 <computeroutput>{
-    "expires_in": 599,
+    "scope": "cn",
+    "expires_in": 60,
     "token_type": "Bearer",
-    "refresh_token": "f838e7d4-7e84-4743-af7c-9a9c42c2969e",
-    "access_token": "9c6a48fc-44b1-4a0c-b4f0-672fba468b0f"
+    "access_token": "f5fb4833-ba3d-41c8-bba4-833b49c3fe2c"
 }</computeroutput>
 
 $ <userinput>curl \
  --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*" \
  https://openam.example.com:8443/openam/frrest/oauth2/token/9c6a48fc...fba468b0f</userinput>
 <computeroutput>{
-    "scope": [
-        "mail",
-        "cn"
+    "expireTime": [
+        "1418818601396"
     ],
-    "type": [
+    "tokenName": [
         "access_token"
     ],
-    "username": [
-        "demo"
+    "scope": [
+        "cn"
     ],
+    "grant_type": [
+        "password"
+    ],
+    "clientID": [
+        "myClientID"
+    ],
+    "parent": [],
+    "id": [
+        "f5fb4833-ba3d-41c8-bba4-833b49c3fe2c"
+    ],
+    "tokenType": [
+        "Bearer"
+    ],
+    "redirectURI": [],
+    "nonce": [],
     "realm": [
         "/"
     ],
-    "id": [
-        "9c6a48fc-44b1-4a0c-b4f0-672fba468b0f"
-    ],
-    "parent": [
-        "f838e7d4-7e84-4743-af7c-9a9c42c2969e"
-    ],
-    "expiry_time": [
-        "1355741494888"
-    ],
-    "client_id": [
-        "myClientID"
+    "userName": [
+        "demo"
     ]
 }</computeroutput>
    </screen>
 
-   <para>To list tokens, perform an HTTP GET on
-   <literal>/frrest/oauth2/token/?_query_id=<replaceable>conditions</replaceable></literal>,
-   where <replaceable>conditions</replaceable> is a comma-separated list of
-   <literal><replaceable>field</replaceable>=<replaceable>value</replaceable></literal>
-   conditions. The <replaceable>field</replaceable>s are taken from the fields
-   returned in the token object through this endpoint.</para>
+   <para>
+    To list tokens, perform an HTTP GET on
+    <literal>/frrest/oauth2/token/?_queryId=<replaceable>string</replaceable></literal>,
+    where <replaceable>string</replaceable> is
+    either <literal>access_token</literal> to request the list of access tokens
+    for the current user or all users if requested by <literal>amAdmin</literal>,
+    or any other string to request the list of access tokens and refresh tokens.
+   </para>
 
-   <variablelist>
-    <varlistentry>
-     <term><literal>"expiry_time"</literal></term>
-     <listitem>
-      <para>Token expiration time in milliseconds since 00:00:00 UTC, January 1,
-      1970.</para>
-     </listitem>
-    </varlistentry>
-
-    <varlistentry>
-     <term><literal>"type"</literal></term>
-     <listitem>
-      <para>Either <literal>"access_token"</literal> or
-      <literal>"refresh_token"</literal>.</para>
-     </listitem>
-    </varlistentry>
-
-    <varlistentry>
-     <term><literal>"username"</literal></term>
-     <listitem>
-      <para>OAuth 2.0 client to whom the token was issued.</para>
-     </listitem>
-    </varlistentry>
-
-    <varlistentry>
-     <term><literal>"realm"</literal></term>
-     <listitem>
-      <para>The realm for which the token was issued.</para>
-     </listitem>
-    </varlistentry>
-
-    <varlistentry>
-     <term><literal>"id"</literal></term>
-     <listitem>
-      <para>Unique ID of the token.</para>
-     </listitem>
-    </varlistentry>
-   </variablelist>
-
-   <para>The following example shows a search for current access tokens that
-   were issued to <literal>myClientID</literal>.</para>
+   <para>
+    The following example shows a search for the demo user's access tokens.
+   </para>
 
    <screen>
 $ <userinput>curl \
- --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*" \
- https://openam.example.com:8443/openam/frrest/oauth2/token/?_queryID\
-=username%3DmyClientID%2Ctype%3Daccess_token</userinput>
+ --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcw..." \
+ https://openam.example.com:8443/openam/frrest/oauth2/token/?_queryId=access_token</userinput>
 <computeroutput>{
     "result": [
         {
-            "scope": [
-                "mail",
-                "cn"
-            ],
-            "id": [
-                "1b836369-4fcf-4fb2-b819-ee4b1314d4f1"
-            ],
-            "type": [
+            "expireTime": "Dec 17, 2014 1:02 PM",
+            "tokenName": [
                 "access_token"
             ],
-            "username": [
+            "scope": [
+                "cn"
+            ],
+            "grant_type": [
+                "password"
+            ],
+            "clientID": [
                 "myClientID"
             ],
+            "parent": [],
+            "id": [
+                "d2bbd4f9-955f-4683-bb83-bc0d7523b0f9"
+            ],
+            "tokenType": [
+                "Bearer"
+            ],
+            "redirectURI": [],
+            "nonce": [],
             "realm": [
                 "/"
             ],
-            "expiry_time": [
-                "1355741986154"
-            ]
+            "userName": [
+                "demo"
+            ],
+            "display_name": "",
+            "scopes": "cn"
         },
         {
-            "scope": [
-                "mail",
-                "cn"
-            ],
-            "type": [
+            "expireTime": "Dec 17, 2014 1:02 PM",
+            "tokenName": [
                 "access_token"
             ],
-            "username": [
+            "scope": [
+                "cn"
+            ],
+            "grant_type": [
+                "password"
+            ],
+            "clientID": [
                 "myClientID"
             ],
+            "parent": [],
+            "id": [
+                "12f9907f-dbfb-4c4c-a231-2b24964fee8b"
+            ],
+            "tokenType": [
+                "Bearer"
+            ],
+            "redirectURI": [],
+            "nonce": [],
             "realm": [
                 "/"
             ],
-            "id": [
-                "5f1763fc-37ae-4698-9e84-d301d49e1f7e"
+            "userName": [
+                "demo"
             ],
-            "expiry_time": [
-                "1355741982091"
-            ]
+            "display_name": "",
+            "scopes": "cn"
         }
     ],
+    "resultCount": 2,
     "pagedResultsCookie": null,
     "remainingPagedResults": -1
 }</computeroutput>
