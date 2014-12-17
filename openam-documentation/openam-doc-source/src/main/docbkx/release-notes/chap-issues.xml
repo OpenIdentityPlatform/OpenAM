@@ -218,10 +218,12 @@
   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM">OpenAM issue
   tracker</link>.</para>
 
-  <!-- List generated using  https://bugster.forgerock.org/jira/rest/api/2/search?jql=project%20%3D%20OpenAM%20and%20labels%20in%20%28release-notes%29%20and%20component%20not%20in%20%28%22web%20agents%22%2C%20%22j2ee%20agents%22%29%20and%20%28resolution%20in%20%28Unresolved%2C%22Won%27t%20Fix%22%29%20OR%20%28resolution%20in%20%28Fixed%29%20and%20fixVersion%20not%20in%20%2812.0.0%29%20and%20fixVersion%20%3C%2012.0.0%20and%20fixVersion%20%3E%2012.0.0%29%29 -->
+  <!-- List generated at 16:45:20 20141217 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+and+labels+in+%28release-notes%29+and+component+not+in+%28%22web+agents%22%2C+%22j2ee+agents%22%2C+documentation%2C+QA%29+and+%28resolution+in+%28Unresolved%2C%22Won%27t+Fix%22%29+OR+%28resolution+in+%28Fixed%29+and+fixVersion+not+in+%2812.0.0%29+and+fixVersion+%3C+12.0.0+and+fixVersion+%3E+12.0.0%29%29&startAt=0&maxResults=500&fields=summary-->
   <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5321" xlink:show="new">OPENAM-5321</link>: Cross realm session upgrade not handled properly by XUI</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5243" xlink:show="new">OPENAM-5243</link>: REST HTTP codes are different for some actions in AM 11.0.2 and AM 12</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5237" xlink:show="new">OPENAM-5237</link>: OAuth2 authorization consent page uses absolute URL in FORM tag</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5234" xlink:show="new">OPENAM-5234</link>: AuthLevel policy condition does not work with pol. agents when result code 403 is expected</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5183" xlink:show="new">OPENAM-5183</link>: CTS port settings are reverted to default when doing upgrade from AM 11 to AM 12</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4517" xlink:show="new">OPENAM-4517</link>: GUI installer crashes and restarts in Safari</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4430" xlink:show="new">OPENAM-4430</link>: Upgrade wizard is out of date for other languages than EN</para></listitem>
@@ -270,5 +272,6 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-291" xlink:show="new">OPENAM-291</link>: SelfWrite permissions are denied to sub realms</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-71" xlink:show="new">OPENAM-71</link>: SAML2 error handling in HTTP POST and Redirect bindings</para></listitem>
   </itemizedlist>
+
  </section>
 </chapter>
