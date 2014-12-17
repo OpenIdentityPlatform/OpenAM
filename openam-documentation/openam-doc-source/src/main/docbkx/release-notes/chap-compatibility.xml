@@ -145,6 +145,79 @@
        in order to use them in OpenAM.
       </para>
      </listitem>
+     <listitem>
+      <para>
+       It is strongly recommended <emphasis>not</emphasis> to use the
+       forward slash character
+       in policy names. Users running OpenAM servers on Tomcat
+       and JBoss web containers will not be able to manipulate policies
+       with the forward slash character in their names without setting the
+       <literal>&#x2011;Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</literal>
+       argument in the <literal>CATALINA_OPTS</literal> environment variable
+       before starting the OpenAM web container.
+      </para>
+      <para>
+       It is also strongly recommended not to enable
+       the <literal>ALLOW_ENCODED_SLASH=true</literal> setting while running
+       OpenAM in production. Using this option introduces a security risk.
+       See
+       <link
+        xlink:href="http://tomcat.apache.org/security-6.html#Fixed_in_Apache_Tomcat_6.0.10
+        ">Apache Tomcat 6.x Vulnerabilities</link>
+       and
+       <link
+        xlink:href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450
+        ">the related CVE</link>
+       for more information.
+      </para>
+      <para>
+       If you have policy names with forward slashes after
+       migration to OpenAM 12, rename the policies so that they
+       do not have forward slashes. Perform the following steps
+       if you use Tomcat or JBoss as your OpenAM web container:
+       <orderedlist>
+        <listitem>
+         <para>
+           Stop the OpenAM web container.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add the
+          <literal>&#x2011;Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</literal>
+          setting to the <literal>CATALINA_OPTS</literal> environment variable.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Restart the OpenAM web container.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Rename any policies with forward slashes in their names.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Stop the OpenAM web container.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Remove the
+          <literal>&#x2011;Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</literal>
+          setting from the <literal>CATALINA_OPTS</literal> environment variable.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Restart the OpenAM web container.
+         </para>
+        </listitem>
+       </orderedlist>
+      </para>
+     </listitem>
     </itemizedlist>
 
     <itemizedlist>
