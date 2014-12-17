@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.*;
 
 import com.sun.identity.shared.OAuth2Constants;
+
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.Scope;
@@ -426,7 +428,15 @@ public abstract class AbstractFlow extends ServerResource {
 
     protected Map<String, Object> getDataModel(Set<String> scopes) {
         Map<String, Object> data = new HashMap<String, Object>(getRequest().getAttributes());
-        data.put("target", getRequest().getResourceRef().toString());
+        
+        Reference resRef = getRequest().getResourceRef();
+        String target = resRef.getPath();
+        String query = resRef.getQuery();
+        if (!StringUtils.isBlank(query)) {
+            target = target + "?" + query;
+        }
+
+        data.put("target", target);
         Set<String> displayNames = client.getClient().getDisplayName();
         Set<String> displayDescriptions = client.getClient().getDisplayDescription();
         Set<String> allScopes = client.getClient().getAllowedGrantScopes();
