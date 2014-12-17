@@ -24,8 +24,6 @@
  *
  * $Id: HOTP.java,v 1.1 2009/03/24 23:52:12 pluo Exp $
  *
- */
-/*
  * Portions Copyrighted 2013-2014 ForgeRock AS
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
@@ -47,6 +45,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -178,7 +177,8 @@ public class HOTPService {
         IdSearchControl idsc = new IdSearchControl();
         idsc.setRecursive(true);
         idsc.setTimeOut(0);
-        idsc.setAllReturnAttributes(true);
+        final Set<String> returnAttributes = getReturnAttributes();
+        idsc.setReturnAttributes(returnAttributes);
         // search for the identity
         Set results = Collections.EMPTY_SET;
         Exception cause = null;
@@ -358,5 +358,22 @@ public class HOTPService {
         }
 
         return mail;
+    }
+    
+    /**
+     * 
+     * @return the attributes to be returned when querying the data store
+     */
+    private Set<String> getReturnAttributes() {
+        Set<String> returnAttributes = new HashSet<String>(2);
+        if ((emailAttribute != null) && (emailAttribute.trim().length() != 0)) {
+            returnAttributes.add(emailAttribute);
+        }
+        
+        if ((telephoneAttribute != null) && (telephoneAttribute.trim().length() != 0)) {
+            returnAttributes.add(telephoneAttribute);
+        }
+        
+        return returnAttributes;
     }
 }
