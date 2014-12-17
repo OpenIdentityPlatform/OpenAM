@@ -48,8 +48,10 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.PasswordCallback;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 public class HOTP extends AMLoginModule {
 
@@ -91,6 +93,8 @@ public class HOTP extends AMLoginModule {
     private int START_STATE = 2;
 
     private HOTPService hotpService;
+    
+    private Set<String> userSearchAttributes = Collections.emptySet();
 
     public void init(Subject subject, Map sharedState, Map options) {
         currentConfig = options;
@@ -113,10 +117,18 @@ public class HOTP extends AMLoginModule {
         telephoneAttribute = CollectionHelper.getMapAttr(options, ATTRIBUTEPHONE);
         carrierAttribute = CollectionHelper.getMapAttr(options, ATTRIBUTECARRIER);
         emailAttribute = CollectionHelper.getMapAttr(options, ATTRIBUTEEMAIL);
+        
+        try {
+            userSearchAttributes = getUserAliasList();
+        } catch (final AuthLoginException ale) {
+            debug.warning("HOTP.init: unable to retrieve search attributes", ale);
+        }
+        
         if (debug.messageEnabled()) {
-            debug.message("HOTP.init() : " + "telephone attribute=" + telephoneAttribute);
-            debug.message("HOTP.init() : " + "carrier attribute=" + carrierAttribute);
-            debug.message("HOTP.init() : " + "email attribute=" + emailAttribute);
+            debug.message("HOTP.init() : " + "telephone attribute=" + telephoneAttribute
+                + " carrier attribute=" + carrierAttribute
+                + " email attribute=" + emailAttribute
+                + " user search attributes=" + userSearchAttributes);
         }
 
         java.util.Locale locale = getLoginLocale();
@@ -157,7 +169,7 @@ public class HOTP extends AMLoginModule {
         HOTPParams hotpParams = new HOTPParams(gatewaySMSImplClass, Long.parseLong(codeValidityDuration),
                 telephoneAttribute, carrierAttribute, emailAttribute, codeDelivery, currentConfig,
                 Integer.parseInt(codeLength), bundle.getString("messageSubject"), bundle.getString("messageContent"),
-                FROM_ADDRESS);
+                FROM_ADDRESS, userSearchAttributes);
         hotpService = new HOTPService(getAMIdentityRepository(getRequestOrg()), userName, hotpParams);
     }
 
@@ -266,5 +278,24 @@ public class HOTP extends AMLoginModule {
         sharedState = null;
         currentConfig = null;
         enteredHOTPCode = null;
+        userSearchAttributes = Collections.emptySet();
     }
+    
+    private Set<String> getUserAliasList() throws AuthLoginException {
+        final Map<String, Set<String>> orgSvc = getOrgServiceTemplate(getRequestOrg(), ISAuthConstants.AUTH_SERVICE_NAME);
+        Set<String> aliasAttrNames = orgSvc.get(ISAuthConstants.AUTH_ALIAS_ATTR);
+        if (debug.messageEnabled()) {
+            debug.message("HOTP.getUserAliasList from " + ISAuthConstants.AUTH_ALIAS_ATTR 
+                    + ": "+ aliasAttrNames);
+                   
+        }
+        if (aliasAttrNames.isEmpty()) { 
+            aliasAttrNames = orgSvc.get(ISAuthConstants.AUTH_NAMING_ATTR);
+            if (debug.messageEnabled()) {
+                debug.message("HOTP.getUserAliasList from " + ISAuthConstants.AUTH_NAMING_ATTR 
+                        +": " + aliasAttrNames);
+            }
+        }
+        return aliasAttrNames;
+    }    
 }

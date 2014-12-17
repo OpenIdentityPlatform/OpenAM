@@ -36,6 +36,7 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchOpModifier;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -49,6 +50,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashMap;
 
 /**
  * Provides the functionality to send OTP codes to a users Telephone and email.
@@ -77,6 +79,8 @@ public class HOTPService {
 
     private String sentHOTPCode;
     private long sentHOTPCodeTime;
+    
+    private final Set<String> userSearchAttributes;
 
     /**
      * Constructs an instance of the HOTPService.
@@ -99,6 +103,7 @@ public class HOTPService {
         this.messageSubject = hotpParams.getMessageSubject();
         this.messageContent = hotpParams.getMessageContent();
         this.fromAddressAttributeName = hotpParams.getFromAddressAttributeName();
+        this.userSearchAttributes = hotpParams.getUserSearchAttributes();
         try {
             secureRandom = SecureRandom.getInstance("SHA1PRNG");
         } catch (NoSuchAlgorithmException ex) {
@@ -180,12 +185,23 @@ public class HOTPService {
         final Set<String> returnAttributes = getReturnAttributes();
         idsc.setReturnAttributes(returnAttributes);
         // search for the identity
-        Set results = Collections.EMPTY_SET;
+        Set<AMIdentity> results = Collections.emptySet();
         Exception cause = null;
         try {
             idsc.setMaxResults(0);
-            IdSearchResults searchResults =
-                    amIdentityRepo.searchIdentities(IdType.USER, userName, idsc);
+
+            IdSearchResults searchResults = amIdentityRepo.searchIdentities(IdType.USER, userName, idsc);
+            if (searchResults.getSearchResults().isEmpty() && !userSearchAttributes.isEmpty()) {
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("HOTP.sendHOTP() searching user identity "
+                            + "with alternative attributes " + userSearchAttributes);
+                }
+                final Map<String, Set<String>> searchAVP = toAvPairMap(userSearchAttributes, userName);
+                idsc.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
+                //workaround as data store always adds 'user-naming-attribute' to searchfilter
+                searchResults = amIdentityRepo.searchIdentities(IdType.USER, "*", idsc);
+            }
+                    
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }
@@ -376,4 +392,17 @@ public class HOTPService {
         
         return returnAttributes;
     }
+    
+    private Map<String, Set<String>> toAvPairMap(final Set<String> names, final String value) {
+        if (value == null) {
+            return Collections.EMPTY_MAP;
+        }
+        final Map<String, Set<String>> map = new HashMap<String, Set<String>>(names.size());
+        final Set<String> set = new HashSet<String>(1);
+        set.add(value);
+        for (final String name : names) {
+            map.put(name, set);
+        }
+        return map;
+    }    
 }
