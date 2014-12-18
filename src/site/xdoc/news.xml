@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <document
@@ -33,6 +33,20 @@
  </properties>
  <body>
   <section name="New Releases">
+   <p>
+    December 18, 2014. OpenAM 12.0.0 is now available.
+
+    This major release brings many new features and important fixes,
+    including fixes for security issues within OpenAM.
+
+    Get this ForgeRock release from the <a
+    href="http://forgerock.com/download-stack/">download page</a>.
+
+    Find the documentation for the release at <a
+    href="http://docs.forgerock.org/en/openam/12.0.0/"
+    >http://docs.forgerock.org/en/openam/12.0.0/</a>.
+   </p>
+
    <p>
     November 8, 2013. OpenAM 11.0 and Policy Agents 3.3 have been released.
 
