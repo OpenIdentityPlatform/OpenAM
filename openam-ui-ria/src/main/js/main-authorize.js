@@ -62,7 +62,6 @@ require([
     window._ = _;
 
     conf.globalData = { auth: { realm : window.realm } };
-    constants.BASE_PATH = "../XUI/";
 
     themeManager.getTheme().then(function(){
         spinner.hideSpinner();

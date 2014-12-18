@@ -16,6 +16,7 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -46,7 +47,7 @@ public class AuthorizationCodeResponseTypeHandlerTest {
     }
 
     @Test
-    public void shouldHandle() throws ServerException {
+    public void shouldHandle() throws Exception {
 
         //Given
         String tokenType = "TOKEN_TYPE";

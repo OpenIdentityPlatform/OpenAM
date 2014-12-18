@@ -69,6 +69,7 @@ import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.SignatureUtil;
+import org.restlet.routing.Router;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -147,6 +148,14 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Singleton
     public ConnectionFactory getConnectionFactory(RestEndpoints restEndpoints) {
         return Resources.newInternalConnectionFactory(restEndpoints.getResourceRouter());
+    }
+
+    @Inject
+    @Provides
+    @Named("OAuth2Router")
+    @Singleton
+    public Router getOAuth2Router(RestEndpoints restEndpoints) {
+        return restEndpoints.getOAuth2ServiceRouter();
     }
 
     @Provides

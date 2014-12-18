@@ -23,6 +23,7 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.rest.resource.CrestHttpServlet;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.service.JSONServiceEndpointApplication;
+import org.forgerock.openam.rest.service.OAuth2ServiceEndpointApplication;
 import org.forgerock.openam.rest.service.RestletServiceServlet;
 import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
 
@@ -46,6 +47,7 @@ public class RestEndpointServlet extends HttpServlet {
     private final org.forgerock.json.resource.servlet.HttpServlet crestServlet;
     private final RestletServiceServlet restletJSONServiceServlet;
     private final RestletServiceServlet restletXACMLServiceServlet;
+    private final RestletServiceServlet restletOAuth2ServiceServlet;
     private final RestEndpointManager endpointManager;
 
     /**
@@ -58,6 +60,8 @@ public class RestEndpointServlet extends HttpServlet {
                 "jsonRestletServiceServlet");
         this.restletXACMLServiceServlet = new RestletServiceServlet(this, XACMLServiceEndpointApplication.class,
                 "xacmlRestletServiceServlet");
+        this.restletOAuth2ServiceServlet = new RestletServiceServlet(this, OAuth2ServiceEndpointApplication.class,
+                "xacmlRestletServiceServlet");
         this.endpointManager = InjectorHolder.getInstance(RestEndpointManager.class);
     }
 
@@ -69,11 +73,15 @@ public class RestEndpointServlet extends HttpServlet {
      * @param restletXACMLServiceServlet An instance of a RestletServiceServlet.
      * @param endpointManager An instance of the RestEndpointManager.
      */
-    RestEndpointServlet(final CrestHttpServlet crestServlet, final RestletServiceServlet restletJSONServiceServlet,
-            final RestletServiceServlet restletXACMLServiceServlet, final RestEndpointManager endpointManager) {
+    RestEndpointServlet(final CrestHttpServlet crestServlet,
+            final RestletServiceServlet restletJSONServiceServlet,
+            final RestletServiceServlet restletXACMLServiceServlet,
+            final RestletServiceServlet restletOAuth2ServiceServlet,
+            final RestEndpointManager endpointManager) {
         this.crestServlet = crestServlet;
         this.restletJSONServiceServlet = restletJSONServiceServlet;
         this.restletXACMLServiceServlet = restletXACMLServiceServlet;
+        this.restletOAuth2ServiceServlet = restletOAuth2ServiceServlet;
         this.endpointManager = endpointManager;
     }
 
@@ -124,6 +132,8 @@ public class RestEndpointServlet extends HttpServlet {
             }
         } else if ("/xacml".equals(request.getServletPath())) {
             restletXACMLServiceServlet.service(new HttpServletRequestWrapper(request), response);
+        } else if ("/oauth2".equals(request.getServletPath())) {
+            restletOAuth2ServiceServlet.service(new HttpServletRequestWrapper(request), response);
         }
     }
 
@@ -152,6 +162,7 @@ public class RestEndpointServlet extends HttpServlet {
     public void destroy() {
         crestServlet.destroy();
         restletXACMLServiceServlet.destroy();
+        restletOAuth2ServiceServlet.destroy();
         restletJSONServiceServlet.destroy();
     }
 }

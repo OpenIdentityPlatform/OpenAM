@@ -341,11 +341,14 @@ public class TokenResource implements CollectionResourceProvider {
         } catch (InternalServerErrorException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as writing the response failed.", e);
             handler.handleError(e);
+        } catch (NotFoundException e) {
+            debug.error("TokenResource :: QUERY : Unable to query collection as realm does not have OAuth 2 provider.", e);
+            handler.handleError(e);
         }
     }
 
     private void handleResponse(QueryResultHandler handler, JsonValue response, ServerContext context) throws UnauthorizedClientException,
-            CoreTokenException, InternalServerErrorException {
+            CoreTokenException, InternalServerErrorException, NotFoundException {
         Resource resource = new Resource("result", "1", response);
         JsonValue value = resource.getContent();
         String acceptLanguage = context.asContext(HttpContext.class).getHeaderAsString("accept-language");
@@ -453,10 +456,15 @@ public class TokenResource implements CollectionResourceProvider {
         };
     }
 
-    private String getExpiryDate(JsonValue token) throws CoreTokenException, InternalServerErrorException {
+    private String getExpiryDate(JsonValue token) throws CoreTokenException, InternalServerErrorException, NotFoundException {
 
-        OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(
-                getAttributeValue(token, "realm"));
+        OAuth2ProviderSettings oAuth2ProviderSettings;
+        try {
+            oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(
+                    getAttributeValue(token, "realm"));
+        } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
 
         try {
             if (token.isDefined("refreshToken")) {

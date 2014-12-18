@@ -25,6 +25,7 @@ import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResponseTypeHandler;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.oauth2.CookieExtractor;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.restlet.Request;
@@ -53,7 +54,7 @@ public class LegacyResponseTypeHandler implements ResponseTypeHandler {
 
     public Map.Entry<String, org.forgerock.oauth2.core.Token> handle(
             String tokenType, Set<String> scope, String resourceOwnerId, String clientId, String redirectUri,
-            String nonce, OAuth2Request request) {
+            String nonce, OAuth2Request request) throws NotFoundException {
 
         final Map<String, Object> data = new HashMap<String, Object>();
         data.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);

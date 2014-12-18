@@ -34,6 +34,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.util.encode.Base64url;
 import org.restlet.Request;
@@ -59,7 +60,12 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
                                                 String authorizationParty, String nonce, String ops,
                                                 OAuth2Request request) throws ServerException, InvalidClientException {
 
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final OAuth2ProviderSettings providerSettings;
+        try {
+            providerSettings = providerSettingsFactory.get(request);
+        } catch (NotFoundException e) {
+            throw new ServerException(e);
+        }
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
         final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Utils.CHARSET);

@@ -46,7 +46,7 @@ public class AccessTokenServiceImplTest {
     private OAuth2ProviderSettings providerSettings;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         Map<String, GrantTypeHandler> grantTypeHandlers = new HashMap<String, GrantTypeHandler>();
         grantTypeHandler = mock(GrantTypeHandler.class);

@@ -40,11 +40,9 @@ public abstract class OAuth2Filter extends Filter {
     /**
      * Constructs a new OAuth2Filter.
      *
-     * @param context The Restlet context.
      * @param restlet The Restlet resource.
      */
-    public OAuth2Filter(Context context, Restlet restlet) {
-        super(context);
+    public OAuth2Filter(Restlet restlet) {
         setNext(restlet);
     }
 

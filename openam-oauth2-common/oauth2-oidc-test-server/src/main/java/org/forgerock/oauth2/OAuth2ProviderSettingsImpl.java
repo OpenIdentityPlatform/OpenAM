@@ -32,6 +32,7 @@ import org.forgerock.oauth2.core.ScopeValidator;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -132,7 +133,11 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     }
 
     public Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request) throws ServerException, UnauthorizedClientException {
-        return getScopeValidator().getUserInfo(token, request);
+        try {
+            return getScopeValidator().getUserInfo(token, request);
+        } catch (NotFoundException e) {
+            throw new ServerException(e);
+        }
     }
 
     public Map<String, Object> evaluateScope(AccessToken accessToken) throws ServerException {
@@ -144,7 +149,11 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     }
 
     public void additionalDataToReturnFromTokenEndpoint(AccessToken accessToken, OAuth2Request request) throws ServerException, InvalidClientException {
-        getScopeValidator().additionalDataToReturnFromTokenEndpoint(accessToken, request);
+        try {
+            getScopeValidator().additionalDataToReturnFromTokenEndpoint(accessToken, request);
+        } catch (NotFoundException e) {
+            throw new ServerException(e);
+        }
     }
 
     public void saveConsent(ResourceOwner resourceOwner, String clientId, Set<String> scope) {
@@ -281,6 +290,11 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     @Override
     public Map<String, String> getAMRAuthModuleMappings() throws ServerException {
         return Collections.emptyMap();
+    }
+
+    @Override
+    public boolean exists() {
+        return true;
     }
 
 }

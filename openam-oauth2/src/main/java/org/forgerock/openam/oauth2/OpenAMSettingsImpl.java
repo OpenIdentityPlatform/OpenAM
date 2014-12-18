@@ -78,12 +78,19 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
      * {@inheritDoc}
      */
     public Set<String> getSetting(String realm, String attributeName) throws SSOException, SMSException {
-        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-        final ServiceConfigManager serviceConfigManager = new ServiceConfigManager(token, serviceName, serviceVersion);
-        final ServiceConfig serviceConfig = serviceConfigManager.getOrganizationConfig(realm, null);
-
+        final ServiceConfig serviceConfig = getServiceConfig(realm);
         final Map<String, Set<String>> attributes = serviceConfig.getAttributes();
         return attributes.get(attributeName);
+    }
+
+    protected boolean hasConfig(String realm) throws SSOException, SMSException {
+        return getServiceConfig(realm).exists();
+    }
+
+    private ServiceConfig getServiceConfig(String realm) throws SMSException, SSOException {
+        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+        final ServiceConfigManager serviceConfigManager = new ServiceConfigManager(token, serviceName, serviceVersion);
+        return serviceConfigManager.getOrganizationConfig(realm, null);
     }
 
     /**

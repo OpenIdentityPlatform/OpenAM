@@ -39,6 +39,7 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.util.Reject;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
@@ -87,7 +88,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
      * {@inheritDoc}
      */
     public ClientRegistration authenticate(OAuth2Request request) throws InvalidClientException,
-            InvalidRequestException, ClientAuthenticationFailedException {
+            InvalidRequestException, ClientAuthenticationFailedException, NotFoundException {
 
         final ClientCredentials clientCredentials = extractCredentials(request);
         Reject.ifTrue(isEmpty(clientCredentials.clientId), "Missing parameter, 'client_id'");
@@ -140,7 +141,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
      * @throws InvalidClientException If the request does not contain the client's id.
      */
     private ClientCredentials extractCredentials(OAuth2Request request) throws InvalidRequestException,
-            InvalidClientException {
+            InvalidClientException, NotFoundException {
 
         final Request req = request.getRequest();
         boolean basicAuth = false;
@@ -180,7 +181,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
     }
 
     private ClientCredentials verifyJwtBearer(OAuth2Request request, boolean basicAuth) throws InvalidClientException,
-            InvalidRequestException {
+            InvalidRequestException, NotFoundException {
 
         OAuth2Jwt jwt = OAuth2Jwt.create(request.<String>getParameter(CLIENT_ASSERTION));
 

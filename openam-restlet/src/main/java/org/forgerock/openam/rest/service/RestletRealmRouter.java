@@ -18,7 +18,6 @@ package org.forgerock.openam.rest.service;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.router.RestRealmValidator;
@@ -35,8 +34,6 @@ import org.restlet.routing.Template;
 import org.restlet.routing.TemplateRoute;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -47,7 +44,8 @@ import java.util.concurrent.ConcurrentMap;
 public class RestletRealmRouter extends Router {
 
     // Keyword for Realm Attribute
-    static final String REALM = "realm";
+    public static final String REALM = "realm";
+    public static final String REALM_URL = "realmUrl";
 
     private final RestRealmValidator realmValidator;
     private final CoreWrapper coreWrapper;
@@ -100,6 +98,7 @@ public class RestletRealmRouter extends Router {
                     realm += realm.endsWith("/") ? subrealm.substring(1) : subrealm;
                 }
             }
+            request.getAttributes().put(REALM_URL, request.getResourceRef().getBaseRef().toString());
         }
 
         request.getAttributes().put(REALM, realm);

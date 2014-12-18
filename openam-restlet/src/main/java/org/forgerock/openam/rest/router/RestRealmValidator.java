@@ -35,12 +35,12 @@ public class RestRealmValidator {
     /**
      * Determines whether the given token is a valid configured realm.
      *
-     * @param token The token to check.
+     * @param candidate The potential realm to check.
      * @return <code>true</code> if the token is a realm.
      */
-    public boolean isRealm(String token) {
+    public boolean isRealm(String candidate) {
         try {
-            new OrganizationConfigManager(getSSOToken(), token);
+            new OrganizationConfigManager(getSSOToken(), candidate);
         } catch (SMSException e) {
             // Cannot find realm
             return false;

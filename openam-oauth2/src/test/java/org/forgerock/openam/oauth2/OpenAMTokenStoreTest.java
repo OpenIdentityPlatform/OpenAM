@@ -22,6 +22,7 @@ import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.restlet.RestletOAuth2Request;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
@@ -31,6 +32,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.fluent.JsonValue.*;
@@ -67,8 +69,13 @@ public class OpenAMTokenStoreTest {
     @Test
     public void shouldReadAccessToken() throws Exception {
         //Given
-        JsonValue token = json(object(field("tokenName", Collections.singleton("access_token"))));
+        JsonValue token = json(object(
+                field("tokenName", Collections.singleton("access_token")),
+                field("realm", Collections.singleton("/testrealm"))));
         given(tokenStore.read("TOKEN_ID")).willReturn(token);
+        ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<String, Object>();
+        given(request.getAttributes()).willReturn(attributes);
+        attributes.put("realm", "/testrealm");
 
         OAuth2Request request = new RestletOAuth2Request(this.request);
 
@@ -78,6 +85,26 @@ public class OpenAMTokenStoreTest {
         //Then
         assertThat(accessToken).isNotNull();
         assertThat(request.getToken(AccessToken.class)).isSameAs(accessToken);
+    }
+
+    @Test (expectedExceptions = InvalidGrantException.class)
+    public void shouldNotReadOtherRealmsAccessToken() throws Exception {
+        //Given
+        JsonValue token = json(object(
+                field("tokenName", Collections.singleton("access_token")),
+                field("realm", Collections.singleton("/otherrealm"))));
+        given(tokenStore.read("TOKEN_ID")).willReturn(token);
+        ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<String, Object>();
+        given(request.getAttributes()).willReturn(attributes);
+        attributes.put("realm", "/testrealm");
+
+        OAuth2Request request = new RestletOAuth2Request(this.request);
+
+        //When
+        AccessToken accessToken = openAMtokenStore.readAccessToken(request, "TOKEN_ID");
+
+        //Then
+        // expect InvalidGrantException
     }
 
     @Test (expectedExceptions = InvalidGrantException.class)
@@ -105,5 +132,19 @@ public class OpenAMTokenStoreTest {
 
         //Then
         //Expected ServerException
+    }
+
+    @Test (expectedExceptions = NotFoundException.class)
+    public void shouldFailWhenNoProvider() throws Exception {
+
+        //Given
+        OAuth2Request request = new RestletOAuth2Request(this.request);
+        doThrow(NotFoundException.class).when(providerSettingsFactory).get(request);
+
+        //When
+        openAMtokenStore.createAccessToken(null, null, null, null, null, null, null, null, null, request);
+
+        //Then
+        //Expected NotFoundException
     }
 }

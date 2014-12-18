@@ -45,7 +45,7 @@ public class AuthorizeRequestValidatorImplTest {
     private ResponseTypeValidator responseTypeValidator;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         ClientRegistrationStore clientRegistrationStore = mock(ClientRegistrationStore.class);
         redirectUriValidator = mock(RedirectUriValidator.class);
@@ -60,8 +60,7 @@ public class AuthorizeRequestValidatorImplTest {
     }
 
     @Test
-    public void shouldValidateValidRequest() throws InvalidClientException, UnsupportedResponseTypeException,
-            InvalidRequestException, RedirectUriMismatchException, ServerException {
+    public void shouldValidateValidRequest() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -80,8 +79,7 @@ public class AuthorizeRequestValidatorImplTest {
     }
 
     @Test
-    public void shouldValidateRequestWithEmptyClientId() throws InvalidClientException,
-            UnsupportedResponseTypeException, InvalidRequestException, RedirectUriMismatchException, ServerException {
+    public void shouldValidateRequestWithEmptyClientId() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -99,8 +97,7 @@ public class AuthorizeRequestValidatorImplTest {
     }
 
     @Test
-    public void shouldValidateRequestWithMissingClientId() throws InvalidClientException,
-            UnsupportedResponseTypeException, InvalidRequestException, RedirectUriMismatchException, ServerException {
+    public void shouldValidateRequestWithMissingClientId() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -116,8 +113,7 @@ public class AuthorizeRequestValidatorImplTest {
     }
 
     @Test
-    public void shouldValidateRequestWithEmptyResponseType() throws InvalidClientException,
-            UnsupportedResponseTypeException, InvalidRequestException, RedirectUriMismatchException, ServerException {
+    public void shouldValidateRequestWithEmptyResponseType() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -136,8 +132,7 @@ public class AuthorizeRequestValidatorImplTest {
     }
 
     @Test
-    public void shouldValidateRequestWithMissingResponseType() throws InvalidClientException,
-            UnsupportedResponseTypeException, InvalidRequestException, RedirectUriMismatchException, ServerException {
+    public void shouldValidateRequestWithMissingResponseType() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);

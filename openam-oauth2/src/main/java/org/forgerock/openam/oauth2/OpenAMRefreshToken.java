@@ -99,6 +99,13 @@ public class OpenAMRefreshToken extends RefreshToken {
     }
 
     /**
+     * Gets the realm.
+     */
+    public String getRealm() {
+        return this.get(OAuth2Constants.CoreTokenParams.REALM).asString();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

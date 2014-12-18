@@ -26,6 +26,7 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResponseTypeHandler;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 
 /**
@@ -53,7 +54,7 @@ public abstract class IdTokenResponseTypeHandler implements ResponseTypeHandler 
      */
     public Map.Entry<String, Token> handle(String tokenType, Set<String> scope,
                                            String resourceOwnerId, String clientId, String redirectUri, String nonce,
-                                           OAuth2Request request) throws ServerException, InvalidClientException {
+                                           OAuth2Request request) throws ServerException, InvalidClientException, NotFoundException {
 
         final OpenIdConnectToken openIDToken = tokenStore.createOpenIDToken(resourceOwnerId, clientId,
                 clientId, nonce, getOps(request), request);

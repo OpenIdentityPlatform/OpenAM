@@ -18,6 +18,7 @@ package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -64,7 +65,7 @@ public class AuthorizeRequestValidatorImpl implements AuthorizeRequestValidator 
      * {@inheritDoc}
      */
     public void validateRequest(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
-            RedirectUriMismatchException, UnsupportedResponseTypeException, ServerException {
+            RedirectUriMismatchException, UnsupportedResponseTypeException, ServerException, NotFoundException {
 
         Reject.ifTrue(isEmpty(request.<String>getParameter("client_id")), "Missing parameter, 'client_id'");
         Reject.ifTrue(isEmpty(request.<String>getParameter("response_type")), "Missing parameter, 'response_type'");

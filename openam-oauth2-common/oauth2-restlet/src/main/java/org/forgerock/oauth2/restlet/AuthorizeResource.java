@@ -26,6 +26,8 @@ import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
+import org.forgerock.openam.rest.service.RestletRealmRouter;
+import org.forgerock.openam.rest.service.RouterContextResource;
 import org.forgerock.openam.xui.XUIState;
 import org.owasp.esapi.ESAPI;
 import org.restlet.Request;
@@ -33,10 +35,12 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
+import org.restlet.routing.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -47,7 +51,7 @@ import java.util.Set;
  *
  * @since 12.0.0
  */
-public class AuthorizeResource extends ServerResource {
+public class AuthorizeResource extends RouterContextResource {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
@@ -69,7 +73,8 @@ public class AuthorizeResource extends ServerResource {
     @Inject
     public AuthorizeResource(OAuth2RequestFactory<Request> requestFactory, AuthorizationService authorizationService,
             ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks,
-            XUIState xuiState) {
+            XUIState xuiState, @Named("OAuth2Router") Router router) {
+        super(router);
         this.requestFactory = requestFactory;
         this.authorizationService = authorizationService;
         this.exceptionHandler = exceptionHandler;
@@ -122,7 +127,7 @@ public class AuthorizeResource extends ServerResource {
                     e.getRedirectUri().toString(), null);
         } catch (ResourceOwnerConsentRequired e) {
             return representation.getRepresentation(getContext(), request, "authorize.ftl",
-                    getDataModel(e.getClientName(), e.getClientDescription(), e.getScopeDescriptions()));
+                    getDataModel(e.getClientName(), e.getClientDescription(), e.getScopeDescriptions(), getRequest()));
         } catch (InvalidClientException e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
@@ -142,9 +147,10 @@ public class AuthorizeResource extends ServerResource {
      * @param displayName The OAuth2 client's display name.
      * @param displayDescription The OAuth2 client's display description.
      * @param displayScope The description of the requested scope.
+     * @param request
      * @return The data model.
      */
-    private Map<String, Object> getDataModel(String displayName, String displayDescription, Set<String> displayScope) {
+    private Map<String, Object> getDataModel(String displayName, String displayDescription, Set<String> displayScope, Request request) {
         Map<String, Object> data = new HashMap<String, Object>(getRequest().getAttributes());
         data.putAll(getQuery().getValuesMap());
         data.put("target", getRequest().getResourceRef().toString());
@@ -153,6 +159,7 @@ public class AuthorizeResource extends ServerResource {
         data.put("display_description", ESAPI.encoder().encodeForHTML(displayDescription));
         data.put("display_scope", encodeSetForHTML(displayScope));
         data.put("xui", xuiState.isXUIEnabled());
+        data.put("baseUrl", request.getRootRef() + "/..");
         return data;
     }
 

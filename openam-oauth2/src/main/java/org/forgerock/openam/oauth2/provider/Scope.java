@@ -25,6 +25,7 @@
 package org.forgerock.openam.oauth2.provider;
 
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.legacy.CoreToken;
 
@@ -97,9 +98,10 @@ public interface Scope {
      * @param parameters set of extra data to pass into the method
      * @param token      the token created that will be returned with the extra data from this method
      * @return
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     public Map<String, Object> extraDataToReturnForTokenEndpoint(Map<String, String> parameters,
-                                                                 CoreToken token);
+                                                                 CoreToken token) throws NotFoundException;
 
     /**
      * This method is called before the authorize end point returns an response. Whatever is returned by this

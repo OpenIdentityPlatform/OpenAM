@@ -16,14 +16,15 @@
 
 package org.forgerock.openidconnect;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
-import org.forgerock.json.fluent.JsonValue;
 
 /**
  * Service for registering OpenId Connect clients.
@@ -43,9 +44,10 @@ public interface OpenIdConnectClientRegistrationService {
      * @throws ServerException If any internal server error occurs.
      * @throws UnsupportedResponseTypeException If the requested response type is not supported by either the client
      *          or the OAuth2 provider.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     JsonValue createRegistration(String accessToken, String deploymentURL, OAuth2Request request)
-            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException;
+            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException, NotFoundException;
 
     /**
      * Gets an OpenId Connect client registration from the OAuth2 provider.

@@ -23,9 +23,9 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.ScopeValidator;
 import org.forgerock.oauth2.core.Token;
-import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openidconnect.OpenIDTokenIssuer;
@@ -38,9 +38,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.RESPONSE_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
 
 /**
  * @since 12.0.0
@@ -176,7 +173,12 @@ public class ScopeValidatorImpl implements ScopeValidator {
     public void additionalDataToReturnFromTokenEndpoint(AccessToken accessToken, OAuth2Request request) throws ServerException, InvalidClientException {
         final Set<String> scope = accessToken.getScope();
         if (scope != null && scope.contains("openid")) {
-            final Map.Entry<String, String> tokenEntry = openIDTokenIssuer.issueToken(accessToken, request);
+            final Map.Entry<String, String> tokenEntry;
+            try {
+                tokenEntry = openIDTokenIssuer.issueToken(accessToken, request);
+            } catch (NotFoundException e) {
+                throw new ServerException(e);
+            }
             if (tokenEntry != null) {
                 accessToken.addExtraData(tokenEntry.getKey(), tokenEntry.getValue());
             }

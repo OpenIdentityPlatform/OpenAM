@@ -19,6 +19,7 @@ package org.forgerock.oauth2.core;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.json.fluent.JsonValue;
 
@@ -44,9 +45,10 @@ public interface TokenStore {
      * @param request The OAuth2 request.
      * @return An AuthorizationCode.
      * @throws ServerException If any internal server error occurs.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     AuthorizationCode createAuthorizationCode(Set<String> scope, String resourceOwnerId, String clientId,
-            String redirectUri, String nonce, OAuth2Request request) throws ServerException;
+            String redirectUri, String nonce, OAuth2Request request) throws ServerException, NotFoundException;
 
     /**
      * Creates an Access Token and stores it in the OAuth2 Provider's store.
@@ -63,10 +65,11 @@ public interface TokenStore {
      * @param request The OAuth2 request.
      * @return An Access Token.
      * @throws ServerException If any internal server error occurs.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode,
             String resourceOwnerId, String clientId, String redirectUri, Set<String> scope, RefreshToken refreshToken,
-            String nonce, OAuth2Request request) throws ServerException;
+            String nonce, OAuth2Request request) throws ServerException, NotFoundException;
 
     /**
      * Creates a Refresh Token and stores it in the OAuth2 Provider's store.
@@ -79,9 +82,10 @@ public interface TokenStore {
      * @param request The OAuth2 request.
      * @return A RefreshToken
      * @throws ServerException If any internal server error occurs.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId, String redirectUri,
-            Set<String> scope, OAuth2Request request) throws ServerException;
+            Set<String> scope, OAuth2Request request) throws ServerException, NotFoundException;
 
     /**
      * Creates an Authorization Code and stores it in the OAuth2 Provider's store.

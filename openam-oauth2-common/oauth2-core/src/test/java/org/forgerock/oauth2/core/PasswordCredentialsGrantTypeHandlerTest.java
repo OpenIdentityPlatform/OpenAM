@@ -50,7 +50,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
     private TokenStore tokenStore;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         clientAuthenticator = mock(ClientAuthenticator.class);
         requestValidator = mock(PasswordCredentialsRequestValidator.class);

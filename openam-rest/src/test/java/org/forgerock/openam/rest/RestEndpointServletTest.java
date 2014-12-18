@@ -20,20 +20,23 @@ import org.forgerock.openam.rest.resource.CrestHttpServlet;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.service.RestletServiceServlet;
 import org.mockito.Matchers;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 
 public class RestEndpointServletTest {
 
@@ -43,17 +46,26 @@ public class RestEndpointServletTest {
     private RestletServiceServlet restletJSONServiceServlet;
     private RestletServiceServlet restletXACMLServiceServlet;
     private RestEndpointManager endpointManager;
+    private RestletServiceServlet restletOAuth2ServiceServlet;
+
+    @BeforeClass
+    public void setupMocks() {
+        restletJSONServiceServlet = mock(RestletServiceServlet.class);
+        restletXACMLServiceServlet = mock(RestletServiceServlet.class);
+        restletOAuth2ServiceServlet = mock(RestletServiceServlet.class);
+    }
 
     @BeforeMethod
     public void setUp() {
 
         crestServlet = mock(CrestHttpServlet.class);
-        restletJSONServiceServlet = mock(RestletServiceServlet.class);
-        restletXACMLServiceServlet = mock(RestletServiceServlet.class);
+        reset(restletJSONServiceServlet);
+        reset(restletXACMLServiceServlet);
+        reset(restletOAuth2ServiceServlet);
         endpointManager = mock(RestEndpointManager.class);
 
         restEndpointServlet = new RestEndpointServlet(crestServlet, restletJSONServiceServlet,
-                restletXACMLServiceServlet, endpointManager);
+                restletXACMLServiceServlet, restletOAuth2ServiceServlet, endpointManager);
     }
 
     @Test
@@ -109,21 +121,33 @@ public class RestEndpointServletTest {
         verifyZeroInteractions(crestServlet);
     }
 
-    @Test
-    public void shouldHandleRequestWithXACMLRestletServlet() throws ServletException, IOException {
+    @DataProvider(name = "restletPaths")
+    public Object[][] restletPathData() {
+        return new Object[][] {
+                {"/xacml", restletXACMLServiceServlet},
+                {"/oauth2", restletOAuth2ServiceServlet}
+        };
+    }
+
+    @Test(dataProvider = "restletPaths")
+    public void shouldHandleRequestWithRestletServlet(String path, RestletServiceServlet servlet) throws Exception {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        given(request.getServletPath()).willReturn("/xacml");
+        given(request.getServletPath()).willReturn(path);
 
         //When
         restEndpointServlet.service(request, response);
 
         //Then
-        verify(restletXACMLServiceServlet).service(Matchers.<HttpServletRequest>anyObject(), eq(response));
-        verifyZeroInteractions(restletJSONServiceServlet);
+        verify(servlet).service(Matchers.<HttpServletRequest>anyObject(), eq(response));
+        for (RestletServiceServlet s : Arrays.asList(restletJSONServiceServlet, restletXACMLServiceServlet, restletOAuth2ServiceServlet)) {
+            if (s != servlet) {
+                verifyZeroInteractions(s);
+            }
+        }
         verifyZeroInteractions(crestServlet);
     }
 

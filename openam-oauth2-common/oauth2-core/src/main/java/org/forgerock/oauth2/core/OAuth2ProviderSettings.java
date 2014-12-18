@@ -19,6 +19,7 @@ package org.forgerock.oauth2.core;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -105,9 +106,10 @@ public interface OAuth2ProviderSettings {
      * @return A {@code Map<String, Object>} of the resource owner's information.
      * @throws ServerException If any internal server error occurs.
      * @throws UnauthorizedClientException If the client's authorization fails.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request) throws ServerException,
-            UnauthorizedClientException;
+            UnauthorizedClientException, NotFoundException;
 
     /**
      * Gets the specified access token's information.
@@ -142,9 +144,10 @@ public interface OAuth2ProviderSettings {
      * @throws ServerException If any internal server error occurs.
      * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
      *          authenticated.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     void additionalDataToReturnFromTokenEndpoint(AccessToken accessToken, OAuth2Request request) throws ServerException,
-            InvalidClientException;
+            InvalidClientException, NotFoundException;
 
     /**
      * Saves the resource owner's consent for the granting authorization for the specified client with the specified
@@ -248,7 +251,7 @@ public interface OAuth2ProviderSettings {
      *
      * @return The OpenID Connect issuer.
      */
-    String getOpenIDConnectIssuer();
+    String getOpenIDConnectIssuer() throws ServerException;
 
     /**
      * Gets the URI for the OAuth2 authorize endpoint.
@@ -364,4 +367,9 @@ public interface OAuth2ProviderSettings {
      */
     Map<String, String> getAMRAuthModuleMappings() throws ServerException;
 
+    /**
+     * Checks whether the config exists.
+     * @return Whether it exists.
+     */
+    boolean exists();
 }

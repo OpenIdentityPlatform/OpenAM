@@ -16,10 +16,13 @@
 
 package org.forgerock.openam.rest;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.VersionSelector;
+import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
+import org.forgerock.oauth2.restlet.AuthorizeEndpointFilter;
+import org.forgerock.oauth2.restlet.AuthorizeResource;
+import org.forgerock.oauth2.restlet.TokenEndpointFilter;
+import org.forgerock.oauth2.restlet.ValidationServerResource;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
 import org.forgerock.openam.forgerockrest.IdentityResourceV2;
@@ -38,7 +41,6 @@ import org.forgerock.openam.forgerockrest.entitlements.SubjectAttributesResource
 import org.forgerock.openam.forgerockrest.entitlements.SubjectTypesResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
-import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.SessionResourceAuthzModule;
@@ -50,12 +52,19 @@ import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
 import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
+import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.ServiceRouter;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.Restlet;
-import org.restlet.resource.Finder;
-import org.restlet.resource.ServerResource;
+import org.forgerock.openidconnect.restlet.ConnectClientRegistration;
+import org.forgerock.openidconnect.restlet.EndSession;
+import org.forgerock.openidconnect.restlet.OpenIDConnectConfiguration;
+import org.forgerock.openidconnect.restlet.OpenIDConnectJWKEndpoint;
+import org.forgerock.openidconnect.restlet.UserInfo;
+import org.restlet.routing.Router;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import static org.forgerock.openam.rest.service.RestletUtils.*;
 
 /**
  * Singleton class which contains both the routers for CREST resources and Restlet service endpoints.
@@ -71,6 +80,7 @@ public class RestEndpoints {
     private final CrestRouter resourceRouter;
     private final ServiceRouter jsonServiceRouter;
     private final ServiceRouter xacmlServiceRouter;
+    private final Router oauth2ServiceRouter;
 
     /**
      * Constructs a new RestEndpoints instance.
@@ -87,6 +97,7 @@ public class RestEndpoints {
         this.resourceRouter = createResourceRouter();
         this.jsonServiceRouter = createJSONServiceRouter();
         this.xacmlServiceRouter = createXACMLServiceRouter();
+        this.oauth2ServiceRouter = createOAuth2Router();
     }
 
     /**
@@ -111,6 +122,14 @@ public class RestEndpoints {
      */
     public ServiceRouter getXACMLServiceRouter() {
         return xacmlServiceRouter;
+    }
+
+    /**
+     * Gets the OAuth2 restlet service router.
+     * @return The router.
+     */
+    public Router getOAuth2ServiceRouter() {
+        return oauth2ServiceRouter;
     }
 
     /**
@@ -232,13 +251,27 @@ public class RestEndpoints {
         return router;
     }
 
-    private Restlet wrap(final Class<? extends ServerResource> resource) {
-        return new Finder() {
-            @Override
-            public ServerResource create(Request request, Response response) {
-                return InjectorHolder.getInstance(resource);
-            }
-        };
+    private Router createOAuth2Router() {
+        final Router router = new RestletRealmRouter(realmValidator, coreWrapper);
+
+        // Standard OAuth2 endpoints
+
+        router.attach("/authorize", new AuthorizeEndpointFilter(wrap(AuthorizeResource.class)));
+        router.attach("/access_token", new TokenEndpointFilter(new AccessTokenFlowFinder()));
+        router.attach("/tokeninfo", wrap(ValidationServerResource.class));
+
+        // OpenID Connect endpoints
+
+        router.attach("/connect/register", wrap(ConnectClientRegistration.class));
+        router.attach("/userinfo", wrap(UserInfo.class));
+        router.attach("/connect/endSession", wrap(EndSession.class));
+        router.attach("/connect/jwk_uri", wrap(OpenIDConnectJWKEndpoint.class));
+
+        // OpenID Connect Discovery
+
+        router.attach("/.well-known/openid-configuration", wrap(OpenIDConnectConfiguration.class));
+
+        return router;
     }
 
 }

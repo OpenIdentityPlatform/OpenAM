@@ -48,7 +48,7 @@ public class AuthorizationServiceImplTest {
     private AuthorizationTokenIssuer tokenIssuer;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         requestValidator = mock(AuthorizeRequestValidator.class);
         List<AuthorizeRequestValidator> requestValidators = new ArrayList<AuthorizeRequestValidator>();

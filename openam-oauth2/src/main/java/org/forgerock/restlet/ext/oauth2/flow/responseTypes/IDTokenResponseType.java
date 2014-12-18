@@ -27,6 +27,7 @@ package org.forgerock.restlet.ext.oauth2.flow.responseTypes;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuthProblemException;
@@ -59,7 +60,7 @@ public class IDTokenResponseType implements ResponseType {
         this.requestFactory = requestFactory;
     }
 
-    public CoreToken createToken(org.forgerock.oauth2.core.Token accessToken, Map<String, Object> data) {
+    public CoreToken createToken(org.forgerock.oauth2.core.Token accessToken, Map<String, Object> data) throws NotFoundException {
 
         final String resourceOwnerId = (String) data.get(OAuth2Constants.CoreTokenParams.USERNAME);
         final String clientId = (String) data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID);

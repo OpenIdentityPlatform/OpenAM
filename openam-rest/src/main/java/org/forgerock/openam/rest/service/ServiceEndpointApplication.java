@@ -59,7 +59,9 @@ public abstract class ServiceEndpointApplication extends Application {
      */
     @Override
     public Restlet createInboundRoot() {
-        return getRouter(restEndpoints);
+        Restlet router = getRouter(restEndpoints);
+        router.setContext(getContext());
+        return router;
     }
 
     /**
@@ -67,5 +69,5 @@ public abstract class ServiceEndpointApplication extends Application {
      * @param restEndpoints Registry of routers.
      * @return The required router.
      */
-    protected abstract ServiceRouter getRouter(RestEndpoints restEndpoints);
+    protected abstract Restlet getRouter(RestEndpoints restEndpoints);
 }

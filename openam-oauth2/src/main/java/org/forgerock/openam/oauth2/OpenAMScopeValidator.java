@@ -39,6 +39,7 @@ import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openidconnect.OpenIDTokenIssuer;
@@ -162,7 +163,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * {@inheritDoc}
      */
     public Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request)
-            throws UnauthorizedClientException {
+            throws UnauthorizedClientException, NotFoundException {
 
         Set<String> scopes = token.getScope();
         Map<String,Object> response = new HashMap<String, Object>();
@@ -317,7 +318,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * {@inheritDoc}
      */
     public void additionalDataToReturnFromTokenEndpoint(AccessToken accessToken, OAuth2Request request)
-            throws ServerException, InvalidClientException {
+            throws ServerException, InvalidClientException, NotFoundException {
         final Set<String> scope = accessToken.getScope();
         if (scope != null && scope.contains(OPENID)) {
             final Map.Entry<String, String> tokenEntry = openIDTokenIssuer.issueToken(accessToken, request);
@@ -327,7 +328,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
         }
     }
 
-    private String getUpdatedAt(String username, String realm, OAuth2Request request) {
+    private String getUpdatedAt(String username, String realm, OAuth2Request request) throws NotFoundException {
         try {
             final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
             String modifyTimestampAttributeName = null;

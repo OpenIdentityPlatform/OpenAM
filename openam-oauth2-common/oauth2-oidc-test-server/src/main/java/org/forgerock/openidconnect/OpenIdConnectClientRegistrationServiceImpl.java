@@ -24,6 +24,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -31,7 +32,6 @@ import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -40,23 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.APPLICATION_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_DESCRIPTION;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_ID;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_SECRET;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_SESSION_URI;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.DEFAULT_SCOPES;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.DISPLAY_NAME;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.ID_TOKEN_SIGNED_RESPONSE_ALG;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.POST_LOGOUT_REDIRECT_URIS;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.REDIRECT_URIS;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.REGISTRATION_ACCESS_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.RESPONSE_TYPES;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.SCOPES;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.SUBJECT_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.fromString;
+import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.*;
 
 /**
  * @since 12.0.0
@@ -90,7 +74,12 @@ public class OpenIdConnectClientRegistrationServiceImpl implements OpenIdConnect
             throw new ServerException("Access Token not valid");
         }
 
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final OAuth2ProviderSettings providerSettings;
+        try {
+            providerSettings = providerSettingsFactory.get(request);
+        } catch (NotFoundException e) {
+            throw new ServerException(e);
+        }
         final JsonValue input = request.getBody();
 
         //check input to ensure it is valid

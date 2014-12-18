@@ -51,6 +51,7 @@ import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
@@ -64,6 +65,7 @@ import org.restlet.Request;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
 /**
  * Implementation of the OpenId Connect Token Store which the OpenId Connect Provider will implement.
  *
@@ -104,7 +106,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      * {@inheritDoc}
      */
     public AuthorizationCode createAuthorizationCode(Set<String> scope, String resourceOwnerId, String clientId,
-            String redirectUri, String nonce, OAuth2Request request) throws ServerException {
+            String redirectUri, String nonce, OAuth2Request request) throws ServerException, NotFoundException {
 
         logger.message("DefaultOAuthTokenStoreImpl::Creating Authorization code");
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
@@ -113,7 +115,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final String ssoTokenId = getSsoTokenId(request);
 
         final AuthorizationCode authorizationCode = new OpenAMAuthorizationCode(code, resourceOwnerId, clientId,
-                redirectUri, scope, expiryTime, nonce, realmNormaliser.normalise(request.<String>getParameter("realm")),
+                redirectUri, scope, expiryTime, nonce, realmNormaliser.normalise(request.<String>getParameter(REALM)),
                 getAuthModulesFromSSOToken(request), getAuthenticationContextClassReferenceFromRequest(request),
                 ssoTokenId);
 
@@ -157,7 +159,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      */
     public OpenIdConnectToken createOpenIDToken(String resourceOwnerId, String clientId,
                                                 String authorizationParty, String nonce, String ops,
-                                                OAuth2Request request) throws ServerException, InvalidClientException {
+                                                OAuth2Request request) throws ServerException, InvalidClientException, NotFoundException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
@@ -168,10 +170,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final long tokenLifetimeInSeconds = providerSettings.getOpenIdTokenLifetime();
         final long exp = (currentTimeInSeconds + tokenLifetimeInSeconds) * 1000;
 
-        final String realm = realmNormaliser.normalise(request.<String>getParameter("realm"));
+        final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
 
-        final Request req = request.getRequest();
-        final String iss = req.getHostRef().toString() + "/" + req.getResourceRef().getSegments().get(0);
+        final String iss = providerSettings.getOpenIDConnectIssuer();
 
         final List<String> amr = getAMRFromAuthModules(request, providerSettings);
 
@@ -314,7 +315,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      */
     public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode,
             String resourceOwnerId, String clientId, String redirectUri, Set<String> scope, RefreshToken refreshToken,
-            String nonce, OAuth2Request request) throws ServerException {
+            String nonce, OAuth2Request request) throws ServerException, NotFoundException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String id = UUID.randomUUID().toString();
@@ -324,11 +325,11 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         if (refreshToken == null) {
             accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, clientId, redirectUri, scope,
                     expiryTime, null, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, grantType, nonce,
-                    realmNormaliser.normalise(request.<String>getParameter("realm")));
+                    realmNormaliser.normalise(request.<String>getParameter(REALM)));
         } else {
             accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, clientId, redirectUri, scope,
                     expiryTime, refreshToken.getTokenId(), OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, grantType, nonce,
-                    realmNormaliser.normalise(request.<String>getParameter("realm")));
+                    realmNormaliser.normalise(request.<String>getParameter(REALM)));
         }
 
         try {
@@ -349,9 +350,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      * {@inheritDoc}
      */
     public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
-            String redirectUri, Set<String> scope, OAuth2Request request) throws ServerException {
+            String redirectUri, Set<String> scope, OAuth2Request request) throws ServerException, NotFoundException {
 
-        final String realm = realmNormaliser.normalise(request.<String>getParameter("realm"));
+        final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
 
         logger.message("Create refresh token");
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
@@ -404,6 +405,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         OpenAMAuthorizationCode authorizationCode = new OpenAMAuthorizationCode(token);
+        if (!authorizationCode.getRealm().equals(request.<String>getParameter(REALM))) {
+            throw new InvalidGrantException("Grant is not valid for the requested realm");
+        }
         request.setToken(AuthorizationCode.class, authorizationCode);
         return authorizationCode;
     }
@@ -537,6 +541,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         OpenAMAccessToken accessToken = new OpenAMAccessToken(token);
+        if (!accessToken.getRealm().equals(request.<String>getParameter(REALM))) {
+            throw new InvalidGrantException("Grant is not valid for the requested realm");
+        }
         request.setToken(AccessToken.class, accessToken);
         return accessToken;
     }
@@ -563,6 +570,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         OpenAMRefreshToken refreshToken = new OpenAMRefreshToken(token);
+        if (!refreshToken.getRealm().equals(request.<String>getParameter(REALM))) {
+            throw new InvalidGrantException("Grant is not valid for the requested realm");
+        }
         request.setToken(RefreshToken.class, refreshToken);
         return refreshToken;
     }

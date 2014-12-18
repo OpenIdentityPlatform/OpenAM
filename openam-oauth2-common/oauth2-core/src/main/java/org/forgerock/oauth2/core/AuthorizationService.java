@@ -23,6 +23,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
@@ -76,12 +77,13 @@ public interface AuthorizationService {
      *          owner is not asked for consent, but the resource owners consent has not been previously stored.
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     AuthorizationToken authorize(OAuth2Request request) throws ResourceOwnerAuthenticationRequired,
             ResourceOwnerConsentRequired, InvalidClientException, UnsupportedResponseTypeException,
             RedirectUriMismatchException, InvalidRequestException, AccessDeniedException, ServerException,
             LoginRequiredException, BadRequestException, InteractionRequiredException,
-            ResourceOwnerConsentRequiredException, InvalidScopeException;
+            ResourceOwnerConsentRequiredException, InvalidScopeException, NotFoundException;
 
     /**
      * Handles an authorization request from a OAuth2 client, validates the request is valid and contains the required
@@ -114,9 +116,10 @@ public interface AuthorizationService {
      *          is not asked to authenticate, but the resource owner does not have a current authenticated session.
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     AuthorizationToken authorize(OAuth2Request request, boolean consentGiven, boolean saveConsent)
             throws AccessDeniedException, ResourceOwnerAuthenticationRequired, InvalidClientException,
             UnsupportedResponseTypeException, InvalidRequestException, RedirectUriMismatchException, ServerException,
-            LoginRequiredException, BadRequestException, InteractionRequiredException, InvalidScopeException;
+            LoginRequiredException, BadRequestException, InteractionRequiredException, InvalidScopeException, NotFoundException;
 }

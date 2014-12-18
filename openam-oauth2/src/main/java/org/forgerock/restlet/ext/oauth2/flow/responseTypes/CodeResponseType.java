@@ -28,6 +28,7 @@ import org.forgerock.oauth2.core.AuthorizationCode;
 import org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.Token;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuthProblemException;
@@ -59,7 +60,7 @@ public class CodeResponseType implements ResponseType {
         this.requestFactory = requestFactory;
     }
 
-    public CoreToken createToken(Token accessToken, Map<String, Object> data) {
+    public CoreToken createToken(Token accessToken, Map<String, Object> data) throws NotFoundException {
         final Set<String> scope = (Set<String>) data.get(OAuth2Constants.CoreTokenParams.SCOPE);
         final String resourceOwnerId = (String) data.get(OAuth2Constants.CoreTokenParams.USERNAME);
         final String clientId = (String) data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID);

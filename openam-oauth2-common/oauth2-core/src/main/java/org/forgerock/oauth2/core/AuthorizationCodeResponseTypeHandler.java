@@ -16,6 +16,7 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 
 import javax.inject.Inject;
@@ -49,7 +50,7 @@ public class AuthorizationCodeResponseTypeHandler implements ResponseTypeHandler
      */
     public Map.Entry<String, Token> handle(String tokenType, Set<String> scope,
                                            String resourceOwnerId, String clientId, String redirectUri, String nonce,
-                                           OAuth2Request request) throws ServerException {
+                                           OAuth2Request request) throws ServerException, NotFoundException {
 
         final AuthorizationCode authorizationCode = tokenStore.createAuthorizationCode(scope, resourceOwnerId, clientId,
                 redirectUri, nonce, request);

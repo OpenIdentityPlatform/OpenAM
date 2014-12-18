@@ -315,6 +315,7 @@
 
         <!-- OpenAM REST - CORE Module -->
         <module>openam-rest</module>
+        <module>openam-restlet</module>
 
         <module>openam-plugins</module>
 
@@ -651,6 +652,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-entitlements</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-restlet</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

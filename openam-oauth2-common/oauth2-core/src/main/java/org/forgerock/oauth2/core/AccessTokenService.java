@@ -24,6 +24,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
@@ -54,10 +55,11 @@ public interface AccessTokenService {
      * @throws ServerException If any internal server error occurs.
      * @throws UnauthorizedClientException If the client's authorization fails.
      * @throws IllegalArgumentException If the request is missing any required parameters.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     AccessToken requestAccessToken(OAuth2Request request) throws InvalidGrantException, RedirectUriMismatchException,
             InvalidClientException, InvalidRequestException, ClientAuthenticationFailedException, InvalidCodeException,
-            ServerException, UnauthorizedClientException, InvalidScopeException;
+            ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException;
 
     /**
      * Handles a request to refresh an already issued access token for a OAuth2 client, validates that the request is
@@ -75,7 +77,8 @@ public interface AccessTokenService {
      * @throws ExpiredTokenException If the access token or refresh token has expired.
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws InvalidGrantException If the given token is not a refresh token.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     AccessToken refreshToken(OAuth2Request request) throws ClientAuthenticationFailedException, InvalidClientException,
-            InvalidRequestException, BadRequestException, ServerException, ExpiredTokenException, InvalidGrantException, InvalidScopeException;
+            InvalidRequestException, BadRequestException, ServerException, ExpiredTokenException, InvalidGrantException, InvalidScopeException, NotFoundException;
 }

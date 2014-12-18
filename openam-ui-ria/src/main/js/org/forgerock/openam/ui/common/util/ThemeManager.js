@@ -45,23 +45,23 @@ define("ThemeManager", [
             $("<link/>", {
                 rel: "stylesheet/less",
                 type: "text/css",
-                href: constants.BASE_PATH + theme.path + "css/styles.less"
+                href: require.toUrl(theme.path + "css/styles.less")
              }).appendTo("head");
 
             $("<link/>", {
                 rel: "icon",
                 type: "image/x-icon",
-                href: constants.BASE_PATH + theme.path + theme.icon
+                href: require.toUrl(theme.path + theme.icon)
              }).appendTo("head");
             
             $("<link/>", {
                 rel: "shortcut icon",
                 type: "image/x-icon",
-                href: constants.BASE_PATH + theme.path + theme.icon
+                href: require.toUrl(theme.path + theme.icon)
              }).appendTo("head");
 
             themeCSSPromise = $.ajax({
-                url: constants.BASE_PATH + constants.LESS_VERSION,
+                url: require.toUrl(constants.LESS_VERSION),
                 dataType: "script",
                 cache:true,
                 error: function (request, status, error) {
@@ -75,7 +75,7 @@ define("ThemeManager", [
     
     obj.loadThemeConfig = function(){
         if (themeConfigPromise === undefined) {
-            themeConfigPromise = $.getJSON(constants.BASE_PATH + constants.THEME_CONFIG_PATH);
+            themeConfigPromise = $.getJSON(require.toUrl(constants.THEME_CONFIG_PATH));
         }
         return themeConfigPromise;
     };

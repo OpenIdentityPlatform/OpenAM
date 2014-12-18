@@ -147,6 +147,7 @@ public class RestletRealmRouterTest {
         //Then
         assertThat(request.getAttributes()).containsEntry("realm", "/REALM");
         verify(httpRequest).setAttribute("realm", "/REALM");
+        assertThat(request.getAttributes()).containsEntry("realmUrl", "The base url");
     }
 
     private Request setUpRequest(HttpServletRequest httpRequest, SSOToken adminToken) {
@@ -161,6 +162,9 @@ public class RestletRealmRouterTest {
         given(request.getResourceRef()).willReturn(reference);
         Form queryForm = mock(Form.class);
         given(reference.getQueryAsForm()).willReturn(queryForm);
+        Reference baseReference = mock(Reference.class);
+        given(reference.getBaseRef()).willReturn(baseReference);
+        given(baseReference.toString()).willReturn("The base url");
 
         given(coreWrapper.getAdminToken()).willReturn(adminToken);
 
@@ -168,10 +172,7 @@ public class RestletRealmRouterTest {
     }
 
     private void setUpServerName(Request request, SSOToken adminToken, String realm) throws IdRepoException, SSOException {
-        Reference reference = mock(Reference.class);
-        given(request.getResourceRef()).willReturn(reference);
-        Form queryForm = mock(Form.class);
-        given(reference.getQueryAsForm()).willReturn(queryForm);
+        Reference reference = request.getResourceRef();
         given(request.getHostRef()).willReturn(reference);
         given(reference.getHostDomain()).willReturn("HOST_DOMAIN");
 
@@ -180,11 +181,8 @@ public class RestletRealmRouterTest {
     }
 
     private void setUpQueryString(Request request, String realm) {
-        Reference reference = mock(Reference.class);
-        given(request.getResourceRef()).willReturn(reference);
-        Form queryForm = mock(Form.class);
-        given(reference.getQueryAsForm()).willReturn(queryForm);
-        given(queryForm.getFirstValue("realm")).willReturn("/" + realm);
+        Form form = request.getResourceRef().getQueryAsForm();
+        given(form.getFirstValue("realm")).willReturn("/" + realm);
     }
 
     private void setUpUri(Request request, String realm) {

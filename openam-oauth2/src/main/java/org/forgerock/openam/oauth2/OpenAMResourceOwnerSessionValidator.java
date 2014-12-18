@@ -36,6 +36,7 @@ import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openidconnect.OpenIdPrompt;
@@ -82,7 +83,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
      */
     public ResourceOwner validate(OAuth2Request request) throws ResourceOwnerAuthenticationRequired,
             AccessDeniedException, BadRequestException, InteractionRequiredException, LoginRequiredException,
-            ServerException {
+            ServerException, NotFoundException {
 
         final OpenIdPrompt openIdPrompt = new OpenIdPrompt(request);
 
@@ -138,7 +139,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     }
 
     private ResourceOwnerAuthenticationRequired authenticationRequired(OAuth2Request request)
-            throws AccessDeniedException, EncodingException, URISyntaxException, ServerException {
+            throws AccessDeniedException, EncodingException, URISyntaxException, ServerException, NotFoundException {
 
         final Request req = request.getRequest();
         final String authURL = getAuthURL(getHttpServletRequest(req));
@@ -190,7 +191,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
      * @param acrValues the values of the acr_values parameter, in preference order.
      * @return the matching ACR value, or {@code null} if no match was found.
      */
-    private ACRValue chooseBestAcrValue(final OAuth2Request request, final String...acrValues) throws ServerException {
+    private ACRValue chooseBestAcrValue(final OAuth2Request request, final String...acrValues) throws ServerException, NotFoundException {
 
         final OAuth2ProviderSettings settings = providerSettingsFactory.get(request);
 

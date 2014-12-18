@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import static org.forgerock.oauth2.core.Utils.splitResponseType;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.slf4j.Logger;
@@ -55,10 +56,11 @@ public class AuthorizationTokenIssuer {
      * @throws UnsupportedResponseTypeException If the requested response type is not supported by either the client
      *          or the OAuth2 provider.
      * @throws ServerException If any internal server error occurs.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     public AuthorizationToken issueTokens(OAuth2Request request, ClientRegistration clientRegistration,
             ResourceOwner resourceOwner, Set<String> authorizationScope, OAuth2ProviderSettings providerSettings)
-            throws InvalidClientException, UnsupportedResponseTypeException, ServerException, InvalidScopeException {
+            throws InvalidClientException, UnsupportedResponseTypeException, ServerException, InvalidScopeException, NotFoundException {
 
         //issue tokens
         final Set<String> requestedResponseTypes = splitResponseType(request.<String>getParameter("response_type"));

@@ -30,6 +30,7 @@ package org.forgerock.openam.oauth2.provider;
 
 import java.util.Map;
 import org.forgerock.oauth2.core.Token;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.oauth2.legacy.CoreToken;
 
 /**
@@ -45,8 +46,9 @@ public interface ResponseType {
      * Creates a token for a response type
      * @param data The data needed to create the token
      * @return  the created token
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    public CoreToken createToken(Token accessToken, Map<String, Object> data);
+    public CoreToken createToken(Token accessToken, Map<String, Object> data) throws NotFoundException;
 
     /**
      * Returns the location in the HTTP response the token should be returned

@@ -16,8 +16,12 @@
 
 package org.forgerock.openidconnect.restlet;
 
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.oauth2.restlet.GuicedRestlet;
 import org.forgerock.oauth2.restlet.OAuth2StatusService;
+import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
@@ -30,6 +34,9 @@ import org.restlet.routing.Router;
  */
 public class WebFinger extends Application {
 
+    private final RestRealmValidator realmValidator;
+    private final CoreWrapper coreWrapper;
+
     /**
      * Constructs a new WebFinger.
      * <br/>
@@ -37,6 +44,9 @@ public class WebFinger extends Application {
      * {@link OAuth2StatusService}.
      */
     public WebFinger() {
+        realmValidator = InjectorHolder.getInstance(RestRealmValidator.class);
+        coreWrapper = InjectorHolder.getInstance(CoreWrapper.class);
+
         getMetadataService().setEnabled(true);
         getMetadataService().setDefaultMediaType(MediaType.APPLICATION_JSON);
         setStatusService(new OAuth2StatusService());
@@ -49,14 +59,13 @@ public class WebFinger extends Application {
      */
     @Override
     public Restlet createInboundRoot() {
-        Router root = new Router(getContext());
+        final Router root = new RestletRealmRouter(realmValidator, coreWrapper);
 
         /**
          * For now we only use webfinger for OpenID Connect. Once the standard is finalized
          * or we decide to use it for other tasks we dont need a full blown handler
          */
         root.attach("/webfinger", new GuicedRestlet(getContext(), OpenIDConnectDiscovery.class));
-        root.attach("/openid-configuration", new GuicedRestlet(getContext(), OpenIDConnectConfiguration.class));
 
         return root;
     }

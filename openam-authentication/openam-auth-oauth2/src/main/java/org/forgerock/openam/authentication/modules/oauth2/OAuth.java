@@ -255,7 +255,15 @@ public class OAuth extends AMLoginModule {
                     if (config.isOpenIDConnect()) {
                         idToken = extractToken(ID_TOKEN, tokenSvcResponse);
                         JwtHandler jwtHandler = new JwtHandler(jwtHandlerConfig);
-                        jwtClaims = jwtHandler.validateJwt(idToken);
+                        try {
+                            jwtClaims = jwtHandler.validateJwt(idToken);
+                        } catch (RuntimeException e) {
+                            debug.warning("Cannot validate JWT", e);
+                            throw e;
+                        } catch (AuthLoginException e) {
+                            debug.warning("Cannot validate JWT", e);
+                            throw e;
+                        }
                         if (!JwtHandler.isIntendedForAudience(config.getClientId(), jwtClaims)) {
                             OAuthUtil.debugError("OAuth.process(): ID token is not for this client as audience.");
                             throw new AuthLoginException(BUNDLE_NAME, "audience", null);

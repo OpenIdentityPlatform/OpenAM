@@ -48,7 +48,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
     private OAuth2ProviderSettings providerSettings;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         clientAuthenticator = mock(ClientAuthenticator.class);
         requestValidator = mock(ClientCredentialsRequestValidator.class);

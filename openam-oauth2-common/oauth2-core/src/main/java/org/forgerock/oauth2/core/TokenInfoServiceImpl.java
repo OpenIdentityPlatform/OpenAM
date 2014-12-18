@@ -17,7 +17,11 @@
 package org.forgerock.oauth2.core;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.slf4j.Logger;
@@ -64,8 +68,8 @@ public class TokenInfoServiceImpl implements TokenInfoService {
     /**
      * {@inheritDoc}
      */
-    public JsonValue getTokenInfo(OAuth2Request request) throws InvalidRequestException, NotFoundException,
-            ServerException {
+    public JsonValue getTokenInfo(OAuth2Request request) throws InvalidTokenException, InvalidRequestException,
+            ExpiredTokenException, ServerException, BadRequestException, InvalidGrantException, NotFoundException {
 
         final AccessTokenVerifier.TokenState headerToken = headerTokenVerifier.verify(request);
         final AccessTokenVerifier.TokenState queryToken = queryTokenVerifier.verify(request);

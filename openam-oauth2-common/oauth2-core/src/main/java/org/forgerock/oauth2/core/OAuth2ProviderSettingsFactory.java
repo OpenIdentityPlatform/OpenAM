@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+
 /**
  * A factory for creating/retrieving OAuth2ProviderSettings instances.
  * <br/>
@@ -32,5 +34,5 @@ public interface OAuth2ProviderSettingsFactory {
      * @param request The OAuth2 request.
      * @return A OAuth2ProviderSettings instance.
      */
-    OAuth2ProviderSettings get(final OAuth2Request request);
+    OAuth2ProviderSettings get(final OAuth2Request request) throws NotFoundException;
 }

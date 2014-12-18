@@ -27,6 +27,8 @@ import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.OAuth2Constants;
 
@@ -55,7 +57,12 @@ public class TokenStoreImpl implements TokenStore {
     public AuthorizationCode createAuthorizationCode(Set<String> scope, String resourceOwnerId, String clientId,
             String redirectUri, String nonce, OAuth2Request request) throws ServerException {
 
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final OAuth2ProviderSettings providerSettings;
+        try {
+            providerSettings = providerSettingsFactory.get(request);
+        } catch (NotFoundException e) {
+            throw new ServerException(e);
+        }
         final String code = UUID.randomUUID().toString();
         final long expiryTime = (providerSettings.getAuthorizationCodeLifetime() * 1000) + System.currentTimeMillis();
         final AuthorizationCode authorizationCode = new AuthorizationCode(code, resourceOwnerId, clientId, redirectUri,
@@ -68,7 +75,12 @@ public class TokenStoreImpl implements TokenStore {
 
     public AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope, RefreshToken refreshToken, String nonce, OAuth2Request request) throws ServerException {
 
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final OAuth2ProviderSettings providerSettings;
+        try {
+            providerSettings = providerSettingsFactory.get(request);
+        } catch (NotFoundException e) {
+            throw new ServerException(e);
+        }
         final String id = UUID.randomUUID().toString();
         final long expiryTime = (providerSettings.getAccessTokenLifetime() * 1000) + System.currentTimeMillis();
 
@@ -84,9 +96,15 @@ public class TokenStoreImpl implements TokenStore {
         return accessToken;
     }
 
-    public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId, String redirectUri, Set<String> scope, OAuth2Request request) throws ServerException {
+    public RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId, String redirectUri, Set<String> scope, OAuth2Request request) throws
+            ServerException {
 
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final OAuth2ProviderSettings providerSettings;
+        try {
+            providerSettings = providerSettingsFactory.get(request);
+        } catch (NotFoundException e) {
+            throw new ServerException(e);
+        }
         final String id = UUID.randomUUID().toString();
         final long expiryTime = (providerSettings.getRefreshTokenLifetime() * 1000) + System.currentTimeMillis();
 

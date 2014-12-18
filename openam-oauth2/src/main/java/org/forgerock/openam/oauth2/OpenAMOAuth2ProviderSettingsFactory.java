@@ -20,6 +20,8 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.PEMDecoder;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.restlet.Request;
 
 import javax.inject.Inject;
@@ -58,11 +60,18 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
     /**
      * {@inheritDoc}
      */
-    public OAuth2ProviderSettings get(OAuth2Request request) {
+    public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
         final String realm = request.getParameter("realm");
         final Request req = request.getRequest();
-        final String deploymentUrl = req.getHostRef().toString() + "/" + req.getResourceRef().getSegments().get(0);
-        return getInstance(realmNormaliser.normalise(realm), deploymentUrl);
+        String urlPattern = (String) req.getAttributes().get(RestletRealmRouter.REALM_URL);
+        if (urlPattern.endsWith("/")) {
+            urlPattern = urlPattern.substring(0, urlPattern.length() - 1);
+        }
+        String queryRealm = req.getResourceRef().getQueryAsForm().getFirstValue("realm");
+        if (queryRealm != null && !"/".equals(queryRealm) && urlPattern.endsWith("/oauth2")) {
+            urlPattern += realmNormaliser.normalise(queryRealm);
+        }
+        return getInstance(realmNormaliser.normalise(realm), urlPattern);
     }
 
     /**
@@ -71,7 +80,7 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
      * @param realm The realm.
      * @return The OAuth2ProviderSettings instance.
      */
-    public OAuth2ProviderSettings get(String realm) {
+    public OAuth2ProviderSettings get(String realm) throws NotFoundException {
         return getInstance(realmNormaliser.normalise(realm), null);
     }
 
@@ -84,12 +93,16 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
      * @param deploymentUrl The deployment url.
      * @return The OAuth2ProviderSettings instance.
      */
-    private OAuth2ProviderSettings getInstance(String realm, String deploymentUrl) {
+    private OAuth2ProviderSettings getInstance(String realm, String deploymentUrl) throws NotFoundException {
         synchronized (providerSettingsMap) {
             OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realm);
             if (providerSettings == null) {
                 providerSettings = new OpenAMOAuth2ProviderSettings(realm, deploymentUrl, cookieExtractor, pemDecoder);
-                providerSettingsMap.put(realm, providerSettings);
+                if (providerSettings.exists()) {
+                    providerSettingsMap.put(realm, providerSettings);
+                } else {
+                    throw new NotFoundException("No OpenID Connect provider for realm " + realm);
+                }
             }
             return providerSettings;
         }

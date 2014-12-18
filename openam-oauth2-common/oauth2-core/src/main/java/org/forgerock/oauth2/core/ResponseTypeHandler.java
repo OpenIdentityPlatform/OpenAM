@@ -17,6 +17,7 @@
 package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
 
@@ -45,9 +46,10 @@ public interface ResponseTypeHandler {
      * @throws ServerException If any internal server error occurs.
      * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
      *          authenticated.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     Map.Entry<String, Token> handle(String tokenType, Set<String> scope, String resourceOwnerId, String clientId,
-            String redirectUri, String nonce, OAuth2Request request) throws ServerException, InvalidClientException;
+            String redirectUri, String nonce, OAuth2Request request) throws ServerException, InvalidClientException, NotFoundException;
 
     /**
      * Returns the location in which the token should be returned, {@link UrlLocation}.

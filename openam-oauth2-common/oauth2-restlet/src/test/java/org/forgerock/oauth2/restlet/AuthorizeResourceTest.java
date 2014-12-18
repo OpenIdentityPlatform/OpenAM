@@ -25,6 +25,7 @@ import org.forgerock.openam.xui.XUIState;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.representation.EmptyRepresentation;
+import org.restlet.routing.Router;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -58,7 +59,7 @@ public class AuthorizeResourceTest {
         when(oauth2RequestFactory.create(request)).thenReturn(o2request);
 
         resource = new AuthorizeResource(oauth2RequestFactory, service, null, representation,
-                CollectionUtils.asSet(hook), xuiState);
+                CollectionUtils.asSet(hook), xuiState, mock(Router.class));
         resource = spy(resource);
         doReturn(request).when(resource).getRequest();
         doReturn(response).when(resource).getResponse();

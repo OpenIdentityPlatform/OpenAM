@@ -28,6 +28,7 @@ import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -95,7 +96,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      * {@inheritDoc}
      */
     public JsonValue createRegistration(String accessToken, String deploymentUrl, OAuth2Request request)
-            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException {
+            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException, NotFoundException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
@@ -301,7 +302,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      * @return the token id of the generated access token.
      * @throws ServerException if an internal error occurs.
      */
-    private String createRegistrationAccessToken(Client client, OAuth2Request request) throws ServerException {
+    private String createRegistrationAccessToken(Client client, OAuth2Request request) throws ServerException, NotFoundException {
         final AccessToken rat = tokenStore.createAccessToken(
                 null,                           // Grant type
                 "Bearer",                       // Access Token Type

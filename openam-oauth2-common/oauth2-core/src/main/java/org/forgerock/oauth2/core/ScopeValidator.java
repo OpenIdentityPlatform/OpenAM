@@ -18,6 +18,7 @@ package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 
@@ -78,8 +79,9 @@ public interface ScopeValidator {
      * @param request The OAuth2 request.
      * @return A {@code Map<String, Object>} of the resource owner's information.
      * @throws UnauthorizedClientException If the client's authorization fails.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request) throws UnauthorizedClientException;
+    Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request) throws UnauthorizedClientException, NotFoundException;
 
     /**
      * Gets the specified access token's information.
@@ -111,7 +113,8 @@ public interface ScopeValidator {
      * @throws ServerException If any internal server error occurs.
      * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
      *          authenticated.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     void additionalDataToReturnFromTokenEndpoint(AccessToken accessToken, OAuth2Request request) throws ServerException,
-            InvalidClientException;
+            InvalidClientException, NotFoundException;
 }

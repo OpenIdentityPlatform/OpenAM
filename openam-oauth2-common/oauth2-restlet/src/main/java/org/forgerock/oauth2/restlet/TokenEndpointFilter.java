@@ -38,11 +38,10 @@ public class TokenEndpointFilter extends OAuth2Filter {
     /**
      * Constructs a new TokenEndpointFilter.
      *
-     * @param context The Restlet context.
      * @param resource The Restlet resource.
      */
-    public TokenEndpointFilter(Context context, Restlet resource) {
-        super(context, resource);
+    public TokenEndpointFilter(Restlet resource) {
+        super(resource);
     }
 
     /**

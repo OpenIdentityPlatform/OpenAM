@@ -46,7 +46,7 @@ public class TokenResponseTypeHandlerTest {
     }
 
     @Test
-    public void shouldHandle() throws ServerException {
+    public void shouldHandle() throws Exception {
 
         //Given
         String grantType = "token";

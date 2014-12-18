@@ -38,11 +38,10 @@ public class AuthorizeEndpointFilter extends OAuth2Filter {
     /**
      * Constructs a new AuthorizeEndpointFilter.
      *
-     * @param context The Restlet context.
      * @param resource The Restlet resource.
      */
-    public AuthorizeEndpointFilter(Context context, Restlet resource) {
-        super(context, resource);
+    public AuthorizeEndpointFilter(Restlet resource) {
+        super(resource);
     }
 
     /**

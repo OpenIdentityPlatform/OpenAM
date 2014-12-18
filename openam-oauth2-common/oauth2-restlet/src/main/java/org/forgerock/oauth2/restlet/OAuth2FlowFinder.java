@@ -50,14 +50,12 @@ public class OAuth2FlowFinder extends Finder {
     /**
      * Constructs a new OAuth2FlowFinder.
      *
-     * @param context The Restlet context.
      * @param requestFactory An instance of the OAuth2RequestFactory.
      * @param exceptionHandler An instance of the ExceptionHandler.
      * @param endpointClasses The endpoint handlers for the OAuth2 token endpoints.
      */
-    public OAuth2FlowFinder(Context context, OAuth2RequestFactory<Request> requestFactory,
+    public OAuth2FlowFinder(OAuth2RequestFactory<Request> requestFactory,
             ExceptionHandler exceptionHandler, Map<String, Finder> endpointClasses) {
-        super(context);
         this.requestFactory = requestFactory;
         this.exceptionHandler = exceptionHandler;
         this.endpointClasses = new ConcurrentHashMap<String, Finder>(endpointClasses);

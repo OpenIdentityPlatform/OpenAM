@@ -16,17 +16,15 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.json.fluent.JsonValue.*;
-import static org.forgerock.oauth2.core.Utils.isEmpty;
-import static org.forgerock.oauth2.core.Utils.joinScope;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
@@ -49,6 +47,7 @@ import org.forgerock.oauth2.core.ScopeValidator;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -76,7 +75,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
+
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.oauth2.core.Utils.*;
 
 /**
  * Models all of the possible settings the OpenAM OAuth2 provider can have and that can be configured.
@@ -86,6 +89,7 @@ import java.util.UUID;
 public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements OAuth2ProviderSettings {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
+    private String issuer;
     private final String realm;
     private final String deploymentUrl;
     private final CookieExtractor cookieExtractor;
@@ -354,7 +358,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
          * {@inheritDoc}
          */
         public void additionalDataToReturnFromTokenEndpoint(AccessToken accessToken, OAuth2Request request)
-                throws ServerException, InvalidClientException {
+                throws ServerException, InvalidClientException, NotFoundException {
 
             final Map<String, String> data = new HashMap<String, String>();
             data.put("nonce", accessToken.getNonce());
@@ -411,7 +415,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request) throws ServerException,
-            UnauthorizedClientException {
+            UnauthorizedClientException, NotFoundException {
         return getScopeValidator().getUserInfo(token, request);
     }
 
@@ -434,7 +438,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public void additionalDataToReturnFromTokenEndpoint(AccessToken accessToken, OAuth2Request request)
-            throws ServerException, InvalidClientException {
+            throws ServerException, InvalidClientException, NotFoundException {
         getScopeValidator().additionalDataToReturnFromTokenEndpoint(accessToken, request);
     }
 
@@ -626,43 +630,61 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     /**
      * {@inheritDoc}
      */
-    public String getOpenIDConnectIssuer() {
-        return deploymentUrl;
+    public String getOpenIDConnectIssuer() throws ServerException {
+        if (issuer == null) {
+            synchronized (this) {
+                final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+                try {
+                    OrganizationConfigManager ocm = new OrganizationConfigManager(token, realm);
+                    Map attrs = ocm.getAttributes(IdConstants.REPO_SERVICE);
+                    Set<String> aliases = (Set<String>)attrs.get(IdConstants.ORGANIZATION_ALIAS_ATTR);
+                    aliases = new TreeSet<String>(aliases);
+                    if (aliases.isEmpty()) {
+                        issuer = deploymentUrl;
+                    } else {
+                        issuer = aliases.iterator().next();
+                    }
+                } catch (SMSException e) {
+                    throw new ServerException(e);
+                }
+            }
+        }
+        return issuer;
     }
 
     /**
      * {@inheritDoc}
      */
     public String getAuthorizationEndpoint() {
-        return deploymentUrl + "/oauth2/authorize";
+        return deploymentUrl + "/authorize";
     }
 
     /**
      * {@inheritDoc}
      */
     public String getTokenEndpoint() {
-        return deploymentUrl + "/oauth2/access_token";
+        return deploymentUrl + "/access_token";
     }
 
     /**
      * {@inheritDoc}
      */
     public String getUserInfoEndpoint() {
-        return deploymentUrl + "/oauth2/userinfo";
+        return deploymentUrl + "/userinfo";
     }
 
     /**
      * {@inheritDoc}
      */
     public String getCheckSessionEndpoint() {
-        return deploymentUrl + "/oauth2/connect/checkSession";
+        return deploymentUrl + "/connect/checkSession";
     }
 
     /**
      * {@inheritDoc}
      */
     public String getEndSessionEndpoint() {
-        return deploymentUrl + "/oauth2/connect/endSession";
+        return deploymentUrl + "/connect/endSession";
     }
 
     /**
@@ -675,8 +697,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                 return userDefinedJWKUri;
             }
 
-            // http://example.forgerock.com:8080/openam/oauth2/connect/jwk_uri?realm= + realm
-            return deploymentUrl + "/oauth2/connect/jwk_uri?realm=" + realm;
+            return deploymentUrl + "/connect/jwk_uri";
         } catch (SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -730,7 +751,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public String getClientRegistrationEndpoint() {
-        return deploymentUrl + "/oauth2/connect/register";
+        return deploymentUrl + "/connect/register";
     }
 
     /**
@@ -817,6 +838,16 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         } catch (SMSException e) {
             logger.message(e.getMessage());
             throw new ServerException(e);
+        }
+    }
+
+    @Override
+    public boolean exists() {
+        try {
+            return hasConfig(realm);
+        } catch (Exception e) {
+            logger.message("Could not access realm config", e);
+            return false;
         }
     }
 

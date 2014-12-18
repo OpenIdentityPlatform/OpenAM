@@ -19,6 +19,7 @@ package org.forgerock.openidconnect;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.json.fluent.JsonValue;
@@ -59,7 +60,8 @@ public class OpenIDConnectProviderConfiguration {
      *          or the OAuth2 provider.
      * @throws ServerException If any internal server error occurs.
      */
-    public JsonValue getConfiguration(OAuth2Request request) throws UnsupportedResponseTypeException, ServerException {
+    public JsonValue getConfiguration(OAuth2Request request) throws UnsupportedResponseTypeException, ServerException,
+            OAuth2Exception {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 

@@ -40,6 +40,7 @@ import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.oauth2.IdentityManager;
@@ -215,7 +216,7 @@ public class ScopeImpl implements Scope {
     /**
      * {@inheritDoc}
      */
-    public Map<String, Object> extraDataToReturnForTokenEndpoint(Map<String, String> parameters, CoreToken token) {
+    public Map<String, Object> extraDataToReturnForTokenEndpoint(Map<String, String> parameters, CoreToken token) throws NotFoundException {
         final Map<String, Object> map = new HashMap<String, Object>();
         final Set<String> scope = token.getScope();
         if (scope != null && scope.contains(OPENID_SCOPE)) {
