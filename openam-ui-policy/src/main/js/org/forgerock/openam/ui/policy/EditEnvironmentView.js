@@ -254,9 +254,14 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             var self = this,
                 defaultTimeZone = 'GMT',
                 setTimeZones = function(){
-                    self.$el.find('#enforcementTimeZone').autocomplete({
+                    var timezones = self.$el.find('#enforcementTimeZone');
+                    timezones.autocomplete({
                         source: self.data.timezones
-                    }).val(defaultTimeZone).trigger('autocompleteselect');
+                    });
+
+                    if (!timezones.val()) {
+                        timezones.val(defaultTimeZone).trigger('autocompleteselect');
+                    }
 
                     self.$el.data().itemData.enforcementTimeZone = defaultTimeZone;
                 };
