@@ -97,7 +97,13 @@
 
     <!-- File Groupings -->
     <fileSets>
-
+        <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.build.directory}/legal-notices</directory>
+            <includes>
+                <include>license.txt</include>
+            </includes>
+        </fileSet>
         <fileSet>
             <outputDirectory>legal-notices</outputDirectory>
             <directory>${project.basedir}/../../license</directory>
