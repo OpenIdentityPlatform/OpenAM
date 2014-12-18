@@ -261,6 +261,27 @@ Upgrade Complete.
     that are not supported or not required.
    </para>
   </step>
+
+  <step>
+   <para>
+    For each OAuth 2.0 client configuration, update the client password.
+   </para>
+
+   <para>
+    As part of a fix for OpenID Connect ID Token signing,
+    the password storage format for OAuth 2.0 clients has changed.
+    OpenAM now stores client passwords using reversible encryption.
+    OpenAM 11.0 stores client passwords using a one-way hash algorithm,
+    and therefore the passwords cannot be recovered.
+   </para>
+
+   <para>
+    You can update the client password by using either OpenAM console
+    or the <command>ssoadm update-agent</command>
+    with the <option>--attributevalues</option> option
+    to update the value of the <literal>userpassword</literal> attribute.
+   </para>
+  </step>
  </procedure>
 
  <procedure xml:id="after-upgrading-from-10-1">

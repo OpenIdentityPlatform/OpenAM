@@ -300,6 +300,20 @@
 
    <listitem>
     <para>
+     As part of a fix for OpenID Connect ID Token signing,
+     the password storage format for OAuth 2.0 clients has changed.
+     As a result you must reset OAuth 2.0 client passwords after upgrade.
+     For details, see the <citetitle>Upgrade Guide</citetitle> procedure
+     <link
+      xlink:href="upgrade-guide#after-upgrading-from-11"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:show="new"
+     ><citetitle>To Complete Upgrade from OpenAM 11.0</citetitle></link>
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
      Following a change to the SAML 2.0 pages in OpenAM,
      you no longer customize <filename>saml2login.template</filename>
      and <filename>saml2loginwithrelay.template</filename>
