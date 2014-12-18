@@ -75,7 +75,8 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                 data: "",
                 url: url,
                 errorsHandlers: {
-                    "unauthorized": { status: "401"}
+                    "unauthorized": { status: "401"},
+                    "bad request": { status: "400"}
                 }
             })
         .done(function (requirements) {
@@ -83,7 +84,8 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
         })
         .fail(function (jqXHR) {
                    // some auth processes might throw an error fail immediately
-                   var errorBody = $.parseJSON(jqXHR.responseText);
+                   var errorBody = $.parseJSON(jqXHR.responseText),
+                       msg;
 
                    // if the error body contains an authId, then we might be able to
                    // continue on after this error to the next module in the chain
@@ -96,7 +98,14 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                           .fail(function () {
                               promise.reject();
                           });
-                   } else {
+                   } else if(errorBody.code && errorBody.code === 400 ) {
+                        msg = {
+                                message: errorBody.message,
+                                type: "error"
+                        };
+                        messageManager.messages.addMessage(msg);
+                        
+                    } else {
                        // in this case, the user has no way to login
                        promise.reject();
                    }
