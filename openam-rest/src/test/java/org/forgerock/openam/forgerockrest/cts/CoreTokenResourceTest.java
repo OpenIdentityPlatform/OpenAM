@@ -15,8 +15,18 @@
  */
 package org.forgerock.openam.forgerockrest.cts;
 
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.isA;
+import static org.mockito.BDDMockito.mock;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.ReadRequest;
@@ -33,13 +43,6 @@ import org.mockito.Matchers;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
 
 public class CoreTokenResourceTest {
 
@@ -73,6 +76,20 @@ public class CoreTokenResourceTest {
 
         // Then
         verify(mockStore).create(mockToken);
+    }
+
+    @Test
+    public void shouldGetBadRequestForMissingTokenId() throws CoreTokenException {
+        // Given
+        CreateRequest request = mock(CreateRequest.class);
+        given(request.getContent()).willReturn(new JsonValue(""));
+        doThrow(IllegalArgumentException.class).when(mockStore).create(any(Token.class));
+
+        // When
+        resource.createInstance(null, request, mockHandler);
+
+        // Then
+        verify(mockHandler).handleError(isA(BadRequestException.class));
     }
 
     @Test

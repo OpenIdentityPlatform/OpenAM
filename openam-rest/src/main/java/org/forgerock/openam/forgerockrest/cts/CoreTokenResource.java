@@ -19,6 +19,7 @@ package org.forgerock.openam.forgerockrest.cts;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -104,6 +105,8 @@ public class CoreTokenResource implements CollectionResourceProvider {
 
             debug("CREATE by {0}: Stored token with ID: {1}", principal, token.getTokenId());
             handler.handleResult(resource);
+        } catch (IllegalArgumentException e) {
+            handler.handleError(new BadRequestException(e.getMessage()));
         } catch (CoreTokenException e) {
             error(e, "CREATE by {0}: Error creating token resource with ID: {1}", principal, token.getTokenId());
             handler.handleError(generateException(e));
