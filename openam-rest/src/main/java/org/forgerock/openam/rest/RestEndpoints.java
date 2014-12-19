@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.rest;
 
+import static org.forgerock.openam.rest.service.RestletUtils.wrap;
+
+import com.sun.identity.sm.OrganizationConfigManager;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
@@ -47,6 +50,7 @@ import org.forgerock.openam.rest.authz.SessionResourceAuthzModule;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.dashboard.TrustedDevicesResource;
 import org.forgerock.openam.rest.fluent.FluentRealmRouter;
+import org.forgerock.openam.rest.fluent.FluentRoute;
 import org.forgerock.openam.rest.fluent.FluentRouter;
 import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
 import org.forgerock.openam.rest.resource.CrestRouter;
@@ -63,8 +67,7 @@ import org.restlet.routing.Router;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import static org.forgerock.openam.rest.service.RestletUtils.*;
+import java.util.Set;
 
 /**
  * Singleton class which contains both the routers for CREST resources and Restlet service endpoints.
@@ -90,13 +93,18 @@ public class RestEndpoints {
      */
     @Inject
     public RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper) {
+        this(realmValidator, versionSelector, coreWrapper, OrganizationConfigManager.getInvalidRealmNames());
+    }
+
+    RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper,
+                  Set<String> invalidRealmNames) {
         this.realmValidator = realmValidator;
         this.versionSelector = versionSelector;
         this.coreWrapper = coreWrapper;
 
-        this.resourceRouter = createResourceRouter();
-        this.jsonServiceRouter = createJSONServiceRouter();
-        this.xacmlServiceRouter = createXACMLServiceRouter();
+        this.resourceRouter = createResourceRouter(invalidRealmNames);
+        this.jsonServiceRouter = createJSONServiceRouter(invalidRealmNames);
+        this.xacmlServiceRouter = createXACMLServiceRouter(invalidRealmNames);
         this.oauth2ServiceRouter = createOAuth2Router();
     }
 
@@ -138,9 +146,12 @@ public class RestEndpoints {
      *
      * @return A {@code RealmRouter}.
      */
-    private CrestRouter createResourceRouter() {
+    private CrestRouter createResourceRouter(final Set<String> invalidRealmNames) {
 
-        FluentRouter rootRealmRouter = InjectorHolder.getInstance(LoggingFluentRouter.class);
+        FluentRouter rootRealmRouterDelegate = InjectorHolder.getInstance(LoggingFluentRouter.class);
+
+        // Ensure all routes are added to the realm name blacklist
+        FluentRouter rootRealmRouter = new RealmBlackListingFluentRouter(rootRealmRouterDelegate, invalidRealmNames);
         FluentRealmRouter dynamicRealmRouter = rootRealmRouter.dynamically();
 
         //not protected
@@ -213,7 +224,7 @@ public class RestEndpoints {
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
         VersionBehaviourConfigListener.bindToServiceConfigManager(dynamicRealmRouter);
 
-        return rootRealmRouter;
+        return rootRealmRouterDelegate;
     }
 
     /**
@@ -221,13 +232,14 @@ public class RestEndpoints {
      *
      * @return A {@code ServiceRouter}.
      */
-    private ServiceRouter createJSONServiceRouter() {
+    private ServiceRouter createJSONServiceRouter(final Set<String> invalidRealmNames) {
 
         ServiceRouter router = new ServiceRouter(realmValidator, versionSelector, coreWrapper);
 
         router.addRoute("/authenticate")
                 .addVersion("1.1", wrap(AuthenticationServiceV1.class))
                 .addVersion("2.0", wrap(AuthenticationServiceV2.class));
+        invalidRealmNames.add("authenticate");
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(router);
 
@@ -239,12 +251,13 @@ public class RestEndpoints {
      *
      * @return A {@code ServiceRouter}.
      */
-    private ServiceRouter createXACMLServiceRouter() {
+    private ServiceRouter createXACMLServiceRouter(final Set<String> invalidRealmNames) {
 
         ServiceRouter router = new ServiceRouter(realmValidator, versionSelector, coreWrapper);
 
         router.addRoute("/policies")
                 .addVersion("1.0", wrap(XacmlService.class));
+        invalidRealmNames.add("policies");
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(router);
 
@@ -274,4 +287,76 @@ public class RestEndpoints {
         return router;
     }
 
+    /**
+     * Decorator realm router that ensures that any REST endpoint route names are automatically added to the
+     * realm name black-list to prevent clashes.
+     */
+    private static class RealmBlackListingFluentRealmRouter implements FluentRealmRouter {
+        private final FluentRealmRouter delegate;
+        private final Set<String> invalidRealmNames;
+
+        RealmBlackListingFluentRealmRouter(final FluentRealmRouter delegate, final Set<String> invalidRealmNames) {
+            this.delegate = delegate;
+            this.invalidRealmNames = invalidRealmNames;
+        }
+
+        @Override
+        public FluentRoute route(final String uriTemplate) {
+            invalidRealmNames.add(firstPathSegment(uriTemplate));
+            return delegate.route(uriTemplate);
+        }
+
+        @Override
+        public FluentRealmRouter setVersioning(final DefaultVersionBehaviour behaviour) {
+            delegate.setVersioning(behaviour);
+            return this;
+        }
+
+        @Override
+        public FluentRealmRouter setHeaderWarningEnabled(final boolean warningEnabled) {
+            delegate.setHeaderWarningEnabled(warningEnabled);
+            return this;
+        }
+
+    }
+    /**
+     * Decorator router that ensures that any REST endpoint route names are automatically added to the
+     * realm name black-list to prevent clashes.
+     */
+    private static class RealmBlackListingFluentRouter extends FluentRouter {
+        private final FluentRouter delegate;
+        private final Set<String> invalidRealmNames;
+
+        public RealmBlackListingFluentRouter(final FluentRouter delegate, final Set<String> invalidRealmNames) {
+            this.delegate = delegate;
+            this.invalidRealmNames = invalidRealmNames;
+        }
+
+        @Override
+        public FluentRoute route(String uriTemplate) {
+            invalidRealmNames.add(firstPathSegment(uriTemplate));
+            return delegate.route(uriTemplate);
+        }
+
+        @Override
+        public FluentRealmRouter dynamically() {
+            return new RealmBlackListingFluentRealmRouter(delegate.dynamically(), invalidRealmNames);
+        }
+    }
+
+    /**
+     * Returns the first path segment from a uri template. For example {@code /foo/bar} becomes {@code foo}.
+     *
+     * @param path the full uri template path.
+     * @return the first non-empty path segment.
+     * @throws IllegalArgumentException if the path contains no non-empty segments.
+     */
+    private static String firstPathSegment(final String path) {
+        for (String part : path.split("/")) {
+            if (!part.isEmpty()) {
+                return part;
+            }
+        }
+        throw new IllegalArgumentException("uriTemplate " + path + " is invalid");
+    }
 }

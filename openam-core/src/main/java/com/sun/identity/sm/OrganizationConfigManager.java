@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -68,6 +69,11 @@ import com.sun.identity.shared.Constants;
  * @supported.all.api
  */
 public class OrganizationConfigManager {
+    /**
+     * Set of forbidden realm names due to clashes with REST endpoints or other reasons.
+     */
+    private static final Set<String> INVALID_REALM_NAMES = new CopyOnWriteArraySet<String>();
+
     // Instance variables
     private SSOToken token;
 
@@ -320,6 +326,7 @@ public class OrganizationConfigManager {
                     SMSEntry.bundle.getString("sms-invalid-org-name"),args1));
             }
         }
+        validateOrgName(subOrgName);
 
         // If in legacy mode or (realm mode and copy org enabled)
         // Create the AMSDK organization first
@@ -435,6 +442,32 @@ public class OrganizationConfigManager {
         // Return the newly created organization config manager
         return (ocm);
     }
+
+    private void validateOrgName(final String subOrgName) throws SMSException {
+        String realm = DNMapper.orgNameToRealmName(subOrgName);
+        int idx = realm.lastIndexOf('/');
+        if (idx > -1 && idx < realm.length() - 1) {
+            realm = realm.substring(idx+1);
+        }
+
+        if (getInvalidRealmNames().contains(realm)) {
+            SMSEntry.debug.error("OrganizationConfigManager::createSubOrganization() : Invalid realm name: " +
+                    subOrgName + " - clashes with REST endpoint");
+            throw new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
+                    SMSEntry.bundle.getString("sms-invalid-org-name"), new Object[]{ subOrgName });
+        }
+    }
+
+    /**
+     * Returns a <em>mutable</em> set of realm names that should be black-listed to prevent conflicts with REST
+     * endpoints or other functionality. The returned set can be safely modified from concurrent threads.
+     *
+     * @return the set of invalid realm names.
+     */
+    public static Set<String> getInvalidRealmNames() {
+        return INVALID_REALM_NAMES;
+    }
+
 
     /**
      * Returns the names of all sub-organizations.
