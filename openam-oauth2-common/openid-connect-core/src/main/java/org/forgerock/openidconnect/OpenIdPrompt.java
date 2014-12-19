@@ -37,6 +37,7 @@ public class OpenIdPrompt {
     public static final String PROMPT_NONE = "none";
     public static final String PROMPT_LOGIN = "login";
     public static final String PROMPT_CONSENT = "consent";
+    public static final String PROMPT_SELECT_ACCOUNT = "select_account";
 
     private String originalValue;
     private final Set<String> prompts;
@@ -96,12 +97,22 @@ public class OpenIdPrompt {
     }
 
     /**
+     * Determines if the prompt contains 'select_account'.
+     *
+     * @return {@code true} if the prompt includes 'select_account'.
+     */
+    public boolean containsSelectAccount() {
+        return prompts.contains(PROMPT_SELECT_ACCOUNT);
+    }
+
+    /**
      * Determines whether the prompt parameter is valid.
      *
-     * @return {@code false} if the prompt includes 'none' combined with either 'consent' or 'login'.
+     * @return {@code false} if the prompt includes 'none' combined with either 'consent' or 'login', or
+     * 'select_account'.
      */
     public boolean isValid() {
-        return !(containsNone() && (containsConsent() || containsLogin()));
+        return !(containsNone() && (containsConsent() || containsLogin())) && !containsSelectAccount();
     }
 
     /**

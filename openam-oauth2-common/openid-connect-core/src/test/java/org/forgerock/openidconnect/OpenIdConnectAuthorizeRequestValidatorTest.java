@@ -20,6 +20,7 @@ import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
@@ -60,6 +61,22 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
 
         given(request.getParameter("client_id")).willReturn("CLIENT_ID");
         given(request.getParameter("scope")).willReturn("openid");
+        given(request.getParameter("prompt")).willReturn("consent");
+
+        //When
+        requestValidator.validateRequest(request);
+    }
+
+    @Test (expectedExceptions = BadRequestException.class)
+    public void validateShouldFailForInvalidPrompt() throws Exception {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("openid"));
+
+        given(request.getParameter("client_id")).willReturn("CLIENT_ID");
+        given(request.getParameter("scope")).willReturn("openid");
+        given(request.getParameter("prompt")).willReturn("select_account");
 
         //When
         requestValidator.validateRequest(request);
