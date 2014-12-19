@@ -15,8 +15,10 @@ package org.forgerock.openam.entitlement.conditions.environment;/*
  */
 
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -85,4 +87,23 @@ public class ResourceEnvIPConditionTest {
         //Then
         //Expected EntitlementException
     }
+
+    @Test
+    public void conditionCanGrantAccessIfSpecificModuleUsedForAuthentication() throws EntitlementException {
+        //Given
+        String realm = "REALM";
+        String resourceName = "RESOURCE_NAME";
+        Map<String, Set<String>> env = new HashMap<String, Set<String>>();
+        env.put(ConditionConstants.REQUEST_IP, CollectionUtils.asSet("127.0.0.1"));
+        env.put(ConditionConstants.REQUEST_AUTH_SCHEMES, CollectionUtils.asSet("LDAP"));
+        condition.setState("{\"resourceEnvIPConditionValue\": [\"IF IP=[127.0.0.1] THEN module=LDAP\"]}");
+
+        //When
+        ConditionDecision result = condition.evaluate(realm, subject, resourceName, env);
+
+        //Then
+        assertThat(result.isSatisfied()).isTrue();
+        assertThat(result.getAdvices()).isEmpty();
+    }
+
 }
