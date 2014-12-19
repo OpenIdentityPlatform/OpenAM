@@ -42,9 +42,15 @@ define("config/routes/PolicyRoutesConfig", [
         },
         "managePolicies": {
             view: "org/forgerock/openam/ui/policy/ManagePoliciesView",
-            url: /^app\/(.+?)\/policies\//,
+            url: /^app\/(.+?)\/(policies)\//,
             role: "ui-admin",
             pattern: "app/?/policies/"
+        },
+        "manageReferrals": {
+            view: "org/forgerock/openam/ui/policy/ManagePoliciesView",
+            url: /^app\/(.+?)\/(referrals)\//,
+            role: "ui-admin",
+            pattern: "app/?/referrals/"
         },
         "editPolicy": {
             view: "org/forgerock/openam/ui/policy/EditPolicyView",

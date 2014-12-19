@@ -49,12 +49,18 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
             'click .tab-links a': 'showTab'
         },
 
+        POLICIES_TAB: 0,
+        REFERRALS_TAB: 1,
+
         render: function (args, callback) {
             this.data.realm = conf.globalData.auth.realm;
             this.data.appName = decodeURI(args[0]);
             this.data.referralsEnabled = conf.globalData.serverInfo && conf.globalData.serverInfo.referralsEnabled === "true";
 
             this.parentRender(function () {
+                this.tabs = this.$el.find('.tab-content .tab');
+                this.tabLinks = this.$el.find('.tab-links li');
+
                 this.policyGridView = new GenericGridView();
                 this.policyGridView.render({
                     element: '#managePolicies',
@@ -75,6 +81,12 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                         initOptions: this.getRefGridInitOptions(),
                         additionalOptions: this.getRefGridAdditionalOptions()
                     }, callback);
+
+                    if (args[1] === 'referrals') {
+                        this.setActiveTab(this.REFERRALS_TAB);
+                    }
+                } else if (!this.data.referralsEnabled && args[1] === 'referrals') {
+                    router.routeTo(router.configuration.routes.managePolicies, {args: args, replace: true});
                 }
             });
         },
@@ -271,14 +283,18 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
             e.preventDefault();
 
             var index = $(e.currentTarget).parent().index(),
-                tabs =  this.$el.find('.tab-content .tab'),
-                tabLinks = this.$el.find('.tab-links li');
+                route = index === this.POLICIES_TAB ? router.configuration.routes.managePolicies : router.configuration.routes.manageReferrals;
 
-            tabLinks.not(':eq('+ index +')').removeClass('active-tab');
-            tabLinks.eq(index).addClass('active-tab');
+            this.setActiveTab(index);
+            router.routeTo(route, {args: [this.data.appName], replace: true});
+        },
 
-            tabs.not(':eq('+ index +')').addClass('inactive-tab');
-            tabs.eq(index).removeClass('inactive-tab');
+        setActiveTab: function (index) {
+            this.tabLinks.not(':eq(' + index + ')').removeClass('active-tab');
+            this.tabLinks.eq(index).addClass('active-tab');
+
+            this.tabs.not(':eq(' + index + ')').addClass('inactive-tab');
+            this.tabs.eq(index).removeClass('inactive-tab');
         }
     });
 

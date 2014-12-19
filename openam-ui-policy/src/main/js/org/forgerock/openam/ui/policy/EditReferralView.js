@@ -156,7 +156,7 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
             if (this.data.entityName) {
                 policyDelegate.updateReferral( this.data.entityName, persisted )
                 .done(function (e) {
-                    router.routeTo(router.configuration.routes.managePolicies, {args: [self.data.options.appName], trigger: true});
+                    router.routeTo(router.configuration.routes.manageReferrals, {args: [self.data.options.appName], trigger: true});
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "referralUpdated");
                 })
                 .fail(function (e) {
@@ -165,7 +165,7 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
             } else {
                 policyDelegate.createReferral(persisted)
                 .done(function (e) {
-                    router.routeTo(router.configuration.routes.managePolicies, {args: [self.data.options.appName], trigger: true});
+                    router.routeTo(router.configuration.routes.manageReferrals, {args: [self.data.options.appName], trigger: true});
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "referralCreated");
                 })
                 .fail(function (e) {
