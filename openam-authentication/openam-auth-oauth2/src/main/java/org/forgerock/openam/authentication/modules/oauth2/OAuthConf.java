@@ -34,7 +34,7 @@ import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import org.forgerock.openam.authentication.modules.common.mapping.MappingUtils;
+import org.forgerock.openam.utils.MappingUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;

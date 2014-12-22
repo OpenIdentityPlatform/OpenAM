@@ -18,16 +18,11 @@ package org.forgerock.openam.authentication.modules.oidc;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.authentication.modules.common.mapping.MappingUtils;
+import org.forgerock.openam.utils.MappingUtils;
 import org.forgerock.util.Reject;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  * This class contains all of the module configuration state.

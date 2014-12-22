@@ -62,6 +62,25 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
 
     private ScopeValidator scopeValidator;
 
+
+    private static final Map<String, Object> scopeToUserUserProfileAttributes;
+
+    static {
+        scopeToUserUserProfileAttributes = new HashMap<String, Object>();
+        scopeToUserUserProfileAttributes.put("email","mail");
+        scopeToUserUserProfileAttributes.put("address", "postaladdress");
+        scopeToUserUserProfileAttributes.put("phone", "telephonenumber");
+
+        Map<String, Object> profileSet = new HashMap<String, Object>();
+        profileSet.put("name", "cn");
+        profileSet.put("given_name", "givenname");
+        profileSet.put("family_name", "sn");
+        profileSet.put("locale", "preferredlocale");
+        profileSet.put("zoneinfo", "preferredtimezone");
+
+        scopeToUserUserProfileAttributes.put("profile", profileSet);
+    }
+
     public OAuth2ProviderSettingsImpl(final String deploymentUrl, final ConfigurationResource configurationResource) {
         this.deploymentUrl = deploymentUrl;
         this.configurationResource = configurationResource;
@@ -295,6 +314,11 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     @Override
     public boolean exists() {
         return true;
+    }
+
+    @Override
+    public Map<String, Object> getUserProfileScopeMappings() {
+        return scopeToUserUserProfileAttributes;
     }
 
 }

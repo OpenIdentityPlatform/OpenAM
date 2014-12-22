@@ -94,6 +94,46 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="org-forgerock-oidc-profile-attribute-mappings"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a104a">
+                    <DefaultValues>
+                        <Value>name=cn</Value>
+                        <Value>given_name=givenname</Value>
+                        <Value>family_name=sn</Value>
+                        <Value>locale=preferredlocale</Value>
+                        <Value>zoneinfo=preferredtimezone</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="org-forgerock-oidc-email-attribute-mapping"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a104b">
+                    <DefaultValues>
+                        <Value>mail</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="org-forgerock-oidc-address-attribute-mapping"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a104c">
+                    <DefaultValues>
+                        <Value>postaladdress</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="org-forgerock-oidc-phone-attribute-mapping"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a104d">
+                    <DefaultValues>
+                        <Value>telephonenumber</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <AttributeSchema name="forgerock-oauth2-provider-response-type-map-class"
                                  type="list"
                                  syntax="string"
@@ -352,6 +392,46 @@
                                      i18nKey="a104">
                         <DefaultValues>
                             <Value>org.forgerock.openam.oauth2.OpenAMScopeValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="org-forgerock-oidc-profile-attribute-mappings"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="a104a">
+                        <DefaultValues>
+                            <Value>name=cn</Value>
+                            <Value>given_name=givenname</Value>
+                            <Value>family_name=sn</Value>
+                            <Value>locale=preferredlocale</Value>
+                            <Value>zoneinfo=preferredtimezone</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="org-forgerock-oidc-email-attribute-mapping"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a104b">
+                        <DefaultValues>
+                            <Value>mail</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="org-forgerock-oidc-address-attribute-mapping"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a104c">
+                        <DefaultValues>
+                            <Value>postaladdress</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="org-forgerock-oidc-phone-attribute-mapping"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a104d">
+                        <DefaultValues>
+                            <Value>telephonenumber</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

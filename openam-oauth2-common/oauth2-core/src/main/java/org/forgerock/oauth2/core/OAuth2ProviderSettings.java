@@ -372,4 +372,10 @@ public interface OAuth2ProviderSettings {
      * @return Whether it exists.
      */
     boolean exists();
+
+    /**
+     * The mappings of user profile attributes to id repo attributes.
+     * @return A map of attributes.
+     */
+    Map<String,Object> getUserProfileScopeMappings();
 }

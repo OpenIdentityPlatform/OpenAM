@@ -57,6 +57,7 @@ import org.forgerock.openam.oauth2.legacy.LegacyCoreTokenAdapter;
 import org.forgerock.openam.oauth2.legacy.LegacyResponseTypeHandler;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.openam.utils.MappingUtils;
 import org.forgerock.util.encode.Base64url;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
@@ -94,8 +95,8 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     private final String deploymentUrl;
     private final CookieExtractor cookieExtractor;
     private final PEMDecoder pemDecoder;
-
     private ScopeValidator scopeValidator;
+    private Map<String, Object> scopeToUserUserProfileAttributes;
 
     /**
      * Constructs a new OpenAMOAuth2ProviderSettings.
@@ -113,6 +114,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         this.cookieExtractor = cookieExtractor;
         this.pemDecoder = pemDecoder;
         addServiceListener();
+        setUserProfileScopeMappings();
     }
 
     private void addServiceListener() {
@@ -851,6 +853,25 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         }
     }
 
+    @Override
+    public Map<String, Object> getUserProfileScopeMappings() {
+        return scopeToUserUserProfileAttributes;
+    }
+
+    private void setUserProfileScopeMappings() {
+        try {
+            scopeToUserUserProfileAttributes = new HashMap<String, Object>();
+            scopeToUserUserProfileAttributes.put("email", getStringSetting(realm, OAuth2ProviderService.EMAIL_MAPPING));
+            scopeToUserUserProfileAttributes.put("address", getStringSetting(realm, OAuth2ProviderService.ADDRESS_MAPPING));
+            scopeToUserUserProfileAttributes.put("phone", getStringSetting(realm, OAuth2ProviderService.PHONE_MAPPING));
+
+            Set<String> profileMappings = getSetting(realm, OAuth2ProviderService.PROFILE_MAPPINGS);
+            scopeToUserUserProfileAttributes.put("profile", MappingUtils.parseMappings(profileMappings));
+        } catch (Exception e) {
+            logger.error("Could not load user profile attributes for realm "+realm, e);
+        }
+    }
+
     /**
      * ServiceListener implementation to clear cache when it changes.
      */
@@ -877,6 +898,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                     attributeCache.clear();
                     jwks.clear();
                 }
+                setUserProfileScopeMappings();
             } else {
                 if (logger.messageEnabled()) {
                     logger.message("Got service update message, but update did not target OAuth2Provider in " +

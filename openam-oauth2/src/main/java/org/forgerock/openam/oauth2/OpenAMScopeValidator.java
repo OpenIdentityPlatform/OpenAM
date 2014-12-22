@@ -73,27 +73,9 @@ import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
 public class OpenAMScopeValidator implements ScopeValidator {
 
     private static final String MULTI_ATTRIBUTE_SEPARATOR = ",";
-    private static Map<String, Object> scopeToUserUserProfileAttributes;
     private static final String DEFAULT_TIMESTAMP = "0";
     private static final DateFormat TIMESTAMP_DATE_FORMAT = new SimpleDateFormat("yyyyMMddhhmmss");
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
-
-    static {
-        scopeToUserUserProfileAttributes = new HashMap<String, Object>();
-        scopeToUserUserProfileAttributes.put("email","mail");
-        scopeToUserUserProfileAttributes.put("address", "postaladdress");
-        scopeToUserUserProfileAttributes.put("phone", "telephonenumber");
-
-        Map<String, Object> profileSet = new HashMap<String, Object>();
-        profileSet.put("name", "cn");
-        profileSet.put("given_name", "givenname");
-        profileSet.put("family_name", "sn");
-        profileSet.put("locale", "preferredlocale");
-        profileSet.put("zoneinfo", "preferredtimezone");
-
-        scopeToUserUserProfileAttributes.put("profile", profileSet);
-    }
-
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final IdentityManager identityManager;
     private final OpenIDTokenIssuer openIDTokenIssuer;
@@ -174,13 +156,15 @@ public class OpenAMScopeValidator implements ScopeValidator {
         response.put(OAuth2Constants.JWTTokenParams.SUB, token.getResourceOwnerId());
         response.put(OAuth2Constants.JWTTokenParams.UPDATED_AT, getUpdatedAt(token.getResourceOwnerId(),
                 ((OpenAMAccessToken) token).getRealm(), request));
+        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        Map<String, Object> scopeToUserProfileAttributes = providerSettings.getUserProfileScopeMappings();
         for(String scope: scopes){
 
             if (OPENID.equals(scope)) {
                 continue;
             }
             //get the attribute associated with the scope
-            Object attributes = scopeToUserUserProfileAttributes.get(scope);
+            Object attributes = scopeToUserProfileAttributes.get(scope);
             if (attributes == null){
                 logger.error("OpenAMScopeValidator.getUserInfo()::Invalid Scope in token scope=" + scope);
             } else if (attributes instanceof String){

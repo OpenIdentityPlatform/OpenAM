@@ -800,6 +800,10 @@ public class OAuth2Constants {
         public static final String ACR_VALUE_MAPPING = "forgerock-oauth2-provider-loa-mapping";
         public static final String DEFAULT_ACR = "forgerock-oauth2-provider-default-acr";
         public static final String INVALID_SCOPE_BEHAVIOUR = "forgerock-oauth2-provider-invalid-scope-behaviour";
+        public static final String PROFILE_MAPPINGS = "org-forgerock-oidc-profile-attribute-mappings";
+        public static final String EMAIL_MAPPING = "org-forgerock-oidc-email-attribute-mapping";
+        public static final String ADDRESS_MAPPING = "org-forgerock-oidc-address-attribute-mapping";
+        public static final String PHONE_MAPPING = "org-forgerock-oidc-phone-attribute-mapping";
     }
 
     /**

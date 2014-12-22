@@ -14,7 +14,7 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.authentication.modules.common.mapping;
+package org.forgerock.openam.utils;
 
 import com.sun.identity.shared.debug.Debug;
 
