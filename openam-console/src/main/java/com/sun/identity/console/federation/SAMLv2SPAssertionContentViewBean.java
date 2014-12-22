@@ -24,6 +24,7 @@
  *
  * $Id: SAMLv2SPAssertionContentViewBean.java,v 1.6 2008/12/11 18:52:06 babysunil Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.console.federation;
@@ -33,12 +34,11 @@ import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.ContainerView;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.View;
-import com.sun.identity.console.base.AMPropertySheet; 
+import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.AMTableTiledView;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.federation.model.SAMLv2Model;
-import com.sun.identity.console.federation.SAMLv2AuthContexts;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.table.CCActionTable;
@@ -52,20 +52,7 @@ import java.util.Set;
 public class SAMLv2SPAssertionContentViewBean extends SAMLv2Base {
     public static final String DEFAULT_DISPLAY_URL =
             "/console/federation/SAMLv2SPAssertionContent.jsp";
-        
-    public static final String CHILD_AUTH_CONTEXT_TILED_VIEW = "tableTiledView";
-    public static final String TBL_AUTHENTICATION_CONTEXTS =
-        "tblAuthenticationContext";
-    public static final String TBL_COL_SUPPORTED = "tblColSupported";
-    public static final String TBL_COL_CONTEXT_REFERENCE =
-        "tblColContextReference";
-    public static final String TBL_COL_LEVEL = "tblColLevel";
-    public static final String TBL_DATA_CONTEXT_REFERENCE =
-        "tblDataContextReference";
-    public static final String TBL_DATA_SUPPORTED = "tblDataSupported";
-    public static final String TBL_DATA_LABEL = "tblDataLabel";
-    public static final String TBL_DATA_LEVEL = "tblDataLevel";
-    
+
     protected CCActionTableModel tblAuthContextsModel;
 
     public SAMLv2SPAssertionContentViewBean() {
@@ -116,61 +103,9 @@ public class SAMLv2SPAssertionContentViewBean extends SAMLv2Base {
                 setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
                     e.getMessage());
             }            
-            populateAuthenticationContext(authContexts);
+            populateAuthenticationContext(authContexts, tblAuthContextsModel,
+                    SAMLv2Model.SP_AUTHN_CONTEXT_CLASS_REF_MAPPING_DEFAULT);
         }
-    }
-         
-    private void populateAuthenticationContext(SAMLv2AuthContexts authContexts) {        
-        List names = AUTH_CONTEXT_REF_NAMES;
-        // We know that names from model contains 25 elements
-        int sz = names.size();
-        tblAuthContextsModel.clear();
-        for (int i = 0; i < sz; i++) {
-            String name = (String)names.get(i);
-            populateAuthenticationContext(name, authContexts, i);           
-        }
-    }
-    
-    private void populateAuthenticationContext(
-        String name,
-        SAMLv2AuthContexts authContexts,
-        int index
-        ) {
-        if (index != 0) {
-            tblAuthContextsModel.appendRow();
-        }
-        
-        SAMLv2Model model =
-            (SAMLv2Model)getModelInternal();
-        tblAuthContextsModel.setValue(TBL_DATA_CONTEXT_REFERENCE, name);
-        tblAuthContextsModel.setValue(TBL_DATA_LABEL,
-            model.getLocalizedString(getAuthContextI18nKey(name)));
-        
-        SAMLv2AuthContexts.SAMLv2AuthContext authContextObj = null;
-        if (authContexts != null) {
-            authContextObj = authContexts.get(name);
-        }
-        
-        if (authContextObj == null) {
-            tblAuthContextsModel.setValue(TBL_DATA_SUPPORTED, "");
-            tblAuthContextsModel.setValue(TBL_DATA_LEVEL, "0");
-        }else{
-            tblAuthContextsModel.setValue(TBL_DATA_SUPPORTED, 
-                authContextObj.supported);
-            tblAuthContextsModel.setValue(TBL_DATA_LEVEL, 
-                authContextObj.level);
-            if(authContextObj.isDefault){
-                setDisplayFieldValue(
-                    model.SP_AUTHN_CONTEXT_CLASS_REF_MAPPING_DEFAULT,
-                    authContextObj.name);
-            }
-        }        
-    }
-    
-    private String getAuthContextI18nKey(String name) {
-        int idx = name.lastIndexOf(":");
-        String key = (idx != -1) ? name.substring(idx+1) : name;
-        return "samlv2.authenticationContext." + key + ".label";
     }
     
     protected void createPropertyModel() {
@@ -212,8 +147,8 @@ public class SAMLv2SPAssertionContentViewBean extends SAMLv2Base {
                 
         SAMLv2AuthContexts authContexts = new SAMLv2AuthContexts();      
         String defaultAuthnContext = 
-            (String)getDisplayFieldValue("spDefaultAuthnContext");  
-        for (int i = 0; i < AUTH_CONTEXT_REF_COUNT; i++) {
+            (String)getDisplayFieldValue(SAMLv2Model.SP_AUTHN_CONTEXT_CLASS_REF_MAPPING_DEFAULT);
+        for (int i = 0; i < tblAuthContextsModel.getSize(); i++) {
             tblAuthContextsModel.setLocation(i);
             String name = (String)tblAuthContextsModel.getValue(
                 TBL_DATA_CONTEXT_REFERENCE);

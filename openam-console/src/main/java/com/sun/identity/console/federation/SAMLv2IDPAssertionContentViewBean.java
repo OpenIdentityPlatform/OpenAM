@@ -24,10 +24,7 @@
  *
  * $Id: SAMLv2IDPAssertionContentViewBean.java,v 1.5 2008/09/25 01:52:20 babysunil Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2014 ForgeRock AS.
  */
 
 package com.sun.identity.console.federation;
@@ -53,24 +50,7 @@ import java.util.*;
 public class SAMLv2IDPAssertionContentViewBean extends SAMLv2Base {
     public static final String DEFAULT_DISPLAY_URL =
             "/console/federation/SAMLv2IDPAssertionContent.jsp";
-        
-    public static final String CHILD_AUTH_CONTEXT_TILED_VIEW = "tableTiledView";
-    public static final String TBL_AUTHENTICATION_CONTEXTS =
-        "tblAuthenticationContext";
-    public static final String TBL_COL_SUPPORTED = "tblColSupported";
-    public static final String TBL_DATA_SUPPORTED = "tblDataSupported";
-    public static final String TBL_COL_CONTEXT_REFERENCE =
-        "tblColContextReference";
-    public static final String TBL_DATA_CONTEXT_REFERENCE =
-        "tblDataContextReference";
-    public static final String TBL_DATA_LABEL = "tblDataLabel";
-    public static final String TBL_COL_KEY = "tblColKey";
-    public static final String TBL_DATA_KEY = "tblDataKey";
-    public static final String TBL_COL_VALUE = "tblColValue";
-    public static final String TBL_DATA_VALUE = "tblDataValue";
-    public static final String TBL_COL_LEVEL = "tblColLevel";
-    public static final String TBL_DATA_LEVEL = "tblDataLevel";
-    
+
     protected CCActionTableModel tblAuthContextsModel;
     
     public SAMLv2IDPAssertionContentViewBean() {
@@ -120,70 +100,11 @@ public class SAMLv2IDPAssertionContentViewBean extends SAMLv2Base {
                 setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
                     e.getMessage());
             }           
-            populateAuthenticationContext(authContexts);
+            populateAuthenticationContext(authContexts, tblAuthContextsModel,
+                    SAMLv2Model.IDP_AUTHN_CONTEXT_CLASS_REF_MAPPING_DEFAULT);
         }
     }
-    
-    private void populateAuthenticationContext(SAMLv2AuthContexts authContexts) {
-        
-        List names = AUTH_CONTEXT_REF_NAMES;
-        // We know that names from model contains 25 elements
-        int sz = names.size();
-        tblAuthContextsModel.clear();
-        for (int i = 0; i < sz; i++) {
-            String name = (String)names.get(i);
-            populateAuthenticationContext(name, authContexts, i);            
-        }
-    }
-    
-    private void populateAuthenticationContext(
-        String name,
-        SAMLv2AuthContexts authContexts,
-        int index
-        ) {
-        if (index != 0) {
-            tblAuthContextsModel.appendRow();
-        }
-        
-        SAMLv2Model model =
-            (SAMLv2Model)getModelInternal();
-        tblAuthContextsModel.setValue(TBL_DATA_CONTEXT_REFERENCE, name);
-        tblAuthContextsModel.setValue(TBL_DATA_LABEL,
-            model.getLocalizedString(getAuthContextI18nKey(name)));
-        
-        SAMLv2AuthContexts.SAMLv2AuthContext authContextObj = null;
-        if (authContexts != null) {
-            authContextObj = authContexts.get(name);
-        }
-        
-        if (authContextObj == null) {
-            tblAuthContextsModel.setValue(TBL_DATA_LEVEL, "0");
-            tblAuthContextsModel.setValue(TBL_DATA_KEY, "none");
-            tblAuthContextsModel.setValue(TBL_DATA_SUPPORTED, "");
-            tblAuthContextsModel.setValue(TBL_DATA_VALUE, "");
-        }else{
-            tblAuthContextsModel.setValue(TBL_DATA_LEVEL, 
-                authContextObj.level);
-            tblAuthContextsModel.setValue(TBL_DATA_KEY, 
-                authContextObj.key);
-            tblAuthContextsModel.setValue(TBL_DATA_SUPPORTED, 
-                authContextObj.supported);
-            tblAuthContextsModel.setValue(TBL_DATA_VALUE, 
-                authContextObj.value);
-            if(authContextObj.isDefault){
-                setDisplayFieldValue(
-                    model.IDP_AUTHN_CONTEXT_CLASS_REF_MAPPING_DEFAULT, 
-                    authContextObj.name);
-            }
-        }        
-    }
-    
-    private String getAuthContextI18nKey(String name) {
-        int idx = name.lastIndexOf(":");
-        String key = (idx != -1) ? name.substring(idx+1) : name;
-        return "samlv2.authenticationContext." + key + ".label";
-    }
-    
+
     protected void createPropertyModel() {
         retrieveCommonProperties();
         if (isHosted()) {
@@ -227,9 +148,9 @@ public class SAMLv2IDPAssertionContentViewBean extends SAMLv2Base {
         tbl.restoreStateData();        
                 
         SAMLv2AuthContexts authContexts = new SAMLv2AuthContexts();                      
-        String defaultAuthnContext = 
-            (String)getDisplayFieldValue("idpDefaultAuthnContext");  
-        for (int i = 0; i < AUTH_CONTEXT_REF_COUNT; i++) {           
+        String defaultAuthnContext =
+                (String)getDisplayFieldValue(SAMLv2Model.IDP_AUTHN_CONTEXT_CLASS_REF_MAPPING_DEFAULT);
+        for (int i = 0; i < tblAuthContextsModel.getSize(); i++) {
             tblAuthContextsModel.setLocation(i);                       
             String name = (String)tblAuthContextsModel.getValue(
                 TBL_DATA_CONTEXT_REFERENCE);

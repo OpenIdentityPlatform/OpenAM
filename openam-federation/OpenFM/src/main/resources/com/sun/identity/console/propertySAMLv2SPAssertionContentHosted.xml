@@ -24,10 +24,7 @@
 
    $Id: propertySAMLv2SPAssertionContentHosted.xml,v 1.7 2008/08/05 22:23:58 babysunil Exp $
 
--->
-
-<!--
-   Portions Copyrighted 2010 ForgeRock AS
+   Portions Copyrighted 2010-2014 ForgeRock AS
 -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -221,35 +218,8 @@
         </property>
         <property required="true">
             <label name="lblDefaultAuthenticationContext" defaultValue="samlv2.entityDescriptor.provider.attribute.label.defaultAuthenticationContext" labelFor="singleChoiceDefaultAuthenticationContext" />
-            <cc name="spDefaultAuthnContext" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
-                <option label="samlv2.authenticationContext.none.label" value="none"/>
-                <option label="samlv2.authenticationContext.InternetProtocol.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol"/>
-                <option label="samlv2.authenticationContext.InternetProtocolPassword.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocolPassword"/>
-                <option label="samlv2.authenticationContext.Kerberos.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:Kerberos"/>
-                <option label="samlv2.authenticationContext.MobileOneFactorUnregistered.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:MobileOneFactorUnregistered"/>
-                <option label="samlv2.authenticationContext.MobileTwoFactorUnregistered.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered"/>
-                <option label="samlv2.authenticationContext.MobileOneFactorContract.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:MobileOneFactorContract"/>
-                <option label="samlv2.authenticationContext.MobileTwoFactorContract.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorContract"/>
-                <option label="samlv2.authenticationContext.Password.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:Password"/>
-                <option label="samlv2.authenticationContext.PasswordProtectedTransport.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"/>
-                <option label="samlv2.authenticationContext.PreviousSession.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession"/>
-                <option label="samlv2.authenticationContext.X509.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:X509"/>
-                <option label="samlv2.authenticationContext.PGP.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:PGP"/>
-                <option label="samlv2.authenticationContext.SPKI.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:SPKI"/>
-                <option label="samlv2.authenticationContext.XMLDSig.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:XMLDSig"/>
-                <option label="samlv2.authenticationContext.Smartcard.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:Smartcard"/>
-                <option label="samlv2.authenticationContext.SmartcardPKI.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:SmartcardPKI"/>
-                <option label="samlv2.authenticationContext.SoftwarePKI.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:SoftwarePKI"/>
-                <option label="samlv2.authenticationContext.Telephony.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:Telephony"/>
-                <option label="samlv2.authenticationContext.NomadTelephony.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:NomadTelephony"/>
-                <option label="samlv2.authenticationContext.PersonalTelephony.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:PersonalTelephony"/>
-                <option label="samlv2.authenticationContext.AuthenticatedTelephony.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:AuthenticatedTelephony"/>
-                <option label="samlv2.authenticationContext.SecureRemotePassword.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:SecureRemotePassword"/>
-                <option label="samlv2.authenticationContext.TLSClient.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:TLSClient"/>
-                <option label="samlv2.authenticationContext.TimeSyncToken.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:TimeSyncToken"/>
-                <option label="samlv2.authenticationContext.unspecified.label" value="urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified"/> 
-            </cc>
-        </property>          
+            <cc name="spDefaultAuthnContext" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
+        </property>
         <property span="true">
             <cc name="tblAuthenticationContext" tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
                 <attribute name="title" value="samlv2.entityDescriptor.provider.table.title.authenticationContexts" />
