@@ -49,15 +49,9 @@ define("org/forgerock/openam/ui/policy/SelectRealmsView", [
 
             var self = this;
             _.extend(this.data, args);
-            this.data.entity.realms = _.sortBy(this.data.entity.realms);
-            self.data.options.selectableRealms = $.extend({}, self.data.options.filteredRealms);
 
-            _.each(this.data.entity.realms, function(realm){
-                self.data.options.selectableRealms = _.reject(self.data.options.selectableRealms,
-                    function(selected) {
-                        return selected === realm;
-                    });
-            });
+            this.data.entity.realms = _.sortBy(this.data.entity.realms);
+            this.data.options.selectableRealms = this.getSelectableRealms();
 
             this.parentRender(function () {
 
@@ -73,6 +67,23 @@ define("org/forgerock/openam/ui/policy/SelectRealmsView", [
                 }
             });
 
+        },
+
+        getSelectableRealms: function () {
+
+            var self = this,
+                selectableRealms = $.extend([], self.data.options.filteredRealms);
+
+            if (self.data.options.filteredRealms.length > 0) {
+                _.each(self.data.entity.realms, function(realm){
+                    selectableRealms = _.reject(selectableRealms,
+                        function(selected) {
+                            return selected === realm;
+                        });
+                });
+            }
+
+            return selectableRealms.length > 0 ? selectableRealms : null;
         },
 
         addRealm: function (e) {
@@ -118,7 +129,7 @@ define("org/forgerock/openam/ui/policy/SelectRealmsView", [
         var result =  string.slice(1);
         if(result.length > 0){
             result = '<span class="realm icon-arrow-right2"></span>' + result.replace(/\//g, '<span class="realm icon-arrow-right2"></span>');
-        } 
+        }
         return new Handlebars.SafeString('<span class="realm toplevel">/</span>' + result);
     });
 

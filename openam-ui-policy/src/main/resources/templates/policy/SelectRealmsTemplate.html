@@ -13,6 +13,7 @@
         <li class="invalid">{{t "policy.common.noRealms"}}</li>
         {{/if}}
 
+        {{#if options.selectableRealms}}
         <li class="editing clearfix">
             <span tabindex="0" class="icon-plus float-right"></span>
             <div id="selectableRealmContainer">
@@ -21,8 +22,16 @@
                 {{#each options.selectableRealms}}
                     <option value={{this}}>{{this}}</option>
                 {{/each}}
-            </select>  
-            </div>      
+            </select>
+            </div>
         </li>
+        {{/if}}
+
     </ul>
+
+    {{#unless options.selectableRealms}}
+    <div class="rules-help">
+        <p>{{t "policy.editReferrals.noAvailableRealms"}}</p>
+    </div>
+    {{/unless}}
 </div>

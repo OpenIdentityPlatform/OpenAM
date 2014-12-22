@@ -263,9 +263,9 @@
       "subjects": "Subjects",
       "environments": "Environments",
 
-      "noRealms": "There are no realms...",
-      "noActions": "There are no actions...",
-      "noResources": "There are no resources...",
+      "noRealms": "There are no selected realms...",
+      "noActions": "There are no selected actions...",
+      "noResources": "There are no selected resources...",
 
       "noStaticAttributes": "There are no Static attributes...",
       "noSubjectAttributes": "There are no Subject attributes...",
@@ -371,7 +371,9 @@
       "step3": "Step 3: Select Realms",
       "step4": "Step 4: Review Configuration and Finish",
       "selectRealmsDescription": "Referrals can only redirect to a sibling or child Realm. Select a Realm in the Available realms field, and then click the Add button. To remove a Realm, click the Delete button.",
-      "selectRealmsPlaceholder": "Available realms..."
+      "selectRealmsPlaceholder": "Available realms...",
+      "noAvailableRealms": "There are no sibling or child realms available for selection."
+
     },
 
 
