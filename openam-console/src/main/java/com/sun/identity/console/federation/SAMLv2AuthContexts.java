@@ -24,6 +24,7 @@
  *
  * $Id: SAMLv2AuthContexts.java,v 1.4 2009/05/11 21:15:39 asyhuang Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.console.federation;
@@ -40,9 +41,9 @@ import java.util.ArrayList;
  * This is collections of authentication contexts. This object can be serialized
  * between view beans forwarding.
  */
-public class SAMLv2AuthContexts
-    implements Serializable {
-    private Map collections = new HashMap();
+public class SAMLv2AuthContexts implements Serializable {
+
+    private Map<String, SAMLv2AuthContext> collections = new HashMap<String, SAMLv2AuthContext>();
     
     /**
      * Default Constructor.
@@ -50,50 +51,41 @@ public class SAMLv2AuthContexts
     public SAMLv2AuthContexts() {
     }
     
-    public List toSPAuthContextInfo(){
-        List list = new ArrayList();
-        Set entries = collections.entrySet();
-        Iterator iterator = entries.iterator();
-        while (iterator.hasNext()) {
-            Map.Entry entry = (Map.Entry)iterator.next();
-            SAMLv2AuthContext SAMLv2AuthContextObj =
-                (SAMLv2AuthContext) entry.getValue();           
-            String str = SAMLv2AuthContextObj.name + "|" +
-                SAMLv2AuthContextObj.level + "|";
-            if(SAMLv2AuthContextObj.isDefault){
-                str = str + "default";
-            }
-            if(SAMLv2AuthContextObj.supported.equals("true")){
-                list.add(str);
+    public List<String> toSPAuthContextInfo() {
+
+        List<String> list = new ArrayList<String>();
+        for (SAMLv2AuthContext entry : collections.values()) {
+            if (entry.supported.equals("true")) {
+                StringBuilder str = new StringBuilder();
+                str.append(entry.name).append("|").append(entry.level).append("|");
+                if (entry.isDefault) {
+                    str.append("default");
+                }
+                list.add(str.toString());
             }
         }
        
         return list;
     }
     
-    public List toIDPAuthContextInfo(){        
-        List list = new ArrayList();
-        Set entries = collections.entrySet();
-        Iterator iterator = entries.iterator();
-        while (iterator.hasNext()) {
-            Map.Entry entry = (Map.Entry)iterator.next();            
-            SAMLv2AuthContext SAMLv2AuthContextObj =
-                (SAMLv2AuthContext)entry.getValue();
-            String str = SAMLv2AuthContextObj.name
-                + "|" +  SAMLv2AuthContextObj.level 
-                + "|" ;
-            if(!SAMLv2AuthContextObj.key.equals("none")){
-                str = str +  SAMLv2AuthContextObj.key
-                    + "=" +  SAMLv2AuthContextObj.value;
+    public List<String> toIDPAuthContextInfo() {
+
+        List<String> list = new ArrayList<String>();
+        for (SAMLv2AuthContext entry : collections.values()) {
+            if (entry.supported.equals("true")) {
+                StringBuilder str = new StringBuilder();
+                str.append(entry.name).append("|").append(entry.level).append("|");
+                if (!entry.key.equals("none")) {
+                    str.append(entry.key).append("=").append(entry.value);
+                }
+                str.append("|");
+                if (entry.isDefault) {
+                    str.append("default");
+                }
+                list.add(str.toString());
             }
-            str = str + "|";
-            if(SAMLv2AuthContextObj.isDefault){
-                str = str + "default";
-            }
-            if(SAMLv2AuthContextObj.supported.equals("true")){
-                list.add(str);
-            }
-        }       
+        }
+
         return list;
     }
     /**
@@ -114,7 +106,7 @@ public class SAMLv2AuthContexts
         return collections.size();
     }
     
-    public Map getCollections(){
+    public Map<String, SAMLv2AuthContext> getCollections(){
         return collections;
     }
     
@@ -212,7 +204,7 @@ public class SAMLv2AuthContexts
      * @return SAMLv2AuthContext in the collection.
      */
     public SAMLv2AuthContext get(String name) {
-        return (SAMLv2AuthContext)collections.get(name);
+        return collections.get(name);
     }
     
     public class SAMLv2AuthContext
