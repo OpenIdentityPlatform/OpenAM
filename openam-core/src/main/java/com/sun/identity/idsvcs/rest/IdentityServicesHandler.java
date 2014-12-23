@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -37,34 +37,39 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.client.ZeroPageLoginConfig;
+import com.sun.identity.authentication.service.AuthException;
+import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.idsvcs.AccountExpired;
+import com.sun.identity.idsvcs.Attribute;
+import com.sun.identity.idsvcs.GeneralFailure;
+import com.sun.identity.idsvcs.IdentityDetails;
+import com.sun.identity.idsvcs.IdentityServicesFactory;
+import com.sun.identity.idsvcs.IdentityServicesImpl;
+import com.sun.identity.idsvcs.ListWrapper;
+import com.sun.identity.idsvcs.MaximumSessionReached;
+import com.sun.identity.idsvcs.ObjectNotFound;
+import com.sun.identity.idsvcs.OrgInactive;
+import com.sun.identity.idsvcs.Token;
+import com.sun.identity.idsvcs.UserDetails;
+import com.sun.identity.idsvcs.UserInactive;
+import com.sun.identity.idsvcs.UserLocked;
 import com.sun.identity.shared.debug.Debug;
-import java.io.IOException;
-import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import com.sun.identity.sm.SMSException;
+
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.sun.identity.idsvcs.Attribute;
-import com.sun.identity.idsvcs.GeneralFailure;
-import com.sun.identity.idsvcs.IdentityDetails;
-import com.sun.identity.idsvcs.IdentityServicesImpl;
-import com.sun.identity.idsvcs.IdentityServicesFactory;
-import com.sun.identity.idsvcs.AccountExpired;
-import com.sun.identity.idsvcs.ListWrapper;
-import com.sun.identity.idsvcs.MaximumSessionReached;
-import com.sun.identity.idsvcs.ObjectNotFound;
-import com.sun.identity.idsvcs.OrgInactive;
-import com.sun.identity.idsvcs.UserInactive;
-import com.sun.identity.idsvcs.UserLocked;
-import com.sun.identity.idsvcs.Token;
-import com.sun.identity.idsvcs.UserDetails;
+import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides a marshall/unmarshall layer to the Security interface.
@@ -681,6 +686,12 @@ public class IdentityServicesHandler extends HttpServlet {
                         new UnsupportedOperationException(path));
                     return;
                 }
+
+                // Respect Zero-Page Login Settings
+                if (method == SecurityMethod.AUTHENTICATE && !isZeroPageLoginAllowed(request)) {
+                    throw new UnsupportedOperationException("Zero-page login is not allowed");
+                }
+
                 // execute the method w/ the parameters..
                 Object value = method.invoke(security, request);
                 // marshall the response..
@@ -735,6 +746,34 @@ public class IdentityServicesHandler extends HttpServlet {
                 }
             }
         }
+
+       private static boolean isZeroPageLoginAllowed(HttpServletRequest request) throws AuthException, SMSException,
+               SSOException {
+           final String realm = getRealm(request);
+           final ZeroPageLoginConfig config = AuthUtils.getZeroPageLoginConfig(realm);
+           return AuthClientUtils.isZeroPageLoginAllowed(config, request);
+       }
+
+       /**
+        * Gets the realm being used for this request by parsing the query parameters on the URI parameter (if present).
+        * This matches the logic used in opensso/IdentityServicesImpl. Defaults to "/".
+        */
+       private static String getRealm(HttpServletRequest request) {
+           String realm = "/";
+
+           final String uri = SecurityParameter.URI.getString(request);
+           if (uri != null) {
+               for (String param : uri.split("&")) {
+                   String[] parts = param.split("=");
+                   if (parts.length == 2 && "realm".equals(parts[0])) {
+                       realm = parts[1];
+                       break;
+                   }
+               }
+           }
+
+           return realm;
+       }
 
         /**
          * If both exist on the path then return JSON, XML, and then Properites

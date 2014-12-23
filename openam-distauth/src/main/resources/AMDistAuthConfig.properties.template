@@ -338,3 +338,21 @@ openam.forbidden.to.copy.headers=connection
  *  it will only display the Logout successful screen.
  */
 openam.authentication.ignore_goto_during_logout=false
+
+/**
+ * Whether to allow Zero Page Login for DAS requests. If enabled, this allows
+ * clients to log in by supplying credentials in query parameters.
+ */
+openam.auth.zero.page.login.enabled=false
+
+/**
+ * A space-separated list of HTTP Referer URLs from which Zero Page Login requests are
+ * accepted. Leave blank to allow from any URL. Provides mitigation against
+ * Login CSRF attacks when ZPL is enabled.
+ */
+openam.auth.zero.page.login.referer.whitelist=
+
+/**
+ * Whether to allow ZPL requests which have no HTTP Referer header.
+ */
+openam.auth.zero.page.login.allow.null.referer=true

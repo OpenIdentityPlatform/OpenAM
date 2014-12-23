@@ -45,6 +45,7 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.UI.ButtonTiledView;
 import com.sun.identity.authentication.UI.CallBackTiledView;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.client.ZeroPageLoginConfig;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -788,7 +789,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     }
     
     private void setOnePageLogin() {
-        if (!bAuthLevel && (isPost || SystemProperties.getAsBoolean(Constants.ZERO_PAGE_LOGIN_ENABLED))) {
+        if (!bAuthLevel && isZeroPageLoginAllowed()) {
             // Auth Level login will never do one page login.
             parseUserCredentials();
 
@@ -802,7 +803,26 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             }
         }
     }
-    
+
+    /**
+     * Determines whether Zero Page Login (ZPL) should be allowed for this request. ZPL is only permitted if it is
+     * enabled and the HTTP Referer for this request is in the configured whitelist (or no referer is provided and
+     * the server is configured to allow requests without a Referer header).
+     *
+     * @return true if ZPL is allowed for this request.
+     * @see com.sun.identity.shared.Constants#ZERO_PAGE_LOGIN_ENABLED
+     * @see com.sun.identity.shared.Constants#ZERO_PAGE_LOGIN_WHITELIST
+     * @see com.sun.identity.shared.Constants#ZERO_PAGE_LOGIN_ALLOW_MISSING_REFERER
+     */
+    private boolean isZeroPageLoginAllowed() {
+        final ZeroPageLoginConfig config = new ZeroPageLoginConfig(
+                SystemProperties.getAsBoolean(Constants.ZERO_PAGE_LOGIN_ENABLED),
+                SystemProperties.getAsSet(Constants.ZERO_PAGE_LOGIN_WHITELIST),
+                SystemProperties.getAsBoolean(Constants.ZERO_PAGE_LOGIN_ALLOW_MISSING_REFERER)
+        );
+        return AuthClientUtils.isZeroPageLoginAllowed(config, request);
+    }
+
     protected void getLoginDisplay() throws Exception {
         loginDebug.message("In getLoginDisplay()");
         

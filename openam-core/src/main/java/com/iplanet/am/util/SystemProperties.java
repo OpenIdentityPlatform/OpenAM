@@ -36,6 +36,7 @@ import com.sun.identity.common.PropertiesFinder;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.SMSEntry;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -43,6 +44,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.security.AccessController;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,6 +83,8 @@ public class SystemProperties {
     private static Map attributeMap = new HashMap();
     private static boolean sitemonitorDisabled = false;
     private final static String TRUE = "true";
+    /** Regular expression pattern for a sequence of 1 or more white space characters. */
+    private static final String WHITESPACE = "\\s+";
     
     static {
         initAttributeMapping();
@@ -386,6 +390,43 @@ public class SystemProperties {
         } catch (NumberFormatException e) {
             return defaultValue;
         }
+    }
+
+    /**
+     * Parses a system property as a set of strings by splitting the value on the given delimiter expression.
+     *
+     * @param key The System Property key to lookup.
+     * @param delimiterRegex The regular expression to use to split the value into elements in the set.
+     * @param defaultValue The default set to return if the property does not exist.
+     * @return the value of the property parsed as a set of strings.
+     */
+    public static Set<String> getAsSet(String key, String delimiterRegex, Set<String> defaultValue) {
+        String value = get(key);
+        if (value == null || value.trim().isEmpty()) {
+            return defaultValue;
+        }
+        return CollectionUtils.asSet(value.split(delimiterRegex));
+    }
+
+    /**
+     * Parses a system property as a set of strings by splitting the value on the given delimiter expression.
+     *
+     * @param key The System Property key to lookup.
+     * @param delimiterRegex The regular expression to use to split the value into elements in the set.
+     * @return the value of the property parsed as a set of strings or an empty set if no match is found.
+     */
+    public static Set<String> getAsSet(String key, String delimiterRegex) {
+        return getAsSet(key, delimiterRegex, Collections.<String>emptySet());
+    }
+
+    /**
+     * Parses a system property as a set of strings by splitting the value on white space characters.
+     *
+     * @param key The System Property key to lookup.
+     * @return the value of the property parsed as a set of strings or an empty set if no match is found.
+     */
+    public static Set<String> getAsSet(String key) {
+        return getAsSet(key, WHITESPACE);
     }
 
     /**

@@ -1300,6 +1300,19 @@ public interface Constants {
     public static final String CTS_MAX_CONNECTIONS = "org.forgerock.services.cts.store.max.connections";
 
     /**
+     * System property/service attribute name for property giving whitelist of allowed HTTP Referer URLs that
+     * are allowed. This provides some mitigation against Login CSRF attacks. When used as a system property, this
+     * should be a space-delimited list of referer urls.
+     */
+    public static final String ZERO_PAGE_LOGIN_WHITELIST = "openam.auth.zero.page.login.referer.whitelist";
+
+    /**
+     * System property/service attribute name for whether to allow Zero Page Login requests if the HTTP Referer
+     * header is not set.
+     */
+    public static final String ZERO_PAGE_LOGIN_ALLOW_MISSING_REFERER = "openam.auth.zero.page.login.allow.null.referer";
+
+    /**
      * Heartbeat in seconds of the LDAP Store
      */
     public static final String LDAP_HEARTBEAT = "org.forgerock.services.cts.store.heartbeat";
