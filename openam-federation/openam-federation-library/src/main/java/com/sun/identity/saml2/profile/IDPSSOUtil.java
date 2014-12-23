@@ -659,21 +659,20 @@ public class IDPSSOUtil {
         Map props = new HashMap();
         props.put(LogUtil.NAME_ID, nameIDString);
 
-        // send the response back through HTTP POST or Artifact 
-        if (acsBinding.equals(SAML2Constants.HTTP_POST)) {
-            // check if response needs to be signed.
-            // if response is signed then assertion
-            // will not be signed for POST Profile
-            boolean signAssertion = true;
-            boolean signResponse =
-                    SAML2Utils.wantPOSTResponseSigned(realm,
-                            spEntityID, SAML2Constants.SP_ROLE);
-            // signing assertion is a must for POST profile if
-            // response signing is not enabled.
+        // send the response back through HTTP POST or Artifact
+        if (acsBinding.equals(SAML2Constants.HTTP_POST)) {  
+            // 4.1.4.5 POST-Specific Processing Rules (sstc-saml-profiles-errata-2.0-wd-06-diff.pdf)
+            //If response is not signed and POST binding is used, the assertion(s) MUST be signed.
             // encryption is optional based on SP config settings.
-            signAndEncryptResponseComponents(
-                    realm, spEntityID, idpEntityID, res, signAssertion);
-
+            boolean signAssertion = true;
+            // check if response needs to be signed.
+            boolean signResponse = SAML2Utils.wantPOSTResponseSigned(realm, spEntityID, SAML2Constants.SP_ROLE);
+            // if signing response then signing assertion is optional
+            // so will base on wantAssertionsSigned flag
+            if (signResponse) {
+                signAssertion = wantAssertionsSigned(spEntityID, realm);
+            }
+            signAndEncryptResponseComponents(realm, spEntityID, idpEntityID, res, signAssertion);
             if (signResponse) {
                 signResponse(realm, idpEntityID, res);
             }
@@ -1463,9 +1462,8 @@ public class IDPSSOUtil {
                 spNameQualifier = recipientEntityID;
             }
         }
-
-        SPSSODescriptorElement spsso = metaManager.getSPSSODescriptor(
-                realm, recipientEntityID);
+        SPSSODescriptorElement spsso = getSPSSODescriptor(
+                realm, recipientEntityID, classMethod);
         if (spsso == null) {
             String[] data = {recipientEntityID};
             LogUtil.error(Level.INFO, LogUtil.SP_METADATA_ERROR, data, null);
@@ -1783,37 +1781,9 @@ public class IDPSSOUtil {
             String spEntityID,
             String realm,
             StringBuffer returnedBinding) throws SAML2Exception {
-
         String classMethod = "IDPSSOUtil.getDefaultACSurl: ";
-        SPSSODescriptorElement spSSODescriptorElement = null;
-        if (metaManager == null) {
-            SAML2Utils.debug.error(classMethod
-                    + "Unable to get meta manager.");
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("errorMetaManager"));
-        }
-
-        try {
-            spSSODescriptorElement = metaManager.getSPSSODescriptor(
-                    realm, spEntityID);
-            if (spSSODescriptorElement == null) {
-                SAML2Utils.debug.error(classMethod
-                        + "Unable to get SP SSO Descriptor from meta.");
-                String[] data = {spEntityID};
-                LogUtil.error(Level.INFO,
-                        LogUtil.SP_METADATA_ERROR, data, null);
-                throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("metaDataError"));
-            }
-        } catch (SAML2MetaException sme) {
-            SAML2Utils.debug.error(classMethod
-                    + "Unable to get SP SSO Descriptor from meta.");
-            String[] data = {spEntityID};
-            LogUtil.error(Level.INFO,
-                    LogUtil.SP_METADATA_ERROR, data, null);
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("metaDataError"));
-        }
+        SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
+                realm, spEntityID, classMethod);
         List acsList = spSSODescriptorElement.getAssertionConsumerService();
         AssertionConsumerServiceElement acs = null;
         String acsURL = null;
@@ -1856,37 +1826,9 @@ public class IDPSSOUtil {
             String spEntityID,
             String realm,
             String acsURL) throws SAML2Exception {
-
         String classMethod = "IDPSSOUtil.getBindingForAcsUrl: ";
-        SPSSODescriptorElement spSSODescriptorElement = null;
-        if (metaManager == null) {
-            SAML2Utils.debug.error(classMethod
-                    + "Unable to get meta manager.");
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("errorMetaManager"));
-        }
-
-        try {
-            spSSODescriptorElement = metaManager.getSPSSODescriptor(
-                    realm, spEntityID);
-            if (spSSODescriptorElement == null) {
-                SAML2Utils.debug.error(classMethod
-                        + "Unable to get SP SSO Descriptor from meta.");
-                String[] data = {spEntityID};
-                LogUtil.error(Level.INFO,
-                        LogUtil.SP_METADATA_ERROR, data, null);
-                throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("metaDataError"));
-            }
-        } catch (SAML2MetaException sme) {
-            SAML2Utils.debug.error(classMethod
-                    + "Unable to get SP SSO Descriptor from meta.");
-            String[] data = {spEntityID};
-            LogUtil.error(Level.INFO,
-                    LogUtil.SP_METADATA_ERROR, data, null);
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("metaDataError"));
-        }
+        SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
+                realm, spEntityID, classMethod);
         List acsList = spSSODescriptorElement.getAssertionConsumerService();
         AssertionConsumerServiceElement acs = null;
         String binding = null;
@@ -1920,36 +1862,8 @@ public class IDPSSOUtil {
             throws SAML2Exception {
 
         String classMethod = "IDPSSOUtil.getACSurlFromMetaByBinding: ";
-        SPSSODescriptorElement spSSODescriptorElement = null;
-        if (metaManager == null) {
-            SAML2Utils.debug.error(classMethod
-                    + "Unable to get meta manager.");
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("errorMetaManager"));
-        }
-
-        try {
-            spSSODescriptorElement = metaManager.getSPSSODescriptor(
-                    realm, spEntityID);
-            if (spSSODescriptorElement == null) {
-                SAML2Utils.debug.error(classMethod
-                        + "Unable to get SP SSO Descriptor from meta.");
-                String[] data = {spEntityID};
-                LogUtil.error(Level.INFO,
-                        LogUtil.SP_METADATA_ERROR, data, null);
-                throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("metaDataError"));
-            }
-        } catch (SAML2MetaException sme) {
-            SAML2Utils.debug.error(classMethod
-                    + "Unable to get SP SSO Descriptor from meta.");
-            String[] data = {spEntityID};
-            LogUtil.error(Level.INFO,
-                    LogUtil.SP_METADATA_ERROR, data, null);
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("metaDataError"));
-        }
-
+        SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
+                realm, spEntityID, classMethod);
         List acsList = spSSODescriptorElement.getAssertionConsumerService();
         String acsURL = null;
         String binding = null;
@@ -2018,36 +1932,8 @@ public class IDPSSOUtil {
 
         String classMethod = "IDPSSOUtil.getACSurlFromMetaByIndex: ";
 
-        SPSSODescriptorElement spSSODescriptorElement = null;
-        if (metaManager == null) {
-            SAML2Utils.debug.error(classMethod
-                    + "Unable to get meta manager.");
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("errorMetaManager"));
-        }
-
-        try {
-            spSSODescriptorElement = metaManager.getSPSSODescriptor(
-                    realm, spEntityID);
-            if (spSSODescriptorElement == null) {
-                SAML2Utils.debug.error(classMethod
-                        + "Unable to get SP SSO Descriptor from meta.");
-                String[] data = {spEntityID};
-                LogUtil.error(Level.INFO,
-                        LogUtil.SP_METADATA_ERROR, data, null);
-                throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("metaDataError"));
-            }
-        } catch (SAML2MetaException sme) {
-            SAML2Utils.debug.error(classMethod
-                    + "Unable to get SP SSO Descriptor from meta.");
-            String[] data = {spEntityID};
-            LogUtil.error(Level.INFO,
-                    LogUtil.SP_METADATA_ERROR, data, null);
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("metaDataError"));
-        }
-
+        SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
+                realm, spEntityID, classMethod);
         List acsList = spSSODescriptorElement.getAssertionConsumerService();
         int index;
         String acsURL = null;
@@ -2622,36 +2508,9 @@ public class IDPSSOUtil {
             }
             return;
         }
-
-        SPSSODescriptorElement spSSODescriptorElement = null;
-        if (metaManager == null) {
-            SAML2Utils.debug.error(classMethod + "Unable to get meta manager.");
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("errorMetaManager"));
-        }
-
-        try {
-            spSSODescriptorElement = metaManager.getSPSSODescriptor(
-                    realm, spEntityID);
-            if (spSSODescriptorElement == null) {
-                SAML2Utils.debug.error(classMethod
-                        + "Unable to get SP SSO Descriptor from meta.");
-                String[] data = {spEntityID};
-                LogUtil.error(Level.INFO,
-                        LogUtil.SP_METADATA_ERROR, data, null);
-                throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("metaDataError"));
-            }
-        } catch (SAML2MetaException sme) {
-            SAML2Utils.debug.error(classMethod
-                    + "Unable to get SP SSO Descriptor from meta.");
-            String[] data = {spEntityID};
-            LogUtil.error(Level.INFO,
-                    LogUtil.SP_METADATA_ERROR, data, null);
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("metaDataError"));
-        }
-        // get the encryption information 
+        SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
+                realm, spEntityID, classMethod);
+        // get the encryption information
         EncInfo encInfo = KeyUtil.getEncInfo(spSSODescriptorElement,
                 spEntityID, SAML2Constants.SP_ROLE);
         if (encInfo == null) {
@@ -3123,33 +2982,10 @@ public class IDPSSOUtil {
 
         boolean isValidACSurl = false;
         String classMethod = "IDPSSOUtil.isACSurlValidInMetadataSP: ";
-
-        SPSSODescriptorElement spSSODescriptorElement = null;
-
-        if (metaManager == null) {
-            SAML2Utils.debug.error(classMethod + "Unable to get meta manager.");
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("errorMetaManager"));
-        }
-
-        try {
-            spSSODescriptorElement = metaManager.getSPSSODescriptor(
-                    realm, spEntityID);
-            if (spSSODescriptorElement == null) {
-                SAML2Utils.debug.error(classMethod
-                        + "Unable to get SP SSO Descriptor from meta.");
-                throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("metaDataError"));
-            }
-        } catch (SAML2MetaException sme) {
-            SAML2Utils.debug.error(classMethod
-                    + "Unable to get SP SSO Descriptor from meta.");
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("metaDataError"));
-        }
+        SPSSODescriptorElement spSSODescriptorElement = getSPSSODescriptor(
+                realm, spEntityID, classMethod);
 
         List acsList = spSSODescriptorElement.getAssertionConsumerService();
-
         AssertionConsumerServiceElement acs = null;
 
         for (int i = 0; i < acsList.size(); i++) {
@@ -3165,4 +3001,58 @@ public class IDPSSOUtil {
 
         return isValidACSurl;
     }
+    
+    /**
+     * Returns the the value of the wantAssertionsSigned property
+     * @param spEntityID ID of the SP entity to be retrieved.
+     * @param realm The realm under which the entity resides.
+     * @return boolean  value of the wantAssertionsSigned property.
+     * @throws SAML2MetaException if unable to retrieve the service
+     *         provider's SSO descriptor.
+     */
+    private static boolean wantAssertionsSigned(String realm, String spEntityID) throws SAML2Exception {
+       
+        String method = "IPDSSOUtil:wantAssertionsSigned : ";
+        if (SAML2Utils.debug.messageEnabled()) {
+            SAML2Utils.debug.message(method + ": realm - " + realm + "/: spEntityID - " + spEntityID);
+        }
+        SPSSODescriptorElement spSSODescriptor = getSPSSODescriptor(spEntityID, realm, method);
+        return spSSODescriptor.isWantAssertionsSigned();
+    }
+
+    /**
+     * Returns the service provider's SSO descriptor in an entity under the realm.
+     * @param realm The realm under which the entity resides.
+     * @param spEntityID ID of the SP entity to be retrieved.
+     * @param classMethod the calling class method
+     * @return <code>SPSSODescriptorElement</code> for the entity
+     * @throws SAML2Exception if entity is not found
+     */
+    private static SPSSODescriptorElement getSPSSODescriptor(String realm,
+            String spEntityID, String classMethod)
+            throws SAML2Exception {
+       
+        SPSSODescriptorElement spSSODescriptor = null;
+        if (metaManager == null) {
+            SAML2Utils.debug.error(classMethod + "Unable to get meta manager.");
+            throw new SAML2Exception(SAML2Utils.bundle.getString("errorMetaManager"));
+        }
+        try {
+            spSSODescriptor = metaManager.getSPSSODescriptor(realm, spEntityID);
+            if (spSSODescriptor == null) {
+                SAML2Utils.debug.error(classMethod
+                        + "Unable to get SP SSO Descriptor from metadata, descriptor is null.");
+                String[] data = { spEntityID };
+                LogUtil.error(Level.INFO, LogUtil.SP_METADATA_ERROR, data, null);
+                throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
+            }
+        } catch (SAML2MetaException sme) {
+            SAML2Utils.debug.error(classMethod + "Unable to get SP SSO Descriptor from metadata, descriptor is null.");
+            String[] data = { spEntityID };
+            LogUtil.error(Level.INFO, LogUtil.SP_METADATA_ERROR, data, null);
+            throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
+        }
+        return spSSODescriptor;
+    }
+
 }
