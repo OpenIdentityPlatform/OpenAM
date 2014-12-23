@@ -433,7 +433,7 @@ public class SAML2Utils extends SAML2SDKUtils {
         spConfig = saml2MetaManager.getSPSSOConfig(
                 orgName, hostEntityId);
         spDesc = saml2MetaManager.getSPSSODescriptor(orgName, hostEntityId);
-        
+
         // decide if assertion needs to be encrypted/decrypted
         boolean needAssertionEncrypted = false;
         String assertionEncryptedAttr = getAttributeValueFromSPSSOConfig(
@@ -443,61 +443,57 @@ public class SAML2Utils extends SAML2SDKUtils {
                 assertionEncryptedAttr.equals("true")) {
             needAssertionEncrypted = true;
         }
-        
-        // for SSO Post Profile check if assertion needs 
-        // to be signed/verified
-        boolean needAssertionSigned = (profileBinding != null) &&
-            (profileBinding.equals(SAML2Constants.HTTP_POST));
 
-        if (!needAssertionSigned) {
-            needAssertionSigned = spDesc.isWantAssertionsSigned();
-        }
-
+        boolean needAssertionSigned = spDesc.isWantAssertionsSigned();
         // POST Profile - if Response signing is true then
-        // assertion signing will not be done at the IDP
-        if (needAssertionSigned) {
-            boolean wantPostResponseSigned =
-                SAML2Utils.wantPOSTResponseSigned(
-                    orgName,hostEntityId,SAML2Constants.SP_ROLE);
-            if (profileBinding.equals(SAML2Constants.HTTP_POST)) {
-                if (debug.messageEnabled()) {
-                    debug.message(method + "binding is :" + profileBinding);
-                }
-                if (wantPostResponseSigned) {
-                    if (debug.messageEnabled()) {
-                        debug.message(method + "signResponse  :" +
-                            wantPostResponseSigned);
+        // assertion signing is optional at the IDP
+        if (profileBinding.equals(SAML2Constants.HTTP_POST)) {
+            if (debug.messageEnabled()) {
+                debug.message(method + "binding is :" + profileBinding);
+            }
+            boolean wantPostResponseSigned = SAML2Utils.wantPOSTResponseSigned(orgName, hostEntityId,
+                    SAML2Constants.SP_ROLE);
+            // If response is signed the signing of assertion(s) is optional and
+            // based on SP setting.
+            if (debug.messageEnabled()) {
+                debug.message(method + "signResponse  :" + wantPostResponseSigned);
+            }
+            // If response is not signed and POST binding is used,
+            // the assertion(s) MUST be signed.
+            if (!wantPostResponseSigned) {
+                needAssertionSigned = true;
+            } else {
+                if (response.isSigned()) {
+                    IDPSSODescriptorElement idpSSODescriptor = null;
+                    try {
+                        idpSSODescriptor = saml2MetaManager.getIDPSSODescriptor(orgName, idpEntityId);
+                    } catch (SAML2MetaException sme) {
+                        String[] data = { orgName, idpEntityId };
+                        LogUtil.error(Level.INFO, LogUtil.IDP_METADATA_ERROR, data, null);
+                        throw new SAML2Exception(sme);
                     }
-                    needAssertionSigned = false;
+                    if (idpSSODescriptor != null) {
+                        X509Certificate idpCert = KeyUtil.getVerificationCert(idpSSODescriptor, idpEntityId,
+                                SAML2Constants.IDP_ROLE);
+                        if (idpCert == null || !response.isSignatureValid(idpCert)) {
+                            debug.error(method + "Response is not signed or signature is not valid.");
+                            String[] data = { orgName, hostEntityId, idpEntityId };
+                            LogUtil.error(Level.INFO, LogUtil.POST_RESPONSE_INVALID_SIGNATURE, data, null);
+                            throw new SAML2Exception(bundle.getString("invalidSignInResponse"));
+                        }
+                    } else {
+                        String[] data = { idpEntityId };
+                        LogUtil.error(Level.INFO, LogUtil.IDP_METADATA_ERROR, data, null);
+                        throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
+                    }
                 } else {
-                    if (response.isSigned()) {
-                       // POST Profile - it is sufficient if response is
-                        // signed, not a mandatory condition that assertion
-                        // be also signed.
-                        // Make sure that the certificate is valid
-                        IDPSSODescriptorElement idpSSODescriptor = null;
-                        try {
-                            idpSSODescriptor = saml2MetaManager.
-                                    getIDPSSODescriptor(orgName, idpEntityId);
-                        } catch (SAML2MetaException sme) {
-                            SAML2Utils.debug.error(method, sme);
-                            idpSSODescriptor = null;
-                        }
-                        if (idpSSODescriptor != null) {
-                            X509Certificate idpCert =
-                                KeyUtil.getVerificationCert(
-                                    idpSSODescriptor, idpEntityId,
-                                    SAML2Constants.IDP_ROLE);
-                            if (idpCert != null &&
-                                response.isSignatureValid(idpCert)) {
-                                needAssertionSigned = false;
-                            }
-                        }
-                    }
+                    String[] data = { orgName, hostEntityId, idpEntityId };
+                    LogUtil.error(Level.INFO, LogUtil.POST_RESPONSE_INVALID_SIGNATURE, data, null);
+                    throw new SAML2Exception(SAML2Utils.bundle.getString("responseNotSigned"));
                 }
             }
         }
-        
+
         List assertions = response.getAssertion();
         if (needAssertionEncrypted && (assertions != null)
         && (assertions.size() != 0)) {
@@ -4370,7 +4366,6 @@ public class SAML2Utils extends SAML2SDKUtils {
     /**
      * Returns value of attribute <code>wantPOSTResponseSigned</code>
      * as a boolean value true to false.
-     *
      * @param realm realm of hosted entity.
      * @param hostEntityId name of hosted entity.
      * @param entityRole role of hosted entity.
@@ -4378,18 +4373,15 @@ public class SAML2Utils extends SAML2SDKUtils {
      *         otherwise false.
      */
     public static boolean wantPOSTResponseSigned(String realm,
-            String hostEntityId,
-            String entityRole) {
+            String hostEntityId, String entityRole) {
         if (debug.messageEnabled()) {
             String method = "SAML2Utils:getWantPOSTResponseSigned : ";
-            debug.message(method + "realm - " + realm);
-            debug.message(method + "hostEntityId - " + hostEntityId);
-            debug.message(method + "entityRole - " + entityRole);
+            SAML2Utils.debug.message(method + ": realm - " + realm
+                    + "/: hostEntityId - " + hostEntityId + ": entityRole - "
+                    + entityRole);
         }
-        String wantSigned =
-                getAttributeValueFromSSOConfig(realm, hostEntityId, entityRole,
-                SAML2Constants.WANT_POST_RESPONSE_SIGNED);
-
+        String wantSigned = getAttributeValueFromSSOConfig(realm, hostEntityId,
+                entityRole, SAML2Constants.WANT_POST_RESPONSE_SIGNED);
         return "true".equalsIgnoreCase(wantSigned);
     }
 
