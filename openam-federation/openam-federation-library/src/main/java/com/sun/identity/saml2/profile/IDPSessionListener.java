@@ -24,9 +24,8 @@
  *
  * $Id: IDPSessionListener.java,v 1.10 2009/09/23 22:28:31 bigfatrat Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
-
 package com.sun.identity.saml2.profile;
 
 import java.util.Iterator;
@@ -49,6 +48,7 @@ import com.sun.identity.saml2.common.SAML2FailoverUtils;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
+import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
@@ -184,7 +184,6 @@ public class IDPSessionListener
                                                             realm,
                                                             SAML2Constants.SOAP,
                                                             nameID,
-                                                            idpEntityID,
                                                             spEntityID,
                                                             paramsMap);
                                 }
@@ -274,70 +273,43 @@ public class IDPSessionListener
     }
 
     /**
-     * Initiates IDP Single logout <code>initiateIDPSingleLogout</code> to
-     * all the SPs
+     * Performs an IdP initiated SLO against the remote SP using SOAP binding.
      *
      * @param sessionIndex Session Index
      * @param metaAlias IDP meta alias
      * @param realm Realm
-     * @param binding Binding used   
+     * @param binding Binding used
      * @param nameID the NameID
-     * @param idpEntityID  IDP Entity ID
-     * @param spEntityID  SP Entity ID
-     * @param paramsMap  parameters map
-     * 
-     * <code>initiateIDPSingleLogout</code>.
-     * @return
-     * @throws SAML2MetaException if error processing
-     *          <code>initiateIDPSingleLogout</code>.
-     * @throws SAML2Exception if error processing
-     *          <code>initiateIDPSingleLogout</code>.
-     * @throws SessionException if error processing
-     *          <code>initiateIDPSingleLogout</code>.
+     * @param spEntityID SP Entity ID
+     * @param paramsMap parameters map
+     * @throws SAML2MetaException If there was an error while retrieving the metadata.
+     * @throws SAML2Exception If there was an error while initiating SLO.
+     * @throws SessionException If there was a problem with the session.
      */
-    private void initiateIDPSingleLogout(String sessionIndex,
-                                         String metaAlias,
-                                         String realm,
-                                         String binding,
-                                         NameID nameID,
-                                         String idpEntityID,
-                                         String spEntityID,                                         
-                                         Map paramsMap)
-                                         throws SAML2MetaException,
-                                         SAML2Exception, SessionException {
-                 
-        // get SPSSODescriptor
+    private void initiateIDPSingleLogout(String sessionIndex, String metaAlias, String realm, String binding,
+            NameID nameID, String spEntityID, Map paramsMap)
+            throws SAML2MetaException, SAML2Exception, SessionException {
         SPSSODescriptorElement spsso = sm.getSPSSODescriptor(realm, spEntityID);
-
         if (spsso == null) {
             String[] data = {spEntityID};
-            LogUtil.error(Level.INFO,LogUtil.SP_METADATA_ERROR,data, null);
-                    throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("metaDataError"));
+            LogUtil.error(Level.INFO, LogUtil.SP_METADATA_ERROR, data, null);
+            throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
         }
 
-        List slosList = spsso.getSingleLogoutService();
-        if (slosList == null) {
-            String[] data = {idpEntityID};
-            LogUtil.error(Level.INFO,LogUtil.SLO_NOT_FOUND,data, null);
-                    throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("sloServiceListNotfound"));
+        List<EndpointType> slosList = spsso.getSingleLogoutService();
+        String location = LogoutUtil.getSLOServiceLocation(slosList, SAML2Constants.SOAP);
+
+        if (location == null) {
+            if (debug.messageEnabled()) {
+                debug.message("IDPSessionListener.initiateIDPSingleLogout(): Unable to synchronize sessions with SP \""
+                        + spEntityID + "\" since the SP does not have SOAP SLO endpoint specified in its metadata");
+            }
+            return;
         }
 
-        // get SP SLO list
-        SPSSOConfigElement spConfig = null;
-        spConfig = sm.getSPSSOConfig(realm, spEntityID);
+        SPSSOConfigElement spConfig = sm.getSPSSOConfig(realm, spEntityID);
 
-        String location = LogoutUtil.getSLOServiceLocation(slosList,
-                                                           SAML2Constants.SOAP);
-
-        // get SP entity config in case of SOAP, for basic auth info
-        location = SAML2Utils.fillInBasicAuthInfo(spConfig, location);
-
-        LogoutUtil.doLogout(metaAlias,
-                            spEntityID,
-                            slosList, null, binding,
-                            null, sessionIndex,
-                            nameID, null, null, paramsMap, spConfig);
+        LogoutUtil.doLogout(metaAlias, spEntityID, slosList, null, binding, null, sessionIndex, nameID, null, null,
+                paramsMap, spConfig);
     }
 }

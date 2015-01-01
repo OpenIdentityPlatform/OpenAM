@@ -24,8 +24,9 @@
  *
  * $Id: LogoutUtil.java,v 1.16 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2012-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
+
 package com.sun.identity.saml2.profile;
 
 import java.io.ByteArrayInputStream;
@@ -35,6 +36,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,7 @@ import javax.xml.soap.SOAPMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.debug.Debug;
@@ -61,6 +64,7 @@ import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
@@ -79,8 +83,6 @@ import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.SessionIndex;
 import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.saml2.protocol.StatusDetail;
-import com.sun.identity.plugin.session.SessionException;
-import java.util.HashMap;
 
 /**
  * This class constructs the <code>LogoutRequest</code> and executes
@@ -133,7 +135,7 @@ public class LogoutUtil {
     public static StringBuffer doLogout(
             String metaAlias,
             String recipientEntityID,
-            List<SingleLogoutServiceElement> recipientSLOList,
+            List<EndpointType> recipientSLOList,
             List extensionsList,
             String binding,
             String relayState,
@@ -143,8 +145,8 @@ public class LogoutUtil {
             HttpServletResponse response,
             Map paramsMap,
             BaseConfigType config) throws SAML2Exception, SessionException {
-        SingleLogoutServiceElement logoutEndpoint = null;
-        for (SingleLogoutServiceElement endpoint : recipientSLOList) {
+        EndpointType logoutEndpoint = null;
+        for (EndpointType endpoint : recipientSLOList) {
             if (binding.equals(endpoint.getBinding())) {
                 logoutEndpoint = endpoint;
                 break;
@@ -158,7 +160,7 @@ public class LogoutUtil {
             String metaAlias,
             String recipientEntityID,
             List extensionsList,
-            SingleLogoutServiceElement logoutEndpoint,
+            EndpointType logoutEndpoint,
             String relayState,
             String sessionIndex,
             NameID nameID,
