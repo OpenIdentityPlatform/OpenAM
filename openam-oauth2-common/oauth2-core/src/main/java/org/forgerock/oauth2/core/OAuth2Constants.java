@@ -870,7 +870,8 @@ public class OAuth2Constants {
         public static final String IAT =  "iat";
         public static final String AUTH_TIME = "auth_time";
         public static final String NONCE = "nonce";
-        public static final String OPS = "ops";
+        public static final String OPS = "org.forgerock.openidconnect.ops";
+        public static final String LEGACY_OPS = "ops";
         public static final String UPDATED_AT = "updated_at";
         public static final String ACR = "acr";
         public static final String AMR = "amr";

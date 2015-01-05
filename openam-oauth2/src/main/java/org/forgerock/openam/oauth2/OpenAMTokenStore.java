@@ -194,7 +194,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         try {
             tokenStore.create(json(object(
                     field(OAuth2Constants.CoreTokenParams.ID, set(opsId)),
-                    field(OAuth2Constants.JWTTokenParams.OPS, set(ops)),
+                    field(OAuth2Constants.JWTTokenParams.LEGACY_OPS, set(ops)),
                     field(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, set(Long.toString(exp))))));
         } catch (CoreTokenException e) {
             logger.error("Unable to create id_token user session token", e);

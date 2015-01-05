@@ -91,8 +91,8 @@ public class OpenAMOpenIDConnectProvider implements OpenIDConnectProvider {
 
             JsonValue idTokenUserSessionToken = tokenAdapter.fromToken(opsToken);
             cts.delete(opsId);
-            String sessionId = idTokenUserSessionToken.get(OAuth2Constants.JWTTokenParams.OPS).asSet(String.class)
-                    .iterator().next();
+            String sessionId = idTokenUserSessionToken.get(OAuth2Constants.JWTTokenParams.LEGACY_OPS)
+                    .asSet(String.class).iterator().next();
 
             final SSOToken token = tokenManager.createSSOToken(sessionId);
             tokenManager.destroyToken(token);

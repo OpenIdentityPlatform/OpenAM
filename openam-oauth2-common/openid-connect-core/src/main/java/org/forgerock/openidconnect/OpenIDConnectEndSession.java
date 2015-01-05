@@ -65,6 +65,9 @@ public class OpenIDConnectEndSession {
 
         JwtClaimsSet claims = jwt.getClaimsSet();
         String opsId = (String) claims.getClaim(OAuth2Constants.JWTTokenParams.OPS);
+        if (opsId == null) {
+            opsId = (String) claims.getClaim(OAuth2Constants.JWTTokenParams.LEGACY_OPS);
+        }
 
         openIDConnectProvider.destroySession(opsId);
     }
