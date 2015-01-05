@@ -23,7 +23,11 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDebugProvider.java,v 1.2 2008/06/25 05:53:01 qcheng Exp $
- *
+ * *
+ */
+
+/**
+ * Portions Copyrighted 2014 ForgeRock As
  */
 
 package com.sun.identity.shared.debug;
@@ -40,10 +44,10 @@ public interface IDebugProvider {
      * Returns an instance of <code>IDebug</code> type which
      * enable the <code>com.iplanet.am.util.Debug</code> instances to delegate
      * the service calls to the provider specific implementation.
-     * 
+     *
      * @param debugName name of the debug instance which will be returned.
      * @return an instance of <code>IDebug</code> type known by the given
-     *         <code>debugName</code> value.
+     * <code>debugName</code> value.
      */
     IDebug getInstance(String debugName);
 }

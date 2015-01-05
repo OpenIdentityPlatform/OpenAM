@@ -26,84 +26,94 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.shared.debug;
 
 /**
  * <p>
  * Allows a pluggable implementation of the Debug service within the Access
  * Manager SDK. The implementation of this interface as well as the
- * <code>com.sun.identity.util.IDebugProvider</code> interface togehter
+ * <code>com.sun.identity.shared.debug.IDebugProvider</code> interface together
  * provide the necessary functionality to replace or enhance the Debug service.
  * </p>
  */
 public interface IDebug {
 
     /**
-     * flags the disabled debug state.
+     * @deprecated use {@link DebugLevel} instead.
      */
-    int OFF = 0;
+    @Deprecated
+    public static final int OFF = DebugLevel.OFF.getLevel();
 
     /**
-     * flags the state where error debugging is enabled. When debugging is set
-     * to less than <code>ERROR</code>, error debugging is also disabled.
+     * @deprecated use {@link DebugLevel} instead.
      */
-    int ERROR = 1;
+    @Deprecated
+    public static final int ERROR = DebugLevel.ERROR.getLevel();
 
     /**
-     * flags the state where warning debugging is enabled, but message debugging
-     * is disabled. When debugging is set to less than <code>WARNING</code>,
-     * warning debugging is also disabled.
+     * @deprecated use {@link DebugLevel} instead.
      */
-    int WARNING = 2;
-
-    /** This state enables debugging of messages, warnings and errors. */
-    int MESSAGE = 3;
+    @Deprecated
+    public static final int WARNING = DebugLevel.WARNING.getLevel();
 
     /**
-     * flags the enabled debug state for warnings, errors and messages. Printing
-     * to a file is disabled. All printing is done on System.out.
+     * @deprecated use {@link DebugLevel} instead.
      */
-    int ON = 4;
-
-    /** flags the disabled debug state. */
-    String STR_OFF = "off";
+    @Deprecated
+    public static final int MESSAGE = DebugLevel.MESSAGE.getLevel();
 
     /**
-     * flags the state where error debugging is enabled. When debugging is set
-     * to less than <code>ERROR</code>, error debugging is also disabled.
+     * @deprecated use {@link DebugLevel} instead.
      */
-    String STR_ERROR = "error";
+    @Deprecated
+    public static final int ON = DebugLevel.ON.getLevel();
 
     /**
-     * flags the state where warning debugging is enabled, but message debugging
-     * is disabled. When debugging is set to less than <code>WARNING</code>,
-     * warning debugging is also disabled.
+     * @deprecated use {@link DebugLevel} instead.
      */
-    String STR_WARNING = "warning";
+    @Deprecated
+    public static final String STR_OFF = DebugLevel.OFF.getName();
 
     /**
-     * This state enables debugging of messages, warnings and errors.
+     * @deprecated use {@link DebugLevel} instead.
      */
-    String STR_MESSAGE = "message";
+    @Deprecated
+    public static final String STR_ERROR = DebugLevel.ERROR.getName();
 
     /**
-     * flags the enables debug state for warnings, errors and messages. Printing
-     * to a file is disabled. All printing is done on System.out.
+     * @deprecated use {@link DebugLevel} instead.
      */
-    String STR_ON = "on";
+    @Deprecated
+    public static final String STR_WARNING = DebugLevel.WARNING.getName();
 
     /**
-     * Returns the name of the IDebug instance. The value is exactly equal 
+     * @deprecated use {@link DebugLevel} instead.
+     */
+    @Deprecated
+    public static final String STR_MESSAGE = DebugLevel.MESSAGE.getName();
+
+    /**
+     * @deprecated use {@link DebugLevel} instead.
+     */
+    @Deprecated
+    public static final String STR_ON = DebugLevel.ON.getName();
+
+    /**
+     * Returns the name of the IDebug instance. The value is exactly equal
      * to the one that was first used to create this instance.
-     * 
+     *
      * @return name of this <code>IDebug</code> instance
      */
     String getName();
 
     /**
-     * Returns current debug level used by this instance. The value is an 
-     * integer equals to one of the various debug level integers as defined in 
-     * the class <code>com.iplanet.am.util.Debug</code>. This value could be 
+     * Returns current debug level used by this instance. The value is an
+     * integer equals to one of the various debug level integers as defined in
+     * the class <code>com.iplanet.am.util.Debug</code>. This value could be
      * one of the followings:
      * <ul>
      * <li><code>OFF</code>
@@ -112,7 +122,7 @@ public interface IDebug {
      * <li><code>MESSAGE</code>
      * <li><code>ON</code>
      * </ul>
-     * 
+     *
      * @return an integer indicating the debug level used by this instance.
      */
     public int getState();
@@ -130,15 +140,19 @@ public interface IDebug {
      * <li><code>MESSAGE</code>
      * <li><code>ON</code>
      * </ul>
-     * 
+     *
      * @param level An integer indicating the debug level to be used by this
-     *        instance.
+     *              instance.
      */
     public void setDebug(int level);
 
     /**
-     * Allows runtime modification of the backend used by this instance. 
+     * Allows runtime modification of the backend used by this instance.
      * by resetting the debug instance to reinitialize itself.
+     *
+     * NB : The debug file associated with this debug won't be closed. Because of
+     * merge, a debug file could be used by more than one debug instances.
+     *
      * @param mf merge flag, on to create a single debug file
      */
     public void resetDebug(String mf);
@@ -156,66 +170,66 @@ public interface IDebug {
      * <li><code>STR_MESSAGE</code>
      * <li><code>STR_ON</code>
      * </ul>
-     * 
+     *
      * @param level String representing the debug level to be used by this
-     *        instance.
+     *              instance.
      */
     public void setDebug(String level);
 
     /**
      * Returns <code>true</code> if the current instance allows logging of
      * <code>MESSAGE</code> level debug messages.
-     * 
+     *
      * @return <code>true</code> if <code>MESSAGE</code> level debugging is
-     *         enabled.
+     * enabled.
      */
     public boolean messageEnabled();
 
     /**
      * Returns <code>true</code> if the current instance allows logging of
      * <code>WARNING</code> level debug messages.
-     * 
+     *
      * @return <code>true</code> if <code>WARNING</code> level debugging is
-     *         enabled.
+     * enabled.
      */
     public boolean warningEnabled();
 
     /**
-     * Returns <code>true</code> if the current instances allows logging of 
+     * Returns <code>true</code> if the current instances allows logging of
      * <code>ERROR</code> level debug messages.
-     * 
+     *
      * @return <code>true</code> if <code>ERROR</code> level debugging is
-     *         enabled.
+     * enabled.
      */
     public boolean errorEnabled();
 
     /**
      * Allows the recording of messages if the debug level is set to
      * <code>MESSAGE</code> for this instance.
-     * 
+     *
      * @param message Message to be recorded.
-     * @param th The optional <code>java.lang.Throwable</code> which if
-     *        present will be used to record the stack trace.
+     * @param th      The optional <code>java.lang.Throwable</code> which if
+     *                present will be used to record the stack trace.
      */
     public void message(String message, Throwable th);
 
     /**
      * Allows the recording of messages if the debug level is set to
      * <code>WARNING</code> or higher for this instance.
-     * 
+     *
      * @param message Message to be recorded.
-     * @param th The optional <code>java.lang.Throwable</code> which if
-     *        present will be used to record the stack trace.
+     * @param th      The optional <code>java.lang.Throwable</code> which if
+     *                present will be used to record the stack trace.
      */
     public void warning(String message, Throwable th);
 
     /**
      * Allows the recording of messages if the debug level is set to
      * <code>ERROR</code> or higher for this instance.
-     * 
+     *
      * @param message Message to be recorded.
-     * @param th the optional <code>java.lang.Throwable</code> which if
-     *        present will be used to record the stack trace.
+     * @param th      the optional <code>java.lang.Throwable</code> which if
+     *                present will be used to record the stack trace.
      */
     void error(String message, Throwable th);
 }

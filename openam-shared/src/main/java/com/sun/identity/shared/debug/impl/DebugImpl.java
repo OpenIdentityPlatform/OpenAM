@@ -27,230 +27,68 @@
  */
 
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 package com.sun.identity.shared.debug.impl;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.DebugConstants;
+import com.sun.identity.shared.debug.DebugLevel;
 import com.sun.identity.shared.debug.IDebug;
-import com.sun.identity.shared.locale.Locale;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStream;
+import com.sun.identity.shared.debug.file.DebugFile;
+import com.sun.identity.shared.debug.file.DebugFileProvider;
+import com.sun.identity.shared.debug.file.impl.StdDebugFile;
+import org.forgerock.openam.utils.IOUtils;
+
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Properties;
-import java.util.ResourceBundle;
 
 /**
  * Debug implementation class.
  */
 public class DebugImpl implements IDebug {
 
-
-    private static final String CONFIG_DEBUG_DIRECTORY =
-        "com.iplanet.services.debug.directory";
-    private static final String CONFIG_DEBUG_LEVEL =
-        "com.iplanet.services.debug.level";
-    private static final String CONFIG_DEBUG_MERGEALL =
-        "com.sun.services.debug.mergeall";
-    private static final String CONFIG_DEBUG_MERGEALL_FILE =
-        "debug.out";
-    private static final String CONFIG_DEBUG_FILEMAP =
-        "/debugfiles.properties";
-    private static final String CONFIG_DEBUG_PROPERTIES =
-            "/debugconfig.properties";
-    private static final String CONFIG_DEBUG_LOGFILE_PREFIX =
-            "org.forgerock.openam.debug.prefix";
-    private static final String CONFIG_DEBUG_LOGFILE_SUFFIX =
-            "org.forgerock.openam.debug.suffix";
-    private static final String CONFIG_DEBUG_LOGFILE_ROTATION =
-            "org.forgerock.openam.debug.rotation";
-    private static final String DEFAULT_DEBUG_SUFFIX_FORMAT = "-MM.dd.yyyy-kk.mm";
-
-    private static HashMap mergedWriters = new HashMap();
-
-    private static Properties debugFileNames = null;
-
-    private static String debugPrefix;
-
-    private static String debugSuffix;
-
-    private static int rotationInterval = -1;
-
-    private String debugName;
-
-    private int debugLevel = IDebug.ON;
-
-    private PrintWriter debugWriter = null;
-
-    private PrintWriter stdoutWriter = new PrintWriter(System.out, true);
-
-    private SimpleDateFormat dateFormat = new SimpleDateFormat(
-        "MM/dd/yyyy hh:mm:ss:SSS a zzz");
-
-    private String debugFilePath;
-
-    private String resolvedName;
-
-    static private boolean mergeAllMode = false;
-
-    private long lastRotation;
+    private static Properties debugFileNames;
 
     static {
-        InputStream is = null;
-        try {
-            is = DebugImpl.class.getResourceAsStream(CONFIG_DEBUG_PROPERTIES);
-            Properties rotationConfig = new Properties();
-            rotationConfig.load(is);
-
-            debugPrefix = rotationConfig.getProperty(CONFIG_DEBUG_LOGFILE_PREFIX);
-            debugSuffix = rotationConfig.getProperty(CONFIG_DEBUG_LOGFILE_SUFFIX);
-            String rotation = rotationConfig.getProperty(CONFIG_DEBUG_LOGFILE_ROTATION);
-            rotationInterval = Integer.parseInt(rotation);
-        } catch (Exception ex) {
-            //it's possible, that we don't have the config file
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Exception ex) {
-                }
-            }
-        }
+        initProperties();
     }
+
+    private final String debugName;
+    private boolean mergeAllMode = false;
+
+    private DebugLevel debugLevel = DebugLevel.ON;
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss:SSS a zzz");
+
+    private DebugFileProvider debugFileProvider;
+    private DebugFile debugFile = null;
+    private DebugFile stdoutDebugFile;
 
     /**
      * Creates an instance of <code>DebugImpl</code>.
      *
      * @param debugName Name of the debug.
      */
-    public DebugImpl(String debugName) {
-        setName(debugName);
-        setDebug(SystemPropertiesManager.get(
-            CONFIG_DEBUG_LEVEL));
-        String mf = SystemPropertiesManager.get(CONFIG_DEBUG_MERGEALL);
+    public DebugImpl(String debugName, DebugFileProvider debugFileProvider) {
+        this.debugName = debugName;
 
-        mergeAllMode = (mf != null && mf.equals("on"));
-
-        lastRotation = System.currentTimeMillis();
-    }
-
-    private String wrapFilename(String fileName) {
-        StringBuilder newFileName = new StringBuilder();
-
-        if (debugPrefix != null) {
-            newFileName.append(debugPrefix);
+        if(SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_LEVEL) != null) {
+            setDebug(SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_LEVEL));
+        } else {
+            setDebug(DebugLevel.OFF);
         }
 
-        newFileName.append(fileName);
+        this.debugFileProvider = debugFileProvider;
+        stdoutDebugFile = debugFileProvider.getStdOutDebugFile();
 
-        SimpleDateFormat suffixDateFormat = null;
-        if (debugSuffix != null && debugSuffix.trim().length() > 0) {
-            try {
-                suffixDateFormat = new SimpleDateFormat(debugSuffix);
-            } catch (IllegalArgumentException iae) {
-                // cannot debug as we are debug
-                System.err.println("Date format invalid; " + debugSuffix);
-            }
-        }
+        String mf = SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_MERGEALL);
+        mergeAllMode = "on".equals(mf);
 
-        if (rotationInterval > 0 && suffixDateFormat == null) {
-            //fallback to a default dateformat, so the debug filenames will differ
-            suffixDateFormat = new SimpleDateFormat(DEFAULT_DEBUG_SUFFIX_FORMAT);
-        }
-
-        if (suffixDateFormat != null) {
-            newFileName.append(suffixDateFormat.format(new Date()));
-        }
-
-        return newFileName.toString();
-    }
-
-    private synchronized void initialize() {
-        if(this.debugWriter == null) {
-            String debugDirectory =
-                SystemPropertiesManager.get(CONFIG_DEBUG_DIRECTORY);
-            boolean directoryAvailable = false;
-            if (debugDirectory != null &&
-                debugDirectory.trim().length() > 0) {
-
-                File dir = new File(debugDirectory);
-                if (!dir.exists()) {
-                    directoryAvailable = dir.mkdirs();
-                } else {
-                    if (dir.isDirectory() && dir.canWrite()) {
-                        directoryAvailable = true;
-                    }
-                }
-            }
-
-            if (!directoryAvailable) {
-                ResourceBundle bundle =
-                    Locale.getInstallResourceBundle("amUtilMsgs");
-                System.err.println(bundle.getString(
-                    "com.iplanet.services.debug.nodir"));
-                return;
-            }
-
-            // Determine debug file name
-            resolveDebugFile(debugDirectory);
-
-            String prefix = debugName+":"+this.dateFormat.format(new Date())
-                + ": " + Thread.currentThread().toString();
-
-            this.debugWriter = (PrintWriter)
-                               mergedWriters.get(resolvedName);
-            try {
-                if (this.debugWriter == null) {
-                    synchronized(mergedWriters) {
-                        if (this.debugWriter == null) {
-                            this.debugWriter = new PrintWriter(
-                                new FileWriter(this.debugFilePath, true), true);
-                            mergedWriters.put(resolvedName,
-                                              this.debugWriter);
-                        }
-                    }
-                }
-                writeIt(prefix,
-                    "**********************************************", null);
-             } catch (IOException ioex) {
-                // turn debugging to STDOUT since debug file is not available
-                setDebug(IDebug.ON);
-                ResourceBundle bundle =
-                    Locale.getInstallResourceBundle("amUtilMsgs");
-                System.err.println(bundle.getString(
-                    "com.iplanet.services.debug.nofile"));
-                ioex.printStackTrace(System.err);
-                if (this.debugWriter != null) {
-                    try {
-                        this.debugWriter.close();
-                    } catch (Exception ex1) {
-                        // No handling required
-                    }
-                }
-            }
-        }
-    }
-
-    private boolean needsRotate() {
-        if (rotationInterval > 0) {
-            Calendar now = Calendar.getInstance();
-            Calendar then = Calendar.getInstance();
-            then.setTimeInMillis(lastRotation);
-
-            then.add(Calendar.MINUTE, rotationInterval);
-            if (now.after(then)) {
-                return true;
-            }
-        }
-
-        return false;
+        //NB : we don't initialize debugFile now, we will do it when we will write on it
     }
 
     /**
@@ -268,7 +106,7 @@ public class DebugImpl implements IDebug {
      * @return debug level.
      */
     public int getState() {
-        return this.debugLevel;
+        return this.debugLevel.getLevel();
     }
 
     /**
@@ -276,32 +114,14 @@ public class DebugImpl implements IDebug {
      *
      * @param level Debug level.
      */
-    public void setDebug(int level){
-        switch(level) {
-            case IDebug.OFF:
-            case IDebug.ERROR:
-            case IDebug.WARNING:
-            case IDebug.MESSAGE:
-            case IDebug.ON:
-                this.debugLevel = level;
-                break;
-            default:
-                // ignore invalid level values
-                break;
-         }
-    }
+    public void setDebug(int level) {
 
-    /**
-     * Reset this instance - ths will trigger this instance to reinitialize
-     * itself.
-     * @param mf  merge flag : true: merge debugs into a single file.`
-     */
-    public void resetDebug(String mf) {
-        mergeAllMode = (mf != null && mf.equals("on"));
-
-        // Note : we dont need to close the writer we will keep it
-        // in the Writer cache in case merge mode chnages again.
-        debugWriter = null;
+        try {
+            setDebug(DebugLevel.fromLevel(level));
+        } catch (IllegalArgumentException e) {
+            // ignore invalid level values
+            StdDebugFile.printError(DebugImpl.class.getSimpleName(), e.getMessage(), e);
+        }
     }
 
     /**
@@ -309,20 +129,39 @@ public class DebugImpl implements IDebug {
      *
      * @param strDebugLevel Debug level.
      */
-    public void setDebug(String strDebugLevel){
-        int debugLevel = IDebug.ON;
-        if (strDebugLevel != null && strDebugLevel.trim().length() > 0) {
-            if (strDebugLevel.equals(IDebug.STR_OFF)) {
-                debugLevel = IDebug.OFF;
-            } else if (strDebugLevel.equals(IDebug.STR_ERROR)) {
-                debugLevel = IDebug.ERROR;
-            } else if (strDebugLevel.equals(IDebug.STR_WARNING)) {
-                debugLevel = IDebug.WARNING;
-            } else if (strDebugLevel.equals(IDebug.STR_MESSAGE)) {
-                debugLevel = IDebug.MESSAGE;
-            }
+    public void setDebug(String strDebugLevel) {
+
+        try {
+            setDebug(DebugLevel.fromName(strDebugLevel));
+        } catch (IllegalArgumentException e) {
+            // ignore invalid level values
+            StdDebugFile.printError(DebugImpl.class.getSimpleName(), e.getMessage(), e);
         }
-        setDebug(debugLevel);
+    }
+
+    /**
+     * Sets debug level.
+     *
+     * @param debugLevel Debug level.
+     */
+    public void setDebug(DebugLevel debugLevel) {
+
+        this.debugLevel = debugLevel;
+    }
+
+    /**
+     * Reset this instance - ths will trigger this instance to reinitialize
+     * itself.
+     *
+     * @param mf merge flag : true: merge debugs into a single file.`
+     */
+    public void resetDebug(String mf) {
+        mergeAllMode = "on".equals(mf);
+        setDebug(SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_LEVEL));
+
+        // Note : we don't need to close the writer we will keep it
+        // in the Writer cache in case merge mode changes again.
+        debugFile = null;
     }
 
     /**
@@ -330,8 +169,8 @@ public class DebugImpl implements IDebug {
      *
      * @return <code>true</code> if debug is enabled.
      */
-    public boolean messageEnabled(){
-        return (this.debugLevel > IDebug.WARNING);
+    public boolean messageEnabled() {
+        return this.debugLevel.compareLevel(DebugLevel.WARNING) > 0;
     }
 
     /**
@@ -339,8 +178,8 @@ public class DebugImpl implements IDebug {
      *
      * @return <code>true</code> if debug warning is enabled.
      */
-    public boolean warningEnabled(){
-        return (this.debugLevel > IDebug.ERROR);
+    public boolean warningEnabled() {
+        return this.debugLevel.compareLevel(DebugLevel.ERROR) > 0;
     }
 
     /**
@@ -348,17 +187,17 @@ public class DebugImpl implements IDebug {
      *
      * @return <code>true</code> if debug error is enabled.
      */
-    public boolean errorEnabled(){
-        return (this.debugLevel > IDebug.OFF);
+    public boolean errorEnabled() {
+        return this.debugLevel.compareLevel(DebugLevel.OFF) > 0;
     }
 
     /**
      * Writes debug message.
      *
      * @param message Debug message.
-     * @param th Throwable object along with the message.
+     * @param th      Throwable object along with the message.
      */
-    public void message(String message, Throwable th){
+    public void message(String message, Throwable th) {
         if (messageEnabled()) {
             record(message, th);
         }
@@ -368,9 +207,9 @@ public class DebugImpl implements IDebug {
      * Writes debug warning message.
      *
      * @param message Debug message.
-     * @param th Throwable object along with the warning message.
+     * @param th      Throwable object along with the warning message.
      */
-    public void warning(String message, Throwable th){
+    public void warning(String message, Throwable th) {
         if (warningEnabled()) {
             record("WARNING: " + message, th);
         }
@@ -380,136 +219,96 @@ public class DebugImpl implements IDebug {
      * Writes debug error message.
      *
      * @param message Debug message.
-     * @param th Throwable object along with the error message.
+     * @param th      Throwable object along with the error message.
      */
-    public void error(String message, Throwable th){
+    public void error(String message, Throwable th) {
         if (errorEnabled()) {
             record("ERROR: " + message, th);
         }
     }
 
     private void record(String msg, Throwable th) {
-        String prefix = debugName + ":" + this.dateFormat.format(new Date())
-                + ": " + Thread.currentThread().toString();
-
-        if (needsRotate()) {
-            rotate();
-        }
-
+        String prefix = debugName + ":" + this.dateFormat.format(new Date()) + ": " + Thread.currentThread().toString();
         writeIt(prefix, msg, th);
     }
 
-    private void rotate() {
-        if (this.debugWriter != null) {
-            try {
-                this.debugWriter.flush();
-                this.debugWriter.close();
-            } catch (Exception ex) {
-                // No handling required
-            }
-        }
-
-        this.debugWriter = null;
-        mergedWriters.remove(resolvedName);
-
-        // remember when we rotated last
-        lastRotation = System.currentTimeMillis();
-
-        initialize();
-    }
-
+    /**
+     * Write message on Debug file. If it failed, it try to print it on the Sdtout Debug file.
+     * If both failed, it prints in System.out
+     *
+     * @param prefix Message prefix
+     * @param msg    Message to be recorded.
+     * @param th     the optional <code>java.lang.Throwable</code> which if
+     *               present will be used to record the stack trace.
+     */
     private void writeIt(String prefix, String msg, Throwable th) {
-        if (this.debugLevel == IDebug.ON) {
-            writeIt(this.stdoutWriter, prefix, msg, th);
-        } else {
-            if(this.debugWriter == null) {
-                initialize();
-            }
 
-            if(this.debugWriter != null) {
-                writeIt(this.debugWriter, prefix, msg, th);
+        //we create the debug file only if we need to write on it
+        if (debugFile == null) {
+            String debugFileName = resolveDebugFileName();
+            debugFile = debugFileProvider.getInstance(debugFileName);
+        }
+
+        try {
+            if (this.debugLevel == DebugLevel.ON) {
+                stdoutDebugFile.writeIt(prefix, msg, th);
             } else {
-                writeIt(this.stdoutWriter, prefix, "DebugWriter is null.", th);
-                writeIt(this.stdoutWriter, prefix, msg, th);
-            }
-        }
-    }
 
-    private void writeIt(
-        PrintWriter writer,
-        String prefix,
-        String msg,
-        Throwable th
-    ) {
-        StringBuilder buf = new StringBuilder(prefix);
-        buf.append('\n');
-        buf.append(msg);
-        if(th != null) {
-            buf.append('\n');
-            StringWriter stBuf = new StringWriter(300);
-            PrintWriter stackStream = new PrintWriter(stBuf);
-            th.printStackTrace(stackStream);
-            stackStream.flush();
-            buf.append(stBuf.toString());
-        }
-        writer.println(buf.toString());
-    }
-
-    private void setName(String debugName) {
-        this.debugName = debugName;
-    }
-
-    protected void finalize() throws Throwable {
-        if (this.debugWriter != null) {
-            try {
-                this.debugWriter.flush();
-                this.debugWriter.close();
-            } catch (Exception ex) {
-                // No handling required
-            }
-        }
-    }
-
-    private void resolveDebugFile(String debugDirectory) {
-        if (mergeAllMode) {
-            debugFilePath = debugDirectory +
-                                 File.separator + wrapFilename(CONFIG_DEBUG_MERGEALL_FILE);
-            resolvedName = CONFIG_DEBUG_MERGEALL_FILE;
-        } else {
-            // Find the bucket this debug belongs to
-            if (debugFileNames == null) {
-                synchronized(mergedWriters) {
-                    if (debugFileNames == null) {
-                        debugFileNames = new Properties();
-                        // Load properties : debugmap.properties
-                        InputStream is = null;
-                        try {
-                            is = getClass().getResourceAsStream(
-                                                    CONFIG_DEBUG_FILEMAP);
-                            debugFileNames.load(is);
-                        } catch(Exception ex) {
-                        } finally {
-                            if (is != null) {
-                                try {
-                                    is.close();
-                                } catch (Exception ex) {
-                                }
-                            }
-                        }
-                    }
+                try {
+                    this.debugFile.writeIt(prefix, msg, th);
+                } catch (IOException e) {
+                    stdoutDebugFile.writeIt(prefix, "debug file can't be writed", e);
+                    stdoutDebugFile.writeIt(prefix, msg, th);
                 }
             }
+        } catch (IOException ioex) {
+            StdDebugFile.printError(DebugImpl.class.getSimpleName(), ioex.getMessage(), ioex);
+        }
+    }
+
+    /**
+     * Return the Debug file name that should be used for this debug name
+     *
+     * @return the debug file name to use
+     */
+    private String resolveDebugFileName() {
+
+        if (mergeAllMode) {
+            return DebugConstants.CONFIG_DEBUG_MERGEALL_FILE;
+        } else {
+            // Find the bucket this debug belongs to
             String nm = (String) debugFileNames.getProperty(debugName);
-            if (nm != null ) {
-                debugFilePath = debugDirectory + File.separator +
-                        wrapFilename(nm);
-                resolvedName = nm;
+            if (nm != null) {
+                return nm;
             } else {
                 // Default to debugName if no mapping is found
-                debugFilePath = debugDirectory + File.separator +
-                        wrapFilename(debugName);
-                resolvedName = debugName;
+                return debugName;
             }
         }
     }
+
+    /**
+     * initialize the properties
+     * It will reset the current properties for every Debug instance
+     */
+    public static synchronized void initProperties() {
+
+        debugFileNames = new Properties();
+        // Load properties : debugmap.properties
+        InputStream is = null;
+        try {
+            is = DebugImpl.class.getResourceAsStream(DebugConstants.CONFIG_DEBUG_FILEMAP);
+            if (is == null && SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_FILEMAP_VARIABLE) != null) {
+                is = DebugImpl.class.getResourceAsStream(SystemPropertiesManager.get(DebugConstants
+                        .CONFIG_DEBUG_FILEMAP_VARIABLE));
+            }
+            debugFileNames.load(is);
+        } catch (Exception ex) {
+            StdDebugFile.printError(DebugImpl.class.getSimpleName(), "Can't read debug files map. '. Please check the" +
+                    " configuration file '" + DebugConstants.CONFIG_DEBUG_FILEMAP + "'.", ex);
+        } finally {
+            IOUtils.closeIfNotNull(is);
+        }
+    }
+
 }
