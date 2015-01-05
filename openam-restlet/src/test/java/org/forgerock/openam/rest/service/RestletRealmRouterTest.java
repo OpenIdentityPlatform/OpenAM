@@ -18,12 +18,13 @@ package org.forgerock.openam.rest.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.router.RestRealmValidator;
@@ -37,9 +38,6 @@ import org.restlet.ext.servlet.internal.ServletCall;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class RestletRealmRouterTest {
     @Test
@@ -148,6 +146,37 @@ public class RestletRealmRouterTest {
         assertThat(request.getAttributes()).containsEntry("realm", "/REALM");
         verify(httpRequest).setAttribute("realm", "/REALM");
         assertThat(request.getAttributes()).containsEntry("realmUrl", "The base url");
+    }
+
+    @Test
+    public void shouldHandleQueryParamRealmWithNoLeadingSlash() throws IdRepoException, SSOException {
+
+        //Given
+        SSOToken adminToken = mock(SSOToken.class);
+        Restlet next = mock(Restlet.class);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        Request request = setUpRequest(httpRequest, adminToken);
+        Response response = mock(Response.class);
+
+        setUpServerName(request, adminToken, "/");
+
+        Reference reference = mock(Reference.class);
+        given(request.getResourceRef()).willReturn(reference);
+        Reference baseRef = mock(Reference.class);
+        given(reference.getBaseRef()).willReturn(baseRef);
+        given(baseRef.toString()).willReturn("The base url");
+        Form queryForm = mock(Form.class);
+        given(reference.getQueryAsForm()).willReturn(queryForm);
+        given(queryForm.getFirstValue("realm")).willReturn("REALM");
+
+        setUpRealmValidator("REALM", false, adminToken);
+
+        //When
+        router.doHandle(next, request, response);
+
+        //Then
+        assertThat(request.getAttributes()).containsEntry("realm", "/REALM");
+        verify(httpRequest).setAttribute("realm", "/REALM");
     }
 
     private Request setUpRequest(HttpServletRequest httpRequest, SSOToken adminToken) {

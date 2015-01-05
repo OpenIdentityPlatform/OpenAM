@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.rest.service;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.ConcurrentMap;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
@@ -32,9 +35,6 @@ import org.restlet.routing.Route;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 import org.restlet.routing.TemplateRoute;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * A Restlet router which will route to service endpoints, dynamically handling realm URI parameters.
@@ -95,7 +95,7 @@ public class RestletRealmRouter extends Router {
                 if (realm == null) {
                     realm = subrealm;
                 } else if (subrealm != null && !subrealm.isEmpty()) {
-                    realm += realm.endsWith("/") ? subrealm.substring(1) : subrealm;
+                    realm = concatenateSubRealm(realm, subrealm);
                 }
             }
             request.getAttributes().put(REALM_URL, request.getResourceRef().getBaseRef().toString());
@@ -110,6 +110,15 @@ public class RestletRealmRouter extends Router {
         validateRealm(request, realm);
 
         super.doHandle(next, request, response);
+    }
+
+    private String concatenateSubRealm(String realm, String subrealm) {
+        if (realm.endsWith("/") && subrealm.startsWith("/")) {
+            subrealm = subrealm.substring(1);
+        } else if (!realm.endsWith("/") && !subrealm.startsWith("/")) {
+            subrealm = "/" + subrealm;
+        }
+        return realm + subrealm;
     }
 
     private String getRealmFromURI(Request request) {
