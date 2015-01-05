@@ -24,14 +24,16 @@
  *
  * $Id: Debug.java,v 1.6 2009/08/19 05:41:17 veiming Exp $
  *
- * Portions Copyrighted 2013 Forgerock AS.
+ * Portions Copyrighted 2013-2014 Forgerock AS.
  *
  */
 
 package com.sun.identity.shared.debug;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.file.impl.StdDebugFile;
 import com.sun.identity.shared.debug.impl.DebugProviderImpl;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +47,8 @@ import java.util.ResourceBundle;
 // is disabled. This does not have serious side-effects other than an occasional
 // invocation of message() missing concurrent update of 'debugLevel'.
 
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * <p>
  * Allows a uniform interface to file debug and exception information in a
  * uniform format. <code>Debug</code> supports different levels/states of
@@ -75,23 +78,23 @@ import java.util.ResourceBundle;
  * 'com.sun.identity.util.debug.provider' may be used to plugin a non-default
  * implementation of the debug service where necessary.
  * </p>
- * 
+ * <p/>
  * <blockquote>
- * 
+ * <p/>
  * <pre>
  *  com.iplanet.services.debug.level
  *  com.iplanet.services.debug.directory
  *  com.sun.identity.util.debug.provider
  * </pre>
- * 
+ * <p/>
  * </blockquote>
- * 
+ * <p/>
  * If there is an error reading or loading the properties, Debug service will
  * redirect all debug information to <code>System.out</code>
- * 
+ * <p/>
  * If these properties are changed, the server must be restarted for the changes
  * to take effect.
- * 
+ * <p/>
  * <p>
  * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt application
  * performance when abused. Particularly, note that Java evaluates the arguments
@@ -101,13 +104,17 @@ import java.util.ResourceBundle;
  * avoid unnecessary argument evaluation and to maximize application
  * performance.
  * </p>
+ *
  * @supported.all.api
  */
 public class Debug {
 
+
     /* Static fields and methods */
 
-    /** flags the disabled debug state. */
+    /**
+     * flags the disabled debug state.
+     */
     public static final int OFF = 0;
 
     /**
@@ -123,7 +130,9 @@ public class Debug {
      */
     public static final int WARNING = 2;
 
-    /** This state enables debugging of messages, warnings and errors. */
+    /**
+     * This state enables debugging of messages, warnings and errors.
+     */
     public static final int MESSAGE = 3;
 
     /**
@@ -132,7 +141,9 @@ public class Debug {
      */
     public static final int ON = 4;
 
-    /** flags the disabled debug state. */
+    /**
+     * flags the disabled debug state.
+     */
     public static final String STR_OFF = "off";
 
     /**
@@ -148,7 +159,9 @@ public class Debug {
      */
     public static final String STR_WARNING = "warning";
 
-    /** This state enables debugging of messages, warnings and errors. */
+    /**
+     * This state enables debugging of messages, warnings and errors.
+     */
     public static final String STR_MESSAGE = "message";
 
     /**
@@ -173,12 +186,6 @@ public class Debug {
      */
     private static IDebugProvider debugProvider;
 
-    /**
-     * Constant string used as property key to look up the debug provider class
-     * name.
-     */
-    private static final String CONFIG_DEBUG_PROVIDER = 
-        "com.sun.identity.util.debug.provider";
 
     /**
      * Gets an existing instance of Debug for the specified debug name or a new
@@ -186,13 +193,13 @@ public class Debug {
      * created, its level is set to the level defined in the
      * <code>AMConfig.properties</code> file. The level can be changed later
      * by using {@link #setDebug(int)} or {@link #setDebug(String)} methods.
-     * 
-     * @param debugName
-     *            name of the debug instances to be created
+     *
+     * @param debugName name of the debug instances to be created
      * @return a Debug instance corresponding to the specified debug name.
      */
     public static synchronized Debug getInstance(String debugName) {
-        Debug debug = (Debug)getDebugMap().get(debugName);
+
+        Debug debug = (Debug) getDebugMap().get(debugName);
         if (debug == null) {
             debug = new Debug(getDebugProvider().getInstance(debugName));
             getDebugMap().put(debugName, debug);
@@ -207,7 +214,7 @@ public class Debug {
      * used, it could potentially cause a
      * <code>ConcurrentModificationException</code> if during the process of
      * iteration, the collection is modified by the system.
-     * 
+     *
      * @return a collection of all Debug instances in the system.
      */
     public static Collection getInstances() {
@@ -217,7 +224,7 @@ public class Debug {
     /**
      * Gets the <code>Map</code> of all Debug instances being used in the
      * system currently.
-     * 
+     *
      * @return the <code>Map</code> of all Debug instances
      */
     private static Map getDebugMap() {
@@ -226,10 +233,9 @@ public class Debug {
 
     /**
      * Sets the provider instance to be used by Debug service.
-     * 
-     * @param provider
-     *            the <code>IDebugProvider</code> instance that is used by the
-     *            Debug service.
+     *
+     * @param provider the <code>IDebugProvider</code> instance that is used by the
+     *                 Debug service.
      */
     private static void setDebugProvider(IDebugProvider provider) {
         debugProvider = provider;
@@ -237,7 +243,7 @@ public class Debug {
 
     /**
      * Gets the configured debug provider being used by the Debug service.
-     * 
+     *
      * @return the configured debug provider.
      */
     static IDebugProvider getDebugProvider() {
@@ -250,30 +256,34 @@ public class Debug {
      */
     private static synchronized void initialize() {
         if (!serviceInitialized) {
-            String providerName = SystemPropertiesManager.get(
-                CONFIG_DEBUG_PROVIDER);
+            String providerName = SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_PROVIDER);
             IDebugProvider provider = null;
             boolean providerLoadFailed = false;
+            Exception exceptionCatched = null;
             if (providerName != null && providerName.trim().length() > 0) {
                 try {
-                    provider = (IDebugProvider) Class.forName(providerName)
-                            .newInstance();
+                    provider = (IDebugProvider) Class.forName(providerName).newInstance();
                 } catch (ClassNotFoundException cnex) {
                     providerLoadFailed = true;
+                    exceptionCatched = cnex;
                 } catch (InstantiationException iex) {
                     providerLoadFailed = true;
+                    exceptionCatched = iex;
                 } catch (IllegalAccessException iaex) {
                     providerLoadFailed = true;
+                    exceptionCatched = iaex;
                 } catch (ClassCastException ccex) {
                     providerLoadFailed = true;
+                    exceptionCatched = ccex;
                 }
             }
             if (provider == null) {
                 if (providerLoadFailed) {
-                    ResourceBundle bundle =com.sun.identity.shared.locale.Locale
-                            .getInstallResourceBundle("amUtilMsgs");
-                    System.err.println(bundle.getString(
-                            "com.iplanet.services.debug.invalidprovider"));
+                    ResourceBundle bundle = com.sun.identity.shared.locale.Locale.getInstallResourceBundle
+                            ("amUtilMsgs");
+                    StdDebugFile.printError(Debug.class.getSimpleName(), bundle.getString("com.iplanet" + ".services" +
+                            ".debug.invalidprovider"), exceptionCatched);
+
                 }
                 provider = new DebugProviderImpl();
             }
@@ -294,7 +304,7 @@ public class Debug {
      * Convinience method to query the name being used for this Debug instance.
      * The return value of this method is a string exactly equal to the name
      * that was used while creating this instance.
-     * 
+     *
      * @return the name of this Debug instance
      */
     public String getName() {
@@ -303,7 +313,7 @@ public class Debug {
 
     /**
      * Checks if message debugging is enabled.
-     * 
+     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -313,9 +323,9 @@ public class Debug {
      * <code>message()</code> methods to avoid unnecessary argument evaluation
      * and maximize application performance.
      * </p>
-     * 
+     *
      * @return <code>true</code> if message debugging is enabled
-     *         <code>false</code> if message debugging is disabled
+     * <code>false</code> if message debugging is disabled
      */
     public boolean messageEnabled() {
         return getDebugServiceInstance().messageEnabled();
@@ -323,7 +333,7 @@ public class Debug {
 
     /**
      * Checks if warning debugging is enabled.
-     * 
+     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -333,9 +343,9 @@ public class Debug {
      * invoking any <code>warning()</code> methods to avoid unnecessary
      * argument evaluation and maximize application performance.
      * </p>
-     * 
+     *
      * @return <code>true</code> if warning debugging is enabled
-     *         <code>false</code> if warning debugging is disabled
+     * <code>false</code> if warning debugging is disabled
      */
     public boolean warningEnabled() {
         return getDebugServiceInstance().warningEnabled();
@@ -343,7 +353,7 @@ public class Debug {
 
     /**
      * Checks if error debugging is enabled.
-     * 
+     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -353,9 +363,9 @@ public class Debug {
      * methods to avoid unnecessary argument evaluation and maximize application
      * performance.
      * </p>
-     * 
+     *
      * @return <code>true</code> if error debugging is enabled
-     *         <code>false</code> if error debugging is disabled
+     * <code>false</code> if error debugging is disabled
      */
     public boolean errorEnabled() {
         return getDebugServiceInstance().errorEnabled();
@@ -370,7 +380,7 @@ public class Debug {
      * <li>Debug.MESSAGE
      * <li>Debug.ON
      * </ul>
-     * 
+     *
      * @return the debug level
      */
     public int getState() {
@@ -380,7 +390,7 @@ public class Debug {
     /**
      * Prints messages only when the debug state is either Debug.MESSAGE or
      * Debug.ON.
-     * 
+     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -392,9 +402,8 @@ public class Debug {
      * before invoking any <code>message()</code> methods to avoid unnecessary
      * argument evaluation and maximize application performance.
      * </p>
-     * 
-     * @param msg
-     *            debug message.
+     *
+     * @param msg debug message.
      * @see Debug#message(String, Throwable)
      */
     public void message(String msg) {
@@ -408,20 +417,20 @@ public class Debug {
      * debugging is enabled, the message along with a time stamp and thread info
      * will be printed on <code>System.out</code>.
      * </p>
-     * 
+     * <p/>
      * <p>
      * This method creates the debug file if does not exist; otherwise it starts
      * appending to the existing debug file. When invoked for the first time on
      * this object, the method writes a line delimiter of '*'s.
      * </p>
-     * 
+     * <p/>
      * <p>
      * Note that the debug file will remain open until <code>destroy()</code>
      * is invoked. To conserve file resources, you should invoke
      * <code>destroy()</code> explicitly rather than wait for the garbage
      * collector to clean up.
      * </p>
-     * 
+     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -431,14 +440,12 @@ public class Debug {
      * <code>message()</code> methods to avoid unnecessary argument evaluation
      * and to maximize application performance.
      * </p>
-     * 
-     * @param msg
-     *            message to be printed. A newline will be appended to the
+     *
+     * @param msg message to be printed. A newline will be appended to the
      *            message before printing either to <code>System.out</code> or
      *            to the debug file. If <code>msg</code> is null, it is
      *            ignored.
-     * @param t
-     *            <code>Throwable</code>, on which
+     * @param t   <code>Throwable</code>, on which
      *            <code>printStackTrace</code> will be invoked to print the
      *            stack trace. If <code>t</code> is null, it is ignored.
      * @see Debug#error(String, Throwable)
@@ -450,7 +457,7 @@ public class Debug {
     /**
      * Prints warning messages only when debug level is greater than
      * Debug.ERROR.
-     * 
+     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -462,13 +469,11 @@ public class Debug {
      * before invoking any <code>warning()</code> methods to avoid unnecessary
      * argument evaluation and to maximize application performance.
      * </p>
-     * 
-     * @param msg
-     *            message to be printed. A newline will be appended to the
+     *
+     * @param msg message to be printed. A newline will be appended to the
      *            message before printing either to <code>System.out</code> or
      *            to the debug file. If <code>msg</code> is null, it is
      *            ignored.
-     * 
      * @see Debug#warning(String, Throwable)
      */
     public void warning(String msg) {
@@ -478,7 +483,7 @@ public class Debug {
     /**
      * Prints warning messages only when debug level is greater than
      * Debug.ERROR.
-     * 
+     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -488,34 +493,31 @@ public class Debug {
      * <code>warning()</code> methods to avoid unnecessary argument evaluation
      * and to maximize application performance.
      * </p>
-     * 
+     * <p/>
      * <p>
      * If the debug file is not accessible and debugging is enabled, the message
      * along with a time stamp and thread info will be printed on
      * <code>System.out</code>.
      * </p>
-     * 
+     * <p/>
      * <p>
      * This method creates the debug file if does not exist; otherwise it starts
      * appending to the existing debug file. When invoked for the first time on
      * this object, the method writes a line delimiter of '*'s.
      * </p>
-     * 
+     * <p/>
      * <p>
      * Note that the debug file will remain open until <code>destroy()</code>
      * is invoked. To conserve file resources, you should invoke
      * <code>destroy()</code> explicitly rather than wait for the garbage
      * collector to clean up.
      * </p>
-     * 
-     * @param msg
-     *            message to be printed. A newline will be appended to the
+     *
+     * @param msg message to be printed. A newline will be appended to the
      *            message before printing either to <code>System.out</code> or
      *            to the debug file. If <code>msg</code> is null, it is
      *            ignored.
-     * 
-     * @param t
-     *            <code>Throwable</code>, on which
+     * @param t   <code>Throwable</code>, on which
      *            <code>printStackTrace()</code> will be invoked to print the
      *            stack trace. If <code>t</code> is null, it is ignored.
      */
@@ -525,13 +527,11 @@ public class Debug {
 
     /**
      * Prints error messages only when debug level is greater than DEBUG.OFF.
-     * 
-     * @param msg
-     *            message to be printed. A newline will be appended to the
+     *
+     * @param msg message to be printed. A newline will be appended to the
      *            message before printing either to <code>System.out</code> or
      *            to the debug file. If <code>msg</code> is null, it is
      *            ignored.
-     * 
      * @see Debug#error(String, Throwable)
      */
     public void error(String msg) {
@@ -544,28 +544,25 @@ public class Debug {
      * along with a time stamp and thread info will be printed on
      * <code>System.out</code>.
      * </p>
-     * 
+     * <p/>
      * <p>
      * This method creates the debug file if does not exist; otherwise it starts
      * appending to the existing debug file. When invoked for the first time on
      * this object, the method writes a line delimiter of '*'s.
      * </p>
-     * 
+     * <p/>
      * <p>
      * Note that the debug file will remain open until <code>destroy()</code>
      * is invoked. To conserve file resources, you should invoke
      * <code>destroy()</code> explicitly rather than wait for the garbage
      * collector to clean up.
      * </p>
-     * 
-     * @param msg
-     *            message to be printed. A newline will be appended to the
+     *
+     * @param msg message to be printed. A newline will be appended to the
      *            message before printing either to <code>System.out</code> or
      *            to the debug file. If <code>msg</code> is null, it is
      *            ignored.
-     * 
-     * @param t
-     *            <code>Throwable</code>, on which
+     * @param t   <code>Throwable</code>, on which
      *            <code>printStackTrace()</code> will be invoked to print the
      *            stack trace. If <code>t</code> is null, it is ignored.
      */
@@ -576,42 +573,42 @@ public class Debug {
     /**
      * Sets the debug capabilities based on the values of the
      * <code>debugType</code> argument.
-     * 
-     * @param debugType
-     *            is any one of five possible values:
-     *            <ul>
-     *            <li><code>Debug.OFF</code>
-     *            <li><code>Debug.ERROR</code>
-     *            <li><code>Debug.WARNING</code>
-     *            <li><code>Debug.MESSAGE</code>
-     *            <li><code>Debug.ON</code>
-     *            </ul>
+     *
+     * @param debugType is any one of five possible values:
+     *                  <ul>
+     *                  <li><code>Debug.OFF</code>
+     *                  <li><code>Debug.ERROR</code>
+     *                  <li><code>Debug.WARNING</code>
+     *                  <li><code>Debug.MESSAGE</code>
+     *                  <li><code>Debug.ON</code>
+     *                  </ul>
      */
     public void setDebug(int debugType) {
         getDebugServiceInstance().setDebug(debugType);
     }
 
     /**
-     * Allows runtime modification of the backend used by this instance. 
+     * Allows runtime modification of the backend used by this instance.
      * by resetting the debug instance to reinitialize itself.
+     *
      * @param mf merge flag - on for creating a single debug file.
      */
     public void resetDebug(String mf) {
         getDebugServiceInstance().resetDebug(mf);
     }
+
     /**
      * Sets the debug capabilities based on the values of the
      * <code>debugType</code> argument.
-     * 
-     * @param debugType
-     *            is any one of the following possible values:
-     *            <ul>
-     *            <li><code>Debug.STR_OFF</code>
-     *            <li><code>Debug.STR_ERROR</code>
-     *            <li><code>Debug.STR_WARNING</code>
-     *            <li><code>Debug.STR_MESSAGE</code>
-     *            <li><code>Debug.STR_ON</code>
-     *            </ul>
+     *
+     * @param debugType is any one of the following possible values:
+     *                  <ul>
+     *                  <li><code>Debug.STR_OFF</code>
+     *                  <li><code>Debug.STR_ERROR</code>
+     *                  <li><code>Debug.STR_WARNING</code>
+     *                  <li><code>Debug.STR_MESSAGE</code>
+     *                  <li><code>Debug.STR_ON</code>
+     *                  </ul>
      */
     public void setDebug(String debugType) {
         getDebugServiceInstance().setDebug(debugType);
@@ -623,7 +620,7 @@ public class Debug {
      * <code>destroy()</code> is invoked. To conserve file resources, you
      * should invoke <code>destroy()</code> explicitly rather than wait for
      * the garbage collector to clean up.
-     * 
+     * <p/>
      * <p>
      * If this object is accessed after <code>destroy()</code> has been
      * invoked, the results are undefined.
@@ -643,7 +640,7 @@ public class Debug {
 
     /**
      * Returns the actual debug service class.
-     * 
+     *
      * @return The underlying debug service class.
      */
     private IDebug getDebugServiceInstance() {
