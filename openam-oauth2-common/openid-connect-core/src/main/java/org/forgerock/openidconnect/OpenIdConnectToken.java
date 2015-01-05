@@ -308,7 +308,7 @@ public class OpenIdConnectToken extends JsonValue implements Token {
             signingHandler = new SigningManager().newHmacSigningHandler(clientSecret);
         }
 
-        JwsHeaderBuilder builder = jwtBuilderFactory.jws(signingHandler).headers().alg(jwsAlgorithm).cty("JWT");
+        JwsHeaderBuilder builder = jwtBuilderFactory.jws(signingHandler).headers().alg(jwsAlgorithm);
         JwtClaimsSet claimsSet = jwtBuilderFactory.claims().claims(asMap()).build();
 
         if (kid != null) {
