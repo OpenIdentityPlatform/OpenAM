@@ -220,32 +220,34 @@ public class IdentityServicesImpl
             if (lc.getStatus() != AuthContext.Status.SUCCESS) {
                 String ec = lc.getErrorCode();
                 String em = lc.getErrorMessage();
-                if(ec.equals(AMAuthErrorCode.AUTH_INVALID_PASSWORD)) {
+                if(AMAuthErrorCode.AUTH_INVALID_PASSWORD.equals(ec)) {
                     if (useGenericAuthenticationException) {
                         // We can't use the error message as it is for invalid password
                         throw new InvalidCredentials("");
                     } else {
                         throw new InvalidPassword(em);
                     }
-                } else if (ec.equals(AMAuthErrorCode.AUTH_PROFILE_ERROR) ||
-                    ec.equals(AMAuthErrorCode.AUTH_USER_NOT_FOUND)) {
+                } else if (AMAuthErrorCode.AUTH_PROFILE_ERROR.equals(ec) ||
+                        AMAuthErrorCode.AUTH_USER_NOT_FOUND.equals(ec)) {
                     throw new UserNotFound(em);
-                } else if (ec.equals(AMAuthErrorCode.AUTH_USER_INACTIVE)) {
+                } else if (AMAuthErrorCode.AUTH_USER_INACTIVE.equals(ec)) {
                     throw new UserInactive(em);
-                } else if (ec.equals(AMAuthErrorCode.AUTH_USER_LOCKED)) {
+                } else if (AMAuthErrorCode.AUTH_USER_LOCKED.equals(ec)) {
                     throw new UserLocked(em);
-                } else if (ec.equals(AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED)) {
+                } else if (AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED.equals(ec)) {
                     throw new AccountExpired(em);
-                } else if (ec.equals(AMAuthErrorCode.AUTH_LOGIN_FAILED)) {
+                } else if (AMAuthErrorCode.AUTH_LOGIN_FAILED.equals(ec)) {
                     if (useGenericAuthenticationException) {
                         // We can't use the error message to be consistent with the invalid password case                        
                         throw new InvalidCredentials("");
                     } else {
                         throw new InvalidCredentials(em);
                     }
-                } else if (ec.equals(AMAuthErrorCode.AUTH_MAX_SESSION_REACHED)) {
+                } else if (AMAuthErrorCode.AUTH_MAX_SESSION_REACHED.equals(ec)) {
                     throw new MaximumSessionReached(em);
-                } else if (ec.equals(AMAuthErrorCode.AUTH_ERROR)) {
+                } else if (AMAuthErrorCode.AUTH_ERROR.equals(ec)) {
+                    throw new GeneralFailure(em);
+                } else {
                     throw new GeneralFailure(em);
                 }
             } else {
