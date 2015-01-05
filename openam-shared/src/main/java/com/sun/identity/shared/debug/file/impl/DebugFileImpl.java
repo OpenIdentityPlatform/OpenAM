@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS
  */
 package com.sun.identity.shared.debug.file.impl;
 
@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -306,12 +307,12 @@ public class DebugFileImpl implements DebugFile {
 
     @Override
     public String toString() {
-        synchronized (suffixDateFormat) {
-            return "DebugFileImpl{" +
-                    "debugName='" + debugName + '\'' +
-                    ", debugDirectory='" + debugDirectory + '\'' +
-                    ", fileCreationTime=" + suffixDateFormat.format(new Date(fileCreationTime)) +
-                    '}';
-        }
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss:SSS a zzz");
+        return "DebugFileImpl{" +
+                "debugName='" + debugName + '\'' +
+                ", debugDirectory='" + debugDirectory + '\'' +
+                ", fileCreationTime=" + dateFormat.format(new Date(fileCreationTime)) +
+                '}';
+
     }
 }
