@@ -103,8 +103,9 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                                 message: errorBody.message,
                                 type: "error"
                         };
-                        messageManager.messages.addMessage(msg);
-                        
+                        // in this case, the user has no way to login
+                        promise.reject(msg);
+
                     } else {
                        // in this case, the user has no way to login
                        promise.reject();
@@ -215,7 +216,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                                 case " Your password has expired. Please contact service desk to reset your password":
                                     failReason = "loginFailureLockout";
                                 break;
-                                default: 
+                                default:
                                     failReason = "authenticationFailed";
                             }
 
@@ -243,8 +244,8 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                    obj.handleRequirements(requirements);
                    ret.resolve(requirements);
                })
-               .fail(function (jqXHR) {
-                   ret.reject();
+               .fail(function (error) {
+                   ret.reject(error);
                });
 
         } else {
@@ -262,7 +263,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
             data: JSON.stringify(args),
             url: "",
             serviceUrl: constants.host + "/" + constants.context + "/json/users?_action=validateGoto",
-            errorsHandlers: {"Bad Request": {status: 400}}
+            errorsHandlers: {"Bad Request": {status: "400"}}
         });
     };
 

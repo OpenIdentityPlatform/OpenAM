@@ -36,8 +36,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager, restLoginHelper, spinnerManager) {
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/commons/ui/common/components/Messages"
+], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager, restLoginHelper, messageManager) {
 
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
@@ -53,7 +54,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         },
         selfServiceClick: function(e) {
             e.preventDefault();
-            //save the login params in a cookie for use with the cancel button on forgotPassword/register page 
+            //save the login params in a cookie for use with the cancel button on forgotPassword/register page
             //and also the "proceed to login" link once password has been successfully changed or registration is complete
             var expire = new Date(),
                 cookieVal = conf.globalData.auth.realm;
@@ -177,7 +178,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                     }
                                 });
                             }
-                            else{ 
+                            else{
                                 location.href = "#confirmLogin/";
                             }
                         },function(){
@@ -189,13 +190,19 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     } else { // we aren't logged in yet, so render a form...
                         this.renderForm(reqs, urlParams);
                         promise.resolve();
-                        
+
                     }
                 }, this))
-                .fail(_.bind(function () {
+                .fail(_.bind(function (error) {
                     // If we can't render a login form, then the user must not be able to login
                     this.template = this.unavailableTemplate;
-                    this.parentRender();
+                    this.parentRender( function () {
+                        if (error) {
+                            messageManager.messages.addMessage(error);
+                        }
+
+                    });
+
                 }, this));
 
             promise
@@ -408,5 +415,3 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
     return new LoginView();
 });
-
-
