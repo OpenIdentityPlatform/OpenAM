@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,15 +26,16 @@
  * @author JKigwana
  */
 
-/*global window, define, $, form2js, _, js2form, document, console */
+/*global window, define, $, _, document, console, Handlebars */
 
 define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
-        "org/forgerock/commons/ui/common/main/AbstractView",
-        "org/forgerock/commons/ui/common/util/UIUtils",
-        "org/forgerock/commons/ui/common/main/EventManager",
-        "org/forgerock/commons/ui/common/util/Constants",
-        "org/forgerock/commons/ui/common/main/Configuration"
-], function(AbstractView, uiUtils, eventManager, constants, conf) {
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/openam/ui/policy/HelpLinkView"
+], function (AbstractView, uiUtils, eventManager, constants, conf, HelpLink) {
 
     var EditEnvironmentView = AbstractView.extend({
 
@@ -164,14 +165,14 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             }
         },
 
-        populateInputGroup:function(group){
-            var populated = false;
-            group.find('input, select').each(function(){
-                populated = this.value !== '';
-            });
+        populateInputGroup: function (group) {
+            var controls = group.find(':input'),
+                populated = _.find(controls, function (el) {
+                    return el.value !== '';
+                });
 
-            group.find('input, select').each(function(){
-                $(this).prop('required', populated);
+            controls.each(function () {
+                $(this).prop('required', !!populated);
             });
         },
 
@@ -195,7 +196,8 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             } else if (firstVal === '' && secondVal !== '') {
                 data[firstLabel] = data[secondLabel];
             } else if (firstVal === '' && secondVal === '') {
-                data[firstLabel] = data[secondLabel] = '';
+                delete data[firstLabel];
+                delete data[secondLabel];
             }
         },
 
@@ -240,7 +242,6 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                       clock.trigger('change');
                   }
               });
-
             });
         },
 
@@ -323,19 +324,24 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                             itemData[title] = value;
                         }
                     }
-                };
+                },
+                selectItem;
 
             this.$el.find('.selectize').each(function () {
-                var $this = $(this);
+                selectItem = $(this);
 
-                if ($this.hasClass('object-prop')) {
+                if (selectItem.prev('label').data('title') === 'dnsName') {
+                    options.createFilter = function (text) {
+                        return text.indexOf('*') === -1 || text.lastIndexOf('*') === 0;
+                    };
+                } else if (selectItem.hasClass('object-prop')) {
                     options.delimiter = ';';
                     options.createFilter = function (text) {
                         return (/^\w+:(?:\w+,?)+$/).test(text);
                     };
                 }
 
-                $this.selectize(options);
+                selectItem.selectize(options);
             });
         },
 
@@ -349,6 +355,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                 selectedType = e.target.value,
                 delay        = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
                 i18nKey,
+                helperText,
                 buildHTML    = function(schemaProps) {
 
                     var count = 0,
@@ -424,6 +431,22 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                     }
 
                     return returnVal;
+                },
+                getHelperText = function () {
+                    var helperText;
+                    switch (schema.title) {
+                        case 'IPv4': // fall through
+                        case 'IPv6':
+                            helperText = Handlebars.helpers.t('policy.conditionTypes.ipHelper');
+                            break;
+                        case 'SimpleTime':
+                            helperText = Handlebars.helpers.t('policy.conditionTypes.SimpleTime.helper');
+                            break;
+                        default:
+                            helperText = '';
+                            break;
+                    }
+                    return helperText;
                 };
 
             schema =  _.findWhere(this.data.conditions, {title: selectedType}) || {};
@@ -431,21 +454,29 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             if (this.$el.data().itemData && this.$el.data().itemData.type === selectedType) {
                 itemData = this.$el.data().itemData;
             } else {
-
                 itemData = self.setDefaultJsonValues(schema);
-                self.$el.data('itemData',itemData);
+                self.$el.data('itemData', itemData);
             }
 
             if (itemData) {
 
                 html = buildHTML(schema.config.properties);
                 self.animateOut();
+                helperText = getHelperText();
 
                 // setTimeout needed to delay transitions.
                 setTimeout( function() {
-
                     self.$el.find('.no-float').remove();
                     self.$el.find('.clear-left').remove();
+
+                    if (helperText) {
+                        new HelpLink().render(self.$el.find('.help-link'), {
+                            customText: helperText
+                        });
+                    } else {
+                        self.$el.find('.help-link').empty();
+                    }
+
                     self.$el.find('#typeSelector').after( html );
 
                     self.initOptions(itemData, schema);
@@ -481,7 +512,9 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             _.map(schema.config.properties, function(value,key) {
                 switch (value.type) {
                     case 'string':
-                        itemData[key] = '';
+                        if (key !== 'startIp' && key !== 'endIp') {
+                            itemData[key] = '';
+                        }
                     break;
                     case 'number':
                     case 'integer':

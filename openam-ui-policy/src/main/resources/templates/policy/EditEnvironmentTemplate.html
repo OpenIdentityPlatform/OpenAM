@@ -6,9 +6,12 @@
 	</span>
 
 	<div class="item-data">
-
 		<div class="field-float-select data-obj" id="typeSelector">
-			<label for="selection" >{{t "policy.common.type"}}</label>
+			<div>
+				<label for="selection" >{{t "policy.common.type"}}</label>
+				<div class="help-link"></div>
+			</div>
+
 			<select id="selection" class="placeholdertext" tabindex="0" >
 				<option value="" selected disabled >{{t "policy.common.select"}}</option>
 				{{#conditions}}
@@ -16,8 +19,7 @@
                 {{/conditions}}
 			</select>
 		</div>
-
-	</div>
+    </div>
 
 	<span class="item-button-panel">
 		<span tabindex="0" class="icon-checkmark"></span>

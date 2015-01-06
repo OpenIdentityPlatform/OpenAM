@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -41,18 +41,20 @@ define("org/forgerock/openam/ui/policy/HelpLinkView", [
             'keyup .icon-info': 'openDocumentation'
         },
 
-        render: function ($el, callback) {
+        render: function ($el, data, callback) {
+            _.extend(this.data, data);
+
             var documentation = conf.globalData.policyEditor && conf.globalData.policyEditor.documentation ? conf.globalData.policyEditor.documentation : {},
                 key = $el.data('help-key');
 
             this.element = $el;
-            this.url = key.split('.').reduce(function (prevVal, currVal) {
+            this.url = key ? key.split('.').reduce(function (prevVal, currVal) {
                 if (prevVal) {
                     return prevVal[currVal];
                 }
-            }, documentation);
+            }, documentation) : null;
 
-            if (this.url) {
+            if (this.url || this.data.customText) {
                 this.parentRender(function () {
                     if (callback) {
                         callback();
@@ -62,6 +64,10 @@ define("org/forgerock/openam/ui/policy/HelpLinkView", [
         },
 
         openDocumentation: function (e) {
+            if (!this.url) {
+                return;
+            }
+
             if (e.type === 'keyup' && e.keyCode !== 13) {
                 return;
             }

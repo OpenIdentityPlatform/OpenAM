@@ -1,4 +1,3 @@
-
 /* VARIABLES */
 
 @or-color:      #DDE9FF;
@@ -538,7 +537,8 @@ span.tooltips {
         padding: 6px 5px 10px;
         box-shadow: 0px 1px 3px #666;
         bottom: 25px;
-        transition:bottom 200ms ease-out, opacity 500ms ease-in;
+        transition:bottom 200ms ease-out, opacity 100ms ease-in;
+        opacity:0;
 
         &:after {
             content: '';
@@ -557,7 +557,7 @@ span.tooltips {
         width: 120px;
         margin-left: -65px;
         visibility: visible;
-        opacity: 0.8;
+        opacity: 0.9;
         bottom: 30px;
         left: 50%;
         z-index: 999;
@@ -1177,6 +1177,10 @@ body.editing{
         top: 0;
         opacity: 0.9;
         z-index: 200;
+
+        .help-link {
+            display: none;
+        }
     }
 
     li.dragged.dropped{
@@ -1189,6 +1193,9 @@ body.editing{
         cursor: move;
         background-color: #ccc;
 
+        .help-link {
+            display: none;
+        }
     }
 
     ol.condition-management-group {
@@ -1320,6 +1327,22 @@ body.editing{
         padding: 0;
     }
 
+    li:not(.dragged) .help-link {
+        float: right;
+        margin-top: -4px;
+
+        .icon-info {
+            font-size: 14px;
+
+            > span {
+                text-align: left;
+                width: 400px;
+                padding: 8px;
+                margin-left: -209px;
+            }
+        }
+    }
+
     .field-float-pattern, .field-float-select, .field-float-selectize {
 
         label {
@@ -1377,6 +1400,10 @@ body.editing{
             opacity:1;
         }
 
+        &#typeSelector select {
+            margin-top: 6px;
+        }
+
         select {
             margin-top: 16px;
             margin-bottom: 1px;
@@ -1403,7 +1430,7 @@ body.editing{
         }
     }
 
-    .field-float-select, .field-float-selectize {
+    .field-float-select:not(#typeSelector), .field-float-selectize {
         label {
             top: 10px;
             position: absolute;
@@ -1509,16 +1536,9 @@ section.active-step{
     }
 }
 
-.ruleHelperText {
-    padding: 10px 10px 0;
-    p {
-        font-size:12px;
-    }
-}
-
 #condition-management .item-data {
 
-    > div#conditionAttrTimeDate, > div.ruleHelperText{
+    > div#conditionAttrTimeDate {
         border-right: none;
         margin-right:0;
 

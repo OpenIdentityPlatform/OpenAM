@@ -544,6 +544,7 @@
               "helper": "A time condition must contain one or more of the following values: Time (Start and End), Day (Start and End), Date (Start and End) and/or Time Zone."
           },
 
+          "ipHelper" : "Enter at least one of Start IP, End IP or DNS Name.<br>To match a single IP, enter it in either Start IP or End IP. Start IP must be less than or equal to End IP.<br>DNS Name is an explicit match, or you can use a wildcard in the lowest sub-domain.",
           "legacyFormat": "This condition is in a legacy format, and should be replaced.",
           "nothingSelected": "Nothing selected"
       }
