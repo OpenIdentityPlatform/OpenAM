@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013-2014 ForgeRock AS
+  !      Copyright 2013-2015 ForgeRock AS
   !      Copyright 2014 Nomura Research Institute, Ltd
   !    
 -->
@@ -643,7 +643,7 @@ $ <userinput>curl \
 
     <para>For an example written in JavaScript, see the registration page in
     the examples <link xlink:show="new"
-    xlink:href="https://github.com/markcraig/openid/">available online</link>.
+    xlink:href="https://github.com/ForgeRock/openid">available online</link>.
     Successful registration shows a response that includes the client ID and
     client secret. Lines are folded in the following example.</para>
 
@@ -710,7 +710,7 @@ $ <userinput>curl \
    Code for the relying party examples shown here is
    <link
     xlink:show="new"
-    xlink:href="https://github.com/markcraig/openid/"
+    xlink:href="https://github.com/ForgeRock/openid"
    >available online</link>.
    Clone the example project to deploy it in the same web container as OpenAM.
    Edit the configuration at the outset of the .js files in the project,
@@ -1596,7 +1596,7 @@ $ <userinput>curl \
   <para>
    A simple, non-secure GSMA Mobile Connect relying party example is
    <link
-    xlink:href="https://github.com/markcraig/openid"
+    xlink:href="https://github.com/ForgeRock/openid"
     xlink:show="new"
    >available online</link>.
   </para>
