@@ -24,7 +24,7 @@
  *
  * $Id: AMSetupServlet.java,v 1.117 2010/01/20 17:01:35 veiming Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -555,11 +555,10 @@ public class AMSetupServlet extends HttpServlet {
        if (userStoreType != null) {     
             // site configuration is passed as a map of the site information 
             Map store = new HashMap(12);  
-            String tmp = (String)request.getParameter(
-                "USERSTORE_DOMAINNAME");
+            String tmp = request.getParameter("USERSTORE_DOMAINNAME");
             String domainName = tmp;
             store.put(SetupConstants.USER_STORE_DOMAINNAME, tmp);
-            tmp = (String)request.getParameter("USERSTORE_HOST"); 
+            tmp = request.getParameter("USERSTORE_HOST");
             if (tmp == null || tmp.length() == 0) {
                 String[] hostAndPort = {""};
                 try {
@@ -585,12 +584,12 @@ public class AMSetupServlet extends HttpServlet {
                 }
             } else {
                 store.put(SetupConstants.USER_STORE_HOST, tmp);
-                tmp = (String)request.getParameter("USERSTORE_PORT");
+                tmp = request.getParameter("USERSTORE_PORT");
                 store.put(SetupConstants.USER_STORE_PORT, tmp);
             }
-            tmp = (String)request.getParameter("USERSTORE_SSL");
+            tmp = request.getParameter("USERSTORE_SSL");
             store.put(SetupConstants.USER_STORE_SSL, tmp);
-            tmp = (String)request.getParameter("USERSTORE_SUFFIX");
+            tmp = request.getParameter("USERSTORE_SUFFIX");
             if (tmp == null || tmp.length() == 0) {
                 if (domainName != null && domainName.length() > 0) {
                     String umRootSuffix = dnsDomainToDN(domainName);
@@ -600,14 +599,14 @@ public class AMSetupServlet extends HttpServlet {
             } else {
                 store.put(SetupConstants.USER_STORE_ROOT_SUFFIX, tmp);
             }
-            tmp = (String)request.getParameter("USERSTORE_MGRDN"); 
+            tmp = request.getParameter("USERSTORE_MGRDN");
             store.put(SetupConstants.USER_STORE_LOGIN_ID, tmp);      
-            tmp = (String)request.getParameter("USERSTORE_PASSWD"); 
+            tmp = request.getParameter("USERSTORE_PASSWD");
             store.put(SetupConstants.USER_STORE_LOGIN_PWD, tmp);      
             store.put(SetupConstants.USERSTORE_PWD, tmp);      
             store.put(SetupConstants.USER_STORE_TYPE, userStoreType);
 
-            req.addParameter("UserStore", store);
+            req.addParameter(SetupConstants.USER_STORE, store);
         }
         
         boolean result = processRequest(req, res);
@@ -668,7 +667,7 @@ public class AMSetupServlet extends HttpServlet {
         Map siteMap = (Map)map.remove(
             SetupConstants.CONFIG_VAR_SITE_CONFIGURATION);
 
-        Map userRepo = (Map)map.remove("UserStore");
+        Map userRepo = (Map)map.remove(SetupConstants.USER_STORE);
 
         try {
 
@@ -851,7 +850,8 @@ public class AMSetupServlet extends HttpServlet {
             SetupConstants.SSHA512_LDAP_USERPWD,
             SetupConstants.UM_DS_DIRMGRPASSWD,
             SetupConstants.USERSTORE_PWD,
-            SetupConstants.USER_STORE_LOGIN_PWD
+            SetupConstants.USER_STORE_LOGIN_PWD,
+            SetupConstants.USER_STORE
     };
 
     // Used to provide a lookup list of items that should be hashed out.

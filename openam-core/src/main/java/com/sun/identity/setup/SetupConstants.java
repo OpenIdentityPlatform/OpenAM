@@ -24,10 +24,7 @@
  *
  * $Id: SetupConstants.java,v 1.46 2009/12/23 00:21:38 goodearth Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -629,6 +626,11 @@ public interface SetupConstants {
      * Password for the user login ID.
      */
     static final String USER_STORE_LOGIN_PWD = "userStoreLoginPassword";
+
+    /**
+     * Pointer to the external user store settings.
+     */
+    static final String USER_STORE = "UserStore";
 
     /**
      * <code>rsa_api.properties</code> file name.
