@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OpenSSOConfigurator.java,v 1.4 2009/08/11 23:50:42 goodearth Exp $
- */
-
-/**
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ *
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -169,7 +167,7 @@ public class OpenSSOConfigurator {
 
         for (String key : config.stringPropertyNames()) {
 
-            if (key.equals(USERSTORE_TYPE) || key.equals(ACCEPT_LICENSES) || key.equals(DEPLOYMENT_URI)) {
+            if (key.equals(ACCEPT_LICENSES) || key.equals(DEPLOYMENT_URI)) {
                 continue;
             }
 
