@@ -24,10 +24,7 @@
  *
  * $Id: ServicesDefaultValues.java,v 1.38 2009/01/28 05:35:02 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2013-2014 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -43,12 +40,10 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.StringTokenizer;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 import org.forgerock.openam.utils.ValidateIPaddress;
@@ -164,7 +159,7 @@ public class ServicesDefaultValues {
         map.put(SetupConstants.DATASTORE_NOTIFICATION, "true");
         map.put(SetupConstants.DISABLE_PERSISTENT_SEARCH, "aci,um");
 
-        Map userRepo = (Map)map.get("UserStore");
+        Map userRepo = (Map)map.get(SetupConstants.USER_STORE);
         String umRootSuffix = null;
         boolean bUseExtUMDS = (userRepo != null) && !userRepo.isEmpty();
         if (bUseExtUMDS) {
