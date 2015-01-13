@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -141,6 +141,8 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("protectedUserAttributes", protectedUserAttributes);
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro"));
             result.put("secureCookie", CookieUtils.isCookieSecure());
+            result.put("twoFactorAuthEnabled", String.valueOf(restSecurity.isTwoFactorAuthEnabled()));
+            result.put("twoFactorAuthMandatory", String.valueOf(restSecurity.isTwoFactorAuthMandatory()));
             result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
             result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
             result.put("lang", locale.getLocale().getLanguage());
