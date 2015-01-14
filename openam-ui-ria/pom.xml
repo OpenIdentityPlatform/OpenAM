@@ -49,6 +49,12 @@
             <groupId>org.mozilla</groupId>
             <artifactId>rhino</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>jquery.qrcode</artifactId>
+            <type>js</type>
+            <classifier>min</classifier>
+        </dependency>
     </dependencies>
 
     <build>

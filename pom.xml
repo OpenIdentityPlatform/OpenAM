@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -888,6 +888,13 @@
                 <version>${project.version}</version>
                 <classifier>www</classifier>
                 <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons.ui.libs</groupId>
+                <artifactId>jquery.qrcode</artifactId>
+                <version>0.11.0</version>
+                <type>js</type>
+                <classifier>min</classifier>
             </dependency>
 
             <!-- CLI components -->

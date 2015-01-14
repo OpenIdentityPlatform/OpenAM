@@ -42,4 +42,12 @@
             <outputDirectory>/</outputDirectory>
         </fileSet>
     </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <includes>
+                <include>org.forgerock.commons.ui.libs:*</include>
+            </includes>
+            <outputDirectory>/libs</outputDirectory>
+        </dependencySet>
+    </dependencySets>
 </assembly>
