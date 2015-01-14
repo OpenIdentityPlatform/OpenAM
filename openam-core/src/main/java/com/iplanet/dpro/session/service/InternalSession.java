@@ -45,6 +45,8 @@ import com.sun.identity.common.TimerPool;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonSetter;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -65,8 +67,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonSetter;
 
 /**
  * The <code>InternalSession</code> class represents a Webtop internal
@@ -194,6 +194,9 @@ public class InternalSession implements TaskRunnable, Serializable {
     /* AM Internal session maximum idle time */
     private static final String AM_MAX_IDLE_TIME = "AMMaxIdleTime";
 
+    /* AM Internal session maximum session time */
+    private static final String AM_MAX_SESSION_TIME = "AMMaxSessionTime";
+
     /* session property: SAML2IDPSessionIndex */
     private static final String SAML2_IDP_SESSION_INDEX = 
         "SAML2IDPSessionIndex";
@@ -304,6 +307,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         protectedProperties.add(Session.SESSION_HANDLE_PROP);
         protectedProperties.add(Session.TOKEN_RESTRICTION_PROP);
         protectedProperties.add(AM_MAX_IDLE_TIME);
+        protectedProperties.add(AM_MAX_SESSION_TIME);
         protectedProperties.add(Constants.AM_CTX_ID);
         protectedProperties.add(Constants.UNIVERSAL_IDENTIFIER);
 
@@ -968,6 +972,8 @@ public class InternalSession implements TaskRunnable, Serializable {
 
         } else if (key.equals(AM_MAX_IDLE_TIME)) {
             setMaxIdleTime(Long.parseLong(value));
+        } else if (key.equals(AM_MAX_SESSION_TIME)) {
+            setMaxSessionTime(Long.parseLong(value));
         } else {
             sessionProperties.put(key, value);
         }
