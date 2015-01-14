@@ -20,8 +20,8 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
-  !    
+  !      Copyright 2011-2015 ForgeRock AS
+  !
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -34,21 +34,22 @@
     </parent>
 
     <!-- Documentation Module -->
-    <groupId>org.forgerock.openam</groupId>
     <artifactId>openam-documentation</artifactId>
 
     <name>OpenAM Documentation</name>
 
     <inceptionYear>2011</inceptionYear>
     <packaging>pom</packaging>
-    <description>DocBook XML source for OpenAM core user documentation. Java API reference documentation is generated
-        from OpenAM source code.
+    <description>
+     DocBook XML source for OpenAM core user documentation.
+     Java API reference documentation is generated from OpenAM source code.
     </description>
 
     <url>http://openam.forgerock.org/</url>
 
     <modules>
-        <module>openam-doc-content</module>
+        <module>openam-doc-log-message-ref</module>
+        <module>openam-doc-ssoadm-ref</module>
         <module>openam-doc-source</module>
     </modules>
 

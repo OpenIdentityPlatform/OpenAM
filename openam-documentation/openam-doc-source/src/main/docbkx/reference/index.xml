@@ -20,15 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock Inc
+  !      Copyright 2011-2015 ForgeRock AS
   !    
 -->
 <book xml:id='reference'
- xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
- xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook
- http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+      xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+      xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+      xsi:schemaLocation='http://docbook.org/ns/docbook
+                          http://docbook.org/xml/5.0/xsd/docbook.xsd'
+      xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
   <xinclude:include href="../shared/mediaobject-fr-logo.xml" />
   <title>OpenAM Reference</title>
@@ -101,11 +101,19 @@
   <xinclude:include href='man-amverifyarchive-1.xml' />
   <xinclude:include href='man-configurator-jar-1.xml' />
   <xinclude:include href="man-upgrade-jar.xml" />
-  <xinclude:include href='../../../target/generated-resources/man-ssoadm-1.xml' /> 
+  <xinclude:include href='../shared/man-ssoadm-1.xml'>
+   <xinclude:fallback>
+    <!-- Failed to unpack and include generated ssoadm reference -->
+   </xinclude:fallback>
+  </xinclude:include>
  </reference>
 
  <xinclude:include href="chap-config-ref.xml" />
- <xinclude:include href='../../../target/generated-resources/chap-log-messages.xml' /> 
+ <xinclude:include href='../shared/chap-log-messages.xml'>
+  <xinclude:fallback>
+   <!-- Failed to unpack and include generated log message reference -->
+  </xinclude:fallback>
+ </xinclude:include>
  <xinclude:include href='chap-error-messages.xml' />
  <xinclude:include href='chap-ports-used.xml' />
  <xinclude:include href='chap-l10n.xml' />

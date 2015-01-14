@@ -20,8 +20,8 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS.
-  !    
+  !      Copyright 2011-2015 ForgeRock AS.
+  !
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -32,12 +32,14 @@
         <version>13.0.0-SNAPSHOT</version>
     </parent>
 
-    <name>OpenAM Generated Documentation Content</name>
-    <inceptionYear>2011</inceptionYear>
-    <groupId>org.forgerock.openam</groupId>
-    <artifactId>openam-doc-content</artifactId>
+    <name>OpenAM ssoadm Reference</name>
+    <artifactId>openam-doc-ssoadm-ref</artifactId>
     <packaging>jar</packaging>
+
+    <inceptionYear>2011</inceptionYear>
+
     <description>Tools for creating/generating the core documentation.</description>
+
     <build>
         <plugins>
             <plugin>
@@ -60,12 +62,32 @@
                                 <processor>org.forgerock.openam.docs.ssoadm.SsoadmAP</processor>
                             </processors>
                             <options>
-                                <outputFile>openam-documentation/openam-doc-content/target/classes/man-ssoadm-1.xml</outputFile>
+                                <outputFile>openam-documentation/openam-doc-ssoadm-ref/target/generated-resources/man-ssoadm-1.xml</outputFile>
                             </options>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-assembly-plugin</artifactId>
+             <executions>
+              <execution>
+               <id>assemble-ssoadm-reference</id>
+               <phase>package</phase>
+               <goals>
+                <goal>single</goal>
+               </goals>
+               <configuration>
+                <descriptors>
+                 <descriptor>src/main/assembly.xml</descriptor>
+                </descriptors>
+               </configuration>
+              </execution>
+             </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>

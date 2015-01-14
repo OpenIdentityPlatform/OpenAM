@@ -20,8 +20,8 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
-  !    
+  !      Copyright 2011-2015 ForgeRock AS
+  !
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -41,8 +41,8 @@
 
     <inceptionYear>2011</inceptionYear>
     <packaging>jar</packaging>
-    <description>DocBook XML source for OpenAM core user documentation. Java API reference documentation is generated
-        from OpenAM source code.
+    <description>
+        DocBook XML source for hand-written OpenAM core user documentation.
     </description>
 
     <url>http://openam.forgerock.org/</url>
@@ -213,137 +213,19 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.forgerock.openam</groupId>
-                                    <artifactId>openam-doc-content</artifactId>
+                                    <artifactId>openam-doc-log-message-ref</artifactId>
                                     <version>${project.version}</version>
-                                    <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
-                                    <includes>man-ssoadm-1.xml</includes>
+                                    <classifier>log-message-ref</classifier>
+                                    <outputDirectory>${project.build.directory}/docbkx-generated</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.forgerock.openam</groupId>
+                                    <artifactId>openam-doc-ssoadm-ref</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>ssoadm-ref</classifier>
+                                    <outputDirectory>${project.build.directory}/docbkx-generated</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>xml-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>transform</goal>
-                        </goals>
-                        <configuration>
-                            <transformationSets>
-                                <transformationSet>
-                                    <dir>../..</dir>
-                                    <includes>
-                                        <include>
-                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/AuthenticationLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/CLILogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/ConsoleLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/CoreTokenLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/EntitlementLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/LoggingLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/OAuth2ProviderLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/PolicyLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/RestLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/SessionLogMessageIDs.xml
-                                        </include>
-
-                                        <include>
-                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/COTLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/IDFFLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/LibertyLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/SAML2LogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/SAMLLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/WebServicesSecurityLogMessageIDs.xml
-                                        </include>
-                                        <include>
-                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/WSFederationLogMessageIDs.xml
-                                        </include>
-
-                                        <!--  <include>legacy/xml/log/Amadmin_CLILogMessageIDs.xml</include>  THIS FILE DOES NOT EXIST -->
-                                    </includes>
-                                    <stylesheet>${basedir}/src/main/xslt/logs.xsl</stylesheet>
-                                    <outputProperties>
-                                        <outputProperty>
-                                            <name>omit-xml-declaration</name>
-                                            <value>yes</value>
-                                        </outputProperty>
-                                    </outputProperties>
-                                    <validating>false</validating>
-                                </transformationSet>
-                            </transformationSets>
-                            <catalogs>
-                                <catalog>src/main/xslt/catalog.xml</catalog>
-                            </catalogs>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>xalan</groupId>
-                        <artifactId>xalan</artifactId>
-                        <version>2.7.1</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate-log-message-ref</id>
-                        <phase>pre-site</phase>
-                        <inherited>false</inherited>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <concat destfile="${project.build.directory}/generated-resources/chap-log-messages.xml">
-                                    <header file="${basedir}/src/main/docbkx/reference/log-messages-preface.header" />
-                                    <fileset dir="${project.build.directory}/generated-resources/xml/xslt" includes="**/*.xml">
-
-                                    </fileset>
-                                    <footer file="${basedir}/src/main/docbkx/reference/log-messages-preface.footer" />
-                                </concat>
-                            </target>
                         </configuration>
                     </execution>
                 </executions>
@@ -357,6 +239,7 @@
                     <projectVersion>${serverDocTargetVersion}</projectVersion>
                     <latestJson>http://docs.forgerock.org/latest.json</latestJson>
                     <googleAnalyticsId>${gaId}</googleAnalyticsId>
+                    <overwriteGeneratedSource>true</overwriteGeneratedSource>
                 </configuration>
                 <executions>
                     <execution>
@@ -400,12 +283,5 @@
         </plugins>
 
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-doc-content</artifactId>
-        </dependency>
-    </dependencies>
 
 </project>
