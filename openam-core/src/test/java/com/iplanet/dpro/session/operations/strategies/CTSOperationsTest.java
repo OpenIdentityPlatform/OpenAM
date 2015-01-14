@@ -111,7 +111,7 @@ public class CTSOperationsTest {
     }
 
     @Test
-    public void shouldTriggerResetOfLastAccessTime() throws CoreTokenException, SessionException {
+    public void shouldResetLastAccessTimeRemotely() throws CoreTokenException, SessionException {
         // Given
         Token mockToken = mock(Token.class);
         given(mockCTS.read(anyString())).willReturn(mockToken);
@@ -123,7 +123,7 @@ public class CTSOperationsTest {
         ctsOperations.refresh(mockSession, true);
 
         // Then
-        verify(mockInternalSession).setLatestAccessTime();
+        verify(mockRemote).refresh(mockSession, true);
     }
 
     @Test (expectedExceptions = SessionException.class)

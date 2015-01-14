@@ -99,17 +99,18 @@ public class CTSOperations implements SessionOperations {
      * @throws SessionException If there was a problem locating the Session in the CTS.
      */
     public SessionInfo refresh(Session session, boolean reset) throws SessionException {
-        SessionID sessionID = session.getID();
-        try {
-            InternalSession internalSession = readToken(sessionID);
-            // Modifies the Session if required.
-            if (reset) {
-                internalSession.setLatestAccessTime();
-            }
-
-            return sessionInfoFactory.getSessionInfo(internalSession, sessionID);
-        } catch (ReadFailedSessionException e) {
+        if (reset) {
+            // all write operations should be delegated to the home server
             return remote.refresh(session, reset);
+        } else {
+            // handle read operations via CTS if possible
+            SessionID sessionID = session.getID();
+            try {
+                InternalSession internalSession = readToken(sessionID);
+                return sessionInfoFactory.getSessionInfo(internalSession, sessionID);
+            } catch (ReadFailedSessionException e) {
+                return remote.refresh(session, reset);
+            }
         }
     }
 
