@@ -11,9 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.rest;
 
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
@@ -197,6 +196,10 @@ public class RestEndpoints {
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(ApplicationsResource.class);
 
+        dynamicRealmRouter.route("/subjectattributes")
+                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
+                .forVersion("1.0").to(SubjectAttributesResourceV1.class);
+
         rootRealmRouter.route("/applicationtypes")
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(ApplicationTypesResource.class);
@@ -212,10 +215,6 @@ public class RestEndpoints {
         rootRealmRouter.route("/subjecttypes")
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(SubjectTypesResource.class);
-
-        rootRealmRouter.route("/subjectattributes")
-                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
-                .forVersion("1.0").to(SubjectAttributesResourceV1.class);
 
         rootRealmRouter.route("/tokens")
                 .through(CoreTokenResourceAuthzModule.class, CoreTokenResourceAuthzModule.NAME)
