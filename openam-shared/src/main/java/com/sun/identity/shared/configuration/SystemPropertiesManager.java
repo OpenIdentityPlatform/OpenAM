@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2014 ForgeRock, AS.
+ * Portions Copyrighted 2014-2015 ForgeRock, AS.
  */
 
 package com.sun.identity.shared.configuration;
@@ -151,6 +151,17 @@ public final class SystemPropertiesManager {
         String value = get(key);
         return ((value != null) && (value.trim().length() > 0)) 
             ? value : defaultValue;
+    }
+
+    /**
+     * Returns the property value as a boolean
+     *
+     * @since 12.0.1
+     * @param key the key whose value one is looking for.
+     * @return the boolean value if the key exists; otherwise returns false
+     */
+    public static boolean getAsBoolean(String key) {
+        return Boolean.parseBoolean(get(key));
     }
 
     /**

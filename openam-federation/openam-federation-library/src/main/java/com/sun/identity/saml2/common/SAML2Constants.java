@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS
  */
 
 package com.sun.identity.saml2.common;
@@ -1608,4 +1608,9 @@ public interface SAML2Constants {
      */
     public static final String SP_DO_NOT_WRITE_FEDERATION_INFO =
             "spDoNotWriteFederationInfo";
+
+    /**
+     * Property to determine whether SAML SP Decryption Debug mode has been enabled.
+     */
+    static final String SAML_DECRYPTION_DEBUG_MODE = "openam.saml.decryption.debug.mode";
 } 

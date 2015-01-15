@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.shared.xml;
 
@@ -758,8 +758,7 @@ public class XMLUtils {
 	}
         
         try {
-            TransformerFactory tFactory =
-                TransformerFactory.newInstance();
+            TransformerFactory tFactory = TransformerFactory.newInstance();
             Transformer transformer = tFactory.newTransformer();
             transformer.setOutputProperty("omit-xml-declaration", "yes");
             transformer.setOutputProperty("encoding", encoding);
