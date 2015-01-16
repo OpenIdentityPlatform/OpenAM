@@ -11,10 +11,28 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
+
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.testng.Assert.*;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.login.LoginException;
+import javax.security.auth.message.MessageInfo;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -31,24 +49,6 @@ import org.forgerock.openam.utils.AMKeyProvider;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.login.LoginException;
-import javax.security.auth.message.MessageInfo;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 public class PersistentCookieAuthModuleTest {
 
@@ -102,7 +102,7 @@ public class PersistentCookieAuthModuleTest {
         Map<String, Object> config = persistentCookieAuthModule.initialize(subject, sharedState, options);
 
         //Then
-        assertEquals(config.size(), 7);
+        assertEquals(config.size(), 9);
         assertEquals(config.get(JwtSessionModule.KEY_ALIAS_KEY), "KEY_ALIAS");
         assertEquals(config.get(JwtSessionModule.PRIVATE_KEY_PASSWORD_KEY), "PRIVATE_KEY_PASS");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
@@ -129,7 +129,7 @@ public class PersistentCookieAuthModuleTest {
         Map<String, Object> config = persistentCookieAuthModule.initialize(subject, sharedState, options);
 
         //Then
-        assertEquals(config.size(), 7);
+        assertEquals(config.size(), 9);
         assertEquals(config.get(JwtSessionModule.KEY_ALIAS_KEY), "KEY_ALIAS");
         assertEquals(config.get(JwtSessionModule.PRIVATE_KEY_PASSWORD_KEY), "PRIVATE_KEY_PASS");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
@@ -158,7 +158,7 @@ public class PersistentCookieAuthModuleTest {
         Map<String, Object> config = persistentCookieAuthModule.initialize(subject, sharedState, options);
 
         //Then
-        assertEquals(config.size(), 7);
+        assertEquals(config.size(), 9);
         assertEquals(config.get(JwtSessionModule.KEY_ALIAS_KEY), "KEY_ALIAS");
         assertEquals(config.get(JwtSessionModule.PRIVATE_KEY_PASSWORD_KEY), "PRIVATE_KEY_PASS");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
@@ -330,13 +330,14 @@ public class PersistentCookieAuthModuleTest {
 
         given(ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY)).willReturn("TOKEN_IDLE_TIME");
         given(ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY)).willReturn("TOKEN_MAX_LIFE");
+        given(ssoToken.getProperty("openam-auth-persistent-cookie-domains")).willReturn("");
 
         //When
         Map<String, Object> config = persistentCookieAuthModule.initialize(requestParamsMap, request, response,
                 ssoToken);
 
         //Then
-        assertEquals(config.size(), 7);
+        assertEquals(config.size(), 9);
         assertEquals(config.get(JwtSessionModule.KEY_ALIAS_KEY), "KEY_ALIAS");
         assertEquals(config.get(JwtSessionModule.PRIVATE_KEY_PASSWORD_KEY), "PRIVATE_KEY_PASS");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
