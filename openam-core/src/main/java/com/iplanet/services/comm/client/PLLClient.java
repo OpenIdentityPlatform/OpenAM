@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.iplanet.services.comm.client;
 
@@ -41,6 +41,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.common.HttpURLConnectionManager;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -53,6 +54,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import javax.servlet.http.Cookie;
+
+import org.forgerock.openam.utils.IOUtils;
 
 /**
  * The <code>PLLClient</code> class is used to send RequestSet XML documents
@@ -214,23 +217,23 @@ public class PLLClient {
             ResponseSet resset = ResponseSet.parseXML(in_string);
             return resset.getResponses();
         } catch (Exception e) {
-            debug.message("PLLClient send exception: ", e);
+            debug.warning("PLLClient.send: exception: ", e);
             throw new SendRequestException(e.getMessage());
         } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    throw new SendRequestException(e.getMessage());
+            IOUtils.closeIfNotNull(out);
+            IOUtils.closeIfNotNull(in);
+            if (conn != null) {
+                // to allow connection re-use when an IOException occurs, the
+                // error stream should be read and then closed.
+                InputStream errorStream = conn.getErrorStream();
+                if (errorStream != null) {
+                    try {
+                        debug.warning("Error stream content is " + IOUtils.readStream(errorStream));
+                    } catch (IOException ioe) {
+                        debug.warning("Error while reading the error stream", ioe);
+                    }
                 }
             }
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    throw new SendRequestException(e.getMessage());
-                }
-            }    
         }
     }
 
