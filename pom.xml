@@ -931,13 +931,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- Documentation dependencies -->
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-doc-content</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-diagnostics-schema</artifactId>
@@ -2085,7 +2078,7 @@
                     <additionalJOption>${javadoc.options}</additionalJOption>
                     <detectLinks>true</detectLinks>
                     <bottom>
-                        <![CDATA[Copyright &#169; 2010-2014, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]>
+                        <![CDATA[Copyright &#169; 2010-2015, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]>
                     </bottom>
                     <links>
                         <link>http://docs.oracle.com/javase/6/docs/api</link>
@@ -2188,11 +2181,6 @@
                     <groupId>com.github.searls</groupId>
                     <artifactId>jasmine-maven-plugin</artifactId>
                     <version>2.0-alpha-01</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.forgerock.commons</groupId>
-                    <artifactId>forgerock-doc-maven-plugin</artifactId>
-                    <version>2.1.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.forgerock.maven.plugins</groupId>

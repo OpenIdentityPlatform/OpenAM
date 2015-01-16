@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock, Inc.
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <project name="${project.name}"
@@ -66,24 +66,24 @@
 
   <menu name="OpenAM Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
-   <item name="Release Notes" href="./openam-documentation/openam-doc-source/doc/release-notes/index.html" />
-   <item name="Getting Started" href="./openam-documentation/openam-doc-source/doc/getting-started/index.html" />
-   <item name="Installation Guide" href="./openam-documentation/openam-doc-source/doc/install-guide/index.html" />
-   <item name="Upgrade Guide" href="./openam-documentation/openam-doc-source/doc/upgrade-guide/index.html" />
-   <item name="Admin Guide" href="./openam-documentation/openam-doc-source/doc/admin-guide/index.html" />
-   <item name="Developer Guide" href="./openam-documentation/openam-doc-source/doc/dev-guide/index.html" />
-   <item name="Reference" href="./openam-documentation/openam-doc-source/doc/reference/index.html" />
+   <item name="Release Notes" href="./doc/release-notes/index.html" />
+   <item name="Getting Started" href="./doc/getting-started/index.html" />
+   <item name="Installation Guide" href="./doc/install-guide/index.html" />
+   <item name="Upgrade Guide" href="./doc/upgrade-guide/index.html" />
+   <item name="Admin Guide" href="./doc/admin-guide/index.html" />
+   <item name="Developer Guide" href="./doc/dev-guide/index.html" />
+   <item name="Reference" href="./doc/reference/index.html" />
    <item name="Javadoc" href="./apidocs/index.html" />
   </menu>
 
   <menu name="Policy Agent Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
-   <item name="Java EE Release Notes" href="./openam-documentation/openam-doc-source/doc/jee-release-notes/index.html" />
-   <item name="Java EE User's Guide" href="./openam-documentation/openam-doc-source/doc/jee-users-guide/index.html" />
-   <item name="Java EE Reference" href="./openam-documentation/openam-doc-source/doc/jee-reference/index.html" />
-   <item name="Web Release Notes" href="./openam-documentation/openam-doc-source/doc/web-release-notes/index.html" />
-   <item name="Web User's Guide" href="./openam-documentation/openam-doc-source/doc/web-users-guide/index.html" />
-   <item name="Web Reference" href="./openam-documentation/openam-doc-source/doc/web-reference/index.html" />
+   <item name="Java EE Release Notes" href="./doc/jee-release-notes/index.html" />
+   <item name="Java EE User's Guide" href="./doc/jee-users-guide/index.html" />
+   <item name="Java EE Reference" href="./doc/jee-reference/index.html" />
+   <item name="Web Release Notes" href="./doc/web-release-notes/index.html" />
+   <item name="Web User's Guide" href="./doc/web-users-guide/index.html" />
+   <item name="Web Reference" href="./doc/web-reference/index.html" />
   </menu>
 
   <menu name="Project Information">
