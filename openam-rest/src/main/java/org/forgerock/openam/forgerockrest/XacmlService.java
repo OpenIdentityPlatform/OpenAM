@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest;
@@ -20,7 +20,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.delegation.DelegationEvaluator;
-import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.delegation.DelegationPermissionFactory;
@@ -33,7 +32,6 @@ import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
@@ -81,9 +79,7 @@ public class XacmlService extends ServerResource {
 
     public static final String QUERY_PARAM_STRING = "filter";
 
-    @VisibleForTesting
-    static final String FORGEROCK_AUTH_CONTEXT = "org.forgerock.authentication.context";
-
+    private static final String FORGEROCK_AUTH_CONTEXT = "org.forgerock.authentication.context";
     private static final String ROOT_REALM = "/";
 
     private final XACMLExportImport importExport;
@@ -259,7 +255,8 @@ public class XacmlService extends ServerResource {
      *
      * @return true if the user has permission, false otherwise.
      */
-    protected boolean checkPermission(String action) throws EntitlementException {
+    @VisibleForTesting
+    boolean checkPermission(String action) throws EntitlementException {
 
         try {
             Request restletRequest = getRequest();
@@ -267,24 +264,34 @@ public class XacmlService extends ServerResource {
             String realm = RestletRealmRouter.getRealmFromRequest(restletRequest);
 
             final Map<String, String> context = (Map<String, String>)
-                                        ServletUtils.getRequest(getRequest()).getAttribute(FORGEROCK_AUTH_CONTEXT);
+                    ServletUtils.getRequest(getRequest()).getAttribute(FORGEROCK_AUTH_CONTEXT);
             final String tokenId = context.get("tokenId");
             final SSOToken token = SSOTokenManager.getInstance().createSSOToken(tokenId);
 
+            return checkPermission(action, urlLastSegment, realm, token);
+
+        } catch (SSOException e) {
+            debug.warning("XacmlService permission evaluation failed", e);
+            throw new EntitlementException(INTERNAL_ERROR, e);
+        }
+    }
+
+    /**
+     * This "lower level" version of checkPermission is really only here to make testing easier.
+     *
+     * @return true if the user has the "action" permission (action being "READ" or "MODIFY"), false otherwise.
+     */
+    private boolean checkPermission(String action, String urlLastSegment, String realm, SSOToken token)
+            throws EntitlementException {
+
+        boolean result;
+        try {
             final Set<String> actions = new HashSet<String>(Arrays.asList(action));
             final DelegationPermissionFactory permissionFactory = new DelegationPermissionFactory();
             final DelegationPermission permissionRequest = permissionFactory.newInstance(realm, REST, VERSION,
                     urlLastSegment, action, actions, Collections.<String, String>emptyMap());
 
-            boolean result = evaluator.isAllowed(token, permissionRequest, Collections.EMPTY_MAP);
-
-            String className = this.getClass().getName();
-            if (result) {
-                restLog.auditAccessGranted(className, urlLastSegment, className, token);
-            } else {
-                restLog.auditAccessDenied(className, urlLastSegment, className, token);
-            }
-            return result;
+            result = checkPermission(permissionRequest, token, urlLastSegment);
 
         } catch (SSOException e) {
             debug.warning("XacmlService permission evaluation failed", e);
@@ -293,5 +300,30 @@ public class XacmlService extends ServerResource {
             debug.warning("XacmlService permission evaluation failed", e);
             throw new EntitlementException(INTERNAL_ERROR, e);
         }
+
+        return result;
+    }
+
+    /**
+     * This is the most atomic of the checkPermissions and finally gives us something we can test without having to mock
+     * out most of the universe.
+     *
+     * @param permissionRequest the permission request, forged from the realm, URL segment, action and other things
+     * @param token the user's SSO token
+     * @param urlLastSegment the last segment of the URL
+     * @return true if the user has the "action" permission (action being "READ" or "MODIFY"), false otherwise.
+     */
+    @VisibleForTesting
+    boolean checkPermission(DelegationPermission permissionRequest, SSOToken token, String urlLastSegment)
+                                                throws DelegationException, SSOException {
+
+        boolean result = evaluator.isAllowed(token, permissionRequest, Collections.EMPTY_MAP);
+        String className = this.getClass().getName();
+        if (result) {
+            restLog.auditAccessGranted(className, urlLastSegment, className, token);
+        } else {
+            restLog.auditAccessDenied(className, urlLastSegment, className, token);
+        }
+        return result;
     }
 }

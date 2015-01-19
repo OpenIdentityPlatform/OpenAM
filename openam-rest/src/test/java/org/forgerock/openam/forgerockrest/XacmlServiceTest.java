@@ -11,78 +11,64 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest;
 
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.delegation.DelegationEvaluator;
-import com.sun.identity.delegation.DelegationEvaluatorImpl;
+import com.sun.identity.delegation.DelegationException;
+import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.xacml3.XACMLExportImport;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
-import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
 import org.forgerock.openam.forgerockrest.entitlements.StubPrivilege;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.restlet.Context;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.testng.PowerMockTestCase;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.Server;
 import org.restlet.data.Disposition;
 import org.restlet.data.Form;
-import org.restlet.data.Protocol;
-import org.restlet.data.Reference;
 import org.restlet.data.Status;
-import org.restlet.engine.adapter.HttpRequest;
-import org.restlet.engine.adapter.ServerCall;
 import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.ext.servlet.internal.ServletCall;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.sun.identity.entitlement.xacml3.XACMLExportImport.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.json.resource.ResourceException.BAD_REQUEST;
-import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.mockito.Mockito.*;
-import static com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
 
-public class XacmlServiceTest {
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({RestLog.class})
+public class XacmlServiceTest extends PowerMockTestCase {
 
     private static final ConcurrentMap<String, Object> REQUEST_ATTRIBUTES = new ConcurrentHashMap<String, Object>() {{
         put("realm", "/");
@@ -248,8 +234,8 @@ public class XacmlServiceTest {
         String xml = new String(baos.toByteArray(), "UTF-8");
 
         //then
-        assertThat(xml).contains("<PolicySet");
-        assertThat(xml).contains("xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\"");
+        assertThat(xml).contains("<ns2:PolicySet");
+        assertThat(xml).contains("xmlns:ns2=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\"");
         verify(response).setStatus(Status.SUCCESS_OK);
         ArgumentCaptor<List> listCaptor = ArgumentCaptor.forClass(List.class);
         verify(importExport).exportXACML(eq("/"), any(Subject.class), listCaptor.capture());
@@ -319,6 +305,70 @@ public class XacmlServiceTest {
         } catch (ResourceException e) {
             assertThat(e.getStatus().getCode()).isEqualTo(INTERNAL_ERROR);
             assertThat(e.getMessage()).isEqualTo("JSON Exception.");
+        }
+    }
+
+    @Test
+    public void testPermissionsCheckSuccess() {
+
+        RestLog restLog = PowerMockito.mock(RestLog.class);
+
+        DelegationEvaluator evaluator = mock(DelegationEvaluator.class);
+        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator);
+
+        SSOToken adminToken = mock(SSOToken.class);
+        DelegationPermission delegationPermission = mock(DelegationPermission.class);
+        String urlLastSegment = "blah";
+
+        try {
+            // when
+            when(evaluator.isAllowed(adminToken, delegationPermission, Collections.EMPTY_MAP)).thenReturn(true);
+
+            boolean result = xacmlService.checkPermission(delegationPermission, adminToken, urlLastSegment);
+
+            assertThat(result).isTrue();
+            verify(restLog).auditAccessGranted(anyString(), anyString(), anyString(), any(SSOToken.class));
+
+        } catch (DelegationException de) {
+            // then
+            fail("Did not expect DelegationException");
+        } catch (SSOException ssoe) {
+            //then
+            fail("Did not expect SSOException");
+        } catch (Exception e) {
+            fail("Did not expect " + e.getClass().getName() + " with message " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testPermissionsCheckFail() {
+
+        RestLog restLog = PowerMockito.mock(RestLog.class);
+
+        DelegationEvaluator evaluator = mock(DelegationEvaluator.class);
+        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator);
+
+        SSOToken adminToken = mock(SSOToken.class);
+        DelegationPermission delegationPermission = mock(DelegationPermission.class);
+        String urlLastSegment = "blah";
+
+        try {
+            // when
+            when(evaluator.isAllowed(adminToken, delegationPermission, Collections.EMPTY_MAP)).thenReturn(false);
+
+            boolean result = xacmlService.checkPermission(delegationPermission, adminToken, urlLastSegment);
+
+            assertThat(result).isFalse();
+            verify(restLog).auditAccessDenied(anyString(), anyString(), anyString(), any(SSOToken.class));
+
+        } catch (DelegationException de) {
+            // then
+            fail("Did not expect DelegationException");
+        } catch (SSOException ssoe) {
+            //then
+            fail("Did not expect SSOException");
+        } catch (Exception e) {
+            fail("Did not expect " + e.getClass().getName() + " with message " + e.getMessage());
         }
     }
 }
