@@ -21,6 +21,8 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import java.util.Collections;
+
 public class ApplicationTest {
 
     private EntitlementRegistry registry;
@@ -62,6 +64,17 @@ public class ApplicationTest {
         //then
         assertEquals(resourceNameClass, result.getClass());
 
+    }
+
+    @Test
+    public void shouldCreateEditableClone() throws IllegalAccessException, InstantiationException {
+        //given
+
+        //when
+        Application clone = testApplication.clone();
+
+        //then
+        assertEquals(clone.isEditable(), true);
     }
 
 }

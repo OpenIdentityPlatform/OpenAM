@@ -840,4 +840,14 @@ public class Application implements Cloneable {
             return false;
         }
     }
+
+    /**
+     * An Application is editable if it can be changed by an end user. This method was put
+     * in place for subclasses that can not be edited.
+     *
+     * @return True if the Application can be edited.
+     */
+    public boolean isEditable() {
+        return true;
+    }
 }

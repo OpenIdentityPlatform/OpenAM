@@ -11,13 +11,14 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.forgerockrest.entitlements.wrappers;
 
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.ReferredApplication;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.util.Map;
@@ -308,6 +309,11 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
     @JsonProperty("lastModifiedDate")
     public long getLastModifiedDate() {
         return application.getLastModifiedDate();
+    }
+
+    @JsonProperty("editable")
+    public boolean isEditable() {
+        return application.isEditable();
     }
 
     public JsonValue toJsonValue() throws EntitlementException {

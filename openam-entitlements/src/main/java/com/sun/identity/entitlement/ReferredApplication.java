@@ -25,6 +25,10 @@
  * $Id: ReferredApplication.java,v 1.1 2009/11/19 01:02:03 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2015 ForgeRock AS
+ */
+
 package com.sun.identity.entitlement;
 
 import java.util.HashMap;
@@ -38,14 +42,17 @@ import java.util.Set;
 public class ReferredApplication extends Application {
     private Map<String, Integer> mapResourcesToCount;
 
-    ReferredApplication(
-        String realm,
-        String name,
-        Application application,
-        Set<String> res) {
+    ReferredApplication(String realm, String name, Application application, Set<String> res) {
         super();
         application.cloneAppl(this);
         setRealm(realm);
+        mapResourcesToCount(res);
+    }
+
+    private ReferredApplication() {
+    }
+
+    private void mapResourcesToCount(Set<String> res) {
         this.mapResourcesToCount = new HashMap<String, Integer>();
         for (String r : res) {
             this.mapResourcesToCount.put(r, 1);
@@ -85,5 +92,18 @@ public class ReferredApplication extends Application {
 
     public boolean hasResources() {
         return !mapResourcesToCount.isEmpty();
+    }
+
+    @Override
+    public boolean isEditable() {
+        return false;
+    }
+
+    @Override
+    public Application clone() {
+        final ReferredApplication clone = new ReferredApplication();
+        cloneAppl(clone);
+        mapResourcesToCount(getResources());
+        return clone;
     }
 }
