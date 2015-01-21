@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2014 ForgeRock Inc
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
@@ -46,7 +46,7 @@ import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;

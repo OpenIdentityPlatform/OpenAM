@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils;
 
@@ -31,10 +31,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import org.codehaus.jackson.map.ObjectMapper;
+import org.forgerock.guice.core.GuiceModules;
+import org.forgerock.guice.core.GuiceTestCase;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.core.guice.CoreGuiceModule;
+import org.forgerock.openam.core.guice.DataLayerGuiceModule;
 import org.forgerock.openam.cts.TokenTestUtils;
-import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.shared.guice.SharedGuiceModule;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.utils.IOUtils;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -42,16 +51,22 @@ import static org.fest.assertions.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
 
-public class JSONSerialisationTest {
+@GuiceModules({CoreGuiceModule.class, SharedGuiceModule.class, DataLayerGuiceModule.class})
+public class JSONSerialisationTest extends GuiceTestCase {
 
-    private static final JSONSerialisation SERIALISATION = new JSONSerialisation();
+    private JSONSerialisation serialization;
+
+    @BeforeMethod
+    public void setup() throws Exception {
+        serialization = InjectorHolder.getInstance(JSONSerialisation.class);
+    }
 
     @Test
     public void shouldSerialiseAString() {
         // Given
         String test = "Badger";
         // When
-        String result = SERIALISATION.deserialise(SERIALISATION.serialise(test), String.class);
+        String result = serialization.deserialise(serialization.serialise(test), String.class);
         // Then
         assertEquals(test, result);
     }
@@ -64,8 +79,8 @@ public class JSONSerialisationTest {
         test.put("ferret", 4321);
 
         // When
-        String text = SERIALISATION.serialise(test);
-        Map<String, Object> result = SERIALISATION.deserialise(text, Map.class);
+        String text = serialization.serialise(test);
+        Map<String, Object> result = serialization.deserialise(text, Map.class);
         // Then
         assertEquals(test, result);
     }
@@ -76,7 +91,7 @@ public class JSONSerialisationTest {
         Token token = new Token("id", TokenType.OAUTH);
 
         // When
-        Token result = SERIALISATION.deserialise(SERIALISATION.serialise(token), Token.class);
+        Token result = serialization.deserialise(serialization.serialise(token), Token.class);
 
         // Then
         TokenTestUtils.assertTokenEquals(result, token);
@@ -87,8 +102,8 @@ public class JSONSerialisationTest {
         // Given
         Token token = TokenTestUtils.generateToken();
         // When
-        String text = SERIALISATION.serialise(token);
-        Token result = SERIALISATION.deserialise(text, Token.class);
+        String text = serialization.serialise(token);
+        Token result = serialization.deserialise(text, Token.class);
         // Then
         TokenTestUtils.assertTokenEquals(result, token);
     }
@@ -96,14 +111,14 @@ public class JSONSerialisationTest {
     @Test
     public void basicSessionSerializationWorks() throws Exception {
         InternalSession is = new InternalSession();
-        String serialised = SERIALISATION.serialise(is);
+        String serialised = serialization.serialise(is);
         assertThat(serialised).isNotNull().isEqualTo(getJSON("/json/basic-session.json"));
         assertThat(is).isNotNull();
     }
 
     @Test
     public void tokenRestrictionDeserialisationWithTypeWorks() throws Exception {
-        InternalSession is = SERIALISATION.deserialise(getJSON("/json/basic-session-with-restriction.json"),
+        InternalSession is = serialization.deserialise(getJSON("/json/basic-session-with-restriction.json"),
                 InternalSession.class);
         assertThat(is).isNotNull();
         TokenRestriction restriction = is.getRestrictionForToken(new SessionID("AQIC5wM2LY4SfcyTLz6VjQ7nkFeDcEh8K5dXkIE"
@@ -123,7 +138,7 @@ public class JSONSerialisationTest {
 
     @Test(dataProvider = "complex")
     public void internalSessionDeserialisationWorks(String path) throws Exception {
-        InternalSession is = SERIALISATION.deserialise(getJSON(path), InternalSession.class);
+        InternalSession is = serialization.deserialise(getJSON(path), InternalSession.class);
         assertThat(is).isNotNull();
         assertThat(is.getID()).isNotNull();
         assertThat(Collections.list(is.getPropertyNames())).hasSize(23);
@@ -132,7 +147,7 @@ public class JSONSerialisationTest {
 
     @Test(dataProvider = "complex")
     public void internalSessionDeserialisationDoesNotModifyMapTypes(String path) throws Exception {
-        InternalSession is = SERIALISATION.deserialise(getJSON(path), InternalSession.class);
+        InternalSession is = serialization.deserialise(getJSON(path), InternalSession.class);
         assertThat(is).isNotNull();
         checkMapType(is, "sessionEventURLs");
         checkMapType(is, "restrictedTokensBySid");
@@ -141,11 +156,11 @@ public class JSONSerialisationTest {
 
     @Test(dataProvider = "complex")
     public void complexInternalSessionSerializationWorks(String path) throws Exception {
-        InternalSession is = SERIALISATION.deserialise(getJSON(path), InternalSession.class);
+        InternalSession is = serialization.deserialise(getJSON(path), InternalSession.class);
         assertThat(is).isNotNull();
-        String serialised = SERIALISATION.serialise(is);
+        String serialised = serialization.serialise(is);
         assertThat(serialised).isNotNull().isNotEmpty();
-        InternalSession is2 = SERIALISATION.deserialise(serialised, InternalSession.class);
+        InternalSession is2 = serialization.deserialise(serialised, InternalSession.class);
         assertThat(is2).isNotNull().isNotSameAs(is);
         assertThat(is.getID()).isEqualTo(is2.getID());
     }
@@ -192,63 +207,4 @@ public class JSONSerialisationTest {
         return Math.random() > 0.5d;
     }
 
-    /**
-     * Demonstrates that neither serialisation mechanism is consistent with the time it takes
-     * to serialise a session. This is not a completely fair test because the Internal Session
-     * class being serialised is awkward at best to serialise and deserialise.
-     *
-     * @param args none.
-     */
-    public static void main(String[] args) throws InterruptedException {
-        final ExecutorService service = Executors.newFixedThreadPool(8);
-        final long iterations = 1000;
-
-        final Runnable command = new Runnable() {
-            public void run() {
-
-                /**
-                 * Time the previous mechanism
-                 */
-                long start = System.currentTimeMillis();
-                for (int ii = 0; ii < iterations; ii++) {
-                    try {
-                        SessionUtils.encode(generateSession());
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                }
-                long delta = System.currentTimeMillis() - start;
-                float previous = (float)delta / iterations;
-
-                /**
-                 * Time the current mechanism
-                 */
-                start = System.currentTimeMillis();
-                for (int ii = 0; ii < iterations; ii++) {
-                    SERIALISATION.serialise(generateSession());
-                }
-                delta = System.currentTimeMillis() - start;
-                float current = (float)delta / iterations;
-
-                String msg = MessageFormat.format(
-                        "Object {0}ms vs JSON: {1}ms",
-                        previous,
-                        current);
-                (current <= previous ? System.out : System.err).println(msg);
-
-                if (!service.isShutdown()) {
-                    service.execute(this);
-                }
-            }
-        };
-
-        System.out.println("Serialisation Test");
-        for (int ii = 0; ii < 8; ii++) {
-            service.execute(command);
-        }
-        Thread.sleep(3000);
-        service.shutdown();
-        service.awaitTermination(1, TimeUnit.SECONDS);
-        System.exit(0);
-    }
 }

@@ -11,25 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils;
 
-import com.iplanet.dpro.session.SessionID;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-
 import java.io.IOException;
 import java.text.MessageFormat;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.DeserializationProblemHandler;
-import org.codehaus.jackson.map.JsonDeserializer;
-import org.codehaus.jackson.map.KeyDeserializer;
-import org.codehaus.jackson.map.module.SimpleModule;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.codehaus.jackson.map.ObjectMapper;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 
 /**
  * Responsible for serialising and deserialising objects to and from JSON.
@@ -51,36 +44,14 @@ import org.codehaus.jackson.map.module.SimpleModule;
  * serialised following the above guidelines.
  */
 public class JSONSerialisation {
-
-    /**
-     * Use a static singleton as per <a href="http://wiki.fasterxml.com/JacksonBestPracticesPerformance">performance
-     * best practice.</a>
-     */
-    private static final ObjectMapper mapper = new ObjectMapper()
-            .configure(SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY, true)
-            .configure(DeserializationConfig.Feature.CAN_OVERRIDE_ACCESS_MODIFIERS, true);
-
-    static {
-        /**
-         * @see http://stackoverflow.com/questions/7105745/how-to-specify-jackson-to-only-use-fields-preferably-globally
-         */
-        mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
-                .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
-                .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
-                .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
-                .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
-                .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
-        SimpleModule customModule = new SimpleModule("openam", Version.unknownVersion());
-        customModule.addKeyDeserializer(SessionID.class, new SessionIDKeyDeserialiser());
-        mapper.registerModule(customModule);
-        mapper.getDeserializationConfig().addHandler(new CompatibilityProblemHandler());
-    }
+    private final ObjectMapper mapper;
 
     /**
      * New default instance of the JSONSerialsation.
      */
-    public JSONSerialisation() {
-        // Nothing to do
+    @Inject
+    public JSONSerialisation(@Named(CoreTokenConstants.OBJECT_MAPPER) ObjectMapper mapper) {
+        this.mapper = mapper;
     }
 
     /**
@@ -135,37 +106,4 @@ public class JSONSerialisation {
         return "\"" + name + "\":";
     }
 
-    /**
-     * This simple {@link KeyDeserializer} implementation allows us to use the {@link SessionID#toString()} value as a
-     * map key instead of a whole {@link SessionID} object. During deserialization this class will reconstruct the
-     * original SessionID object from the session ID string.
-     */
-    private static class SessionIDKeyDeserialiser extends KeyDeserializer {
-
-        @Override
-        public Object deserializeKey(String key, DeserializationContext ctxt)
-                throws IOException, JsonProcessingException {
-            return new SessionID(key);
-        }
-    }
-
-    /**
-     * This extension allows us to ignore the now unmapped restrictedTokensByRestriction field in InternalSession. This
-     * is especially helpful when dealing with legacy tokens that still contain this field. As the field is now
-     * recalculated based on the restrictedTokensBySid map, we just ignore this JSON property.
-     */
-    private static class CompatibilityProblemHandler extends DeserializationProblemHandler {
-
-        private static final String RESTRICTED_TOKENS_BY_RESTRICTION = "restrictedTokensByRestriction";
-
-        @Override
-        public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer,
-                Object beanOrClass, String propertyName) throws IOException, JsonProcessingException {
-            if (propertyName.equals(RESTRICTED_TOKENS_BY_RESTRICTION)) {
-                ctxt.getParser().skipChildren();
-                return true;
-            }
-            return false;
-        }
-    }
 }

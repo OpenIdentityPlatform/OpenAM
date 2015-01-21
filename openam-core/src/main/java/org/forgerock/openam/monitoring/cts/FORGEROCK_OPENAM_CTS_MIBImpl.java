@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -20,7 +20,7 @@ package org.forgerock.openam.monitoring.cts;
 import java.io.Serializable;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.tokens.TokenType;
 
 /**
  * The class is used for representing "FORGEROCK-OPENAM-CTS-MIB".

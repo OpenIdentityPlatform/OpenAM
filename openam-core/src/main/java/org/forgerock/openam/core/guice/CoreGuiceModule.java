@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.core.guice;
 
@@ -20,6 +20,7 @@ import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
@@ -46,6 +47,18 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
+
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.Version;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.DeserializationProblemHandler;
+import org.codehaus.jackson.map.JsonDeserializer;
+import org.codehaus.jackson.map.KeyDeserializer;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.module.SimpleModule;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
@@ -91,6 +104,8 @@ import org.forgerock.util.thread.ExecutorServiceFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
@@ -327,6 +342,69 @@ public class CoreGuiceModule extends AbstractModule {
             return new OrganizationConfigManager(token, "/");
         } catch (SMSException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * CTS Jackson Object Mapper.
+     * <p>
+     * Use a static singleton as per <a href="http://wiki.fasterxml.com/JacksonBestPracticesPerformance">performance
+     * best practice.</a>
+     */
+    @Provides @Named(CoreTokenConstants.OBJECT_MAPPER) @Singleton
+    ObjectMapper getCTSObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY, true)
+                .configure(DeserializationConfig.Feature.CAN_OVERRIDE_ACCESS_MODIFIERS, true);
+
+        /**
+         * @see http://stackoverflow.com/questions/7105745/how-to-specify-jackson-to-only-use-fields-preferably-globally
+         */
+        mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
+                .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
+                .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
+                .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
+        SimpleModule customModule = new SimpleModule("openam", Version.unknownVersion());
+        customModule.addKeyDeserializer(SessionID.class, new SessionIDKeyDeserialiser());
+        mapper.registerModule(customModule);
+        mapper.getDeserializationConfig().addHandler(new CompatibilityProblemHandler());
+
+        return mapper;
+    }
+
+    /**
+     * This simple {@link org.codehaus.jackson.map.KeyDeserializer} implementation allows us to use the {@link SessionID#toString()} value as a
+     * map key instead of a whole {@link SessionID} object. During deserialization this class will reconstruct the
+     * original SessionID object from the session ID string.
+     */
+    private static class SessionIDKeyDeserialiser extends KeyDeserializer {
+
+        @Override
+        public Object deserializeKey(String key, DeserializationContext ctxt)
+                throws IOException, JsonProcessingException {
+            return new SessionID(key);
+        }
+    }
+
+    /**
+     * This extension allows us to ignore the now unmapped restrictedTokensByRestriction field in InternalSession. This
+     * is especially helpful when dealing with legacy tokens that still contain this field. As the field is now
+     * recalculated based on the restrictedTokensBySid map, we just ignore this JSON property.
+     */
+    private static class CompatibilityProblemHandler extends DeserializationProblemHandler {
+
+        private static final String RESTRICTED_TOKENS_BY_RESTRICTION = "restrictedTokensByRestriction";
+
+        @Override
+        public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer,
+                Object beanOrClass, String propertyName) throws IOException, JsonProcessingException {
+            if (propertyName.equals(RESTRICTED_TOKENS_BY_RESTRICTION)) {
+                ctxt.getParser().skipChildren();
+                return true;
+            }
+            return false;
         }
     }
 

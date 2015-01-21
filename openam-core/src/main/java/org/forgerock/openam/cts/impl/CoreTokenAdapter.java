@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl;
 
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.*;
@@ -162,8 +162,8 @@ public class CoreTokenAdapter {
      * 'return attributes' defined within it. The results of this query will consist of PartialTokens
      * that match the requested CoreTokenFields.
      *
-     * @see TokenFilter#addReturnAttribute(org.forgerock.openam.cts.api.fields.CoreTokenField)
-     * @see org.forgerock.openam.cts.api.fields.CoreTokenField
+     * @see TokenFilter#addReturnAttribute(org.forgerock.openam.tokens.CoreTokenField)
+     * @see org.forgerock.openam.tokens.CoreTokenField
      *
      * @param filter Non null TokenFilter with return attributes defined.
      * @return Non null, but possibly empty results.

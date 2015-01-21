@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.queue;
 
@@ -19,14 +19,13 @@ import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.query.PartialToken;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 public class DeleteOnQueryResultHandlerTest {
 

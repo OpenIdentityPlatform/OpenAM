@@ -11,11 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts;
 
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
@@ -135,7 +135,7 @@ public interface CTSPersistentStore {
      * As stated in the PartialToken class, this is not a full Token and should not be treated
      * as one. Instead it is a way of getting specific access to parts of the Token data.
      *
-     * @see org.forgerock.openam.cts.api.filter.TokenFilter#addReturnAttribute(org.forgerock.openam.cts.api.fields.CoreTokenField)
+     * @see org.forgerock.openam.cts.api.filter.TokenFilter#addReturnAttribute(org.forgerock.openam.tokens.CoreTokenField)
      * @see org.forgerock.openam.cts.api.filter.TokenFilterBuilder
      * @see org.forgerock.openam.cts.impl.query.PartialToken
      *

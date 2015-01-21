@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.openam.cts.TokenTestUtils;
-import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.api.fields.SAMLTokenField;
 import org.forgerock.openam.cts.api.tokens.SAMLToken;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -56,10 +57,10 @@ public class SAMLAdapterTest {
     public void shouldSerialiseAndDeserialiseToken() {
         // Given
         // Need real delegates for this test.
-        serialisation = new JSONSerialisation();
+        serialisation = new JSONSerialisation(new ObjectMapper());
         adapter = new SAMLAdapter(
                 new TokenIdFactory(encoding),
-                new JSONSerialisation(),
+                new JSONSerialisation(new ObjectMapper()),
                 new TokenBlobUtils());
 
         String tokenId = "badger";

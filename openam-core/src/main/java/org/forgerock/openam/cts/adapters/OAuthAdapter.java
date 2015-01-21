@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -16,7 +16,7 @@
 package org.forgerock.openam.cts.adapters;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
@@ -94,9 +94,9 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
         Set<String> idSet = (Set<String>) request.get(TokenIdFactory.ID).getObject();
         String id = null;
         if (idSet != null && !idSet.isEmpty()){
-            id = tokenIdFactory.getOAuthTokenId(idSet.iterator().next());
+            id = tokenIdFactory.generateTokenId(idSet.iterator().next());
         } else {
-            id = tokenIdFactory.getOAuthTokenId(null);
+            id = tokenIdFactory.generateTokenId(null);
         }
         request.get(TokenIdFactory.ID).setObject(id);
         Token token = new Token(id, TokenType.OAUTH);

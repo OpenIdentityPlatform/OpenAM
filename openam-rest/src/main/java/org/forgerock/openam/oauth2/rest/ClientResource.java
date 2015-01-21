@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2014 ForgeRock AS.
+ * Copyright (c) 2012-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -60,7 +60,7 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.forgerockrest.RestUtils;

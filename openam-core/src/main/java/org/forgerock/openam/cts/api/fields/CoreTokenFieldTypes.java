@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -18,6 +18,7 @@ package org.forgerock.openam.cts.api.fields;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
+import org.forgerock.openam.tokens.CoreTokenField;
 
 import java.text.MessageFormat;
 import java.util.Calendar;

@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -220,6 +220,10 @@
             <groupId>org.forgerock.commons</groupId>
             <artifactId>forgerock-util</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-tokens</artifactId>
+        </dependency>
 
         <!-- LDAP APIs -->
         <dependency>
@@ -429,6 +433,10 @@
         <dependency>
             <groupId>org.hdrhistogram</groupId>
             <artifactId>HdrHistogram</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-guice-test</artifactId>
         </dependency>
     </dependencies>
 </project>

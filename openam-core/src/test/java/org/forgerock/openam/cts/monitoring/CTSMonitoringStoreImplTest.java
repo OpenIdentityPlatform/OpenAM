@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.cts.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.CTSOperation;
-import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
 import org.forgerock.openam.cts.monitoring.impl.connections.ConnectionStore;

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.api;
 
@@ -145,4 +145,9 @@ public class CoreTokenConstants {
      * The number of minutes to retain Sessions in DESTROYED state while waiting for delete replication to occur.
      */
     public static final String REDUCED_CROSSTALK_PURGE_DELAY = "iplanet-am-session-reduced-crosstalk-purge-delay";
+
+    /**
+     * Binding constant for the CTS Jackson Object Mapper.
+     */
+    public static final String OBJECT_MAPPER = "cts-json-object-mapper";
 }

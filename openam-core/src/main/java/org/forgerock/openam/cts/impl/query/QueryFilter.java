@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -16,7 +16,7 @@
 package org.forgerock.openam.cts.impl.query;
 
 import javax.inject.Inject;
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
 import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.opendj.ldap.Filter;

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  * Copyright (c) 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -50,8 +50,8 @@ import org.forgerock.openam.authentication.modules.common.mapping.AttributeMappe
 import org.forgerock.openam.authentication.modules.oidc.JwtHandler;
 import org.forgerock.openam.authentication.modules.oidc.JwtHandlerConfig;
 import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.api.TokenType;
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.utils.CollectionUtils;

@@ -11,16 +11,19 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
+
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.TokenTestUtils;
-import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
@@ -117,7 +120,14 @@ public class SessionAdapterTest {
         token.setBlob("{\"clientDomain\":null,\"creationTime\":1376307674,\"isISStored\":true,\"maxCachingTime\":3}".getBytes());
 
         // need a real JSONSerialisation for this test
-        JSONSerialisation serialisation = new JSONSerialisation();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibilityChecker(mapper.getSerializationConfig().getDefaultVisibilityChecker()
+                .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
+                .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
+                .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
+        JSONSerialisation serialisation = new JSONSerialisation(mapper);
         adapter = new SessionAdapter(tokenIdFactory, coreTokenConfig, serialisation, blobUtils);
 
         // When

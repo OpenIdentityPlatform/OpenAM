@@ -129,7 +129,7 @@
         <powermock.version>1.5</powermock.version>
         <jackson.version>2.4.2</jackson.version>
         <guice.version>3.0</guice.version>
-        <forgerock.guice.version>1.0.2</forgerock.guice.version>
+        <forgerock.guice.version>1.1.0-SNAPSHOT</forgerock.guice.version>
         <slf4j.version>1.7.5</slf4j.version>
         <santuario.xmlsec.version>1.5.6</santuario.xmlsec.version>
         <cxf.version>2.7.8</cxf.version>
@@ -373,6 +373,7 @@
         <module>openam-slf4j</module>
         <module>openam-oauth2-saml2</module>
         <module>openam-http-client</module>
+        <module>openam-tokens</module>
     </modules>
 
     <!-- Mailing Lists -->
@@ -864,6 +865,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-http-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-tokens</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -1776,6 +1782,12 @@
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-guice-servlet</artifactId>
                 <version>${forgerock.guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-guice-test</artifactId>
+                <version>${forgerock.guice.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>

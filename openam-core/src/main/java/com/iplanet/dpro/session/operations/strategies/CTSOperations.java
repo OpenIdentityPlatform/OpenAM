@@ -27,7 +27,7 @@ import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.SessionAdapter;
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
@@ -79,7 +79,7 @@ public class OAuthTokenStore {
      * @throws CoreTokenException If there is a problem reading the token.
      */
     public JsonValue read(String id) throws CoreTokenException {
-        Token token = cts.read(tokenIdFactory.getOAuthTokenId(id));
+        Token token = cts.read(tokenIdFactory.generateTokenId(id));
         //The CTS will not throw exception, but return null when read does not return a value
         if (token == null) {
             return null;

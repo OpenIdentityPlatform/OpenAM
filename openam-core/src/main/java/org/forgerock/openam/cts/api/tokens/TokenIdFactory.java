@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -77,15 +77,15 @@ public class TokenIdFactory {
     /**
      * Checks that the given id is not null, if so will generate an unique id, and then returns the non-null id.
      *
-     * @param id The ID of the OAuth Token.
-     * @return Non null Token Id.
+     * @param existingId The existing ID of the token.
+     * @return Non-null Token Id.
      */
-    public String getOAuthTokenId(String id) {
+    public String generateTokenId(String existingId) {
 
-        if (id == null){
-            id = UUID.randomUUID().toString();
+        if (existingId != null){
+            return existingId;
         }
 
-        return id;
+        return UUID.randomUUID().toString();
     }
 }

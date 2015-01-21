@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -24,7 +24,7 @@ import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.utils.IOUtils;

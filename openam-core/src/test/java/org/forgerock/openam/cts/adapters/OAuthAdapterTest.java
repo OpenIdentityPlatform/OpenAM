@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
@@ -137,7 +138,7 @@ public class OAuthAdapterTest {
         List<String> list = new ArrayList<String>(Arrays.asList(id));
         OAuthTokenField field = OAuthTokenField.ID;
 
-        JSONSerialisation serialisation = new JSONSerialisation();
+        JSONSerialisation serialisation = new JSONSerialisation(new ObjectMapper());
         OAuthAdapter adapter = generateOAuthAdapter();
 
         // Populate a map for serialisation.
@@ -174,7 +175,7 @@ public class OAuthAdapterTest {
     @Test (expectedExceptions = IllegalArgumentException.class)
     public void shouldNotDeserialiseATokenWhichDoesntContainAMap() {
         // Given
-        JSONSerialisation serialisation = new JSONSerialisation();
+        JSONSerialisation serialisation = new JSONSerialisation(new ObjectMapper());
         OAuthAdapter adapter = generateOAuthAdapter();
 
         Token token = new Token("", TokenType.OAUTH);
@@ -189,7 +190,7 @@ public class OAuthAdapterTest {
      * @return Makes a standard OAuthAdapter with real dependencies.
      */
     private OAuthAdapter generateOAuthAdapter() {
-        JSONSerialisation serialisation = new JSONSerialisation();
+        JSONSerialisation serialisation = new JSONSerialisation(new ObjectMapper());
         KeyConversion keyConversion = new KeyConversion();
         OAuthValues oAuthValues = new OAuthValues();
         TokenBlobUtils blobUtils = new TokenBlobUtils();

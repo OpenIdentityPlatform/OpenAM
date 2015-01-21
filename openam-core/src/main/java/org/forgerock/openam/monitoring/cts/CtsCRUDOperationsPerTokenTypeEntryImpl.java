@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -21,7 +21,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.management.snmp.SnmpStatusException;
 import com.sun.management.snmp.agent.SnmpMib;
 import org.forgerock.openam.cts.CTSOperation;
-import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.utils.Enums;
