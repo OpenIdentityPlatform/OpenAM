@@ -718,7 +718,8 @@ class ServiceConfigImpl implements ServiceListener {
             attributesWithoutDefaults.isEmpty()) &&
             ((serviceConfigNames == null) ||
                 serviceConfigNames.isEmpty()) &&
-            ((orgAttributes == null) || orgAttributes.isEmpty())
+            ((orgAttributes == null) || orgAttributes.isEmpty()) &&
+            ((nodeName == null) || !nodeName.equals(SMSUtils.SUB_CONFIG))
         ) {
             return "";
         }
