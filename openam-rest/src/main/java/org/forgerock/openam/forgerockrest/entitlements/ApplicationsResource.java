@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
@@ -46,6 +46,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryFilterVisitorAdapter;
@@ -77,21 +78,21 @@ public class ApplicationsResource extends RealmAwareResource {
     private final Map<String, QueryAttribute> queryAttributes;
     private final Debug debug;
 
-    private final ResourceErrorHandler<EntitlementException> resourceErrorHandler;
+    private final ExceptionMappingHandler<EntitlementException, ResourceException> exceptionMappingHandler;
 
     /**
      * @param debug Debug instance.
      * @param appManager Wrapper for the static {@link com.sun.identity.entitlement.ApplicationManager}. Cannot be null.
      * @param appTypeManagerWrapper instantiable version of the static ApplicationTypeManager class. Cannot be null.
      * @param queryAttributes Definition of Application fields that can be queried
-     * @param resourceErrorHandler Error handler to convert EntitlementExceptions to ResourceExceptions.
+     * @param exceptionMappingHandler Error handler to convert EntitlementExceptions to ResourceExceptions.
      */
     @Inject
     public ApplicationsResource(@Named("frRest") Debug debug, ApplicationManagerWrapper appManager,
                                 ApplicationTypeManagerWrapper appTypeManagerWrapper,
                                 @Named(ApplicationsResource.APPLICATION_QUERY_ATTRIBUTES)
                                 Map<String, QueryAttribute> queryAttributes,
-                                ResourceErrorHandler<EntitlementException> resourceErrorHandler) {
+                                ExceptionMappingHandler<EntitlementException, ResourceException> exceptionMappingHandler) {
 
         Reject.ifNull(appManager);
         Reject.ifNull(appTypeManagerWrapper);
@@ -100,7 +101,7 @@ public class ApplicationsResource extends RealmAwareResource {
         this.appManager = appManager;
         this.appTypeManagerWrapper = appTypeManagerWrapper;
         this.queryAttributes = queryAttributes;
-        this.resourceErrorHandler = resourceErrorHandler;
+        this.exceptionMappingHandler = exceptionMappingHandler;
 
         mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
@@ -213,7 +214,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                         ": Application creation failed. ", e);
             }
-            handler.handleError(resourceErrorHandler.handleError(request, e));
+            handler.handleError(exceptionMappingHandler.handleError(request, e));
         }
 
     }
@@ -318,7 +319,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: DELETE by " + principalName +
                         ": Application failed to delete the resource specified. ", e);
             }
-            handler.handleError(resourceErrorHandler.handleError(request, e));
+            handler.handleError(exceptionMappingHandler.handleError(request, e));
         }
 
     }
@@ -400,7 +401,7 @@ public class ApplicationsResource extends RealmAwareResource {
                         ": Failed to query resource.", e);
 
             }
-            handler.handleError(resourceErrorHandler.handleError(request, e));
+            handler.handleError(exceptionMappingHandler.handleError(request, e));
             return;
         }
 
@@ -447,7 +448,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: READ by " + principalName +
                         ": Application failed to retrieve the resource specified.", e);
             }
-            handler.handleError(resourceErrorHandler.handleError(request, e));
+            handler.handleError(exceptionMappingHandler.handleError(request, e));
         }
 
     }
@@ -515,7 +516,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Error performing update operation.", e);
             }
-            handler.handleError(resourceErrorHandler.handleError(request, e));
+            handler.handleError(exceptionMappingHandler.handleError(request, e));
         }
 
     }

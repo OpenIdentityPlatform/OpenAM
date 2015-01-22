@@ -15,6 +15,9 @@
  */
 package org.forgerock.openam.forgerockrest;
 
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.openam.forgerockrest.RestUtils.*;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -27,6 +30,7 @@ import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.DuplicateObject;
 import com.sun.identity.idsvcs.GeneralFailure;
+import com.sun.identity.idsvcs.IdServicesException;
 import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.NeedMoreCredentials;
 import com.sun.identity.idsvcs.ObjectNotFound;
@@ -41,6 +45,21 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.mail.MessagingException;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
@@ -67,8 +86,6 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
@@ -79,28 +96,10 @@ import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
-
-import javax.mail.MessagingException;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.forgerock.json.fluent.JsonValue.*;
-import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
-import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -1093,6 +1092,9 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             } catch (TokenExpired e) {
                 debug.error("Cannot change password: " + e.getMessage());
                 handler.handleError(new PermanentException(401, "Unauthorized", null));
+            } catch (IdServicesException e) {
+                debug.error("Cannot change password: " + e.getMessage());
+                handler.handleError(new BadRequestException(e.getMessage(), e));
             }
         } else {
             handler.handleError(new NotSupportedException(action + " not supported for resource instances"));

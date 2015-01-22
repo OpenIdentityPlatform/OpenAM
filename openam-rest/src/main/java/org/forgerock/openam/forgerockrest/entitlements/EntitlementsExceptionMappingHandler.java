@@ -11,32 +11,33 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.EntitlementException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.forgerock.json.resource.Request;
-import org.forgerock.json.resource.RequestType;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.util.Reject;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.forgerock.json.resource.Request;
+import org.forgerock.json.resource.RequestType;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.errors.ExceptionMappingHandler;
+import org.forgerock.util.Reject;
 
 /**
- * Default {@link ResourceErrorHandler} for entitlements exceptions that translates errors based on the
+ * Default {@link org.forgerock.openam.errors.ExceptionMappingHandler} for entitlements exceptions that translates errors based on the
  * {@link com.sun.identity.entitlement.EntitlementException#getErrorCode()}.
  *
  * @since 12.0.0
  */
-public final class EntitlementsResourceErrorHandler implements ResourceErrorHandler<EntitlementException> {
+public final class EntitlementsExceptionMappingHandler
+        implements ExceptionMappingHandler<EntitlementException, ResourceException> {
     public static final String RESOURCE_ERROR_MAPPING = "EntitlementsResourceErrorMapping";
     public static final String REQUEST_TYPE_ERROR_OVERRIDES = "EntitlementsResourceRequestTypeErrorOverrides";
 
@@ -68,7 +69,7 @@ public final class EntitlementsResourceErrorHandler implements ResourceErrorHand
      *                           values are both ResourceException error codes.
      */
     @Inject
-    public EntitlementsResourceErrorHandler(
+    public EntitlementsExceptionMappingHandler(
             @Named(RESOURCE_ERROR_MAPPING) Map<Integer, Integer> errorCodeMapping,
             @Named(REQUEST_TYPE_ERROR_OVERRIDES) Map<RequestType, Map<Integer, Integer>> errorCodeOverrides) {
         Reject.ifNull(errorCodeMapping);
@@ -84,7 +85,7 @@ public final class EntitlementsResourceErrorHandler implements ResourceErrorHand
      *
      * @param errorCodeMapping the mapping from EntitlementException error codes to ResourceException error codes.
      */
-    public EntitlementsResourceErrorHandler(Map<Integer, Integer> errorCodeMapping) {
+    public EntitlementsExceptionMappingHandler(Map<Integer, Integer> errorCodeMapping) {
         this(errorCodeMapping, Collections.<RequestType, Map<Integer, Integer>>emptyMap());
     }
 
@@ -115,6 +116,11 @@ public final class EntitlementsResourceErrorHandler implements ResourceErrorHand
         }
 
         return ResourceException.getException(resourceErrorType, errorToHandle.getMessage(), errorToHandle);
+    }
+
+    @Override
+    public ResourceException handleError(EntitlementException error) {
+        return handleError(null, error);
     }
 
     /**

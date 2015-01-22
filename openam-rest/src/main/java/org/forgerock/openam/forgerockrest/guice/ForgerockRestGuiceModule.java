@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -36,6 +36,14 @@ import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestType;
@@ -44,18 +52,19 @@ import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
 import org.forgerock.openam.forgerockrest.IdentityResourceV2;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationsResource;
 import org.forgerock.openam.forgerockrest.entitlements.EntitlementEvaluatorFactory;
-import org.forgerock.openam.forgerockrest.entitlements.EntitlementsResourceErrorHandler;
+import org.forgerock.openam.forgerockrest.entitlements.EntitlementsExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.entitlements.JsonPolicyParser;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluatorFactory;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyParser;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
-import org.forgerock.openam.forgerockrest.entitlements.ResourceErrorHandler;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.*;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
@@ -70,18 +79,6 @@ import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.SignatureUtil;
 import org.restlet.routing.Router;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
 
 /**
  * Guice Module for configuring bindings for the AuthenticationRestService classes.
@@ -107,12 +104,12 @@ public class ForgerockRestGuiceModule extends AbstractModule {
 
         // PolicyResource configuration
         bind(PrivilegeManager.class).to(PolicyPrivilegeManager.class);
-        bind(new TypeLiteral<ResourceErrorHandler<EntitlementException>>() {})
-                .to(EntitlementsResourceErrorHandler.class);
+        bind(new TypeLiteral<ExceptionMappingHandler<EntitlementException, ResourceException>>() {})
+                .to(EntitlementsExceptionMappingHandler.class);
         bind(PolicyParser.class).to(JsonPolicyParser.class);
         bind(PolicyStoreProvider.class).to(PrivilegePolicyStoreProvider.class);
         bind(new TypeLiteral<Map<Integer, Integer>>() {})
-                .annotatedWith(Names.named(EntitlementsResourceErrorHandler.RESOURCE_ERROR_MAPPING))
+                .annotatedWith(Names.named(EntitlementsExceptionMappingHandler.RESOURCE_ERROR_MAPPING))
                 .toProvider(EntitlementsResourceErrorMappingProvider.class)
                 .asEagerSingleton();
 
@@ -123,7 +120,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 Collections.singletonMap(ResourceException.NOT_FOUND, ResourceException.BAD_REQUEST));
 
         bind(new TypeLiteral<Map<RequestType, Map<Integer, Integer>>>() {})
-                .annotatedWith(Names.named(EntitlementsResourceErrorHandler.REQUEST_TYPE_ERROR_OVERRIDES))
+                .annotatedWith(Names.named(EntitlementsExceptionMappingHandler.REQUEST_TYPE_ERROR_OVERRIDES))
                 .toInstance(errorCodeOverrides);
 
         bind(new TypeLiteral<Map<String, QueryAttribute>>() {})

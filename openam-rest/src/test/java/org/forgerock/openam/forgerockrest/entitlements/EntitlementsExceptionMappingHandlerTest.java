@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements;
@@ -33,14 +33,14 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-public class EntitlementsResourceErrorHandlerTest {
+public class EntitlementsExceptionMappingHandlerTest {
     private static final int ERROR_CODE = 123;
     private static final String ERROR_MESSAGE = "a test message";
 
     @Test
     public void shouldMapKnownErrorsAsConfigured() {
         // Given
-        EntitlementsResourceErrorHandler errorHandler = new EntitlementsResourceErrorHandler(
+        EntitlementsExceptionMappingHandler errorHandler = new EntitlementsExceptionMappingHandler(
                 Collections.singletonMap(ERROR_CODE, ResourceException.NOT_FOUND));
         EntitlementException error = exception(ERROR_CODE, ERROR_MESSAGE);
 
@@ -55,7 +55,7 @@ public class EntitlementsResourceErrorHandlerTest {
     @Test
     public void shouldMapUnknownErrorsAsServerErrors() {
         // Given
-        EntitlementsResourceErrorHandler errorHandler = new EntitlementsResourceErrorHandler(
+        EntitlementsExceptionMappingHandler errorHandler = new EntitlementsExceptionMappingHandler(
                 Collections.<Integer, Integer>emptyMap());
         EntitlementException error = exception(ERROR_CODE, ERROR_MESSAGE);
 
@@ -74,7 +74,7 @@ public class EntitlementsResourceErrorHandlerTest {
         Map<RequestType, Map<Integer, Integer>> overrides = new HashMap<RequestType, Map<Integer, Integer>>();
         RequestType requestType = RequestType.CREATE;
         overrides.put(requestType, Collections.singletonMap(ResourceException.NOT_FOUND, ResourceException.BAD_REQUEST));
-        EntitlementsResourceErrorHandler errorHandler = new EntitlementsResourceErrorHandler(
+        EntitlementsExceptionMappingHandler errorHandler = new EntitlementsExceptionMappingHandler(
                 Collections.singletonMap(ERROR_CODE, ResourceException.NOT_FOUND),
                 overrides
         );

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements;
@@ -34,9 +34,9 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
 import org.mockito.Mock;
@@ -61,7 +61,7 @@ public class PolicyResourceTest {
     @Mock
     private PolicyStore mockStore;
 
-    private ResourceErrorHandler resourceErrorHandler;
+    private ExceptionMappingHandler resourceErrorHandler;
 
     @Mock
     private ServerContext mockServerContext;
@@ -94,7 +94,7 @@ public class PolicyResourceTest {
         given(mockStoreProvider.getPolicyStore(any(ServerContext.class))).willReturn(mockStore);
 
         // Use a real error handler as this is a core part of the functionality we are testing and doesn't need to be mocked
-        resourceErrorHandler = new EntitlementsResourceErrorHandler(ForgerockRestGuiceModule.getEntitlementsErrorHandlers());
+        resourceErrorHandler = new EntitlementsExceptionMappingHandler(ForgerockRestGuiceModule.getEntitlementsErrorHandlers());
 
         policyResource = new PolicyResource(mockFactory, requestFactory, mockParser, mockStoreProvider, resourceErrorHandler);
     }

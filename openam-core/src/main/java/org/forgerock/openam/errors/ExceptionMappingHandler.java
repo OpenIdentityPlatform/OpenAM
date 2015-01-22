@@ -11,26 +11,35 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.forgerockrest.entitlements;
+package org.forgerock.openam.errors;
 
 import org.forgerock.json.resource.Request;
-import org.forgerock.json.resource.ResourceException;
 
 /**
- * Translates errors that occur during resource management into appropriate resource errors.
+ * Translates errors from underlying processes into appropriate errors for the given task.
  *
  * @since 12.0.0
  */
-public interface ResourceErrorHandler<E extends Exception> {
+public interface ExceptionMappingHandler<E extends Exception, R extends Exception> {
+
     /**
      * Converts an exception into an appropriate resource exception.
      *
      * @param request the request that failed with an error.
      * @param error the error that occurred.
-     * @return an appropriate resource exception.
+     * @return an appropriate exception.
      */
-    ResourceException handleError(Request request, E error);
+    R handleError(Request request, E error);
+
+    /**
+     * Converts an exception into an appropriate resource exception.
+     *
+     * @param error the error that occurred.
+     * @return an appropriate exception.
+     */
+    R handleError(E error);
+
 }

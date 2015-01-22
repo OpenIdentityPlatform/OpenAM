@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <definitions
-    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-    xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://opensso.idsvcs.identity.sun.com/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns="http://schemas.xmlsoap.org/wsdl/"
-    targetNamespace="http://opensso.idsvcs.identity.sun.com/" name="IdentityServices">
+        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+        xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns:tns="http://opensso.idsvcs.identity.sun.com/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://schemas.xmlsoap.org/wsdl/"
+        targetNamespace="http://opensso.idsvcs.identity.sun.com/" name="IdentityServices">
     <types>
         <xsd:schema xmlns:tns="http://opensso.idsvcs.identity.sun.com/"
-            xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0"
-            targetNamespace="http://opensso.idsvcs.identity.sun.com/">
-            
+                    xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0"
+                    targetNamespace="http://opensso.idsvcs.identity.sun.com/">
+
+            <xsd:element name="IdServicesException" type="tns:IdServicesException"></xsd:element>
+
             <xsd:element name="AccessDenied" type="tns:AccessDenied"></xsd:element>
 
             <xsd:element name="AccountExpired" type="tns:AccountExpired"></xsd:element>
 
             <xsd:element name="GeneralFailure" type="tns:GeneralFailure"></xsd:element>
-            
+
             <xsd:element name="InvalidCredentials" type="tns:InvalidCredentials"></xsd:element>
-            
+
             <xsd:element name="InvalidPassword" type="tns:InvalidPassword"></xsd:element>
-            
+
             <xsd:element name="InvalidToken" type="tns:InvalidToken"></xsd:element>
-            
+
             <xsd:element name="NeedMoreCredentials" type="tns:NeedMoreCredentials"></xsd:element>
 
             <xsd:element name="OrgInactive" type="tns:OrgInactive"></xsd:element>
@@ -42,59 +44,59 @@
             <xsd:element name="ObjectNotFound" type="tns:ObjectNotFound"></xsd:element>
 
             <xsd:element name="DuplicateObject" type="tns:DuplicateObject"></xsd:element>
-            
+
             <xsd:element name="attributes" type="tns:attributes"></xsd:element>
 
             <xsd:element name="attributesRequest" type="tns:attributesRequest"></xsd:element>
-            
+
             <xsd:element name="attributesResponse" type="tns:attributesResponse"></xsd:element>
-            
+
             <xsd:element name="authenticate" type="tns:authenticate"></xsd:element>
-            
+
             <xsd:element name="authenticateResponse" type="tns:authenticateResponse"></xsd:element>
-            
+
             <xsd:element name="logout" type="tns:logout"></xsd:element>
-            
+
             <xsd:element name="logoutResponse" type="tns:logoutResponse"></xsd:element>
-            
+
             <xsd:element name="authorize" type="tns:authorize"></xsd:element>
-            
+
             <xsd:element name="authorizeResponse" type="tns:authorizeResponse"></xsd:element>
-            
+
             <xsd:element name="isTokenValid" type="tns:isTokenValid"></xsd:element>
-            
+
             <xsd:element name="isTokenValidResponse" type="tns:isTokenValidResponse"></xsd:element>
-            
+
             <xsd:element name="getCookieNameForToken" type="tns:getCookieNameForToken"></xsd:element>
-            
+
             <xsd:element name="getCookieNameForTokenResponse" type="tns:getCookieNameForTokenResponse"></xsd:element>
-            
+
             <xsd:element name="getCookieNamesToForward" type="tns:getCookieNamesToForward"></xsd:element>
-            
+
             <xsd:element name="getCookieNamesToForwardResponse" type="tns:getCookieNamesToForwardResponse"></xsd:element>
-            
+
             <xsd:element name="log" type="tns:log"></xsd:element>
-            
+
             <xsd:element name="logResponse" type="tns:logResponse"></xsd:element>
-            
+
             <xsd:element name="search" type="tns:search"></xsd:element>
-            
+
             <xsd:element name="searchResponse" type="tns:searchResponse"></xsd:element>
-            
+
             <xsd:element name="create" type="tns:create"></xsd:element>
-            
+
             <xsd:element name="createResponse" type="tns:createResponse"></xsd:element>
-            
+
             <xsd:element name="read" type="tns:read"></xsd:element>
-            
+
             <xsd:element name="readResponse" type="tns:readResponse"></xsd:element>
-            
+
             <xsd:element name="update" type="tns:update"></xsd:element>
-            
+
             <xsd:element name="updateResponse" type="tns:updateResponse"></xsd:element>
-            
+
             <xsd:element name="delete" type="tns:delete"></xsd:element>
-            
+
             <xsd:element name="deleteResponse" type="tns:deleteResponse"></xsd:element>
 
             <xsd:complexType name="log">
@@ -105,63 +107,97 @@
                     <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="token">
                 <xsd:sequence>
                     <xsd:element name="id" type="xsd:string" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="logResponse">
                 <xsd:sequence></xsd:sequence>
             </xsd:complexType>
-            
+
+            <xsd:complexType name="IdServicesException" abstract="true"/>
+
             <xsd:complexType name="AccessDenied">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
-            
+
             <xsd:complexType name="TokenExpired">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
-            
+
             <xsd:complexType name="GeneralFailure">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
-            
+
             <xsd:complexType name="OrgInactive">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
 
             <xsd:complexType name="UserInactive">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
 
             <xsd:complexType name="UserLocked">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
 
             <xsd:complexType name="AccountExpired">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
 
             <xsd:complexType name="MaximumSessionReached">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
 
             <xsd:complexType name="attributes">
@@ -170,7 +206,7 @@
                     <xsd:element name="subject" type="tns:token" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="attributesRequest">
                 <xsd:sequence>
                     <xsd:element name="attributes" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
@@ -184,7 +220,7 @@
                     <xsd:element name="return" type="tns:userDetails" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="userDetails">
                 <xsd:sequence>
                     <xsd:element name="attributes" type="tns:attribute" nillable="true" minOccurs="0" maxOccurs="unbounded"></xsd:element>
@@ -192,14 +228,14 @@
                     <xsd:element name="token" type="tns:token" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="attribute">
                 <xsd:sequence>
                     <xsd:element name="name" type="xsd:string" minOccurs="0"></xsd:element>
                     <xsd:element name="values" type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="authorize">
                 <xsd:sequence>
                     <xsd:element name="uri" type="xsd:string" minOccurs="0"></xsd:element>
@@ -207,43 +243,43 @@
                     <xsd:element name="subject" type="tns:token" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="authorizeResponse">
                 <xsd:sequence>
                     <xsd:element name="return" type="xsd:boolean"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="isTokenValid">
                 <xsd:sequence>
                     <xsd:element name="token" type="tns:token" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="isTokenValidResponse">
                 <xsd:sequence>
                     <xsd:element name="return" type="xsd:boolean"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="getCookieNameForToken">
             </xsd:complexType>
-            
+
             <xsd:complexType name="getCookieNameForTokenResponse">
                 <xsd:sequence>
                     <xsd:element name="return" type="xsd:string"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="getCookieNamesToForward">
             </xsd:complexType>
-            
+
             <xsd:complexType name="getCookieNamesToForwardResponse">
                 <xsd:sequence>
                     <xsd:element name="return" type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="search">
                 <xsd:sequence>
                     <xsd:element name="filter" type="xsd:string" minOccurs="0"></xsd:element>
@@ -251,7 +287,7 @@
                     <xsd:element name="admin" type="tns:token" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="searchResponse">
                 <xsd:sequence>
                     <xsd:element name="return" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
@@ -275,18 +311,18 @@
                     <xsd:element name="attributes" type="tns:attribute" nillable="true" minOccurs="0" maxOccurs="unbounded"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="create">
                 <xsd:sequence>
                     <xsd:element name="identity" type="tns:identityDetails" minOccurs="0"></xsd:element>
                     <xsd:element name="admin" type="tns:token" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="createResponse">
                 <xsd:sequence></xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="read">
                 <xsd:sequence>
                     <xsd:element name="name" type="xsd:string" minOccurs="0"></xsd:element>
@@ -294,41 +330,45 @@
                     <xsd:element name="admin" type="tns:token" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="readResponse">
                 <xsd:sequence>
                     <xsd:element name="return" type="tns:identityDetails" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="update">
                 <xsd:sequence>
                     <xsd:element name="identity" type="tns:identityDetails" minOccurs="0"></xsd:element>
                     <xsd:element name="admin" type="tns:token" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="updateResponse">
                 <xsd:sequence></xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="delete">
                 <xsd:sequence>
                     <xsd:element name="identity" type="tns:identityDetails" minOccurs="0"></xsd:element>
                     <xsd:element name="admin" type="tns:token" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="deleteResponse">
                 <xsd:sequence></xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="NeedMoreCredentials">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
-            
+
             <xsd:complexType name="authenticate">
                 <xsd:sequence>
                     <xsd:element name="username" type="xsd:string" minOccurs="0"></xsd:element>
@@ -337,60 +377,83 @@
                     <xsd:element name="client" type="xsd:string" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="authenticateResponse">
                 <xsd:sequence>
                     <xsd:element name="return" type="tns:token" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="logout">
                 <xsd:sequence>
                     <xsd:element name="subject" type="tns:token" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="logoutResponse">
                 <xsd:sequence></xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="UserNotFound">
                 <xsd:sequence>
                     <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
-            
+
             <xsd:complexType name="ObjectNotFound">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
-            
+
             <xsd:complexType name="DuplicateObject">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
-            
+
             <xsd:complexType name="InvalidPassword">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
-            
+
             <xsd:complexType name="InvalidToken">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
-            
+
             <xsd:complexType name="InvalidCredentials">
-                <xsd:sequence>
-                    <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
-                </xsd:sequence>
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
             </xsd:complexType>
         </xsd:schema>
     </types>
+    <message name="IdServicesException">
+        <part name="fault" element="tns:IdServicesException"></part>
+    </message>
     <message name="log">
         <part name="parameters" element="tns:log"></part>
     </message>
@@ -478,7 +541,7 @@
     <message name="getCookieNameForTokenResponse">
         <part name="parameters" element="tns:getCookieNameForTokenResponse"></part>
     </message>
-        <message name="getCookieNamesToForward">
+    <message name="getCookieNamesToForward">
         <part name="parameters" element="tns:getCookieNamesToForward"></part>
     </message>
     <message name="getCookieNamesToForwardResponse">
@@ -595,6 +658,7 @@
             <fault message="tns:ObjectNotFound" name="ObjectNotFound"></fault>
             <fault message="tns:GeneralFailure" name="GeneralFailure"></fault>
             <fault message="tns:AccessDenied" name="AccessDenied"></fault>
+            <fault message="tns:IdServicesException" name="IdServicesException"></fault>
         </operation>
         <operation name="update">
             <input message="tns:update"></input>
@@ -604,6 +668,7 @@
             <fault message="tns:ObjectNotFound" name="ObjectNotFound"></fault>
             <fault message="tns:GeneralFailure" name="GeneralFailure"></fault>
             <fault message="tns:AccessDenied" name="AccessDenied"></fault>
+            <fault message="tns:IdServicesException" name="IdServicesException"></fault>
         </operation>
         <operation name="delete">
             <input message="tns:delete"></input>
@@ -613,6 +678,7 @@
             <fault message="tns:ObjectNotFound" name="ObjectNotFound"></fault>
             <fault message="tns:GeneralFailure" name="GeneralFailure"></fault>
             <fault message="tns:AccessDenied" name="AccessDenied"></fault>
+            <fault message="tns:IdServicesException" name="IdServicesException"></fault>
         </operation>
     </portType>
     <binding name="IdentityServicesImplPortBinding" type="tns:IdentityServicesImpl">
@@ -826,6 +892,9 @@
             <fault name="AccessDenied">
                 <soap:fault name="AccessDenied" use="literal"></soap:fault>
             </fault>
+            <fault name="IdServicesException">
+                <soap:fault name="IdServicesException" use="literal"></soap:fault>
+            </fault>
         </operation>
         <operation name="update">
             <soap:operation soapAction=""></soap:operation>
@@ -850,6 +919,9 @@
             <fault name="AccessDenied">
                 <soap:fault name="AccessDenied" use="literal"></soap:fault>
             </fault>
+            <fault name="IdServicesException">
+                <soap:fault name="IdServicesException" use="literal"></soap:fault>
+            </fault>
         </operation>
         <operation name="delete">
             <soap:operation soapAction=""></soap:operation>
@@ -873,6 +945,9 @@
             </fault>
             <fault name="AccessDenied">
                 <soap:fault name="AccessDenied" use="literal"></soap:fault>
+            </fault>
+            <fault name="IdServicesException">
+                <soap:fault name="IdServicesException" use="literal"></soap:fault>
             </fault>
         </operation>
     </binding>

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements;
@@ -80,8 +80,8 @@ public class PolicyResourceEvaluationTest {
         policySubject = new Subject();
 
         // Use a real error handler as this is a core part of the functionality we are testing and doesn't need to be mocked
-        EntitlementsResourceErrorHandler resourceErrorHandler =
-                new EntitlementsResourceErrorHandler(ForgerockRestGuiceModule.getEntitlementsErrorHandlers());
+        EntitlementsExceptionMappingHandler resourceErrorHandler =
+                new EntitlementsExceptionMappingHandler(ForgerockRestGuiceModule.getEntitlementsErrorHandlers());
 
         policyResource = new PolicyResource(factory, requestFactory, parser,
                 mock(PolicyStoreProvider.class), resourceErrorHandler);

@@ -24,7 +24,7 @@
  *
  * $Id: IdentityServicesImpl.java,v 1.20 2010/01/06 19:11:17 veiming Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS
  */
 package com.sun.identity.idsvcs.opensso;
 
@@ -57,6 +57,7 @@ import com.sun.identity.idsvcs.CreateResponse;
 import com.sun.identity.idsvcs.DeleteResponse;
 import com.sun.identity.idsvcs.DuplicateObject;
 import com.sun.identity.idsvcs.GeneralFailure;
+import com.sun.identity.idsvcs.IdServicesException;
 import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.InvalidCredentials;
 import com.sun.identity.idsvcs.InvalidPassword;
@@ -104,15 +105,20 @@ import java.util.regex.Pattern;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.errors.ExceptionMappingHandler;
+import org.forgerock.openam.errors.IdentityServicesExceptionMappingHandler;
 import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Web Service to provide security based on authentication and authorization
  * support.
  */
-public class IdentityServicesImpl
-    implements com.sun.identity.idsvcs.IdentityServicesImpl
+public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentityServicesImpl
 {
+    private final ExceptionMappingHandler<IdRepoException, IdServicesException> idServicesErrorHandler =
+            InjectorHolder.getInstance(IdentityServicesExceptionMappingHandler.class);
+
     // Debug
     private static Debug debug = Debug.getInstance("amIdentityServices");
 
@@ -957,10 +963,7 @@ public class IdentityServicesImpl
      * @throws GeneralFailure on other errors.
      * @throws AccessDenied if reading of attributes for the user is disallowed.
      */
-    public IdentityDetails read(String name, Attribute[] attributes, Token admin)
-        throws NeedMoreCredentials, ObjectNotFound, TokenExpired,
-        GeneralFailure, AccessDenied
-    {
+    public IdentityDetails read(String name, Attribute[] attributes, Token admin) throws IdServicesException {
         List attrList = null;
         
         if (name == null ||  name.isEmpty() || name.equals("null")) {
@@ -976,10 +979,7 @@ public class IdentityServicesImpl
         return read(name, attrList, admin);
     }
 
-    public IdentityDetails read(String name, List attributes, Token admin)
-        throws NeedMoreCredentials, ObjectNotFound, TokenExpired,
-        GeneralFailure, AccessDenied
-    {
+    public IdentityDetails read(String name, List attributes, Token admin) throws IdServicesException {
         IdentityDetails rv = null;
         String realm = null;
         String repoRealm = null;
@@ -1069,10 +1069,7 @@ public class IdentityServicesImpl
      * @throws GeneralFailure on other errors.
      * @throws AccessDenied if reading of attributes for the user is disallowed
      */
-    public UpdateResponse update(IdentityDetails identity, Token admin)
-        throws NeedMoreCredentials, ObjectNotFound, TokenExpired,
-        GeneralFailure, AccessDenied
-    {
+    public UpdateResponse update(IdentityDetails identity, Token admin) throws IdServicesException {
         String idName = identity.getName();
         String idType = identity.getType();
         String realm = identity.getRealm();
@@ -1218,21 +1215,8 @@ public class IdentityServicesImpl
      * @throws AccessDenied when permission to preform action is denied
      * @throws GeneralFailure on other errors.
      */
-    private void mapIdRepoException(IdRepoException exception) throws NeedMoreCredentials,
-            ObjectNotFound, TokenExpired, GeneralFailure, AccessDenied {
-        String ldapErrCode = exception.getLDAPErrorCode();
-        String errorCode = exception.getErrorCode();
-        String msg = exception.getMessage();
-
-        if(errorCode.equals("402")){
-            throw new AccessDenied(msg);
-        } else if (errorCode.equals("223") || 
-            (ldapErrCode!=null && ldapErrCode.equals("32"))) {
-            throw new ObjectNotFound(msg);
-        } else {
-            throw new GeneralFailure(msg);
-        } //Need to add other cases when found
-
+    private void mapIdRepoException(IdRepoException exception) throws IdServicesException {
+        throw idServicesErrorHandler.handleError(exception);
     }
 
     /**
@@ -1248,10 +1232,7 @@ public class IdentityServicesImpl
      * @throws TokenExpired when subject's token has expired.
      * @throws GeneralFailure on other errors.
      */
-    public DeleteResponse delete(IdentityDetails identity, Token admin)
-        throws NeedMoreCredentials, ObjectNotFound, TokenExpired,
-        GeneralFailure, AccessDenied
-    {
+    public DeleteResponse delete(IdentityDetails identity, Token admin) throws IdServicesException {
         if (identity == null) {
             throw new GeneralFailure("delete failed: identity object not specified.");
         }
@@ -1724,8 +1705,7 @@ public class IdentityServicesImpl
     }
 
     private IdentityDetails convertToIdentityDetails(AMIdentity amIdentity,
-                                                     List attrList)
-        throws IdRepoException, SSOException
+                                                     List attrList) throws IdRepoException, SSOException
     {
         IdentityDetails rv = null;
 
