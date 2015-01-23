@@ -3,7 +3,7 @@
 <!--
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright 2014 ForgeRock AS.
+  ~ Copyright 2014-2015 ForgeRock AS.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -30,11 +30,11 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-oauth2-common</artifactId>
-        <version>12.0.0</version>
+        <version>12.0.0-1-SNAPSHOT</version>
     </parent>
 
     <artifactId>oauth2-oidc-test-server</artifactId>
-    <version>12.0.0</version>
+    <version>12.0.0-1-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <name>OAuth2/OpenID Connect Test Server</name>

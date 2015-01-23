@@ -13,7 +13,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS. All rights reserved.
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-sts</artifactId>
-        <version>12.0.0</version>
+        <version>12.0.0-1-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM REST STS</name>
