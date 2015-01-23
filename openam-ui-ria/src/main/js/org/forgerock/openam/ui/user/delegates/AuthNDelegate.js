@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,7 +23,7 @@
  */
 
 /**
- * "Portions Copyrighted 2011-2014 ForgeRock Inc"
+ * "Portions Copyrighted 2011-2015 ForgeRock Inc"
  */
 
 /*global document, $, define, _, window */
@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
     "org/forgerock/commons/ui/common/components/Messages"
-], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router, i18nManager, sessionDelegate, messageManager) {
+], function(constants, AbstractDelegate, conf, eventManager, cookieHelper, router, i18nManager, sessionDelegate, messageManager) {
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/authenticate"),
         requirementList = [],
@@ -51,18 +51,18 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
             tokenCookie,
             promise = $.Deferred();
 
-        if (configuration.globalData.auth.realm !== "/") {
-            args.realm = configuration.globalData.auth.realm;
+        if (conf.globalData.auth.realm !== "/") {
+            args.realm = conf.globalData.auth.realm;
         }
 
-        knownAuth = _.clone(configuration.globalData.auth);
+        knownAuth = _.clone(conf.globalData.auth);
 
-        if (configuration.globalData.auth.urlParams) {
-            _.extend(args, configuration.globalData.auth.urlParams);
+        if (conf.globalData.auth.urlParams) {
+            _.extend(args, conf.globalData.auth.urlParams);
         }
 
         // In case user has logged in already update session
-        tokenCookie = cookieHelper.getCookie(configuration.globalData.auth.cookieName);
+        tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
         if (tokenCookie) {
             args.sessionUpgradeSSOTokenId = tokenCookie;
         }
@@ -120,9 +120,13 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);
         } else if (requirements.hasOwnProperty("tokenId")) {
-            _.each(configuration.globalData.auth.cookieDomains,function(cookieDomain){
-                cookieHelper.setCookie(configuration.globalData.auth.cookieName, requirements.tokenId, "", "/", cookieDomain, configuration.globalData.secureCookie);
-            });
+            if (conf.globalData.auth.cookieDomains && conf.globalData.auth.cookieDomains.length !== 0){
+                _.each(conf.globalData.auth.cookieDomains,function(cookieDomain){
+                    cookieHelper.setCookie(conf.globalData.auth.cookieName, requirements.tokenId, "", "/", cookieDomain, conf.globalData.secureCookie);
+                });
+            } else {
+                cookieHelper.setCookie(conf.globalData.auth.cookieName, requirements.tokenId, "", "/", location.hostname, conf.globalData.secureCookie);
+            }
         }
     };
 
@@ -237,7 +241,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
         var ret = $.Deferred();
 
         // if we don't have any requires yet, or if the realm changes.
-        if (requirementList.length === 0 || !_.isEqual(configuration.globalData.auth, knownAuth)) {
+        if (requirementList.length === 0 || !_.isEqual(conf.globalData.auth, knownAuth)) {
 
             obj.begin(args)
                .done(function (requirements) {

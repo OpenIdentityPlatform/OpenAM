@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -207,9 +207,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     };
 
     obj.removeSessionCookie = function(){
-        _.each(conf.globalData.auth.cookieDomains,function(cookieDomain){
-            cookieHelper.deleteCookie(conf.globalData.auth.cookieName, "/", cookieDomain);
-        });
+        if (conf.globalData.auth.cookieDomains && conf.globalData.auth.cookieDomains.length !== 0){
+            _.each(conf.globalData.auth.cookieDomains,function(cookieDomain){
+                cookieHelper.deleteCookie(conf.globalData.auth.cookieName, "/", cookieDomain);
+            });
+        } else {
+            cookieHelper.deleteCookie(conf.globalData.auth.cookieName, "/", location.hostname);
+        }
     };
     
     return obj;
