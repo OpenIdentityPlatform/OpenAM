@@ -40,14 +40,16 @@ public class BaseURLResourceNameTest {
         match(WILDCARD_MATCH, "http://www.google.com.co.uk:80/", "http://www.google.com*", true);
         match(WILDCARD_MATCH, "http://www.google.com.co.uk:80/blah", "http://www.google.com*", true);
         match(WILDCARD_MATCH, "http://example.com/index.html", "http*://example.com/index.html", true);
-        match(WILDCARD_MATCH, "http://www.google.com:80/blah?boo=bing", "http://www.google.com:80/*", true);
         match(WILDCARD_MATCH, "http://www.google.com:80/123/index.html", "http://*.com:80/123/index.html", true);
+        match(WILDCARD_MATCH,  "http://example.com:80/index.html?a=b", "http://example.com:80/index.*?a=b", true);
+        match(WILDCARD_MATCH,  "http://example.com:80/index.html?a=b", "http://example.com:80/index.*?*", true);
     }
 
     @Test
     public void testExactMatchCompare() throws Exception {
         match(EXACT_MATCH, "http://example.com:80/fred/index.html", "http://example.com:80/fred/index.html", true);
         match(EXACT_MATCH, "http://example.com:80/fred/index.html", "http://example.com:80/fred/index.html", false);
+        match(EXACT_MATCH, "http://example.com:80/fred/index.html?a=b", "http://example.com:80/fred/index.html?a=b", true);
     }
 
     @Test
@@ -56,6 +58,9 @@ public class BaseURLResourceNameTest {
         match(SUPER_RESOURCE_MATCH, "http://example.com:8080/foo/index.html", "http://example.com:8080/", true);
         match(SUPER_RESOURCE_MATCH, "http://example.com:8080/foo/index.html", "http://example.com:8080", true);
         match(SUPER_RESOURCE_MATCH, "http://example.com:8080/foo*", "http://example.com:8080/", true);
+        match(SUPER_RESOURCE_MATCH, "http://www.google.com:80/blah?boo=bing", "http://www.google.com:80/*", true);
+        match(SUPER_RESOURCE_MATCH, "http://www.google.com:80/index.html?abc=123?456", "http://www.google.com:80/*", true);
+        match(SUPER_RESOURCE_MATCH, "http://www.google.com:80/index?hello", "http://www.google.com:80/-*-", true);
     }
 
     @Test
