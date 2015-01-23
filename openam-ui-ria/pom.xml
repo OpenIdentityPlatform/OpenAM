@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>12.0.0-1-SNAPSHOT</version>
+        <version>12.0.0-1</version>
     </parent>
 
     <artifactId>openam-ui-ria</artifactId>
