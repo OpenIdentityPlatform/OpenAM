@@ -23,12 +23,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: Authenticator.java,v 1.9 2008/08/19 19:08:57 veiming Exp $
- *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.cli;
 
 import com.sun.identity.shared.locale.Locale;
@@ -115,14 +112,14 @@ class Authenticator {
             lc = sessionBasedLoginInternal(mgr, bindUser, bindPwd, authModule);
         } else {
             /*
-             * try LDAP and then DataStore
+             * try DataStore and then LDAP
              */
             try {
                 lc = sessionBasedLoginInternal(mgr, bindUser, bindPwd,
-                    LDAP_AUTH_MODULE);
+                    FLATFILE_AUTH_MODULE);
             } catch (CLIException e) {
                 lc = sessionBasedLoginInternal(mgr, bindUser, bindPwd,
-                    FLATFILE_AUTH_MODULE);
+                    LDAP_AUTH_MODULE);
             }
         }
         return lc;
