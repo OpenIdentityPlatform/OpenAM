@@ -48,6 +48,7 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
     private static final String COLON = ":";
     private static final String SCHEME_DELIMITER = "://";
     private static final String SLASH = "/";
+    private static final String QUERY_DELIMITER = "?";
     private static final String DEFAULT_WEB_PROTOCOL = "http";
     private static final String SECURE_WEB_PROTOCOL = "https";
     private static final String DEFAULT_PORT = "80";
@@ -90,15 +91,18 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
 
             T schemeMatch = compareBeforeBreakpoint(requestResource, targetResource, SCHEME_DELIMITER);
 
-            if (noMatch.equals(schemeMatch) || subResourceMatch.equals(schemeMatch)) {
+            if (!isSuccessfulMatch(schemeMatch)) {
                 return noMatch; //subResource of scheme/host/port isn't appropriate
-            } else if (firstSlash >= 0 && firstSlash < firstColon) { //no port, or : is part of the path
-                return super.compare(schemelessRequest, schemelessTarget, wildcardCompare);
-            } else if (firstSlash >= 0 && firstSlash > firstColon) { //port, wildcard & path
+            }
 
+            if (firstSlash >= 0 && firstSlash < firstColon) { //no port, or : is part of the path
+                return super.compare(schemelessRequest, schemelessTarget, wildcardCompare);
+            }
+
+            if (firstSlash >= 0 && firstSlash > firstColon) { //port, wildcard & path
                 T hostMatch = compareBeforeBreakpoint(schemelessRequest, schemelessTarget, COLON);
 
-                if (noMatch.equals(hostMatch) || subResourceMatch.equals(hostMatch)) {
+                if (!isSuccessfulMatch(hostMatch)) {
                     return noMatch;
                 }
 
@@ -107,20 +111,53 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
 
                 T portMatch = compareBeforeBreakpoint(postColonRequest, postColonTarget, SLASH);
 
-                if (noMatch.equals(portMatch) || subResourceMatch.equals(portMatch)) {
+                if (!isSuccessfulMatch(portMatch)) {
                     return noMatch;
                 }
 
                 final String postSlashRequest = postColonRequest.substring(postColonRequest.indexOf(SLASH));
                 final String postSlashTarget = postColonTarget.substring(postColonTarget.indexOf(SLASH));
+                final int requestQueryStringIndex = postSlashRequest.indexOf(QUERY_DELIMITER);
+                final int targetQueryStringIndex = postSlashTarget.indexOf(QUERY_DELIMITER);
 
-                T pathMatch = super.compare(postSlashRequest, postSlashTarget, wildcardCompare); //for multilevel
+                if (requestQueryStringIndex != -1) {
+                    // Compare query strings.
 
-                return wildcardResponseCombiner(hostMatch, portMatch, pathMatch);
+                    if (targetQueryStringIndex == -1) {
+                        final String preQueryStringRequest = postSlashRequest.substring(0, requestQueryStringIndex);
+                        T pathMatch = super.compare(preQueryStringRequest, postSlashTarget, wildcardCompare);
+
+                        if (noMatch.equals(pathMatch) || subResourceMatch.equals(pathMatch)) {
+                            return noMatch;
+                        }
+
+                        return superResourceMatch;
+                    }
+
+                    T pathMatch = compareBeforeBreakpoint(postSlashRequest, postSlashTarget, QUERY_DELIMITER);
+
+                    if (!isSuccessfulMatch(pathMatch)) {
+                        return noMatch;
+                    }
+
+                    T queryMatch = super.compare(postSlashRequest.substring(requestQueryStringIndex),
+                            postSlashTarget.substring(targetQueryStringIndex), wildcardCompare);
+
+                    return wildcardResponseCombiner(hostMatch, portMatch, pathMatch, queryMatch);
+
+                } else {
+                    T pathMatch = super.compare(postSlashRequest, postSlashTarget, wildcardCompare); //for multilevel
+                    return wildcardResponseCombiner(hostMatch, portMatch, pathMatch);
+                }
+
             } else { //case where firstColon >= 0; port wildcard
                 return compareSplit(schemelessRequest, schemelessTarget, COLON);
             }
         }
+    }
+
+    private boolean isSuccessfulMatch(T matchResult) {
+        return exactMatch.equals(matchResult) || wildcardMatch.equals(matchResult);
     }
 
     /**
