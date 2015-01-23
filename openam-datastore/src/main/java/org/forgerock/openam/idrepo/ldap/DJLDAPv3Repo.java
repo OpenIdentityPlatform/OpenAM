@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -193,7 +193,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                         + ", hostSiteId=" + hostSiteId);
             }
         }
-        boolean dnCacheEnabled = CollectionHelper.getBooleanMapAttr(configMap, LDAP_DNCACHE_ENABLED, true);
+        dnCacheEnabled = CollectionHelper.getBooleanMapAttr(configMap, LDAP_DNCACHE_ENABLED, true);
         if (dnCacheEnabled) {
             dnCache = new Cache(CollectionHelper.getIntMapAttr(configParams, LDAP_DNCACHE_SIZE, 1500, DEBUG));
         }
