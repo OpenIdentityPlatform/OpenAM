@@ -214,7 +214,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                         ": Application creation failed. ", e);
             }
-            handler.handleError(exceptionMappingHandler.handleError(request, e));
+            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
         }
 
     }
@@ -319,7 +319,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: DELETE by " + principalName +
                         ": Application failed to delete the resource specified. ", e);
             }
-            handler.handleError(exceptionMappingHandler.handleError(request, e));
+            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
         }
 
     }
@@ -401,7 +401,7 @@ public class ApplicationsResource extends RealmAwareResource {
                         ": Failed to query resource.", e);
 
             }
-            handler.handleError(exceptionMappingHandler.handleError(request, e));
+            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
             return;
         }
 
@@ -448,7 +448,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: READ by " + principalName +
                         ": Application failed to retrieve the resource specified.", e);
             }
-            handler.handleError(exceptionMappingHandler.handleError(request, e));
+            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
         }
 
     }
@@ -516,7 +516,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Error performing update operation.", e);
             }
-            handler.handleError(exceptionMappingHandler.handleError(request, e));
+            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
         }
 
     }

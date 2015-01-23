@@ -17,6 +17,7 @@ package org.forgerock.openam.errors;
 
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.IdServicesException;
+import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.Request;
 
 /**
@@ -25,7 +26,7 @@ import org.forgerock.json.resource.Request;
 public class IdentityServicesExceptionMappingHandler implements ExceptionMappingHandler<IdRepoException, IdServicesException> {
 
     @Override
-    public IdServicesException handleError(Request request, IdRepoException error) {
+    public IdServicesException handleError(Context context, Request request, IdRepoException error) {
         return handleError(error);
     }
 

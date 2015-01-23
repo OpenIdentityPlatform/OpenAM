@@ -20,14 +20,17 @@ import com.sun.identity.entitlement.EntitlementException;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
+import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.util.Reject;
 
 /**
@@ -93,12 +96,13 @@ public final class EntitlementsExceptionMappingHandler
      * Constructs an appropriate {@link ResourceException} for the given request and entitlements exception. If no
      * specific mapping is present for the error code in the exception, then an internal server error is reported.
      *
+     * @param context the server context from which the language header can be read.
      * @param request the request that failed with an error.
      * @param error the error that occurred.
      * @return an appropriate resource error.
      */
     @Override
-    public ResourceException handleError(Request request, EntitlementException error) {
+    public ResourceException handleError(Context context, Request request, EntitlementException error) {
 
         EntitlementException errorToHandle =  causeOf(error);
 
@@ -115,12 +119,12 @@ public final class EntitlementsExceptionMappingHandler
             }
         }
 
-        return ResourceException.getException(resourceErrorType, errorToHandle.getMessage(), errorToHandle);
+        return ResourceException.getException(resourceErrorType, getLocalizedMessage(context, error), errorToHandle);
     }
 
     @Override
     public ResourceException handleError(EntitlementException error) {
-        return handleError(null, error);
+        return handleError(null, null, error);
     }
 
     /**
@@ -146,4 +150,19 @@ public final class EntitlementsExceptionMappingHandler
         return ex;
     }
 
+    /**
+     * Get the localized message for the specified entitlement exception.
+     * @param context The server context from which the language header can be read.
+     * @param exception The exception that contains the message.
+     * @return The localized message.
+     */
+    private String getLocalizedMessage(Context context, EntitlementException exception) {
+        final Locale local = ServerContextUtils.getLocaleFromContext(context);
+
+        if (local == null) {
+            return exception.getMessage();
+        } else {
+            return exception.getLocalizedMessage(local);
+        }
+    }
 }

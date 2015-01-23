@@ -18,8 +18,12 @@ package org.forgerock.openam.forgerockrest.utils;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
+
+import java.util.Locale;
 import java.util.Map;
+
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -29,6 +33,7 @@ import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RouterContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
 
@@ -44,6 +49,8 @@ public class ServerContextUtils {
     public static final String PATCH = "PATCH";
     public static final String ACTION = "ACTION";
     public static final String QUERY = "QUERY";
+
+    public static final String ACCEPT_LANGUAGE = "accept-language";
 
     /**
      * Retrieves a link to the user's SSO Token, if it exists in the context.
@@ -228,5 +235,26 @@ public class ServerContextUtils {
 
         return action;
 
+    }
+
+    /**
+     * Get the ServerContext as an HttpContext, read the accept-language from the
+     * header and create a Locale object from that.
+     *
+     * @param context The server context from which the language header can be read.
+     * @return The Local instance or null if no accept-language header was found.
+     */
+    public static Locale getLocaleFromContext(Context context) {
+        if (context == null) {
+            return null;
+        }
+        Locale locale;
+        try {
+            final String language = context.asContext(HttpContext.class).getHeaderAsString(ACCEPT_LANGUAGE);
+            locale = com.sun.identity.shared.locale.Locale.getLocaleObjFromAcceptLangHeader(language);
+        } catch (IllegalArgumentException iae) {
+            locale = null;
+        }
+        return locale;
     }
 }

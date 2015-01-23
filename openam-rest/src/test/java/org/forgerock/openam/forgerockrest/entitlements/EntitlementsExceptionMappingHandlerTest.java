@@ -23,8 +23,12 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +36,7 @@ import java.util.Map;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.forgerock.json.fluent.JsonValue.*;
 
 public class EntitlementsExceptionMappingHandlerTest {
     private static final int ERROR_CODE = 123;
@@ -45,7 +50,7 @@ public class EntitlementsExceptionMappingHandlerTest {
         EntitlementException error = exception(ERROR_CODE, ERROR_MESSAGE);
 
         // When
-        ResourceException result = errorHandler.handleError(null, error);
+        ResourceException result = errorHandler.handleError(null, null, error);
 
         // Then
         assertThat(result).isInstanceOf(NotFoundException.class)
@@ -60,7 +65,7 @@ public class EntitlementsExceptionMappingHandlerTest {
         EntitlementException error = exception(ERROR_CODE, ERROR_MESSAGE);
 
         // When
-        ResourceException result = errorHandler.handleError(null, error);
+        ResourceException result = errorHandler.handleError(null, null, error);
 
         // Then
         assertThat(result).isInstanceOf(InternalServerErrorException.class)
@@ -83,12 +88,40 @@ public class EntitlementsExceptionMappingHandlerTest {
         given(request.getRequestType()).willReturn(requestType);
 
         // When
-        ResourceException result = errorHandler.handleError(request, error);
+        ResourceException result = errorHandler.handleError(null, request, error);
 
         // Then
         assertThat(result).isInstanceOf(BadRequestException.class)
                           .hasMessage(ERROR_MESSAGE);
     }
+
+    @Test
+    public void shouldGetExceptionMessageAsEnglish() throws Exception {
+        // Given
+        EntitlementsExceptionMappingHandler errorHandler = new EntitlementsExceptionMappingHandler(Collections.singletonMap(EntitlementException.EMPTY_PRIVILEGE_NAME, ResourceException.BAD_REQUEST));
+        EntitlementException error = new EntitlementException(EntitlementException.EMPTY_PRIVILEGE_NAME);
+
+        // When
+        ResourceException result = errorHandler.handleError(getHttpServerContext("en"), null, error);
+
+        // Then
+        assertThat(result.getMessage()).isEqualTo("Policy name cannot be empty.");
+    }
+
+    @Test
+    public void shouldGetExceptionMessageAsFrench() throws Exception {
+        // Given
+        EntitlementsExceptionMappingHandler errorHandler = new EntitlementsExceptionMappingHandler(
+        Collections.singletonMap(EntitlementException.SUBJECT_REQUIRED, ResourceException.BAD_REQUEST));
+        EntitlementException error = new EntitlementException(EntitlementException.SUBJECT_REQUIRED);
+
+        // When
+        ResourceException result = errorHandler.handleError(getHttpServerContext("fr"), null, error);
+
+        // Then
+        assertThat(result.getMessage()).isEqualTo("Les objets sont obligatoires.");
+    }
+
 
     private EntitlementException exception(int code, String message) {
         // Use a mock to avoid loading error messages from the resource bundle
@@ -96,5 +129,12 @@ public class EntitlementsExceptionMappingHandlerTest {
         given(error.getErrorCode()).willReturn(code);
         given(error.getMessage()).willReturn(message);
         return error;
+    }
+
+    private ServerContext getHttpServerContext(String ...language) throws Exception {
+        final HttpContext httpContext = new HttpContext(json(object(field(HttpContext.ATTR_HEADERS,
+                Collections.singletonMap(ServerContextUtils.ACCEPT_LANGUAGE, Arrays.asList(language))),
+                field(HttpContext.ATTR_PARAMETERS, Collections.emptyMap()))), null);
+        return new ServerContext(httpContext);
     }
 }

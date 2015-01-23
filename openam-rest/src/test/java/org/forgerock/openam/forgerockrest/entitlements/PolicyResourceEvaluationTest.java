@@ -177,7 +177,7 @@ public class PolicyResourceEvaluationTest {
         verify(requestFactory).buildRequest(PolicyAction.EVALUATE, context, request);
         verify(request).getRequestType();
         verify(jsonHandler).handleError(argThat(new ResourceExceptionMatcher(ResourceException.BAD_REQUEST)));
-        verifyNoMoreInteractions(request, subjectContext, requestFactory,
+        verifyNoMoreInteractions(request, requestFactory,
                 policyRequest, factory, evaluator, parser, jsonHandler);
     }
 

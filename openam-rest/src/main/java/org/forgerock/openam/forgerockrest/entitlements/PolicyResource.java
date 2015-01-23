@@ -127,7 +127,7 @@ public final class PolicyResource implements CollectionResourceProvider {
 
         } catch (final EntitlementException eE) {
             DEBUG.error("Error evaluating policy request", eE);
-            handler.handleError(resourceErrorHandler.handleError(actionRequest, eE));
+            handler.handleError(resourceErrorHandler.handleError(context, actionRequest, eE));
             return;
         }
     }
@@ -175,7 +175,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             handler.handleResult(policyResource(policy));
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: CREATE : Error performing create for policy, " + providedName, ex);
-            handler.handleError(resourceErrorHandler.handleError(request, ex));
+            handler.handleError(resourceErrorHandler.handleError(context, request, ex));
         }
     }
 
@@ -195,7 +195,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             handler.handleResult(new Resource(resourceId, "0", json(object())));
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: DELETE : Error performing delete for policy, " + resourceId, ex);
-            handler.handleError(resourceErrorHandler.handleError(request, ex));
+            handler.handleError(resourceErrorHandler.handleError(context, request, ex));
         }
     }
 
@@ -232,7 +232,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             handler.handleResult(new QueryResult(null, remaining));
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: QUERY : Error querying policy collection.", ex);
-            handler.handleError(resourceErrorHandler.handleError(request, ex));
+            handler.handleError(resourceErrorHandler.handleError(context, request, ex));
         } catch (IllegalArgumentException ex) {
             DEBUG.error("PolicyResource :: QUERY : Error querying policy collection due to bad request.", ex);
             handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST, ex.getMessage()));
@@ -250,7 +250,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             handler.handleResult(policyResource(policy));
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: READ : Error reading policy, " + resourceId + ".", ex);
-            handler.handleError(resourceErrorHandler.handleError(request, ex));
+            handler.handleError(resourceErrorHandler.handleError(context, request, ex));
         }
     }
 
@@ -266,7 +266,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             handler.handleResult(result);
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: UPDATE : Error updating policy, " + resourceId + ".", ex);
-            handler.handleError(resourceErrorHandler.handleError(request, ex));
+            handler.handleError(resourceErrorHandler.handleError(context, request, ex));
         }
     }
 
