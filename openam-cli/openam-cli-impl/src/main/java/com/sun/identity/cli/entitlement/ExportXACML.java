@@ -24,7 +24,7 @@
  *
  * $Id: ListXACML.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.cli.entitlement;
 
@@ -70,7 +70,7 @@ import java.util.logging.Level;
  * Gets policies in a realm.
  * @author dillidorai
  */
-public class ListXACML extends AuthenticatedCommand {
+public class ExportXACML extends AuthenticatedCommand {
 
     private static final String ARGUMENT_POLICY_NAMES = "policynames";
     private SSOToken adminSSOToken;
@@ -92,22 +92,22 @@ public class ListXACML extends AuthenticatedCommand {
         super.handleRequest(rc);
         ldapLogin();
 
-        // FIXME: change to use entitlementService.xacmlPrivilegEnabled()
+        // FIXME: change to use entitlementService.xacmlPrivilegeEnabled()
         EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
             adminSubject, "/");
         if(!ec.migratedToEntitlementService()) {
             String[] args = {realm, "ANY",
-                    "list-xacml not supported in  legacy policy mode"};
-            debugError("ListXACML.handleRequest(): "
-                    + "list-xacml not supported in  legacy policy mode");
+                    "export-xacml not supported in  legacy policy mode"};
+            debugError("ExportXACML.handleRequest(): "
+                    + "export-xacml not supported in  legacy policy mode");
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_GET_POLICY_IN_REALM",
                 args);
             throw new CLIException(
                 getResourceString(
-                    "list-xacml-not-supported-in-legacy-policy-mode"),
+                    "export-xacml-not-supported-in-legacy-policy-mode"),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED,
-                "list-xacml");
+                "export-xacml");
         }
 
         adminSSOToken = getAdminSSOToken();
@@ -186,7 +186,7 @@ public class ListXACML extends AuthenticatedCommand {
                         fout = new FileOutputStream(outfile, true);
                         pwout = new PrintWriter(fout, true);
                     } catch (FileNotFoundException e) {
-                        debugError("ListXACML.handleXACMLPolicyRequest", e);
+                        debugError("ExportXACML.handleXACMLPolicyRequest", e);
                         try {
                             if (fout != null) {
                                 fout.close();
@@ -196,7 +196,7 @@ public class ListXACML extends AuthenticatedCommand {
                         }
                         throw new CLIException(e, ExitCodes.IO_EXCEPTION);
                     } catch (SecurityException e) {
-                        debugError("ListXACML.handleXACMLPolicyRequest", e);
+                        debugError("ExportXACML.handleXACMLPolicyRequest", e);
                         try {
                             if (fout != null) {
                                 fout.close();
@@ -245,7 +245,7 @@ public class ListXACML extends AuthenticatedCommand {
 
         } catch (EntitlementException e) {
             String[] args = {realm, currentPrivilegeName, e.getMessage()};
-            debugError("ListXACML.handleRequest", e);
+            debugError("ExportXACML.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_GET_POLICY_NAMES_IN_REALM", args);
             throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
@@ -267,7 +267,7 @@ public class ListXACML extends AuthenticatedCommand {
                 fout = new FileOutputStream(outfile, true);
                 pwout = new PrintWriter(fout, true);
             } catch (FileNotFoundException e) {
-                debugError("ListXACML.handleXACMLPolicyRequest", e);
+                debugError("ExportXACML.handleXACMLPolicyRequest", e);
                 try {
                     if (fout != null) {
                         fout.close();
@@ -277,7 +277,7 @@ public class ListXACML extends AuthenticatedCommand {
                 }
                 throw new CLIException(e, ExitCodes.IO_EXCEPTION);
             } catch (SecurityException e) {
-                debugError("ListXACML.handleXACMLPolicyRequest", e);
+                debugError("ExportXACML.handleXACMLPolicyRequest", e);
                 try {
                     if (fout != null) {
                         fout.close();
@@ -304,12 +304,12 @@ public class ListXACML extends AuthenticatedCommand {
             policySet = importExport.exportXACML(realm, adminSubject, filters);
         } catch (EntitlementException e) {
             String[] args = {realm, e.getMessage()};
-            debugError("ListXACML.handleRequest", e);
+            debugError("ExportXACML.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO, "FAILED_GET_POLICY_IN_REALM", args);
             throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SMSException e) {
             String[] args = {realm, e.getMessage()};
-            debugError("ListXACML.handleRequest", e);
+            debugError("ExportXACML.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO, "FAILED_GET_POLICY_IN_REALM", args);
             throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
@@ -348,5 +348,4 @@ public class ListXACML extends AuthenticatedCommand {
             }
         }
     }
-
 }

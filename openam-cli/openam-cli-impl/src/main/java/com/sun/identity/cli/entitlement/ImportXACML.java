@@ -22,12 +22,15 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: CreateXACML.java,v 1.3 2010/01/11 01:21:01 dillidorai Exp $
+ * $Id: ImportXACML.java,v 1.3 2010/01/11 01:21:01 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
+
+import static com.sun.identity.cli.LogWriter.*;
+import static java.util.logging.Level.*;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AuthenticatedCommand;
@@ -60,15 +63,11 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.List;
 
-import static com.sun.identity.cli.LogWriter.LOG_ACCESS;
-import static com.sun.identity.cli.LogWriter.LOG_ERROR;
-import static java.util.logging.Level.INFO;
-
 /**
  * Converts access policies read from XACML XML into Entitlement Framework Privileges
  * and then imports these into the specified realm.
  */
-public class CreateXACML extends AuthenticatedCommand {
+public class ImportXACML extends AuthenticatedCommand {
 
     /**
      * Services the command line request to import XACML.
@@ -103,7 +102,7 @@ public class CreateXACML extends AuthenticatedCommand {
         List<ImportStep> importSteps;
         try {
             PrivilegeValidator privilegeValidator = new PrivilegeValidator(
-                    new RealmValidator(new OrganizationConfigManager(adminSSOToken, "/")));
+                    new RealmValidator(new OrganizationConfigManager(adminSSOToken, realm)));
             XACMLExportImport xacmlExportImport = new XACMLExportImport(
                     new XACMLExportImport.PrivilegeManagerFactory(),
                     new XACMLExportImport.ReferralPrivilegeManagerFactory(),
@@ -114,11 +113,11 @@ public class CreateXACML extends AuthenticatedCommand {
 
             importSteps = xacmlExportImport.importXacml(realm, xacmlInputStream, adminSubject, isDryRun());
         } catch (EntitlementException e) {
-            debugError("CreateXACML.handleRequest", e);
+            debugError("ImportXACML.handleRequest", e);
             logException(realm, e);
             throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SMSException e) {
-            debugError("CreateXACML.handleRequest", e);
+            debugError("ImportXACML.handleRequest", e);
             logException(realm, e);
             throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
@@ -175,7 +174,7 @@ public class CreateXACML extends AuthenticatedCommand {
         EntitlementConfiguration ec = EntitlementConfiguration.getInstance(adminSubject, "/");
         if (!ec.migratedToEntitlementService()) {
             String[] args = {realm, "ANY", "create-xacml not supported in  legacy policy mode"};
-            debugError("CreateXACML.handleRequest(): create-xacml not supported in  legacy policy mode");
+            debugError("ImportXACML.handleRequest(): create-xacml not supported in  legacy policy mode");
             writeLog(LOG_ERROR, INFO, "FAILED_CREATE_POLICY_IN_REALM", args);
             throw new CLIException(getResourceString("create-xacml-not-supported-in-legacy-policy-mode"),
                     ExitCodes.REQUEST_CANNOT_BE_PROCESSED,
@@ -196,9 +195,9 @@ public class CreateXACML extends AuthenticatedCommand {
             try {
                 inputStream = new FileInputStream(datafile);
             } catch (FileNotFoundException e) {
-                debugError("CreateXACML.handleRequest", e);
+                debugError("ImportXACML.handleRequest", e);
                 logException(realm, e);
-                throw new CLIException(e ,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+                throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
         }
 
@@ -228,11 +227,11 @@ public class CreateXACML extends AuthenticatedCommand {
             fout = new FileOutputStream(getOutfileName(), true); // appending to be consistent with ListXACML
             pwout = new PrintWriter(fout, true);
         } catch (FileNotFoundException e) {
-            debugError("CreateXACML.writeToOutputFile", e);
+            debugError("ImportXACML.writeToOutputFile", e);
             IOUtils.closeIfNotNull(fout);
             throw new CLIException(e, ExitCodes.IO_EXCEPTION);
         } catch (SecurityException e) {
-            debugError("CreateXACML.writeToOutputFile", e);
+            debugError("ImportXACML.writeToOutputFile", e);
             IOUtils.closeIfNotNull(fout);
             throw new CLIException(e, ExitCodes.IO_EXCEPTION);
         }

@@ -24,10 +24,9 @@
  *
  * $Id: SubCommandInfo.java,v 1.4 2008/06/25 05:42:11 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
 package com.sun.identity.cli.annotation;
-
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -45,4 +44,5 @@ public @interface SubCommandInfo {
     String macro();
     String[] optionAliases();
     String[] resourceStrings();
+    String deprecationWarning() default "";
 }

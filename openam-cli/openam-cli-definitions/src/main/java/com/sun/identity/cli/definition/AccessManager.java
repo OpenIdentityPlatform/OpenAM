@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.cli.definition;
@@ -38,6 +38,7 @@ import com.sun.identity.cli.annotation.Macro;
 import com.sun.identity.cli.annotation.ResourceStrings;
 import com.sun.identity.cli.annotation.SubCommandInfo;
 
+@SuppressWarnings("unused")
 public class AccessManager {
     @DefinitionClassInfo(
         productName="OpenAM",
@@ -46,27 +47,28 @@ public class AccessManager {
     private String product;
 
     @ResourceStrings(
-        string={"resourcebundle-not-found=Resource Bundle not found.",
+        string={
+            "resourcebundle-not-found=Resource Bundle not found.",
             "realm-does-not-exist=Could not process the request because realm {0} did not exist.",
             "identity-does-not-exist=Could not process the request because identity {0} did not exist.",
-        "missing-attributevalues=attributevalues and datafile options are missing.",
-        "missing-choicevalues=choicevalues and datafile options are missing.",
-        "attribute-schema-not-exist=Attribute schema {0} did not exist.",
-        "serverconfig-no-supported=This sub command is not supported because platform service is not upgraded.",
-        "application-type-invalid=Application Type {0} is invalid.",
-        "actions-required=actions attributes are required. Example: get=true",
-        "resources-required=resources attributes are required. This defines the resources that are supported by this application.",
-        "subjects-required=subjects attributes are required. This defines the subject plugin classes for administration console.",
-        "conditions-required=conditions attributes are required. This defines the condition plugin classes for administration console.",
-        "entitlement-combiner-required=entitlementCombiner attribute is required.",
-        "entitlement-combiner-class-not-found=entitlementCombiner {0} class not found.",
-        "entitlement-combiner-does-not-extend-superclass=entitlementCombiner {0} did not extend EntitlementCombiner base class.",
-        "resource-comparator-class-not-found=resourceComparator {0} class not found.",
-        "resource-comparator-does-not-extend-interface=resourceComparator {0} did not implement ResourceName interface.",
-        "save-index-class-not-found=saveIndexImpl {0} class not found.",
-        "save-index-does-not-extend-interface=saveIndexImpl {0} did not implement ISaveIndex interface.",
-        "search-index-class-not-found=searchIndexImpl {0} class not found.",
-        "search-index-does-not-extend-interface=searchIndexImpl {0} did not implement ISearchIndex interface."
+            "missing-attributevalues=attributevalues and datafile options are missing.",
+            "missing-choicevalues=choicevalues and datafile options are missing.",
+            "attribute-schema-not-exist=Attribute schema {0} did not exist.",
+            "serverconfig-no-supported=This sub command is not supported because platform service is not upgraded.",
+            "application-type-invalid=Application Type {0} is invalid.",
+            "actions-required=actions attributes are required. Example: get=true",
+            "resources-required=resources attributes are required. This defines the resources that are supported by this application.",
+            "subjects-required=subjects attributes are required. This defines the subject plugin classes for administration console.",
+            "conditions-required=conditions attributes are required. This defines the condition plugin classes for administration console.",
+            "entitlement-combiner-required=entitlementCombiner attribute is required.",
+            "entitlement-combiner-class-not-found=entitlementCombiner {0} class not found.",
+            "entitlement-combiner-does-not-extend-superclass=entitlementCombiner {0} did not extend EntitlementCombiner base class.",
+            "resource-comparator-class-not-found=resourceComparator {0} class not found.",
+            "resource-comparator-does-not-extend-interface=resourceComparator {0} did not implement ResourceName interface.",
+            "save-index-class-not-found=saveIndexImpl {0} class not found.",
+            "save-index-does-not-extend-interface=saveIndexImpl {0} did not implement ISaveIndex interface.",
+            "search-index-class-not-found=searchIndexImpl {0} class not found.",
+            "search-index-does-not-extend-interface=searchIndexImpl {0} did not implement ISearchIndex interface."
         }
     )
     private String resourcestrings;
@@ -2956,8 +2958,8 @@ public class AccessManager {
     private String remove_app_priv_resources;
 
     @SubCommandInfo(
-        implClassName="com.sun.identity.cli.entitlement.ListXACML",
-        description="export policies in realm as XACML.",
+        implClassName="com.sun.identity.cli.entitlement.ExportXACML",
+        description="Export policies in realm as XACML.",
         webSupport="true",
         mandatoryOptions={
             "realm|e|s|Name of realm."},
@@ -2968,15 +2970,15 @@ public class AccessManager {
             "outfile|o|s|Filename where policy definition will be printed to. Definition will be printed in standard output if this option is not provided.",
             "namesonly|n|u|Returns only names of matching policies. Policies are not returned." },
         resourceStrings={
-            "list-xacml-not-supported-in-legacy-policy-mode=list-xacml not supported in legacy policy mode",
+            "export-xacml-not-supported-in-legacy-policy-mode=export-xacml not supported in legacy policy mode",
             "get-policy-names-in-realm-succeed=Policy names were returned under realm, {0}.",
-            "get-policy-names-in-realm-no-policies=There were not matching policy names under realm, {0}.",
+            "get-policy-names-in-realm-no-policies=There were no matching policy names under realm, {0}.",
             "get-policy-in-realm-succeed=Policy definitions were returned under realm, {0}.",
-            "get-policy-in-realm-no-policies=There were not matching policies under realm, {0}."})
-    private String list_xacml;
+            "get-policy-in-realm-no-policies=There were no matching policies under realm, {0}."})
+    private String export_xacml;
 
     @SubCommandInfo(
-        implClassName="com.sun.identity.cli.entitlement.CreateXACML",
+        implClassName="com.sun.identity.cli.entitlement.ImportXACML",
         description="Create policies in a realm with XACML input.",
         webSupport="true",
         mandatoryOptions={
@@ -2985,31 +2987,79 @@ public class AccessManager {
         optionAliases={},
         macro="authentication",
         optionalOptions={
-                "dryrun|n|u|Provide a summary of the policies and referral policies which would be updated, and those which would be added, as a result of the create-xacml command without the 'dryrun' option specified. Nothing will be updated or added when using this option.",
-                "outfile|o|s|Filename where the output of a 'dryrun' command will be sent to. If no 'dryrun' command is specified, the outfile will not be used for anything."
+            "dryrun|n|u|Provide a summary of the policies and referral policies which would be updated, and those which would be added, as a result of the import-xacml command without the 'dryrun' option specified. Nothing will be updated or added when using this option.",
+            "outfile|o|s|Filename where the output of a 'dryrun' command will be sent to. If no 'dryrun' command is specified, outfile will not be used for anything."
         },
         resourceStrings={
             "create-xacml-not-supported-in-legacy-policy-mode=add-xacml not supported in legacy policy mode",
             "subcmd-create-policies-__web__-xmlfile=Policy XML",
             "create-policy-in-realm-succeed=Policies were created under realm, {0}.",
             "no-policies-provided=No policies provided"})
+    private String import_xacml;
+
+    //=========================================================================
+    //=========================================================================
+    // NOTE: THE FOLLOWING COMMANDS ARE DEPRECATED in 13.*.* remove in 14.*.*
+    //=========================================================================
+    //=========================================================================
+
+    @SubCommandInfo(
+        implClassName = "com.sun.identity.cli.entitlement.CreateXACML",
+        description = "Create policies in realm via XACML (same as import-xacml).",
+        webSupport = "true",
+        mandatoryOptions = {
+            "realm|e|s|Name of realm.",
+            "xmlfile|X|s|File that contains the policy XACML definition. In the console, paste the XML into the text field instead."
+        },
+        optionAliases = {},
+        macro = "authentication",
+        optionalOptions = {
+            "dryrun|n|u|Provide a summary of the policies and referral policies which would be updated, and those which would be added, as a result of the create-xacml command without the 'dryrun' option specified. Nothing will be updated or added when using this option.",
+            "outfile|o|s|Filename where the output of a 'dryrun' command will be sent to. If no 'dryrun' command is specified, outfile will not be used for anything."
+        },
+        resourceStrings = {},
+        deprecationWarning = "The command create-xacml is deprecated, please use the command import-xacml"
+    )
     private String create_xacml;
 
     @SubCommandInfo(
-        implClassName="com.sun.identity.cli.entitlement.DeleteXACML",
-        description="Delete XACML policies from a realm.",
-        webSupport="true",
-        mandatoryOptions={"realm|e|s|Name of realm."},
+        implClassName = "com.sun.identity.cli.entitlement.ListXACML",
+        description = "List policies in realm as XACML (same as export-xacml).",
+        webSupport = "true",
+        mandatoryOptions = {
+            "realm|e|s|Name of realm."
+        },
         optionAliases={},
         macro="authentication",
         optionalOptions={
+            "policynames|p|m|Names of policy. This can be a wildcard. All policy definition in the realm will be returned if this option is not provided.",
+            "outfile|o|s|Filename where policy definition will be printed to. Definition will be printed in standard output if this option is not provided.",
+            "namesonly|n|u|Returns only names of matching policies. Policies are not returned."
+        },
+        resourceStrings = {},
+        deprecationWarning = "The command list-xacml is deprecated, please use the command export-xacml"
+    )
+    private String list_xacml;
+
+    // Note that delete-xacml directs to realm delete policy, as this has the same functionality
+    //
+    @SubCommandInfo(
+        implClassName = "com.sun.identity.cli.realm.RealmDeletePolicy",
+        description = "Delete XACML policies from a realm.",
+        webSupport = "true",
+        mandatoryOptions = {"realm|e|s|Name of realm."},
+        optionAliases = {},
+        macro = "authentication",
+        optionalOptions = {
             "policynames|p|m|Names of policy to be deleted.",
-            "file|D|s|Name of file that contains the policy names to be deleted."},
-        resourceStrings={
+            "file|D|s|Name of file that contains the policy names to be deleted."
+        },
+        resourceStrings = {
             "delete-xacml-not-supported-in-legacy-policy-mode=delete-xacml not supported in legacy policy mode",
             "missing-policy-names=Policy names need to be provided either with --policynames or --file option",
-            "delete-policy-in-realm-succeed=Policies were deleted under realm, {0}."})
+            "delete-policy-in-realm-succeed=Policies were deleted under realm, {0}."
+        },
+        deprecationWarning = "The command delete-xacml is deprecated, please use the command delete-policies"
+    )
     private String delete_xacml;
-
 }
-

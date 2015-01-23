@@ -24,8 +24,8 @@
  *
  * $Id: SubCommand.java,v 1.11 2008/10/21 03:14:31 veiming Exp $
  *
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
-
 package com.sun.identity.cli;
 
 import com.iplanet.sso.SSOToken;
@@ -56,6 +56,7 @@ public class SubCommand {
     private List mandatoryOptions = new ArrayList();
     private List optionalOptions = new ArrayList();
     private boolean webSupport;
+    private String deprecationWarning;
     private Map optionNameToShortName = new HashMap();
     private Set unaryOptionNames = new HashSet();
     private Set singleOptionNames = new HashSet();
@@ -66,29 +67,29 @@ public class SubCommand {
 
     private static Set reservedLongOptionNames = new HashSet();
     private static Set reservedShortOptionNames = new HashSet();
-    private static Map mapLongToShortOptionName = 
+    private static Map mapLongToShortOptionName =
         new HashMap();
 
     static {
         try {
-        Field[] allFields = CLIConstants.class.getFields();
-        for (int i = 0; i < allFields.length; i++) {
-            Field fld = (Field)allFields[i];
-            if (fld.getName().startsWith(CLIConstants.PREFIX_ARGUMENT)) {
-                reservedLongOptionNames.add((String)fld.get(null));
+            Field[] allFields = CLIConstants.class.getFields();
+            for (int i = 0; i < allFields.length; i++) {
+                Field fld = (Field) allFields[i];
+                if (fld.getName().startsWith(CLIConstants.PREFIX_ARGUMENT)) {
+                    reservedLongOptionNames.add((String)fld.get(null));
 
-                String option = fld.getName().substring(
-                    CLIConstants.PREFIX_ARGUMENT.length());
-                Field fldShort = CLIConstants.class.getField(
-                    CLIConstants.PREFIX_SHORT_ARGUMENT + option);
-                mapLongToShortOptionName.put(
-                    (String)fld.get(null), (String)fldShort.get(null));
-            } else if (fld.getName().startsWith(
-                CLIConstants.PREFIX_SHORT_ARGUMENT)
-            ) {
-                reservedShortOptionNames.add((String)fld.get(null));
+                    String option = fld.getName().substring(
+                        CLIConstants.PREFIX_ARGUMENT.length());
+                    Field fldShort = CLIConstants.class.getField(
+                        CLIConstants.PREFIX_SHORT_ARGUMENT + option);
+                    mapLongToShortOptionName.put(
+                        (String)fld.get(null), (String)fldShort.get(null));
+                } else if (fld.getName().startsWith(
+                    CLIConstants.PREFIX_SHORT_ARGUMENT)
+                ) {
+                    reservedShortOptionNames.add((String)fld.get(null));
+                }
             }
-        }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -156,8 +157,8 @@ public class SubCommand {
      * @param optionalOptions Formated list of optional argument/options.
      * @param optionAliases Formated list of argument/options aliases.
      * @param implClassName Implementation class name.
-     * @param webSupport <code>true</code> if this command is supported on the
-     *        web browser.
+     * @param webSupport <code>true</code> if this command is supported on the web browser.
+     * @param deprecationWarning if set to a non zero length string (default is "") then print this warning.
      * @throws CLIException if this object cannot be constructed.
      */
     public SubCommand(
@@ -168,15 +169,17 @@ public class SubCommand {
         List optionalOptions,
         List optionAliases,
         String implClassName,
-        boolean webSupport
+        boolean webSupport,
+        String deprecationWarning
     ) throws CLIException {
         this.definition = definition;
         this.name = name;
         this.rb = rb;
         this.implClassName = implClassName;
         this.webSupport = webSupport;
+        this.deprecationWarning = deprecationWarning;
 
-        //this is use to clean duplicate short options.
+        //this is used to clean duplicate short options.
         Set shortOptions = new HashSet();
 
         parseOptions(mandatoryOptions, this.mandatoryOptions, shortOptions);
@@ -316,7 +319,7 @@ public class SubCommand {
         boolean valid = true;
 
         for (Iterator i = optionAliases.keySet().iterator();
-            i.hasNext() && valid; 
+            i.hasNext() && valid;
         ) {
             String opt = (String)i.next();
             valid = validateAliasOptions(
@@ -354,7 +357,7 @@ public class SubCommand {
             List list = (List)options.get(name);
             valid = (list == null) || (list.size() == 1);
         }
-        
+
         for (Iterator i = multipleOptionNames.iterator();
             i.hasNext() && valid;
         ) {
@@ -363,7 +366,7 @@ public class SubCommand {
             valid = (list == null) || (list.size() > 0);
         }
 
-        
+
         return valid;
     }
 
@@ -420,7 +423,7 @@ public class SubCommand {
     public String getLongOptionName(String name) {
         String longName = null;
         for (Iterator i = optionNameToShortName.keySet().iterator();
-            i.hasNext() && (longName == null); 
+            i.hasNext() && (longName == null);
         ) {
             String opt = (String)i.next();
             String val = (String)optionNameToShortName.get(opt);
@@ -530,7 +533,7 @@ public class SubCommand {
                     textBoxUI.add(name);
                 } else if (webUI.equals(CLIConstants.FLAG_WEB_UI_CHECKBOX)) {
                     checkboxUI.add(name);
-                } 
+                }
             }
 
             if (reservedLongOptionNames.contains(name)) {
@@ -612,7 +615,7 @@ public class SubCommand {
      * @return <code>true</code> if option is unary.
      */
     public boolean isUnaryOption(String cmdName) {
-        return unaryOptionNames.contains(cmdName);        
+        return unaryOptionNames.contains(cmdName);
     }
 
     /**
@@ -621,7 +624,7 @@ public class SubCommand {
      * @return <code>true</code> if option is binary.
      */
     public boolean isBinaryOption(String cmdName) {
-        return singleOptionNames.contains(cmdName);        
+        return singleOptionNames.contains(cmdName);
     }
 
     /**
@@ -631,6 +634,13 @@ public class SubCommand {
      */
     public boolean webEnabled() {
         return webSupport;
+    }
+
+    /**
+     * @return any deprecation warning (by default this is set to the empty string).
+     */
+    public String getDeprecationWarning() {
+        return deprecationWarning;
     }
 
     /**

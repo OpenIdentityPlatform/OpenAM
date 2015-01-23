@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyright 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.cli;
 
@@ -70,7 +70,7 @@ public abstract class CLIDefinitionBase implements IDefinition {
         }
     }
 
-    private void getProductName(Class clazz) 
+    private void getProductName(Class clazz)
         throws CLIException {
         try {
             Field pdtField = clazz.getDeclaredField(
@@ -91,15 +91,15 @@ public abstract class CLIDefinitionBase implements IDefinition {
                 ExitCodes.INCORRECT_DEFINITION_CLASS);
         }
     }
-  
-    private void getCommands(Class clazz) 
-        throws CLIException 
+
+    private void getCommands(Class clazz)
+        throws CLIException
     {
         Field[] fields = clazz.getDeclaredFields();
 
         for (Field fld : fields) {
             SubCommandInfo info = fld.getAnnotation(SubCommandInfo.class);
- 
+
             if (info != null) {
                 if ((info.implClassName() == null) ||
                     (info.description() == null)
@@ -108,7 +108,7 @@ public abstract class CLIDefinitionBase implements IDefinition {
                         definitionClass + " missing product field",
                         ExitCodes.INCORRECT_DEFINITION_CLASS);
                 }
- 
+
                 List<String> mandatoryOptions = toList(
                     info.mandatoryOptions());
                 List<String> optionalOptions = toList(
@@ -137,23 +137,23 @@ public abstract class CLIDefinitionBase implements IDefinition {
                 String subcmdName = fld.getName().replace('_', '-');
                 subCommands.add(new SubCommand(
                     this, rb, subcmdName, mandatoryOptions, optionalOptions,
-                    optionAliases, info.implClassName(), webSupport));
+                    optionAliases, info.implClassName(), webSupport, info.deprecationWarning()));
             }
         }
     }
-    
+
     /**
      * Initializes the definition class.
-     * 
+     *
      * @param locale Locale of the request.
      * @throws CLIException if command definition cannot initialized.
-     */    
+     */
     public void init(Locale locale) throws CLIException {
         Class defClass = getDefinitionClass();
         getProductName(defClass);
         getCommands(defClass);
     }
-    
+
     /**
      * Returns a list of sub commands.
      *
@@ -162,7 +162,7 @@ public abstract class CLIDefinitionBase implements IDefinition {
     public List getSubCommands() {
         return subCommands;
     }
-    
+
     /**
      * Returns log name.
      *

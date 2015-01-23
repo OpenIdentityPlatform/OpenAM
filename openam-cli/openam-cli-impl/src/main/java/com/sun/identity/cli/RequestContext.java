@@ -27,11 +27,13 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.cli;
 
 import com.sun.identity.shared.locale.Locale;
+import org.forgerock.openam.utils.StringUtils;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,21 +70,28 @@ public class RequestContext {
         rb = commandMgr.getResourceBundle();
         subCommand = subcmd;
 
+        // Deprecated commands print out annoying text to discourage the user from using them.
+        //
+        String deprecationWarning = subcmd.getDeprecationWarning();
+        if (StringUtils.isNotEmpty(deprecationWarning)) {
+            commandMgr.getOutputWriter().printlnError(deprecationWarning);
+        }
+
         if (commandMgr.isVerbose()) {
             commandMgr.getOutputWriter().printlnMessage(
                 rb.getString("verbose-constructing-request-context"));
         }
+
         String[] argv = request.getOptions();
         CLIRequest parentRequest = request.getParent();
-        String[] parentArgv = (parentRequest != null) ?
-            parentRequest.getOptions() : null;
+        String[] parentArgv = (parentRequest != null) ? parentRequest.getOptions() : null;
         parseArgs(commandMgr.getCommandName(), subcmd, argv, parentArgv);
 
         if (commandMgr.isVerbose()) {
             commandMgr.getOutputWriter().printlnMessage(
                 getResourceString("verbose-validate-mandatory-options"));
         }
-        
+
         if (!subcmd.validateOptions(mapOptions, request.getSSOToken())) {
             throw createIncorrectOptionException(commandMgr.getCommandName(),
                 argv);
@@ -195,7 +204,7 @@ public class RequestContext {
                 }
             } else if (values != null) {
                 if (commandMgr.webEnabled()) {
-                    values.add(Locale.URLDecodeField(arg, 
+                    values.add(Locale.URLDecodeField(arg,
                         commandMgr.getDebugger()));
                 } else {
                     values.add(arg);
@@ -244,7 +253,7 @@ public class RequestContext {
                 throw createIncorrectOptionException(commandName, argv);
             } else if (arg.trim().length() > 0) {
                 if (commandMgr.webEnabled()) {
-                    values.add(Locale.URLDecodeField(arg, 
+                    values.add(Locale.URLDecodeField(arg,
                         commandMgr.getDebugger()));
                 } else {
                     values.add(arg);
