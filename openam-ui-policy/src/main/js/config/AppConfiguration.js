@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -100,12 +100,15 @@ define("config/AppConfiguration", function () {
                         "templates/policy/EditSubjectTemplate.html",
                         "templates/policy/EditEnvironmentTemplate.html",
                         "templates/policy/OperatorRulesTemplate.html",
-                        "templates/policy/ConditionAttrTimeDate.html",
-                        "templates/policy/ConditionAttrEnum.html",
-                        "templates/policy/ConditionAttrString.html",
-                        "templates/policy/ConditionAttrBoolean.html",
-                        "templates/policy/ConditionAttrArray.html",
-                        "templates/policy/ConditionAttrObject.html",
+                        "templates/policy/conditions/ConditionAttrEnum.html",
+                        "templates/policy/conditions/ConditionAttrString.html",
+                        "templates/policy/conditions/ConditionAttrBoolean.html",
+                        "templates/policy/conditions/ConditionAttrArray.html",
+                        "templates/policy/conditions/ConditionAttrObject.html",
+                        "templates/policy/conditions/ConditionAttrTime.html",
+                        "templates/policy/conditions/ConditionAttrDay.html",
+                        "templates/policy/conditions/ConditionAttrDate.html",
+                        "templates/policy/conditions/ConditionAttrTimeZone.html",
                         "templates/policy/ListItem.html",
                         "templates/policy/LegacyListItem.html",
                         "templates/policy/ManageAppsGridCellActionsTemplate.html",

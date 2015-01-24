@@ -1,9 +1,0 @@
-<div class="field-float-select data-obj">
-    <label for="selection_{{id}}" data-title="{{title}}">{{t i18nKey}}</label>
-    <select id="selection_{{id}}" class="placeholderText" tabindex="0" required>
-        <option value=""  disabled="">{{t "policy.common.select"}}</option>
-        {{#each data.enum}}
-            <option value="{{this}}" {{#equals this ../selected}}selected=""{{/equals}} >{{this}}</option>
-        {{/each}}
-    </select>
-</div>

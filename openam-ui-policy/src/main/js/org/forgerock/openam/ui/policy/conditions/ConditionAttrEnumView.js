@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,38 +26,24 @@
  * @author Eugenia Sergueeva
  */
 
-/*global window, define, $, _, document, console */
+/*global window, define, $, _ */
 
-define("org/forgerock/openam/ui/policy/AddNewResourceView", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/policy/ResourcesListView"
-], function (AbstractView, resourcesListView) {
-    var AddNewResourceView = AbstractView.extend({
-        element: "#patterns",
-        template: "templates/policy/AddNewResourceTemplate.html",
-        noBaseTemplate: true,
-        events: {
-            'click .addPattern': 'addPattern',
-            'keyup .addPattern': 'addPattern'
-        },
+define("org/forgerock/openam/ui/policy/conditions/ConditionAttrEnumView", [
+    "org/forgerock/openam/ui/policy/conditions/ConditionAttrBaseView"
+], function (ConditionAttrBaseView) {
+    var ConditionAttrEnumView = ConditionAttrBaseView.extend({
+        template: 'templates/policy/conditions/ConditionAttrEnum.html',
 
-        render: function (args, callback) {
-            _.extend(this.data, args);
+        render: function (data, element, callback) {
+            this.initBasic(data, element, 'field-float-select data-obj');
 
             this.parentRender(function () {
                 if (callback) {
                     callback();
                 }
             });
-        },
-
-        addPattern: function (e) {
-            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
-            this.data.options.newPattern = $(e.currentTarget).find(".pattern").text();
-            resourcesListView.render(this.data);
         }
-
     });
 
-    return new AddNewResourceView();
+    return ConditionAttrEnumView;
 });

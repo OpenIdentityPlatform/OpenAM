@@ -41,8 +41,8 @@ define("org/forgerock/openam/ui/policy/HelpLinkView", [
             'keyup .icon-info': 'openDocumentation'
         },
 
-        render: function ($el, data, callback) {
-            _.extend(this.data, data);
+        render: function ($el, customText, callback) {
+            this.data.customText = customText ? customText : '';
 
             var documentation = conf.globalData.policyEditor && conf.globalData.policyEditor.documentation ? conf.globalData.policyEditor.documentation : {},
                 key = $el.data('help-key');

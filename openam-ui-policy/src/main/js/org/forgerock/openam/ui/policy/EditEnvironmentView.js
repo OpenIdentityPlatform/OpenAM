@@ -24,51 +24,41 @@
 
 /**
  * @author JKigwana
+ * @author Eugenia Sergueeva
  */
 
 /*global window, define, $, _, document, console, Handlebars */
 
-define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
+define("org/forgerock/openam/ui/policy/EditEnvironmentView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/openam/ui/policy/HelpLinkView"
-], function (AbstractView, uiUtils, eventManager, constants, conf, HelpLink) {
-
+    "org/forgerock/openam/ui/policy/HelpLinkView",
+    "org/forgerock/openam/ui/policy/conditions/ConditionAttrBooleanView",
+    "org/forgerock/openam/ui/policy/conditions/ConditionAttrArrayView",
+    "org/forgerock/openam/ui/policy/conditions/ConditionAttrStringView",
+    "org/forgerock/openam/ui/policy/conditions/ConditionAttrObjectView",
+    "org/forgerock/openam/ui/policy/conditions/ConditionAttrEnumView",
+    "org/forgerock/openam/ui/policy/conditions/ConditionAttrTimeView",
+    "org/forgerock/openam/ui/policy/conditions/ConditionAttrDayView",
+    "org/forgerock/openam/ui/policy/conditions/ConditionAttrDateView",
+    "org/forgerock/openam/ui/policy/conditions/ConditionAttrTimeZoneView"
+], function (AbstractView, uiUtils, HelpLink, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr, TimeAttr, DayAttr, DateAttr, TimeZoneAttr) {
     var EditEnvironmentView = AbstractView.extend({
-
         events: {
-            'change select#selection' :       'changeType',
-            'change select:not(#selection):not(.selectize)' : 'changeInput',
-            'change input':                   'changeInput',
-            'keyup  input':                   'changeInput',
-            'autocompletechange input':       'changeInput',
-            'click .buttonControl a.button':  'buttonControlClick',
-            'keyup .buttonControl a.button':  'buttonControlClick',
-            'click .clockpicker':             'clickClockPicker',
-            'click .icon-clock':              'clickClockPicker'
+            'change select#selection': 'changeType'
         },
-
         data: {},
-        mode:'append',
-
         i18n: {
-            'condition': { 'key': 'policy.conditionTypes.', 'title': '.title', 'props': '.props.' },
-            'weekdays': { 'key': 'policy.common.weekdays.', 'full': '.full', 'short': '.short' }
+            'condition': { 'key': 'policy.conditionTypes.', 'title': '.title', 'props': '.props.' }
         },
 
-        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-
-        render: function( schema, callback, element, itemID, itemData ) {
+        render: function (schema, callback, element, itemID, itemData) {
             var self = this;
+
             this.setElement(element);
 
             this.data = $.extend(true, [], schema);
             this.data.itemID = itemID;
-
-            this.weekdays = this.getWeekDays();
 
             _.each(this.data.conditions, function (condition) {
                 condition.i18nKey = $.t(self.i18n.condition.key + condition.title + self.i18n.condition.title);
@@ -78,34 +68,24 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
             this.$el.append(uiUtils.fillTemplateWithData("templates/policy/EditEnvironmentTemplate.html", this.data));
 
-            this.setElement('#environment_' + itemID );
-            this.delegateEvents();
+            this.setElement('#environment_' + itemID);
 
             if (itemData) {
                 // Temporary fix, the name attribute is being added by the server after the policy is created.
                 // TODO: Serverside solution required
                 delete itemData.name;
-                this.$el.data('itemData',itemData);
+                this.$el.data('itemData', itemData);
                 this.$el.find('select#selection').val(itemData.type).trigger('change');
             }
 
             this.$el.find('select#selection').focus();
 
-            if (callback) {callback();}
+            if (callback) {
+                callback();
+            }
         },
 
-        getWeekDays: function () {
-            var weekdays = [], i = 0, self = this;
-            _.invoke(self.days, function () {
-                weekdays[i] = {};
-                weekdays[i].title = $.t(self.i18n.weekdays.key + this + self.i18n.weekdays.full);
-                weekdays[i].value = $.t(self.i18n.weekdays.key + this + self.i18n.weekdays.short);
-                i++;
-            });
-            return weekdays;
-        },
-
-        createListItem: function(allEnvironments, item){
+        createListItem: function (allEnvironments, item) {
             var self = this,
                 itemToDisplay = null,
                 data = item.data().itemData,
@@ -113,6 +93,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                 html;
 
             item.focus(); //  Required to trigger changeInput.
+
             this.data.conditions = allEnvironments;
 
             if (data) {
@@ -130,326 +111,16 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             html = uiUtils.fillTemplateWithData('templates/policy/ListItem.html', {data: itemToDisplay});
             item.find('.item-data').html(html);
             this.setElement('#' + item.attr('id'));
-            this.delegateEvents();
         },
 
-        changeInput: function(e) {
+        changeType: function (e) {
             e.stopPropagation();
-
-            var $control = $(e.currentTarget),
-                propTitle,
-                inputGroup,
-                autoFillGroup;
-
-            if ($control.parent().children('label').length === 0) {
-                return; // this is a temporary workaround needed for a event leakage
-            }
-
-            propTitle = $control.parent().children('label').data().title;
-            inputGroup = $control.closest('div.input-group');
-            autoFillGroup = $control.closest('li').find('div.auto-fill-group');
-
-            this.$el.data().itemData[propTitle] = e.currentTarget.value;
-
-            this.populateInputGroup(inputGroup);
-            this.populateAutoFillGroup(autoFillGroup);
-
-            if (propTitle === 'enforcementTimeZone') {
-                this.handleTimeZone(e.currentTarget.value);
-            }
-        },
-
-        handleTimeZone: function (currentVal) {
-            if (!_.find(this.data.timezones, function (zone) { return zone === currentVal; })) {
-                this.$el.data().itemData.enforcementTimeZone = 'GMT';
-            }
-        },
-
-        populateInputGroup: function (group) {
-            var controls = group.find(':input'),
-                populated = _.find(controls, function (el) {
-                    return el.value !== '';
-                });
-
-            controls.each(function () {
-                $(this).prop('required', !!populated);
-            });
-        },
-
-        populateAutoFillGroup: function (group) {
-            var first = group.eq(0),
-                second = group.eq(1),
-                firstVal, firstLabel,
-                secondVal, secondLabel ,
-                data;
-
-            if (first.length && second.length) {
-                firstVal = first.find('input').val();
-                firstLabel = first.find('label').data().title;
-                secondVal = second.find('input').val();
-                secondLabel = second.find('label').data().title;
-                data = this.$el.data().itemData;
-            }
-
-            if (firstVal !== '' && secondVal === '') {
-                data[secondLabel] = data[firstLabel];
-            } else if (firstVal === '' && secondVal !== '') {
-                data[firstLabel] = data[secondLabel];
-            } else if (firstVal === '' && secondVal === '') {
-                delete data[firstLabel];
-                delete data[secondLabel];
-            }
-        },
-
-        buttonControlClick: function(e){
-            if (e.type === 'keyup' && e.keyCode !== 13) {
-                return;
-            }
-            var $target = $(e.currentTarget),
-                buttonControl = $target.closest('ul.buttonControl'),
-                label = buttonControl.prev('label').data().title;
-            this.$el.data().itemData[label] = $target.data('val');
-            buttonControl.find('li a').removeClass('selected');
-            $target.addClass('selected');
-        },
-
-        initDatePickers: function() {
-            this.$el.find("#startDate").datepicker({
-                numberOfMonths: 2,
-                dateFormat: 'yy:mm:dd',
-                onClose: function (selectedDate) {
-                    $("#endDate").datepicker("option", "minDate", selectedDate);
-                }
-            });
-            this.$el.find("#endDate").datepicker({
-                numberOfMonths: 2,
-                dateFormat: 'yy:mm:dd',
-                onClose: function (selectedDate) {
-                    $("#startDate").datepicker("option", "maxDate", selectedDate);
-                }
-            });
-        },
-
-        initClockPickers: function() {
-            this.$el.find('.clockpicker').each(function(){
-
-              var clock = $(this);
-              clock.clockpicker({
-                  placement: 'top',
-                  autoclose: true,
-                  //default: 'now',
-                  afterDone: function() {
-                      clock.trigger('change');
-                  }
-              });
-            });
-        },
-
-        clickClockPicker: function(e) {
-            e.stopPropagation();
-            var target = $(e.currentTarget).is('input') ? $(e.currentTarget) : $(e.currentTarget).prev('input');
-            target.clockpicker('show');
-        },
-
-        getTimeZones: function(){
             var self = this,
-                defaultTimeZone = 'GMT',
-                setTimeZones = function(){
-                    var timezones = self.$el.find('#enforcementTimeZone');
-                    timezones.autocomplete({
-                        source: self.data.timezones
-                    });
-
-                    if (!timezones.val()) {
-                        timezones.val(defaultTimeZone).trigger('autocompleteselect');
-                    }
-
-                    self.$el.data().itemData.enforcementTimeZone = defaultTimeZone;
-                };
-
-            if (self.data.timezones) {
-                setTimeZones();
-                return;
-            }
-
-            $.ajax({
-                url: 'timezones.json',
-                dataType: "json",
-                cache: true
-            }).then( function(data){
-                self.data.timezones = data.timezones;
-                setTimeZones();
-            });
-
-        },
-
-        initSelectize: function () {
-            var self = this,
-                title = '',
-                itemData,
-                keyValPair,
-                options = {
-                    plugins: ['restore_on_backspace'],
-                    delimiter: ',',
-                    persist: false,
-                    create: function (input) {
-                        return {
-                            value: input,
-                            text: input
-                        };
-                    },
-                    onItemRemove: function (value) {
-                        title = this.$input.parent().find('label')[0].dataset.title;
-                        itemData = self.$el.data().itemData;
-
-                        if (title !== '' && this.$wrapper.hasClass('object-prop')) {
-                            keyValPair = value.split(':');
-                            delete itemData[title][keyValPair[0]];
-                        }
-                    },
-                    onItemAdd: function (value) {
-                        title = this.$input.parent().find('label')[0].dataset.title;
-                        itemData = self.$el.data().itemData;
-
-                        if (title !== '' && this.$wrapper.hasClass('object-prop')) {
-                            keyValPair = value.split(':');
-                            itemData[title][keyValPair[0]] = _.uniq(_.compact(keyValPair[1].split(',')));
-                        }
-                    },
-                    onChange: function (value) {
-                        title = this.$input.parent().find('label')[0].dataset.title;
-                        itemData = self.$el.data().itemData;
-
-                        if (title !== '' && !this.$wrapper.hasClass('object-prop')) {
-                            itemData[title] = value;
-                        }
-                    }
-                },
-                selectItem;
-
-            this.$el.find('.selectize').each(function () {
-                selectItem = $(this);
-
-                if (selectItem.prev('label').data('title') === 'dnsName') {
-                    options.createFilter = function (text) {
-                        return text.indexOf('*') === -1 || text.lastIndexOf('*') === 0;
-                    };
-                } else if (selectItem.hasClass('object-prop')) {
-                    options.delimiter = ';';
-                    options.createFilter = function (text) {
-                        return (/^\w+:(?:\w+,?)+$/).test(text);
-                    };
-                }
-
-                selectItem.selectize(options);
-            });
-        },
-
-        changeType: function(e) {
-            e.stopPropagation();
-            var self         = this,
-                itemData     = {},
-                schema       = {},
-                html         = '',
-                returnVal    = '',
+                itemData = {},
                 selectedType = e.target.value,
-                delay        = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
-                i18nKey,
-                helperText,
-                buildHTML    = function(schemaProps) {
-
-                    var count = 0,
-                        pattern   = null,
-                        additionalCssClass;
-
-                    returnVal = '';
-
-                    if (itemData.type === "SimpleTime") {
-                        // 'SimpleTime' is a special case and requires its own template.
-                        // This is because the endpoint only describes the inputs as strings, however in order to build a helpful UI we need to do more.
-                        returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrTimeDate.html", {
-                            weekdays: self.weekdays,
-                            data: itemData,
-                            id: count
-                        });
-
-                    } else {
-
-                        returnVal += '<div class="no-float">';
-
-                        _.map(schemaProps, function(value, key) {
-
-                            returnVal += '\n';
-
-                            i18nKey = self.i18n.condition.key + schema.title + self.i18n.condition.props + key;
-
-                            if (value.type === 'string' || value.type === 'number' || value.type === 'integer') {
-
-                                if (value["enum"]) {
-                                    returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrEnum.html",
-                                        {data: value, title: key, i18nKey: i18nKey, selected: itemData[key], id: count});
-                                } else {
-                                    if (key === 'startIp' || key === 'endIp') {
-                                        if (schema.title === 'IPv4') {
-                                            pattern = constants.IPV4_PATTERN;
-                                        } else if (schema.title === 'IPv6') {
-                                            pattern = constants.IPV6_PATTERN;
-                                        }
-                                        additionalCssClass = 'auto-fill-group';
-                                    } else if (value.type === 'number') {
-                                        pattern = "[-+]?[0-9]*[.,]?[0-9]+";
-                                    } else if (value.type === 'integer') {
-                                        pattern = "\\d+";
-                                    } else {
-                                        pattern = null;
-                                    }
-                                    returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html",
-                                        {data: itemData[key], title: key, i18nKey: i18nKey, id: count, pattern: pattern, cssClass: additionalCssClass});
-                                }
-
-                            } else if (value.type === 'boolean' ) {
-                                // Ignoring the required property and assuming it defaults to false. See AME-4324
-                                returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrBoolean.html",
-                                    {data: value, title: key, i18nKey: i18nKey, selected: itemData[key]});
-
-                            } else if (value.type === 'array' ) {
-                                returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrArray.html",
-                                    {data: itemData[key], title: key, i18nKey: i18nKey, id: count});
-
-                            } else if (value.type === 'object' ) {
-                                returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrObject.html",
-                                    {data: itemData[key], title: key, i18nKey: i18nKey, id: count});
-
-                            } else {
-                                console.error('Unexpected data type:',key,value);
-                            }
-
-                            count++;
-                        });
-
-                        returnVal += '</div>';
-                    }
-
-                    return returnVal;
-                },
-                getHelperText = function () {
-                    var helperText;
-                    switch (schema.title) {
-                        case 'IPv4': // fall through
-                        case 'IPv6':
-                            helperText = Handlebars.helpers.t('policy.conditionTypes.ipHelper');
-                            break;
-                        case 'SimpleTime':
-                            helperText = Handlebars.helpers.t('policy.conditionTypes.SimpleTime.helper');
-                            break;
-                        default:
-                            helperText = '';
-                            break;
-                    }
-                    return helperText;
-                };
-
-            schema =  _.findWhere(this.data.conditions, {title: selectedType}) || {};
+                schema = _.findWhere(this.data.conditions, {title: selectedType}) || {},
+                delay = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
+                helperText;
 
             if (this.$el.data().itemData && this.$el.data().itemData.type === selectedType) {
                 itemData = this.$el.data().itemData;
@@ -459,87 +130,127 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             }
 
             if (itemData) {
-
-                html = buildHTML(schema.config.properties);
                 self.animateOut();
-                helperText = getHelperText();
+                helperText = this.getHelperText(schema);
 
                 // setTimeout needed to delay transitions.
-                setTimeout( function() {
+                setTimeout(function () {
                     self.$el.find('.no-float').remove();
                     self.$el.find('.clear-left').remove();
 
                     if (helperText) {
-                        new HelpLink().render(self.$el.find('.help-link'), {
-                            customText: helperText
-                        });
+                        new HelpLink().render(self.$el.find('.help-link'), helperText);
                     } else {
                         self.$el.find('.help-link').empty();
                     }
 
-                    self.$el.find('#typeSelector').after( html );
+                    if (!self.$el.parents('#dropbox').length || self.$el.hasClass('editing')) {
+                        self.buildHTML(itemData, schema);
+                    }
 
-                    self.initOptions(itemData, schema);
                     self.animateIn();
-
                 }, delay);
             }
         },
 
-        initOptions: function(itemData, schema){
+        getHelperText: function (schema) {
+            var helperText;
+            switch (schema.title) {
+                case 'IPv4': // fall through
+                case 'IPv6':
+                    helperText = Handlebars.helpers.t('policy.conditionTypes.ipHelper');
+                    break;
+                case 'SimpleTime':
+                    helperText = Handlebars.helpers.t('policy.conditionTypes.SimpleTime.helper');
+                    break;
+                default:
+                    helperText = '';
+                    break;
+            }
+            return helperText;
+        },
 
-            var selectize = false;
+        buildHTML: function (itemData, schema) {
+            var self = this,
+                itemDataEl = this.$el.find('.item-data'),
+                schemaProps = schema.config.properties,
+                i18nKey,
+                attributesWrapper,
+                attributesSelector = '.condition-attr';
 
             if (itemData.type === "SimpleTime") {
-                this.initClockPickers();
-                this.initDatePickers();
-                this.getTimeZones();
-            } else {
+                attributesWrapper = '<div class="clearfix clear-left" id="conditionAttrTimeDate"></div>';
 
-                selectize =  _.find(schema.config.properties, function(item){
-                    return item.type === 'array' || item.type === 'object';
+                new TimeAttr().render({itemData: itemData}, itemDataEl);
+                new DayAttr().render({itemData: itemData}, itemDataEl);
+                new DateAttr().render({itemData: itemData}, itemDataEl);
+                new TimeZoneAttr().render({itemData: itemData}, itemDataEl);
+
+                this.$el.find(attributesSelector).wrapAll(attributesWrapper);
+            } else {
+                attributesWrapper = '<div class="no-float"></div>';
+
+                _.map(schemaProps, function (value, key) {
+                    i18nKey = self.i18n.condition.key + schema.title + self.i18n.condition.props + key;
+
+                    switch (value.type) {
+                        case 'string': // fall through
+                        case 'number': // fall through
+                        case 'integer':
+                            new StringAttr().render({itemData: itemData, data: itemData[key], title: key, i18nKey: i18nKey, schema: schema, value: value}, itemDataEl);
+                            break;
+                        case 'boolean':
+                            new BooleanAttr().render({itemData: itemData, data: value, title: key, i18nKey: i18nKey, selected: itemData[key]}, itemDataEl);
+                            break;
+                        case 'array':
+                            new ArrayAttr().render({itemData: itemData, data: itemData[key], title: key, i18nKey: i18nKey}, itemDataEl);
+                            break;
+                        case 'object':
+                            new ObjectAttr().render({itemData: itemData, data: itemData[key], title: key, i18nKey: i18nKey}, itemDataEl);
+                            break;
+                        default:
+                            break;
+                    }
                 });
 
-                if (selectize) {
-                    this.initSelectize();
-                }
+                this.$el.find(attributesSelector).wrapAll(attributesWrapper);
             }
         },
 
-        setDefaultJsonValues: function(schema){
-
+        setDefaultJsonValues: function (schema) {
             var itemData = {type: schema.title};
-            _.map(schema.config.properties, function(value,key) {
+            _.map(schema.config.properties, function (value, key) {
                 switch (value.type) {
                     case 'string':
+                        // OPENAM-5182: we should not submit empty string if IP is missing
                         if (key !== 'startIp' && key !== 'endIp') {
                             itemData[key] = '';
                         }
-                    break;
-                    case 'number':
+                        break;
+                    case 'number': // fall through
                     case 'integer':
                         itemData[key] = 0;
-                    break;
+                        break;
                     case 'boolean':
                         itemData[key] = false;
-                    break;
+                        break;
                     case 'array':
                         itemData[key] = [];
-                    break;
+                        break;
                     case 'object':
                         itemData[key] = {};
-                    break;
+                        break;
                     default:
-                        console.error('Unexpected data type:',key,value);
-                    break;
+                        console.error('Unexpected data type:', key, value);
+                        break;
                 }
             });
 
             return itemData;
         },
 
-        animateOut: function(){
-            // all items except the title selector are contained inside either a no-float or a clear-left
+        animateOut: function () {
+            // hide all items except the title selector
             this.$el.find('.no-float').fadeOut(500);
             this.$el.find('.clear-left').fadeOut(500);
             this.$el.find('.field-float-pattern, .field-float-selectize, .timezone-field')
@@ -552,21 +263,17 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             this.$el.removeClass('invalid-rule');
         },
 
-        animateIn: function(){
+        animateIn: function () {
             var self = this;
-            setTimeout( function() {
+            setTimeout(function () {
                 self.$el.find('.field-float-pattern, .field-float-selectize, .timezone-field')
                     .find('label').addClass('showLabel')
                     .next('input, div input').removeClass('placeholderText').prop('readonly', false);
 
                 self.$el.find('.field-float-select select:not(#selection)').removeClass('placeholderText').prop('readonly', false)
                     .prev('label').addClass('showLabel');
-
-                self.delegateEvents();
             }, 10);
         }
-
-
     });
 
     return EditEnvironmentView;
