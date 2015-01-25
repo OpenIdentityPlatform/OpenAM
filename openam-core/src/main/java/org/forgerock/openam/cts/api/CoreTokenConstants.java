@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.api;
 
@@ -60,4 +60,12 @@ public class CoreTokenConstants {
     public static final String OBJECT_CLASS = "objectClass";
     public static final String FR_CORE_TOKEN = "frCoreToken";
 
+    /**
+     * The name of the Scheduled Service used by the CTS Reaper.
+     */
+    public static final String CTS_SCHEDULED_SERVICE = "CTSScheduledService";
+    /**
+     * The name of the general purpose worker pool for the CTS.
+     */
+    public static final String CTS_WORKER_POOL = "CTSWorkerPool";
 }

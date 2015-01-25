@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.core.guice;
 
@@ -46,7 +46,6 @@ import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.CTSConnectionFactory;
 import org.forgerock.openam.cts.impl.LDAPConfig;
-import org.forgerock.openam.cts.reaper.CTSReaper;
 import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManagerImpl;
@@ -57,13 +56,15 @@ import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.guice.AMGuiceModule;
 import org.forgerock.openam.shared.concurrency.LockFactory;
+import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.utils.ExecutorServiceFactory;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
 
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
@@ -87,7 +88,6 @@ public class CoreGuiceModule extends AbstractModule {
 
         bind(EntitlementConfiguration.class).toProvider(new Provider<EntitlementConfiguration>() {
 
-            @Override
             public EntitlementConfiguration get() {
                 return EntitlementConfiguration.getInstance(SubjectUtils.createSuperAdminSubject(), "/");
             }
@@ -133,9 +133,22 @@ public class CoreGuiceModule extends AbstractModule {
             }
         }).in(Singleton.class);
         // CTS Worker Thread Pools
-        bind(ScheduledExecutorService.class).annotatedWith(Names.named(CTSReaper.CTS_SCHEDULED_SERVICE))
-                .toInstance(Executors.newScheduledThreadPool(1));
-
+        bind(ScheduledExecutorService.class)
+                .annotatedWith(Names.named(CoreTokenConstants.CTS_SCHEDULED_SERVICE))
+                .toProvider(new Provider<ScheduledExecutorService>() {
+                    public ScheduledExecutorService get() {
+                        ExecutorServiceFactory factory = InjectorHolder.getInstance(ExecutorServiceFactory.class);
+                        return factory.createScheduledService(1);
+                    }
+                });
+        bind(ExecutorService.class)
+                .annotatedWith(Names.named(CoreTokenConstants.CTS_WORKER_POOL))
+                .toProvider(new Provider<ExecutorService>() {
+                    public ExecutorService get() {
+                        ExecutorServiceFactory factory = InjectorHolder.getInstance(ExecutorServiceFactory.class);
+                        return factory.createThreadPool(5);
+                    }
+                });
 
         /**
          * Session related dependencies.
@@ -188,6 +201,21 @@ public class CoreGuiceModule extends AbstractModule {
             return DNMapper.orgNameToRealmName(orgName);
         }
 
+        /**
+         * @see com.sun.identity.common.ShutdownManager#removeShutdownListener(com.sun.identity.common.ShutdownListener)
+         */
+        public void removeShutdownListener(ShutdownListener listener) {
+            ShutdownManager shutdownManager = ShutdownManager.getInstance();
+
+            try {
+                if (shutdownManager.acquireValidLock()) {
+                    // Remove the listener.
+                    shutdownManager.removeShutdownListener(listener);
+                }
+            } finally {
+                shutdownManager.releaseLockAndNotify();
+            }
+        }
     }
 
     /**
