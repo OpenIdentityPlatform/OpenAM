@@ -24,9 +24,8 @@
  *
  * $Id: Constants.java,v 1.47 2009/08/12 23:10:44 ericow Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
-
 package com.sun.identity.shared;
 
 /**
@@ -1317,4 +1316,8 @@ public interface Constants {
      */
     public static final String CORE_TOKEN_RESOURCE_ENABLED = "org.forgerock.openam.cts.rest.enabled";
 
+    /**
+     * Property to define the default time limit for LDAP operations performed by the Netscape LDAP SDK.
+     */
+    public static final String DEFAULT_LDAP_TIME_LIMIT = "org.forgerock.openam.ldap.default.time.limit";
 }

@@ -19,13 +19,14 @@
  *
  * Contributor(s): 
  */
-/**
- * Portions Copyrighted 2012 ForgeRock AS
+/*
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.shared.ldap;
 
-import java.util.*;
-import com.sun.identity.shared.ldap.client.*;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * Manages search results, references and responses returned on one or 
@@ -283,7 +284,7 @@ public class LDAPSearchListener extends LDAPMessageQueue {
     private void waitForMessage(ExtendedRequestEntry entry) throws
         LDAPException {
         try {
-            if (entry.timeToComplete > 0) {
+            if (!m_asynchOp && entry.timeToComplete > 0) {
                 long timeToWait = entry.timeToComplete -
                     System.currentTimeMillis();
                 if (timeToWait > 0) {
@@ -294,16 +295,14 @@ public class LDAPSearchListener extends LDAPMessageQueue {
                         // Spurious wakeup before timeout
                         return;
                     } else {
-                        removeRequest(entry.id);                        
-                        m_exception = new LDAPException(
-                            "Time to complete operation exceeded",
-                            LDAPException.LDAP_TIMEOUT);
+                        removeRequest(entry.id);
+                        m_exception = new LDAPException("Time to complete operation exceeded. Operation ID: "
+                                + entry.id, LDAPException.LDAP_TIMEOUT);
                     }
                 } else {
-                    removeRequest(entry.id);                                            
-                    m_exception = new LDAPException(
-                        "Time to complete operation exceeded",
-                        LDAPException.LDAP_TIMEOUT);
+                    removeRequest(entry.id);
+                    m_exception = new LDAPException("Time to complete operation exceeded. Operation ID: " + entry.id,
+                            LDAPException.LDAP_TIMEOUT);
                 }
             } else {
                 wait();
