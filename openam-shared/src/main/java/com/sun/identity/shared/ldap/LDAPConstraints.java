@@ -19,7 +19,13 @@
  *
  * Contributor(s): 
  */
+/*
+ * Portions Copyrighted 2015 ForgeRock AS.
+ */
 package com.sun.identity.shared.ldap;
+
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
 /**
  * Represents a set of operation preferences.
@@ -48,7 +54,7 @@ public class LDAPConstraints implements Cloneable, java.io.Serializable {
      * the default set of constraints.
      */
     public LDAPConstraints() {
-        m_time_limit = 0;
+        m_time_limit = SystemPropertiesManager.getAsInt(Constants.DEFAULT_LDAP_TIME_LIMIT, 0);
         referrals = false;
         m_bind_proc = null;
         m_rebind_proc = null;
