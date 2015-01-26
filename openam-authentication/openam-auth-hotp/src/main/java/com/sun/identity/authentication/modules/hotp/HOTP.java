@@ -45,8 +45,6 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.PasswordCallback;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.Map;
@@ -202,7 +200,7 @@ public class HOTP extends AMLoginModule {
                 // callback[0] is OTP code
                 // callback[1] is user selected button index
                 // action = 0 is Submit HOTP Code Button
-                // action = 1 is Request HOTP COde Button
+                // action = 1 is Request HOTP Code Button
                 if (callbacks != null && callbacks.length == 2) {
                     action =
                         ((ConfirmationCallback)
@@ -236,8 +234,7 @@ public class HOTP extends AMLoginModule {
                             //it's already logged so we just handle the exception
                             substituteHeader(START_STATE, bundle.getString("send.failure"));
                         }
-                        //repeat state 2
-                        return START_STATE-1;
+                        return START_STATE;
                     }
                 } else {
                     setFailureID(userName);
