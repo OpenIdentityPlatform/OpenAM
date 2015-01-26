@@ -24,11 +24,11 @@
  *
  * $Id: Authenticator.java,v 1.9 2008/08/19 19:08:57 veiming Exp $
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ *
  */
 
 package com.sun.identity.cli;
 
-import com.sun.identity.shared.locale.Locale;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -38,6 +38,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.locale.Locale;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,15 +57,12 @@ class Authenticator {
     private static final String LOGIN_STATUS = "iplanet-am-user-login-status";
     private static final String ACCOUNT_LIFE = "iplanet-am-user-account-life";
     private static final String STRING_ACTIVE = "active";
-    
-    private static final String DEFINED_AUTH_MODULE =
-        "com.sun.identity.amadmin.authModule";
+    private static final String DEFINED_INDEX_TYPE = "org.forgerock.openam.ssoadm.auth.indexType";
+    private static final String DEFINED_INDEX_NAME = "org.forgerock.openam.ssoadm.auth.indexName";
     private static final String LDAP_AUTH_MODULE = "LDAP";
     private static final String FLATFILE_AUTH_MODULE = "DataStore";
-
     private static Set ACTIVE_STATE_ATTRIBUTES = new HashSet(4);
     private static Authenticator instance = new Authenticator();
-
     static {
         ACTIVE_STATE_ATTRIBUTES.add(LOGIN_STATUS);
         ACTIVE_STATE_ATTRIBUTES.add(ACCOUNT_LIFE);
@@ -81,8 +79,7 @@ class Authenticator {
         CommandManager mgr,
         String bindUser,
         String bindPwd
-    ) throws CLIException
-    {
+    ) throws CLIException {
         String[] param = {bindUser};
         LogWriter.log(mgr, LogWriter.LOG_ACCESS, Level.INFO,
             "ATTEMPT_LOGIN", param, null);
@@ -106,33 +103,34 @@ class Authenticator {
         String bindPwd
     ) throws CLIException {
         AuthContext lc = null;
-        String authModule = SystemProperties.get(DEFINED_AUTH_MODULE);
-
-        if (authModule != null) {
-            lc = sessionBasedLoginInternal(mgr, bindUser, bindPwd, authModule);
+        String indexType = SystemProperties.get(DEFINED_INDEX_TYPE);
+        String indexName = SystemProperties.get(DEFINED_INDEX_NAME);
+        if (indexType != null && indexName != null) {
+            lc = sessionBasedLoginInternal(mgr, bindUser, bindPwd, indexType, indexName);
         } else {
             /*
              * try DataStore and then LDAP
              */
             try {
                 lc = sessionBasedLoginInternal(mgr, bindUser, bindPwd,
-                    FLATFILE_AUTH_MODULE);
+                    "MODULE_INSTANCE", FLATFILE_AUTH_MODULE);
             } catch (CLIException e) {
                 lc = sessionBasedLoginInternal(mgr, bindUser, bindPwd,
-                    LDAP_AUTH_MODULE);
+                    "MODULE_INSTANCE", LDAP_AUTH_MODULE);
             }
         }
         return lc;
     }
     
-    
     private AuthContext sessionBasedLoginInternal(
         CommandManager mgr,
         String bindUser,
         String bindPwd,
-        String authModule
+        String indexType,
+        String indexName
     ) throws CLIException {
-        AuthContext lc = getAuthContext(mgr, authModule);
+
+        AuthContext lc = getAuthContext(mgr, indexType, indexName);
         processCallback(mgr, lc, bindUser, bindPwd);
 
         try {
@@ -148,8 +146,8 @@ class Authenticator {
     }
 
     SSOToken ldapLogin(CommandManager mgr, String bindUser, String bindPwd)
-        throws CLIException
-    {
+        throws CLIException {
+
         SSOToken ssoToken = null;
         IOutput outputWriter = mgr.getOutputWriter();
         ResourceBundle rb = mgr.getResourceBundle();
@@ -244,8 +242,7 @@ class Authenticator {
         getLDAPAuthContext(
         String bindUser,
         String bindPwd
-    ) throws LoginException
-    {
+    ) throws LoginException {
         com.sun.identity.authentication.internal.AuthPrincipal principal =
             new com.sun.identity.authentication.internal.AuthPrincipal(
                 bindUser);
@@ -255,12 +252,27 @@ class Authenticator {
         return authContext;
     }
 
-    private AuthContext getAuthContext(CommandManager mgr, String moduleName)
-        throws CLIException
-    {
+    private AuthContext getAuthContext(CommandManager mgr, String strIndexType, String indexName)
+        throws CLIException {
         try {
             AuthContext lc = new AuthContext("/");
-            lc.login(AuthContext.IndexType.MODULE_INSTANCE, moduleName);
+            AuthContext.IndexType indexType = null;
+            if (strIndexType.equalsIgnoreCase("module_instance")) {
+                indexType = AuthContext.IndexType.MODULE_INSTANCE;
+            } else if (strIndexType.equalsIgnoreCase("service")) {
+                indexType = AuthContext.IndexType.SERVICE;
+            } else if (strIndexType.equalsIgnoreCase("user")) {
+                indexType = AuthContext.IndexType.USER;
+            } else if (strIndexType.equalsIgnoreCase("role")) {
+                indexType = AuthContext.IndexType.ROLE;
+            } else if (strIndexType.equalsIgnoreCase("level")) {
+                indexType = AuthContext.IndexType.LEVEL;
+            } else if (strIndexType.equalsIgnoreCase("composite_advice")) {
+                indexType = AuthContext.IndexType.COMPOSITE_ADVICE;
+            } else if (strIndexType.equalsIgnoreCase("resource")) {
+                indexType = AuthContext.IndexType.RESOURCE;
+            }
+            lc.login(indexType, indexName);
             return lc;
         } catch (LoginException le) {
             ResourceBundle rb = mgr.getResourceBundle();
@@ -274,8 +286,8 @@ class Authenticator {
         AuthContext lc,
         String bindUser,
         String bindPwd
-    ) throws CLIException
-    {
+    ) throws CLIException {
+
         ResourceBundle rb = mgr.getResourceBundle();
         while (lc.hasMoreRequirements()) {
             Callback[] callbacks =  lc.getRequirements();
