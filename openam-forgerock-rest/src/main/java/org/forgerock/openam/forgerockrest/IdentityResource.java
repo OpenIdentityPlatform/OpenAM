@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS 
+ * Copyright 2012-2015 ForgeRock AS. 
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -256,13 +256,18 @@ public final class IdentityResource implements CollectionResourceProvider {
                 confURLBuilder.append(confURL);
             }
 
-            confirmationLink = confURLBuilder.append("?confirmationId=").append(confirmationId)
-                    .append("&email=").append(emailAddress)
-                    .append("&tokenId=").append(tokenID)
+            confirmationLink = confURLBuilder.append("?confirmationId=").append(requestParamEncode(confirmationId))
+                    .append("&email=").append(requestParamEncode(emailAddress))
+                    .append("&tokenId=").append(requestParamEncode(tokenID))
                     .toString();
 
+            if (RestDispatcher.debug.messageEnabled()) {
+                RestDispatcher.debug.message("IdentityResource.createRegistrationEmail(): sending confirmationLink of "
+                        + confirmationLink);
+            }
+
             // Send Registration
-            sendNotification(emailAddress, subject,message, confirmationLink);
+            sendNotification(emailAddress, subject, message, confirmationLink);
             handler.handleResult(result);
         } catch (BadRequestException be) {
             RestDispatcher.debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
@@ -549,13 +554,16 @@ public final class IdentityResource implements CollectionResourceProvider {
                 confURLBuilder.append(confURL);
             }
 
-            confirmationLink = confURLBuilder.append("?confirmationId=").append(confirmationId)
-                    .append("&tokenId=").append(ctsToken.getTokenId())
+            confirmationLink = confURLBuilder.append("?confirmationId=").append(requestParamEncode(confirmationId))
+                    .append("&tokenId=").append(requestParamEncode(ctsToken.getTokenId()))
                     .append("&username=").append(requestParamEncode(username))
                     .toString();
-
+            if (RestDispatcher.debug.messageEnabled()) {
+                RestDispatcher.debug.message("IdentityResource.generateNewPasswordEmail(): sending confirmationLink of "
+                        + confirmationLink);
+            }
             // Send Registration
-            sendNotification(email, subject,message, confirmationLink);
+            sendNotification(email, subject, message, confirmationLink);
             handler.handleResult(result);
         } catch (BadRequestException be) {
             RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
