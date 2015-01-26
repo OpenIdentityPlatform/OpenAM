@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -347,9 +347,9 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 confURLBuilder.append(confURL);
             }
 
-            confirmationLink = confURLBuilder.append("?confirmationId=").append(confirmationId)
-                    .append("&email=").append(emailAddress)
-                    .append("&tokenId=").append(tokenID)
+            confirmationLink = confURLBuilder.append("?confirmationId=").append(requestParamEncode(confirmationId))
+                    .append("&email=").append(requestParamEncode(emailAddress))
+                    .append("&tokenId=").append(requestParamEncode(tokenID))
                     .append("&realm=").append(realm)
                     .toString();
 
@@ -800,8 +800,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 } else {
                     confURLBuilder.append(confURL);
                 }
-                String confirmationLink = confURLBuilder.append("?confirmationId=").append(confirmationId)
-                        .append("&tokenId=").append(ctsToken.getTokenId())
+                String confirmationLink = confURLBuilder.append("?confirmationId=").append(requestParamEncode(confirmationId))
+                        .append("&tokenId=").append(requestParamEncode(ctsToken.getTokenId()))
                         .append("&username=").append(requestParamEncode(username))
                         .append("&realm=").append(realm)
                         .toString();
@@ -810,8 +810,11 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 sendNotification(email, subject, message, realm, confirmationLink);
 
                 String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-                debug.message("IdentityResource.generateNewPasswordEmail :: ACTION of generate new password email " +
+
+                if (debug.messageEnabled()) {
+                    debug.message("IdentityResource.generateNewPasswordEmail :: ACTION of generate new password email " +
                         " for username " + username + " in realm " + realm + " performed by " + principalName);
+                }
             }
             handler.handleResult(result);
         } catch (ResourceException re) {
