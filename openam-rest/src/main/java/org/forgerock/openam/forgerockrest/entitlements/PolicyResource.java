@@ -128,7 +128,6 @@ public final class PolicyResource implements CollectionResourceProvider {
         } catch (final EntitlementException eE) {
             DEBUG.error("Error evaluating policy request", eE);
             handler.handleError(resourceErrorHandler.handleError(context, actionRequest, eE));
-            return;
         }
     }
 
@@ -194,8 +193,8 @@ public final class PolicyResource implements CollectionResourceProvider {
             // Return an empty resource to indicate success?
             handler.handleResult(new Resource(resourceId, "0", json(object())));
         } catch (EntitlementException ex) {
-            DEBUG.error("PolicyResource :: DELETE : Error performing delete for policy, " + resourceId, ex);
-            handler.handleError(resourceErrorHandler.handleError(context, request, ex));
+            String debug = "PolicyResource :: DELETE : Error performing delete for policy, " + resourceId;
+            handler.handleError(resourceErrorHandler.handleError(context, debug, request, ex));
         }
     }
 

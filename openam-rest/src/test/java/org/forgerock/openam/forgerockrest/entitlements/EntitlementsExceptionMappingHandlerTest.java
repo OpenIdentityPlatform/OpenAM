@@ -16,7 +16,12 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import static org.mockito.Mockito.mock;
+
 import com.sun.identity.entitlement.EntitlementException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
@@ -29,13 +34,9 @@ import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.forgerock.json.fluent.JsonValue.*;
 
 public class EntitlementsExceptionMappingHandlerTest {
@@ -50,7 +51,7 @@ public class EntitlementsExceptionMappingHandlerTest {
         EntitlementException error = exception(ERROR_CODE, ERROR_MESSAGE);
 
         // When
-        ResourceException result = errorHandler.handleError(null, null, error);
+        ResourceException result = errorHandler.handleError(error);
 
         // Then
         assertThat(result).isInstanceOf(NotFoundException.class)
@@ -65,7 +66,7 @@ public class EntitlementsExceptionMappingHandlerTest {
         EntitlementException error = exception(ERROR_CODE, ERROR_MESSAGE);
 
         // When
-        ResourceException result = errorHandler.handleError(null, null, error);
+        ResourceException result = errorHandler.handleError(error);
 
         // Then
         assertThat(result).isInstanceOf(InternalServerErrorException.class)
@@ -81,14 +82,15 @@ public class EntitlementsExceptionMappingHandlerTest {
         overrides.put(requestType, Collections.singletonMap(ResourceException.NOT_FOUND, ResourceException.BAD_REQUEST));
         EntitlementsExceptionMappingHandler errorHandler = new EntitlementsExceptionMappingHandler(
                 Collections.singletonMap(ERROR_CODE, ResourceException.NOT_FOUND),
-                overrides
+                overrides,
+                Collections.<Integer, Integer>emptyMap()
         );
         EntitlementException error = exception(ERROR_CODE, ERROR_MESSAGE);
         Request request = mock(Request.class);
         given(request.getRequestType()).willReturn(requestType);
 
         // When
-        ResourceException result = errorHandler.handleError(null, request, error);
+        ResourceException result = errorHandler.handleError(request, error);
 
         // Then
         assertThat(result).isInstanceOf(BadRequestException.class)

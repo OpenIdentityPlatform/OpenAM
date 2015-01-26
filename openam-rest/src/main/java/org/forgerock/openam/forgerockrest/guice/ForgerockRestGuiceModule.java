@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.forgerockrest.guice;
 
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.*;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
@@ -64,7 +66,6 @@ import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluatorFactory;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyParser;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.*;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
@@ -123,7 +124,13 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 .annotatedWith(Names.named(EntitlementsExceptionMappingHandler.REQUEST_TYPE_ERROR_OVERRIDES))
                 .toInstance(errorCodeOverrides);
 
-        bind(new TypeLiteral<Map<String, QueryAttribute>>() {})
+        bind(new TypeLiteral<Map<Integer, Integer>>() {})
+                .annotatedWith(Names.named(EntitlementsExceptionMappingHandler.DEBUG_TYPE_OVERRIDES))
+                .toProvider(EntitlementsResourceDebugMappingProvider.class)
+                .asEagerSingleton();
+
+        bind(new TypeLiteral<Map<String, QueryAttribute>>() {
+        })
                 .annotatedWith(Names.named(PrivilegePolicyStoreProvider.POLICY_QUERY_ATTRIBUTES))
                 .toProvider(PolicyQueryAttributesMapProvider.class)
                 .asEagerSingleton();
@@ -313,6 +320,16 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.PROPERTY_CONTAINS_BLANK_VALUE, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.APPLICATION_NAME_MISMATCH, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.INVALID_CLASS, ResourceException.BAD_REQUEST);
+
+            return handlers;
+        }
+    }
+
+    private static class EntitlementsResourceDebugMappingProvider implements Provider<Map<Integer, Integer>> {
+        @Override
+        public Map<Integer, Integer> get() {
+            final Map<Integer, Integer> handlers = new HashMap<Integer, Integer>();
+            handlers.put(EntitlementException.NO_SUCH_POLICY, Debug.MESSAGE);
 
             return handlers;
         }

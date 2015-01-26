@@ -15,12 +15,13 @@
 */
 package org.forgerock.openam.errors;
 
+import static org.mockito.BDDMockito.*;
+import static org.testng.Assert.*;
+
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.GeneralFailure;
 import com.sun.identity.idsvcs.IdServicesException;
 import com.sun.identity.idsvcs.ObjectNotFound;
-import static org.mockito.BDDMockito.*;
-import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
 public class IdentityServicesExceptionMappingHandlerTest {
@@ -59,7 +60,7 @@ public class IdentityServicesExceptionMappingHandlerTest {
     public void knownErrorReturns() {
         //given
         IdRepoException mockException = mock(IdRepoException.class);
-        given(mockException.getErrorCode()).willReturn(String.valueOf(IdentityServicesException.UNKNOWN_OBJECT_NOT_FOUND));
+        given(mockException.getErrorCode()).willReturn(String.valueOf(IdentityServicesException.GENERAL_OBJECT_NOT_FOUND));
 
         //when
         IdServicesException exp = handler.handleError(mockException);

@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.errors;
 
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idsvcs.IdServicesException;
 import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.Request;
 
@@ -27,6 +29,27 @@ import org.forgerock.json.resource.Request;
 public interface ExceptionMappingHandler<E extends Exception, R extends Exception> {
 
     /**
+     * Converts an exception into an appropriate resource exception, with debug logging.
+     *
+     * @param context the server context from which to read the preferred language.
+     * @param debug a debug message to store.
+     * @param request the request that failed with an error.
+     * @param error the error that occurred.
+     * @return an appropriate exception.
+     */
+    R handleError(Context context, String debug, Request request, E error);
+
+    /**
+     * Converts an exception into an appropriate resource exception, with debug logging.
+     *
+     * @param debug a debug message to store.
+     * @param request the request that failed with an error.
+     * @param error the error that occurred.
+     * @return an appropriate exception.
+     */
+    R handleError(String debug, Request request, E error);
+
+    /**
      * Converts an exception into an appropriate resource exception.
      *
      * @param context the server context from which to read the preferred language.
@@ -35,6 +58,15 @@ public interface ExceptionMappingHandler<E extends Exception, R extends Exceptio
      * @return an appropriate exception.
      */
     R handleError(Context context, Request request, E error);
+
+    /**
+     * Converts an exception into an appropriate resource exception.
+     *
+     * @param request the request that failed with an error.
+     * @param error the error that occurred.
+     * @return an appropriate exception.
+     */
+    R handleError(Request request, E error);
 
     /**
      * Converts an exception into an appropriate resource exception.

@@ -17,6 +17,7 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.shared.debug.Debug;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.util.Reject;
 
@@ -43,6 +45,9 @@ public final class EntitlementsExceptionMappingHandler
         implements ExceptionMappingHandler<EntitlementException, ResourceException> {
     public static final String RESOURCE_ERROR_MAPPING = "EntitlementsResourceErrorMapping";
     public static final String REQUEST_TYPE_ERROR_OVERRIDES = "EntitlementsResourceRequestTypeErrorOverrides";
+    public static final String DEBUG_TYPE_OVERRIDES = "EntitlementResourceErrorDebug";
+
+    private static final Debug DEBUG = Debug.getInstance("amPolicy");
 
     /**
      * Mapping from EntitlementException error codes to ResourceException error codes.
@@ -63,6 +68,11 @@ public final class EntitlementsExceptionMappingHandler
     private final Map<RequestType, Map<Integer, Integer>> errorCodeOverrides;
 
     /**
+     * Maps requests that don't need debug information to be attached to them using the default debug format.
+     */
+    private final Map<Integer, Integer> errorDebugMap;
+
+    /**
      * Constructs the error resource handler with the given mapping from EntitlementException error codes to
      * ResourceException error codes, and the given map of overrides of ResourceException error codes for particular
      * request types.
@@ -74,10 +84,13 @@ public final class EntitlementsExceptionMappingHandler
     @Inject
     public EntitlementsExceptionMappingHandler(
             @Named(RESOURCE_ERROR_MAPPING) Map<Integer, Integer> errorCodeMapping,
-            @Named(REQUEST_TYPE_ERROR_OVERRIDES) Map<RequestType, Map<Integer, Integer>> errorCodeOverrides) {
+            @Named(REQUEST_TYPE_ERROR_OVERRIDES) Map<RequestType, Map<Integer, Integer>> errorCodeOverrides,
+            @Named(DEBUG_TYPE_OVERRIDES) Map<Integer, Integer> errorDebugMap) {
         Reject.ifNull(errorCodeMapping);
         Reject.ifNull(errorCodeOverrides);
+        Reject.ifNull(errorDebugMap);
 
+        this.errorDebugMap = new HashMap<Integer, Integer>(errorDebugMap);
         this.errorCodeMapping = new HashMap<Integer, Integer>(errorCodeMapping);
         this.errorCodeOverrides = new EnumMap<RequestType, Map<Integer, Integer>>(RequestType.class);
         this.errorCodeOverrides.putAll(errorCodeOverrides);
@@ -89,7 +102,8 @@ public final class EntitlementsExceptionMappingHandler
      * @param errorCodeMapping the mapping from EntitlementException error codes to ResourceException error codes.
      */
     public EntitlementsExceptionMappingHandler(Map<Integer, Integer> errorCodeMapping) {
-        this(errorCodeMapping, Collections.<RequestType, Map<Integer, Integer>>emptyMap());
+        this(errorCodeMapping, Collections.<RequestType, Map<Integer, Integer>>emptyMap(),
+                Collections.<Integer, Integer>emptyMap());
     }
 
     /**
@@ -103,12 +117,34 @@ public final class EntitlementsExceptionMappingHandler
      */
     @Override
     public ResourceException handleError(Context context, Request request, EntitlementException error) {
+        return handleError(context, null, request, error);
+    }
 
-        EntitlementException errorToHandle =  causeOf(error);
+    /**
+     * Constructs an appropriate {@link ResourceException} for the given request and entitlements exception. If no
+     * specific mapping is present for the error code in the exception, then an internal server error is reported. Will
+     * also write a debug entry - defaulting at the ERROR level. This level can be changed by mapping the
+     * appropriate resource error to the desired debug level.
+     *
+     * @param context the server context from which the language header can be read.
+     * @param msg the debug message to write.
+     * @param request the request that failed with an error.
+     * @param error the error that occurred.
+     * @return an appropriate resource error.
+     */
+    @Override
+    public ResourceException handleError(Context context, String msg, Request request, EntitlementException error) {
+
+        EntitlementException errorToHandle = causeOf(error);
 
         Integer resourceErrorType = errorCodeMapping.get(errorToHandle.getErrorCode());
         if (resourceErrorType == null) {
             resourceErrorType = ResourceException.INTERNAL_ERROR;
+        }
+
+        if (!StringUtils.isBlank(msg)) {
+            final Integer debugOverride = errorDebugMap.get(errorToHandle.getErrorCode());
+            debug(debugOverride, msg, error);
         }
 
         // Apply any request type specific overrides. E.g., NOT FOUND codes make no sense in Create requests.
@@ -122,9 +158,61 @@ public final class EntitlementsExceptionMappingHandler
         return ResourceException.getException(resourceErrorType, getLocalizedMessage(context, error), errorToHandle);
     }
 
+    /**
+     * Constructs an appropriate {@link ResourceException} for the given request and entitlements exception. If no
+     * specific mapping is present for the error code in the exception, then an internal server error is reported. Will
+     * also write a debug entry - defaulting at the ERROR level. This level can be changed by mapping the
+     * appropriate resource error to the desired debug level.
+     *
+     * @param request the request that failed with an error.
+     * @param error the error that occurred.
+     * @param msg the debug message to write.
+     * @return an appropriate resource error.
+     */
+    @Override
+    public ResourceException handleError(String msg, Request request, EntitlementException error) {
+        return handleError(null, msg, request, error);
+    }
+
+    /**
+     * Writes out the provided debug message to the indicates debug.
+     * @param debugOverride of the types Debug.ERROR, Debug.WARNING or Debug.MESSAGE.
+     * @param msg to write to the debug log.
+     * @param error the error triggering this debug message.
+     */
+    private void debug(Integer debugOverride, String msg, EntitlementException error) {
+
+        if (debugOverride == null) {
+            debugOverride = Debug.ERROR;
+        }
+
+        switch (debugOverride) {
+            case Debug.WARNING:
+                if (DEBUG.warningEnabled()) {
+                    DEBUG.warning(msg, error);
+                }
+                break;
+            case Debug.MESSAGE:
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message(msg); //no error in msg
+                }
+                break;
+            default:
+                if (DEBUG.errorEnabled()) {
+                    DEBUG.error(msg, error);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public ResourceException handleError(Request request, EntitlementException error) {
+        return handleError(null, null, request, error);
+    }
+
     @Override
     public ResourceException handleError(EntitlementException error) {
-        return handleError(null, null, error);
+        return handleError(null, error);
     }
 
     /**

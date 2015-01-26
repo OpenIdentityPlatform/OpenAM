@@ -1204,7 +1204,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
     }
 
     /**
-     * Maps a IdRepoException to appropriate exceptioin.
+     * Maps a IdRepoException to appropriate exception.
      *
      * @param exception IdRepoException that needs to be mapped
      * @return boolean true if the identity object was deleted.

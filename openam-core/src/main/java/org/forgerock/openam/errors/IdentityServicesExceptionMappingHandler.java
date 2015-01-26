@@ -21,9 +21,20 @@ import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.Request;
 
 /**
- * To convert from specific LDAP errors into a generic IdServicesError class.
+ * To convert from specific Identity Repo (e.g. LDAP) errors into a generic IdServicesError class.
  */
-public class IdentityServicesExceptionMappingHandler implements ExceptionMappingHandler<IdRepoException, IdServicesException> {
+public class IdentityServicesExceptionMappingHandler
+        implements ExceptionMappingHandler<IdRepoException, IdServicesException> {
+
+    @Override
+    public IdServicesException handleError(Context context, String debug, Request request, IdRepoException error) {
+        return handleError(error);
+    }
+
+    @Override
+    public IdServicesException handleError(String debug, Request request, IdRepoException error) {
+        return handleError(error);
+    }
 
     @Override
     public IdServicesException handleError(Context context, Request request, IdRepoException error) {
@@ -31,17 +42,27 @@ public class IdentityServicesExceptionMappingHandler implements ExceptionMapping
     }
 
     @Override
+    public IdServicesException handleError(Request request, IdRepoException error) {
+        return handleError(error);
+    }
+
+    @Override
     public IdServicesException handleError(IdRepoException error) {
 
-        int code = -1;
+        int code;
 
         try {
             code = Integer.valueOf(error.getLDAPErrorCode());
+
+            if (!IdentityServicesException.isMapped(code)) {
+                code = Integer.valueOf(error.getErrorCode()); //use more generic
+            }
+
         } catch (NumberFormatException nfe) {
             try {
-                code = Integer.valueOf(error.getErrorCode());
+                code = Integer.valueOf(error.getErrorCode()); //default to generic
             } catch (NumberFormatException nfe2) {
-                //left as -1
+                code = -1; //default to -1
             }
         }
 

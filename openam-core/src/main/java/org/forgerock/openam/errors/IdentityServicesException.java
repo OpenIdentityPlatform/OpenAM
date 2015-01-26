@@ -26,8 +26,8 @@ import com.sun.identity.idsvcs.ObjectNotFound;
 public class IdentityServicesException {
 
     //original errors from IdServices
-    public static final int UNKNOWN_ACCESS_DENIED = 403;
-    public static final int UNKNOWN_OBJECT_NOT_FOUND = 223;
+    public static final int GENERAL_ACCESS_DENIED = 402;
+    public static final int GENERAL_OBJECT_NOT_FOUND = 223;
 
     //original errors from LDAP
     public static final int LDAP_NOT_ALLOWED_ON_RDN = 67;
@@ -42,17 +42,16 @@ public class IdentityServicesException {
      */
     public static IdServicesException getIdentityServiceException(int code, String message) {
         switch (code) {
-
             case LDAP_NO_SUCH_OBJECT :
-                    return new ObjectNotFound("Object does not exist.");
+                return new ObjectNotFound("Object does not exist.");
 
             case LDAP_NOT_ALLOWED_ON_RDN :
-                    return new AccessDenied("Unable to set attributes for identity.");
+                return new AccessDenied("Unable to set attributes for identity.");
 
-            case UNKNOWN_ACCESS_DENIED:
+            case GENERAL_ACCESS_DENIED:
                 return new AccessDenied(message);
 
-            case UNKNOWN_OBJECT_NOT_FOUND:
+            case GENERAL_OBJECT_NOT_FOUND:
                 return new ObjectNotFound(message);
 
             default:
@@ -60,4 +59,13 @@ public class IdentityServicesException {
         }
     }
 
+    /**
+     * Returns true if we can specifically map this (non-general) error.
+     *
+     * @param code to check
+     * @return true if there's a mapping, false otherwise
+     */
+    public static boolean isMapped(int code) {
+        return code == LDAP_NOT_ALLOWED_ON_RDN || code == LDAP_NO_SUCH_OBJECT;
+    }
 }
