@@ -60,9 +60,9 @@ import java.util.ResourceBundle;
 public class DebugFileImpl implements DebugFile {
 
     //static
-    private static String debugPrefix;
+    private static String debugPrefix = "";
 
-    private static String debugSuffix;
+    private static String debugSuffix = "";
 
     private static int rotationInterval = -1;
 
@@ -178,11 +178,12 @@ public class DebugFileImpl implements DebugFile {
         newFileName.append(fileName);
 
         //Set suffix
-        synchronized (suffixDateFormat) {
-            if (suffixDateFormat != null && rotationInterval > 0) {
+        if (suffixDateFormat != null && rotationInterval > 0) {
+            synchronized (suffixDateFormat) {
                 newFileName.append(suffixDateFormat.format(new Date(clock.now())));
             }
         }
+
         return newFileName.toString();
     }
 
