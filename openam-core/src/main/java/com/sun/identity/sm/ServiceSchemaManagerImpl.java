@@ -24,10 +24,7 @@
  *
  * $Id: ServiceSchemaManagerImpl.java,v 1.8 2008/08/28 18:36:30 arviranga Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012-2013 ForgeRock AS
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -36,7 +33,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.common.DNUtils;
-import com.sun.identity.idm.IdConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.io.ByteArrayInputStream;
@@ -47,6 +43,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -597,73 +595,63 @@ public class ServiceSchemaManagerImpl implements SMSObjectListener {
     static ServiceSchemaManagerImpl getInstance(SSOToken t, String serviceName,
             String version) throws SMSException, SSOException {
         String cacheName = ServiceManager.getCacheIndex(serviceName, version);
-        ServiceSchemaManagerImpl ssmi = 
-            (ServiceSchemaManagerImpl) schemaManagers.get(cacheName);
+        ServiceSchemaManagerImpl ssmi = null;
 
-        Map listeners = null;
-        if (ssmi != null && !ssmi.isValid()) {
-            // CachedSMSEntry is not valid. Re-create this object
-            schemaManagers.remove(cacheName);
-            // registration to SMSNotificationManager should be removed
-            listeners = ssmi.clear(true);
-            ssmi = null;
+        Map<String, ServiceListener> listeners = null;
+        while (true) {
+            ssmi = schemaManagers.get(cacheName);
+            if (ssmi != null && !ssmi.isValid()) {
+                if (schemaManagers.remove(cacheName, ssmi)) {
+                    listeners = ssmi.clear(true);
+                }
+            } else {
+                break;
+            }
         }
+
         if (ssmi != null) {
             // Check if the entry needs to be updated
             if (!SMSEntry.cacheSMSEntries) {
                 // Read the entry, since it should not be cached
                 ssmi.smsEntry.refresh();
             }
-            return (ssmi);
+            return ssmi;
         }
 
-        synchronized (schemaManagers) {
-            // Check again, since it is now in synchronized block
-            ssmi = (ServiceSchemaManagerImpl) schemaManagers.get(cacheName);
-            if (ssmi == null || !ssmi.isValid()) {
-                // Instantiate and add to cache
-                ssmi = new ServiceSchemaManagerImpl(t, serviceName, version);
-                
+        // Instantiate and add to cache
+        ssmi = new ServiceSchemaManagerImpl(t, serviceName, version);
+
+        //Utilizing SSMI_LOCK here to ensure that listeners are only added to one new ssmi instance
+        synchronized (SSMI_LOCK) {
+            ServiceSchemaManagerImpl tmp = schemaManagers.get(cacheName);
+            if (tmp == null) {
                 //listeners that were registered to old ServiceSchemaManagerImpl 
                 //should be added back
                 //sundidentityrepositoryservice will add back new instance of 
                 //SpecialRepo itself so not adding old ones here.
                 if (listeners != null) {
-                    Iterator l = listeners.keySet().iterator();
-                    while (l.hasNext()) {
-                        String id = (String)l.next();
-                    	ServiceListener listener = (ServiceListener) listeners.get(id);
-                        ssmi.addListener(id, listener);
+                    for (Map.Entry<String, ServiceListener> entry : listeners.entrySet()) {
+                        ssmi.addListener(entry.getKey(), entry.getValue());
                     }
                 }
+
                 schemaManagers.put(cacheName, ssmi);
+            } else {
+                ssmi = tmp;
             }
         }
 
-        return (ssmi);
-    }
-
-    // Clears the cache
-    static void clearCache() {
-        synchronized (schemaManagers) {
-            // Mark the entries as invalid and return
-            for (Iterator items = schemaManagers.values().iterator();
-                items.hasNext();) {
-                ServiceSchemaManagerImpl ssmi = (ServiceSchemaManagerImpl)
-                    items.next();
-                ssmi.clear();
-            }
-            schemaManagers.clear();
-        }
+        return ssmi;
     }
 
     // Debug & I18n
     private static Debug debug = SMSEntry.debug;
 
     // Pointers to ServiceSchemaManager instances
-    public static Map schemaManagers = Collections.synchronizedMap(
-        new HashMap());
+    private static final ConcurrentMap<String, ServiceSchemaManagerImpl> schemaManagers =
+            new ConcurrentHashMap<String, ServiceSchemaManagerImpl>();
 
+    private static final Object SSMI_LOCK = new Object();
     private static final int DEFAULT_REVISION = 10;
 
     private static final int REVISION_ERROR = -1;
