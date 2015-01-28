@@ -24,14 +24,14 @@
  *
  * $Id: ConsumerRequest.java,v 1.3 2009/12/15 01:27:48 huacui Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
+ *
  */
 
 package com.sun.identity.oauth.service;
 
 import com.sun.identity.oauth.service.models.Consumer;
 import com.sun.identity.oauth.service.util.UniqueRandomString;
-import com.sun.jersey.oauth.signature.HMAC_SHA1;
-import com.sun.jersey.oauth.signature.RSA_SHA1;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -51,6 +51,11 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.WebApplicationException;
+import org.owasp.esapi.errors.EncodingException;
+import org.owasp.esapi.errors.IntrusionException;
+import org.owasp.esapi.Encoder;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.Validator;
 
 /**
  * REST Web Service
@@ -114,19 +119,27 @@ public class ConsumerRequest implements OAuthServiceConstants {
 
             Set<String> pnames = formParams.keySet();
             Iterator<String> iter = pnames.iterator();
+            Encoder enc = ESAPI.encoder();
+            Validator validator = ESAPI.validator();
             while (iter.hasNext()) {
                 String key = iter.next();
                 String val = formParams.getFirst(key);
                 if (key.equalsIgnoreCase(C_NAME)) {
+                    String consumerName = enc.canonicalize(val);
+                    if (!validator.isValidInput(C_NAME, consumerName, "HTTPParameterValue", 512, true)) {
+                        String resp = "Invalid name entered entered. Please try again.";
+                        return Response.ok().entity(resp)
+                                .type(MediaType.APPLICATION_FORM_URLENCODED).build();
+                    }
+
                     // Check if a consumer with the same name is already registered,
                     // if so, will not do the registration again.
-                    String consumerName = URLDecoder.decode(val);
                     Map<String, String> searchMap = new HashMap<String, String>();
                     searchMap.put(CONSUMER_NAME, consumerName);
                     List<Consumer> consumers= oauthResMgr.searchConsumers(searchMap);
                     if ((consumers != null) && (!consumers.isEmpty())) {
                         String resp = "A consumer is already registered with name "
-                                      + consumerName + ".";
+                                      + enc.encodeForHTML(consumerName) + ".";
                         return Response.ok().entity(resp)
                            .type(MediaType.APPLICATION_FORM_URLENCODED).build();
                     }
@@ -137,16 +150,22 @@ public class ConsumerRequest implements OAuthServiceConstants {
                     tmpsecret = URLDecoder.decode(val);
                 } else if (key.equalsIgnoreCase(C_KEY)) {
                     keyed = true;
+                    String consumerKey = enc.canonicalize(val);
+                    if (!validator.isValidInput(C_KEY, consumerKey, "HTTPParameterValue", 512, true)) {
+                        String resp = "Invalid key entered entered. Please try again.";
+                        return Response.ok().entity(resp)
+                                .type(MediaType.APPLICATION_FORM_URLENCODED).build();
+                    }
+
                     // Check if a consumer with the same key is already registered,
                     // if so, will not do the registration again.
-                    String consumerKey = URLDecoder.decode(val);
                     cons.setConsKey(consumerKey);
                     Map<String, String> searchMap = new HashMap<String, String>();
                     searchMap.put(CONSUMER_KEY, consumerKey);
                     List<Consumer> consumers= oauthResMgr.searchConsumers(searchMap);
                     if ((consumers != null) && (!consumers.isEmpty())) {
                         String resp = "A consumer is already registered with key "
-                                      + consumerKey + ".";
+                                      + enc.encodeForHTML(consumerKey) + ".";
                         return Response.ok().entity(resp)
                            .type(MediaType.APPLICATION_FORM_URLENCODED).build();
                     }
@@ -183,6 +202,12 @@ public class ConsumerRequest implements OAuthServiceConstants {
         } catch (OAuthServiceException e) {
             Logger.getLogger(ConsumerRequest.class.getName()).log(Level.SEVERE, null, e);
             throw new WebApplicationException(e);
+        } catch (IntrusionException e) {
+            Logger.getLogger(ConsumerRequest.class.getName()).log(Level.SEVERE, null, e);
+            throw new WebApplicationException(e);
+        } catch (EncodingException e) {
+            Logger.getLogger(ConsumerRequest.class.getName()).log(Level.SEVERE, null, e);
+            throw new WebApplicationException(e);
         }
-    }
+        }
 }

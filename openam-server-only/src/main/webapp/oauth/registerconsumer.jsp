@@ -24,12 +24,13 @@
 
    $Id: registerconsumer.jsp,v 1.2 2009/12/15 01:28:22 huacui Exp $
 
-   Portions Copyrighted 2014 ForgeRock AS
+   Portions Copyrighted 2014-2015 ForgeRock AS.
+
 --%>
 
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="com.sun.identity.common.HttpURLConnectionManager" %>
+<%@page contentType="text/html" pageEncoding="UTF-8" import="com.sun.identity.shared.debug.Debug,
+        com.sun.identity.common.HttpURLConnectionManager" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -41,6 +42,7 @@
     <body>
         <h1>Registering Service...</h1>
         <%
+            Debug oauthDebug = Debug.getInstance("amAuth");
             String name = request.getParameter("name");
             String cert = request.getParameter("cert");
             String protocol = request.getScheme();
@@ -62,7 +64,6 @@
                 java.io.DataOutputStream dos = new java.io.DataOutputStream(conn.getOutputStream());
                 String postmsg = "name=" + java.net.URLEncoder.encode(name);
                 if (cert != null) {
-                    //cert = cert.replaceAll("[\\r\\n]", "");
                     postmsg += "&certificate=" + java.net.URLEncoder.encode(cert);
                 }
                 dos.writeBytes(postmsg);
@@ -73,18 +74,24 @@
                         (java.io.InputStream) conn.getContent()));
                 out.println("<h2> Service Consumer registered.</h2>");
                 String line;
-                String buf = "";
+                StringBuilder buf = new StringBuilder();
+                buf.append("<div>");
                 while ((line = reader.readLine()) != null) {
-                    buf += line;
-                    }
-                java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(buf, "&");
+                    buf.append(line);
+                }
+                buf.append("</div>");
+                java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(buf.toString(), "&");
                 while (tokenizer.hasMoreTokens()) {
                     String token = tokenizer.nextToken();
                     out.println(java.net.URLDecoder.decode(token) + "<br>");
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace(new java.io.PrintWriter(out));
-                    }
+                }
+            } catch (Exception ex) {
+                if (oauthDebug.errorEnabled()) {
+                    oauthDebug.error("Unexpected error occurred while registering consumer", ex);
+                }
+                out.println("<div> Exception thrown during processing, see Authentication Debug Log for details.<br>" +
+                        "Please contact your system administrator. </div>");
+            }
         %>
         <hr><br>
         <form name="return_ind" action="index.jsp" method="GET">
