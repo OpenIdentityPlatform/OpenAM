@@ -24,10 +24,7 @@
  *
  * $Id: InternalSession.java,v 1.21 2009/03/20 21:05:25 weisun2 Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.iplanet.dpro.session.service;
 
@@ -1394,11 +1391,13 @@ public class InternalSession implements TaskRunnable, Serializable {
         return willExpireFlag;
     }
 
-    /** 
-     * Determine whether it is an application session
+    /**
+     * Determine whether it is an application session.
+     *
+     * @return <code>true</code> if this is an application session, <code>false</code> otherwise.
      */
     boolean isAppSession() {
-        return (sessionType == Session.APPLICATION_SESSION || !willExpireFlag);
+        return sessionType == Session.APPLICATION_SESSION;
     }
 
     /**

@@ -1468,13 +1468,13 @@ public class LoginState {
             } else {
                 debug.message("request: in putProperty stuff");
                 session.setClientID(userDN);
+                session.setType(Session.USER_SESSION);
                 session.setMaxSessionTime(maxSession);
                 session.setMaxIdleTime(idleTime);
                 session.setMaxCachingTime(cacheTime);
             }
             
             session.setClientDomain(getOrgDN());
-            session.setType(Session.USER_SESSION);
             if ((client = getClient()) != null) {
                 session.putProperty(ISAuthConstants.HOST, client);
             }
