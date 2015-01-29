@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -31,11 +31,12 @@
 define("org/forgerock/openam/ui/policy/GenericGridView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/util/DateUtil",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/components/Messages"
-], function (AbstractView, uiUtils, router, constants, eventManager, messages) {
+], function (AbstractView, uiUtils, dateUtil, router, constants, eventManager, messages) {
     var GenericGridView = AbstractView.extend({
         noBaseTemplate: true,
 
@@ -48,9 +49,10 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
         },
 
         render: function (options, callback) {
+            var self = this, storedItems, dateRangeFilter;
+
             this.element = options.element;
             this.template = options.tpl;
-
             this.gridId = options.gridId;
 
             this.data[this.gridId] = {};
@@ -58,8 +60,16 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
             this.actionsTpl = options.actionsTpl;
             this.storageKey = constants.OPENAM_STORAGE_KEY_PREFIX + options.storageKey;
 
-            var storedItems = JSON.parse(sessionStorage.getItem(this.storageKey));
+            storedItems = JSON.parse(sessionStorage.getItem(this.storageKey));
             this.selectedItems = storedItems ? storedItems : [];
+
+            dateRangeFilter = { groupOp: "AND", rules: [] };
+            dateRangeFilter.rules.push({ field: "creationDate", op: "gt", data: "" });
+            dateRangeFilter.rules.push({ field: "creationDate", op: "lt", data: "" });
+            dateRangeFilter.rules.push({ field: "lastModifiedDate", op: "gt", data: "" });
+            dateRangeFilter.rules.push({ field: "lastModifiedDate", op: "lt", data: "" });
+
+            $.extend(true, options.initOptions, { postData: { filters: JSON.stringify(dateRangeFilter)} });
 
             this.parentRender(function () {
                 this.actions = this.$el.find('.global-actions');
@@ -140,7 +150,43 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
         isCheckBoxCellSelected: function (e) {
             var $target = $(e.target);
             return $target.is(this.checkBox) || $target.find(this.checkBox).length !== 0;
+        },
+
+        datePicker: function(gridView, elem) {
+            var view = gridView;
+            $(elem).datepicker({onSelect: function(){
+                if (this.id.substr(0, 3) === "gs_") {
+                    // in case of searching toolbar
+                    view.grid[0].triggerToolbar();
+                } else {
+                    // refresh the filter in case of searching dialog
+                    $(this).trigger('change');
+                }
+            }});
+        },
+
+        serializeDataToFilter: function (postedData, colNames) {
+            var filter = '', filterDataToDate, nextDay;
+
+            _.each(colNames, function (element, index, list) {
+                if (postedData[element]) {
+                    if (filter.length > 0) {
+                        filter += ' AND ';
+                    }
+                    filterDataToDate = new Date(postedData[element]);
+                    if (dateUtil.isDateValid(filterDataToDate)) {
+                        nextDay = new Date( filterDataToDate.getTime() + 24 * 60 * 60 * 1000 );
+                        filter = filter.concat(element, ' gt ', filterDataToDate.getTime().toString(), ' AND ',  element, ' lt ', nextDay.getTime().toString());
+                    } else {
+                        filter = filter.concat(element, ' eq "*', postedData[element], '*"');
+                    }
+                }
+                delete postedData[element];
+            });
+
+            return filter;
         }
+
     });
 
     return GenericGridView;

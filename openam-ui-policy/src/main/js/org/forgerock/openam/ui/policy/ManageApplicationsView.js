@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -72,7 +72,8 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
             var self = this,
                 actionsFormatter = function (cellVal, options, rowObject) {
                     return uiUtils.fillTemplateWithData("templates/policy/ManageAppsGridCellActionsTemplate.html");
-                };
+                },
+                datePick = function(elem) { return self.appGridView.datePicker(self.appGridView, elem); };
 
             return {
                 url: '/' + constants.context + '/json' + this.subrealm + '/applications',
@@ -80,12 +81,12 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 colModel: [
                     {name: 'iconChB',           width: 40,  sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
                     {name: 'actions',           width: 65,  sortable: false, formatter: actionsFormatter, frozen: true, search: false, hidedlg: true},
-                    {name: 'name',              width: 262, frozen: true, hidedlg: true},
-                    {name: 'description',       width: 263, sortable: false},
+                    {name: 'name',              width: 262, frozen: true, hidedlg: true, searchoptions: {sopt: ['gt','lt','ge','le','eq']}},
+                    {name: 'description',       width: 263, sortable: false, searchoptions: {sopt: ['gt','lt','ge','le','eq']}},
                     {name: 'resources',         width: 263, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                     {name: 'createdBy',         width: 250, hidden: true},
-                    {name: 'creationDate',      width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false},
-                    {name: 'lastModifiedDate',  width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, search: false}
+                    {name: 'creationDate',      width: 150, index:'creationDate', formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, searchoptions: {searchhidden: true, dataInit: datePick, sopt: ['gt','lt','ge','le','eq']}},
+                    {name: 'lastModifiedDate',  width: 150, index:'lastModifiedDate', formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true, searchoptions: {searchhidden: true, dataInit: datePick,sopt: ['gt','lt','ge','le','eq']}}
                 ],
                 beforeSelectRow: function (rowId, e) {
                     var checkBoxCellSelected = self.appGridView.isCheckBoxCellSelected(e);
@@ -97,6 +98,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 onSelectRow: function (rowid, status, e) {
                     self.appGridView.onRowSelect(rowid, status, e);
                 },
+                search: true,
                 sortname: 'name',
                 width: 918,
                 shrinkToFit: false,
@@ -117,20 +119,8 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 storageKey: 'PE-mng-apps-sel-' + this.data.realm,
                 // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
                 serializeGridData: function (postedData) {
-                    var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name'),
-                        filter = '';
-
-                    _.each(colNames, function (element, index, list) {
-                        if (postedData[element]) {
-                            if (filter.length > 0) {
-                                filter += ' AND ';
-                            }
-                            filter = filter.concat(element, ' eq "*', postedData[element], '*"');
-                        }
-                        delete postedData[element];
-                    });
-
-                    return filter;
+                    var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name');
+                    return self.appGridView.serializeDataToFilter(postedData, colNames);
                 },
                 callback: function () {
                     self.appGridView.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {

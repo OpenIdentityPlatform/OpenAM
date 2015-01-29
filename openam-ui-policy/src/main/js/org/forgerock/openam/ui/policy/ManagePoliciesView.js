@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -92,7 +92,9 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         },
 
         getPolicyGridInitOptions: function () {
-            var self = this;
+            var self = this,
+                datePick = function(elem) { return self.policyGridView.datePicker(self.policyGridView, elem); };
+
             return {
                 url: '/' + constants.context + '/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/policies',
                 colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified', 'Actions', 'Resources', 'Resource Attributes', 'Subject'],
@@ -102,9 +104,9 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                     {name: 'name',           width: 285, frozen: true, hidedlg: true},
                     {name: 'description',    width: 285, hidden: true, sortable: false},
                     {name: 'createdBy',      width: 250, hidden: true},
-                    {name: 'creationDate',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                    {name: 'creationDate',   width: 150, index: 'creationDate', hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter, searchoptions: {searchhidden: true, dataInit: datePick, sopt: ['gt','lt','ge','le','eq']}},
                     {name: 'lastModifiedBy', width: 250, hidden: true},
-                    {name: 'lastModified',   width: 150, search: false, hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                    {name: 'lastModifiedDate',   width: 150, index: 'lastModifiedDate', hidden: true, formatter: uiUtils.commonJQGridFormatters.dateFormatter, searchoptions: {searchhidden: true, dataInit: datePick, sopt: ['gt','lt','ge','le','eq']}},
                     {name: 'actionValues',   width: 285, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
                     {name: 'resources',      width: 285, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                     {name: 'resourceAttributes', width: 285, sortable: false, hidden: true, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
@@ -128,6 +130,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                         console.log('loadError', xhr.responseText, status, error);
                     }
                 },
+                search: true,
                 sortname: 'name',
                 width: 915,
                 shrinkToFit: false,
@@ -190,20 +193,8 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 storageKey: 'PE-mng-pols-sel-' + this.data.appName,
                 // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
                 serializeGridData: function (postedData) {
-                    var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name'),
-                        filter = '';
-
-                    _.each(colNames, function (element, index, list) {
-                        if (postedData[element]) {
-                            if (filter.length > 0) {
-                                filter += ' AND ';
-                            }
-                            filter = filter.concat(element, ' eq "*', postedData[element], '*"');
-                        }
-                        delete postedData[element];
-                    });
-
-                    return filter;
+                    var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name');
+                    return self.policyGridView.serializeDataToFilter(postedData, colNames);
                 },
                 callback: function () {
                     self.policyGridView.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
