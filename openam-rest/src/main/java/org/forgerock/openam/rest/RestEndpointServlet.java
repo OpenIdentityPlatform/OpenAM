@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
@@ -61,7 +61,7 @@ public class RestEndpointServlet extends HttpServlet {
         this.restletXACMLServiceServlet = new RestletServiceServlet(this, XACMLServiceEndpointApplication.class,
                 "xacmlRestletServiceServlet");
         this.restletOAuth2ServiceServlet = new RestletServiceServlet(this, OAuth2ServiceEndpointApplication.class,
-                "xacmlRestletServiceServlet");
+                "oauth2RestletServiceServlet");
         this.endpointManager = InjectorHolder.getInstance(RestEndpointManager.class);
     }
 
