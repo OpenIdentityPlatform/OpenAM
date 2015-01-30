@@ -27,7 +27,7 @@
 */
 
 /*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm.server;
 
@@ -1752,7 +1752,7 @@ public class IdServicesImpl implements IdServices {
                // 220 is entry not found. this error should have lower
                // precedence than other error because we search thru
                // all the ds and this entry might exist in one of the other ds.
-               if (!ide.getErrorCode().equalsIgnoreCase("220")
+               if (!"220".equalsIgnoreCase(ide.getErrorCode())
                        || (origEx == null)) {
                    origEx = ide;
                }
