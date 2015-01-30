@@ -26,9 +26,8 @@
 
    $Id: AgentService.xml,v 1.87 2009/12/19 00:05:46 subbae Exp $
 
+   Portions Copyrighted 2011-2015 ForgeRock AS.
 -->
-
-<!-- Portions Copyrighted 2011-2013 ForgeRock AS -->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -38,8 +37,16 @@
     <Service name="AgentService" version="1.0">
         <Schema i18nFileName="agentService" revisionNumber="10">
             <Organization>
-
-	      <SubSchema name="OAuth2Client" inheritance="multiple" i18nKey="a7001">
+                <SubSchema name="OAuth2Client" inheritance="multiple" i18nKey="a7001">
+                    <AttributeSchema
+                        name="agentgroup"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                    <AttributeSchema
                             name="userpassword"
                             type="single"
@@ -411,6 +418,15 @@
           </SubSchema>
 
 	      <SubSchema name="WebAgent" inheritance="multiple">
+                    <AttributeSchema
+                        name="agentgroup"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema
                         name="userpassword"
                         type="single"
@@ -1515,6 +1531,15 @@
                     </AttributeSchema>
                 </SubSchema>
                 <SubSchema name="J2EEAgent" inheritance="multiple">
+                    <AttributeSchema
+                        name="agentgroup"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                      <AttributeSchema
                          name="userpassword"
                          type="single"
@@ -3045,6 +3070,15 @@
                 </SubSchema>
                 
                 <SubSchema name="WSCAgent" inheritance="multiple">
+                    <AttributeSchema
+                        name="agentgroup"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                      <AttributeSchema
                          name="userpassword"
                          type="single"
@@ -3431,6 +3465,15 @@
                 </SubSchema>
                 
                 <SubSchema name="WSPAgent" inheritance="multiple">
+                    <AttributeSchema
+                        name="agentgroup"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                      <AttributeSchema
                          name="userpassword"
                          type="single"
@@ -3842,6 +3885,15 @@
                 </SubSchema>
                 
                 <SubSchema name="STSAgent" inheritance="multiple">
+                    <AttributeSchema
+                        name="agentgroup"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                      <AttributeSchema
                          name="userpassword"
                          type="single"
