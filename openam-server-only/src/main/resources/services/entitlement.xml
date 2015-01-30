@@ -26,7 +26,7 @@
 
    $Id: entitlement.xml,v 1.9 2010/01/07 00:19:12 veiming Exp $
 
-   Portions copyright 2011-2014 ForgeRock AS.
+   Portions copyright 2011-2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -499,7 +499,7 @@
                             <Value>NOT</Value>
                             <Value>AMIdentityMembership</Value>
                             <Value>AuthLevel</Value>
-                            <Value>AuthLevelLE</Value>
+                            <Value>LEAuthLevel</Value>
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
@@ -544,7 +544,7 @@
                             <Value>NOT</Value>
                             <Value>AMIdentityMembership</Value>
                             <Value>AuthLevel</Value>
-                            <Value>AuthLevelLE</Value>
+                            <Value>LEAuthLevel</Value>
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
@@ -590,7 +590,7 @@
                             <Value>NOT</Value>
                             <Value>AMIdentityMembership</Value>
                             <Value>AuthLevel</Value>
-                            <Value>AuthLevelLE</Value>
+                            <Value>LEAuthLevel</Value>
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
@@ -635,7 +635,7 @@
                             <Value>NOT</Value>
                             <Value>AMIdentityMembership</Value>
                             <Value>AuthLevel</Value>
-                            <Value>AuthLevelLE</Value>
+                            <Value>LEAuthLevel</Value>
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
@@ -722,7 +722,7 @@
                             <Value>NOT</Value>
                             <Value>AMIdentityMembership</Value>
                             <Value>AuthLevel</Value>
-                            <Value>AuthLevelLE</Value>
+                            <Value>LEAuthLevel</Value>
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
@@ -770,7 +770,7 @@
                             <Value>NOT</Value>
                             <Value>AMIdentityMembership</Value>
                             <Value>AuthLevel</Value>
-                            <Value>AuthLevelLE</Value>
+                            <Value>LEAuthLevel</Value>
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
@@ -816,7 +816,7 @@
                             <Value>NOT</Value>
                             <Value>AMIdentityMembership</Value>
                             <Value>AuthLevel</Value>
-                            <Value>AuthLevelLE</Value>
+                            <Value>LEAuthLevel</Value>
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
@@ -862,7 +862,7 @@
                             <Value>NOT</Value>
                             <Value>AMIdentityMembership</Value>
                             <Value>AuthLevel</Value>
-                            <Value>AuthLevelLE</Value>
+                            <Value>LEAuthLevel</Value>
                             <Value>AuthScheme</Value>
                             <Value>AuthenticateToRealm</Value>
                             <Value>AuthenticateToService</Value>
