@@ -24,13 +24,12 @@
  *
  * $Id: AgentsRepo.java,v 1.46 2009/09/21 19:47:28 goodearth Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012-2014 ForgeRock Inc
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.idm.plugins.internal;
+
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -68,6 +67,7 @@ import com.sun.identity.idm.IdRepoUnsupportedOpException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.DNMapper;
@@ -93,7 +93,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
     private static final String version = "1.0";
     private static final String comma = ",";
     private static final String agentserviceName = IdConstants.AGENT_SERVICE;
-    private static final String agentGroupNode = "agentgroup";
+    private static final String AGENT_GROUP = "agentgroup";
     private static final String instancesNode = "ou=Instances,";
     private static final String hashAlgStr = "{SHA-1}";
     private static final String oauth2Attribute = "com.forgerock.openam.oauth2provider.clientType";
@@ -344,27 +344,22 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 }
                 aCfg = agentGroupConfig.getSubConfig(name);
                 if (aCfg != null) {
-                    // AgentGroup deletion should clear the group memberships
-                    // of the agents that belong to this group.
-                    // Get the members that belong to this group and their
-                    // config and set the labeledURI to an empty string.
-                    Set members = getMembers(token, type, name,
-                        IdType.AGENTONLY);
-                    Iterator it = members.iterator();
-                    ServiceConfig memberCfg = null;
-                    while (it.hasNext()) {
-                        String agent = (String) it.next();
+                    // AgentGroup deletion should clear the group memberships of the agents that belong to this group.
+                    // Get the members that belong to this group and their config and set the agentgroup attribute to
+                    // an empty string.
+                    Set<String> members = getMembers(token, type, name, IdType.AGENTONLY);
+                    ServiceConfig memberCfg;
+                    for (String agent : members) {
                         memberCfg = getOrgConfig(token).getSubConfig(agent);
-                        if (memberCfg !=null) {
-                             memberCfg.deleteLabeledUri(name);
+                        if (memberCfg != null) {
+                            memberCfg.removeAttribute(AGENT_GROUP);
                         }
                     }
                     agentGroupConfig.removeSubConfig(name);
                 } else {
                     // Agent not found, throw an exception
                     Object args[] = { name, type.getName() };
-                    throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                            "223", args));
+                    throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "223", args);
                 }
             }
         } catch (SMSException smse) {
@@ -589,19 +584,15 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         }
         if (type.equals(IdType.AGENTGROUP)) {
             try {
-                // Search and get the serviceconfig of the agents and get
-                // the value of the attribute 'labeledURI' and if the agent
-                // belongs to the agentgroup, add the agent/member to the 
-                // result set. 
+                // Search and get the serviceconfig of the agents and get the value of the attribute 'agentgroup' and
+                // if the agent belongs to the agentgroup, add the agent/member to the result set.
                 ServiceConfig orgConfig = getOrgConfig(token);
-                for (Iterator items = orgConfig.getSubConfigNames()
-                    .iterator(); items.hasNext();) {
-                    String agent = (String) items.next();
-                    ServiceConfig aCfg = null;
-                    aCfg = orgConfig.getSubConfig(agent);
-                    if (aCfg !=null) {
-                        String lUri = aCfg.getLabeledUri();
-                        if ((lUri != null) && lUri.equalsIgnoreCase(name)) {
+                for (String agent : orgConfig.getSubConfigNames()) {
+                    ServiceConfig agentConfig;
+                    agentConfig = orgConfig.getSubConfig(agent);
+                    if (agentConfig != null) {
+                        String group = CollectionHelper.getMapAttr(agentConfig.getAttributes(), AGENT_GROUP);
+                        if (name.equalsIgnoreCase(group)) {
                             results.add(agent);
                         }
                     }
@@ -660,10 +651,8 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         Set results = new HashSet();
         if (membershipType.equals(IdType.AGENTGROUP)) {
             try {
-                // Search and get the serviceconfig of the agent and get
-                // the value of the attribute 'labeledURI' and if the agent
-                // belongs to the agentgroup, add the agentgroup to the 
-                // result set. 
+                // Search and get the serviceconfig of the agent and get the value of the 'agentgroup' attribute and
+                // if the agent belongs to the agentgroup, add the agentgroup to the result set.
                 ServiceConfig orgConfig = getOrgConfig(token);
                 results = getGroupNames(orgConfig, name);
             } catch (SMSException sme) {
@@ -684,21 +673,18 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         return (results);
     }
 
-    private String getGroupName(ServiceConfig orgConfig, String agentName)
-        throws SSOException, SMSException {
-        Set groups = getGroupNames(orgConfig, agentName);
-        return ((groups != null) && !groups.isEmpty()) ? 
-            (String)groups.iterator().next() : null;
+    private String getGroupName(ServiceConfig orgConfig, String agentName) throws SSOException, SMSException {
+        Set<String> groups = getGroupNames(orgConfig, agentName);
+        return (groups != null && !groups.isEmpty()) ? groups.iterator().next() : null;
     }
     
-    private Set getGroupNames(ServiceConfig orgConfig, String agentName)
-        throws SSOException, SMSException {
-        Set results = new HashSet(2);
-        ServiceConfig aCfg = orgConfig.getSubConfig(agentName);
-        if (aCfg !=null) {
-            String lUri = aCfg.getLabeledUri();
-            if ((lUri != null) && (lUri.length() > 0)) {
-                results.add(lUri);
+    private Set<String> getGroupNames(ServiceConfig orgConfig, String agentName) throws SSOException, SMSException {
+        Set<String> results = new HashSet<String>(2);
+        ServiceConfig agentConfig = orgConfig.getSubConfig(agentName);
+        if (agentConfig != null) {
+            String groupName = CollectionHelper.getMapAttr(agentConfig.getAttributes(), AGENT_GROUP);
+            if (groupName != null && !groupName.isEmpty()) {
+                results.add(groupName);
             }
         }
         return results;
@@ -771,10 +757,8 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
      *      com.sun.identity.idm.IdType, java.lang.String, java.util.Set,
      *      com.sun.identity.idm.IdType, int)
      */
-    public void modifyMemberShip(SSOToken token, IdType type, String name,
-            Set members, IdType membersType, int operation)
-            throws IdRepoException, SSOException {
-
+    public void modifyMemberShip(SSOToken token, IdType type, String name, Set<String> members, IdType membersType,
+            int operation) throws IdRepoException, SSOException {
         /*
          * name would be the name of the agentgroup.
          * members would include the name of the agents to be added/removed 
@@ -783,68 +767,60 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
          * type would be the IdType of the agentgroup.
          */
 
-         if (debug.messageEnabled()) {
-             debug.message("AgentsRepo: modifyMemberShip called " + type + ": "
-                    + name + ": " + members + ": " + membersType);
-         }
-         if (initializationException != null) {
-             debug.error("AgentsRepo.modifyMemberShip: "
-                 + "Realm " + realmName + " does not exist.");
-             throw (initializationException);
-         }
-         if (members == null || members.isEmpty()) {
-             debug.error("AgentsRepo.modifyMemberShip: Members set is empty");
-             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
-         }
-         if (type.equals(IdType.USER) || type.equals(IdType.AGENT)) {
-             debug.error("AgentsRepo.modifyMembership: Membership to users "
-                 + "and agents is not supported");
-             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "203", null);
-         }
-         if (!membersType.equals(IdType.AGENTONLY)) {
-             debug.error("AgentsRepo.modifyMembership: A non-agent type"
-                 + " cannot be made a member of any identity"
+        if (debug.messageEnabled()) {
+            debug.message("AgentsRepo: modifyMemberShip called " + type + ": " + name + ": "
+                    + members + ": " + membersType);
+        }
+        if (initializationException != null) {
+            debug.error("AgentsRepo.modifyMemberShip: Realm " + realmName + " does not exist.");
+            throw initializationException;
+        }
+        if (members == null || members.isEmpty()) {
+            debug.error("AgentsRepo.modifyMemberShip: Members set is empty");
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "201", null);
+        }
+        if (type.equals(IdType.USER) || type.equals(IdType.AGENT)) {
+            debug.error("AgentsRepo.modifyMembership: Membership to users and agents is not supported");
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "203", null);
+        }
+        if (!membersType.equals(IdType.AGENTONLY)) {
+            debug.error("AgentsRepo.modifyMembership: A non-agent type cannot be made a member of any identity "
                     + membersType.getName());
-             Object[] args = { NAME };
-             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "206", args);
-         }
-         if (type.equals(IdType.AGENTGROUP)) {
-             try {
-                 // Search and get the serviceconfig of the agent and set 
-                 // the 'labeledURI' with the value of the agentgroup name 
-                 // eg., 'AgentGroup1'.
-                 // One agent instance should belong to at most one group.
+            Object[] args = {NAME};
+            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "206", args);
+        }
 
-                 ServiceConfig orgConfig = getOrgConfig(token);
-                 Iterator it = members.iterator();
-                 ServiceConfig aCfg = null;
-                 while (it.hasNext()) {
-                     String agent = (String) it.next();
-                     aCfg = orgConfig.getSubConfig(agent);
-                     if (aCfg !=null) {
-                         switch (operation) {
-                         case ADDMEMBER:
-                             aCfg.setLabeledUri(name);
-                             break;
-                         case REMOVEMEMBER:
-                             aCfg.deleteLabeledUri(name);
-                             break;
-                         }
-                     }
-                 }
+        if (type.equals(IdType.AGENTGROUP)) {
+            try {
+                // Search and get the serviceconfig of the agent and set the agentgroup attribute with the value of
+                // the agentgroup name eg., 'AgentGroup1'. One agent instance should belong to at most one group.
+                ServiceConfig orgConfig = getOrgConfig(token);
+                ServiceConfig agentConfig;
+                for (String agent : members) {
+                    agentConfig = orgConfig.getSubConfig(agent);
+                    if (agentConfig != null) {
+                        switch (operation) {
+                            case ADDMEMBER:
+                                Map<String, Set<String>> agentGroup = new HashMap<String, Set<String>>(1);
+                                agentGroup.put(AGENT_GROUP, asSet(name));
+                                agentConfig.setAttributes(agentGroup);
+                                break;
+                            case REMOVEMEMBER:
+                                agentConfig.removeAttribute(AGENT_GROUP);
+                                break;
+                        }
+                    }
+                }
             } catch (SMSException sme) {
-                debug.error("AgentsRepo.modifyMembership: Caught "
-                        + "exception while " + " adding/removing agents"
-                        + " to groups", sme);
-                Object args[] = { NAME, type.getName(), name };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "212", 
-                    args);
+                debug.error("AgentsRepo.modifyMembership: Caught exception while adding/removing agents to groups",
+                        sme);
+                Object args[] = {NAME, type.getName(), name};
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "212", args);
             }
         } else {
             // throw an exception
-            debug.error("AgentsRepo.modifyMembership: Memberships cannot be"
-                    + "modified for type= " + type.getName());
-            Object[] args = { NAME, type.getName() };
+            debug.error("AgentsRepo.modifyMembership: Memberships cannot be modified for type= " + type.getName());
+            Object[] args = {NAME, type.getName()};
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "209", args);
         }
     }
@@ -1500,7 +1476,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             // Always get from ServiceConfigManager which checks the cache
             // and returns latest values stored in cache.
             agentGroupConfigCache = 
-                scm.getOrganizationConfig(realmName, agentGroupNode);
+                scm.getOrganizationConfig(realmName, AGENT_GROUP);
                         
         } catch (SMSException smse) {
             if (debug.warningEnabled()) {
@@ -1527,17 +1503,17 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 scm = new ServiceConfigManager(token, agentserviceName, 
                     version);
             }
-            String agentGroupDN = constructDN(agentGroupNode, 
+            String agentGroupDN = constructDN(AGENT_GROUP,
                 instancesNode, realmName, version, agentserviceName);
             ServiceConfig orgConfig = getOrgConfig(token);
             if (orgConfig != null) {
                 orgConfig.checkAndCreateGroup(agentGroupDN, 
-                    agentGroupNode);
+                    AGENT_GROUP);
             }
             // Always get from ServiceConfigManager which checks the cache
             // and returns latest values stored in cache.
             agentGroupConfigCache = 
-                scm.getOrganizationConfig(realmName, agentGroupNode);
+                scm.getOrganizationConfig(realmName, AGENT_GROUP);
                         
         } catch (SMSException smse) {
             if (debug.warningEnabled()) {

@@ -24,10 +24,7 @@
  *
  * $Id: ServiceConfig.java,v 1.18 2009/01/28 05:35:03 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.sm;
@@ -152,6 +149,7 @@ public class ServiceConfig {
      * Returns the labeled uri assigned to the service configuration.
      * 
      * @return the labeled uri assigned to the service configuration
+     * @deprecated The labeledURI setting shall not be used for storing configuration data.
      */
     public String getLabeledUri() {
         validate();
@@ -166,6 +164,7 @@ public class ServiceConfig {
      *             if there is an error occurred while performing the operation
      * @throws SSOException
      *             if the user's single sign-on is invalid or expired
+     * @deprecated The labeledURI setting shall not be used for storing configuration data.
      */
     public void setLabeledUri(String luri) throws SSOException, SMSException {
         validateServiceConfigImpl();
@@ -184,6 +183,7 @@ public class ServiceConfig {
      *             if there is an error occurred while performing the operation
      * @throws SSOException
      *             if the user's single sign-on is invalid or expired
+     * @deprecated The labeledURI setting shall not be used for storing configuration data.
      */
     public void deleteLabeledUri(String luri) throws SSOException, SMSException {
         validateServiceConfigImpl();
@@ -200,10 +200,10 @@ public class ServiceConfig {
      * @throws SMSException
      *             if there is an error accessing the data store
      */
-    public Set getSubConfigNames() throws SMSException {
+    public Set<String> getSubConfigNames() throws SMSException {
         validateServiceConfigImpl();
         try {
-            return (sc.getSubConfigNames(token));
+            return sc.getSubConfigNames(token);
         } catch (SSOException s) {
             SMSEntry.debug.error("ServiceConfig: Unable to "
                     + "get subConfig Names", s);
@@ -944,7 +944,7 @@ public class ServiceConfig {
     private void validateServiceConfigImpl() throws SMSException {
         if (!sc.isValid()) {
             throw (new SMSException("service-config: " + sc.getDN() +
-                " No loger valid. Cache has been cleared. Recreate from" +
+                " No longer valid. Cache has been cleared. Recreate from" +
                 "ServiceConfigManager"));
         }
     }
