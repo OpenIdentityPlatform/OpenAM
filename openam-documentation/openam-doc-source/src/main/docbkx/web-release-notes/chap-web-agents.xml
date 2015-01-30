@@ -52,8 +52,31 @@
   <title>New in Web Policy Agents ${agentsDocTargetVersion}</title>
 
   <para>
-   No new features have been added since the release of 3.3.0.
+   The following new settings have been added to this release:
   </para>
+  <itemizedlist>
+   <listitem>
+    <para><emphasis role="bold">OPENAM-4265</emphasis>.
+     Improved IIS site support.
+     If the agent module is enabled for a site that does not have a corresponding
+     <literal>Instance_{siteid}</literal> directory, the request will not be interrupted
+     by the agent and will continue to other IIS modules, including <literal>.net</literal>.
+     For more information, see
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4265" xlink:show="new">OPENAM-4265</link>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para><emphasis role="bold">OPENAM-4888</emphasis>.
+     Introduces one new setting in
+     the bootstrap file: <literal>com.forgerock.agents.nss.shutdown = on | off</literal>.
+     Default is <literal>on</literal> (not set) and indicates that the agent tries
+     to close NSS connections.
+     For more information, see
+     <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4888" xlink:show="new">OPENAM-4888</link>.
+    </para>
+   </listitem>
+  </itemizedlist>
  </section>
 
  <section xml:id="product-documentation">
@@ -94,12 +117,6 @@
 
   <para>This section covers software and hardware prerequisites for installing
   and running OpenAM web policy agents.</para>
-
-  <note>
-   <para>
-    The content of this section has not changed since the 3.3.0 release.
-   </para>
-  </note>
 
   <section xml:id="java-requirements-web-agents">
    <title>Web Agents Java Requirements</title>
@@ -334,11 +351,57 @@
     <title>Important Changes to Web Policy Agent Functionality</title>
 
     <itemizedlist>
-
      <para>
-      This change is new in OpenAM web policy agents 3.3.3.
+      The following changes are new in OpenAM Web Policy Agents ${agentsDocTargetVersion}.
      </para>
+     <listitem>
+      <para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4265" xlink:show="new">OPENAM-4265</link>
+       introduces improved IIS site support.
+       If the agent module is enabled for a site that does not have a corresponding
+       <literal>Instance_{siteid}</literal> directory, the request will not be interrupted
+       by the agent and will continue to other IIS modules, including <literal>.net</literal>.
+      </para>
+      <para>
+       This change however does not add support for multiple sites and/or multiple
+       processes in IIS. We only support one configuration/site per agent dll (instance).
+       Also, directories should be removed from the <literal>web_agents</literal>
+       directory.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4629" xlink:show="new">OPENAM-4629</link>
+       introduces two net settings. The first is
+       <literal>com.forgerock.agents.init.retry.wait</literal>, which
+       sets the wait time (in seconds) between retries.
+       Default (not set) value is 0.
+      </para>
+      <para>
+       The second setting is
+       <literal>com.forgerock.agents.init.retry.wait</literal>, which
+       sets the wait time (in seconds) between retries.
+       Default (not set) value is 0.
+      </para>
+      <para>
+       If <literal>Hot-Swap Enabled = no</literal>, then
+       both properties have no value.
+      </para>
+      </listitem>
+      <listitem>
+       <para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4888" xlink:show="new">OPENAM-4888</link>
+        introduces one new setting in
+        the bootstrap file: <literal>com.forgerock.agents.nss.shutdown = on | off</literal>.
+        Default is <literal>on</literal> (not set) and indicates that the agent tries
+        to close NSS connections.
+       </para>
+      </listitem>
+    </itemizedlist>
 
+
+    <itemizedlist>
+     <para>
+      The following change was listed in OpenAM Web Policy Agents 3.3.3.
+     </para>
      <listitem>
       <para>
        On Linux, library requirements have changed.
@@ -359,7 +422,7 @@
     <itemizedlist>
 
      <para>
-      These changes are new in OpenAM web policy agents 3.3.1 and later.
+      The following changes were listed in OpenAM web policy agents 3.3.1 and later.
      </para>
 
      <listitem>
@@ -465,7 +528,7 @@
 
     <itemizedlist>
      <para>
-      These changes were listed for OpenAM Web Policy Agents 3.3.0.
+      The following changes were listed for OpenAM Web Policy Agents 3.3.0.
      </para>
 
      <listitem>
@@ -530,7 +593,7 @@
 
      <listitem>
       <para>Web policy agent support for Oracle iPlanet Web Proxy Server
-      (formerly Sun Java System Web Sun Proxy Server) is no longer provided
+      (formerly Sun Java System Web Proxy Server) is no longer provided
       in this release.</para>
      </listitem>
     </itemizedlist>
