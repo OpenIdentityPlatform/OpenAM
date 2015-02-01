@@ -24,10 +24,7 @@
  *
  * $Id: ServiceSchemaManager.java,v 1.12 2009/07/25 05:11:55 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -807,6 +804,21 @@ public class ServiceSchemaManager {
         validate();
         return (new PluginSchema(token, serviceName, version, pluginSchemaName,
             interfaceName, orgName));
+    }
+
+    /**
+     * Returns true if admin token  cached within this class is valid
+     *
+     * @return true is admin token is valid
+     */
+    public boolean isSSOTokenValid() {
+        try {
+            SMSEntry.validateToken(token);
+            return true;
+        } catch (SMSException smse) {
+            debug.warning("ServiceSchemaManager: token is not valid.", smse);
+        }
+        return false;
     }
     
     // -----------------------------------------------------------

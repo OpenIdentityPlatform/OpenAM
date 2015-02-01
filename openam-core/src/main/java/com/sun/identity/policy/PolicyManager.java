@@ -24,7 +24,7 @@
  *
  * $Id: PolicyManager.java,v 1.19 2010/01/25 23:48:15 veiming Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.policy;
 
@@ -1170,7 +1170,7 @@ public final class PolicyManager {
      * Gets plugins schemas for a given interface name
      */
     static Set getPluginSchemaNames(String interfaceName) {
-        if (ssm == null) {
+        if (ssm == null || !ssm.isSSOTokenValid()) {
             try {
                 ssm = new ServiceSchemaManager(
                     PolicyManager.POLICY_SERVICE_NAME,
