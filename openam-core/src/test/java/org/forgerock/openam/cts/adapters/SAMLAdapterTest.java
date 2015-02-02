@@ -15,6 +15,11 @@
  */
 package org.forgerock.openam.cts.adapters;
 
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.mock;
+import static org.mockito.Matchers.*;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.openam.cts.TokenTestUtils;
 import org.forgerock.openam.tokens.TokenType;
@@ -30,11 +35,6 @@ import org.testng.annotations.Test;
 
 import java.util.Calendar;
 
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.*;
-
 public class SAMLAdapterTest {
 
     private JSONSerialisation serialisation;
@@ -48,7 +48,7 @@ public class SAMLAdapterTest {
         serialisation = mock(JSONSerialisation.class);
         tokenIdFactory = mock(TokenIdFactory.class);
         blobUtils = mock(TokenBlobUtils.class);
-        encoding = mock(KeyConversion.class);
+        encoding = new KeyConversion();
 
         adapter = new SAMLAdapter(tokenIdFactory, serialisation, blobUtils);
     }
@@ -63,7 +63,7 @@ public class SAMLAdapterTest {
                 new JSONSerialisation(new ObjectMapper()),
                 new TokenBlobUtils());
 
-        String tokenId = "badger";
+        String tokenId = encoding.encodeKey("badger");
         Token token = new Token(tokenId, TokenType.SAML2);
 
         // SAML tokens only store time to seconds resolution
@@ -76,13 +76,9 @@ public class SAMLAdapterTest {
         token.setBlob(serialisation.serialise(blob).getBytes());
         token.setAttribute(SAMLTokenField.OBJECT_CLASS.getField(), String.class.getName());
 
-        // SAML mocking for primary key
-        given(encoding.encodeKey(eq(tokenId))).willReturn(tokenId);
-
         // SAML detail for secondary key
-        String secondaryKey = "weasel";
+        String secondaryKey = encoding.encodeKey("weasel");
         token.setAttribute(SAMLTokenField.SECONDARY_KEY.getField(), secondaryKey);
-        given(encoding.encodeKey(eq(secondaryKey))).willReturn(secondaryKey);
 
         // When
         Token result = adapter.toToken(adapter.fromToken(token));

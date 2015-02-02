@@ -1,4 +1,3 @@
-
 /*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -33,8 +32,6 @@ import java.util.Calendar;
 /**
  * TokenAdapter for SAML tokens. SAML tokens in particular have no specific hierarchy so the SAMLToken
  * class exists to simplify this problem.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class SAMLAdapter implements TokenAdapter<SAMLToken> {
 
@@ -126,7 +123,12 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
         // Secondary Key
         String secondaryKey = token.getValue(SAMLTokenField.SECONDARY_KEY.getField());
 
-        SAMLToken samlToken = new SAMLToken(token.getTokenId(), secondaryKey, expiryTime, blob);
+        String primaryKey = tokenIdFactory.fromSAMLPrimaryTokenId(token.getTokenId());
+        if (secondaryKey != null && !secondaryKey.isEmpty()) {
+            secondaryKey = tokenIdFactory.fromSAMLSecondaryTokenId(secondaryKey);
+        }
+
+        SAMLToken samlToken = new SAMLToken(primaryKey, secondaryKey, expiryTime, blob);
 
         return samlToken;
     }

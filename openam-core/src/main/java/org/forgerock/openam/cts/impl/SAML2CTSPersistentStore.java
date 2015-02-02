@@ -13,7 +13,6 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.cts.impl;
 
 import com.google.inject.Inject;
@@ -24,19 +23,17 @@ import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.SAMLTokenField;
 import org.forgerock.openam.cts.api.tokens.SAMLToken;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class is used in SAML2 failover mode to store/recover serialized
@@ -51,6 +48,7 @@ public class SAML2CTSPersistentStore implements SAML2TokenRepository {
     // Injected via Guice
     private final CTSPersistentStore persistentStore;
     private final TokenAdapter<SAMLToken> tokenAdapter;
+    private final TokenIdFactory tokenIdFactory;
     private final Debug debug;
 
 
@@ -58,18 +56,20 @@ public class SAML2CTSPersistentStore implements SAML2TokenRepository {
      * Constructs new SAML2CTSPersistentStore,
      * @param persistentStore The CTSPersistentStore implementation to use
      * @param tokenAdapter The SAML2 TokenAdapter implementation to use
+     * @param tokenIdFactory The TokenIdFactory implementation to use.
      * @param debug The Debug instance to use
      */
     @Inject
     public SAML2CTSPersistentStore(CTSPersistentStore persistentStore, TokenAdapter<SAMLToken> tokenAdapter,
-                                   @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
-
+            TokenIdFactory tokenIdFactory, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         this.persistentStore = persistentStore;
         this.tokenAdapter = tokenAdapter;
+        this.tokenIdFactory = tokenIdFactory;
         this.debug = debug;
         if (debug.messageEnabled()) {
             debug.message("SAML2CTSPersistentStore instance created using persistentStore:"
-                    + persistentStore.getClass().getName() + " and tokenAdapter:" + tokenAdapter.getClass().getName());
+                    + persistentStore.getClass().getName() + ", tokenAdapter:" + tokenAdapter.getClass().getName()
+                    + " and tokenIdFactory: " + tokenIdFactory.getClass().getName());
         }
     }
 
@@ -78,6 +78,7 @@ public class SAML2CTSPersistentStore implements SAML2TokenRepository {
      */
     @Override
     public Object retrieveSAML2Token(String primaryKey) throws SAML2TokenRepositoryException {
+        primaryKey = tokenIdFactory.toSAMLPrimaryTokenId(primaryKey);
 
         try {
             // Retrieve the SAML2 Token from the Repository using the primary key.
@@ -100,12 +101,9 @@ public class SAML2CTSPersistentStore implements SAML2TokenRepository {
      */
     @Override
     public List<Object> retrieveSAML2TokensWithSecondaryKey(String secondaryKey) throws SAML2TokenRepositoryException {
+        secondaryKey = tokenIdFactory.toSAMLSecondaryTokenId(secondaryKey);
 
         try {
-            // Perform a query against the token store with the secondary key.
-            Map<CoreTokenField, Object> queryMap = new EnumMap<CoreTokenField, Object>(CoreTokenField.class);
-            queryMap.put(SAMLTokenField.SECONDARY_KEY.getField(), secondaryKey);
-
             TokenFilter filter = new TokenFilterBuilder()
                     .withAttribute(SAMLTokenField.SECONDARY_KEY.getField(), secondaryKey)
                     .build();
@@ -129,6 +127,7 @@ public class SAML2CTSPersistentStore implements SAML2TokenRepository {
      */
     @Override
     public void deleteSAML2Token(String primaryKey) throws SAML2TokenRepositoryException {
+        primaryKey = tokenIdFactory.toSAMLPrimaryTokenId(primaryKey);
 
         try {
             persistentStore.delete(primaryKey);
