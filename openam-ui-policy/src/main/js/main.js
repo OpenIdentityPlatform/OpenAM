@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -33,7 +33,7 @@ require.config({
         js2form:        "libs/js2form-2.0",
         form2js:        "libs/form2js-2.0",
         spin:           "libs/spin-2.0.1-min",
-        jquery:         "libs/jquery-1.11.1-min",
+        jquery:         "libs/jquery-2.1.1-min",
         xdate:          "libs/xdate-0.8-min",
         sortable:       "libs/jquery-nestingSortable-0.9.12",
         doTimeout:      "libs/jquery.ba-dotimeout-1.0-min",

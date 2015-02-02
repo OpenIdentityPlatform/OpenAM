@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,7 +27,7 @@
 require.config({
     paths: {
         sinon: "../test/libs/sinon-1.10.3",
-        jquery: "libs/jquery-1.11.1-min",
+        jquery: "libs/jquery-2.1.1-min",
         text: "../test/text"
     },
     shim: {
