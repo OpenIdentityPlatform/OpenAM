@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -67,7 +67,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
             OAuth2Utils.DEBUG.error("Refresh token does not exist for id: " + refresh_token);
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "RefreshToken does not exist");
-        } else if (!refreshTokenClient.getClientId().equals(client.getClient().getClientId())) {
+        } else if (!refreshTokenClient.getClientId().equalsIgnoreCase(client.getClient().getClientId())) {
             OAuth2Utils.DEBUG.error("Refresh Token was issued to a different client id: " + refreshTokenClient.getClientId());
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Token was issued to a different client");
