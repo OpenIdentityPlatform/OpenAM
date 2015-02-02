@@ -27,8 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
- * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.authentication.UI;
 
@@ -153,7 +153,7 @@ public abstract class AuthViewBeanBase extends ViewBeanBase {
                         String[] splitParams = value.split("&");
                         for (String param: splitParams) {
                             String[] keyAndValue = param.split("=", 0);
-                            tmpMap.put(keyAndValue[0], keyAndValue[1]);
+                            tmpMap.put(keyAndValue[0], (keyAndValue.length == 1) ? "" : keyAndValue[1]);
                         }
                     } catch (Exception e) {
                         loginDebug.message("getEncodedQueryParams: "
