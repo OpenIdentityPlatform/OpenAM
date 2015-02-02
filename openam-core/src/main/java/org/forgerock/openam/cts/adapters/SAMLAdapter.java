@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
@@ -32,8 +32,6 @@ import java.util.Calendar;
 /**
  * TokenAdapter for SAML tokens. SAML tokens in particular have no specific hierarchy so the SAMLToken
  * class exists to simplify this problem.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class SAMLAdapter implements TokenAdapter<SAMLToken> {
 
@@ -48,6 +46,8 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
      *
      * @param tokenIdFactory Non null.
      * @param serialisation Non null.
+     * @param dataConversion Non null.
+     * @param blobUtils Non null.
      */
     @Inject
     public SAMLAdapter(TokenIdFactory tokenIdFactory, JSONSerialisation serialisation,
@@ -127,7 +127,12 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
         // Secondary Key
         String secondaryKey = token.getValue(SAMLTokenField.SECONDARY_KEY.getField());
 
-        SAMLToken samlToken = new SAMLToken(token.getTokenId(), secondaryKey, expiryTime, blob);
+        String primaryKey = tokenIdFactory.fromSAMLPrimaryTokenId(token.getTokenId());
+        if (secondaryKey != null && !secondaryKey.isEmpty()) {
+            secondaryKey = tokenIdFactory.fromSAMLSecondaryTokenId(secondaryKey);
+        }
+
+        SAMLToken samlToken = new SAMLToken(primaryKey, secondaryKey, expiryTime, blob);
 
         return samlToken;
     }

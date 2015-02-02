@@ -1,8 +1,4 @@
-/**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright (c) 2012-2013 ForgeRock US Inc. All Rights Reserved
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -13,18 +9,15 @@
  * When distributing Covered Software, include this CDDL Header Notice in each file and include
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information:
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * "Portions copyright [year] [name of copyright owner]".
- *
+ * Copyright 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.common;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionBundle;
-import com.iplanet.services.naming.ServerEntryNotFoundException;
-import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.coretoken.interfaces.AMTokenSAML2Repository;
@@ -38,12 +31,13 @@ import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.SAMLTokenField;
 import org.forgerock.openam.cts.api.tokens.SAMLToken;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.guice.InjectorHolder;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -58,13 +52,7 @@ import java.util.Map;
  * to handle the actual CRUD for Tokens.
  *
  */
-public class SAML2CTSPersistentStore extends GeneralTaskRunnable
-    implements AMTokenSAML2Repository {
-
-    /**
-     * This Instances Server ID.
-     */
-    private static String serverId;
+public class SAML2CTSPersistentStore extends GeneralTaskRunnable implements AMTokenSAML2Repository {
 
     /**
      * Indicator for Persistence Store.
@@ -129,11 +117,10 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
      */
     private static long runPeriod = 1 * 60 * 1000; // 1 min in milliseconds
 
+    private static final Debug debug = Debug.getInstance("amToken");
 
-    static Debug debug = Debug.getInstance("amToken");
-    private String SAML2="saml2";
-
-    private TokenAdapter<SAMLToken> tokenAdapter = InjectorHolder.getInstance(SAMLAdapter.class);
+    private final TokenAdapter<SAMLToken> tokenAdapter = InjectorHolder.getInstance(SAMLAdapter.class);
+    private final TokenIdFactory tokenIdFactory = InjectorHolder.getInstance(TokenIdFactory.class);
 
     /**
      * Static Initialization Stanza.
@@ -159,10 +146,10 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
         // Instantiate the Singleton Instance.
         try {
             initialize();
-        } catch(Exception e) {
-            debug.error("Unable to Instantiate "+SAML2CTSPersistentStore.class.getName()+" for SAML2 Persistence",e);
+        } catch (Exception e) {
+            debug.error("Unable to initialize " + SAML2CTSPersistentStore.class.getName()
+                    + " for SAML2 Persistence", e);
         }
-
     }
 
     /**
@@ -185,8 +172,6 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
                 .get(Constants.AM_SERVER_HOST);
         String thisSessionServerPortAsString = SystemPropertiesManager
                 .get(Constants.AM_SERVER_PORT);
-        String thisSessionURI = SystemPropertiesManager
-                .get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
 
         if (thisSessionServerProtocol == null
                 || thisSessionServerPortAsString == null
@@ -194,14 +179,7 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
             throw new SessionException(SessionBundle.rbName,
                     "propertyMustBeSet", null);
         }
-       try {
-        // Obtain our Server ID for this OpenAM Instance.
-        serverId = WebtopNaming.getServerID(thisSessionServerProtocol,
-                thisSessionServer, thisSessionServerPortAsString,
-                thisSessionURI);
-       } catch (ServerEntryNotFoundException serverNotFoundException) {
-           throw new SessionException("WebTopNaming Exception: "+serverNotFoundException.getMessage());
-       }
+
         // Initialize our Persistence Layer.
         initPersistSession();   
         // Schedule our Runnable Background Thread Task. @see run() method for associated Task.
@@ -230,7 +208,6 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
                 debug.message(DB_ERROR_MSG, e);
             }
         }
-
     }
 
     /**
@@ -248,13 +225,14 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
      * @param samlKey primary key
      * @return Object - SAML2 unMarshaled Object, if failed, return null.
      */
-   public Object retrieveSAML2Token(String samlKey) {
+    @Override
+    public Object retrieveSAML2Token(String samlKey) {
         if (!isDatabaseUp) {
             return null;
         }
         try {
             // Retrieve the SAML2 Token from the Repository using the SAML2 Primary Key.
-            Token token = persistentStore.read(samlKey);
+            Token token = persistentStore.read(tokenIdFactory.toSAMLPrimaryTokenId(samlKey));
             SAMLToken samlToken = tokenAdapter.fromToken(token);
             return samlToken.getToken();
         } catch (CoreTokenException e) {
@@ -279,14 +257,15 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
     * @param secKey Secondary Key 
     * @return SAML2 object, if failed, return null. 
     */
-   public List<Object> retrieveSAML2TokenWithSecondaryKey(String secKey) {
+    @Override
+    public List<Object> retrieveSAML2TokenWithSecondaryKey(String secKey) {
         if (!isDatabaseUp) {
             return null;
         }
         try {
             // Perform a query against the token store with the secondary key.
-            Map<CoreTokenField, Object> queryMap = new HashMap<CoreTokenField, Object>();
-            queryMap.put(SAMLTokenField.SECONDARY_KEY.getField(), secKey);
+            Map<CoreTokenField, Object> queryMap = new EnumMap<CoreTokenField, Object>(CoreTokenField.class);
+            queryMap.put(SAMLTokenField.SECONDARY_KEY.getField(), tokenIdFactory.toSAMLSecondaryTokenId(secKey));
 
             Collection<Token> tokens = persistentStore.list(queryMap);
             List<Object> results = new LinkedList<Object>();
@@ -315,12 +294,13 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
     * Deletes the SAML2 object by given primary key from the repository
     * @param samlKey primary key 
     */
-   public void deleteSAML2Token(String samlKey)  {
+    @Override
+    public void deleteSAML2Token(String samlKey)  {
         if (!isDatabaseUp) {
             return;
         }
         try {
-            persistentStore.delete(samlKey);
+            persistentStore.delete(tokenIdFactory.toSAMLPrimaryTokenId(samlKey));
         } catch (CoreTokenException e) {
             isDatabaseUp = false;
             logDBStatus();
@@ -335,7 +315,6 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
 
     /**
      * Deletes expired SAML2 object from the repository
-     * @exception Exception When Unable to delete the expired SAML2 objects
      */
     public void deleteExpiredSAML2Tokens()  {
     }
@@ -343,6 +322,7 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
     /**
      * {@inheritDoc}
      */
+    @Override
     public void saveSAML2Token(String samlKey, Object samlObj, long expirationTime,
         String secKey) {
         // Is our Token Repository Available?
@@ -468,7 +448,5 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
             debug.error("SAML2CTSPersistentStore.run(): Exception in thread",
                     e);
         }
-
     }
-
 }

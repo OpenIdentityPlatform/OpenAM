@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,8 +10,15 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.mock;
+import static org.mockito.Matchers.*;
 
 import org.forgerock.openam.cts.TokenTestUtils;
 import org.forgerock.openam.cts.api.TokenType;
@@ -30,14 +35,6 @@ import org.testng.annotations.Test;
 
 import java.util.Calendar;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.*;
-
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class SAMLAdapterTest {
 
     private JSONSerialisation serialisation;
@@ -53,7 +50,7 @@ public class SAMLAdapterTest {
         dataConversion = mock(LDAPDataConversion.class);
         tokenIdFactory = mock(TokenIdFactory.class);
         blobUtils = mock(TokenBlobUtils.class);
-        encoding = mock(KeyConversion.class);
+        encoding = new KeyConversion();
 
         adapter = new SAMLAdapter(tokenIdFactory, serialisation, dataConversion, blobUtils);
     }
@@ -69,7 +66,7 @@ public class SAMLAdapterTest {
                 new LDAPDataConversion(),
                 new TokenBlobUtils());
 
-        String tokenId = "badger";
+        String tokenId = encoding.encodeKey("badger");
         Token token = new Token(tokenId, TokenType.SAML2);
 
         // SAML tokens only store time to seconds resolution
@@ -82,13 +79,9 @@ public class SAMLAdapterTest {
         token.setBlob(serialisation.serialise(blob).getBytes());
         token.setAttribute(SAMLTokenField.OBJECT_CLASS.getField(), String.class.getName());
 
-        // SAML mocking for primary key
-        given(encoding.encodeKey(eq(tokenId))).willReturn(tokenId);
-
         // SAML detail for secondary key
-        String secondaryKey = "weasel";
+        String secondaryKey = encoding.encodeKey("weasel");
         token.setAttribute(SAMLTokenField.SECONDARY_KEY.getField(), secondaryKey);
-        given(encoding.encodeKey(eq(secondaryKey))).willReturn(secondaryKey);
 
         // When
         Token result = adapter.toToken(adapter.fromToken(token));
