@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -107,7 +107,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
             throw new InvalidRequestException("RefreshToken does not exist");
         }
 
-        if (!refreshToken.getClientId().equals(clientRegistration.getClientId())) {
+        if (!refreshToken.getClientId().equalsIgnoreCase(clientRegistration.getClientId())) {
             logger.error("Refresh Token was issued to a different client id: " + clientRegistration.getClientId());
             throw new InvalidRequestException("Token was issued to a different client");
         }
