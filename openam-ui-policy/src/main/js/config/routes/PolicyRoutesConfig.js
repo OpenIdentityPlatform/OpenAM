@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -29,38 +29,38 @@ define("config/routes/PolicyRoutesConfig", [
 ],function (constants) {
     return {
         "manageApps": {
-            view: "org/forgerock/openam/ui/policy/ManageApplicationsView",
+            view: "org/forgerock/openam/ui/policy/applications/ManageApplicationsView",
             url: "apps/",
             role: "ui-admin"
         },
         "editApp": {
-            view: "org/forgerock/openam/ui/policy/EditApplicationView",
+            view: "org/forgerock/openam/ui/policy/applications/EditApplicationView",
             url: /^app\/(.*?)(?:\/){0,1}$/,
             defaults: [""],
             role: "ui-admin",
             pattern: "app/?"
         },
         "managePolicies": {
-            view: "org/forgerock/openam/ui/policy/ManagePoliciesView",
+            view: "org/forgerock/openam/ui/policy/policies/ManagePoliciesView",
             url: /^app\/(.+?)\/(policies)\//,
             role: "ui-admin",
             pattern: "app/?/policies/"
         },
         "manageReferrals": {
-            view: "org/forgerock/openam/ui/policy/ManagePoliciesView",
+            view: "org/forgerock/openam/ui/policy/policies/ManagePoliciesView",
             url: /^app\/(.+?)\/(referrals)\//,
             role: "ui-admin",
             pattern: "app/?/referrals/"
         },
         "editPolicy": {
-            view: "org/forgerock/openam/ui/policy/EditPolicyView",
+            view: "org/forgerock/openam/ui/policy/policies/EditPolicyView",
             url: /^app\/(.+?)\/policy\/(.*?)(?:\/){0,1}$/,
             defaults: ["", ""],
             role: "ui-admin",
             pattern: "app/?/policy/?"
         },
         "editReferral": {
-            view: "org/forgerock/openam/ui/policy/EditReferralView",
+            view: "org/forgerock/openam/ui/policy/referrals/EditReferralView",
             url: /^app\/(.+?)\/referral\/(.*?)(?:\/){0,1}$/,
             defaults: ["", ""],
             role: "ui-admin",

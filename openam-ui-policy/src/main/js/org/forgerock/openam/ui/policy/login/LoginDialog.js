@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/policy/login/LoginDialog", [
             newDialog.remove();
         },
         LoginDialog = {
-            template: "templates/policy/LoginDialog.html",
+            template: "templates/policy/login/LoginDialog.html",
             data : {
                 reauthUrl: constants.host + "/"+ constants.context + "?goto=" + encodeURIComponent(window.location.href)
             },

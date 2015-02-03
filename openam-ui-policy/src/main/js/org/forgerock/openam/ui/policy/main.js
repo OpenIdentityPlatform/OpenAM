@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -30,36 +30,31 @@ define([
     "./login/LoginHelper",
     "./login/SessionDelegate",
 
-    "./PolicyDelegate",
+    "./delegates/PolicyDelegate",
+    "./delegates/SiteConfigurationDelegate",
 
-    "./PolicyEditorUtils",
-    "./HelpLinkView",
+    "./common/Utils",
+    "./common/HelpLinkView",
+    "./common/GenericGridView",
+    "./common/AbstractEditView",
 
-    "./GenericGridView",
-    "./ManageApplicationsView",
-    "./EditApplicationView",
+    "./applications/ManageApplicationsView",
+    "./applications/EditApplicationView",
 
-    "./ManagePoliciesView",
-    "./EditPolicyView",
-    "./ManageResponseAttrsView",
-    "./ResponseAttrsUserView",
+    "./policies/ManagePoliciesView",
+    "./policies/EditPolicyView",
 
-    "./AbstractEditView",
+    "./policies/attributes/ManageResponseAttrsView",
+    "./policies/attributes/ResponseAttrsUserView",
 
+    "./policies/conditions/ManageRulesView",
+    "./policies/conditions/ManageSubjectsView",
+    "./policies/conditions/EditSubjectView",
+    "./policies/conditions/ManageEnvironmentsView",
+    "./policies/conditions/EditEnvironmentView",
+    "./policies/conditions/LegacyListItemView",
+    "./policies/conditions/OperatorRulesView",
 
-    "./EditReferralView",
-    "./SelectRealmsView",
-    "./ManageRulesView",
-
-    "./ManageSubjectsView",
-    "./EditSubjectView",
-
-    "./ManageEnvironmentsView",
-    "./EditEnvironmentView",
-
-    "./LegacyListItemView",
-    "./OperatorRulesView",
-
-    "./SiteConfigurationDelegate"
-
+    "./referrals/EditReferralView",
+    "./referrals/SelectRealmsView"
 ]);
