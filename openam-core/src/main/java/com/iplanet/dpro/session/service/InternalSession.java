@@ -1517,7 +1517,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * protocol://server:port/path?queryString&&lt;cookieName>=&lt;cookieValue>
      * </pre>
      * <p>
-     * This is the default and OpenSSO always encodes in this format
+     * This is the default and OpenAM always encodes in this format
      * unless otherwise specified. If the URL passed in has query parameter then
      * entity escaping of ampersand will be done before appending the cookie if
      * the escape is true. Only the ampersand before appending cookie parameter
@@ -1576,7 +1576,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * protocol://server:port/path?queryString&&lt;cookieName>=&lt;cookieValue>
      * </pre>
      * <p>
-     * This is the default and OpenSSO always encodes in this format 
+     * This is the default and OpenAM always encodes in this format
      * unless otherwise specified. If the URL passed in has query parameter then
      * entity escaping of ampersand will be done before appending the cookie
      * if the escape is true.  Only the ampersand before appending 

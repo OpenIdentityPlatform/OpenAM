@@ -28,7 +28,7 @@
 package com.sun.identity.log;
 
 /**
- * OpenSSO Logger provider
+ * OpenAM Logger provider
  */
 public class LoggerProvider implements
     com.sun.identity.entitlement.log.ILoggerProvider {

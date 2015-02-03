@@ -77,12 +77,12 @@ public class IdType implements java.io.Serializable {
     public static final IdType REALM = new IdType("realm");
 
     /**
-     * Identity type of OpenSSO agent only.
+     * Identity type of OpenAM agent only.
      */
     public static final IdType AGENTONLY = new IdType("agentonly");
 
     /**
-     * Identity type of OpenSSO agents under the OpenSSO
+     * Identity type of OpenAM agents under the OpenAM
      * agent groups.
      */
     public static final IdType AGENTGROUP = new IdType("agentgroup");

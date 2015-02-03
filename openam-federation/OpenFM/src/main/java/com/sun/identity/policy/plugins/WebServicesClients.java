@@ -61,7 +61,7 @@ import com.sun.identity.shared.debug.Debug;
 
 /**
  * This subject represents web services clients that authenticate to web service
- * providers(PP service, Discovery Service) hosted by OpenSSO. The 
+ * providers(PP service, Discovery Service) hosted by OpenAM. The
  * clients authenticate either by Anonymous, X509 token, ClientTLS, or
  * SAML token profile. This subject covers X509Token, ClientTLS and SAML Token
  * profiles. The subject values are the subject DNs associated with the 

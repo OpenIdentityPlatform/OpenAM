@@ -351,7 +351,7 @@ public class FSLogoutUtil {
     
     /**
      * Retrieves the session token from the Http Request, and
-     * validates the token with OpenSSO session manager.
+     * validates the token with the OpenAM session manager.
      * @param request <code>HTTPServletRequest</code> object containing the 
      *  session cookie information
      * @return session token if request contained valid

@@ -1407,19 +1407,18 @@ class ResourceResultCache implements SSOTokenListener {
     }
 
     /** 
-     * Returns names of policy advices that could be handled by OpenSSO
-     * Enterprise if PEP redirects user agent to OpenSSO.
+     * Returns names of policy advices that could be handled by OpenAM
+     * Enterprise if PEP redirects user agent to OpenAM.
      *
      * @param appToken application sso token that would be used while
-     *        communicating to OpenSSO
+     *        communicating to OpenAM
      * @param refetchFromServer indicates whether to get the values fresh 
-     *      from OpenSSO or return the values from local cache. 
+     *      from OpenAM or return the values from local cache.
      *      If the server reports app sso token is invalid, a new app sso
      *      token is created and one more call is made to the server.
-     * @return names of policy advices that could be handled by OpenSSO
-     *         Enterprise
+     * @return names of policy advices that could be handled by OpenAM
      * @throws InvalidAppSSOTokenException if the server reported that the
-     *         app sso token provided wasinvalid
+     *         app sso token provided was invalid
      * @throws PolicyEvaluationException if the server reported any other error
      * @throws PolicyException if there are problems in getting the advice 
      *          names

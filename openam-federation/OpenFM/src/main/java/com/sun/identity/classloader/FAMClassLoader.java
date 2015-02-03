@@ -40,14 +40,14 @@ import java.util.Arrays;
 import com.sun.identity.common.SystemConfigurationUtil;
 
 /**
- * OpenSSO class loader to overcome the class loading
- * issues of jars that are not compatible for OpenSSO.
+ * OpenAM class loader to overcome the class loading
+ * issues of jars that are not compatible for OpenAM.
  */
 public class FAMClassLoader {
     
     public static ClassLoader cl;
     
-    // Jar files path at OpenSSO client, for OpenSSO
+    // Jar files path at the OpenAM client, for OpenAM
     // classloader to load those jar files. 
     public static final String FAM_CLASSLOADER_DIR_PATH = 
         "com.sun.identity.classloader.client.jarsPath";

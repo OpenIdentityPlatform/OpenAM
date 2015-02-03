@@ -50,7 +50,7 @@ import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * This class does Directory Server related tasks for 
- * OpenSSO deployed as single web-application. 
+ * OpenAM deployed as single web application.
  */
 public class AMSetupDSConfig {
     private String dsManager;
@@ -225,7 +225,7 @@ public class AMSetupDSConfig {
     }
 
     /**
-     * Check if DS is loaded with OpenSSO entries
+     * Check if DS is loaded with OpenAM entries
      *
      * @param ssl <code>true</code> of directory server is running on LDAPS.
      * @return <code>true</code> if Service Schema is loaded into

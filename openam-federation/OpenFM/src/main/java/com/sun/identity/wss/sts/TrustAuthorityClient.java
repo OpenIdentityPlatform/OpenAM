@@ -81,7 +81,7 @@ import com.sun.identity.wss.trust.ClaimType;
  * used to obtain the Security Tokens from the trusted authority services such 
  * as Security Token Service (STS) or Liberty Discovery Service.
  * 
- * In this current OpenSSO 8.0 release, this client API is used as STS client 
+ * In OpenAM, this client API is used as STS client
  * API class that retrieves Security Tokens from STS service by making WS-Trust 
  * request and receiving WS-Trust response. 
  * 
@@ -347,8 +347,7 @@ public class TrustAuthorityClient {
      * interactions with Security Token Service (STS).
      * This method applies only for the STS Tokens.
      * 
-     * In this current OpenSSO 8.0 release, this method implementation is not 
-     * supported.
+     * In OpenAM, this method implementation is not supported.
      * 
      * @param securityToken security token that needs to be renewed.
      * @param pc provider configuration of the web services client.
@@ -371,8 +370,7 @@ public class TrustAuthorityClient {
      * interactions with Security Token Service (STS).
      * This method applies only for the STS Tokens.
      * 
-     * In this current OpenSSO 8.0 release, this method implementation is not 
-     * supported.
+     * In OpenAM, this method implementation is not supported.
      * 
      * @param securityToken security token that needs to be canceled.
      * @param pc provider configuration of the web services client.

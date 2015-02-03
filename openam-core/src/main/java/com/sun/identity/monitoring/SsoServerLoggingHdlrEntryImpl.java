@@ -153,7 +153,7 @@ public class SsoServerLoggingHdlrEntryImpl extends SsoServerLoggingHdlrEntry {
      * This is NOT showing the number of DB/File connections currently open,
      * BUT rather the number of times DB/File has been connected to from the
      * particular log handler (DB, File, Secure File, Remote etc.)
-     * since the OpenSSO server came up.
+     * since the OpenAM server came up.
      */
     public void incHandlerConnectionsMade(int n) {
         long li = LoggingHdlrConnMade.longValue();

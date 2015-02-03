@@ -76,7 +76,7 @@ public class RemoteHandler extends Handler {
     private int recCountLimit;
     // Map with loggedBySID as key & reqSet as value.
     // It's to make remote loggging work properly when buffering is enabled 
-    // and log request is directed to different OpenSSO servers.
+    // and log request is directed to different OpenAM servers.
     private Map reqSetMap;
     private TimeBufferingTask bufferTask;
     private boolean timeBufferingEnabled = false;

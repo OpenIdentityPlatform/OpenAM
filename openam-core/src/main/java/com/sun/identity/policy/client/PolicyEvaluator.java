@@ -553,16 +553,16 @@ public class PolicyEvaluator {
     }
 
     /**
-     * Gets names of policy advices that could be handled by OpenSSO
-     * if PEP redirects user agent to OpenSSO. If the server reports
+     * Gets names of policy advices that could be handled by OpenAM
+     * if PEP redirects user agent to OpenAM. If the server reports
      * an error indicating the app sso token provided was invalid,
      * new app sso token is obtained from app 
      * sso token  provider and another attempt is made to get policy advices
      * 
      * @param refetchFromServer indicates whether to get the values fresh 
-     *      from OpenSSO or return the values from local cache
-     * @return names of policy advices that could be handled by OpenSSO
-     *         Enterprise if PEP redirects user agent to OpenSSO.
+     *      from OpenAM or return the values from local cache
+     * @return names of policy advices that could be handled by OpenAM
+     *         Enterprise if PEP redirects user agent to OpenAM.
      * @throws InvalidAppSSOTokenException if the server reported that the
      *         app sso token provided was invalid 
      * @throws PolicyEvaluationException if the server reported any other error

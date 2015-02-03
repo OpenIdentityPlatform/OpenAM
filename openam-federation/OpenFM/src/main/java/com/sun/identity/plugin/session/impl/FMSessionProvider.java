@@ -98,7 +98,7 @@ public class FMSessionProvider implements SessionProvider {
         get(Constants.AM_COOKIE_NAME);
 /**
  *  Commented out since initializing session service statically here brings
- *  in the whole OpenSSO which is not desirable for clientsdk.
+ *  in the whole OpenAM which is not desirable for clientsdk.
  *  Can remove this, issue handler probably could do that.
     private static String lbcookieName = Session.lbCookieName;
     private static String lbcookieValue = SessionService.getSessionService().

@@ -53,7 +53,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Custom authentication module for validating siteminder user session
- * to enable SSO integration between OpenSSO and
+ * to enable SSO integration between OpenAM and
  * Siteminder access server.
  * Siteminder is the trade mark of Computer Associates, the usage of the
  * Siteminder API is subject to Siteminder License terms.

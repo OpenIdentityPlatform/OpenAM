@@ -72,32 +72,32 @@ import org.w3c.dom.Node;
  */
 public class PolicyResponse {
     /**
-     * Policy Response Resource Result Id.
+     * Policy Response Resource Result ID.
      */
     public static final int POLICY_RESPONSE_RESOURCE_RESULT = 1;
 
     /**
-     * Add Policy Listener Resource Id.
+     * Add Policy Listener Resource ID.
      */
     public static final int POLICY_ADD_LISTENER_RESPONSE = 2;
 
     /**
-     * Remove Policy Listener Resource Id.
+     * Remove Policy Listener Resource ID.
      */
     public static final int POLICY_REMOVE_LISTENER_RESPONSE = 3;
 
     /**
-     * Policy Exception Id.
+     * Policy Exception ID.
      */
     public static final int POLICY_EXCEPTION = 4;
 
     /**
-     * Policy Advices Handleable by OpenSSO Response Id.
+     * Policy Advices Handleable by OpenAM Response ID.
      */
     public static final int POLICY_ADVICES_HANDLEABLE_BY_AM_RESPONSE = 5;
 
     /**
-     * Exception message if Application SSO Token is ivalid
+     * Exception message if Application SSO Token is invalid
      */
     public static final String APP_SSO_TOKEN_INVALID 
             = "Application sso token is invalid";
@@ -129,36 +129,36 @@ public class PolicyResponse {
     }
 
     /**
-     * Returns the method Id of the Policy Response.
+     * Returns the method ID of the Policy Response.
      *
-     * @return the method Id.
+     * @return the method ID.
      */
     public int getMethodID() {
         return methodID;
     }
 
     /**
-     * Sets the method Id of the Policy Response.
+     * Sets the method ID of the Policy Response.
      *
-     * @param id the method Id.
+     * @param id the method ID.
      */
     public void setMethodID(int id) {
         methodID = id;
     }
 
     /**
-     * Returns the request Id.
+     * Returns the request ID.
      *
-     * @return the request Id.
+     * @return the request ID.
      */
     public String getRequestId() {
         return requestId;
     }
 
     /**
-     * Sets the request Id.
+     * Sets the request ID.
      *
-     * @param reqId the Id of the request.
+     * @param reqId the ID of the request.
      */
     public void setRequestId(String reqId) {
         requestId = reqId;

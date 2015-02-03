@@ -50,7 +50,7 @@ public interface PWResetModel {
     String PW_RESET_SERVICE = "iPlanetAMPasswordResetService";
 
     /**
-     * OpenSSO's user service name
+     * OpenAM's user service name
      */
     String USER_SERVICE = "iPlanetAMUserService";
 

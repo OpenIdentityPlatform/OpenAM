@@ -62,9 +62,9 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 /**
- * OpenSSO extension to the jdk1.4 Logger
+ * OpenAM extension to the jdk1.4 Logger
  * This extension gives some functionality required by
- * OpenSSO secure logger.
+ * OpenAM secure logger.
  * For <code>JDK1.4</code> Logger please refer to
  * <pre>
  * http://java.sun.com/j2se/1.4.1/docs/api/java/util/logging/Logger.html

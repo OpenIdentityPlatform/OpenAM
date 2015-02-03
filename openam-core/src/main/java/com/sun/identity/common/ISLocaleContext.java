@@ -52,15 +52,15 @@ import org.forgerock.json.resource.servlet.HttpContext;
 
 /**
  * Sets the locale suitable for the given situation. Each response to end-user
- * must be in a well defined locale. Even if the user has not logged in, OpenSSO
- * Enterprise should respond in a locale. Hence OpenSSO consults
+ * must be in a well defined locale. Even if the user has not logged in, OpenAM
+ * should respond in a locale. Hence OpenAM consults
  * various parameter to find out the locale for any given response. The order
- * and priorty of local setting is as follows:
+ * and priority of the locale setting is as follows:
  *
  * Priority 0 - OS_LOCALE - value returned by java.util.Locale.getDefault()
  * Priority 1 - PLATFORM_LOCALE - iplanet-am-platform-locale attribute value
  *              in iPlanetAMPlatform Service - Global value for entire 
- *              OpenSSO
+ *              OpenAM instance
  * Priority 2 - AUTH-LOCALE - iplanet-am-auth-locale attribute value in 
  *              iPlantAMAuth service - Org specific locale value
  * Priority 3 - USER_LOCALE - preferredlocale - iPlanetAMUser service and 

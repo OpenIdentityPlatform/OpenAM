@@ -35,7 +35,7 @@ import com.sun.identity.wsfederation.profile.RequestSecurityTokenResponse;
 /**
  * The class <code>PartnerAccountMapper</code> is an interface
  * that is implemented to map partner account to user account
- * in OpenSSO.  
+ * in OpenAM.
  * <p>
  * Different partner would need to have a different implementation
  * of the interface. The mappings between the partner source ID and 

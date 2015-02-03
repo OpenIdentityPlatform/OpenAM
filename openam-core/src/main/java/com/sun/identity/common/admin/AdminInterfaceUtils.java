@@ -208,13 +208,13 @@ public class AdminInterfaceUtils implements ServiceListener {
 
     /**
      * Returns the default people container name created when an organization is
-     * created in OpenSSO. This may not be the one which the user
-     * sees as his/her default container through OpenSSO console.
+     * created in OpenAM. This may not be the one which the user
+     * sees as his/her default container through OpenAM console.
      * 
      * @return Returns the default people container name created when an
-     *         organization is created in OpenSSO. This may not be
+     *         organization is created in OpenAM. This may not be
      *         the one which the user sees as his/her default container through
-     *         OpenSSO console.
+     *         OpenAM console.
      */
     public static String defaultPCCreateDuringOrgConfig() {
         initialize();
@@ -223,13 +223,13 @@ public class AdminInterfaceUtils implements ServiceListener {
 
     /**
      * Returns the default group container name created when an organization is
-     * created in OpenSSO. This may not be the one which the user
-     * sees as his/her default container through OpenSSO console.
+     * created in OpenAM. This may not be the one which the user
+     * sees as his/her default container through the OpenAM console.
      * 
      * @return Returns the default group container name created when an
-     *         organization is created in OpenSSO. This may not be
+     *         organization is created in OpenAM. This may not be
      *         the one which the user sees as his/her default container through
-     *         OpenSSO console.
+     *         the OpenAM console.
      */
     public static String defaultGCCreateDuringOrgConfig() {
         initialize();
@@ -238,10 +238,10 @@ public class AdminInterfaceUtils implements ServiceListener {
 
     /**
      * Returns the default org admin role name created when an organization is
-     * created in OpenSSO.
+     * created in OpenAM.
      * 
      * @return Returns the default org admin role name created when an
-     *         organization is created in OpenSSO.
+     *         organization is created in OpenAM.
      */
     public static String defaultOrgAdminRoleCreateDuringOrgConfig() {
         initialize();
@@ -250,10 +250,10 @@ public class AdminInterfaceUtils implements ServiceListener {
 
     /**
      * Returns the default help desk admin role name created when an
-     * organization is created in OpenSSO.
+     * organization is created in OpenAM.
      * 
      * @return Returns the default help desk admin role name created when an
-     *         organization is created in OpenSSO.
+     *         organization is created in OpenAM.
      */
     public static String defaultHelpDeskAdminRoleCreateDuringOrgConfig() {
         initialize();
@@ -262,10 +262,10 @@ public class AdminInterfaceUtils implements ServiceListener {
 
     /**
      * Returns the default policy admin role name created when an organization
-     * is created in OpenSSO.
+     * is created in OpenAM.
      * 
      * @return Returns the default policy admin role name created when an
-     *         organization is created in OpenSSO.
+     *         organization is created in OpenAM.
      */
     public static String defaultPolicyAdminRoleCreateDuringOrgConfig() {
         initialize();

@@ -93,13 +93,13 @@ public class ConfigMonitoring {
     }
 
     /*
-     *  this method is called by AMSetupServlet, when it's done
-     *  configuring the OpenSSO server after deployment.  it's also
+     *  This method is called by AMSetupServlet, when it's done
+     *  configuring the OpenAM server after deployment.  It is also
      *  called by the MonitoringConfiguration load-on-startup servlet
-     *  when the OpenSSO server is restarted any time after being
-     *  configured.  it completes the configuring of the monitoring
+     *  when the OpenAM server is restarted any time after being
+     *  configured.  It completes the configuring of the monitoring
      *  agent with the config information that requires an SSOToken
-     *  to retrieve.  there is another part of the configuration supplied
+     *  to retrieve.  There is another part of the configuration supplied
      *  to the agent by WebtopNaming.
      */
     public void configureMonitoring() {

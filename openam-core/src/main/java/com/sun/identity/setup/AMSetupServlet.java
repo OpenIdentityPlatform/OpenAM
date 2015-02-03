@@ -1196,7 +1196,7 @@ public class AMSetupServlet extends HttpServlet {
             }
 
             /*
-             * Requiring the keystore.jks file in OpenSSO workspace.
+             * Requiring the keystore.jks file in OpenAM workspace.
              * The createIdentitiesForWSSecurity is for the 
              * JavaEE/NetBeans integration that we had done.
              */
@@ -1711,7 +1711,7 @@ public class AMSetupServlet extends HttpServlet {
     
             /*
              * if the file's not there, just skip it
-             * usually will be about a file included with OpenSSO,
+             * usually will be about a file included with OpenAM,
              * so it's informational, rather than a "real" error.
              */
             try {
@@ -1942,13 +1942,13 @@ public class AMSetupServlet extends HttpServlet {
     }
 
     /**
-      * Obtains misc config data from a remote OpenSSO server :
+      * Obtains misc config data from a remote OpenAM server :
       *     opends admin port
       *     config basedn
       *     flag to indicate replication is already on or not
       *     opends replication port or opends sugested port
       *
-      * @param server URL string representing the remote OpenSSO
+      * @param server URL string representing the remote OpenAM
       *        server
       * @param userid - admin userid on remote server (only amdmin)
       * @param pwd - admin password

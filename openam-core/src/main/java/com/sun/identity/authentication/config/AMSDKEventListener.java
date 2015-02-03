@@ -36,7 +36,7 @@ import com.sun.identity.shared.debug.Debug;
 import javax.security.auth.login.Configuration;
 
 /**
- * Implements <code>AMEvenetListener</code> from OpenSSO SDK. This
+ * Implements <code>AMEventListener</code> from OpenAM SDK. This
  * listens to authentication configuration changes for users and roles
  */ 
 public class AMSDKEventListener implements AMEventListener {

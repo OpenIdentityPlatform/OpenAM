@@ -33,7 +33,7 @@ import javax.servlet.ServletContextListener;
 
 /**
  * The <code>AuthServletContextListener</code> class is used to reset the
- * JAAS configuration to the default container's configuration when OpenSSO
+ * JAAS configuration to the default container's configuration when OpenAM
  * web application is undeployed, or the web container is terminated.
  */
 

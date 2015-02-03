@@ -48,8 +48,8 @@ import com.sun.identity.shared.xml.XMLUtils;
  * This <code>final</code> class is used to retrieve the Liberty protocol
  * objects such as Discovery Service Boot Strap information after 
  * successful Liberty ID-FF(Identity Federation) Single Sign-on. This 
- * information will be used by the remote OpenSSO clients such as 
- * web service client providers for bootatrapping into Liberty ID-WSF
+ * information will be used by the remote OpenAM clients such as
+ * web service client providers for bootstrapping into Liberty ID-WSF
  * (Identity web services framework).
  */  
 public final class LibertyManagerClient {

@@ -209,9 +209,9 @@ public interface IdentityServices extends Remote {
         throws InvalidToken, GeneralFailure, TokenExpired, RemoteException;
     
     /**
-     * Returns the cookie used by OpenSSO Authentication module to store
+     * Returns the cookie used by OpenAM Authentication module to store
      * the SSOToken. Can be used for Single-Sign-On by replaying this cookie
-     * back to OpenSSO for other operations.
+     * back to OpenAM for other operations.
      *
      * @return cookie name that contains the SSOToken
      * @throws GeneralFailure on other errors.
@@ -220,7 +220,7 @@ public interface IdentityServices extends Remote {
         throws GeneralFailure, RemoteException;
     
     /**
-     * Returns a list of cookie names that are used by OpenSSO for
+     * Returns a list of cookie names that are used by OpenAM for
      * authentication and load balancing. Replaying all these cookies
      * during the request is highly recommended.
      *

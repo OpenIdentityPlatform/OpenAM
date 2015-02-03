@@ -74,9 +74,9 @@ import javax.xml.soap.SOAPException;
  * <p>
  * The class provides mechanisms to manage the <code>Assertion</code>s either
  * locally (i.e., within the same JVM process) or remotely on another instance
- * of OpenSSO. The default constructor will manage the <code>
+ * of OpenAM. The default constructor will manage the <code>
  * Assertion</code>s locally if it detects SAML web services running locally,
- * else will use on of the configured OpenSSO. The constructor which
+ * else will use on of the configured OpenAM. The constructor which
  * accepts an <code>URL</code> will always use the URL to manage the assertions.
  * <p>
  * Having obtained an instance of <code>AssertionManagerClient</code>, its

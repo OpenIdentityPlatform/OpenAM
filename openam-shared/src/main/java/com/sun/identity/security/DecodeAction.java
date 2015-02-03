@@ -53,9 +53,9 @@ import com.iplanet.services.util.Crypt;
  * com.iplanet.services.util.Crypt.decode(str) should be replaced with: String
  * decStr = (String) AccessController.doPrivileged( new DecodeAction(str)); If
  * this is not done and Java security permissions check is enabled, then the
- * operation will fail and return a null everytime.
+ * operation will fail and return a null every time.
  * 
- * Note: Java security permissions check for OpenSSO can be enabled by
+ * Note: Java security permissions check for OpenAM can be enabled by
  * setting the property <code>com.sun.identity.security.checkcaller</code> to
  * true in AMConfig properties file.
  * 

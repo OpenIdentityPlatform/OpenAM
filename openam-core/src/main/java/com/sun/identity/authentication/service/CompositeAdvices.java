@@ -49,10 +49,10 @@ import com.sun.identity.policy.plugins.AuthenticateToServiceCondition;
 import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
 
 /**
- * This class allows the authentication services of OpenSSO to 
+ * This class allows the authentication services of OpenAM to
  * decouple the advice handling mechanism of the agents. 
  * This allows user to introduce and manage custom advices by solely 
- * writing OpenSSO side plug-ins. 
+ * writing OpenAM server-side plug-ins.
  * Users are not required to make changes on the agent side. 
  * Such advices are honored automatically by the composite advice 
  * handling mechanism. A benefit of composite advice is that you can 

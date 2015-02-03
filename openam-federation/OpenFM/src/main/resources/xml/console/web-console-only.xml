@@ -26,7 +26,7 @@
 
 -->
 
-<!-- For OpenSSO Console Only WAR -->
+<!-- For OpenAM Console Only WAR -->
 
     <filter>
         <filter-name>clientConfiguratorFilter</filter-name>

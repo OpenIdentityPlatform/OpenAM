@@ -44,7 +44,7 @@ import com.sun.identity.wss.security.SecurityToken;
 
 /**
  * This class implements ClientUserToken for on behalf of token that will be 
- * used to pass end user OpenSSO SSO Token to the STS service.
+ * used to pass end user OpenAM SSO Token to the STS service.
  */
 public class STSClientUserToken implements ClientUserToken {
      

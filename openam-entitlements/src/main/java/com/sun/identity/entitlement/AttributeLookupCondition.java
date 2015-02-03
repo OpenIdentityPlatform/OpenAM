@@ -188,11 +188,11 @@ public class AttributeLookupCondition extends EntitlementConditionAdaptor {
     }
 
     /**
-     * Returns OpenSSO policy Condition name.
+     * Returns OpenAM policy Condition name.
      *
-     * @return subject name as used in OpenSSO policy,
-     *         this is releavant only when UserECondition was created from
-     *         OpenSSO policy Condition.
+     * @return subject name as used in OpenAM policy,
+     *         this is relevant only when UserECondition was created from
+     *         OpenAM policy Condition.
      */
     public String getPConditionName() {
         return pConditionName;
@@ -217,10 +217,10 @@ public class AttributeLookupCondition extends EntitlementConditionAdaptor {
     }
 
     /**
-     * Sets OpenSSO policy Condition name
-     * @param pConditionName subject name as used in OpenSSO policy,
-     *        this is releavant only when UserECondition was created from
-     *        OpenSSO policy Condition.
+     * Sets OpenAM policy Condition name
+     * @param pConditionName subject name as used in OpenAM policy,
+     *        this is relevant only when UserECondition was created from
+     *        OpenAM policy Condition.
      */
     public void setPConditionName(String pConditionName) {
         this.pConditionName = pConditionName;

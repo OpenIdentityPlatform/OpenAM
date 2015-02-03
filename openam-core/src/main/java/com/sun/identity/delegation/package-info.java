@@ -29,8 +29,8 @@
 
 /**
  * Provides classes for delegation service. Delegation service provides
- * plugins which provide the access control to OpenSSO, making
- * sure that only users with expected  privileges perform a privileged
+ * plugins which provide the access control to OpenAM, making
+ * sure that only users with expected privileges perform a privileged
  * operation.
  */
 package com.sun.identity.delegation;

@@ -104,7 +104,7 @@ public class RequestUtils {
     /**
      * Use this method to check an HTTP servlet request size against the
      * configured limit to insure that it is not too large, and possibly being
-     * sent to an OpenSSO servlet to cause a Denial of Service (DOS).
+     * sent to an OpenAM servlet to cause a Denial of Service (DOS).
      * 
      * @param servletRequest
      *            The HTTP servlet request.

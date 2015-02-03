@@ -139,7 +139,7 @@ public class Crypt {
 
     /**
      * Check to see if security is enabled and Caller needs to be checked for
-     * OpenSSO specific Java security permissions
+     * OpenAM specific Java security permissions
      * 
      * @return boolean true if security check enabled, false otherwise
      */

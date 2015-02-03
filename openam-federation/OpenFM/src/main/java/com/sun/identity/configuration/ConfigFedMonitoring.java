@@ -97,9 +97,9 @@ public class ConfigFedMonitoring {
 
     /*
      *  this method is called by AMSetupServlet, when it's done
-     *  configuring the OpenSSO server after deployment.  it's also
+     *  configuring the OpenAM server after deployment.  it's also
      *  called by the MonitoringConfiguration load-on-startup servlet
-     *  when the OpenSSO server is restarted any time after being
+     *  when the OpenAM server is restarted any time after being
      *  configured.  it completes the configuring of the monitoring
      *  agent with the config information that requires an SSOToken
      *  to retrieve.  there is another part of the configuration supplied

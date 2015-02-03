@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * The class <code>AttributeMapper</code> is an interface that is 
  * implemented to get SSO information and map partner attributes to
- * OpenSSO attributes.
+ * OpenAM attributes.
  * <p>
  * A different implementation of the interface may be developed for different
  * partner. The mapping between the partner source ID and the implementation
@@ -50,7 +50,7 @@ import java.util.List;
 public interface AttributeMapper {
 
     /**
-     * Returns the single sign on token id to OpenSSO from the query.
+     * Returns the single sign on token ID to OpenAM from the query.
      * @param query The received <code>AttributeQuery</code>.
      * @return String which is the single sign on token ID.
      */

@@ -693,13 +693,13 @@ public class PolicyUtils {
 
     /**
      * Checks if the <code>hostName</code> is the same as
-     * the one used by OpenSSO SDK.
+     * the one used by the OpenAM SDK.
      *
-     * @param hostName host name to compared against AM SDK config store host
+     * @param hostName host name to compare against OpenAM SDK config store host
      *
-     * @return true if <code>hostName</code> is the same as the one used by
-     *         OpenSSO SDK, false otherwise
-     * @throws PolicyException if host names comparision did not succeed
+     * @return true if <code>hostName</code> is the same as the one used by the
+     *         OpenAM SDK, false otherwise
+     * @throws PolicyException if host names comparison does not succeed
      */
     public static boolean isLocalDS(String hostName) throws PolicyException {
         if (hostName == null) {

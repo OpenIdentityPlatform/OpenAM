@@ -41,7 +41,7 @@ import com.sun.identity.shared.debug.Debug;
 
 /**
  * The class <code>FAMSecurityToken</code> represents Federation
- * OpenSSO Security Token using OpenSSO Single Sign-on
+ * OpenAM Security Token using OpenAM Single Sign-on
  * Token.
  */
 public class FAMSecurityToken implements SecurityToken {

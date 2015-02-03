@@ -32,12 +32,12 @@ package com.sun.identity.entitlement;
  */
 public class PrivilegeType {
     /**
-     * OpenSSO privilege.
+     * OpenAM privilege.
      */
     public static final PrivilegeType OPENSSO = new PrivilegeType("opensso");
 
     /**
-     * XACML OpenSSO privilege.
+     * XACML OpenAM privilege.
      */
     public static final PrivilegeType XACML3_OPENSSO = new PrivilegeType(
         "xacml_opensso");

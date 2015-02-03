@@ -110,7 +110,7 @@ public class STSConstants {
     public static final String SAML_SENDER_VOUCHES_2_0 = 
         "urn:oasis:names:tc:SAML:2.0:cm:sender-vouches";
     
-    // Jar files path at OpenSSO client, for OpenSSO
+    // Jar files path at OpenAM client, for OpenAM
     // classloader to load those jar files. 
     public static final String FAM_CLASSLOADER_DIR_PATH = 
         "com.sun.identity.classloader.client.jarsPath";

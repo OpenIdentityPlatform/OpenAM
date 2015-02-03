@@ -110,8 +110,8 @@ import org.forgerock.openam.utils.ClientUtils;
 /**
  * This class maintains the User's login state information from the time user 
  * requests for authentication till the time the user either logs out of the 
- * OpenSSO system or the session is destroyed by any privileged application of 
- * the OpenSSO system.
+ * OpenAM system or the session is destroyed by any privileged application of
+ * the OpenAM system.
  */
 public class LoginState {
     

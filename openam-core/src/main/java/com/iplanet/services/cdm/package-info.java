@@ -28,11 +28,11 @@
 
 /**
  * Provides the classes for implementing services and applications
- * serving multiple clients to OpenSSO.
+ * serving multiple clients to OpenAM.
  * <p>
  * Using the interfaces and classes provided, services and applications
- * serving multiple clients may provide access to OpenSSO's services.
- * Through the implementation, OpenSSO determines the client from
+ * serving multiple clients may provide access to OpenAM's services.
+ * Through the implementation, OpenAM determines the client from
  * which the request has originated.
  * @supported.api
  */

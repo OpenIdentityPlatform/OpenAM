@@ -79,7 +79,7 @@ import javax.servlet.http.HttpServletResponse;
  * <code>AssertionArtifact</code>, and to obtain decision from an 
  * <code>Query</code>.
  * <p>
- * This class could only be used in the same JVM as the OpenSSO.
+ * This class could only be used in the same JVM as OpenAM.
  * @supported.api
  */
 public final class AssertionManager {
@@ -1513,8 +1513,7 @@ public final class AssertionManager {
                     + " missing SubjectConfirmation.");
             }
             // since we couldn't find the SSOToken in SubjectConfirmationData
-            // we don't know if the subject is authenticated to OpenSSO
-            // Enterprise.
+            // we don't know if the subject is authenticated to OpenAM.
             throw new SAMLException(
                 SAMLUtils.bundle.getString("missingSubjectConfirmation"));
         }

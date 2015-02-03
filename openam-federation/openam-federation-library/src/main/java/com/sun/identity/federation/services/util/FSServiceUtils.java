@@ -338,7 +338,7 @@ public class FSServiceUtils {
     }
    
     /**
-     * Returns base URL for OpenSSO services deployment.
+     * Returns the base URL for OpenAM services deployment.
      * @param request HttpServletRequest
      * @return service base url
      */

@@ -74,8 +74,8 @@ public interface SecurityToken {
      public static final String WSS_KERBEROS_TOKEN = "urn:sun:wss:kerberostoken";
      
      /**
-      * The <code>URI</code> is to identify the OpenSSO security
-      * token. The OpenSSO security token contains SSOToken.
+      * The <code>URI</code> is to identify the OpenAM security
+      * token. The OpenAM security token contains SSOToken.
       */
      public static final String WSS_FAM_SSO_TOKEN = "urn:sun:wss:ssotoken";
 

@@ -31,7 +31,7 @@ package com.sun.identity.entitlement.interfaces;
 import com.sun.identity.shared.debug.IDebug;
 
 /**
- * Allows a pluggable implementation of the Debug service within the OpenSSO
+ * Allows a pluggable implementation of the Debug service within the OpenAM
  * SDK. The implementation of this interface as well as the
  * <code>com.sun.identity.entitlement.interface.IDebug</code> interface
  * together provide the necessary functionality to replace or enhance the

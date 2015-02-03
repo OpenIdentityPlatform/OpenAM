@@ -41,13 +41,13 @@ import com.iplanet.sso.SSOToken;
  * be implemented by services and applications to do post
  * authentication processing.
  * <p>
- * This interface is invoked by OpenSSO Authentication
- * service on a successful authentication , failed authentication
+ * This interface is invoked by the OpenAM Authentication
+ * service on a successful authentication, failed authentication
  * or during logout.
  * <p>
  * This interface has three methods <code>onLoginSuccess</code>,
  * <code>onLoginFailure</code> and <code>onLogout</code>. The
- * <code>onLoginSucess</code> will be invoked when authentication
+ * <code>onLoginSuccess</code> will be invoked when authentication
  * is successful. The <code>onFailure</code> will be invoked on failed
  * authentication. The <code>onLogout</code> is invoked during a logout.
  * <p>

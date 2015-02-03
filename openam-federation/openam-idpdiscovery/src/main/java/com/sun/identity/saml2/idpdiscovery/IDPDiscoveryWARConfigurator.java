@@ -43,7 +43,7 @@ import java.util.Properties;
 import javax.servlet.ServletException;
 
 /**
- * This class is used to setup the OpenSSO IDP Discovery WAR.
+ * This class is used to setup the OpenAM IDP Discovery WAR.
  */
 public class IDPDiscoveryWARConfigurator {
 

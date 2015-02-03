@@ -106,10 +106,10 @@ public class FMSubjectMapper implements SubjectMapper {
     }
 
     /**
-     * Returns native subject, OpenSSO SSOToken
+     * Returns native subject, OpenAM SSOToken
      * @param xacmlContextSubjects XACML  context Subject(s) from the
      * xacml-context:Request
-     * @return native subject, OpenSSO SSOToken, returns null if 
+     * @return native subject, OpenAM SSOToken, returns null if
      *         Subject did not match
      * @exception XACMLException if can not map to native subject
      */

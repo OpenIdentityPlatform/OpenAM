@@ -2836,7 +2836,7 @@ public class AuthClientUtils {
     } 
 
     /**
-     * Sets the redirectBackUrlCookie to be set as OpenSSO 
+     * Sets the redirectBackUrlCookie to be set as OpenAM
      * server URL when redirecting to external web site during authentication
      * process.
      * @param cookieName auth context associated with lb cookie
@@ -2918,7 +2918,7 @@ public class AuthClientUtils {
     }
 
     /**
-     * Checks whether OpenSSO session cookie has to be made
+     * Checks whether OpenAM session cookie has to be made
      * persistent.
      *
      * Only if value of <code>true</code> is providued for HTTP query

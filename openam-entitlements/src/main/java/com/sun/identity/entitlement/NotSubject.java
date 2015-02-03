@@ -76,9 +76,9 @@ public class NotSubject extends LogicalSubject {
     /**
      * Constructs NotSubject
      * @param eSubject eSubject nested EntitlementSubject
-     * @param pSubjectName subject name as used in OpenSSO policy,
-     * this is releavant only when NotrESubject was created from
-     * OpenSSO policy Subject
+     * @param pSubjectName subject name as used in OpenAM policy,
+     * this is relevant only when NotrESubject was created from
+     * OpenAM policy Subject
      */
     public NotSubject(EntitlementSubject eSubject, String pSubjectName) {
         this.eSubject = eSubject;
@@ -198,10 +198,10 @@ public class NotSubject extends LogicalSubject {
     }
 
     /**
-     * Sets OpenSSO policy Subject name
-     * @param pSubjectName subject name as used in OpenSSO policy,
-     * this is releavant only when NotrESubject was created from
-     * OpenSSO policy Subject
+     * Sets OpenAM policy Subject name
+     * @param pSubjectName subject name as used in OpenAM policy,
+     * this is relevant only when NotrESubject was created from
+     * OpenAM policy Subject
      */
     @Override
     public void setPSubjectName(String pSubjectName) {
@@ -209,10 +209,10 @@ public class NotSubject extends LogicalSubject {
     }
 
     /**
-     * Returns OpenSSO policy Subject name
-     * @return subject name as used in OpenSSO policy,
-     * this is releavant only when NotrESubject was created from
-     * OpenSSO policy Subject
+     * Returns OpenAM policy Subject name
+     * @return subject name as used in OpenAM policy,
+     * this is relevant only when NotrESubject was created from
+     * OpenAM policy Subject
      */
     @Override
     public String getPSubjectName() {

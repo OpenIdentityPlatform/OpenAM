@@ -56,21 +56,21 @@ import java.util.Collections;
  * Its a new JAAS <code>Permission</code> which extends the
  * {@link java.security.Permission} class. This is the only
  * API which gets used by an application/container to evaluate policy against
- * the OpenSSO Policy framework. This class provides implementations
+ * the OpenAM Policy framework. This class provides implementations
  * of all the required abstract methods of <code>java.security.Permission</code>
- * , in a way that the policy evaluation is made against the OpenSSO
- * Enterprise's Policy service.
+ * , in a way that the policy evaluation is made against the OpenAM
+ * Policy service.
  * <p>
  * For example, one would use this class as follows to evaluate policy
  * permissions:
  * <pre>
  * ISPermission perm = new ISPermission("iPlanetAMWebAgentService",
- *                  "http://www.sun.com:80","GET");
+ *                  "http://www.example.com:80","GET");
  * AccessController.checkPermission(perm);
  * </pre>
- * If OpenSSO has the policy service
+ * If OpenAM has the policy service
  * <code>iPlanetAMWebAgentService</code> which has a <code>Rule</code> defined
- * for resource <code>http://www.sun.com:80</code>
+ * for resource <code>http://www.example.com:80</code>
  * with action "GET" with allow privilege, this call will return quietly, if
  * such a policy is not found then access is denied and Exception thrown
  * accordingly. Also <code>ISPermission</code> co-exists with the 
@@ -154,7 +154,7 @@ public class ISPermission extends Permission {
      * service name, resource name and action name.
      * @param serviceName name of service for which this
      *        <code>ISPermission</code> is being created. This name needs to be
-     *        one of the loaded services in the OpenSSO's policy
+     *        one of the loaded services in the OpenAM's policy
      *        engine. example: <code>iPlanetAMWegAgentService</code>
      *
      * @param resourceName name of the resource for which this 
@@ -527,7 +527,7 @@ public class ISPermission extends Permission {
      * @param perm the permission to check against.
      *
      * @return true if the specified permission is implied by this object,
-     *         false if not. The check is made against the OpenSSO's 
+     *         false if not. The check is made against the OpenAM's
      *         policy service to determine this evaluation.
      */
     public boolean implies(Permission perm) {

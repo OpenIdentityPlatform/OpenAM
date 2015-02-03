@@ -56,7 +56,7 @@ import org.w3c.dom.Element;
  * <pre>
  * http://www.w3.org/2001/XMLSchema#string
  * </pre>
- * Attribute resource-id is mapped to OpenSSO Policy resource name.
+ * Attribute resource-id is mapped to OpenAM Policy resource name.
  *
  * This mapper also recognises only additional attributeId
  * <pre>
@@ -66,7 +66,7 @@ import org.w3c.dom.Element;
  * <pre>
  * http://www.w3.org/2001/XMLSchema#string
  * </pre>
- * Attribute target-service is mapped to OpenSSO Policy service type name
+ * Attribute target-service is mapped to OpenAM Policy service type name
  *
  * If the attribute is not specified in the request a default value 
  * of <code>iPlanetAMWebAgentService</code> would be used. This is 

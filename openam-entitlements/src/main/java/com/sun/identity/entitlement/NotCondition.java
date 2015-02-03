@@ -76,9 +76,9 @@ public class NotCondition extends LogicalCondition {
      * Constructs <code>NotCondition</code>.
      *
      * @param eConditions wrapped <code>EntitlementCondition</code>(s)
-     * @param pConditionName subject name as used in OpenSSO policy,
-     * this is releavant only when UserECondition was created from
-     * OpenSSO policy Condition
+     * @param pConditionName subject name as used in OpenAM policy,
+     * this is relevant only when UserECondition was created from
+     * OpenAM policy Condition
      */
     public NotCondition(
         EntitlementCondition eConditions,
@@ -204,10 +204,10 @@ public class NotCondition extends LogicalCondition {
     }
 
     /**
-     * Sets OpenSSO policy Condition name
-     * @param pConditionName subject name as used in OpenSSO policy,
-     * this is releavant only when UserECondition was created from
-     * OpenSSO policy Condition
+     * Sets OpenAM policy Condition name
+     * @param pConditionName subject name as used in OpenAM policy,
+     * this is relevant only when UserECondition was created from
+     * OpenAM policy Condition
      */
     @Override
     public void setPConditionName(String pConditionName) {
@@ -215,10 +215,10 @@ public class NotCondition extends LogicalCondition {
     }
 
     /**
-     * Returns OpenSSO policy Condition name
-     * @return  subject name as used in OpenSSO policy,
-     * this is releavant only when UserECondition was created from
-     * OpenSSO policy Condition
+     * Returns OpenAM policy Condition name
+     * @return  subject name as used in OpenAM policy,
+     * this is relevant only when UserECondition was created from
+     * OpenAM policy Condition
      */
     @Override
     public String getPConditionName() {

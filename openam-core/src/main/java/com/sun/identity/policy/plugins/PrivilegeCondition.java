@@ -48,8 +48,8 @@ import java.util.Set;
 
 
 /**
- * A generic condition mapper which map entitlement condition to OpenSSO
- * condition.
+ * A generic condition mapper that maps entitlement conditions to OpenAM
+ * conditions.
  */
 public class PrivilegeCondition implements Condition, Cloneable {
     private static List propertyNames = new ArrayList(1);

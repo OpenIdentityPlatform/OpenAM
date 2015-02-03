@@ -66,9 +66,9 @@ public abstract class EntitlementSubjectImpl implements SubjectImplementation {
     /**
      * Constructor.
      *
-     * @param uuid is the universal Id of subject.
-     * @param pSubjectName subject name as used in OpenSSO policy,
-     * this is releavant only when it was created from OpenSSO policy Subject
+     * @param uuid is the universal ID of subject.
+     * @param pSubjectName subject name as used in OpenAM policy,
+     * this is relevant only when it was created from OpenAM policy Subject
      */
     public EntitlementSubjectImpl(String uuid, String pSubjectName) {
         this.uuid = uuid;
@@ -150,20 +150,20 @@ public abstract class EntitlementSubjectImpl implements SubjectImplementation {
     }
 
     /**
-     * Sets OpenSSO policy subject name of the object
-     * @param pSubjectName subject name as used in OpenSSO policy,
-     * this is releavant only when GroupSubject was created from
-     * OpenSSO policy Subject
+     * Sets OpenAM policy subject name of the object
+     * @param pSubjectName subject name as used in OpenAM policy,
+     * this is relevant only when GroupSubject was created from
+     * OpenAM policy Subject
      */
     public void setPSubjectName(String pSubjectName) {
         this.pSubjectName = pSubjectName;
     }
 
     /**
-     * Returns OpenSSO policy subject name of the object
-     * @return subject name as used in OpenSSO policy,
-     * this is releavant only when GroupSubject was created from
-     * OpenSSO policy Subject
+     * Returns OpenAM policy subject name of the object
+     * @return subject name as used in OpenAM policy,
+     * this is relevant only when GroupSubject was created from
+     * OpenAM policy Subject
      */
     public String getPSubjectName() {
         return pSubjectName;

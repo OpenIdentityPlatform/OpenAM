@@ -2820,14 +2820,14 @@ public class SessionService {
     /**
      * Removes InternalSession from the session table so that another server
      * instance can be an owner This is used to help work around persistent
-     * association of OpenSSO session id and Http session id which
+     * association of OpenAM session ID and HTTP session ID which
      * some loadbalancers (like Weblogic) use to make routing decisions. This
-     * helps to deal with the case a session is migrated while the current owner
-     * is still alive to avoid having redundant copies of the session. This is
-     * the client side of distributed invocation
+     * helps to deal with the case where a session is migrated while the current
+     * owner is still alive to avoid having redundant copies of the session.
+     * This is the client side of distributed invocation.
      *
-     * @param owner url of the server instance who previously owned the session
-     * @param sid   session id of the session migrated
+     * @param owner URL of the server instance who previously owned the session
+     * @param sid   session ID of the session migrated
      */
     private boolean releaseSession(URL owner, SessionID sid) {
         if (sessionDebug.messageEnabled()) {

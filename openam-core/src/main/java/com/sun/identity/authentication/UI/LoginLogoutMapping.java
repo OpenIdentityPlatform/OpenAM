@@ -93,7 +93,7 @@ public class LoginLogoutMapping extends HttpServlet {
     }
 
     /**
-     * Initializes OpenSSO.
+     * Initializes OpenAM.
      **
      * @param servletCtx Servlet Context.
      */

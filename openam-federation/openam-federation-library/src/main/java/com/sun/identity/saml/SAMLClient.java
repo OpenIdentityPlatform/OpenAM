@@ -124,7 +124,7 @@ public class SAMLClient {
 
     /**
      * This method is designed to do the SAML web-browser profile with 
-     * Artifact. Once the browser (user) authenticated to OpenSSO, 
+     * Artifact. Once the browser (user) authenticated to OpenAM,
      * it can call this method to complete the single sign on to the
      * target host and be redirected to the specified target site.
      * @param request HTTP Servlet Request
@@ -144,7 +144,7 @@ public class SAMLClient {
 
     /**
      * This method is designed to do the SAML web-browser POST profile. 
-     * Once the browser (user) authenticated to OpenSSO, 
+     * Once the browser (user) authenticated to OpenAM,
      * it can call this method
      * to complete the single sign on to the target host and be
      * redirected to the target site.
@@ -393,7 +393,7 @@ public class SAMLClient {
     /**
      * This private method is designed to get the URLEndpoint which points to 
      * the partner's SOAP Receiver service, such as the URLEndpoint of 
-     * SAMLSOAPReceiver servlet in OpenSSO context. 
+     * SAMLSOAPReceiver servlet in OpenAM context.
      * @param destSite  A object of 
      *                com.sun.identity.saml.common.SAMLServiceManager.SOAPEntry
      * @param to An URLEndpoint object 

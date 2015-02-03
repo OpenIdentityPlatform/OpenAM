@@ -119,7 +119,7 @@ class OrganizationConfigManagerImpl implements SMSObjectListener {
                 if (ServiceManager.isCoexistenceMode()) {
                     // For backward compatibility, get the version from the
                     // service. no hardcoding to '1.0', even if it improves
-                    // performance in OpenSSO. Otherwise, it breaks for
+                    // performance in OpenAM. Otherwise, it breaks for
                     // services like iplanetAMProviderConfigService with
                     // '1.1' as version.
                     scmi = ServiceConfigManagerImpl

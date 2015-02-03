@@ -36,7 +36,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * local identities that maps the <code>SAML</code> protocol objects such as
  * <code>Assertion</code>, <code>ManageNameIDRequest</code> etc.
  * This mapper interface is used to map the identities only at the
- * <code>SAMLAssertionConsumer</code>, in otherwords, 
+ * <code>SAMLAssertionConsumer</code>, in other words,
  * <code>ServiceProvider</code> version of the <code>SAML</code> provider. 
  * The implementation of this interface will be used by the <code>SAML</code>
  * framework to retrieve the user identity information for the consumption
@@ -45,8 +45,8 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * through local configuration in the <code>SAML2</code> plugin.
  *
  * The implementation of this interface may need to consider the
- * deployment of the SAML v2 plugin for example on the OpenSSO
- * platform or on Federation Manager.
+ * deployment of the SAML v2 plugin for example on the OpenAM
+ * platform.
  * @see com.sun.identity.saml2.plugins.IDPAccountMapper
  *
  * @supported.all.api

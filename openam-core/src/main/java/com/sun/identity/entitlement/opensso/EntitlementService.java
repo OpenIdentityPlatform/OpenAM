@@ -1155,10 +1155,10 @@ public class EntitlementService extends EntitlementConfiguration {
     }
 
     /**
-     * Returns <code>true</code> if OpenSSO policy data is migrated to a
+     * Returns <code>true</code> if OpenAM policy data is migrated to a
      * form that entitlements service can operates on them.
      *
-     * @return <code>true</code> if OpenSSO policy data is migrated to a
+     * @return <code>true</code> if OpenAM policy data is migrated to a
      * form that entitlements service can operates on them.
      */
     public boolean hasEntitlementDITs() {

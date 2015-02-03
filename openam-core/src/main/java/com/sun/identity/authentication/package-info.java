@@ -27,9 +27,9 @@
 
 /**
  * Provides interfaces and classes for writing a Remote Java client application
- * to authenticate into OpenSSO. Using these remotable
+ * to authenticate to OpenAM. Using these remotable
  * interfaces and classes provided, a custom application may be authenticated
- * to OpenSSO's list of supported authentication
+ * to OpenAM's list of supported authentication
  * modules/types or pure JAAS modules.
  *
  * @supported.api

@@ -363,7 +363,7 @@ public final class SAMLConstants
                 "urn:oasis:names:tc:SAML:1.0:cm:artifact-01";
 
     /**
-     * OpenSSO confirmation method identifier URI.
+     * OpenAM confirmation method identifier URI.
      *
      * @supported.api
      */
@@ -761,7 +761,7 @@ public final class SAMLConstants
 
     /**
      * A SAML service attribute parameter that defines the creator of an
-     * assertion generated within OpenSSO. The syntax is
+     * assertion generated within OpenAM. The syntax is
      * hostname:port.
      *
      * @supported.api

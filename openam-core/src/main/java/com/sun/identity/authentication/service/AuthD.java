@@ -87,7 +87,7 @@ import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 /**
  * This class is used to initialize the Authentication service and retrieve 
  * the Global attributes for the Authentication service.
- * It also initializes the other dependent services in the OpenSSO system and 
+ * It also initializes the other dependent services in the OpenAM system and
  * hence used as bootstrap class for the authentication server.
  */
 public class AuthD  {
@@ -1229,10 +1229,10 @@ public class AuthD  {
     }
     
     /**
-     * Returns the OpenSSO Identity Repository for an organization.
+     * Returns the OpenAM Identity Repository for an organization.
      *
      * @param orgDN name of the organization
-     * @return OpenSSO Identity Repository.
+     * @return OpenAM Identity Repository.
      */
     public AMIdentityRepository getAMIdentityRepository(String orgDN) {
         AMIdentityRepository amIdentityRepository = null;

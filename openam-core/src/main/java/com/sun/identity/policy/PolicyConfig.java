@@ -205,7 +205,7 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
             = "iPlanetAMPolicyConfigService";
 
     /** 
-     * OpenSSO directory host.
+     * OpenAM directory host.
      */
     public static final String ISDS_HOST = PolicyUtils.getISDSHostName();
 

@@ -70,7 +70,7 @@ public interface SubjectMapper {
      * manager).
      * @param xacmlContextSubjects <code>xacml-context:Subject</code>s from the
      * <code>xacml-context:Request</code> object.
-     * @return OpenSSO <code>SSOToken</code> representing the mapped native subject. 
+     * @return OpenAM <code>SSOToken</code> representing the mapped native subject.
      * If the mapping fails, <code>null<code> would be returned
      * @exception XACMLException if an error conditions occurs.
      */

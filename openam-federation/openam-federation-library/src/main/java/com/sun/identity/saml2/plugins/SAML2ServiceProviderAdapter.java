@@ -135,8 +135,8 @@ public abstract class SAML2ServiceProviderAdapter {
     public abstract void initialize(Map initParams);
  
     /**
-     * Invokes before OpenSSO sends the 
-     * Single-Sing-On request to IDP. 
+     * Invokes before OpenAM sends the
+     * Single-Sign-On request to IDP.
      * @param hostedEntityID entity ID for the hosted SP
      * @param idpEntityID entity id for the IDP to which the request will 
      * 		be sent. This will be null in ECP case.

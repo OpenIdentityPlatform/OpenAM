@@ -253,7 +253,7 @@ public final class WSFederationConstants {
      */
     public static final String WCTX = "wctx";
     /**
-     * HTTP request parameter for OpenSSO realm 
+     * HTTP request parameter for OpenAM realm
      */
     public static final String REALM_PARAM = "famrealm";
     /**

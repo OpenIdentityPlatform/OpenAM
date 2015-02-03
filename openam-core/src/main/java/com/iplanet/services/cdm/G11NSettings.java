@@ -151,9 +151,9 @@ public class G11NSettings implements ServiceListener, ICDMConstants,
 
     /**
      * @param mimeCharset
-     * @return a Map which can provide equivalent charset names Currently,
-     *        OpenSSO uses only Java name however application Can
-     *        configure to have different names for platform level mapping etc.
+     * @return a Map which can provide equivalent charset names. Currently,
+     *        OpenAM uses only Java name; however an application can be
+     *        configured to have different names for platform level mapping etc.
      */
     public Map getCharsetAliasTable(String mimeCharset) {
         return (Map) charsetAlias.get(mimeCharset);

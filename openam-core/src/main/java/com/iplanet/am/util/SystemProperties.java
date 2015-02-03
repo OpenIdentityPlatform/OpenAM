@@ -555,13 +555,12 @@ public class SystemProperties {
     }
     
     /**
-     * Initializes the properties to be used by OpenSSO. Ideally this
-     * must be called first before any other method is called within OpenSSO
-     * Enterprise. This method provides a programmatic way to set the
-     * properties, and will override similar properties if loaded for a
-     * properties file.
+     * Initializes the properties to be used by OpenAM. Ideally this
+     * must be called first before any other method is called within OpenAM.
+     * This method provides a programmatic way to set the properties, and will
+     * override similar properties if loaded for a properties file.
      * 
-     * @param properties properties for OpenSSO
+     * @param properties properties for OpenAM
      * @param reset <code>true</code> to reset existing properties.
      */
     public static void initializeProperties(
@@ -572,13 +571,12 @@ public class SystemProperties {
     }
     
     /**
-     * Initializes the properties to be used by OpenSSO. Ideally this
-     * must be called first before any other method is called within OpenSSO
-     * Enterprise. This method provides a programmatic way to set the
-     * properties, and will override similar properties if loaded for a
-     * properties file.
+     * Initializes the properties to be used by OpenAM. Ideally this
+     * must be called first before any other method is called within OpenAM.
+     * This method provides a programmatic way to set the properties, and will
+     * override similar properties if loaded for a properties file.
      * 
-     * @param properties properties for OpenSSO.
+     * @param properties properties for OpenAM.
      * @param reset <code>true</code> to reset existing properties.
      * @param withDefaults <code>true</code> to include default properties.
      */
@@ -616,9 +614,8 @@ public class SystemProperties {
     }
 
     /**
-     * Initializes the property to be used by OpenSSO. Ideally this
-     * must be called first before any other method is called within OpenSSO
-     * Enterprise.
+     * Initializes a property to be used by OpenAM. Ideally this
+     * must be called first before any other method is called within OpenAM.
      * This method provides a programmatic way to set a specific property, and
      * will override similar property if loaded for a properties file.
      * 
@@ -646,8 +643,8 @@ public class SystemProperties {
     /**
      * Returns a counter for last modification. The counter is incremented if
      * the properties are changed by calling the following method
-     * <code>initializeProperties</code>. This is a convenience methods for
-     * applications to track changes to OpenSSO properties.
+     * <code>initializeProperties</code>. This is a convenience method for
+     * applications to track changes to OpenAM properties.
      * 
      * @return counter of the last modification
      */
@@ -668,7 +665,7 @@ public class SystemProperties {
      * Returns error messages during initialization using the single war
      * deployment, else <code>null</code>.
      * 
-     * @return error messages during initialization of AM as single war
+     * @return error messages during initialization of OpenAM as single war
      */
     public static String getSecondaryInitializationError() {
         return (initSecondaryError);

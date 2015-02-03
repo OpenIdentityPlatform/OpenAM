@@ -42,13 +42,13 @@ import java.util.Enumeration;
  * <code>java.security.Policy</code> for representing the system security
  * policy for a Java application environment. It provides a custom policy
  * implementation based on JAAS and JDK 1.5 and above.It makes policy evaluation
- * against the OpenSSO Policy Service instead of the default file
+ * against the OpenAM Policy Service instead of the default file
  * based one.
  *<p>
  * It provides implementation of the abstract methods in Policy class.
  * <p>In general the source location for the policy information utilized by the
  * Policy object to make policy decisions is up to the Policy implementation.
- * In the case of ISPolicy the source comes from the OpenSSO's policy
+ * In the case of ISPolicy the source comes from the OpenAM's policy
  * store, which is consulted to make the policy evaluation.
  * <p>A <code>Policy</code> object can be queried for the set of Permissions 
  * granted to set of classes running as a <code>Principal</code> in the 
@@ -101,7 +101,7 @@ public class ISPolicy extends java.security.Policy {
      * set of classes. Here we always return the 
      * <code>PermissionCollection</code> after
      * adding the<code>ISPermission</code> object into it, so that policy
-     * determination is also based on OpenSSO's policies.
+     * determination is also based on OpenAM's policies.
      *
      * @param protectionDomain  the protection domain which encapsulates the 
      *        characteristics of a domain, which encloses the set of classes 
@@ -143,7 +143,7 @@ public class ISPolicy extends java.security.Policy {
      * permissions allowed for Principals associated with the specified code
      * source. Here we always return the <code>PermissionCollection</code> 
      * after adding the<code>ISPermission</code> object into it, so that policy
-     * determination is also based on OpenSSO's policies.
+     * determination is also based on OpenAM's policies.
      *
      * @param codesource the <code>CodeSource</code> associated with the caller.
      * This encapsulates the original location of the code (where the code 

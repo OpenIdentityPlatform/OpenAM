@@ -54,7 +54,7 @@ import com.iplanet.services.ldap.ServerInstance;
  * permissions check is enabled, then the operation will fail and return a null
  * everytime.
  * 
- * Note: Java security permissions check for OpenSSO can be enabled
+ * Note: Java security permissions check for OpenAM can be enabled
  * by setting the property <code>com.sun.identity.security.checkcaller</code> to
  * true in AMConfig properties file.
  * 

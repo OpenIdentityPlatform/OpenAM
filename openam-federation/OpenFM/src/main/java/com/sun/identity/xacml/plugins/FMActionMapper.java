@@ -52,7 +52,7 @@ import org.w3c.dom.Element;
  * <pre>
  * urn:oasis:names:tc:xacml:1.0:action:action-id
  * </pre>
- * This attribute would be mapped to an action name in OpenSSO Policy.
+ * This attribute would be mapped to an action name in OpenAM Policy.
  * This mapper requires that the dataType of the attribute is
  * <pre>
  * http://www.w3.org/2001/XMLSchema#string

@@ -35,7 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class is the base for all <code>OpenSSO</code> unit testcases.
+ * This class is the base for all <code>OpenAM</code> unit test cases.
  * It has commonly used methods; and hopefully we can grow this class
  * to support more methods in future.
  */

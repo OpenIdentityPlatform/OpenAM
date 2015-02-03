@@ -72,7 +72,7 @@ import com.sun.identity.shared.ldap.LDAPv2;
 
 /**
  * This class does Directory Server related tasks for 
- * OpenSSO deployed as single web-application. 
+ * OpenAM deployed as single web application.
  */
 class UserIdRepo {
     private static final String umSunDSForAM;

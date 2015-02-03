@@ -40,8 +40,8 @@ import com.sun.identity.policy.Syntax;
 import java.util.HashSet;
 
 /**
- * A generic subject mapper which map entitlement subject to OpenSSO
- * subject.
+ * A generic subject mapper that maps entitlement subjects to OpenAM
+ * subjects.
  */
 public class PrivilegeSubject implements Subject, Cloneable {
     private String state;

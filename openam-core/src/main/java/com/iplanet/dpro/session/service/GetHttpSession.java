@@ -60,7 +60,7 @@ import com.sun.identity.shared.encode.URLEncDec;
  * <ol>
  * <li>Creating a new Http session
  * <li>Recovering an existing Http session in case of server failover
- * <li>Releasing an existing OpenSSO session if it is being
+ * <li>Releasing an existing OpenAM session if it is being
  * relocated to a different "owner" server
  * 
  * Name GetHttpSession is largely a misnomer, but it was kept to minimize

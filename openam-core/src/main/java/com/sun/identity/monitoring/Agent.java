@@ -269,18 +269,18 @@ public class Agent {
      *  This method starts up the monitoring agent.  Returns either
      *  zero (0) if intialization has completed successfully, or one (1)
      *  if not.
-     *  @param OpenSSOServerID The OpenSSO server's ID in the site
-     *  @param svrProtocol OpenSSO server's protocol (http/https)
-     *  @param svrName OpenSSO server's hostname
-     *  @param svrPort OpenSSO server's port
-     *  @param svrURI OpenSSO server's URI
-     *  @param siteID OpenSSO server's Site ID
-     *  @param openSSOServerID OpenSSO server's ID
-     *  @param isEmbeddedDS Whether the OpenSSO server is using an embedded DS
+     *  @param OpenSSOServerID The OpenAM server's ID in the site
+     *  @param svrProtocol OpenAM server's protocol (http/https)
+     *  @param svrName OpenAM server's hostname
+     *  @param svrPort OpenAM server's port
+     *  @param svrURI OpenAM server's URI
+     *  @param siteID OpenAM server's Site ID
+     *  @param openSSOServerID OpenAM server's ID
+     *  @param isEmbeddedDS Whether the OpenAM server is using an embedded DS
      *  @param siteIdTbl the Site ID table for this installation
      *  @param serverIdTbl the Server ID table for this installation
      *  @param namingTbl the Naming table for this installation
-     *  @param stDate start date/time for this OpenSSO server
+     *  @param stDate start date/time for this OpenAM server
      *  @return Success (0) or Failure (1)
      */
     private static void startMonitoringAgent(SSOServerInfo svrInfo) {
@@ -408,7 +408,7 @@ public class Agent {
      *  at least one adaptor is started, monitoring will be "active"
      *  (Agent.isRunning() will return true).
      *
-     *  @param monConfig SSOServerMonConfig structure of OpenSSO configuration
+     *  @param monConfig SSOServerMonConfig structure of OpenAM configuration
      *  @return 0 (zero) if at least one of HTML/SNMP/RMI adaptors started up;
      *     MON_CONFIG_DISABLED:
      *       if monitoring configured as disabled
@@ -432,7 +432,7 @@ public class Agent {
         policyWindow = monConfig.policyWindow;
         sessionWindow = monConfig.sessionWindow;
         String classMethod = "Agent.startAgent:";
-        // OpenSSO server port comes from WebtopNaming.siteAndServerInfo
+        // OpenAM server port comes from WebtopNaming.siteAndServerInfo
         String serverPort = agentSvrInfo.serverPort;
 
         // Check for Legacy MonAuthFile.
@@ -449,7 +449,7 @@ public class Agent {
         /*
          *  there are a lot of exception checks in this method, as
          *  it's invoked from a load-on-startup servlet.  if it
-         *  chokes in here, OpenSSO won't start up.
+         *  chokes in here, OpenAM won't start up.
          */
         if (debug.messageEnabled()) {
             debug.message(classMethod + "entry:\n" +
@@ -474,7 +474,7 @@ public class Agent {
 
         /*
          *  verify that the HTML, SNMP and RMI ports aren't the same as
-         *  the OpenSSO server port.  if HTML or SNMP conflict with it,
+         *  the OpenAM server port.  if HTML or SNMP conflict with it,
          *  then they'll be disabled (warning message).  if the RMI port
          *  conflicts, then all of monitoring is disabled.  there might
          *  be other ports that should be checked.
@@ -527,7 +527,7 @@ public class Agent {
         }
 
         /*
-         *  if OpenSSO's deployed on a container that has MBeanServer(s),
+         *  if OpenAM's deployed on a container that has MBeanServer(s),
          *  will the findMBeanServer(null) "find" those?  if so,
          *  is using the first one the right thing to do?
          */

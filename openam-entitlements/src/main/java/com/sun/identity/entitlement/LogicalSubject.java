@@ -60,9 +60,9 @@ public abstract class LogicalSubject implements EntitlementSubject {
      * Constructor.
      *
      * @param eSubjects wrapped EntitlementSubject(s)
-     * @param pSubjectName subject name as used in OpenSSO policy,
-     * this is releavant only when UserESubject was created from
-     * OpenSSO policy Subject
+     * @param pSubjectName subject name as used in OpenAM policy,
+     * this is relevant only when UserESubject was created from
+     * OpenAM policy Subject
      */
     public LogicalSubject(
         Set<EntitlementSubject> eSubjects,
@@ -133,20 +133,20 @@ public abstract class LogicalSubject implements EntitlementSubject {
     }
 
     /**
-     * Sets OpenSSO policy Subject name
-     * @param pSubjectName subject name as used in OpenSSO policy,
-     * this is releavant only when UserESubject was created from
-     * OpenSSO policy Subject
+     * Sets OpenAM policy Subject name
+     * @param pSubjectName subject name as used in OpenAM policy,
+     * this is relevant only when UserESubject was created from
+     * OpenAM policy Subject
      */
     public void setPSubjectName(String pSubjectName) {
         this.pSubjectName = pSubjectName;
     }
 
     /**
-     * Returns OpenSSO policy Subject name
-     * @return  subject name as used in OpenSSO policy,
-     * this is releavant only when UserESubject was created from
-     * OpenSSO policy Subject
+     * Returns OpenAM policy Subject name
+     * @return  subject name as used in OpenAM policy,
+     * this is relevant only when UserESubject was created from
+     * OpenAM policy Subject
      */
     public String getPSubjectName() {
         return pSubjectName;

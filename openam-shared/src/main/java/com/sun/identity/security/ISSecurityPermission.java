@@ -38,9 +38,9 @@ import java.util.StringTokenizer;
 /**
  * This class <code>ISSecurityPermission</code> is used to protect the Access
  * Manager resources which should be accessed only by trusted application. The
- * resources this Permission is used to protect are: OpenSSO
+ * resources this Permission is used to protect are: OpenAM
  * administrator DN and password, and access to the encryption and decryption
- * methods used to encrypt all passwords in OpenSSO services. The
+ * methods used to encrypt all passwords in OpenAM services. The
  * supported permissions is <code>"access"</code> and supported actions are
  * <code>"adminpassword"</code> and <code>"crypt"</code>. So in the Java
  * security policy file which will define the security options to grant this

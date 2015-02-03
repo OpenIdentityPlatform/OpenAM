@@ -230,10 +230,10 @@ public abstract class EntitlementConfiguration {
         throws EntitlementException;
 
     /**
-     * Returns <code>true</code> if OpenSSO policy data is migrated to a
+     * Returns <code>true</code> if OpenAM policy data is migrated to a
      * form that entitlements service can operates on them.
      *
-     * @return <code>true</code> if OpenSSO policy data is migrated to a
+     * @return <code>true</code> if OpenAM policy data is migrated to a
      * form that entitlements service can operates on them.
      */
     public abstract boolean hasEntitlementDITs();

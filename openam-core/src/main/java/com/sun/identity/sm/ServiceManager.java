@@ -283,7 +283,7 @@ public class ServiceManager {
                                 // For backward compatibility, get the
                                 // version from the service.
                                 // no hardcoding to '1.0', even if it
-                                // improves performance in OpenSSO.
+                                // improves performance in OpenAM.
                                 // Otherwise, it breaks for services like
                                 // iplanetAMProviderConfigService with
                                 // '1.1' as version.

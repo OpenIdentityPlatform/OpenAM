@@ -54,7 +54,7 @@ import java.util.Set;
 import static com.sun.identity.entitlement.EntitlementException.*;
 
 /**
- * This condition wraps all OpenSSO policy condition.
+ * This condition wraps all OpenAM policy conditions.
  */
 
 public class PolicyCondition extends  EntitlementConditionAdaptor {

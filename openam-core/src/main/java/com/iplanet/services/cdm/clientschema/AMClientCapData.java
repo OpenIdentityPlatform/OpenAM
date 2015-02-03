@@ -221,14 +221,14 @@ public class AMClientCapData implements IDSEventListener {
     private static Map schemaMap = null;
 
     //
-    // Needed since OpenSSO retrieves all LDAP attrs in lowercase &
+    // Needed since OpenAM retrieves all LDAP attrs in lowercase &
     // also since we prefix client attrs with "sunamclient"
     //
     private static Map schemaToLDAP = new HashMap();
 
     private static Map LDAPToSchema = new HashMap();
 
-    // Persisstent search related values
+    // Persistent search related values
     protected static final String SEARCH_FILTER = "(" + OBJECTCLASS + EQUALS
             + CLIENT_OBJECTCLASS + ")";
 

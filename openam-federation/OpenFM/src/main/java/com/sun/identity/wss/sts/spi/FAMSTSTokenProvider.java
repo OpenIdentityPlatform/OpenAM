@@ -470,7 +470,7 @@ public class FAMSTSTokenProvider implements STSTokenProvider {
     }
     
     /**
-     * Generates OpenSSO SSOToken by consuming SAML Assertion.
+     * Generates OpenAM SSOToken by consuming SAML Assertion.
      * @param ctx Issued Token Context from WS-Trust Request
      * @throws com.sun.xml.ws.api.security.trust.WSTrustException
      */

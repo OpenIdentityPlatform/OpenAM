@@ -28,7 +28,7 @@
 
 /**
  * Provides the classes to be used for performing privileged operations (like
- * getting the OpenSSO administrator's DN and password).
+ * getting the OpenAM administrator's DN and password).
  * @supported.api
  */
 

@@ -64,9 +64,9 @@ public class UserSubject extends EntitlementSubjectImpl {
     /**
      * Constructs UserSubject
      * @param user the uuid of the user who is member of the EntitlementSubject
-     * @param pSubjectName subject name as used in OpenSSO policy,
-     * this is releavant only when UserSubject was created from
-     * OpenSSO policy Subject
+     * @param pSubjectName subject name as used in OpenAM policy,
+     * this is relevant only when UserSubject was created from
+     * OpenAM policy Subject
      */
     public UserSubject(String user, String pSubjectName) {
         super(user, pSubjectName);

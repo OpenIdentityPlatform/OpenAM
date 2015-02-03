@@ -97,7 +97,7 @@ import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * An abstract class which implements JAAS LoginModule, it provides
- * methods to access OpenSSO services and the module
+ * methods to access OpenAM services and the module
  * xml configuration.
  * <p>
  * Because it is an abstract class, Login Module writers must subclass
@@ -1636,7 +1636,8 @@ public abstract class AMLoginModule implements LoginModule {
      * @deprecated This method has been deprecated. Please use the
      *             IdRepo API's to get the AMIdentity object for the user. More
      *             information on how to use the Identity Repository APIs is
-     *             available in the OpenSSO Developer's Guide.
+     *             available in the "Customizing Identity Data Storage" chapter
+     *             of the OpenAM Developer's Guide.
      *
      * @supported.api
      */

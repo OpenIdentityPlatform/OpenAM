@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * This class extends XWSS Security Token and enables the STS Clients to
  * use any custom tokens that can be used in WS-Trust protocol element
- * <code>OnBehalfOf</code>. This element is used by the OpenSSO
+ * <code>OnBehalfOf</code>. This element is used by the OpenAM
  * STS Service to allow any custom changes to the issued tokens by the STS.
  * 
  * This is also known as End user token conversion interface (SPI) that can

@@ -82,9 +82,9 @@ public class OpenSSOGroupSubject extends GroupSubject {
      *
      * @param group the uuid of the group who is member of the
      *        EntitlementSubject
-     * @param pSubjectName subject name as used in OpenSSO policy,
-     *        this is releavant only when GroupSubject was created from
-     *        OpenSSO policy Subject
+     * @param pSubjectName subject name as used in OpenAM policy,
+     *        this is relevant only when GroupSubject was created from
+     *        OpenAM policy Subject
      */
     public OpenSSOGroupSubject(String group, String pSubjectName) {
         super(group, pSubjectName);

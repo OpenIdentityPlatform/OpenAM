@@ -157,20 +157,20 @@ public class StaticAttributes implements ResourceAttribute {
     }
 
     /**
-     * Sets OpenSSO policy response provider name of the object
-     * @param pResponseProviderName response provider name as used in OpenSSO
-     *        policy, this is releavant only when StaticAttributes was created
-     *        from OpenSSO policy Subject
+     * Sets OpenAM policy response provider name of the object
+     * @param pResponseProviderName response provider name as used in OpenAM
+     *        policy, this is relevant only when StaticAttributes was created
+     *        from OpenAM policy Subject
      */
     public void setPResponseProviderName(String pResponseProviderName) {
         this.pResponseProviderName = pResponseProviderName;
     }
 
     /**
-     * Returns OpenSSO policy response provider name of the object
-     * @return response provider name as used in OpenSSO policy,
-     * this is releavant only when StaticAttributes was created from
-     * OpenSSO policy Subject
+     * Returns OpenAM policy response provider name of the object
+     * @return response provider name as used in OpenAM policy,
+     * this is relevant only when StaticAttributes was created from
+     * OpenAM policy Subject
      */
     public String getPResponseProviderName() {
         return pResponseProviderName;

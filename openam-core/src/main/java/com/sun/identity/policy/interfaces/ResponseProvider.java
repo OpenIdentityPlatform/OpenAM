@@ -43,7 +43,7 @@ import java.util.Set;
 
 /**
  * The class <code>ResponseProvider</code> defines an interface to allow 
- * pluggable response providers into the OpenSSO framework. These 
+ * pluggable response providers into the OpenAM framework. These
  * are used to provide policy response attributes. Policy response attributes 
  * are different from <code>ActionDecision</code>. Policy response attributes 
  * typically provide attribute values of user profile. User profile could 
@@ -58,9 +58,9 @@ import java.util.Set;
  * <code>setProperties()</code> method.
  * <p>
  * Response attribute names are not checked against schema of the service
- * registered with OpenSSO. (<code>ActionDecision</code> attributes
+ * registered with OpenAM. (<code>ActionDecision</code> attributes
  * are checked against the schema of the service registered with
- * OpenSSO).
+ * OpenAM).
  *
  * A Response Provider computes a <code>Map</code> of response attributes
  * and their values based on the <code>SSOToken</code>, resource name and  

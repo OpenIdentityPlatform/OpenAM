@@ -57,7 +57,7 @@ import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 
 /**
- * OpenSSO JAAS Configuration implementation.
+ * OpenAM JAAS Configuration implementation.
  */
 public class AMConfiguration extends Configuration {
     

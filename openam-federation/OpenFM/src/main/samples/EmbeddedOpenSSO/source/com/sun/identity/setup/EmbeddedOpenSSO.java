@@ -33,9 +33,9 @@ import javax.servlet.ServletContext;
 import com.sun.identity.authentication.UI.LoginLogoutMapping;
 
 /**
- * Provides interfaces to manage an embedded OpenSSO instance.
+ * Provides interfaces to manage an embedded OpenAM instance.
  * Methods to start, configure and shutdown are provided, and additionally
- * a method to determine if the OpenSSO instance is configured.
+ * a method to determine if the OpenAM instance is configured.
  */
 public class EmbeddedOpenSSO {
     private String baseDir;
@@ -44,10 +44,10 @@ public class EmbeddedOpenSSO {
     private Map configData;
 
     /**
-     * Instance for standalone i.e., non-web based OpenSSO instance.
+     * Instance for standalone i.e., non-web based OpenAM instance.
      * Should not be used within a web application.
      *
-     * @param baseDir directory to install OpenDS (if required)
+     * @param baseDir directory to install OpenDJ (if required)
      * and directory to create debugs, logs and templates
      * @param configData configuration data such as server url, admin password,
      */
@@ -58,8 +58,8 @@ public class EmbeddedOpenSSO {
     }
 
     /**
-     * Instance of OpenSSO for web based applications. The <class>config</class>
-     * parameter is used to initialize the servlets within OpenSSO
+     * Instance of OpenAM for web based applications. The <class>config</class>
+     * parameter is used to initialize the servlets within OpenAM
      *
      * @param config servlet configuration
      * @param baseDir directory to install OpenDS (if required)
@@ -79,16 +79,16 @@ public class EmbeddedOpenSSO {
     }
 
     /**
-     * Determines if the instance of OpenSSO is configured.
+     * Determines if the instance of OpenAM is configured.
      *
-     * @return true if OpenSSO instance is configured; false otherwise
+     * @return true if OpenAM instance is configured; false otherwise
      */
     public boolean isConfigured() {
         return AMSetupServlet.isConfigured(baseDir);
     }
 
     /**
-     * Configures the instance of the OpenSSO as provided by the
+     * Configures the instance of OpenAM as provided by the
      * configuration data. In the future we should be able to return
      * an OutputStream that provides the current operation being performed.
      * 
@@ -104,7 +104,7 @@ public class EmbeddedOpenSSO {
     }
 
     /**
-     * Starts the instance of OpenSSO
+     * Starts the instance of OpenAM
      */
     public void startup() {
         try {
@@ -114,7 +114,7 @@ public class EmbeddedOpenSSO {
     }
 
     /**
-     * Shuts down the instance of OpenSSO
+     * Shuts down the instance of OpenAM
      */
     public void shutdown() {
         // Shutdown the threads

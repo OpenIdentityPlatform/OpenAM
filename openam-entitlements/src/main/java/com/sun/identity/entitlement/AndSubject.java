@@ -55,9 +55,9 @@ public class AndSubject extends LogicalSubject {
     /**
      * Constructs OrSubject
      * @param eSubjects wrapped EntitlementSubject(s)
-     * @param pSubjectName subject name as used in OpenSSO policy,
-     * this is releavant only when UserESubject was created from
-     * OpenSSO policy Subject
+     * @param pSubjectName subject name as used in OpenAM policy,
+     * this is relevant only when UserESubject was created from
+     * OpenAM policy Subject
      */
     public AndSubject(Set<EntitlementSubject> eSubjects, String pSubjectName) {
         super(eSubjects, pSubjectName);

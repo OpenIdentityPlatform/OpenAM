@@ -486,7 +486,7 @@ public interface Constants {
 
     /**
      * Property string to determine if validation is required when parsing XML
-     * documents using OpenSSO XMLUtils class.
+     * documents using OpenAM XMLUtils class.
      */
     static final String XML_VALIDATING = "com.iplanet.am.util.xml.validating";
 
@@ -617,7 +617,7 @@ public interface Constants {
 
     /**
      * HTTP Form Parameter name used by PEP for posting policy advices to
-     * OpenSSO.
+     * OpenAM.
      */
     static final String COMPOSITE_ADVICE = "sunamcompositeadvice";
 

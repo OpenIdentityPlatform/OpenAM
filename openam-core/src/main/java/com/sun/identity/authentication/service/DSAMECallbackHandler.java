@@ -41,7 +41,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 
 /**
- * This class is OpenSSO implementation for Java 
+ * This class is the OpenAM implementation for Java
  * <code>CallbackHandler</code> and it can be passed to underlying 
  * auth services so that it may interact with other components to retrieve 
  * specific authentication data, such as usernames and passwords, or to display 

@@ -42,10 +42,9 @@ import java.util.Set;
 /**
  * This class implements the interface <code>ServiceListener</code> in order
  * to receive session service data change notifications. The method
- * schemaChanged() is invoked when a session service schema data under
- * followings has been changed. Console/Service Configuration/OpenSSO
- * Configuration/Session - Upper limit for session search result set size -
- * Search timeout
+ * schemaChanged() is invoked when session service schema data in the
+ * following locations is changed; Console > Configuration > Global > Session -
+ * Maximum Number or Search Results and Timeout for Search.
  * @see com.sun.identity.sm.ServiceSchemaManager
  */
 public class SessionConfigListener implements ServiceListener {

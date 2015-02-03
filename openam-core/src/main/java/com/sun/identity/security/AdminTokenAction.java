@@ -63,7 +63,7 @@ import org.forgerock.util.thread.listener.ShutdownListener;
  * <code>AMConfig.properties</code>. If so, we will generate single sign on
  * token based on the user name and secret.
  * 
- * Note: Java security permissions check for OpenSSO can be enabled
+ * Note: Java security permissions check for OpenAM can be enabled
  * by setting the property <code>com.sun.identity.security.checkcaller</code> to
  * true in <code>AMConfig.properties</code> file.
  * 

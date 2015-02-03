@@ -63,7 +63,7 @@ public class SwapClientConfig {
      * Creates AMConfig.properties file
      * @param configFile Absolute path to the AMConfig.properties to be created.
      * @param templateFile Template file for AMConfig.properties
-     * @param serverURL OpenSSO server URL to be swapped in the template file
+     * @param serverURL OpenAM server URL to be swapped in the template file
      * @param baseDir Base directory for Debug and Keystore files, to be swapped in the template file
      * @param appUser Application user name to be swapped in the template file
      * @param appPassword Application user password to be swapped in the template file

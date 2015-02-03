@@ -28,9 +28,9 @@
 
 /**
  * Provides interfaces and classes for writing a supplemental authentication
- * module to plug into OpenSSO. Using the interfaces
- * and classes provided, a custom authentication module may be added to Sun
- * OpenSSO's list of supported authentication modules/types.
+ * module to plug into OpenAM. Using the interfaces
+ * and classes provided, a custom authentication module may be added to
+ * OpenAM's list of supported authentication modules/types.
  * <p>
  * Provides an interface for post authentication processing on successful,
  * failed authentication or on a logout.

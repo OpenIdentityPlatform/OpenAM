@@ -57,7 +57,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This subject wraps all OpenSSO policy subject.
+ * This subject wraps all OpenAM policy subjects.
  */
 public class PolicySubject implements EntitlementSubject {
     private String name;

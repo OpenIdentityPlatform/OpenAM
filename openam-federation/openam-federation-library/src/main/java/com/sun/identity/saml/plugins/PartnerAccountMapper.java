@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * The class <code>PartnerAccountMapper</code> is an interface
  * that is implemented to map partner account to user account
- * in OpenSSO.  
+ * in OpenAM.
  * <p>
  * Different partner would need to have a different implementation
  * of the interface. The mappings between the partner source ID and 
@@ -66,7 +66,7 @@ public interface PartnerAccountMapper {
 
 
     /**
-     * Returns user account in OpenSSO to which the
+     * Returns user account in OpenAM to which the
      * subject in the assertion is mapped. This method will be called in POST
      * profile, <code>ARTIFACT</code> profile, <code>AttributeQuery</code> and
      * <code>AuthorizationDecisionQuery</code>.
@@ -84,7 +84,7 @@ public interface PartnerAccountMapper {
      *         key is the user DN, value of the <code>ORG</code> is the user
      *         organization  DN, value of the <code>ATTRIBUTE</code> is a Map
      *         containing key/value pairs which will be set as properties
-     *         on the OpenSSO SSO token, the key is the SSO
+     *         on the OpenAM SSO token, the key is the SSO
      *         property name, the value is a String value of the property.
      *         Returns empty map if the mapped user could not be obtained
      *         from the subject.
@@ -92,7 +92,7 @@ public interface PartnerAccountMapper {
     public Map getUser(List assertions,String sourceID,String targetURL);
 
     /**
-     * Returns user account in OpenSSO to which the
+     * Returns user account in OpenAM to which the
      * subject in the query is mapped. This method will be called in
      * <code>AttributeQuery</code>.
      *

@@ -57,7 +57,7 @@ import com.sun.identity.shared.ldap.LDAPRequestParser;
 import com.sun.identity.shared.ldap.LDAPSearchRequest;
 
 /**
- * This class respresents a group of OpenSSO organizations.
+ * This class represents a group of OpenAM organizations.
  */
 public class Organization implements Subject {
 

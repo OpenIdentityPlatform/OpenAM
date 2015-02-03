@@ -376,7 +376,7 @@ public class OrganizationConfigManager {
 
         // If in realm mode and copy org enabled, default services needs
         // to be registered for the newly created org/suborg and the
-        // amSDKOrgName/OpenSSO Organization is updated with the
+        // amSDKOrgName/OpenAM Organization is updated with the
         // new suborg dn.
         if (realmEnabled && isCopyOrgEnabled()) {
             registerSvcsForOrg(subOrgName, subOrgDN);

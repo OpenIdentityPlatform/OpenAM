@@ -73,9 +73,9 @@ public class OpenSSOUserSubject extends UserSubject {
     /**
      * Constructs OpenSSOUserSubject
      * @param user the uuid of the user who is member of the OpenSSOUserSubject
-     * @param pSubjectName subject name as used in OpenSSO policy,
-     * this is releavant only when OpenSSOUserSubject was created from
-     * OpenSSO policy Subject
+     * @param pSubjectName subject name as used in OpenAM policy,
+     * this is relevant only when OpenSSOUserSubject was created from
+     * OpenAM policy Subject
      */
     public OpenSSOUserSubject(String user, String pSubjectName) {
         super(user, pSubjectName);

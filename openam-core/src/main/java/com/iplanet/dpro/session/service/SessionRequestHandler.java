@@ -289,7 +289,7 @@ public class SessionRequestHandler implements RequestHandler {
                         }
                     } else {
                         // use LB-dependent routing
-                        // if session is not found at this instance we check that both OpenSSO session and
+                        // if session is not found at this instance we check that both OpenAM session and
                         // HTTP session cookies were enclosed in the request. If they were then LB must have 
                         // routed to the proper server instance and we must treat it as a session recovery
                         // case. If any of the cookies missing or do not match the sid in the message we 

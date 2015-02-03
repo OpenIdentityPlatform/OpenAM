@@ -1427,7 +1427,7 @@ public class AuthUtils extends AuthClientUtils {
      * the value is retrieved from the auth service if a
      * handle on the auth context object is there otherwise
      * check the HttpServletRequest object to see if the
-     * OpenSSO cookie is in the request header
+     * OpenAM cookie is in the request header
      *
      * @param authContext is the handle to the auth service
      *	                  for the request

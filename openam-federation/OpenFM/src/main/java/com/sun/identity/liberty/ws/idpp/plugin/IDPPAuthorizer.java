@@ -50,7 +50,7 @@ import com.sun.identity.shared.locale.Locale;
  * IDPP Authorization and implements <code>Authorizer</code>. It 
  * provides an allow ,deny, interact for consent, interact for value action 
  * based on the resource that a WSC is requesting for.
- * This makes use of existing OpenSSO policy frame work by defining
+ * This makes use of the existing OpenAM policy framework by defining
  * policy as action values in the personal profile service.
  */
 public class IDPPAuthorizer implements Authorizer {

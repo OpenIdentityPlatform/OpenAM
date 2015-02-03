@@ -87,10 +87,10 @@ public interface ResourceAttribute {
         throws EntitlementException;
 
     /**
-     * Sets OpenSSO policy response provider name of the object.
+     * Sets OpenAM policy response provider name of the object.
      *
-     * @param pResponseProviderName response provider name as used in OpenSSO policy, this is relevant only
-     *        when StaticAttributes was created from OpenSSO policy Subject
+     * @param pResponseProviderName response provider name as used in OpenAM policy, this is relevant only
+     *        when StaticAttributes was created from OpenAM policy Subject
      *
      * @deprecated
      */
@@ -98,10 +98,10 @@ public interface ResourceAttribute {
     void setPResponseProviderName(String pResponseProviderName);
 
     /**
-     * Returns OpenSSO policy response provider name of the object
+     * Returns OpenAM policy response provider name of the object
      *
-     * @return response provider name as used in OpenSSO policy, this is relevant only when StaticAttributes
-     *         were created from OpenSSO policy Subject
+     * @return response provider name as used in OpenAM policy, this is relevant only when StaticAttributes
+     *         were created from OpenAM policy Subject
      *
      * @deprecated
      */

@@ -45,8 +45,8 @@ import org.w3c.dom.Node;
  * <pre>
  *    <!-- AdvicesHandleableByAMResponse element is the response from server
  *         that contains the names of policy advices that could be
- *         handled by OpenSSO
- *         if PEP redirects the user agent to OpenSSO
+ *         handled by OpenAM
+ *         if PEP redirects the user agent to OpenAM
  *    -->
  *
  *    <!ELEMENT    AdvicesHandleableByAMResponse    (AttributeValuePair?) >
@@ -74,8 +74,7 @@ public class AdvicesHandleableByAMResponse {
     /**
      * Constructs an <code>AdvicesHandleableByAMResponse</code> object.
      *
-     * @param advicesHandleableByAM Set of advices to be handled by OpenSSO
-     *        Enterprise
+     * @param advicesHandleableByAM Set of advices to be handled by OpenAM
      */
     public AdvicesHandleableByAMResponse(Set advicesHandleableByAM) {
         this.advicesHandleableByAM = advicesHandleableByAM;
@@ -84,18 +83,16 @@ public class AdvicesHandleableByAMResponse {
     /**
      * Sets the advices to be handled by OpenSSO.
      *
-     * @param advicesHandleableByAM Set of advices to be handled by OpenSSO
-     *        Enterprise.
+     * @param advicesHandleableByAM Set of advices to be handled by OpenAM
      */
     public void setAdvicesHandleableByAM(Set advicesHandleableByAM) {
         this.advicesHandleableByAM = advicesHandleableByAM;
     }
 
     /**
-     * Returns the advices to be handled by OpenSSO.
+     * Returns the advices to be handled by OpenAM.
      *
-     * @return advicesHandleableByAM Set of advices to be handled by OpenSSO
-     *         Enterprise.
+     * @return advicesHandleableByAM Set of advices to be handled by OpenAM.
      */
     public Set getAdvicesHandleableByAM() {
         return advicesHandleableByAM;

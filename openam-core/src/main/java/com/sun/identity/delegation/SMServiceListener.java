@@ -77,14 +77,14 @@ public class SMServiceListener implements ServiceListener {
         try {
             // Try Delegation Service, present only in OpenSSO
             // Since Delegation Service is being added only in OpenSSO
-            // check for its presense in root realm. If not present,
+            // check for its presence in root realm. If not present,
             // it is an upgrade from AM 7.1 and use AuthService
             ServiceConfigManager scm = null;
             try {
                 scm = new ServiceConfigManager(
                     DelegationManager.DELEGATION_SERVICE, token);
                 if (scm.getOrganizationConfig("/", null) == null) {
-                    // Delegation servier does not exisit for realm
+                    // Delegation Service does not exist for realm
                     // Default to auth service
                     scm = null;
                 }

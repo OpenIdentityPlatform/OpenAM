@@ -381,7 +381,7 @@ public class FSPreLogin {
     }
 
     /**
-     * Validates the OpenSSO Session Token String.
+     * Validates the OpenAM Session Token String.
      *
      * @param token the Session Token String.
      * @return a boolean value true if valid otherwise false.
@@ -523,8 +523,8 @@ public class FSPreLogin {
     /**
      * Redirects request to URL based on whether a Single Sign-On needs to
      * be done or local Authentication. The decision is based on AuthFlag
-     * which is set in LocalConfiguration of the provider, presence/absense
-     * of Federation Cookie and the presence/absence of OpenSSO
+     * which is set in LocalConfiguration of the provider, presence/absence
+     * of Federation Cookie and the presence/absence of OpenAM
      * Session Cookie or/and its validity.
      *
      * @param request the <code>HttpServletRequest</code> object.

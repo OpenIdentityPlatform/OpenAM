@@ -62,22 +62,22 @@ import org.w3c.dom.Node;
  */
 public class PolicyRequest {
     /**
-     * Policy Request - Get Resource Results Id.
+     * Policy Request - Get Resource Results ID.
      */
     public static final int POLICY_REQUEST_GET_RESOURCE_RESULTS = 1;
 
     /**
-     * Policy Request - Add Policy Listener Id.
+     * Policy Request - Add Policy Listener ID.
      */
     public static final int POLICY_REQUEST_ADD_POLICY_LISTENER = 2;
 
     /**
-     * Policy Request - Remove Policy Listener Id.
+     * Policy Request - Remove Policy Listener ID.
      */
     public static final int POLICY_REQUEST_REMOVE_POLICY_LISTENER = 3;
 
     /**
-     * Policy Request - Advices handleable by OpenSSO Id.
+     * Policy Request - Advices handleable by OpenAM ID.
      */
     public static final int POLICY_REQUEST_ADVICES_HANDLEABLE_BY_AM_REQUEST = 4;
 
@@ -108,18 +108,18 @@ public class PolicyRequest {
     }
 
     /**
-     * Returns the method Id of the Policy Request.
+     * Returns the method ID of the Policy Request.
      *
-     * @return the method Id.
+     * @return the method ID.
      */
     public int getMethodID() {
         return methodID;
     }
 
     /**
-     * Sets the method Id of the Policy Request.
+     * Sets the method ID of the Policy Request.
      *
-     * @param id the method Id.
+     * @param id the method ID.
      */
     public void setMethodID(int id) {
         methodID = id;
@@ -145,18 +145,18 @@ public class PolicyRequest {
     }
 
     /**
-     * Returns the request Id.
+     * Returns the request ID.
      *
-     * @return the request Id.
+     * @return the request ID.
      */
     public String getRequestId() {
         return requestId;
     }
 
     /**
-     * Sets the request Id.
+     * Sets the request ID.
      *
-     * @param reqId the Id of the request.
+     * @param reqId the ID of the request.
      */
     public void setRequestId(String reqId) {
         requestId = reqId;

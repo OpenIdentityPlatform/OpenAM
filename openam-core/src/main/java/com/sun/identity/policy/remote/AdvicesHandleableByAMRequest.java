@@ -39,8 +39,8 @@ import org.w3c.dom.Node;
  * <p>
  * <pre>
  *    <!-- AdvicesHandleableByAMRequest element requests the server to return
- *         the names of policy advices that could be handled by OpenSSO
- *         Enterprise if PEP redirects the user agent to OpenSSO
+ *         the names of policy advices that could be handled by OpenAM
+ *         if PEP redirects the user agent to OpenAM
  *    -->
  *
  *    <!ELEMENT    AdvicesHandleableByAMRequest    EMPTY >

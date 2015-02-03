@@ -89,8 +89,8 @@ public class RedirectCallback implements Callback, java.io.Serializable {
      * @param method Method used for redirection, either "GET" or "POST".
      * @param statusParameter statusParameter to be checked from 
      * HttpServletRequest object at the result of redirection.
-     * @param redirectBackUrlCookie redirectBackUrlCookie name to be set as 
-     * OpenSSO server URL when redirecting to external web site.
+     * @param redirectBackUrlCookie redirectBackUrlCookie name to be set as the
+     * OpenAM server URL when redirecting to external web site.
      */
     public RedirectCallback(String redirectUrl, Map redirectData, 
                             String method, String statusParameter, 
@@ -198,21 +198,21 @@ public class RedirectCallback implements Callback, java.io.Serializable {
     }
     
     /**
-     * Sets the redirectBackUrlCookie name to be set as OpenSSO 
+     * Sets the redirectBackUrlCookie name to be set as the OpenAM
      * server URL when redirecting to external web site.
      *
-     * @param redirectBackUrlCookie redirectBackUrlCookie name to be set as 
-     * OpenSSO server URL when redirecting to external web site.
+     * @param redirectBackUrlCookie redirectBackUrlCookie name to be set as the
+     * OpenAM server URL when redirecting to external web site.
      */
     public void setRedirectBackUrlCookieName(String redirectBackUrlCookie) {
         this.redirectBackUrlCookie = redirectBackUrlCookie;
     }
     
     /**
-     * Returns the redirectBackUrlCookie name to be set as OpenSSO 
+     * Returns the redirectBackUrlCookie name to be set as the OpenAM
      * server URL when redirecting to external web site.
      *
-     * @return the redirectBackUrlCookie name to be set as OpenSSO 
+     * @return the redirectBackUrlCookie name to be set as the OpenAM
      * server URL when redirecting to external web site.
      */
     public String getRedirectBackUrlCookieName() {

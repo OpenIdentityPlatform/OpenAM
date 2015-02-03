@@ -46,7 +46,7 @@ import com.oblix.access.*;
 
 /**
  * Custom authentication module for validating oracle Acess Manager(Oblix)
- *  user session  to enable SSO integration between OpenSSO and
+ *  user session  to enable SSO integration between OpenAM and
  * Oracle access manager.
  */
 public class OblixAuthModule extends AMLoginModule {

@@ -166,7 +166,7 @@ public class OAMAdapter extends SAML2ServiceProviderAdapter {
     }
  
     /**
-     * Invokes before OpenSSO sends the 
+     * Invokes before OpenAM sends the
      * Single-Sign-On request to IDP. 
      * @param hostedEntityID entity ID for the hosted SP
      * @param idpEntityID entity id for the IDP to which the request will 
@@ -190,7 +190,7 @@ public class OAMAdapter extends SAML2ServiceProviderAdapter {
 
 
     /**
-     * Invokes when the OpenSSO Server received the Single-Sign-On
+     * Invokes when the OpenAM Server received the Single-Sign-On
      * response from the IDP, this is called before any processing started on
      * SP side.
      * @param hostedEntityID entity ID for the hosted SP

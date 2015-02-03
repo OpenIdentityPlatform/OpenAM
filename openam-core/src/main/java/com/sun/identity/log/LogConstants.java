@@ -128,7 +128,7 @@ public class LogConstants {
 
     /**
      * Attribute defining the ELFFormatter class.
-     * (OpenSSO ELF Formatting. Hence FHandler
+     * (OpenAM ELF Formatting. Hence FHandler
      * should be associated with a ELFFormatter).
      */
     public static final String ELF_FORMATTER =
@@ -137,7 +137,7 @@ public class LogConstants {
     /**
      * Attribute defining the RemoteFormatter class which creates a
      * xml string for a log action and sends it across to the remote
-     * OpenSSO.
+     * OpenAM.
      */
     public static final String REMOTE_FORMATTER =
         "iplanet-am-logging-remote-formatter";

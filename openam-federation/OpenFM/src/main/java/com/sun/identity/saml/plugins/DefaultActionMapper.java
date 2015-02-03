@@ -181,12 +181,12 @@ public class DefaultActionMapper implements ActionMapper {
 
     /**
      * This method first converts the AttributeStatements in Evidence to
-     * OpenSSO Policy API environment variables. The Attributes in
-     * the AttributeStatement(s) are expected to be OpenSSO
+     * OpenAM Policy API environment variables. The Attributes in
+     * the AttributeStatement(s) are expected to be OpenAM
      * attributes.
      * It then query the Policy decision one action at a time. Currently,
      * it handles actions defined in urn:oasis:names:tc:SAML:1.0:ghpp only.
-     * This action Namespace is mapped to OpenSSO
+     * This action Namespace is mapped to OpenAM
      * iPlanetAMWebAgentService.
      */
     public Map getAuthorizationDecisions(AuthorizationDecisionQuery query,

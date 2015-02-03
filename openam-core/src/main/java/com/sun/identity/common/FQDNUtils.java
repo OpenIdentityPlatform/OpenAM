@@ -123,7 +123,7 @@ public class FQDNUtils {
     /**
      * Returns true if a host name is valid. <code>hostname</code> is valid if
      * it is contained in the list of fully qualified host names. Or, it is the
-     * default host name where OpenSSO is installed.
+     * default host name where OpenAM is installed.
      * 
      * @param hostname
      *            host name

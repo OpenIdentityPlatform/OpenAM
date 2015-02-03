@@ -50,7 +50,7 @@ import com.iplanet.sso.SSOToken;
 /**
  * The class <code>FAMAuthScheme</code> implements siteminer authentication
  * scheme <code>SMAuthScheme</code>. The FAMAuthScheme generates siteminder
- * session by consuming OpenSSO session. 
+ * session by consuming an OpenAM session.
  * Siteminder is the trade mark of Computer Associates, the usage of the
  * Siteminder API is subject to Siteminder License terms.
  */

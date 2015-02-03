@@ -52,9 +52,9 @@ import com.sun.identity.common.SystemConfigurationUtil;
  * <p>
  * The class provides mechanisms to manage the <code>Assertion</code>s either
  * locally (i.e., within the same JVM process) or remotely on another instance
- * of OpenSSO. The default constructor will manage the <code>
+ * of OpenAM. The default constructor will manage the <code>
  * Assertion</code>s locally if it detects SAML web services running locally,
- * else will use on of the configured OpenSSO. The constructor which
+ * else will use one of the configured OpenAM servers. The constructor which
  * accepts an <code>URL</code> will always use the URL to manage the assertions.
  * <p>
  * Having obtained an instance of <code>AssertionManagerClient</code>, its
@@ -116,8 +116,9 @@ public final class AssertionManagerClient {
                 checkedForLocal = true;
             /*
              * The following code is commented out since we are not ready
-             * to do a fall back funtion yet, as rest of the OpenSSO
-             * donot support this. The server specified in AMConfig.properties
+             * to do a fall back function yet, as the rest of OpenAM
+             * does not support this. The server specified in AMConfig
+             * .properties
              * will only be used to determine the remote server.
               */
             /* } catch (URLNotFoundException unfe) {
@@ -572,7 +573,7 @@ public final class AssertionManagerClient {
         
     /**
      * Returns all valid <code>AssertionArtifacts</code> managed by
-     * this instance (or the identified remote instance) of OpenSSO.
+     * this instance (or the identified remote instance) of OpenAM.
      * @param token User session which is allowed to get all
      *        <code>AssertionArtifacts</code>
      * @return A Set of valid <code>AssertionArtifacts</code>. Each element
@@ -600,7 +601,7 @@ public final class AssertionManagerClient {
 
     /**
      * Returns all valid <code>Assertion</code>s managed by this instance
-     * (or the identified remote instance) of OpenSSO.
+     * (or the identified remote instance) of OpenAM.
      *
      * @param token User session which is allowed to get all Assertions.
      * @return A Set of valid Assertion IDs. Each element in the Set is a

@@ -48,8 +48,7 @@ import java.util.Set;
  * <p>
  * SSOTokenManager is a singleton class; there can be, at most, only one
  * instance of SSOTokenManager in any given JVM. <p> SSOTokenManager currently
- * supports only two kinds of provider, one for Grappa and another for Sun
- * OpenSSO. In the future, this will be extended to support
+ * supports only two kinds of provider: Grappa and OpenAM.
  * <p> It is assumed that the provider classes or the JAR file is in the
  * CLASSPATH so that they can be found automatically. Providers can be
  * configured using <code>providerimplclass</code> property.
@@ -274,8 +273,8 @@ public class SSOTokenManager {
      * @deprecated This method has been deprecated. Please use the regular LDAP
      *             authentication mechanism instead. More information on how to
      *             use the authentication programming interfaces as well as the
-     *             code samples can be obtained from the "Authentication
-     *             Service" chapter of the OpenSSO Developer's Guide.
+     *             code samples can be obtained from the "Authenticating Using
+     *             OpenAM Java SDK" chapter of the OpenAM Developer's Guide.
      */
     public SSOToken createSSOToken(Principal user, String password)
             throws UnsupportedOperationException, SSOException {

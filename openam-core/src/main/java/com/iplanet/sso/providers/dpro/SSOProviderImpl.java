@@ -131,8 +131,8 @@ public final class SSOProviderImpl implements SSOProvider {
      * @deprecated This method has been deprecated. Please use the
      * regular LDAP authentication mechanism instead. More information
      * on how to use the authentication programming interfaces as well as the
-     * code samples can be obtained from the "Authentication
-     * Service" chapter of the OpenSSO Developer's Guide.
+     * code samples can be obtained from the "Authenticating Using
+     * OpenAM Java SDK" chapter of the OpenAM Developer's Guide.
      */
     public SSOToken createSSOToken(java.security.Principal user,
                                    String password) throws SSOException, UnsupportedOperationException {

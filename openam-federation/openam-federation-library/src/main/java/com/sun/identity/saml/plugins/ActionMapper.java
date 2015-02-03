@@ -39,7 +39,7 @@ import java.util.Set;
 /**
  * The class <code>ActionMapper</code> is an interface that is 
  * implemented to get SSO information and map partner actions to
- * OpenSSO authorization decisions.
+ * OpenAM authorization decisions.
  * <p>
  * A different implementation of the interface may be developed for different
  * partner. The mapping between the partner source ID and the implementation
@@ -66,11 +66,11 @@ public interface ActionMapper {
     public static final String INDETERMINATE = "Indeterminate";
 
     /**
-     * Returns the single sign on token id to OpenSSO from the query.
+     * Returns the single sign on token id to OpenAM from the query.
      *
      * @param query The received <code>AuthorizationDecisionQuery</code>.
      * @return String which is the single sign on token ID. Return null if the
-     *         OpenSSO single sign on token id could not be obtained
+     *         OpenAM single sign on token id could not be obtained
      *         from the query.
      */
     public String getSSOTokenID(AuthorizationDecisionQuery query);
