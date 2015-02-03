@@ -18,11 +18,13 @@ package org.forgerock.openam.sts.rest.config.user;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.shared.sts.SharedSTSConstants;
-import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.DeploymentPathNormalizationImpl;
 import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.config.user.DeploymentConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
+import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.util.Reject;
 
@@ -30,7 +32,7 @@ import java.util.*;
 
 
 /**
- * Class which encapsulates all of the user-provided config information necessary to create an instance of the
+ * Class which encapsulates all of the user-provided config information necessary to create an instance of the rest
  * STS.
  * It is an immutable object with getter methods to obtain all of the necessary information needed by the various
  * guice modules and providers to inject the object graph corresponding to a fully-configured STS instance.
@@ -47,13 +49,13 @@ import java.util.*;
 public class RestSTSInstanceConfig extends STSInstanceConfig {
     public abstract static class RestSTSInstanceConfigBuilderBase<T extends RestSTSInstanceConfigBuilderBase<T>> extends STSInstanceConfig.STSInstanceConfigBuilderBase<T>  {
         private Set<TokenTransformConfig> supportedTokenTranslations;
-        private RestDeploymentConfig deploymentConfig;
+        private DeploymentConfig deploymentConfig;
 
         private RestSTSInstanceConfigBuilderBase() {
             supportedTokenTranslations = new HashSet<TokenTransformConfig>();
         }
 
-        public T deploymentConfig(RestDeploymentConfig deploymentConfig) {
+        public T deploymentConfig(DeploymentConfig deploymentConfig) {
             this.deploymentConfig = deploymentConfig;
             return self();
         }
@@ -85,15 +87,14 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     }
 
     private final Set<TokenTransformConfig> supportedTokenTranslations;
-    private final RestDeploymentConfig deploymentConfig;
+    private final DeploymentConfig deploymentConfig;
 
     /*
     Define the names of fields to aid in json marshalling. Note that these names match the names of the AttributeSchema
     entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
     SMS persistence.
      */
-    private static final String DEPLOYMENT_CONFIG = "deployment-config";
-    private static final String SUPPORTED_TOKEN_TRANSLATIONS = SharedSTSConstants.SUPPORTED_TOKEN_TRANSFORMS;
+    static final String SUPPORTED_TOKEN_TRANSLATIONS = SharedSTSConstants.SUPPORTED_TOKEN_TRANSFORMS;
 
     private RestSTSInstanceConfig(RestSTSInstanceConfigBuilderBase<?> builder) {
         super(builder);
@@ -115,7 +116,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         }
     }
 
-    public static RestSTSInstanceConfigBuilderBase<?> builder() {
+    public static RestSTSInstanceConfigBuilder builder() {
         return new RestSTSInstanceConfigBuilder();
     }
 
@@ -123,7 +124,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
      * @return  The RestDeploymentConfig instance which specifies the url of the deployed STS instance, its realm,
      *          and its OpenAM authN context for each validated token type.
      */
-    public RestDeploymentConfig getDeploymentConfig() {
+    public DeploymentConfig getDeploymentConfig() {
         return deploymentConfig;
     }
 
@@ -148,15 +149,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     public String getDeploymentSubPath() {
         String deploymentSubPath = new UrlConstituentCatenatorImpl().catenateUrlConstituents(
                 getDeploymentConfig().getRealm(), getDeploymentConfig().getUriElement());
-        if (deploymentSubPath.endsWith(AMSTSConstants.FORWARD_SLASH)) {
-            return deploymentSubPath.substring(0, deploymentSubPath.lastIndexOf(AMSTSConstants.FORWARD_SLASH));
-        }
-
-        if (deploymentSubPath.startsWith(AMSTSConstants.FORWARD_SLASH)) {
-            deploymentSubPath = deploymentSubPath.substring(1, deploymentSubPath.length());
-        }
-
-        return deploymentSubPath;
+        return new DeploymentPathNormalizationImpl().normalizeDeploymentPath(deploymentSubPath);
     }
 
     @Override
@@ -205,7 +198,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         RestSTSInstanceConfigBuilderBase<?> builder = RestSTSInstanceConfig.builder()
                 .issuerName(baseConfig.getIssuerName())
                 .saml2Config(baseConfig.getSaml2Config())
-                .deploymentConfig(RestDeploymentConfig.fromJson(json.get(DEPLOYMENT_CONFIG)));
+                .deploymentConfig(DeploymentConfig.fromJson(json.get(DEPLOYMENT_CONFIG)));
         JsonValue supportedTranslations = json.get(SUPPORTED_TOKEN_TRANSLATIONS);
         if (!supportedTranslations.isList()) {
             throw new IllegalStateException("Unexpected value for the " + SUPPORTED_TOKEN_TRANSLATIONS + " field: "
@@ -266,10 +259,10 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
 
      */
     public static RestSTSInstanceConfig marshalFromAttributeMap(Map<String, Set<String>> attributeMap) {
-        RestDeploymentConfig restDeploymentConfig = RestDeploymentConfig.marshalFromAttributeMap(attributeMap);
+        DeploymentConfig deploymentConfig = DeploymentConfig.marshalFromAttributeMap(attributeMap);
         Map<String, Object> jsonAttributes = MapMarshallUtils.toJsonValueMap(attributeMap);
         jsonAttributes.remove(DEPLOYMENT_CONFIG);
-        jsonAttributes.put(DEPLOYMENT_CONFIG, restDeploymentConfig.toJson());
+        jsonAttributes.put(DEPLOYMENT_CONFIG, deploymentConfig.toJson());
 
         SAML2Config saml2Config = SAML2Config.marshalFromAttributeMap(attributeMap);
         if (saml2Config != null) {
@@ -300,7 +293,8 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     in the ViewBean class, as this would introduce a dependency on the rest-sts into the openam-console module. Thus the
     RestSecurityTokenServiceViewBean can only invoke the rest-sts-publish service with a JsonValue wrapping the
     Map<String, Set<String>> (or the Set<String> has to be turned into List<String> as JsonValue#toString does not currently
-    turn Set values into json arrays). This method will be invoked with the JsonValue generated by wrapping a Map<String, List<String>>
+    turn Set values into json arrays- TODO: is this still true, or can this logic be changed?).
+    This method will be invoked with the JsonValue generated by wrapping a Map<String, List<String>>
     containing the user's rest-sts-configurations. It will turn the Map<String, List<String>> wrapped by the JsonValue back into
     a raw Map<String, Set<String>>, and call marshalFromAttributeMap.
      */

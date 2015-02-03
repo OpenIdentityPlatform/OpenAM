@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.token.config;
@@ -23,22 +23,19 @@ import com.google.inject.name.Named;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
-import org.apache.cxf.sts.token.renewer.TokenRenewer;
 import org.apache.cxf.sts.token.validator.TokenValidator;
-import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.Matchers.any;
@@ -66,20 +63,11 @@ public class TokenValidateOperationProviderTest {
         }
 
         @Provides
-        @Named(AMSTSConstants.TOKEN_VALIDATE_OPERATION_STATUS)
-        public Set<TokenType> getTokenTypes() {
-            HashSet<TokenType> tokenTypes = new HashSet<TokenType>();
-            tokenTypes.add(TokenType.SAML2);
-            tokenTypes.add(TokenType.OPENAM);
-            return tokenTypes;
-        }
-
-        @Provides
-        public Map<TokenType, TokenType> getTransformTypes() {
-            HashMap<TokenType, TokenType> tokenTypes = new HashMap<TokenType, TokenType>();
-            tokenTypes.put(TokenType.USERNAME, TokenType.SAML2);
-            tokenTypes.put(TokenType.USERNAME, TokenType.OPENAM);
-            return tokenTypes;
+        Set<TokenTransformConfig> getValidateTransformations() {
+            Set<TokenTransformConfig> transformConfigs = new HashSet<TokenTransformConfig>();
+            transformConfigs.add(new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, false));
+            transformConfigs.add(new TokenTransformConfig(TokenType.USERNAME, TokenType.SAML2, true));
+            return transformConfigs;
         }
 
         @Provides
@@ -103,7 +91,7 @@ public class TokenValidateOperationProviderTest {
     public void testExceptionInitialization() throws STSInitializationException {
         TokenOperationFactory mockOperationFactory = mock(TokenOperationFactory.class);
         TokenValidator mockValidator = mock(TokenValidator.class);
-        when(mockOperationFactory.getTokenStatusValidatorForType(any(TokenType.class))).thenThrow(STSInitializationException.class);
+        when(mockOperationFactory.getTokenValidatorForTransformOperation(any(TokenTransformConfig.class))).thenThrow(STSInitializationException.class);
         TokenValidateOperationProvider validateOperationProvider =
                 Guice.createInjector(new MyModule(mockOperationFactory)).getInstance(TokenValidateOperationProvider.class);
         validateOperationProvider.get();

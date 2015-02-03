@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts;
 
-import com.sun.identity.common.HttpURLConnectionManager;
 import org.forgerock.openam.utils.IOUtils;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -35,13 +35,13 @@ public class HttpURLConnectionWrapperFactory {
      * Private implementation of the HttpURLConnectionWrapper.
      * @see org.forgerock.openam.sts.HttpURLConnectionWrapper
      */
-    private static class HttpURLConnectionWrapperImpl implements HttpURLConnectionWrapper {
+    private class HttpURLConnectionWrapperImpl implements HttpURLConnectionWrapper {
         private final HttpURLConnection httpURLConnection;
         private String requestPayload;
         private int expectedResponseCode = HttpURLConnection.HTTP_OK;
 
         private HttpURLConnectionWrapperImpl(URL url) throws IOException {
-            httpURLConnection = HttpURLConnectionManager.getConnection(url);
+            httpURLConnection = httpURLConnectionFactory.getHttpURLConnection(url);
         }
 
         @Override
@@ -128,6 +128,12 @@ public class HttpURLConnectionWrapperFactory {
         }
     }
 
+    private final HttpURLConnectionFactory httpURLConnectionFactory;
+
+    @Inject
+    public HttpURLConnectionWrapperFactory(HttpURLConnectionFactory httpURLConnectionFactory) {
+        this.httpURLConnectionFactory = httpURLConnectionFactory;
+    }
     /**
      * Method invoked to obtain instances of the HttpURLConnectionWrapper.
      * @param url the URL targeted by the invocation

@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 /**
- * Contains the classes related to publishing STS instances.
+ * Contains the classes related to publishing STS instances. Logic includes querying sts-publish/soap on the OpenAM
+ * 'home' server for published soap-sts instances, and adding/removing/updating the web-services corresponding to
+ * these published soap-sts instances.
  */
 package org.forgerock.openam.sts.soap.publish;

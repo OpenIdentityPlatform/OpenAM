@@ -25,7 +25,7 @@ import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.*;
-import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.rest.marshal.*;
 import org.forgerock.openam.sts.service.invocation.OpenAMTokenState;
 import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;

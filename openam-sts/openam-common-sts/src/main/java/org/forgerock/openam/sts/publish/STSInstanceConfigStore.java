@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.publish;
 
 import org.forgerock.openam.sts.STSPublishException;
+import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 
 import java.util.List;
 
@@ -29,14 +30,15 @@ import java.util.List;
  * be persisted.
  *
  */
-public interface STSInstanceConfigStore<T> {
+public interface STSInstanceConfigStore<T extends STSInstanceConfig> {
     /**
      * Called by the RestSTSInstancePublisherImpl class to persist the configuration corresponding to the published
      * STS instance
      * @param stsId The unique identifier for the STS instance. Currently obtained by calling RestSTSInstanceConfig#getDeploymentSubPath.
+     * @param realm The realm in which the sts instance should be deployed
      * @param instance The to-be-persisted state.
      */
-    void persistSTSInstance(String stsId, T instance) throws STSPublishException;
+    void persistSTSInstance(String stsId, String realm, T instance) throws STSPublishException;
 
     /**
      *

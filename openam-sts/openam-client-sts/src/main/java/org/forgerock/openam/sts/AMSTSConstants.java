@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts;
@@ -36,8 +36,8 @@ public class AMSTSConstants {
     These constants define the QNames referencing services and ports in wsdl documents which define the semantics and
     SecurityPolicy bindings of published STS instances.
      */
-    public static final QName STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "unprotected_sts_service");
-    public static final QName STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "unprotected_sts_service_port");
+    public static final QName UNPROTECTED_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "unprotected_sts_service");
+    public static final QName UNPROTECTED_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "unprotected_sts_service_port");
     public static final QName SYMMETRIC_UT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "symmetric_ut_sts_service");
     public static final QName SYMMETRIC_UT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "symmetric_ut_sts_service_port");
     public static final QName ASYMMETRIC_UT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "asymmetric_ut_sts_service");
@@ -81,6 +81,7 @@ public class AMSTSConstants {
     public static final String APPLICATION_JSON = SharedSTSConstants.APPLICATION_JSON;
     public static final String COOKIE = "Cookie";
     public static final String POST = "POST";
+    public static final String GET = "GET";
     public static final String EQUALS = "=";
     public static final String PIPE = "|";
     /*
@@ -129,6 +130,13 @@ public class AMSTSConstants {
     service.
      */
     public static final String REST_STS_PUBLISH_SERVICE_URI_ELEMENT = "am_rest_sts_publish_service";
+
+    /*
+    Used in conjunction with a @Named annotation to provide the uri element corresponding to the Rest STS publish
+    service. Consumed by the PublishServiceConsumerImpl to build up the uri necessary to consume this
+    service.
+     */
+    public static final String SOAP_STS_PUBLISH_SERVICE_URI_ELEMENT = "am_soap_sts_publish_service";
 
     /*
     Used in conjunction with a @Named annotation to inject the url string corresponding to the AM deployment.
@@ -188,11 +196,6 @@ public class AMSTSConstants {
     public static final boolean INVALIDATE_INTERIM_OPENAM_SESSION = true;
 
     /*
-    Used to access the headers in restlet ClientResource instances
-     */
-    public static final String RESTLET_HEADER_KEY = "org.restlet.http.headers";
-
-    /*
     the /json/users/?_action=idFromSession needs the iPDP value in a cookie with a name corresponding to the cookie name
     in the AM deployment.
      */
@@ -204,6 +207,15 @@ public class AMSTSConstants {
      */
     public static final String AM_REST_AUTHN_JSON_ROOT = "am_rest_authn_json_root";
 
+    /*
+    Used to constitute the header values POSTed to the rest authN.
+     */
+    public static final String AM_REST_AUTHN_USERNAME_HEADER = "X-OpenAM-Username";
+
+    /*
+    Used to constitute the header values POSTed to the rest authN.
+     */
+    public static final String AM_REST_AUTHN_PASSWORD_HEADER = "X-OpenAM-Password";
 
     public static final String ROOT_REALM = "/";
 
@@ -272,14 +284,6 @@ public class AMSTSConstants {
     public static final String INPUT_TOKEN_STATE_KEY = "input_token_state_key";
 
     /*
-    This property is defined to allow end-users to implement a custom implementation of the
-    org.forgerock.openam.sts.rest.token.provider.AuthnContextMapper class. If this property is set, and the specified class
-    can be instantiated, and it implements the AuthnContextMapper, then it will be used to map the AuthnContext value
-    sent to the TokenGenerationService when issuing SAML2 assertions.
-     */
-    public static final String CUSTOM_STS_AUTHN_CONTEXT_MAPPER_PROPERTY = "org.forgerock.openam.sts.rest.custom.AuthnContextMapper";
-
-    /*
     Used in a @Named annotation to inject the instance id for the STS, as this is required to make invocations to the
     TokenGenerationService. This state will ultimately be pulled from the STSInstanceConfig.
      */
@@ -292,12 +296,27 @@ public class AMSTSConstants {
     public static final String ISSUED_TOKEN = "issued_token";
 
     /*
-    The name of the rest sts service, as defined in restSTS.xml. Referenced in the RestSTSInstanceConfigPersister, to
+    The name of the rest sts service, as defined in restSTS.xml. Referenced in the RestSTSInstanceConfigStore, to
     write rest sts instance config state to the SMS.
      */
     public static final String REST_STS_SERVICE_NAME = "RestSecurityTokenService";
 
+    /*
+    The name of the rest sts service, as defined in soapSTS.xml. Referenced in the SoapSTSInstanceConfigStore, to
+    write rest sts instance config state to the SMS.
+     */
+    public static final String SOAP_STS_SERVICE_NAME = "SoapSecurityTokenService";
+
+    /*
+    Corresponds to the version specified in restSTS.xml. Used to register ServiceListeners.
+     */
     public static final String REST_STS_SERVICE_VERSION = "1.0";
+
+    /*
+    Corresponds to the version specified in soapSTS.xml. Used to register ServiceListeners.
+     */
+    public static final String SOAP_STS_SERVICE_VERSION = "1.0";
+
     /*
     The name of the json field corresponding to the deployment path of a successfully-published Rest STS instance.
      */
@@ -305,30 +324,30 @@ public class AMSTSConstants {
 
     /*
     The name of the json field in the json rest-sts publish invocation that references the field which allows the
-    marshalling logic in the RestSTSPublishServiceRequestHandler to distinguish between programmatic invocations via
-    the client stk classes, which will publish with state generated by calling toJson() on an instance of the RestSTSInstanceConfig
-    class, and the RestSecurityTokenServiceViewBean, which will publish with state harvested from the ViewBean property
+    marshalling logic in the {Rest|Soap}STSPublishServiceRequestHandler to distinguish between programmatic invocations via
+    the client stk classes, which will publish with state generated by calling toJson() on an instance of the {Rest|Soap}STSInstanceConfig
+    class, and the {Rest|Soap}SecurityTokenServiceViewBean, which will publish with state harvested from the ViewBean property
      sheet, and will thus be in the format of Map<String, Set<String>>.
      */
-    public static final String REST_STS_PUBLISH_INVOCATION_CONTEXT = SharedSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT;
+    public static final String STS_PUBLISH_INVOCATION_CONTEXT = SharedSTSConstants.STS_PUBLISH_INVOCATION_CONTEXT;
 
     /*
-    Used  as the value for the REST_STS_PUBLISH_INVOCATION_CONTEXT key for invocations to the rest sts publish service
+    Used  as the value for the STS_PUBLISH_INVOCATION_CONTEXT key for invocations to the rest sts publish service
     issued by the RestSecurityTokenServiceViewBean.
      */
-    public static final String REST_STS_PUBLISH_INVOCATION_CONTEXT_VIEW_BEAN = SharedSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT_VIEW_BEAN;
+    public static final String STS_PUBLISH_INVOCATION_CONTEXT_VIEW_BEAN = SharedSTSConstants.STS_PUBLISH_INVOCATION_CONTEXT_VIEW_BEAN;
 
     /*
-    Used as the value for the REST_STS_PUBLISH_INVOCATION_CONTEXT key for invocations to the rest sts publish service
+    Used as the value for the STS_PUBLISH_INVOCATION_CONTEXT key for invocations to the rest sts publish service
     issued by the client sdk (i.e. by calling toJson() on an instance of the RestSTSInstanceConfig class).
      */
-    public static final String REST_STS_PUBLISH_INVOCATION_CONTEXT_CLIENT_SDK = "invocation_context_client_sdk";
+    public static final String STS_PUBLISH_INVOCATION_CONTEXT_CLIENT_SDK = "invocation_context_client_sdk";
 
     /*
     Used as the key to the JsonValue corresponding to a wrapped Map<String, Set<String>> or the output of
     RestSTSInstanceConfig#toJson(), depending upon the invocation context.
      */
-    public static final String REST_STS_PUBLISH_INSTANCE_STATE = SharedSTSConstants.REST_STS_PUBLISH_INSTANCE_STATE;
+    public static final String STS_PUBLISH_INSTANCE_STATE = SharedSTSConstants.STS_PUBLISH_INSTANCE_STATE;
 
     /**
      * If a rest-sts instance is configured to support a token transformation with an x509 token as an input token type, the
@@ -375,4 +394,25 @@ public class AMSTSConstants {
      * Used in context of a @Named annotation to identify the String identifying the version of targeted CREST services.
      */
     public static final String CREST_VERSION_USERS_SERVICE = "crest_version_users_service";
+
+    /**
+     * Used in context of a @Named annotation to identify the String identifying the version of targeted CREST services.
+     */
+    public static final String CREST_VERSION_SOAP_STS_PUBLISH_SERVICE = "crest_version_soap_sts_publish_service";
+
+    /**
+     * Used in context of a @Named annotation to specify the Set of TokenTypes for which token validators are plugged-into
+     * the IssueOperation to support ActAs and/or OnBehalfOf tokens.\
+     */
+    public static final String DELEGATED_TOKEN_VALIDATORS = "delegated_token_validators";
+
+    /**
+     * For soap-sts instance which support token delegation (ActAs/OnBehalfOf elements), users have the option to publish
+     * a soap-sts instance which specifies custom implementations of org.apache.cxf.sts.token.delegation.TokenDelegationHandler.
+     * If only such implementations are specified to validate the delegated token, this handler has to set
+     * the OpenAM session id corresponding to this delegated token in the additionalProperties map in the
+     * org.apache.cxf.sts.token.delegation.TokenDelegationResponse keyed by the string below if the TokenGenerationService
+     * is to issue tokens corresponding to this principal.
+     */
+    public static final String CUSTOM_DELEGATION_HANDLER_AM_SESSION_ID = "custom_delegation_handler_am_session_id";
 }

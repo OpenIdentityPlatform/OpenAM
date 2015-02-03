@@ -11,16 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap;
 
-import org.apache.cxf.Bus;
+import com.google.inject.Key;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
-import org.forgerock.openam.sts.soap.publish.web.STSPublishImpl;
+import org.forgerock.openam.sts.soap.config.SoapSTSInjectorHolder;
+import org.forgerock.openam.sts.soap.publish.SoapSTSPublishPoller;
 
 import javax.servlet.ServletConfig;
 
@@ -30,33 +30,20 @@ import javax.servlet.ServletConfig;
  * the uri element corresponding to the web.xml entry. Decoupling Spring from CXF requires an instance of the
  * CXFNonSpringServlet to be specified in the web.xml entry. Dynamically publishing web-service endpoints which are
  * aggregated on this endpoint requires that the publish action occurs in the context of this class' bus.
- *
- * Currently, a web-service which allows the publish of STS instances is associated with this bus. This means that all
- * STS instances published via the web-service-publish web-service will also be automatically associated with bus associated
- * with instances of this class.
- *
- * Going forward, it is unlikely that users will publish STS instances by invoking a web-service. If this is the case,
- * then the association of the published STS instance with the bus associated with instances of this class must
- * be investigated and re-established.
- *
  */
 public class STSBroker extends CXFNonSpringServlet {
     @Override
     public void loadBus(ServletConfig servletConfig) {
         super.loadBus(servletConfig);
-        Bus bus = getBus();
-        BusFactory.setDefaultBus(bus);
         /*
-        WebLogic 11g requires that published endpoints have a trailing '/'. Need to determine whether this
-         causes problems on other supported containers. The code below did not work either (with the trailing '/'),
-         so I went back to the CXF-specific way of publishing a web-service. That is probably the best approach - provides
-         more isolation from container vagaries.
-
-        Endpoint.publish("/sts_publish/", new STSPublishImpl());
-        */
-        JaxWsServerFactoryBean serverFactoryBean = new JaxWsServerFactoryBean();
-        serverFactoryBean.setAddress("/sts_publish/");
-        serverFactoryBean.setServiceBean(new STSPublishImpl());
-        serverFactoryBean.create();
+        The SoapSTSInstancePublisher will initialize the bus associated with the JaxWsServerFactoryBean used to publish
+        each soap-sts instance via the call to BusFactory#getDefaultBus. Note that this must occur prior to the call
+        to SoapSTSInstancePublisher#initiatePublishPolling, as the context associated with this method will ultimately
+        have to reference the BusFactory's default Bus instance so that published web-services are exposed via this
+        class, which is the entry point for all web-service invocations.
+         */
+        BusFactory.setDefaultBus(getBus());
+        // reference the SoapSTSInjectorHolder to trigger the process of exposing published soap-sts instances
+        SoapSTSInjectorHolder.getInstance(Key.get(SoapSTSPublishPoller.class)).initiatePublishPolling();
     }
 }

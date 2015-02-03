@@ -23,11 +23,11 @@ import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProvider;
  * Interface which defines all of the state which the token generation service must be able to obtain from the
  * state corresponding to a published STS instance.
  */
-public interface STSInstanceState {
+public interface STSInstanceState<T extends STSInstanceConfig> {
     /**
-     * @return The STSInstanceConfig corresponding to the STS instance consuming the TokenGenerationService.
+     * @return The STSInstanceConfig subclass corresponding to the STS instance consuming the TokenGenerationService.
      */
-    STSInstanceConfig getConfig();
+    T getConfig();
 
     /**
      *

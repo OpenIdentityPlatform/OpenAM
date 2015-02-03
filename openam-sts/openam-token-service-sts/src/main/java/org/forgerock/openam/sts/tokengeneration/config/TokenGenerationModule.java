@@ -23,17 +23,19 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.MapMarshaller;
+import org.forgerock.openam.sts.InstanceConfigMarshaller;
+import org.forgerock.openam.sts.SoapSTSInstanceConfigMarshaller;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.publish.STSInstanceConfigStore;
+import org.forgerock.openam.sts.publish.soap.SoapSTSInstanceConfigStore;
 import org.forgerock.openam.sts.rest.ServiceListenerRegistration;
 import org.forgerock.openam.sts.rest.ServiceListenerRegistrationImpl;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
-import org.forgerock.openam.sts.rest.marshal.RestSTSInstanceConfigMapMarshaller;
-import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigStore;
+import org.forgerock.openam.sts.RestSTSInstanceConfigMarshaller;
+import org.forgerock.openam.sts.publish.rest.RestSTSInstanceConfigStore;
+import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceState;
-import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateFactoryImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateServiceListener;
@@ -41,7 +43,12 @@ import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGenerationImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.SSOTokenIdentity;
 import org.forgerock.openam.sts.tokengeneration.saml2.SSOTokenIdentityImpl;
+import org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceStateFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.saml2.SoapSTSInstanceState;
+import org.forgerock.openam.sts.tokengeneration.saml2.SoapSTSInstanceStateFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.saml2.SoapSTSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.saml2.SoapSTSInstanceStateServiceListener;
 import org.forgerock.openam.sts.tokengeneration.saml2.StatementProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.StatementProviderImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
@@ -56,21 +63,36 @@ import org.slf4j.LoggerFactory;
  */
 public class TokenGenerationModule extends AbstractModule {
     public static final String REST_STS_INSTANCE_STATE_LISTENER = "rest_sts_instance_state_listener";
+    public static final String SOAP_STS_INSTANCE_STATE_LISTENER = "soap_sts_instance_state_listener";
     @Override
     protected void configure() {
         bind(SAML2TokenGeneration.class).to(SAML2TokenGenerationImpl.class);
         bind(StatementProvider.class).to(StatementProviderImpl.class);
+        /*
+        Bind the top-level instances which will provide sts-instance state to the TGS
+         */
         bind(new TypeLiteral<STSInstanceStateProvider<RestSTSInstanceState>>(){}).to(RestSTSInstanceStateProvider.class)
                 .in(Scopes.SINGLETON);
+        bind(new TypeLiteral<STSInstanceStateProvider<SoapSTSInstanceState>>(){}).to(SoapSTSInstanceStateProvider.class)
+                .in(Scopes.SINGLETON);
+
         /*
-        Once the TokenGenerationService gets called by the SOAP STS, I will need to bind a
-        STSInstanceConfigPersister<SoapSTSInstanceConfig> class.
+        Bind the persistent stores for rest and soap sts instance state, along with the marshalling classes that marshal
+        between the SMS and java representations.
          */
         bind(new TypeLiteral<STSInstanceConfigStore<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigStore.class)
                 .in(Scopes.SINGLETON);
-        bind(new TypeLiteral<MapMarshaller<RestSTSInstanceConfig>>() {}).to(RestSTSInstanceConfigMapMarshaller.class);
+        bind(new TypeLiteral<InstanceConfigMarshaller<RestSTSInstanceConfig>>() {}).to(RestSTSInstanceConfigMarshaller.class);
+        bind(new TypeLiteral<STSInstanceConfigStore<SoapSTSInstanceConfig>>(){}).to(SoapSTSInstanceConfigStore.class)
+                .in(Scopes.SINGLETON);
+        bind(new TypeLiteral<InstanceConfigMarshaller<SoapSTSInstanceConfig>>() {}).to(SoapSTSInstanceConfigMarshaller.class);
 
-        bind(RestSTSInstanceStateFactory.class).to(RestSTSInstanceStateFactoryImpl.class);
+        /*
+        Bind the factory classes which are responsible for created the new STSInstanceState subclasses upon cache-misses
+         */
+        bind(new TypeLiteral<STSInstanceStateFactory<RestSTSInstanceState, RestSTSInstanceConfig>>(){}).to(RestSTSInstanceStateFactoryImpl.class);
+        bind(new TypeLiteral<STSInstanceStateFactory<SoapSTSInstanceState, SoapSTSInstanceConfig>>(){}).to(SoapSTSInstanceStateFactoryImpl.class);
+
         bind(STSKeyProviderFactory.class).to(STSKeyProviderFactoryImpl.class);
         bind(KeyInfoFactory.class).to(KeyInfoFactoryImpl.class);
         bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
@@ -91,6 +113,8 @@ public class TokenGenerationModule extends AbstractModule {
          */
         bind(ServiceListener.class).annotatedWith(Names.named(REST_STS_INSTANCE_STATE_LISTENER))
                 .to(RestSTSInstanceStateServiceListener.class).in(Scopes.SINGLETON);
+        bind(ServiceListener.class).annotatedWith(Names.named(SOAP_STS_INSTANCE_STATE_LISTENER))
+                .to(SoapSTSInstanceStateServiceListener.class).in(Scopes.SINGLETON);
     }
 
     @Provides

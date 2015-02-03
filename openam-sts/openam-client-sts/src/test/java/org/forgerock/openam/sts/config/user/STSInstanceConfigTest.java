@@ -16,8 +16,10 @@
 
 package org.forgerock.openam.sts.config.user;
 
+import org.forgerock.openam.utils.IOUtils;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import static org.testng.Assert.assertEquals;
@@ -77,6 +79,113 @@ public class STSInstanceConfigTest {
         instance1 = buildConfigWithSaml2Config();
         assertEquals(instance1, STSInstanceConfig.marshalFromAttributeMap(instance1.marshalToAttributeMap()));
 
+    }
+
+    /*
+    Because SoapSTSInstanceConfig and RestSTSInstanceConfig and encapsulated instances must be marshaled to a
+    Map<String, Set<String>> for SMS persistence,
+    STSInstanceConfig and encapsulated classes define statics that define the keys which must correspond to the String
+    keys in the SMS-persisted-map, values which must correspond to the entries defined in restSTS.xml and soapSTS.xml.
+    This unit test tests this correspondence.
+    */
+    @Test
+    public void testServicePropertyFileCorrespondence() throws IOException {
+        String restSTSfileContent =
+                IOUtils.getFileContent("../../openam-server-only/src/main/resources/services/restSTS.xml");
+        String soapSTSfileContent =
+                IOUtils.getFileContent("../../openam-server-only/src/main/resources/services/soapSTS.xml");
+        assertTrue(restSTSfileContent.contains(STSInstanceConfig.ISSUER_NAME));
+        assertTrue(soapSTSfileContent.contains(STSInstanceConfig.ISSUER_NAME));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.NAME_ID_FORMAT));
+        assertTrue(restSTSfileContent.contains(SAML2Config.NAME_ID_FORMAT));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.ATTRIBUTE_MAP));
+        assertTrue(restSTSfileContent.contains(SAML2Config.ATTRIBUTE_MAP));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.TOKEN_LIFETIME));
+        assertTrue(restSTSfileContent.contains(SAML2Config.TOKEN_LIFETIME));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.CUSTOM_CONDITIONS_PROVIDER_CLASS));
+        assertTrue(restSTSfileContent.contains(SAML2Config.CUSTOM_CONDITIONS_PROVIDER_CLASS));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.CUSTOM_SUBJECT_PROVIDER_CLASS));
+        assertTrue(restSTSfileContent.contains(SAML2Config.CUSTOM_SUBJECT_PROVIDER_CLASS));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS));
+        assertTrue(restSTSfileContent.contains(SAML2Config.CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS));
+        assertTrue(restSTSfileContent.contains(SAML2Config.CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS));
+        assertTrue(restSTSfileContent.contains(SAML2Config.CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.CUSTOM_ATTRIBUTE_MAPPER_CLASS));
+        assertTrue(restSTSfileContent.contains(SAML2Config.CUSTOM_ATTRIBUTE_MAPPER_CLASS));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS));
+        assertTrue(restSTSfileContent.contains(SAML2Config.CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.SIGN_ASSERTION));
+        assertTrue(restSTSfileContent.contains(SAML2Config.SIGN_ASSERTION));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.ENCRYPT_ATTRIBUTES));
+        assertTrue(restSTSfileContent.contains(SAML2Config.ENCRYPT_ATTRIBUTES));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.ENCRYPT_NAME_ID));
+        assertTrue(restSTSfileContent.contains(SAML2Config.ENCRYPT_NAME_ID));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.ENCRYPT_ASSERTION));
+        assertTrue(restSTSfileContent.contains(SAML2Config.ENCRYPT_ASSERTION));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.ENCRYPTION_ALGORITHM));
+        assertTrue(restSTSfileContent.contains(SAML2Config.ENCRYPTION_ALGORITHM));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.ENCRYPTION_ALGORITHM_STRENGTH));
+        assertTrue(restSTSfileContent.contains(SAML2Config.ENCRYPTION_ALGORITHM_STRENGTH));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.KEYSTORE_FILE_NAME));
+        assertTrue(restSTSfileContent.contains(SAML2Config.KEYSTORE_FILE_NAME));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.KEYSTORE_PASSWORD));
+        assertTrue(restSTSfileContent.contains(SAML2Config.KEYSTORE_PASSWORD));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.SP_ENTITY_ID));
+        assertTrue(restSTSfileContent.contains(SAML2Config.SP_ENTITY_ID));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.SP_ACS_URL));
+        assertTrue(restSTSfileContent.contains(SAML2Config.SP_ACS_URL));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.SP_ENTITY_ID));
+        assertTrue(restSTSfileContent.contains(SAML2Config.SP_ENTITY_ID));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.ENCRYPTION_KEY_ALIAS));
+        assertTrue(restSTSfileContent.contains(SAML2Config.ENCRYPTION_KEY_ALIAS));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.SIGNATURE_KEY_ALIAS));
+        assertTrue(restSTSfileContent.contains(SAML2Config.SIGNATURE_KEY_ALIAS));
+
+        assertTrue(soapSTSfileContent.contains(SAML2Config.SIGNATURE_KEY_PASSWORD));
+        assertTrue(restSTSfileContent.contains(SAML2Config.SIGNATURE_KEY_PASSWORD));
+
+        assertTrue(soapSTSfileContent.contains(DeploymentConfig.REALM));
+        assertTrue(restSTSfileContent.contains(DeploymentConfig.REALM));
+
+        assertTrue(soapSTSfileContent.contains(DeploymentConfig.URI_ELEMENT));
+        assertTrue(restSTSfileContent.contains(DeploymentConfig.URI_ELEMENT));
+
+        assertTrue(soapSTSfileContent.contains(DeploymentConfig.AUTH_TARGET_MAPPINGS));
+        assertTrue(restSTSfileContent.contains(DeploymentConfig.AUTH_TARGET_MAPPINGS));
+
+        assertTrue(soapSTSfileContent.contains(DeploymentConfig.OFFLOADED_TWO_WAY_TLS_HEADER_KEY));
+        assertTrue(restSTSfileContent.contains(DeploymentConfig.OFFLOADED_TWO_WAY_TLS_HEADER_KEY));
+
+        assertTrue(soapSTSfileContent.contains(DeploymentConfig.TLS_OFFLOAD_ENGINE_HOSTS));
+        assertTrue(restSTSfileContent.contains(DeploymentConfig.TLS_OFFLOAD_ENGINE_HOSTS));
+
+        assertTrue(soapSTSfileContent.contains(AuthTargetMapping.AUTH_TARGET_MAPPINGS));
+        assertTrue(restSTSfileContent.contains(AuthTargetMapping.AUTH_TARGET_MAPPINGS));
     }
 
     private STSInstanceConfig buildConfig() throws UnsupportedEncodingException {

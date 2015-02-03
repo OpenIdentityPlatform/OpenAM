@@ -49,19 +49,25 @@ import static org.forgerock.openam.sts.service.invocation.TokenGenerationService
 public class TokenGenerationServiceConsumerImpl implements TokenGenerationServiceConsumer {
     private static final String COOKIE = "Cookie";
 
+    private final AMSTSConstants.STSType stsType;
     private final String tokenGenerationServiceEndpoint;
     private final String crestVersionTokenGenService;
     private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
+    private final String amSessionCookieName;
 
     @Inject
-    TokenGenerationServiceConsumerImpl(UrlConstituentCatenator urlConstituentCatenator,
+    TokenGenerationServiceConsumerImpl(AMSTSConstants.STSType stsType,
+                                       UrlConstituentCatenator urlConstituentCatenator,
                                        @Named(AMSTSConstants.AM_DEPLOYMENT_URL) String amDeploymentUrl,
                                        @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT) String tokenGenServiceUriElement,
                                        @Named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE) String crestVersionTokenGenService,
-                                       HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory) {
+                                       HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
+                                       @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String amSessionCookieName) {
+        this.stsType = stsType;
         tokenGenerationServiceEndpoint = urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, tokenGenServiceUriElement);
         this.crestVersionTokenGenService = crestVersionTokenGenService;
         this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
+        this.amSessionCookieName = amSessionCookieName;
     }
 
     public String getSAML2BearerAssertion(String ssoTokenString,
@@ -120,7 +126,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                 .tokenType(TokenType.SAML2)
                 .saml2SubjectConfirmation(subjectConfirmation)
                 .authNContextClassRef(authnContextClassRef)
-                .stsType(AMSTSConstants.STSType.REST)
+                .stsType(stsType)
                 .stsInstanceId(stsInstanceId)
                 .realm(realm)
                 .ssoTokenString(ssoTokenString);
@@ -152,7 +158,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
     }
 
     private String createAMSessionCookie(String callerSSOTokenString) {
-        return SystemPropertiesManager.get(Constants.AM_COOKIE_NAME) + AMSTSConstants.EQUALS + callerSSOTokenString;
+        return amSessionCookieName + AMSTSConstants.EQUALS + callerSSOTokenString;
     }
 
     private String parseTokenResponse(String response) throws TokenCreationException {

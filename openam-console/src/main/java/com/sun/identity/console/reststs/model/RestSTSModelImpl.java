@@ -268,8 +268,8 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
     private JsonValue createInstanceInvocationState(Map<String, Set<String>> configurationState) {
         JsonValue propertiesMap = new JsonValue(marshalSetValuesToListValues(configurationState));
         return json(object(
-                field(SharedSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT, SharedSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT_VIEW_BEAN),
-                field(SharedSTSConstants.REST_STS_PUBLISH_INSTANCE_STATE, propertiesMap)));
+                field(SharedSTSConstants.STS_PUBLISH_INVOCATION_CONTEXT, SharedSTSConstants.STS_PUBLISH_INVOCATION_CONTEXT_VIEW_BEAN),
+                field(SharedSTSConstants.STS_PUBLISH_INSTANCE_STATE, propertiesMap)));
     }
 
     private String getSuccessMessage(HttpURLConnection connection) throws IOException {

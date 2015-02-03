@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright © 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.operation;
@@ -22,13 +22,15 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
+import org.forgerock.openam.sts.HttpURLConnectionFactory;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
-import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -37,8 +39,8 @@ import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
-import org.forgerock.openam.sts.token.provider.AuthnContextMapper;
-import org.forgerock.openam.sts.token.provider.AuthnContextMapperImpl;
+import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapper;
+import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapperImpl;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
@@ -57,6 +59,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.security.cert.X509Certificate;
 
@@ -94,7 +97,8 @@ public class TokenTransformFactoryImplTest {
             bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
             bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
             bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
-            bind(AuthnContextMapper.class).to(AuthnContextMapperImpl.class);
+            bind(JsonTokenAuthnContextMapper.class).to(JsonTokenAuthnContextMapperImpl.class);
+            bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class);
         }
 
         @Provides
@@ -170,6 +174,12 @@ public class TokenTransformFactoryImplTest {
         @Named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)
         String getCrestVersionTokenGenService() {
             return "protocol=1.0, resource=1.0";
+        }
+
+        @Provides
+        @Singleton
+        AMSTSConstants.STSType getSTSType() {
+            return AMSTSConstants.STSType.REST;
         }
     }
 

@@ -11,21 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap;
 
 import com.google.inject.Inject;
-import org.apache.cxf.sts.operation.TokenIssueOperation;
-import org.apache.cxf.sts.operation.TokenRenewOperation;
-import org.apache.cxf.sts.operation.TokenValidateOperation;
 import org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.RenewOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
-import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.TokenValidationException;
 
 /**
  * An instance of this class is created for each STS instance. An instance of this class is set as the bean published via
@@ -39,16 +34,18 @@ public class STSEndpoint extends SecurityTokenServiceProvider {
      */
     @Inject
     public STSEndpoint(IssueOperation issueOperation,
-                       ValidateOperation validateOperation,
-                       RenewOperation renewOperation) throws Exception {
+                       ValidateOperation validateOperation/*,
+                       RenewOperation renewOperation*/) throws Exception {
         /*
         I'm never setting the issueSingle operation. The IssueOperation above also implements the IssueSingle interface -
         perhaps I should inject both IssueOperation and IssueSingleOperation instances. Probably necessary for full
         spec compliance.
         TODO:
+        And also - I believe the fact that I am not setting the cancel operation means that cancel invocations are rejected -
+        need to confirm...
          */
         setIssueOperation(issueOperation);
         setValidateOperation(validateOperation);
-        setRenewOperation(renewOperation);
+//        setRenewOperation(renewOperation);
     }
 }

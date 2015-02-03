@@ -38,6 +38,10 @@
             <artifactId>openam-shared</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.commons.guava</groupId>
+            <artifactId>forgerock-guava-collect</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
         </dependency>

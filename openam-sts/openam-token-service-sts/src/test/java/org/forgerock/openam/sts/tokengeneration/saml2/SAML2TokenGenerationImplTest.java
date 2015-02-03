@@ -29,7 +29,7 @@ import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
-import org.forgerock.openam.sts.rest.config.user.RestDeploymentConfig;
+import org.forgerock.openam.sts.config.user.DeploymentConfig;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeMapper;
@@ -63,7 +63,7 @@ import static org.testng.Assert.assertTrue;
 
 public class SAML2TokenGenerationImplTest {
     private SAML2TokenGeneration saml2TokenGeneration;
-    private RestSTSInstanceStateFactory restSTSInstanceStateFactory;
+    private STSInstanceStateFactory restSTSInstanceStateFactory;
     private Injector injector;
     private static final String AUTHN_CONTEXT = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport";
     private static final String SSO_TOKEN_STRING = "irrelevant";
@@ -84,7 +84,7 @@ public class SAML2TokenGenerationImplTest {
                 throw new IllegalStateException("Could not mock SSOTokenIdentity: " + e, e);
             }
             bind(SAML2TokenGeneration.class).to(SAML2TokenGenerationImpl.class);
-            bind(RestSTSInstanceStateFactory.class).to(RestSTSInstanceStateFactoryImpl.class);
+            bind(STSInstanceStateFactory.class).to(RestSTSInstanceStateFactoryImpl.class);
             bind(STSKeyProviderFactory.class).to(STSKeyProviderFactoryImpl.class);
             bind(SSOTokenIdentity.class).toInstance(mockTokenIdentity);
         }
@@ -131,7 +131,7 @@ public class SAML2TokenGenerationImplTest {
     public void setup() {
         injector = Guice.createInjector(new MyModule());
         saml2TokenGeneration = injector.getInstance(SAML2TokenGeneration.class);
-        restSTSInstanceStateFactory = injector.getInstance(RestSTSInstanceStateFactory.class);
+        restSTSInstanceStateFactory = injector.getInstance(STSInstanceStateFactory.class);
     }
 
     @Test
@@ -167,7 +167,7 @@ public class SAML2TokenGenerationImplTest {
     }
 
     private STSInstanceState getSTSInstanceState(boolean signAssertion) throws Exception {
-        return restSTSInstanceStateFactory.createRestSTSInstanceState(getRestSTSInstanceConfig(signAssertion));
+        return restSTSInstanceStateFactory.createSTSInstanceState(getRestSTSInstanceConfig(signAssertion));
     }
 
     private TokenGenerationServiceInvocationState getTokenGenerationInvocationState(
@@ -194,8 +194,8 @@ public class SAML2TokenGenerationImplTest {
                 .addMapping(TokenType.USERNAME, "service", "ldapService")
                 .addMapping(TokenType.OPENIDCONNECT, "module", "oidc", context)
                 .build();
-        RestDeploymentConfig deploymentConfig =
-                RestDeploymentConfig.builder()
+        DeploymentConfig deploymentConfig =
+                DeploymentConfig.builder()
                         .uriElement("boborealm/inst1")
                         .authTargetMapping(mapping)
                         .build();

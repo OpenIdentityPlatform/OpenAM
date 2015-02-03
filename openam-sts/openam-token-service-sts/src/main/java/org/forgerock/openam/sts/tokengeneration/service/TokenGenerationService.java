@@ -22,6 +22,7 @@ import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.ReadRequest;
@@ -30,7 +31,6 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSPublishException;
@@ -39,7 +39,9 @@ import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceState;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
+import org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceState;
 import org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.saml2.SoapSTSInstanceState;
 import org.slf4j.Logger;
 
 import static org.forgerock.json.fluent.JsonValue.field;
@@ -49,13 +51,11 @@ import static org.forgerock.json.fluent.JsonValue.object;
 /**
  * This service will be consumed by the REST/SOAP STS to issue tokens, initially focused on SAML assertions.
  *
- * The REST/SOAP STS will have credentials similar to agents, and a SSOToken corresponding to these credentials
- * will be required to consume this service, enforced by a auth filter. TODO: enforcement must be added
- *
  */
 class TokenGenerationService implements SingletonResourceProvider {
     private final SAML2TokenGeneration saml2TokenGeneration;
-    private final STSInstanceStateProvider<RestSTSInstanceState> restStsInstanceStateProvider;
+    private final STSInstanceStateProvider<RestSTSInstanceState> restSTSInstanceStateProvider;
+    private final STSInstanceStateProvider<SoapSTSInstanceState> soapSTSInstanceStateProvider;
     private final Logger logger;
 
     /*
@@ -64,9 +64,11 @@ class TokenGenerationService implements SingletonResourceProvider {
 
     Once this service starts being consumed by SOAP, I need to bind a STSInstanceStateProvider<SoapSTSInstanceState>
      */
-    TokenGenerationService(SAML2TokenGeneration saml2TokenGeneration, STSInstanceStateProvider<RestSTSInstanceState> restStsInstanceStateProvider, Logger logger) {
+    TokenGenerationService(SAML2TokenGeneration saml2TokenGeneration, STSInstanceStateProvider<RestSTSInstanceState> restSTSInstanceStateProvider,
+                           STSInstanceStateProvider<SoapSTSInstanceState> soapSTSInstanceStateProvider, Logger logger) {
         this.saml2TokenGeneration = saml2TokenGeneration;
-        this.restStsInstanceStateProvider = restStsInstanceStateProvider;
+        this.restSTSInstanceStateProvider = restSTSInstanceStateProvider;
+        this.soapSTSInstanceStateProvider = soapSTSInstanceStateProvider;
         this.logger = logger;
     }
     public static final String ISSUE = "issue";
@@ -79,10 +81,6 @@ class TokenGenerationService implements SingletonResourceProvider {
             } catch (Exception e) {
                 logger.error("Exception caught marshalling json into TokenGenerationServiceInvocationState instance: " + e);
                 handler.handleError(new BadRequestException(e));
-                return;
-            }
-            if (!AMSTSConstants.STSType.REST.equals(invocationState.getStsType())) {
-                handler.handleError(new BadRequestException("Only the REST STS can currently call the token generation service."));
                 return;
             }
             if (TokenType.SAML2.equals(invocationState.getTokenType())) {
@@ -101,19 +99,38 @@ class TokenGenerationService implements SingletonResourceProvider {
                     handler.handleError(new ForbiddenException("SSO token string does not correspond to a valid SSOToken"));
                     return;
                 }
-
+                STSInstanceState stsInstanceState = null;
+                try {
+                    if (AMSTSConstants.STSType.REST.equals(invocationState.getStsType())) {
+                        stsInstanceState = restSTSInstanceStateProvider.getSTSInstanceState(invocationState.getStsInstanceId(), invocationState.getRealm());
+                    } else if (AMSTSConstants.STSType.SOAP.equals(invocationState.getStsType())) {
+                        stsInstanceState = soapSTSInstanceStateProvider.getSTSInstanceState(invocationState.getStsInstanceId(), invocationState.getRealm());
+                    } else {
+                        String message = "Illegal STSType specified in TokenGenerationService invocation: " + invocationState.getStsType();
+                        logger.error(message);
+                        handler.handleError(new BadRequestException(message));
+                    }
+                } catch (TokenCreationException e) {
+                    logger.error("Exception caught obtaining the sts instance state necessary to generate a saml2 assertion: " + e, e);
+                    handler.handleError(e);
+                    return;
+                } catch (STSPublishException e) {
+                    logger.error("Exception caught obtaining the sts instance state necessary to generate a saml2 assertion: " + e, e);
+                    handler.handleError(e);
+                    return;
+                } catch (Exception e) {
+                    logger.error("Exception caught obtaining the sts instance state necessary to generate a saml2 assertion: " + e, e);
+                    handler.handleError(new InternalServerErrorException(e));
+                    return;
+                }
                 try {
                     final String assertion = saml2TokenGeneration.generate(
                             subjectToken,
-                            restStsInstanceStateProvider.getSTSInstanceState(invocationState.getStsInstanceId(), invocationState.getRealm()),
+                            stsInstanceState,
                             invocationState);
                     handler.handleResult(json(object(field(AMSTSConstants.ISSUED_TOKEN, assertion))));
                     return;
                 } catch (TokenCreationException e) {
-                    logger.error("Exception caught generating saml2 token: " + e, e);
-                    handler.handleError(e);
-                    return;
-                } catch (STSPublishException e) {
                     logger.error("Exception caught generating saml2 token: " + e, e);
                     handler.handleError(e);
                     return;

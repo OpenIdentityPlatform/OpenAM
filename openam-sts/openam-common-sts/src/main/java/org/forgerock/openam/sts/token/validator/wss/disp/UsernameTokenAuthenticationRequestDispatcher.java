@@ -37,9 +37,6 @@ import java.util.Map;
  * OpenAM REST authN context.
  */
 public class UsernameTokenAuthenticationRequestDispatcher implements TokenAuthenticationRequestDispatcher<UsernameToken> {
-    private static final String USERNAME = "X-OpenAM-Username";
-    private static final String PASSWORD = "X-OpenAM-Password";
-
     private final String crestVersionAuthNService;
     private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
 
@@ -56,8 +53,8 @@ public class UsernameTokenAuthenticationRequestDispatcher implements TokenAuthen
             Map<String, String> headerMap = new HashMap<String, String>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionAuthNService);
-            headerMap.put(USERNAME, token.getName());
-            headerMap.put(PASSWORD, token.getPassword());
+            headerMap.put(AMSTSConstants.AM_REST_AUTHN_USERNAME_HEADER, token.getName());
+            headerMap.put(AMSTSConstants.AM_REST_AUTHN_PASSWORD_HEADER, token.getPassword());
             HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory
                     .httpURLConnectionWrapper(url)
                     .setRequestHeaders(headerMap)

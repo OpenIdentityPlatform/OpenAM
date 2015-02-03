@@ -44,6 +44,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -115,6 +116,12 @@ public class TokenRequestMarshallerImplTest {
         @Named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)
         String getCrestVersionTokenGenService() {
             return "protocol=1.0, resource=1.0";
+        }
+
+        @Provides
+        @Singleton
+        AMSTSConstants.STSType getSTSType() {
+            return AMSTSConstants.STSType.REST;
         }
     }
 

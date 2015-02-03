@@ -18,6 +18,7 @@ package org.forgerock.openam.sts.tokengeneration.saml2;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
@@ -31,9 +32,9 @@ import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.publish.STSInstanceConfigStore;
 import org.forgerock.openam.sts.rest.ServiceListenerRegistration;
 import org.forgerock.openam.sts.rest.ServiceListenerRegistrationImpl;
-import org.forgerock.openam.sts.rest.config.user.RestDeploymentConfig;
+import org.forgerock.openam.sts.config.user.DeploymentConfig;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
-import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigStore;
+import org.forgerock.openam.sts.publish.rest.RestSTSInstanceConfigStore;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationModule;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactoryImpl;
@@ -41,34 +42,28 @@ import org.slf4j.Logger;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.testng.Assert.assertEquals;
 
 
 public class RestSTSInstanceStateProviderTest {
     private static final String DEPLOYMENT_URL_ELEMENT = "bobo/inst1";
-    private static final String REALM = "/";
+    private static final String REALM = "bobo";
     private RestSTSInstanceStateProvider provider;
     private RestSTSInstanceConfigStore mockConfigStore;
-    private RestSTSInstanceStateFactory mockRestSTSInstanceStateFactory;
-    private RestSTSInstanceState mockRestSTSInstanceState;
 
     class TestModule extends AbstractModule {
         @Override
         protected void configure() {
-            mockRestSTSInstanceState = mock(RestSTSInstanceState.class);
-            mockRestSTSInstanceStateFactory = mock(RestSTSInstanceStateFactory.class);
             mockConfigStore = mock(RestSTSInstanceConfigStore.class);
             bind(new TypeLiteral<STSInstanceConfigStore<RestSTSInstanceConfig>>(){}).toInstance(mockConfigStore);
             bind(Logger.class).toInstance(mock(Logger.class));
-            bind(RestSTSInstanceStateFactory.class).toInstance(mockRestSTSInstanceStateFactory);
             bind(STSKeyProviderFactory.class).to(STSKeyProviderFactoryImpl.class);
             bind(RestSTSInstanceStateProvider.class);
             bind(ServiceListenerRegistration.class).toInstance(mock(ServiceListenerRegistrationImpl.class));
@@ -76,34 +71,47 @@ public class RestSTSInstanceStateProviderTest {
                     .to(RestSTSInstanceStateServiceListener.class);
             bind(new TypeLiteral<STSInstanceStateProvider<RestSTSInstanceState>>(){})
                     .to(RestSTSInstanceStateProvider.class).in(Scopes.SINGLETON);
+            bind(new TypeLiteral<STSInstanceStateFactory<RestSTSInstanceState, RestSTSInstanceConfig>>(){}).to(RestSTSInstanceStateFactoryImpl.class);
         }
     }
 
     @BeforeTest
     public void setUpTest() {
-        provider = Guice.createInjector(new TestModule()).getInstance(RestSTSInstanceStateProvider.class);
+        final Injector injector = Guice.createInjector(new TestModule());
+        provider = injector.getInstance(RestSTSInstanceStateProvider.class);
+    }
+
+    @Test
+    public void verifyLookup() throws TokenCreationException, STSPublishException {
+        RestSTSInstanceConfig instanceConfig = createSAMLRestInstanceConfig();
+        when(mockConfigStore.getSTSInstanceConfig(DEPLOYMENT_URL_ELEMENT, REALM)).thenReturn(instanceConfig);
+        assertEquals(provider.getSTSInstanceState(DEPLOYMENT_URL_ELEMENT, REALM).getConfig(), instanceConfig);
     }
 
     @Test
     public void verifyCaching() throws TokenCreationException, STSPublishException {
-        RestSTSInstanceConfig instanceConfig = createSAMLRestInstanceConfig(DEPLOYMENT_URL_ELEMENT);
+        RestSTSInstanceConfig instanceConfig = createSAMLRestInstanceConfig();
         when(mockConfigStore.getSTSInstanceConfig(DEPLOYMENT_URL_ELEMENT, REALM)).thenReturn(instanceConfig);
-        when(mockRestSTSInstanceStateFactory.createRestSTSInstanceState(any(RestSTSInstanceConfig.class))).thenReturn(mockRestSTSInstanceState);
-        provider.getSTSInstanceState(DEPLOYMENT_URL_ELEMENT, REALM);
-        provider.getSTSInstanceState(DEPLOYMENT_URL_ELEMENT, REALM);
-        verify(mockRestSTSInstanceStateFactory, times(1)).createRestSTSInstanceState(instanceConfig);
+        provider.getSTSInstanceState(DEPLOYMENT_URL_ELEMENT, REALM); //initializes the cache with the mocked config
+        verify(mockConfigStore, times(1)).getSTSInstanceConfig(DEPLOYMENT_URL_ELEMENT, REALM);
+        //now insure that the config store will return null, to insure that only the cache can return a valid result
+        when(mockConfigStore.getSTSInstanceConfig(DEPLOYMENT_URL_ELEMENT, REALM)).thenReturn(null);
+        assertEquals(provider.getSTSInstanceState(DEPLOYMENT_URL_ELEMENT, REALM).getConfig(), instanceConfig);
+        //the mockConfigStore should only have been called once, with the first invocation of provider.getSTSInstanceState -
+        //the second call should be resolved in the caching layer.
+        verify(mockConfigStore, times(1)).getSTSInstanceConfig(DEPLOYMENT_URL_ELEMENT, REALM);
     }
 
-    private RestSTSInstanceConfig createSAMLRestInstanceConfig(String urlElement) {
+    private RestSTSInstanceConfig createSAMLRestInstanceConfig() {
         Map<String, String> context = new HashMap<String, String>();
         context.put(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_AUTH_TARGET_HEADER_KEY, "oidc_id_token");
         AuthTargetMapping mapping = AuthTargetMapping.builder()
                 .addMapping(TokenType.USERNAME, "service", "ldapService")
                 .addMapping(TokenType.OPENIDCONNECT, "module", "oidc", context)
                 .build();
-        RestDeploymentConfig deploymentConfig =
-                RestDeploymentConfig.builder()
-                        .uriElement(urlElement)
+        DeploymentConfig deploymentConfig =
+                DeploymentConfig.builder()
+                        .uriElement(DEPLOYMENT_URL_ELEMENT)
                         .authTargetMapping(mapping)
                         .build();
 

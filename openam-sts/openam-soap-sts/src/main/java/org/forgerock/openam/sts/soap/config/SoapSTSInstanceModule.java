@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.config;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
@@ -25,34 +26,37 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.inject.Provider;
 
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.google.inject.name.Names;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
+import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
-import org.apache.cxf.ws.security.sts.provider.operation.RenewOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.forgerock.openam.sts.JsonMarshaller;
+import org.apache.ws.security.validate.SignatureTrustValidator;
+import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
+import org.forgerock.openam.sts.HttpURLConnectionFactory;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.XmlMarshaller;
+import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.soap.STSEndpoint;
 import org.forgerock.openam.sts.soap.SoapSTSCallbackHandler;
-import org.forgerock.openam.sts.soap.publish.STSInstancePublisher;
-import org.forgerock.openam.sts.soap.publish.STSInstancePublisherImpl;
+import org.forgerock.openam.sts.soap.publish.PublishServiceAccessTokenProvider;
 import org.forgerock.openam.sts.soap.token.config.TokenIssueOperationProvider;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactory;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactoryImpl;
-import org.forgerock.openam.sts.soap.token.config.TokenRenewOperationProvider;
 import org.forgerock.openam.sts.soap.token.config.TokenValidateOperationProvider;
+import org.forgerock.openam.sts.soap.token.delegation.TokenDelegationHandlersProvider;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -61,10 +65,10 @@ import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
-import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
-import org.forgerock.openam.sts.token.provider.AuthnContextMapper;
-import org.forgerock.openam.sts.token.provider.AuthnContextMapperImpl;
+import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapper;
+import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapperImpl;
+import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
+import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
@@ -82,13 +86,15 @@ import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvide
 import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Properties;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is the base module for the STS operations. It will take an instance of KeystoreConfig (ultimately provided by
@@ -99,21 +105,16 @@ import org.slf4j.LoggerFactory;
 public class SoapSTSInstanceModule extends AbstractModule {
 
     private final SoapSTSInstanceConfig stsInstanceConfig;
-    private final Logger logger;
 
 
     public SoapSTSInstanceModule(SoapSTSInstanceConfig stsInstanceConfig) {
         this.stsInstanceConfig = stsInstanceConfig;
-        logger = LoggerFactory.getLogger(AMSTSConstants.SOAP_STS_DEBUG_ID);
     }
 
     public void configure() {
 //        bind(AMTokenCache.class).to(AMTokenCacheImpl.class).in(Scopes.SINGLETON);
         bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class).in(Scopes.SINGLETON);
         bind(AMTokenParser.class).to(AMTokenParserImpl.class);
-
-        //Bind the class used to publish STS instances. Leverages instance-specific state, so can't be global.
-        bind(STSInstancePublisher.class).to(STSInstancePublisherImpl.class);
 
         //we want only one instance of the TokenStore shared among all token operations
         bind(TokenStore.class).to(DefaultInMemoryTokenStore.class).in(Scopes.SINGLETON);
@@ -132,23 +133,60 @@ public class SoapSTSInstanceModule extends AbstractModule {
          */
         bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
 
-        bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
-        bind(new TypeLiteral<JsonMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
+//        bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
+//        bind(new TypeLiteral<JsonMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
 
         //binding all of the Providers of the various sorts of operations
         bind(TokenOperationFactory.class).to(TokenOperationFactoryImpl.class).in(Scopes.SINGLETON);
         bind(IssueOperation.class).toProvider(TokenIssueOperationProvider.class);
         bind(ValidateOperation.class).toProvider(TokenValidateOperationProvider.class);
-        bind(RenewOperation.class).toProvider(TokenRenewOperationProvider.class);
+        //TODO: don't bind renewal - probably won't renew tokens
+//        bind(RenewOperation.class).toProvider(TokenRenewOperationProvider.class);
         bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class);
 
         //bind the class defining the core STS functionality - necessary for its dependencies to be injected
         bind(SecurityTokenServiceProvider.class).to(STSEndpoint.class);
         bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
 
+        /*
+        Bind the client class used to speak to the TokenGenerationService
+         */
         bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
+
+        /*
+        Bind a XMLUtilities class which encapsulates the shared XMLUtils class, so that static methods are not called
+        directly.
+         */
         bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
+
+        /*
+        Bind the XmlMarhsaller for marshalling OpenAMSessionTokens to/from xml.
+         */
+        bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
+
+        /*
+        Bind the class responsible for producing HttpURLConnectionWrapper instances, and the HttpURLConnectionFactory it consumes
+         */
+        bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class).in(Scopes.SINGLETON);
+        bind(HttpURLConnectionWrapperFactory.class).in(Scopes.SINGLETON);
+
+        /*
+        Bind the Provider responsible for providing the List<TokenDelegationHandler> required by the IssueOperation.
+         */
+        bind(new TypeLiteral<List<TokenDelegationHandler>>(){}).toProvider(TokenDelegationHandlersProvider.class);
+
     }
+
+    //TODO: Temporary binding for providing token needed by TGS - replace with final binding. Also should we be
+    //referencing global binding state in this fashion - can't bind the PublishServiceAccessTokenProviderImpl locally,
+    //or else I will have to bind the properties, or at least the interface/impl that wraps the decryption of the
+    //username and password properties - functionality which will be encapsulated anyways.
+    @Provides
+    @Singleton
+    PublishServiceAccessTokenProvider getAccessTokenProvider() {
+        return SoapSTSInjectorHolder.getInstance(Key.get(PublishServiceAccessTokenProvider.class));
+    }
+
     /**
      * This method will provide the instance of the STSPropertiesMBean necessary both for the STS proper, and for the
      * CXF interceptor-set which enforces the SecurityPolicy bindings.
@@ -185,7 +223,9 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Provides
     @Named(AMSTSConstants.STS_WEB_SERVICE_PROPERTIES)
     @Inject
-    Map<String, Object> getProperties(Provider<UsernameTokenValidator> usernameTokenValidatorProvider, Logger logger) throws WSSecurityException {
+    Map<String, Object> getProperties(Provider<UsernameTokenValidator> usernameTokenValidatorProvider,
+                                      Provider<SignatureTrustValidator> signatureTrustValidatorProvider,
+                                      Logger logger) throws WSSecurityException {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.CALLBACK_HANDLER, new SoapSTSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -207,7 +247,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
           enforcement - perhaps this should be determined by the SecurityPolicy binding associated with the STS deployment.
          */
         properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, usernameTokenValidatorProvider.get());
-//        properties.put(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR, certificateTokenValidatorProvider.get());
+        properties.put(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR, signatureTrustValidatorProvider.get());
 
         return properties;
     }
@@ -229,15 +269,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
         return properties;
     }
 
-
-    /*
-    The STSInstancePublisherImpl needs this dependency injected.
-     */
-    @Provides
-    SoapSTSInstanceConfig getStsInstanceConfig() {
-        return stsInstanceConfig;
-    }
-
     /*
     Ultimately, the Token*OperationProvider instances must know the set of Token{Validators | Providers | Renewers} to
     create for the Token*OperationProvider. This information will ultimately come from the user, and will be injected
@@ -250,25 +281,13 @@ public class SoapSTSInstanceModule extends AbstractModule {
         return stsInstanceConfig.getIssueTokenTypes();
     }
 
-    @Provides
-    @Named(AMSTSConstants.TOKEN_VALIDATE_OPERATION_STATUS)
-    Set<TokenType> validateTokenStatusTypes() {
-        return stsInstanceConfig.getValidateTokenStatusTypes();
-    }
-
-    @Provides
-    @Named(AMSTSConstants.TOKEN_RENEW_OPERATION)
-    Set<TokenType> renewTokenTypes() {
-        return stsInstanceConfig.getRenewTokenTypes();
-    }
-
     /*
     Provides the valid input->output mappings for the token transformations that can be realized by the validate
     method.
      */
     @Provides
-    Map<TokenType, TokenType> getValidateTransformTypes() {
-        return stsInstanceConfig.getValidateTokenTransformTypes();
+    Set<TokenTransformConfig> getValidateTransformTypes() {
+        return stsInstanceConfig.getValidateTokenTranslations();
     }
 
     /*
@@ -280,7 +299,8 @@ public class SoapSTSInstanceModule extends AbstractModule {
     UNT verification, and caching the sessionId in the ThreadLocalTokenCache the second time will cause it to emit a warning
     message. I only need to cache any interim AMSession instance as part of a token transformation - i.e. if the principal
     associated with the token validation operation is necessary for the token issue operation. So my UsernameTokenValidator
-    needs the contextual information necessary to make this distinction.
+    needs the contextual information necessary to make this distinction. But does it make sense to define a UNT-based token
+    transformation protected by a UNT-based SecurityPolicy binding?
      */
     @Provides
     @Inject
@@ -292,8 +312,18 @@ public class SoapSTSInstanceModule extends AbstractModule {
     }
 
     /*
-    Bindings below required by the STSAuthenticationUriProviderImpl - necessary to construct the URI for the REST authn call.
+    TODO: when to plug-in the SoapCertificateTokenValidator, which integrates x509 token authN into OpenAM?
      */
+    @Provides
+    SignatureTrustValidator getSignatureTrustValidator() {
+        return new SignatureTrustValidator();
+    }
+
+    @Provides
+    AuthTargetMapping authTargetMapping() {
+        return stsInstanceConfig.getDeploymentConfig().getAuthTargetMapping();
+    }
+
     @Provides
     @Named (AMSTSConstants.REALM)
     String realm() {
@@ -303,86 +333,198 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Provides
     @Named (AMSTSConstants.AM_DEPLOYMENT_URL)
     String amDeploymentUrl() {
-        return stsInstanceConfig.getDeploymentConfig().getAMDeploymentUrl();
-    }
-
-
-    @Provides
-    @Named (AMSTSConstants.REST_AUTHN_URI_ELEMENT)
-    String restAuthnUriElement() {
-        return "/authenticate";
-    }
-
-    @Provides
-    AuthTargetMapping authTargetMapping() {
-        return stsInstanceConfig.getDeploymentConfig().getAuthTargetMapping();
-    }
-
-    @Provides
-    @Named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT)
-    String restLogoutUriElement() {
-        return "/sessions/?_action=logout";
-    }
-
-    @Provides
-    @Named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT)
-    String restAMTokenValidationUriElement() {
-        return "/users/?_action=idFromSession";
-    }
-
-    @Provides
-    @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
-    String tokenGenerationServiceUriElement() {
-        return "/sts-tokengen/issue?_action=issue";
+        return stsInstanceConfig.getDeploymentConfig().getAmDeploymentUrl();
     }
 
     @Provides
     @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME)
     String getAMSessionCookieName() {
-        /*
-        This cannot come from the SystemPropertiesManager, as this is not running in the context of OpenAM. Perhaps
-        set in SystemProperties, or some other properties file? Right now, just hard-code. TODO
-         */
-        return "iPlanetDirectoryPro";
-//        return SystemPropertiesManager.get(Constants.AM_COOKIE_NAME);
-    }
-
-    @Provides
-    @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT)
-    String getJsonRoot() {
-        return "/json";
-    }
-
-    @Provides
-    @Named(AMSTSConstants.STS_INSTANCE_ID)
-    String getSTSInstanceId() {
-        return stsInstanceConfig.getDeploymentConfig().getUriElement();
+        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(SoapSTSModule.AM_SESSION_COOKIE_NAME_PROPERTY_KEY)));
     }
 
     /*
-    Allows for a custom AuthnContextMapper to be plugged-in. This AuthnContextMapper provides a
+    This method is used to identify the soap sts instance. This identification is necessary when consuming
+    the TokenGenerationService, as it is used to look-up the sts-instance-specific configuration state
+    (crypto and SAML2 configurations) when issuing tokens for this sts instance. Note that this identifier
+    does not have to be unique across rest and soap sts instances, as each will be represented by a different
+    service-definition xml file and thus will be stored in a different DN by the SMS. The soap-sts will be identified
+    by a combination of the realm, and the uri element within this realm. The uriElement defines the final endpoint, and
+    it will always be deployed at a url which includes the realm.
+    The value returned from RestSTSInstanceConfig#getDeploymentSubPath() will:
+    1. determine the sub-path in the SoapSTSInstancePublisherImpl at which the new sts instance will be exposed
+    2. be the most discriminating DN element identifying the config state corresponding to the STS instance in the SMS/LDAP
+    3. Because of #2, the same deployment sub-path will be used to identify the rest sts instance when this instance consumes
+    the TokenGenerationService, thereby allowing the TGS to look-up the instance-specific state necessary to produce
+    instance-specific tokens.
+     */
+    @Provides
+    @Named(AMSTSConstants.STS_INSTANCE_ID)
+    String getSTSInstanceId() {
+        return stsInstanceConfig.getDeploymentSubPath();
+    }
+
+    /*
+    Allows for a custom XmlTokenAuthnContextMapper to be plugged-in. This XmlTokenAuthnContextMapper provides a
     SAML2 AuthnContext class ref value given an input token and input token type.
      */
     @Provides
     @Inject
-    AuthnContextMapper getAuthnContextMapper(Logger logger) {
-        String customMapperClassName = SystemPropertiesManager.get(AMSTSConstants.CUSTOM_STS_AUTHN_CONTEXT_MAPPER_PROPERTY);
+    XmlTokenAuthnContextMapper getAuthnContextMapper(Logger logger) {
+        String customMapperClassName = stsInstanceConfig.getSaml2Config().getCustomAuthNContextMapperClassName();
         if (customMapperClassName == null) {
-            return new AuthnContextMapperImpl(logger);
+            return new XmlTokenAuthnContextMapperImpl(logger);
         } else {
             try {
-                return Class.forName(customMapperClassName).asSubclass(AuthnContextMapper.class).newInstance();
+                return Class.forName(customMapperClassName).asSubclass(XmlTokenAuthnContextMapper.class).newInstance();
             } catch (Exception e) {
-                logger.error("Exception caught implementing custom AuthnContextMapper class " + customMapperClassName
-                        + "; Returning default AuthnContextMapperImpl. The exception: " + e);
-                return new AuthnContextMapperImpl(logger);
+                logger.error("Exception caught implementing custom JsonTokenAuthnContextMapper class " + customMapperClassName
+                        + "; Returning default XmlTokenAuthnContextMapperImpl. The exception: " + e);
+                return new XmlTokenAuthnContextMapperImpl(logger);
             }
         }
     }
 
     @Provides
     Logger getSlf4jLogger() {
-        return LoggerFactory.getLogger(AMSTSConstants.SOAP_STS_DEBUG_ID);
+        return SoapSTSInjectorHolder.getInstance(Key.get(Logger.class));
+    }
+
+    @Provides
+    @Inject
+    AMSessionInvalidator getAMSessionInvalidator(@Named(AMSTSConstants.AM_DEPLOYMENT_URL) String amDeploymentUrl,
+                                                 @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRestRoot,
+                                                 @Named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT) String restLogoutUriElement,
+                                                 @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String amSessionCookieName,
+                                                 @Named (AMSTSConstants.REALM) String realm,
+                                                 UrlConstituentCatenator urlConstituentCatenator,
+                                                 @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE) String crestVersionSessionService,
+                                                 HttpURLConnectionWrapperFactory connectionWrapperFactory,
+                                                 Logger logger) {
+        try {
+            return new AMSessionInvalidatorImpl(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement,
+                    amSessionCookieName, urlConstituentCatenator, crestVersionSessionService, connectionWrapperFactory, logger);
+        } catch (MalformedURLException e) {
+            //TODO: throwing providers?
+            throw new RuntimeException("URL elements passed to the AMSessionInvalidator constitute a malformed url: " + e, e);
+        }
+    }
+
+    /*
+    The following five strings are used to constitute the various urls used to consume various restful services - e.g.
+     authentication, session, token-generation-service, etc.
+     */
+
+    @Provides
+    @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT)
+    String getJsonRoot() {
+        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT)));
+    }
+
+    @Provides
+    @Singleton
+    @Named (AMSTSConstants.REST_AUTHN_URI_ELEMENT)
+    String restAuthnUriElement() {
+        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.REST_AUTHN_URI_ELEMENT)));
+    }
+
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT)
+    String restLogoutUriElement() {
+        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT)));
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT)
+    String restAMTokenValidationUriElement() {
+        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT)));
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
+    String tokenGenerationServiceUriElement() {
+        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)));
+    }
+
+    /*
+     * The value corresponding to the Accept-API-Version header specifying the version of CREST services to consume. Note
+     * that the soap-sts run-time consumes the rest authN (classes in the wss/disp package), the token generation
+     * service (TokenGenerationServiceConsumerImpl), the service to obtain a principal from a session (PrincipalFromSessionImpl),
+     * and the session invalidation service (AMSessionInvalidatorImpl).
+     * All of these will specify the version returned below. If different versions need to be consumed, different strings
+     * can be @Named and provided for the various clients.
+     */
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE)
+    String getSessionServiceVersion() {
+        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE)));
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE)
+    String getAuthNServiceVersion() {
+        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE)));
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)
+    String getTokenGenServiceVersion() {
+        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)));
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)
+    String getUsersServiceVersion() {
+        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)));
+    }
+
+    /*
+    Required by the TokenGenerationServiceConsumerImpl, to specify the sts type which will allow the token generation
+    service to look-up the appropriate sts instance state.
+    */
+    @Provides
+    @Singleton
+    AMSTSConstants.STSType getSTSType() {
+        return AMSTSConstants.STSType.SOAP;
+    }
+
+    /*
+    Returns the set token types for which TokenValidators will be plugged-in to validate ActAs or OnBehalfOf tokens.
+    Consumed by the TokenIssueOperationProvider.
+     */
+    @Provides
+    @Named(AMSTSConstants.DELEGATED_TOKEN_VALIDATORS)
+    Set<TokenType> getDelegatedTokenValidators() {
+        if (stsInstanceConfig.delegationRelationshipsSupported()) {
+            return stsInstanceConfig.getSoapDelegationConfig().getValidatedDelegatedTokenTypes();
+        } else {
+            return Collections.emptySet();
+        }
+    }
+
+    /*
+    Required by the TokenDelegationHandlersProvider.
+     */
+    @Provides
+    SoapSTSInstanceConfig getStsInstanceConfig() {
+        return stsInstanceConfig;
     }
 }
 

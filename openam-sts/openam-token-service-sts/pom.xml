@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-rest-sts</artifactId>
+            <artifactId>openam-publish-sts</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>

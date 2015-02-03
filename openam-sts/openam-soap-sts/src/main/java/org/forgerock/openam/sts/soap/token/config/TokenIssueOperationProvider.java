@@ -11,19 +11,19 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.token.config;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
+import javax.inject.Named;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.operation.TokenIssueOperation;
-import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
+import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
 import org.apache.cxf.sts.token.provider.TokenProvider;
+import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
@@ -88,7 +88,9 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
     }
     private final STSPropertiesMBean stsPropertiesMBean;
     private final TokenStore tokenStore;
-    private final Set<TokenType> tokenTypes;
+    private final Set<TokenType> issueTokenTypes;
+    private final Set<TokenType> delegatedTokenValidatorTypes;
+    private final List<TokenDelegationHandler> tokenDelegationHandlers;
     private final TokenOperationFactory operationFactory;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final Logger logger;
@@ -97,13 +99,17 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
     TokenIssueOperationProvider(
             STSPropertiesMBean stsPropertiesMBean,
             TokenStore tokenStore,
-            @Named(AMSTSConstants.TOKEN_ISSUE_OPERATION) Set<TokenType> tokenTypes,
+            @Named(AMSTSConstants.TOKEN_ISSUE_OPERATION) Set<TokenType> issueTokenTypes,
+            @Named(AMSTSConstants.DELEGATED_TOKEN_VALIDATORS) Set<TokenType> delegatedTokenValidators,
+            List<TokenDelegationHandler> tokenDelegationHandlers,
             TokenOperationFactory operationFactory,
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
             Logger logger) {
         this.stsPropertiesMBean = stsPropertiesMBean;
         this.tokenStore = tokenStore;
-        this.tokenTypes = tokenTypes;
+        this.issueTokenTypes = issueTokenTypes;
+        this.delegatedTokenValidatorTypes = delegatedTokenValidators;
+        this.tokenDelegationHandlers = tokenDelegationHandlers;
         this.operationFactory = operationFactory;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.logger = logger;
@@ -113,13 +119,27 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
         //TODO: migrate to throwing providers
         try {
             TokenIssueOperation tokenIssueOperation = new TokenIssueOperation();
-            //TODO: does this need to be configurable?
+            /*
+            The STS will not encrypt the issued tokens - the TokenGenerationService already offers functionality to
+            encrypt issued SAML assertions.
+             */
             tokenIssueOperation.setEncryptIssuedToken(false);
             tokenIssueOperation.setStsProperties(stsPropertiesMBean);
             tokenIssueOperation.setTokenStore(tokenStore);
+            /*
+            Set the tokenValidators which will be called to validate the tokens presented as ActAs or OnBehalfOf
+            elements
+             */
+            tokenIssueOperation.setTokenValidators(getDelegationTokenValidators());
+
+            /*
+            Set the TokenDelegationHandlers (either empty if this sts instance will not process ActAs or OnBehalfOf elements,
+            or with the DefaultTokenDelegationHandler, or with user-specified custom handlers.
+             */
+            tokenIssueOperation.setDelegationHandlers(tokenDelegationHandlers);
 
             List<TokenProvider> tokenProviders = new ArrayList<TokenProvider>();
-            for(TokenType tokenType: tokenTypes) {
+            for(TokenType tokenType: issueTokenTypes) {
                 tokenProviders.add(operationFactory.getTokenProviderForType(tokenType));
             }
             tokenIssueOperation.setTokenProviders(tokenProviders);
@@ -128,5 +148,13 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
             logger.error("Exception caught initializing a IssueOperation: " + e, e);
             throw new RuntimeException(e);
         }
+    }
+
+    private List<TokenValidator> getDelegationTokenValidators() throws STSInitializationException {
+        List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
+        for (TokenType tokenType : delegatedTokenValidatorTypes) {
+            tokenValidators.add(operationFactory.getTokenStatusValidatorForType(tokenType));
+        }
+        return tokenValidators;
     }
 }

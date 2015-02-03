@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.token.config;
@@ -19,12 +19,11 @@ package org.forgerock.openam.sts.soap.token.config;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Provides;
-import com.google.inject.Scopes;
 import com.google.inject.name.Named;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
-import org.apache.cxf.sts.operation.TokenIssueOperation;
+import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -36,10 +35,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+import javax.inject.Inject;
+
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class TokenIssueOperationProviderTest {
@@ -74,7 +77,17 @@ public class TokenIssueOperationProviderTest {
         Logger getSlf4jLogger() {
             return LoggerFactory.getLogger(AMSTSConstants.REST_STS_DEBUG_ID);
         }
+        @Provides
+        @javax.inject.Named(AMSTSConstants.DELEGATED_TOKEN_VALIDATORS)
+        Set<TokenType> getDelegatedTokenValidators() {
+            return Collections.emptySet();
+        }
 
+        @Provides
+        @Inject
+        List<TokenDelegationHandler> getTokenDelegationHandlers(Logger logger) {
+            return Collections.emptyList();
+        }
     }
 
     @Test

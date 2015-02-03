@@ -18,6 +18,7 @@ package org.forgerock.openam.sts.config.user;
 
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.xml.security.encryption.XMLCipher;
+import org.forgerock.guava.common.base.Objects;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -245,29 +246,29 @@ public class SAML2Config {
     entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
     SMS persistence.
      */
-    private static final String NAME_ID_FORMAT = "saml2-name-id-format";
-    private static final String ATTRIBUTE_MAP = "saml2-attribute-map";
-    private static final String TOKEN_LIFETIME = SharedSTSConstants.SAML2_TOKEN_LIFETIME;
-    private static final String CUSTOM_CONDITIONS_PROVIDER_CLASS = "saml2-custom-conditions-provider-class-name";
-    private static final String CUSTOM_SUBJECT_PROVIDER_CLASS = "saml2-custom-subject-provider-class-name";
-    private static final String CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS = "saml2-custom-attribute-statements-provider-class-name";
-    private static final String CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS = "saml2-custom-authentication-statements-provider-class-name";
-    private static final String CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS = "saml2-custom-authz-decision-statements-provider-class-name";
-    private static final String CUSTOM_ATTRIBUTE_MAPPER_CLASS = "saml2-custom-attribute-mapper-class-name";
-    private static final String CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS = "saml2-custom-authn-context-mapper-class-name";
-    private static final String SIGN_ASSERTION = SharedSTSConstants.SAML2_SIGN_ASSERTION;
-    private static final String ENCRYPT_ATTRIBUTES = SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES;
-    private static final String ENCRYPT_NAME_ID = SharedSTSConstants.SAML2_ENCRYPT_NAME_ID;
-    private static final String ENCRYPT_ASSERTION = SharedSTSConstants.SAML2_ENCRYPT_ASSERTION;
-    private static final String ENCRYPTION_ALGORITHM = SharedSTSConstants.SAML2_ENCRYPTION_ALGORITHM;
-    private static final String ENCRYPTION_ALGORITHM_STRENGTH = SharedSTSConstants.SAML2_ENCRYPTION_ALGORITHM_STRENGTH;
-    private static final String KEYSTORE_FILE_NAME = SharedSTSConstants.SAML2_KEYSTORE_FILE_NAME;
-    private static final String KEYSTORE_PASSWORD = SharedSTSConstants.SAML2_KEYSTORE_PASSWORD;
-    private static final String SP_ENTITY_ID = SharedSTSConstants.SAML2_SP_ENTITY_ID;
-    private static final String SP_ACS_URL = SharedSTSConstants.SAML2_SP_ACS_URL;
-    private static final String ENCRYPTION_KEY_ALIAS = SharedSTSConstants.SAML2_ENCRYPTION_KEY_ALIAS;
-    private static final String SIGNATURE_KEY_ALIAS = SharedSTSConstants.SAML2_SIGNATURE_KEY_ALIAS;
-    private static final String SIGNATURE_KEY_PASSWORD = SharedSTSConstants.SAML2_SIGNATURE_KEY_PASSWORD;
+    static final String NAME_ID_FORMAT = "saml2-name-id-format";
+    static final String ATTRIBUTE_MAP = "saml2-attribute-map";
+    static final String TOKEN_LIFETIME = SharedSTSConstants.SAML2_TOKEN_LIFETIME;
+    static final String CUSTOM_CONDITIONS_PROVIDER_CLASS = "saml2-custom-conditions-provider-class-name";
+    static final String CUSTOM_SUBJECT_PROVIDER_CLASS = "saml2-custom-subject-provider-class-name";
+    static final String CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS = "saml2-custom-attribute-statements-provider-class-name";
+    static final String CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS = "saml2-custom-authentication-statements-provider-class-name";
+    static final String CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS = "saml2-custom-authz-decision-statements-provider-class-name";
+    static final String CUSTOM_ATTRIBUTE_MAPPER_CLASS = "saml2-custom-attribute-mapper-class-name";
+    static final String CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS = "saml2-custom-authn-context-mapper-class-name";
+    static final String SIGN_ASSERTION = SharedSTSConstants.SAML2_SIGN_ASSERTION;
+    static final String ENCRYPT_ATTRIBUTES = SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES;
+    static final String ENCRYPT_NAME_ID = SharedSTSConstants.SAML2_ENCRYPT_NAME_ID;
+    static final String ENCRYPT_ASSERTION = SharedSTSConstants.SAML2_ENCRYPT_ASSERTION;
+    static final String ENCRYPTION_ALGORITHM = SharedSTSConstants.SAML2_ENCRYPTION_ALGORITHM;
+    static final String ENCRYPTION_ALGORITHM_STRENGTH = SharedSTSConstants.SAML2_ENCRYPTION_ALGORITHM_STRENGTH;
+    static final String KEYSTORE_FILE_NAME = SharedSTSConstants.SAML2_KEYSTORE_FILE_NAME;
+    static final String KEYSTORE_PASSWORD = SharedSTSConstants.SAML2_KEYSTORE_PASSWORD;
+    static final String SP_ENTITY_ID = SharedSTSConstants.SAML2_SP_ENTITY_ID;
+    static final String SP_ACS_URL = SharedSTSConstants.SAML2_SP_ACS_URL;
+    static final String ENCRYPTION_KEY_ALIAS = SharedSTSConstants.SAML2_ENCRYPTION_KEY_ALIAS;
+    static final String SIGNATURE_KEY_ALIAS = SharedSTSConstants.SAML2_SIGNATURE_KEY_ALIAS;
+    static final String SIGNATURE_KEY_PASSWORD = SharedSTSConstants.SAML2_SIGNATURE_KEY_PASSWORD;
 
     private final String nameIdFormat;
     private final Map<String, String> attributeMap;
@@ -495,48 +496,20 @@ public class SAML2Config {
                     encryptNameID == otherConfig.encryptNameID() &&
                     encryptionAlgorithmStrength == otherConfig.encryptionAlgorithmStrength &&
                     spEntityId.equals(otherConfig.spEntityId) &&
-                    (encryptionAlgorithm != null
-                            ? encryptionAlgorithm.equals(otherConfig.getEncryptionAlgorithm())
-                            : otherConfig.getEncryptionAlgorithm() == null) &&
-                    (customConditionsProviderClassName != null
-                            ? customConditionsProviderClassName.equals(otherConfig.getCustomConditionsProviderClassName())
-                            : otherConfig.getCustomConditionsProviderClassName() == null) &&
-                    (customSubjectProviderClassName != null
-                            ? customSubjectProviderClassName.equals(otherConfig.getCustomSubjectProviderClassName())
-                            : otherConfig.getCustomSubjectProviderClassName() == null) &&
-                    (customAttributeStatementsProviderClassName != null
-                        ? customAttributeStatementsProviderClassName.equals(otherConfig.getCustomAttributeStatementsProviderClassName())
-                        : otherConfig.getCustomAttributeStatementsProviderClassName() == null) &&
-                    (customAuthzDecisionStatementsProviderClassName != null
-                            ? customAuthzDecisionStatementsProviderClassName.equals(otherConfig.getCustomAuthzDecisionStatementsProviderClassName())
-                            : otherConfig.getCustomAuthzDecisionStatementsProviderClassName() == null) &&
-                    (customAttributeMapperClassName != null
-                            ? customAttributeMapperClassName.equals(otherConfig.getCustomAttributeMapperClassName())
-                            : otherConfig.getCustomAttributeMapperClassName() == null) &&
-                    (customAuthNContextMapperClassName != null
-                            ? customAuthNContextMapperClassName.equals(otherConfig.getCustomAuthNContextMapperClassName())
-                            : otherConfig.getCustomAuthNContextMapperClassName() == null) &&
-                    (customAuthenticationStatementsProviderClassName != null
-                        ? customAuthenticationStatementsProviderClassName.equals(otherConfig.getCustomAuthenticationStatementsProviderClassName())
-                        : otherConfig.getCustomAuthenticationStatementsProviderClassName() == null) &&
-                    (keystoreFileName != null
-                            ? keystoreFileName.equals(otherConfig.getKeystoreFileName())
-                            : otherConfig.getKeystoreFileName() == null) &&
-                    (keystorePassword != null
-                            ? Arrays.equals(keystorePassword, otherConfig.getKeystorePassword())
-                            : otherConfig.getKeystorePassword() == null) &&
-                    (spAcsUrl != null
-                            ? spAcsUrl.equals(otherConfig.getSpAcsUrl())
-                            : otherConfig.getSpAcsUrl() == null) &&
-                    (signatureKeyAlias != null
-                            ? signatureKeyAlias.equals(otherConfig.getSignatureKeyAlias())
-                            : otherConfig.getSignatureKeyAlias() == null) &&
-                    (encryptionKeyAlias != null
-                            ? encryptionKeyAlias.equals(otherConfig.getEncryptionKeyAlias())
-                            : otherConfig.getEncryptionKeyAlias() == null) &&
-                    (signatureKeyPassword != null
-                            ? Arrays.equals(signatureKeyPassword, otherConfig.getSignatureKeyPassword())
-                            : otherConfig.getSignatureKeyPassword() == null);
+                    Objects.equal(encryptionAlgorithm, otherConfig.getEncryptionAlgorithm()) &&
+                    Objects.equal(customConditionsProviderClassName, otherConfig.getCustomConditionsProviderClassName()) &&
+                    Objects.equal(customSubjectProviderClassName, otherConfig.getCustomSubjectProviderClassName()) &&
+                    Objects.equal(customAttributeStatementsProviderClassName, otherConfig.getCustomAttributeStatementsProviderClassName()) &&
+                    Objects.equal(customAuthzDecisionStatementsProviderClassName, otherConfig.getCustomAuthzDecisionStatementsProviderClassName()) &&
+                    Objects.equal(customAttributeMapperClassName, otherConfig.getCustomAttributeMapperClassName()) &&
+                    Objects.equal(customAuthNContextMapperClassName, otherConfig.getCustomAuthNContextMapperClassName()) &&
+                    Objects.equal(customAuthenticationStatementsProviderClassName, otherConfig.getCustomAuthenticationStatementsProviderClassName()) &&
+                    Objects.equal(keystoreFileName, otherConfig.getKeystoreFileName()) &&
+                    Arrays.equals(keystorePassword, otherConfig.getKeystorePassword()) &&
+                    Objects.equal(spAcsUrl, otherConfig.getSpAcsUrl()) &&
+                    Objects.equal(signatureKeyAlias, otherConfig.getSignatureKeyAlias()) &&
+                    Objects.equal(encryptionKeyAlias, otherConfig.getEncryptionKeyAlias()) &&
+                    Arrays.equals(signatureKeyPassword, otherConfig.getSignatureKeyPassword());
         }
         return false;
     }

@@ -18,27 +18,12 @@ package org.forgerock.openam.sts.rest.config;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.Scopes;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.sm.ServiceListener;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
-import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.MapMarshaller;
-import org.forgerock.openam.sts.publish.STSInstanceConfigStore;
-import org.forgerock.openam.sts.rest.ServiceListenerRegistration;
-import org.forgerock.openam.sts.rest.ServiceListenerRegistrationImpl;
-import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
-import org.forgerock.openam.sts.rest.marshal.RestSTSInstanceConfigMapMarshaller;
-import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigStore;
-import org.forgerock.openam.sts.rest.publish.RestSTSInstancePublisher;
-import org.forgerock.openam.sts.rest.publish.RestSTSInstancePublisherImpl;
-import org.forgerock.openam.sts.rest.publish.RestSTSPublishServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,11 +31,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * This module defines bindings which are common to all STS instances. This includes, for example, state related to
- * publishing Rest STS instances.
+ * This module defines bindings which are common to all STS instances. This includes the ConnectionFactory and Router
+ * used by CREST.
  */
 public class RestSTSModule extends AbstractModule {
-    public static final String REST_STS_PUBLISH_LISTENER = "rest_sts_publish_listener";
     private final Router router;
     public RestSTSModule() {
         router = new Router();
@@ -58,37 +42,10 @@ public class RestSTSModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(RestSTSInstancePublisher.class).to(RestSTSInstancePublisherImpl.class).in(Scopes.SINGLETON);
-        /*
-        A binding for the concern of marshalling RestSTSInstanceConfig instances to and from an attribute map representation,
-        which is necessary for SMS persistence.
-         */
-        bind(new TypeLiteral<MapMarshaller<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigMapMarshaller.class).in(Scopes.SINGLETON);
-        bind(new TypeLiteral<STSInstanceConfigStore<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigStore.class).in(Scopes.SINGLETON);
-
-        /*
-        Bind the class which encapsulates ServiceListener registration so that the RestSTSInstancePublisherImpl can
-        invoke it to register a ServiceListener to add rest-sts-instances, published at another server in a site deployment,
-        the CREST rest-sts-instance router.
-         */
-        bind(ServiceListenerRegistration.class).to(ServiceListenerRegistrationImpl.class).in(Scopes.SINGLETON);
-
-        /*
-        Bind the ServiceListener injected into the RestSTSInstancePublisher, which will be registered with the
-        ServiceListenerRegistration by the RestSTSInstancePublisher so that it can hang rest-sts instances published to
-        another server in a site deployment to the CREST rest-sts-instance router.
-         */
-        bind(ServiceListener.class).annotatedWith(Names.named(REST_STS_PUBLISH_LISTENER))
-                .to(RestSTSPublishServiceListener.class).in(Scopes.SINGLETON);
-
-        /*
-        The RestSTSPublishServiceRequestHandler uses the RestRealmValidator to insure that invocation-specified realms do exist
-         */
-        bind(RestRealmValidator.class);
     }
 
     /*
-    Might want to return a dynamic router like the RealmRouterConnectionFactory. For now, take the more static approach.
+    Used to obtain the ConnectionFactory servicing all rest-sts invocations.
      */
     @Provides
     @Named(AMSTSConstants.REST_STS_CONNECTION_FACTORY_NAME)
@@ -98,7 +55,9 @@ public class RestSTSModule extends AbstractModule {
     }
 
     /*
-    Used to obtain the router to publish new Rest STS instances.
+    Used to obtain the router to publish new Rest STS instances. Note that this method will be consumed by the sts-publish
+    service (via the RestSTSInjectorHolder) so that the RestSTSInstancePublisherImpl can obtain the router necessary to
+    add/remove newly-published rest-sts instances to CREST.
      */
     @Provides
     Router getRouter() {
@@ -114,7 +73,7 @@ public class RestSTSModule extends AbstractModule {
     @Singleton
     @Named(AMSTSConstants.REST_STS_PUBLISH_SERVICE_URI_ELEMENT)
     String getRestSTSPublishServiceUriElement() {
-        return "/rest-sts-publish/publish";
+        return "/sts-publish/rest";
     }
     /*
         The following 6 methods provide the String constants corresponding to relatively static values relating to

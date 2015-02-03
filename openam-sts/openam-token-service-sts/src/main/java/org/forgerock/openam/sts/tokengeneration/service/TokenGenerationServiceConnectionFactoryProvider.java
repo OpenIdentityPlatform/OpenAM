@@ -28,6 +28,7 @@ import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationServiceInj
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceState;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
 import org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.saml2.SoapSTSInstanceState;
 import org.slf4j.Logger;
 
 /**
@@ -41,8 +42,10 @@ public class TokenGenerationServiceConnectionFactoryProvider {
         final SingletonResourceProvider tokenGenerationService =
                 new TokenGenerationService(TokenGenerationServiceInjectorHolder.getInstance(Key.get(SAML2TokenGeneration.class)),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<RestSTSInstanceState>>(){})),
+                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<SoapSTSInstanceState>>(){})),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(Logger.class)));
         router.route("/issue/")
+                //TODO: authz must be of a token type which remotely-deployed soap-sts instances can present - see AME-5401
                 .through(SpecialUserOnlyAuthzModule.class, SpecialUserOnlyAuthzModule.NAME)
                 .forVersion(VERSION_STRING)
                 .to(tokenGenerationService);

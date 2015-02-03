@@ -27,15 +27,15 @@ import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XmlMarshaller;
-import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
-import org.forgerock.openam.sts.rest.token.provider.AMSessionInvalidator;
+import org.forgerock.openam.sts.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapper;
+import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.rest.token.validator.RestCertificateTokenValidator;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-import org.forgerock.openam.sts.rest.token.provider.AMSAMLTokenProvider;
-import org.forgerock.openam.sts.rest.token.provider.AMSessionInvalidatorImpl;
+import org.forgerock.openam.sts.rest.token.provider.RestSamlTokenProvider;
+import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.forgerock.openam.sts.token.provider.AuthnContextMapper;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.validator.AMTokenValidator;
 import org.forgerock.openam.sts.token.validator.OpenIdConnectIdTokenValidator;
@@ -71,7 +71,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private final XmlMarshaller<OpenIdConnectIdToken> idTokenXmlMarshaller;
     private final XMLUtilities xmlUtilities;
     private final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
-    private final AuthnContextMapper authnContextMapper;
+    private final JsonTokenAuthnContextMapper jsonTokenAuthnContextMapper;
     private final HttpURLConnectionWrapperFactory connectionWrapperFactory;
     private final String crestVersionSessionService;
     private final Logger logger;
@@ -93,7 +93,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             XmlMarshaller<OpenIdConnectIdToken> idTokenXmlMarshaller,
             XMLUtilities xmlUtilities,
             TokenGenerationServiceConsumer tokenGenerationServiceConsumer,
-            AuthnContextMapper authnContextMapper,
+            JsonTokenAuthnContextMapper jsonTokenAuthnContextMapper,
             HttpURLConnectionWrapperFactory connectionWrapperFactory,
             @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE) String crestVersionSessionService,
             Logger logger) {
@@ -113,13 +113,12 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         this.idTokenXmlMarshaller = idTokenXmlMarshaller;
         this.xmlUtilities = xmlUtilities;
         this.tokenGenerationServiceConsumer = tokenGenerationServiceConsumer;
-        this.authnContextMapper = authnContextMapper;
+        this.jsonTokenAuthnContextMapper = jsonTokenAuthnContextMapper;
         this.connectionWrapperFactory = connectionWrapperFactory;
         this.crestVersionSessionService = crestVersionSessionService;
         this.logger = logger;
     }
 
-    @Override
     public TokenTransform buildTokenTransform(TokenTransformConfig tokenTransformConfig) throws STSInitializationException {
         TokenType inputTokenType = tokenTransformConfig.getInputTokenType();
         TokenType outputTokenType = tokenTransformConfig.getOutputTokenType();
@@ -176,14 +175,14 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
                 final AMSessionInvalidator sessionInvalidator =
                         new AMSessionInvalidatorImpl(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement,
                                 amSessionCookieName, urlConstituentCatenator, crestVersionSessionService, connectionWrapperFactory, logger);
-                return new AMSAMLTokenProvider(tokenGenerationServiceConsumer, sessionInvalidator,
-                        threadLocalAMTokenCache, stsInstanceId, realm, xmlUtilities, authnContextMapper, logger);
+                return new RestSamlTokenProvider(tokenGenerationServiceConsumer, sessionInvalidator,
+                        threadLocalAMTokenCache, stsInstanceId, realm, xmlUtilities, jsonTokenAuthnContextMapper, logger);
             } catch (MalformedURLException e) {
                 throw new STSInitializationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
             }
         } else {
-            return new AMSAMLTokenProvider(tokenGenerationServiceConsumer, NULL_AM_SESSION_INVALIDATOR,
-                    threadLocalAMTokenCache, stsInstanceId, realm, xmlUtilities, authnContextMapper, logger);
+            return new RestSamlTokenProvider(tokenGenerationServiceConsumer, NULL_AM_SESSION_INVALIDATOR,
+                    threadLocalAMTokenCache, stsInstanceId, realm, xmlUtilities, jsonTokenAuthnContextMapper, logger);
         }
     }
 }

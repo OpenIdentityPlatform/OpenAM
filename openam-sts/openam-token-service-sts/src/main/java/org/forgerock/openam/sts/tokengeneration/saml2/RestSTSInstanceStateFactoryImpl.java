@@ -23,9 +23,9 @@ import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFacto
 import javax.inject.Inject;
 
 /**
- * @see org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateFactory
+ * @see org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceStateFactory
  */
-public class RestSTSInstanceStateFactoryImpl implements RestSTSInstanceStateFactory {
+public class RestSTSInstanceStateFactoryImpl implements STSInstanceStateFactory<RestSTSInstanceState, RestSTSInstanceConfig> {
     private final STSKeyProviderFactory keyProviderFactory;
 
     @Inject
@@ -33,7 +33,7 @@ public class RestSTSInstanceStateFactoryImpl implements RestSTSInstanceStateFact
         this.keyProviderFactory = keyProviderFactory;
     }
 
-    public RestSTSInstanceState createRestSTSInstanceState(RestSTSInstanceConfig config) throws TokenCreationException {
+    public RestSTSInstanceState createSTSInstanceState(RestSTSInstanceConfig config) throws TokenCreationException {
         return new RestSTSInstanceState(config, keyProviderFactory.createSTSKeyProvider(config.getSaml2Config()));
     }
 }

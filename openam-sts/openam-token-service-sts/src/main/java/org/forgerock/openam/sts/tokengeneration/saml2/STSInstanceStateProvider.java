@@ -21,11 +21,12 @@ import org.forgerock.openam.sts.TokenCreationException;
 
 /**
  * Defines concern related to obtaining the STSInstanceConfig state corresponding to the sts instance identifier.
- * Allows a single token-generation-service to generate STS-instance-specific tokens.
+ * Allows a single token-generation-service to generate STS-instance-specific tokens. The token generation service will
+ * consume two such instances - one for the rest-sts, and one for the soap-sts.
  *
- * The generic type corresponds to either RestSTSInstanceState or SoapSTSInstanceState (latter class still pending).
+ * The generic type corresponds to either RestSTSInstanceState or SoapSTSInstanceState.
  */
-public interface STSInstanceStateProvider<T> {
+public interface STSInstanceStateProvider<T extends STSInstanceState> {
     /**
      * Returns the instance type specified by the generic type. Implementations of this interface will cache returned
      * state, so that the persistent store (SMS) does not have to be consulted every time, as each token generation for

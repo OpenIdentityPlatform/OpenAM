@@ -834,6 +834,11 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-publish-sts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-soap-sts</artifactId>
                 <version>${project.version}</version>
             </dependency>

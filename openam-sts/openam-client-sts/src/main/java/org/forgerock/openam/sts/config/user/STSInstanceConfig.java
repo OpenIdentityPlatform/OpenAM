@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.config.user;
 
+import org.forgerock.guava.common.base.Objects;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.MapMarshallUtils;
@@ -46,8 +47,14 @@ public class STSInstanceConfig {
     entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
     SMS persistence.
      */
-    protected static final String ISSUER_NAME = SharedSTSConstants.ISSUER_NAME;
+    static final String ISSUER_NAME = SharedSTSConstants.ISSUER_NAME;
+
+    /*
+    The following two constants define the key names for the json maps that encapsulate state for both rest and soap
+    STS instances.
+     */
     protected static final String SAML2_CONFIG = "saml2-config";
+    protected static final String DEPLOYMENT_CONFIG = "deployment-config";
 
     protected final String issuerName;
     protected final SAML2Config saml2Config;
@@ -120,7 +127,7 @@ public class STSInstanceConfig {
         if (other instanceof STSInstanceConfig) {
             STSInstanceConfig otherConfig = (STSInstanceConfig)other;
             return  issuerName.equals(otherConfig.getIssuerName()) &&
-                    ((saml2Config != null ? saml2Config.equals(otherConfig.getSaml2Config()) : (otherConfig.getSaml2Config() == null)));
+                    Objects.equal(saml2Config, otherConfig.getSaml2Config());
         }
         return false;
     }

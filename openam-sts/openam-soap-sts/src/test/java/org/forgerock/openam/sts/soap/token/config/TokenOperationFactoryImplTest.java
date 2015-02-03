@@ -11,23 +11,35 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.token.config;
+
+import static org.testng.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
-import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.renewer.SAMLTokenRenewer;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
+import org.forgerock.openam.sts.HttpURLConnectionFactory;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
+import org.forgerock.openam.sts.XMLUtilities;
+import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XmlMarshaller;
+import org.forgerock.openam.sts.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.soap.publish.PublishServiceAccessTokenProvider;
+import org.forgerock.openam.sts.soap.token.provider.SoapSamlTokenProvider;
+import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapper;
+import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapperImpl;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -36,6 +48,10 @@ import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
+import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
+import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
+import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
@@ -51,9 +67,14 @@ import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 
-import static org.testng.Assert.assertTrue;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TokenOperationFactoryImplTest {
     TokenOperationFactory operationFactory;
@@ -77,36 +98,44 @@ public class TokenOperationFactoryImplTest {
             bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
             bind(TokenOperationFactory.class).to(TokenOperationFactoryImpl.class);
             bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class);
+            bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
+            bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
+            bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
+            bind(XmlTokenAuthnContextMapper.class).to(XmlTokenAuthnContextMapperImpl.class);
+            bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
+            bind(PublishServiceAccessTokenProvider.class).toInstance(mock(PublishServiceAccessTokenProvider.class));
+            bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class);
+            bind(HttpURLConnectionWrapperFactory.class);
         }
 
         @Provides
         @Named(AMSTSConstants.AM_DEPLOYMENT_URL)
         public String getAMDeploymentUrl() {
-            return "am_deployment_url";
+            return "http://host.com:8080/openam";
         }
 
         @Provides
         @Named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT)
         public String getAMRestLogoutUriElement() {
-            return "am_rest_logout";
+            return "/sessions/?_action=logout";
         }
 
         @Provides
         @Named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT)
         public String getIdFromSessionUriElement() {
-            return "id_from_session";
+            return "/users/?_action=idFromSession";
         }
 
         @Provides
         @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME)
         public String getAMSessionCookieName() {
-            return "cornholio";
+            return "iPlanetDirectoryPro";
         }
 
         @Provides
         @Named (AMSTSConstants.REST_AUTHN_URI_ELEMENT)
         String restAuthnUriElement() {
-            return "rest_authn";
+            return "/authenticate";
         }
 
         @Provides
@@ -142,15 +171,73 @@ public class TokenOperationFactoryImplTest {
         }
 
         @Provides
+        @javax.inject.Singleton
+        @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
+        String tokenGenerationServiceUriElement() {
+            return "/sts-tokengen/issue?_action=issue";
+        }
+
+        @Provides
+        @Named(AMSTSConstants.STS_INSTANCE_ID)
+        String getSTSInstanceId() {
+            return "cho_mama";
+        }
+
+        @Provides
+        @Inject
+        AMSessionInvalidator getSessionInvalidator(
+                @Named(AMSTSConstants.AM_DEPLOYMENT_URL) String deploymentUrl,
+                @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRestRoot,
+                @Named (AMSTSConstants.REALM) String realm,
+                @Named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT) String logoutUriElement,
+                @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String sessionCookieName,
+                HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
+                Logger logger) throws URISyntaxException {
+            try {
+                return new AMSessionInvalidatorImpl(deploymentUrl, jsonRestRoot, realm, logoutUriElement,
+                        sessionCookieName, new UrlConstituentCatenatorImpl(), "crest_session_version", httpURLConnectionWrapperFactory, logger);
+            } catch (MalformedURLException e) { return null;}
+        }
+
+        @Provides
+        Set<TokenTransformConfig> getValidateTransformations() {
+            Set<TokenTransformConfig> transformConfigs = new HashSet<TokenTransformConfig>();
+            transformConfigs.add(new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, true));
+            return transformConfigs;
+        }
+
+        @Provides
+        @Singleton
+        @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE)
+        String getSessionServiceVersion() {
+            return "protocol=1.0, resource=1.1";
+        }
+
+        @Provides
+        @Singleton
         @Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE)
-        String getCrestAuthNVersion() {
+        String getAuthNServiceVersion() {
+            return "protocol=1.0, resource=2.0";
+        }
+
+        @Provides
+        @Singleton
+        @Named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)
+        String getTokenGenServiceVersion() {
             return "protocol=1.0, resource=1.0";
         }
 
         @Provides
+        @Singleton
         @Named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)
-        String getCrestUsersServiceVersion() {
-            return "protocol=1.0, resource=1.0";
+        String getUsersServiceVersion() {
+            return "protocol=1.0, resource=2.0";
+        }
+
+        @Provides
+        @Singleton
+        AMSTSConstants.STSType getSTSType() {
+            return AMSTSConstants.STSType.REST;
         }
     }
 
@@ -174,14 +261,9 @@ public class TokenOperationFactoryImplTest {
         operationFactory.getTokenRenewerForType(TokenType.USERNAME);
     }
 
-    @Test(expectedExceptions = STSInitializationException.class)
-    public void testNonExistentTransform() throws STSInitializationException {
-        operationFactory.getTokenProviderForTransformOperation(TokenType.OPENAM, TokenType.USERNAME);
-    }
-
     @Test
     public void testProvider() throws STSInitializationException {
-        assertTrue(operationFactory.getTokenProviderForType(TokenType.SAML2) instanceof SAMLTokenProvider);
+        assertTrue(operationFactory.getTokenProviderForType(TokenType.SAML2) instanceof SoapSamlTokenProvider);
     }
 
     @Test(expectedExceptions = STSInitializationException.class)

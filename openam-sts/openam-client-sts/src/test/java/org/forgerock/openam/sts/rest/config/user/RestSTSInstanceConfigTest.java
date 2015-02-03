@@ -22,7 +22,9 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.config.user.DeploymentConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
+import org.forgerock.openam.utils.IOUtils;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
@@ -104,9 +107,7 @@ public class RestSTSInstanceConfigTest {
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
         org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
-        for details. This is using the older version of jackson
-        (org.codehaus.jackson.map.ObjectMapper), and I will do the same, to reproduce
-        the same behavior.
+        for details.
          */
         org.codehaus.jackson.JsonParser parser =
                 new org.codehaus.jackson.map.ObjectMapper().getJsonFactory().createJsonParser(origConfig.toJson().toString());
@@ -140,6 +141,19 @@ public class RestSTSInstanceConfigTest {
         assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
     }
 
+    /*
+    Because SoapSTSInstanceConfig and encapsulated instances must be marshaled to a Map<String, Set<String>> for SMS persistence,
+    RestSTSInstanceConfig and encapsulated classes define statics that define the keys which must correspond to the String
+    keys in the SMS-persisted-map, values which must correspond to the entries defined in restSTS.xml. This unit test
+    tests this correspondence.
+    */
+    @Test
+    public void testServicePropertyFileCorrespondence() throws IOException {
+        String fileContent =
+                IOUtils.getFileContent("../../openam-server-only/src/main/resources/services/restSTS.xml");
+        assertTrue(fileContent.contains(RestSTSInstanceConfig.SUPPORTED_TOKEN_TRANSLATIONS));
+    }
+
     private RestSTSInstanceConfig createInstanceConfig(String uriElement, boolean withTlsOffloadConfig) throws UnsupportedEncodingException {
         Map<String,String> oidcContext = new HashMap<String,String>();
         oidcContext.put("context_key_1", "context_value_1");
@@ -149,10 +163,10 @@ public class RestSTSInstanceConfigTest {
                 .build();
         Set<String> offloadHosts = new HashSet<String>(1);
         offloadHosts.add(TLS_OFFLOAD_HOST_IP);
-        RestDeploymentConfig deploymentConfig;
+        DeploymentConfig deploymentConfig;
         if (withTlsOffloadConfig) {
             deploymentConfig =
-                    RestDeploymentConfig.builder()
+                    DeploymentConfig.builder()
                             .uriElement(uriElement)
                             .authTargetMapping(mapping)
                             .tlsOffloadEngineHostIpAddrs(offloadHosts)
@@ -160,7 +174,7 @@ public class RestSTSInstanceConfigTest {
                             .build();
         } else {
             deploymentConfig =
-                    RestDeploymentConfig.builder()
+                    DeploymentConfig.builder()
                             .uriElement(uriElement)
                             .authTargetMapping(mapping)
                             .build();
@@ -229,8 +243,8 @@ public class RestSTSInstanceConfigTest {
                 .addMapping(TokenType.USERNAME, "service", "ldapService")
                 .build();
 
-        RestDeploymentConfig deploymentConfig =
-                RestDeploymentConfig.builder()
+        DeploymentConfig deploymentConfig =
+                DeploymentConfig.builder()
                         .uriElement(uriElement)
                         .authTargetMapping(mapping)
                         .build();
@@ -257,7 +271,7 @@ public class RestSTSInstanceConfigTest {
                 )
                 .build();
     }
-
+    //TODO: investigate if this is still necessary - does CREST turn Set values into json arrays?
     private Map<String, List<String>> marshalSetValuesToListValues(Map<String, Set<String>> smsMap) {
         Map<String, List<String>> listMap = new HashMap<String, List<String>>();
         for (Map.Entry<String, Set<String>> entry : smsMap.entrySet()) {

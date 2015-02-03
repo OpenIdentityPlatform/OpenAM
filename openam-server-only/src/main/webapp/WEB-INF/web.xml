@@ -178,7 +178,7 @@
     </filter-mapping>
     <filter-mapping>
         <filter-name>CommonsAuthenticationFilter</filter-name>
-        <url-pattern>/rest-sts-publish/*</url-pattern>
+        <url-pattern>/sts-publish/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>CommonsAuthenticationFilter</filter-name>
@@ -627,11 +627,11 @@
     </servlet>
 
     <servlet>
-        <servlet-name>rest-sts-publish</servlet-name>
+        <servlet-name>sts-publish</servlet-name>
         <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
         <init-param>
             <param-name>connection-factory-class</param-name>
-            <param-value>org.forgerock.openam.sts.rest.publish.service.RestSTSPublishServiceConnectionFactoryProvider</param-value>
+            <param-value>org.forgerock.openam.sts.publish.service.STSPublishServiceConnectionFactoryProvider</param-value>
         </init-param>
     </servlet>
 
@@ -1058,8 +1058,8 @@
         <url-pattern>/rest-sts/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>rest-sts-publish</servlet-name>
-        <url-pattern>/rest-sts-publish/*</url-pattern>
+        <servlet-name>sts-publish</servlet-name>
+        <url-pattern>/sts-publish/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>sts-tokengeneration-service</servlet-name>

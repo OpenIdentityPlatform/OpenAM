@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.config;
@@ -37,7 +37,9 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.message.token.UsernameToken;
 
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.HttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
+import org.forgerock.openam.sts.OpenAMHttpURLConnectionFactory;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.JsonMarshaller;
 import org.forgerock.openam.sts.XMLUtilities;
@@ -46,12 +48,13 @@ import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.rest.RestSTSImpl;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
-import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.rest.marshal.*;
 import org.forgerock.openam.sts.rest.operation.TokenTransformFactory;
 import org.forgerock.openam.sts.rest.operation.TokenTransformFactoryImpl;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperationImpl;
+import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapperImpl;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -62,8 +65,7 @@ import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
-import org.forgerock.openam.sts.token.provider.AuthnContextMapper;
-import org.forgerock.openam.sts.token.provider.AuthnContextMapperImpl;
+import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapper;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
@@ -157,7 +159,11 @@ public class RestSTSInstanceModule extends AbstractModule {
         bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
         bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
 
-        //bind the class responsible for producing HttpURLConnectionWrapper instances
+        /*
+        Bind the class responsible for producing HttpURLConnectionWrapper instances, and the HttpURLConnectionFactory
+        it consumes.
+         */
+        bind(HttpURLConnectionFactory.class).to(OpenAMHttpURLConnectionFactory.class).in(Scopes.SINGLETON);
         bind(HttpURLConnectionWrapperFactory.class).in(Scopes.SINGLETON);
     }
 
@@ -323,22 +329,22 @@ public class RestSTSInstanceModule extends AbstractModule {
     }
 
     /*
-    Allows for a custom AuthnContextMapper to be plugged-in. This AuthnContextMapper provides a
+    Allows for a custom JsonTokenAuthnContextMapper to be plugged-in. This JsonTokenAuthnContextMapper provides a
     SAML2 AuthnContext class ref value given an input token and input token type.
      */
     @Provides
     @Inject
-    AuthnContextMapper getAuthnContextMapper(Logger logger) {
+    JsonTokenAuthnContextMapper getAuthnContextMapper(Logger logger) {
         String customMapperClassName = stsInstanceConfig.getSaml2Config().getCustomAuthNContextMapperClassName();
         if (customMapperClassName == null) {
-            return new AuthnContextMapperImpl(logger);
+            return new JsonTokenAuthnContextMapperImpl(logger);
         } else {
             try {
-                return Class.forName(customMapperClassName).asSubclass(AuthnContextMapper.class).newInstance();
+                return Class.forName(customMapperClassName).asSubclass(JsonTokenAuthnContextMapper.class).newInstance();
             } catch (Exception e) {
-                logger.error("Exception caught implementing custom AuthnContextMapper class " + customMapperClassName
-                        + "; Returning default AuthnContextMapperImpl. The exception: " + e);
-                return new AuthnContextMapperImpl(logger);
+                logger.error("Exception caught implementing custom JsonTokenAuthnContextMapper class " + customMapperClassName
+                        + "; Returning default JsonTokenAuthnContextMapperImpl. The exception: " + e);
+                return new JsonTokenAuthnContextMapperImpl(logger);
             }
         }
     }
@@ -425,6 +431,16 @@ public class RestSTSInstanceModule extends AbstractModule {
     String getUsersServiceVersion() {
         return RestSTSInjectorHolder.getInstance(Key.get(String.class,
                 Names.named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)));
+    }
+
+    /*
+    Required by the TokenGenerationServiceConsumerImpl, to specify the sts type which will allow the token generation
+    service to look-up the appropriate sts instance state.
+     */
+    @Provides
+    @Singleton
+    AMSTSConstants.STSType getSTSType() {
+        return AMSTSConstants.STSType.REST;
     }
 }
 

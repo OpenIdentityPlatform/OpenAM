@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.token.config;
@@ -21,6 +21,7 @@ import org.apache.cxf.sts.token.renewer.TokenRenewer;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 
 /**
  * Interface consumed by the Token*OperationProvider classes to obtain instances of the TokenValidator, TokenProvider,
@@ -36,13 +37,13 @@ public interface TokenOperationFactory {
      * Called to obtain the set of TokenProvider instances to create a new token in the context of token transformation -
      * the validate operation called with a TokenType other than STATUS.
      */
-    TokenProvider getTokenProviderForTransformOperation(TokenType inputTokenType, TokenType outputTokenType) throws STSInitializationException;
+    TokenProvider getTokenProviderForTransformOperation(TokenTransformConfig tokenTransformConfig) throws STSInitializationException;
 
     /**
      * Called to obtain the set of TokenValidate instances to validate the initial token in the context of token transformation -
      * the validate operation called with a TokenType other than STATUS.
      */
-    TokenValidator getTokenValidatorForTransformOperation(TokenType inputTokenType, TokenType outputTokenType) throws STSInitializationException;
+    TokenValidator getTokenValidatorForTransformOperation(TokenTransformConfig tokenTransformConfig) throws STSInitializationException;
 
     /**
      * Called to obtain the set of of TokenProvider instances to satisfy the issue operation.
@@ -51,12 +52,14 @@ public interface TokenOperationFactory {
 
     /**
      * Called to obtain a TokenValidator used in the context of token renewal.
+     * TODO: are we supporting renew?
      */
     TokenValidator getTokenValidatorForRenewal(TokenType tokenType) throws STSInitializationException;
     /**
      * Called to obtain the set of TokenRenewer instances to satisfy the renew operation.
      * Note that the TokenRenewOperation encapsulates a set of TokenValidators and TokenRenewers, as the
      * process of renewing a token first involves validating the existing token, and then renewing the existing token.
+     * TODO: are we supporting renew?
      */
     TokenRenewer getTokenRenewerForType(TokenType tokenType) throws STSInitializationException;
 }

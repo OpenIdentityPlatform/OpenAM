@@ -784,6 +784,11 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-publish-sts</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-slf4j</artifactId>
         </dependency>
         <dependency>

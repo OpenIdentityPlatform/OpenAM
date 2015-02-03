@@ -32,7 +32,7 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenValidationException;
-import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller;
 import org.forgerock.openam.sts.rest.marshal.TokenResponseMarshaller;
 import org.forgerock.openam.sts.rest.marshal.WebServiceContextFactory;
@@ -205,7 +205,7 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
             }
             /*
              Set the inputToken JsonValue in the additionalProperties if we are issuing a SAML2 token so that the
-             AuthnContextMapper can use it to determine the appropriate AuthnContext mapping.
+             JsonTokenAuthnContextMapper can use it to determine the appropriate AuthnContext mapping.
              */
             additionalProperties.put(AMSTSConstants.INPUT_TOKEN_STATE_KEY, inputToken);
         }

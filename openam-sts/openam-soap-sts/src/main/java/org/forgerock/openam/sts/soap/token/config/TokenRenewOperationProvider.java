@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.token.config;
@@ -58,6 +58,8 @@ import org.slf4j.Logger;
  * configuration object will be injected into this Provider to support these configurations. And it may well be that
  * what is injected is itself a Provider, which has the state necessary to provide the various interface instances necessary
  * to configure a SAMLTokenValidator
+ *
+ * TODO: get rid of this class? Probably not going to provide for token renewal?
  *
  */
 public class TokenRenewOperationProvider implements Provider<RenewOperation> {

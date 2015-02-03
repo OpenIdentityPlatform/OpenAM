@@ -11,39 +11,28 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.token.config;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 import org.apache.cxf.sts.STSPropertiesMBean;
-import org.apache.cxf.sts.operation.TokenIssueOperation;
 import org.apache.cxf.sts.operation.TokenValidateOperation;
-import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
-import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
+import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-import org.forgerock.openam.sts.token.validator.AMTokenValidator;
-
 
 import javax.xml.ws.WebServiceContext;
-
-import org.forgerock.openam.sts.TokenType;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -83,8 +72,7 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
 
     private final STSPropertiesMBean stsPropertiesMBean;
     private final TokenStore tokenStore;
-    private final Set<TokenType> statusTokenTypes;
-    private final Map<TokenType,TokenType> transformTokenTypes;
+    private final Set<TokenTransformConfig> transformTokenTypes;
     private final TokenOperationFactory operationFactory;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final Logger logger;
@@ -93,14 +81,12 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
     TokenValidateOperationProvider(
             STSPropertiesMBean stsPropertiesMBean,
             TokenStore tokenStore,
-            @Named(AMSTSConstants.TOKEN_VALIDATE_OPERATION_STATUS) Set<TokenType> statusTokenTypes,
-            Map<TokenType,TokenType> transformTokenTypes,
+            Set<TokenTransformConfig> transformTokenTypes,
             TokenOperationFactory operationFactory,
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
             Logger logger) {
         this.stsPropertiesMBean = stsPropertiesMBean;
         this.tokenStore = tokenStore;
-        this.statusTokenTypes = statusTokenTypes;
         this.transformTokenTypes = transformTokenTypes;
         this.operationFactory = operationFactory;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
@@ -116,16 +102,11 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
             tokenValidateOperation.setTokenStore(tokenStore);
 
             List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
-            logger.debug("The status token types: " + statusTokenTypes);
-            for(TokenType tokenType: statusTokenTypes) {
-                tokenValidators.add(operationFactory.getTokenStatusValidatorForType(tokenType));
-            }
-
             /*
             Plug-in the TokenValidator instances for the input-set in the token transformation operations.
              */
-            for (Map.Entry<TokenType, TokenType> entry : transformTokenTypes.entrySet()) {
-                tokenValidators.add(operationFactory.getTokenValidatorForTransformOperation(entry.getKey(), entry.getValue()));
+            for (TokenTransformConfig tokenTransformConfig : transformTokenTypes) {
+                tokenValidators.add(operationFactory.getTokenValidatorForTransformOperation(tokenTransformConfig));
             }
 
             tokenValidateOperation.setTokenValidators(tokenValidators);
@@ -141,10 +122,11 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
             wait - if I just plug in the wss TokenValidator, I will not have access to this state. So I may need to plug in the actual
             sts.token.Validator class, so I can get at this state. This state is necessary to determine if the desired token transformation
             is allowed, if a transformation is indeed being specified.
+            TODO
              */
             List<TokenProvider> tokenProviders = new ArrayList<TokenProvider>();
-            for (Map.Entry<TokenType, TokenType> entry : transformTokenTypes.entrySet()) {
-                tokenProviders.add(operationFactory.getTokenProviderForTransformOperation(entry.getKey(), entry.getValue()));
+            for (TokenTransformConfig tokenTransformConfig : transformTokenTypes) {
+                tokenProviders.add(operationFactory.getTokenProviderForTransformOperation(tokenTransformConfig));
             }
             tokenValidateOperation.setTokenProviders(tokenProviders);
 
@@ -153,6 +135,5 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
             logger.error("Exception caught initializing a Validate operation: " + e, e);
             throw new RuntimeException(e);
         }
-
     }
 }

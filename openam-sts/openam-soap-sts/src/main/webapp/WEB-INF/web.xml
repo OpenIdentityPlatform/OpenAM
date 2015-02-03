@@ -12,22 +12,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright © 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
 -->
 <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
     <display-name>OpenAM STS</display-name>
 
+    <listener>
+        <listener-class>org.forgerock.openam.sts.soap.publish.SoapSTSPublishContextListener</listener-class>
+    </listener>
     <!--
     Non-spring-based CXF requires a subclass of the CXFNonSpringServlet to be the servlet serving the non-spring
      web-services.
     -->
     <servlet>
-        <servlet-name>new_sts</servlet-name>
+        <servlet-name>soap_sts</servlet-name>
         <servlet-class>org.forgerock.openam.sts.soap.STSBroker</servlet-class>
+        <load-on-startup>5</load-on-startup>
     </servlet>
     <servlet-mapping>
-        <servlet-name>new_sts</servlet-name>
-        <url-pattern>/new_sts/*</url-pattern>
+        <servlet-name>soap_sts</servlet-name>
+        <url-pattern>/sts/*</url-pattern>
     </servlet-mapping>
 </web-app>
