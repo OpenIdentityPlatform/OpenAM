@@ -62,7 +62,7 @@
                                 <processor>org.forgerock.openam.docs.ssoadm.SsoadmAP</processor>
                             </processors>
                             <options>
-                                <outputFile>openam-documentation/openam-doc-ssoadm-ref/target/generated-resources/man-ssoadm-1.xml</outputFile>
+                                <outputFile>${project.build.directory}/generated-resources/man-ssoadm-1.xml</outputFile>
                             </options>
                         </configuration>
                     </execution>
