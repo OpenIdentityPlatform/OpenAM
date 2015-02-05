@@ -14,7 +14,7 @@
  * Copyright 2006 Sun Microsystems Inc
  */
 /*
- * Portions Copyright 2011-2014 ForgeRock AS
+ * Portions Copyright 2011-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -24,6 +24,7 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.Pair;
 import org.forgerock.util.time.TimeService;
 import org.json.JSONException;
@@ -606,5 +607,68 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
     public void setEnforcementTimeZone(String enforcementTimeZone) {
         this.enforcementTZ = TimeZone.getTimeZone(enforcementTimeZone);
         this.enforcementTimeZone = enforcementTimeZone;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        SimpleTimeCondition other = (SimpleTimeCondition)obj;
+
+        // We only need to consider the processed properties as it is these that are used during the evaluation stages.
+        // Also, integer compares are more efficient than string ones...
+        if (this.startHour != other.startHour) {
+            return false;
+        }
+        if (this.startMinute != other.startMinute) {
+            return false;
+        }
+        if (this.endHour != other.endHour) {
+            return false;
+        }
+        if (this.endMinute != other.endMinute) {
+            return false;
+        }
+        if (this.startDayInt != other.startDayInt) {
+            return false;
+        }
+        if (this.endDayInt != other.endDayInt) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.startDateCal, other.startDateCal)) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.endDateCal, other.endDateCal)) {
+            return false;
+        }
+
+        return CollectionUtils.genericCompare(this.enforcementTZ, other.enforcementTZ);
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        hc = 31*hc + startHour;
+        hc = 31*hc + startMinute;
+        hc = 31*hc + endHour;
+        hc = 31*hc + endMinute;
+        hc = 31*hc + startDayInt;
+        hc = 31*hc + endDayInt;
+        if (startDateCal != null) {
+            hc = 31*hc + startDateCal.hashCode();
+        }
+        if (endDateCal != null) {
+            hc = 31*hc + endDateCal.hashCode();
+        }
+        if (enforcementTZ != null) {
+            hc = 31*hc + enforcementTZ.hashCode();
+        }
+
+        return hc;
     }
 }

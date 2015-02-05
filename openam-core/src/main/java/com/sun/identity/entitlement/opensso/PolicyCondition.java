@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -40,6 +40,7 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.interfaces.Condition;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -210,13 +211,13 @@ public class PolicyCondition extends  EntitlementConditionAdaptor {
             return false;
         }
         PolicyCondition other = (PolicyCondition)obj;
-        if (!compareString(this.className, other.className)) {
+        if (!CollectionUtils.genericCompare(this.className, other.className)) {
             return false;
         }
-        if (!compareString(this.name, other.name)) {
+        if (!CollectionUtils.genericCompare(this.name, other.name)) {
             return false;
         }
-        return compareMap(this.properties, other.properties);
+        return CollectionUtils.genericCompare(this.properties, other.properties);
     }
 
 	@Override
@@ -253,5 +254,20 @@ public class PolicyCondition extends  EntitlementConditionAdaptor {
     public void validate() throws EntitlementException {
         // Attempt to load the policy condition to validate it
         getPolicyCondition();
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        if (className != null) {
+            hc = 31*hc + className.hashCode();
+        }
+        if (name != null) {
+            hc = 31*hc + name.hashCode();
+        }
+        if (properties != null) {
+            hc = 31*hc + properties.hashCode();
+        }
+        return hc;
     }
 }

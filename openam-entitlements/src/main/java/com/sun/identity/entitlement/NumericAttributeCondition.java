@@ -25,10 +25,11 @@
  * $Id: NumericAttributeCondition.java,v 1.3 2009/08/31 19:48:13 veiming Exp $
  */
 /*
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -236,6 +237,17 @@ public class NumericAttributeCondition extends EntitlementConditionAdaptor {
     }
 
     @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        if (attributeName != null) {
+            hc = 31*hc + attributeName.hashCode();
+        }
+        hc = 31*hc + operator.hashCode();
+        hc = 31*hc + (value != +0.0f ? Float.floatToIntBits(value) : 0);
+        return hc;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!super.equals(obj)) {
             return false;
@@ -244,24 +256,13 @@ public class NumericAttributeCondition extends EntitlementConditionAdaptor {
             return false;
         }
         NumericAttributeCondition other = (NumericAttributeCondition)obj;
-        if (!compareString(this.attributeName, other.attributeName)) {
+        if (!CollectionUtils.genericCompare(this.attributeName, other.attributeName)) {
             return false;
         }
         if (this.operator != other.operator) {
             return false;
         }
         return (this.value == other.value);
-    }
-
-    @Override
-    public int hashCode() {
-        int hc = super.hashCode();
-        if (attributeName != null) {
-            hc += attributeName.hashCode();
-        }
-        hc += operator.hashCode();
-        hc += value;
-        return hc;
     }
 
     public enum Operator {

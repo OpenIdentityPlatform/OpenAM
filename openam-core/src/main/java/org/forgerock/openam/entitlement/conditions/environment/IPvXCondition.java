@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -540,6 +540,83 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
 
     private String formattedWithHeader(String format, Object... args) {
         return getClass().getSimpleName() + ": " + MessageFormat.format(format, args);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        IPvXCondition other = (IPvXCondition)obj;
+        if (!CollectionUtils.genericCompare(this.version.toString(), other.version.toString())) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.ipRange, other.ipRange)) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.ipList, other.ipList)) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.dnsName, other.dnsName)) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.startIpString, other.startIpString)) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.endIpString, other.endIpString)) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.initialStartIp, other.initialStartIp)) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.initialEndIp, other.initialEndIp)) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.startIp, other.startIp)) {
+            return false;
+        }
+
+        return CollectionUtils.genericCompare(this.endIp, other.endIp);
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        if (version.toString() != null) {
+            hc = 31*hc + version.toString().hashCode();
+        }
+        if (ipRange != null) {
+            hc = 31*hc + ipRange.hashCode();
+        }
+        if (ipList != null) {
+            hc = 31*hc + ipList.hashCode();
+        }
+        if (dnsName != null) {
+            hc = 31*hc + dnsName.hashCode();
+        }
+        if (startIpString != null) {
+            hc = 31*hc + startIpString.hashCode();
+        }
+        if (endIpString != null) {
+            hc = 31*hc + endIpString.hashCode();
+        }
+        if (initialStartIp != null) {
+            hc = 31*hc + initialStartIp.hashCode();
+        }
+        if (initialEndIp != null) {
+            hc = 31*hc + initialEndIp.hashCode();
+        }
+        if (startIp != null) {
+            hc = 31*hc + startIp.hashCode();
+        }
+        if (endIp != null) {
+            hc = 31*hc + endIp.hashCode();
+        }
+        return hc;
     }
 
 }

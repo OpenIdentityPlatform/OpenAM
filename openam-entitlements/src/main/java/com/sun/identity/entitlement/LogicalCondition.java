@@ -25,7 +25,7 @@
  * $Id: LogicalCondition.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  */
 /*
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -261,11 +261,11 @@ public abstract class LogicalCondition extends EntitlementConditionAdaptor {
         int code = super.hashCode();
         if (eConditions != null) {
             for (EntitlementCondition eCondition : eConditions) {
-                code += eCondition.hashCode();
+                code = 31*code + eCondition.hashCode();
             }
         }
         if (pConditionName != null) {
-            code += pConditionName.hashCode();
+            code = 31*code + pConditionName.hashCode();
         }
         return code;
     }

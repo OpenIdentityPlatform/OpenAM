@@ -23,11 +23,14 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EntitlementConditionAdaptor.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
+ *
+ * Portions Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
 import java.util.Map;
 import java.util.Set;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -84,7 +87,7 @@ public abstract class EntitlementConditionAdaptor
             return false;
         }
         EntitlementConditionAdaptor other = (EntitlementConditionAdaptor)obj;
-        return compareString(this.displayType, other.displayType);
+        return CollectionUtils.genericCompare(this.displayType, other.displayType);
     }
 
     /**
@@ -95,34 +98,5 @@ public abstract class EntitlementConditionAdaptor
     @Override
     public int hashCode() {
         return (displayType == null) ? 0 : displayType.hashCode();
-    }
-
-    protected static boolean compareString(String s1, String s2) {
-        if ((s1 == null) && (s2 == null)) {
-            return true;
-        }
-        if ((s1 == null) && (s2 != null)) {
-            return false;
-        }
-        if ((s1 != null) && (s2 == null)) {
-            return false;
-        }
-        return s1.equals(s2);
-    }
-
-    protected static boolean compareMap(
-        Map<String, Set<String>> map1,
-        Map<String, Set<String>> map2
-    ) {
-        if ((map1 == null) && (map2 == null)) {
-            return true;
-        }
-        if ((map1 == null) && (map2 != null)) {
-            return false;
-        }
-        if ((map1 != null) && (map2 == null)) {
-            return false;
-        }
-        return map1.equals(map2);
     }
 }
