@@ -15,7 +15,7 @@
  */
 /*
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
- * Portions Copyright 2011-2014 ForgeRock AS
+ * Portions Copyright 2011-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -73,6 +73,7 @@ import static org.forgerock.openam.entitlement.conditions.environment.ConditionC
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_AUTH_LEVEL;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_AUTH_SCHEMES;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_IP;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.ValidateIPaddress;
 import org.json.JSONArray;
@@ -967,6 +968,29 @@ public class ResourceEnvIPCondition extends EntitlementConditionAdaptor {
         }
 
         parseConditions(resourceEnvIPConditionValue);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        ResourceEnvIPCondition other = (ResourceEnvIPCondition)obj;
+
+        return CollectionUtils.genericCompare(this.resourceEnvIPConditionValue, other.resourceEnvIPConditionValue);
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        if (resourceEnvIPConditionValue != null) {
+            hc = 31*hc + resourceEnvIPConditionValue.hashCode();
+        }
+        return hc;
     }
 
     /**

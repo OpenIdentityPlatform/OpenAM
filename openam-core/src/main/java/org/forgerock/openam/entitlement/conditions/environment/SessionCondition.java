@@ -14,7 +14,7 @@
  * Copyright 2006 Sun Microsystems Inc
  */
 /*
- * Portions Copyright 2014 ForgeRock AS
+ * Portions Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -238,5 +238,31 @@ public class SessionCondition extends EntitlementConditionAdaptor {
             throw new EntitlementException(EntitlementException.INVALID_PROPERTY_VALUE, "maxSessionTime",
                     maxSessionTime);
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        SessionCondition other = (SessionCondition)obj;
+
+        if (this.maxSessionTime != other.maxSessionTime) {
+            return false;
+        }
+
+        return (this.terminateSession == other.terminateSession);
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        hc = 31*hc + (int) (maxSessionTime ^ (maxSessionTime >>> 32));
+        hc = 31*hc + (terminateSession?1:0);
+        return hc;
     }
 }

@@ -25,10 +25,11 @@
  * $Id: StringAttributeCondition.java,v 1.3 2009/08/31 19:48:14 veiming Exp $
  */
 /*
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -191,26 +192,26 @@ public class StringAttributeCondition extends EntitlementConditionAdaptor {
         if (!getClass().equals(obj.getClass())) {
             return false;
         }
-        StringAttributeCondition other = (StringAttributeCondition)obj;
-        if (!compareString(this.attributeName, other.attributeName)) {
+        StringAttributeCondition other = (StringAttributeCondition) obj;
+        if (!CollectionUtils.genericCompare(this.attributeName, other.attributeName)) {
             return false;
         }
         if (this.bCaseSensitive != other.bCaseSensitive) {
             return false;
         }
-        return compareString(this.value, other.value);
+        return CollectionUtils.genericCompare(this.value, other.value);
     }
 
     @Override
     public int hashCode() {
         int hc = super.hashCode();
         if (attributeName != null) {
-            hc += attributeName.hashCode();
+            hc = 31*hc + attributeName.hashCode();
         }
-        hc += (bCaseSensitive) ? 1 : 0;
+        hc = 31*hc + (bCaseSensitive ? 1 : 0);
 
         if (value != null) {
-            hc += value.hashCode();
+            hc = 31*hc + value.hashCode();
         }
         return hc;
     }

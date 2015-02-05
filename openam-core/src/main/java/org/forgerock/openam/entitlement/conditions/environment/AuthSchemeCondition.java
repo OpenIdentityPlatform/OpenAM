@@ -14,7 +14,7 @@
  * Copyright 2006 Sun Microsystems Inc
  */
 /*
- * Portions Copyright 2014 ForgeRock AS
+ * Portions Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -27,6 +27,7 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.time.TimeService;
 import org.json.JSONArray;
@@ -405,5 +406,50 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
         if (StringUtils.isAnyBlank(authScheme)) {
             throw new EntitlementException(EntitlementException.PROPERTY_CONTAINS_BLANK_VALUE, AUTH_SCHEME);
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        AuthSchemeCondition other = (AuthSchemeCondition)obj;
+        if (this.appIdleTimeoutEnabled != other.appIdleTimeoutEnabled) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.authScheme, other.authScheme)) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.applicationIdleTimeout, other.applicationIdleTimeout)) {
+            return false;
+        }
+        if (!CollectionUtils.genericCompare(this.applicationName, other.applicationName)) {
+            return false;
+        }
+
+        return CollectionUtils.genericCompare(this.appIdleTimesoutAtSessionKey, other.appIdleTimesoutAtSessionKey);
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        hc = 31*hc + (appIdleTimeoutEnabled?1:0);
+        if (authScheme != null) {
+            hc = 31*hc + authScheme.hashCode();
+        }
+        if (applicationIdleTimeout != null) {
+            hc = 31*hc + applicationIdleTimeout.hashCode();
+        }
+        if (applicationName != null) {
+            hc = 31*hc + applicationName.hashCode();
+        }
+        if (appIdleTimesoutAtSessionKey != null) {
+            hc = 31*hc + appIdleTimesoutAtSessionKey.hashCode();
+        }
+        return hc;
     }
 }

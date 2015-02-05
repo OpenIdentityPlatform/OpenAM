@@ -14,7 +14,7 @@
  * Copyright 2007 Sun Microsystems Inc
  */
 /*
- * Portions Copyright 2011-2014 ForgeRock AS.
+ * Portions Copyright 2011-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -30,6 +30,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -270,5 +271,27 @@ public class AMIdentityMembershipCondition extends EntitlementConditionAdaptor {
         if (StringUtils.isAnyBlank(amIdentityName)) {
             throw new EntitlementException(EntitlementException.PROPERTY_CONTAINS_BLANK_VALUE, AM_IDENTITY_NAME);
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        AMIdentityMembershipCondition other = (AMIdentityMembershipCondition)obj;
+        return CollectionUtils.genericCompare(this.amIdentityName, other.amIdentityName);
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        if (amIdentityName != null) {
+            hc = 31*hc + amIdentityName.hashCode();
+        }
+        return hc;
     }
 }

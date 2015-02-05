@@ -14,7 +14,7 @@
  * Copyright 2006 Sun Microsystems Inc
  */
 /*
- * Portions Copyright 2014 ForgeRock AS
+ * Portions Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -177,5 +177,28 @@ public class AuthenticateToRealmCondition extends EntitlementConditionAdaptor {
         if (StringUtils.isBlank(authenticateToRealm)) {
             throw new EntitlementException(PROPERTY_VALUE_NOT_DEFINED, AUTHENTICATE_TO_REALM);
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        AuthenticateToRealmCondition other = (AuthenticateToRealmCondition)obj;
+        return StringUtils.compareCaseInsensitiveString(this.authenticateToRealm, other.authenticateToRealm);
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        if (authenticateToRealm != null) {
+            // As case insensitive, force lower case for the hashcode generation.
+            hc = 31*hc + authenticateToRealm.toLowerCase().hashCode();
+        }
+        return hc;
     }
 }

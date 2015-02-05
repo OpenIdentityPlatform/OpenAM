@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.utils;
 
@@ -218,4 +218,118 @@ public class CollectionUtils {
         return iterator.hasNext() ? iterator.next() : defaultValue;
     }
 
+    /**
+     * Compares any two arbitrary objects - including collections, for equality. It also handles either of the objects
+     * being null without issue.
+     *
+     * @param valA - the first object to be compared.
+     * @param valB - the second object to tbe compared.
+     * @return true if the parameter values are the same, false if different.
+     */
+    public static <T> boolean genericCompare(T valA, T valB) {
+        return valA == null ? valB == null : valA.equals(valB);
+    }
+
+    /**
+     * Compares two map collections containing sets of strings in a case insensitive manner.
+     *
+     * @param valA - the first map of set of strings to be compared.
+     * @param valB - the second map of set of strings to be compared.
+     * @return true if the parameter values are the same, false if different.
+     */
+    public static boolean compareCaseInsensitiveMapOfSetOfStrings(Map<String, Set<String>> valA, Map<String, Set<String>> valB) {
+        if (valA == valB) {
+            return true;
+        }
+        if ((valA == null) || (valB == null)) {
+            return false;
+        }
+        if (valA.size() != valB.size()) {
+            return false;
+        }
+        if (valA.size() == 0) {
+            return true;
+        }
+
+        for (Map.Entry<String, Set<String>> valAEntry : valA.entrySet()) {
+            Set<String> valBValues = valB.get(valAEntry.getKey());
+            Set<String> valAValues = valAEntry.getValue();
+            if (valBValues == null) {
+                if (valAValues != null) {
+                    return false;
+                }
+                continue;
+            }
+
+            if (valAValues.size() != valBValues.size()) {
+                return false;
+            }
+            if (valAValues.size() == 0) {
+                continue;
+            }
+
+            for (String valAValueString : valAValues)
+            {
+                if (valAValueString == null) {
+                    boolean bFoundNull = false;
+                    for (String nullTestInValBString : valBValues) {
+                        // This works as sets can only have a maximum of 1 null entry
+                        bFoundNull = nullTestInValBString == null;
+                        if (bFoundNull) {
+                            break;
+                        }
+                    }
+
+                    if (!bFoundNull) {
+                        return false;
+                    }
+                    continue;
+                }
+
+                boolean bFound=false;
+                for (String valBValueString : valBValues) {
+                    bFound = StringUtils.compareCaseInsensitiveString(valAValueString, valBValueString);
+                    if (bFound) {
+                        break;
+                    }
+                }
+
+                if (!bFound) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Creates a hash code for a map of set of strings in a case insensitive manner. This is needed so that
+     * if a case insensitive equality is applied to the map, the hash is generated in a similar and consisent
+     * manner.
+     *
+     * @param map - the map of set of strings for which the hash code is to be generated.
+     * @return the generated hash code.
+     */
+    public static int createHashForCaseInsensitiveMapOfSetOfStrings(Map<String, Set<String>> map) {
+        int hc = 0;
+        for (Map.Entry<String, Set<String>> currentEntry : map.entrySet()) {
+            if (currentEntry == null) {
+                continue;
+            }
+            Set<String> currentValue = currentEntry.getValue();
+            if (currentValue == null) {
+                continue;
+            }
+            for (String currentString : currentValue) {
+                if (currentString == null) {
+                    continue;
+                }
+                // case insensitive mode so force lower case on strings
+                hc = hc * 31 + currentString.toLowerCase().hashCode();
+            }
+        }
+
+        return hc;
+    }
 }

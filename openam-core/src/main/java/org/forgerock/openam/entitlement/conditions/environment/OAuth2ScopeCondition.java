@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -21,6 +21,7 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -205,5 +206,28 @@ public class OAuth2ScopeCondition extends EntitlementConditionAdaptor {
                 throw new EntitlementException(INVALID_OAUTH2_SCOPE, scope);
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        OAuth2ScopeCondition other = (OAuth2ScopeCondition)obj;
+
+        return CollectionUtils.genericCompare(this.requiredScopes, other.requiredScopes);
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        if (requiredScopes != null) {
+            hc = 31*hc + requiredScopes.hashCode();
+        }
+        return hc;
     }
 }

@@ -14,7 +14,7 @@
  * Copyright 2006 Sun Microsystems Inc
  */
 /*
- * Portions Copyright 2014 ForgeRock AS
+ * Portions Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -27,6 +27,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -216,5 +217,33 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
         if (StringUtils.isBlank(authenticateToService)) {
             throw new EntitlementException(PROPERTY_VALUE_NOT_DEFINED, AUTHENTICATE_TO_SERVICE);
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        AuthenticateToServiceCondition other = (AuthenticateToServiceCondition)obj;
+        if (this.realmEmpty != other.realmEmpty) {
+            return false;
+        }
+
+        return CollectionUtils.genericCompare(this.authenticateToService, other.authenticateToService);
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        if (authenticateToService != null) {
+            hc = 31*hc + authenticateToService.hashCode();
+        }
+
+        hc = 31*hc + (realmEmpty?1:0);
+        return hc;
     }
 }

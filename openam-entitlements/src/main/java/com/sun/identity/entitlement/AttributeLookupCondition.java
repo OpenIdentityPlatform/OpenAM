@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -301,13 +301,13 @@ public class AttributeLookupCondition extends EntitlementConditionAdaptor {
     public int hashCode() {
         int code = super.hashCode();
         if (key != null) {
-            code += key.hashCode();
+            code = 31*code + key.hashCode();
         }
         if (value != null) {
-            code += value.hashCode();
+            code = 31*code + value.hashCode();
         }
         if (pConditionName != null) {
-            code += pConditionName.hashCode();
+            code = 31*code + pConditionName.hashCode();
         }
         return code;
     }

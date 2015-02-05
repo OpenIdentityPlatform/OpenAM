@@ -14,7 +14,7 @@
  * Copyright 2006 Sun Microsystems Inc
  */
 /*
- * Portions Copyright 2014 ForgeRock AS
+ * Portions Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -27,6 +27,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -261,5 +262,42 @@ public class SessionPropertyCondition extends EntitlementConditionAdaptor {
         if (properties == null || properties.isEmpty()) {
             throw new EntitlementException(EntitlementException.PROPERTY_VALUE_NOT_DEFINED, "properties");
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+
+        SessionPropertyCondition other = (SessionPropertyCondition)obj;
+
+        if (this.ignoreValueCase != other.ignoreValueCase) {
+            return false;
+        }
+
+        if (ignoreValueCase) {
+            return CollectionUtils.compareCaseInsensitiveMapOfSetOfStrings(this.properties, other.properties);
+        }
+
+        return CollectionUtils.genericCompare(this.properties, other.properties);
+    }
+
+    @Override
+    public int hashCode() {
+        int hc = super.hashCode();
+        hc = 31 * hc + (ignoreValueCase ? 1 : 0);
+        if (!ignoreValueCase) {
+            if (properties != null) {
+                hc = 31 * hc + properties.hashCode();
+            }
+            return hc;
+        }
+
+        hc = 31*hc + CollectionUtils.createHashForCaseInsensitiveMapOfSetOfStrings(this.properties);
+        return hc;
     }
 }
