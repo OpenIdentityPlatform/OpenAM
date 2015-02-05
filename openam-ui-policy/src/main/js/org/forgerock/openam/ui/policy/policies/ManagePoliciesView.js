@@ -53,6 +53,8 @@ define("org/forgerock/openam/ui/policy/policies/ManagePoliciesView", [
         REFERRALS_TAB: 1,
 
         render: function (args, callback) {
+            var self = this,
+                appPromise = policyDelegate.getApplicationByName(args[0]);
             this.data.realm = conf.globalData.auth.realm;
             this.data.appName = decodeURI(args[0]);
             this.data.referralsEnabled = conf.globalData.serverInfo && conf.globalData.serverInfo.referralsEnabled === "true";
@@ -60,6 +62,13 @@ define("org/forgerock/openam/ui/policy/policies/ManagePoliciesView", [
             this.parentRender(function () {
                 this.tabs = this.$el.find('.tab-content .tab');
                 this.tabLinks = this.$el.find('.tab-links li');
+
+                appPromise.done(function(app){
+                    var data = { appEditable: app.editable, appName: app.name };
+                    uiUtils.fillTemplateWithData("templates/policy/policies/ManagePoliciesHeaderTemplate.html", data, function(html){
+                        self.$el.find('#appNameHeader').html(html);
+                    });
+                });
 
                 this.policyGridView = new GenericGridView();
                 this.policyGridView.render({

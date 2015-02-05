@@ -71,7 +71,7 @@ define("org/forgerock/openam/ui/policy/applications/ManageApplicationsView", [
         getGridInitOptions: function () {
             var self = this,
                 actionsFormatter = function (cellVal, options, rowObject) {
-                    return uiUtils.fillTemplateWithData("templates/policy/applications/ManageAppsGridCellActionsTemplate.html");
+                    return uiUtils.fillTemplateWithData("templates/policy/applications/ManageAppsGridCellActionsTemplate.html", rowObject);
                 },
                 datePick = function(elem) { return self.appGridView.datePicker(self.appGridView, elem); };
 
