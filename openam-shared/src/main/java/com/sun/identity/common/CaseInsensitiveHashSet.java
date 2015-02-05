@@ -24,6 +24,7 @@
  *
  * $Id: CaseInsensitiveHashSet.java,v 1.4 2008/06/25 05:42:25 qcheng Exp $
  *
+ * Portions copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.common;
@@ -31,6 +32,7 @@ package com.sun.identity.common;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * An implementation of Case Insensitive Hash Set with case preservation.
@@ -125,6 +127,25 @@ public class CaseInsensitiveHashSet extends HashSet {
 
     public Object[] toArray() {
         return toArray(null);
+    }
+    
+    /**
+     * Removes all elements specified in the parameter collection from the current set.
+     *
+     * @param c The collection of elements that need to be removed from this set.
+     * @return <code>true</code> if at least one element has been removed from this set.
+     * @see java.util.AbstractSet#removeAll(java.util.Collection)
+     */
+    @Override
+    public boolean removeAll(Collection c) {
+        // Override to ensure that the collection we are removing
+        // is an instance of CaseInsensitiveHashSet 
+        if (c instanceof CaseInsensitiveHashSet) {
+            return super.removeAll(c);
+        } else {
+            Set<String> ciHashSet = new CaseInsensitiveHashSet(c);
+            return super.removeAll(ciHashSet);
+        }           
     }
 
     /**
