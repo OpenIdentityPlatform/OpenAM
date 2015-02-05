@@ -65,14 +65,14 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
 
     obj.getApplicationByName = function (name) {
         return obj.serviceCall({
-            url: "/applications/" + name,
+            url: "/applications/" + encodeURIComponent(name),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
     obj.updateApplication = function (name, data) {
         return obj.serviceCall({
-            url: "/applications/" + name,
+            url: "/applications/" + encodeURIComponent(name),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "PUT",
             data: JSON.stringify(data),
@@ -92,7 +92,7 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
 
     obj.deleteApplication = function (name) {
         return obj.serviceCall({
-            url: "/applications/" + name,
+            url: "/applications/" + encodeURIComponent(name),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "DELETE",
             errorsHandlers: obj.ERROR_HANDLERS

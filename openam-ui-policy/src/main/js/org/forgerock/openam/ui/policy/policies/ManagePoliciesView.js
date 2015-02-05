@@ -56,7 +56,8 @@ define("org/forgerock/openam/ui/policy/policies/ManagePoliciesView", [
             var self = this,
                 appPromise = policyDelegate.getApplicationByName(args[0]);
             this.data.realm = conf.globalData.auth.realm;
-            this.data.appName = decodeURI(args[0]);
+            this.data.appName = args[0];
+            
             this.data.referralsEnabled = conf.globalData.serverInfo && conf.globalData.serverInfo.referralsEnabled === "true";
 
             this.parentRender(function () {

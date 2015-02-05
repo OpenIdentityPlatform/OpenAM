@@ -93,5 +93,8 @@ define("org/forgerock/openam/ui/policy/common/Utils", [
         return new Handlebars.SafeString('<span class="realm toplevel">/</span>' + result);
     });
 
+
+    Handlebars.registerHelper('encodeURIComponent', encodeURIComponent);
+
     return obj;
 });
