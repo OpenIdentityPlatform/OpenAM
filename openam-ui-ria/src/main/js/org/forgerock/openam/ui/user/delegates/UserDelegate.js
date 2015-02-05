@@ -78,6 +78,7 @@ define("UserDelegate", [
      */
     obj.getProfile = function(successCallback, errorCallback, errorsHandlers) {
         var realm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
+
         obj.serviceCall({
             url: realm + "/users?_action=idFromSession",
             data: "{}",

@@ -7,11 +7,14 @@
             "dayNamesShort" : "Sun. , Mon., Tue., Wed., Thu., Fri., Sat."
         },
         "messages" : {
+            "AppMessages" : {
+                "invalidRealm": "The realm doesn't exist",
+                "inconsistentRealm": "The realm is inconsistent"
+            },
             "CommonMessages" : {
                 "authenticationFailed" : "Login/password combination is invalid.",
                 "loginFailureLockout" : "Your password has expired. Please contact service desk to reset your password",
                 "maxSessionsLimitOrSessionQuota": "Maximum sessions limit reached or session quota has exhausted.",
-                "invalidRealm" : "The realm doesn't exist",
                 "serviceUnavailable" : "Service unavailable",
                 "unknown" : "Unknown error. Please contact your Administrator",
                 "loggedIn" : "You have been successfully logged in.",
@@ -45,7 +48,6 @@
                 "errorFetchingNotifications" : "Error Fetching notifications.",
                 "identityNoSpace" : "Identity names may not have a space <br> character at the beginning or end.",
                 "selfRegistrationDisabled"  : "Self Registration is disabled."
-                
             },
             "AdminMessages" : {
                 "cannotDeleteYourself" : "You can't delete yourself",
@@ -79,7 +81,7 @@
     "templates" : {
         "user" : {
             "LoginDialog" : {
-                "refreshOnLogin" : "Should refresh on login" 
+                "refreshOnLogin" : "Should refresh on login"
             },
             "LoginTemplate" : {
                 "loginRemember" : "Remember my username",
@@ -302,7 +304,7 @@
             "changePhoto" : "Change photo",
             "SKYPE" : "SKYPE",
             "googlePlus" : "Google+"
-         }, 
+         },
          "task" : {
             "unassigned" : "Unassigned",
             "assignToMe" : "Assign to me",
@@ -369,9 +371,9 @@
                 "password": "Password"
             },
             "unavailable": "Unable to login to OpenAM"
-            
+
         }
-    },    
+    },
     "openidm" : {
         "ui" : {
             "common" : {
@@ -392,15 +394,15 @@
                             "for" : "For",
                             "application" : "Application",
                             "requested" : "Requested",
-                            "actions" : "Actions"                            
+                            "actions" : "Actions"
                         },
                         "headers" : {
                             "initiator" : "Initiator",
                             "key" : "Key",
                             "requested" : "Requested",
                             "inQueue" : "In queue",
-                            "actions" : "Actions"    
-                        }   
+                            "actions" : "Actions"
+                        }
                     },
                     "TasksWithMenuView" : {
                         "chooseTask" : "Choose a task"
@@ -421,7 +423,7 @@
                         "profileWillBeDeleted" : "%s account will be deleted."
                     },
                     "ChangeUserPasswordDialog" : {
-                        "securityDataChangeForWhom" : "Security data change for %s" 
+                        "securityDataChangeForWhom" : "Security data change for %s"
                     }
                 }
             },
@@ -431,7 +433,7 @@
                         "noNotifications" : "You have no notifications right now.",
                         "seeMoreNotifications" : "see more notifications"
                     }
-                }, 
+                },
                 "BaseApplicationsView" : {
                     "noApplicationsHere" : "Your have no apps here",
                     "noDefaultApplications" : "Your have no default apps",

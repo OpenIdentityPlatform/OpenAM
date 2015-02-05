@@ -37,8 +37,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
-    "org/forgerock/commons/ui/common/components/Messages"
-], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager, restLoginHelper, messageManager) {
+    "org/forgerock/commons/ui/common/components/Messages",
+    'org/forgerock/openam/ui/common/util/RealmHelper'
+], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager, restLoginHelper, messageManager, RealmHelper) {
 
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
@@ -120,19 +121,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 promise = $.Deferred();
 
             if (args && args.length) {
-                conf.globalData.auth.realm = args[0];
+                conf.globalData.auth.realm = RealmHelper.getRealm();
                 conf.globalData.auth.additional = args[1]; // may be "undefined"
                 conf.globalData.auth.urlParams = urlParams;
 
                 if(args[1]){
                     urlParams = this.handleUrlParams();
-                }
-
-                if(urlParams.realm && args[0] === "/"){
-                    if(urlParams.realm.substring(0,1) !== "/"){
-                        urlParams.realm = "/" + urlParams.realm;
-                    }
-                    conf.globalData.auth.realm = urlParams.realm;
                 }
 
                 //if there are IDTokens try to login with the provided credentials

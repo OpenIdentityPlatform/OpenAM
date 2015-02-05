@@ -28,7 +28,7 @@
  * @author yaromin
  */
 define("config/AppConfiguration", [
-    "org/forgerock/commons/ui/common/util/Constants", 
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager"
 ], function(constants, eventManager) {
     var obj = {
@@ -54,8 +54,8 @@ define("config/AppConfiguration", [
                     moduleClass: "org/forgerock/commons/ui/common/main/Router",
                     configuration: {
                         routes: { },
-                        loader: [ 
-                            {"routes":"config/routes/AMRoutesConfig"}, 
+                        loader: [
+                            {"routes":"config/routes/AMRoutesConfig"},
                             {"routes":"config/routes/CommonRoutesConfig"},
                             {"routes":"config/routes/UserRoutesConfig"}
                         ]
@@ -111,7 +111,8 @@ define("config/AppConfiguration", [
                         },
                         loader: [
                                 {"messages":"config/messages/CommonMessages"},
-                                {"messages":"config/messages/UserMessages"}
+                                {"messages":"config/messages/UserMessages"},
+                                {"messages":"config/AppMessages"}
                         ]
                     }
                 },

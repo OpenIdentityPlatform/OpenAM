@@ -36,47 +36,40 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function(constants, AbstractDelegate, configuration, eventManager, uiUtils, realmHelper) {
 
-    var obj = new AbstractDelegate(constants.host + "/"+ constants.context ),
+    var obj = new AbstractDelegate(constants.host + "/" + constants.context ),
         lastKnownRealm = "/";
 
+    /**
+     * Makes a HTTP request to the server to get its configuration
+     * @param {Function} successCallback Success callback function
+     * @param {Function} errorCallback   Error callback function
+     */
     obj.getConfiguration = function(successCallback, errorCallback) {
-
-        console.info("Getting configuration");
+        console.info("Requesting configuration from server");
         obj.serviceCall({
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
             url: "/json/serverinfo/*",
             success: function(response) {
                 var hostname = location.hostname,
-                    fqdn = response.FQDN,
-                    currentUrl = uiUtils.getUrl();
-                if (hostname !== fqdn) {
-                    location.href = currentUrl.replace(hostname,fqdn);
+                    fqdn = response.FQDN;
+
+                if(hostname !== fqdn) {
+                    // Redirect browser back to the server using the FQDN to ensure cookies are set correctly
+                    location.href = uiUtils.getUrl().replace(hostname, fqdn);
                 } else {
                     successCallback(response);
                 }
             },
             error: errorCallback
         });
-
     };
 
-
     obj.checkForDifferences = function(route,params) {
+        var realm = realmHelper.getRealm();
+        if(realm) { configuration.globalData.auth.realm = realm; }
 
-        var index = _.indexOf(route.argumentNames, "realm"),
-            urlParams = uiUtils.convertCurrentUrlToJSON().params;
-
-        if (urlParams && typeof urlParams.realm === "string" && urlParams.realm !== "") {
-            configuration.globalData.auth.realm = urlParams.realm;
-            if (configuration.globalData.auth.realm[0] !== "/") {
-                configuration.globalData.auth.realm = "/" + configuration.globalData.auth.realm;
-            }
-        } else if (index !== -1 && params[index] !== undefined && params[index] !== null ) {
-            configuration.globalData.auth.realm = params[index];
-        }
-
-        if (lastKnownRealm !== configuration.globalData.auth.realm) {
-            lastKnownRealm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
+        if(configuration.globalData.auth.realm && lastKnownRealm !== configuration.globalData.auth.realm) {
+            lastKnownRealm = configuration.globalData.auth.realm === '/' ? '' : configuration.globalData.auth.realm;
 
             return obj.serviceCall({
                 type: "GET",

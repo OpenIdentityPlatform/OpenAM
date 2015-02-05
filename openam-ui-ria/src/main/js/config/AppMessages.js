@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,18 +24,16 @@
 
 /*global define*/
 
-define("config/main", [
-    "./errorhandlers/CommonErrorHandlers",
-    "./validators/CommonValidators",
-    "./validators/UserValidators",
-    "./routes/CommonRoutesConfig",
-    "./routes/AMRoutesConfig",
-    "./routes/UserRoutesConfig",
-    "./messages/CommonMessages",
-    "./messages/UserMessages",
-    "./AppMessages",
-    "./AppConfiguration",
-    "./process/CommonConfig",
-    "./process/UserConfig",
-    "./process/AMConfig"
-]);
+define("config/AppMessages", [
+], function() {
+    return {
+        "inconsistentRealm": {
+            msg: "config.messages.AppMessages.inconsistentRealm",
+            type: "error"
+        },
+        "invalidRealm": {
+            msg: "config.messages.AppMessages.invalidRealm",
+            type: "error"
+        }
+    };
+});

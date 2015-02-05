@@ -27,14 +27,18 @@
 define("org/forgerock/openam/ui/common/util/Constants", [
     "org/forgerock/commons/ui/common/util/Constants"
 ], function (commonConstants) {
-    
+
     var context = location.pathname.substring(1,location.pathname.indexOf('XUI')-1);
 
     commonConstants.context = context;
     commonConstants.THEME_CONFIG_PATH = 'themeConfig.json';
     commonConstants.CONSOLE_PATH = '/' + commonConstants.context + '/console';
-    commonConstants.CONSOLE_USERS = ['amadmin']; 
+    commonConstants.CONSOLE_USERS = ['amadmin'];
     commonConstants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword";
+
+    // Realm
+    commonConstants.EVENT_INVALID_REALM = "main.EVENT_INVALID_REALM";
+    commonConstants.EVENT_INCONSISTENT_REALM = "main.EVENT_INCONSISTENT_REALM";
 
     return commonConstants;
 });

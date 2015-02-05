@@ -29,7 +29,7 @@
 /*global document, $, define, _, window */
 
 define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
-    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -49,7 +49,17 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
         var url,
             args = {},
             tokenCookie,
-            promise = $.Deferred();
+            promise = $.Deferred(),
+            originalRealm;
+
+        if(conf.globalData.auth.realm) {
+            if(conf.globalData.auth.realm !== '/') {
+                args.realm = conf.globalData.auth.realm;
+            }
+        } else {
+            eventManager.sendEvent(constants.EVENT_INCONSISTENT_REALM);
+            return promise.reject();
+        }
 
         if (conf.globalData.auth.realm !== "/") {
             args.realm = conf.globalData.auth.realm;
@@ -57,8 +67,15 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
 
         knownAuth = _.clone(conf.globalData.auth);
 
+        /**
+         * args is the URL query string
+         * conf.globalData.auth.urlParams is fragment query string
+         */
         if (conf.globalData.auth.urlParams) {
+            // Realm has been determined from all possible sources already, don't overwrite it
+            originalRealm = args.realm;
             _.extend(args, conf.globalData.auth.urlParams);
+            args.realm = originalRealm;
         }
 
         // In case user has logged in already update session

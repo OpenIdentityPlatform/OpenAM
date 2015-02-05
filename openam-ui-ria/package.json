@@ -6,6 +6,12 @@
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-sync": "~0.2.0"
+    "grunt-sync": "~0.2.0",
+    "jsdoc": "^3.3.0-beta1",
+    "rimraf": "^2.2.8"
+  },
+  "scripts": {
+    "predocs": "rimraf docs",
+    "docs": "jsdoc -P package.json -d docs -r src/main/js"
   }
 }

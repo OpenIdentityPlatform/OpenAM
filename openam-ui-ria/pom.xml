@@ -105,6 +105,7 @@
                         <phase>process-resources</phase>
                         <goals>
                             <goal>resources</goal>
+                            <goal>testResources</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -185,12 +186,12 @@
                                           <arg value="-o" />
                                           <arg value="${requirejs.dir}/app.build.js" />
                                       </java>
-                                      
+
                                       <concat destfile="${minified.dir}/main_with_licenses.js">
                                           <fileset file="${requirejs.dir}/license" />
                                           <fileset file="${minified.dir}/main.js" />
                                       </concat>
-                                      
+
                                       <move file="${minified.dir}/main_with_licenses.js" tofile="${minified.dir}/main.js" />
 
                                       <delete dir="${classes.dir}" />
@@ -212,4 +213,3 @@
     </profiles>
 
 </project>
-

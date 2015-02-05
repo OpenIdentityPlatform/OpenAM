@@ -29,7 +29,7 @@
  */
 
 define("config/process/AMConfig", [
-    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager"
 ], function(constants, eventManager) {
     var obj = [
@@ -64,7 +64,6 @@ define("config/process/AMConfig", [
                 "org/forgerock/commons/ui/common/main/Configuration"
             ],
             processDescription: function(event, router, conf) {
-               
                 if (event.error.responseJSON.message.indexOf('Invalid realm') > -1 ) {
                     if (conf.baseTemplate) {
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
@@ -74,6 +73,18 @@ define("config/process/AMConfig", [
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
                     }
                 }
+            }
+        }, {
+            startEvent: constants.EVENT_INCONSISTENT_REALM,
+            override: true,
+            dependencies: [
+                "org/forgerock/commons/ui/common/main/Router",
+                "org/forgerock/commons/ui/common/main/Configuration"
+            ],
+            processDescription: function(event, router, conf) {
+                if(!conf.baseTemplate) { router.navigate('login', { trigger: true }); }
+
+                eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'inconsistentRealm');
             }
         }
     ];

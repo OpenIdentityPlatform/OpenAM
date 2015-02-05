@@ -22,12 +22,21 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define */
+/*global define, _ */
 
 define("org/forgerock/openam/ui/common/util/RealmHelper", [
-], function () {
+    "underscore",
+    'org/forgerock/commons/ui/common/util/UIUtils'
+], function(_, uiUtils) {
+    /**
+     * @exports org/forgerock/openam/ui/common/util/RealmHelper
+     */
     var obj = {};
 
+    /**
+     * Cleans a realm string
+     * @param {String} realm The realm
+     */
     obj.cleanRealm = function(realm) {
         if(typeof realm === "string" && realm.charAt(0) !== "/"){
             realm = "/" + realm;
@@ -35,6 +44,32 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
         if((typeof realm !== "string") || realm === "/"){
             realm = "";
         }
+        return realm;
+    };
+
+    /**
+     * Determines the realm from the current URI
+     * <p>
+     * As a realm can be specified in more than one section of the URI,
+     * this function will determine (if more than one is specified) they
+     * are consistent and return that consistent realm.
+     * @returns Realm with leading forward slash (e.g. <code>/realmA'</code>) or <code>null</code> if realm was inconsistent
+     */
+    obj.getRealm = function() {
+        var urlQueryStringRealm = (uiUtils.convertQueryParametersToJSON(uiUtils.getURIQueryString()).realm || '').trim(),
+            fragmentRealm = ((uiUtils.getURIFragment().split('/')[1] || '').split('&')[0] || '').trim(),
+            fragmentQueryStringRealm = (uiUtils.convertQueryParametersToJSON(uiUtils.getURIFragmentQueryString()).realm || '').trim(),
+            realm = '/', // Default to root realm
+            realms = _.compact(_.uniq([urlQueryStringRealm, fragmentRealm, fragmentQueryStringRealm]));
+
+        if(realms.length > 1) {
+          return null;
+        } else if(realms.length === 1) {
+          realm = realms[0];
+        }
+
+        if(realm[0] !== '/') { realm = '/' + realm; }
+
         return realm;
     };
 
