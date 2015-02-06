@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.file.impl;
 
@@ -36,13 +36,18 @@ public class StdDebugFile implements DebugFile {
     private StdDebugFile() {
     }
 
+    /**
+     * Get std out debug file
+     *
+     * @return std debug file
+     */
     public static StdDebugFile getInstance() {
         return INSTANCE;
     }
 
-
-    public void writeIt(String prefix, String msg, Throwable th) throws IOException {
-        StringBuilder buf = new StringBuilder(prefix);
+    @Override
+    public void writeIt(StringBuilder prefix, String msg, Throwable th) throws IOException {
+        StringBuilder buf = prefix;
         buf.append('\n');
         buf.append(msg);
         if (th != null) {
@@ -56,19 +61,20 @@ public class StdDebugFile implements DebugFile {
         stdoutWriter.println(buf.toString());
     }
 
-    public void close() {
-        this.stdoutWriter.flush();
-        this.stdoutWriter.close();
-        this.stdoutWriter = null;
-    }
-
+    /**
+     * Printing error directly into the stdout. A log header will be generated
+     *
+     * @param debugName debug name
+     * @param message   the error message
+     * @param ex        the exception (can be null)
+     */
     public static void printError(String debugName, String message, Throwable ex) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss:SSS a zzz");
-        String prefix = debugName + ":" + dateFormat.format(new Date()) + ": " + Thread.currentThread()
-                .toString()  + "\n";
+        String prefix = debugName + ":" + dateFormat.format(new Date()) + ": " + Thread.currentThread().toString() +
+                "\n";
 
-        System.err.println(prefix + message );
-        if(ex != null) {
+        System.err.println(prefix + message);
+        if (ex != null) {
             ex.printStackTrace(System.err);
         }
     }

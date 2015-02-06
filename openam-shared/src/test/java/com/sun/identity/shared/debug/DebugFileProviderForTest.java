@@ -13,66 +13,48 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  */
-package com.sun.identity.shared.debug.file.impl;
-
+package com.sun.identity.shared.debug;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.shared.debug.DebugConstants;
 import com.sun.identity.shared.debug.file.DebugConfiguration;
 import com.sun.identity.shared.debug.file.DebugFile;
 import com.sun.identity.shared.debug.file.DebugFileProvider;
+import com.sun.identity.shared.debug.file.impl.DebugFileImpl;
+import com.sun.identity.shared.debug.file.impl.StdDebugFile;
+import org.forgerock.util.time.TimeService;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Debug file provider
- * Manage Debug files controller
- * Keep the following constraint one :
- * - One debugFile instance for One log file
+ * Debug file provider with an accelerate clock
  */
-public class DebugFileProviderImpl implements DebugFileProvider {
+public class DebugFileProviderForTest implements DebugFileProvider {
 
     private Map<String, DebugFile> debugMap = new HashMap<String, DebugFile>();
-
+    private TimeService clock;
     private DebugConfiguration configuration;
 
-    /**
-     * Default constructor
-     */
-    public DebugFileProviderImpl() {
-
-        try {
-            this.configuration = new DebugConfigurationFromProperties(DebugConstants.CONFIG_DEBUG_PROPERTIES);
-
-        } catch (InvalidDebugConfigurationException e) {
-            StdDebugFile.printError("DebugConfiguration", "'" + DebugConstants.CONFIG_DEBUG_PROPERTIES +
-                    "isn't valid, the default configuration will be used instead.", e);
-            this.configuration = DefaultDebugConfiguration.getInstance();
-        }
+    public DebugFileProviderForTest(DebugConfiguration configuration, TimeService accelerateClock) {
+        this.configuration = configuration;
+        this.clock = accelerateClock;
     }
 
-    /**
-     * Get debug file instance
-     *
-     * @param debugName name of the debug instance which will be returned.
-     * @return debug file
-     */
+    public void setClock(TimeService accelerateClock) {
+        this.clock = accelerateClock;
+    }
+
     public synchronized DebugFile getInstance(String debugName) {
         DebugFile debugFile = debugMap.get(debugName);
         if (debugFile == null) {
             String debugDirectory = SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_DIRECTORY);
-            debugFile = new DebugFileImpl(configuration, debugName, debugDirectory);
+            debugFile = new DebugFileImpl(configuration, debugName, debugDirectory, clock);
             debugMap.put(debugName, debugFile);
         }
         return debugFile;
     }
 
-    /**
-     * Get std out debug file
-     *
-     * @return debug file
-     */
+
     public DebugFile getStdOutDebugFile() {
         return StdDebugFile.getInstance();
     }

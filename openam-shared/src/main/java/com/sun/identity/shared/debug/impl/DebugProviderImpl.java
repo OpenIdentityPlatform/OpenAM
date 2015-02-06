@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.shared.debug.impl;
@@ -66,6 +66,12 @@ public class DebugProviderImpl implements IDebugProvider {
         this.debugFileProvider = debugFileProvider;
     }
 
+    /**
+     * Get the debugger associated with the debug name
+     *
+     * @param debugName name of the debug instance which will be returned.
+     * @return a debug instance
+     */
     public synchronized IDebug getInstance(String debugName) {
 
         IDebug debug = debugMap.get(debugName);
