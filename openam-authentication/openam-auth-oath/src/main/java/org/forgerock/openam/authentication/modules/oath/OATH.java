@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock Inc. All rights reserved.
+ * Copyright © 2012-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,7 +23,7 @@
  */
 
 /*
- * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.authentication.modules.oath;
@@ -670,31 +670,20 @@ public class OATH extends AMLoginModule {
         Set<AMIdentity> results = Collections.EMPTY_SET;
         try {
             idsc.setMaxResults(0);
-            IdSearchResults searchResults =
-                    amIdRepo.searchIdentities(IdType.USER, uName, idsc);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, uName, idsc);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }
-
-            if (results == null || results.size() != 1) {
-                throw new IdRepoException("OATH" +
-                        ".getIdentity : " +
-                        "More than one user found");
-
+            if (results.isEmpty()) {
+                throw new IdRepoException("OATH.getIdentity : User " + uName + " is not found");
+            } else if (results.size() > 1) {
+                throw new IdRepoException("OATH.getIdentity : More than one user found for the userName " + uName);
             }
-
             theID = results.iterator().next();
         } catch (IdRepoException e) {
-            debug.error("OATH" +
-                    ".getIdentity : " +
-                    "error searching Identities with username : " +
-                    userName,
-                    e);
+            debug.error("OATH.getIdentity : error searching Identities with username : " + uName, e);
         } catch (SSOException e) {
-            debug.error("OATH" +
-                    ".getIdentity : " +
-                    "AuthOATH module exception : ",
-                    e);
+            debug.error("OATH.getIdentity : AuthOATH module exception : ", e);
         }
         return theID;
     }
