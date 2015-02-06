@@ -27,29 +27,27 @@
  */
 
 /**
- * Portions Copyrighted 2014-2015 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.file.impl;
 
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.DebugConstants;
+import com.sun.identity.shared.debug.file.DebugConfiguration;
 import com.sun.identity.shared.debug.file.DebugFile;
 import com.sun.identity.shared.locale.Locale;
-import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.util.time.TimeService;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Manage a log file :
@@ -59,20 +57,8 @@ import java.util.ResourceBundle;
  */
 public class DebugFileImpl implements DebugFile {
 
-    //static
-    private static String debugPrefix = "";
-
-    private static String debugSuffix = "";
-
-    private static int rotationInterval = -1;
-
     private final TimeService clock;
 
-    static {
-        initProperties();
-    }
-
-    //local
     private final String debugName;
 
     private final String debugDirectory;
@@ -81,39 +67,48 @@ public class DebugFileImpl implements DebugFile {
 
     private long fileCreationTime = 0;
 
+    private long nextRotation = 0;
+
     private final SimpleDateFormat suffixDateFormat;
+
+    private final ReadWriteLock fileLock = new ReentrantReadWriteLock();
+
+    private final DebugConfiguration configuration;
 
     /**
      * Constructor
      *
+     * @param configuration debug configuration
      * @param debugName     log file name
      * @param debugFilePath log file path
      */
-    public DebugFileImpl(String debugName, String debugFilePath) {
-        this(debugName, debugFilePath, TimeService.SYSTEM);
+    public DebugFileImpl(DebugConfiguration configuration, String debugName, String debugFilePath) {
+        this(configuration, debugName, debugFilePath, TimeService.SYSTEM);
     }
 
     /**
      * Constructor
      *
+     * @param configuration debug configuration
      * @param debugName     log file name
      * @param debugFilePath log file path
+     * @param clock         Clock used to generate date
      */
-    public DebugFileImpl(String debugName, String debugFilePath, TimeService clock) {
+    public DebugFileImpl(DebugConfiguration configuration, String debugName, String debugFilePath, TimeService clock) {
         this.debugName = debugName;
         this.debugDirectory = debugFilePath;
         this.clock = clock;
+        this.configuration = configuration;
 
         //initialize SimpleDateFormat
         SimpleDateFormat tmpSuffixDateFormat = null;
-        if (!debugSuffix.isEmpty()) {
+        if (!configuration.getDebugSuffix().isEmpty()) {
             try {
-                tmpSuffixDateFormat = new SimpleDateFormat(debugSuffix);
+                tmpSuffixDateFormat = new SimpleDateFormat(configuration.getDebugSuffix());
             } catch (IllegalArgumentException iae) {
                 // cannot debug as we are debug
-                String message = "An error occurred with the date format suffix : '" + debugSuffix +
-                        "'. Please check the configuration file '" + DebugConstants.CONFIG_DEBUG_PROPERTIES
-                        + "'.";
+                String message = "An error occurred with the date format suffix : '" + configuration.getDebugSuffix() +
+                        "'. Please check the configuration file '" + DebugConstants.CONFIG_DEBUG_PROPERTIES + "'.";
                 StdDebugFile.printError(debugName, message, iae);
                 tmpSuffixDateFormat = new SimpleDateFormat(DebugConstants.DEFAULT_DEBUG_SUFFIX_FORMAT);
             }
@@ -121,23 +116,14 @@ public class DebugFileImpl implements DebugFile {
         this.suffixDateFormat = tmpSuffixDateFormat;
     }
 
-    /**
-     * Write log in the log file
-     *
-     * @param prefix Message prefix
-     * @param msg    Message to be recorded.
-     * @param th     the optional <code>java.lang.Throwable</code> which if
-     *               present will be used to record the stack trace.
-     * @throws IOException
-     */
-    public void writeIt(String prefix, String msg, Throwable th) throws IOException {
+    @Override
+    public void writeIt(StringBuilder buf, String msg, Throwable th) throws IOException {
 
         if (debugWriter == null) {
             initialize();
         } else if (needsRotate()) {
             rotate();
         }
-        StringBuilder buf = new StringBuilder(prefix);
         buf.append('\n');
         buf.append(msg);
         if (th != null) {
@@ -148,13 +134,21 @@ public class DebugFileImpl implements DebugFile {
             stackStream.flush();
             buf.append(stBuf.toString());
         }
-        debugWriter.println(buf.toString());
+
+        // printing is the printer can be consider here as a reading access to it
+        fileLock.readLock().lock();
+        try {
+            debugWriter.println(buf.toString());
+        } finally {
+            fileLock.readLock().unlock();
+        }
+
     }
 
     /**
      * Close the log file
      */
-    public void close() {
+    private void close() {
         this.debugWriter.flush();
         this.debugWriter.close();
         this.debugWriter = null;
@@ -170,17 +164,17 @@ public class DebugFileImpl implements DebugFile {
         StringBuilder newFileName = new StringBuilder();
 
         //Set prefix
-        if (debugPrefix != null) {
-            newFileName.append(debugPrefix);
+        if (configuration.getDebugPrefix() != null) {
+            newFileName.append(configuration.getDebugPrefix());
         }
 
         //Set name
         newFileName.append(fileName);
 
         //Set suffix
-        if (suffixDateFormat != null && rotationInterval > 0) {
+        if (suffixDateFormat != null && configuration.getRotationInterval() > 0) {
             synchronized (suffixDateFormat) {
-                newFileName.append(suffixDateFormat.format(new Date(clock.now())));
+                newFileName.append(suffixDateFormat.format(new Date(fileCreationTime)));
             }
         }
 
@@ -196,6 +190,10 @@ public class DebugFileImpl implements DebugFile {
         if (this.debugWriter == null) {
             // remember when we rotated last
             fileCreationTime = clock.now();
+            // Is rounded to the lower minute
+            fileCreationTime -= fileCreationTime % (1000 * 60);
+
+            nextRotation = fileCreationTime + configuration.getRotationInterval() * 60 * 1000;
 
             //Create the log directory
             boolean directoryAvailable = false;
@@ -225,7 +223,7 @@ public class DebugFileImpl implements DebugFile {
                 }
                 ResourceBundle bundle = Locale.getInstallResourceBundle("amUtilMsgs");
                 throw new IOException(bundle.getString("com.iplanet.services.debug.nofile") + " Current Debug File : " +
-                        "" + this, ioex);
+                        this, ioex);
             }
         }
     }
@@ -236,16 +234,9 @@ public class DebugFileImpl implements DebugFile {
      * @return true if the log file need to be rotate
      */
     private boolean needsRotate() {
-        if (rotationInterval > 0) {
-            //init calendar
-            Calendar now = Calendar.getInstance();
-            now.setTimeInMillis(clock.now());
-            Calendar then = Calendar.getInstance();
-            then.setTimeInMillis(fileCreationTime);
+        if (configuration.getRotationInterval() > 0) {
 
-            //compare dates
-            then.add(Calendar.MINUTE, rotationInterval);
-            return now.after(then);
+            return nextRotation <= clock.now();
         }
         return false;
     }
@@ -256,54 +247,21 @@ public class DebugFileImpl implements DebugFile {
      * @throws IOException
      */
     private synchronized void rotate() throws IOException {
+
         if (needsRotate()) {
-            if (this.debugWriter != null) {
-                close();
-            }
-            initialize();
-        }
-    }
 
-    /**
-     * initialize the properties
-     * It will reset the current properties for every Debug instance
-     */
-    public static synchronized void initProperties() {
-        InputStream is = null;
-        try {
-            is = DebugFileImpl.class.getResourceAsStream(DebugConstants.CONFIG_DEBUG_PROPERTIES);
-            if (is == null && SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_PROPERTIES_VARIABLE) != null) {
-                is = DebugFileImpl.class.getResourceAsStream(SystemPropertiesManager.get(DebugConstants
-                        .CONFIG_DEBUG_PROPERTIES_VARIABLE));
-            }
-            Properties rotationConfig = new Properties();
-            rotationConfig.load(is);
+            fileLock.writeLock().lock();
+            try {
+                if (this.debugWriter != null) {
+                    close();
 
-            debugPrefix = rotationConfig.getProperty(DebugConstants.CONFIG_DEBUG_LOGFILE_PREFIX);
-            debugSuffix = rotationConfig.getProperty(DebugConstants.CONFIG_DEBUG_LOGFILE_SUFFIX);
-            String rotation = rotationConfig.getProperty(DebugConstants.CONFIG_DEBUG_LOGFILE_ROTATION);
-            if (!rotation.isEmpty()) {
-                try {
-                    rotationInterval = Integer.parseInt(rotation);
-                } catch (NumberFormatException e) {
-                    //Can't parse the number
-                    String message = "'" + DebugConstants.CONFIG_DEBUG_LOGFILE_ROTATION + "' value can't be parse :" +
-                            " '" + rotation + "'. Please " + "check the configuration file '" + DebugConstants
-                            .CONFIG_DEBUG_PROPERTIES + "'.";
-                    StdDebugFile.printError(DebugFile.class.getSimpleName(), message, e);
-                    rotationInterval = -1;
                 }
+                initialize();
+            } finally {
+                fileLock.writeLock().unlock();
             }
-        } catch (Exception ex) {
-            //it's possible, that we don't have the config file
-            String message = "Can't load debug file properties. Please check the configuration file '" + DebugConstants.CONFIG_DEBUG_PROPERTIES + "'.";
-            StdDebugFile.printError(DebugFile.class.getSimpleName(), message, ex);
-        } finally {
-            IOUtils.closeIfNotNull(is);
         }
-
     }
-
 
     @Override
     public String toString() {
