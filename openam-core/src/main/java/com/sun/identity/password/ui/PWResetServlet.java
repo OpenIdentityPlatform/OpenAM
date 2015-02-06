@@ -24,9 +24,7 @@
  *
  * $Id: PWResetServlet.java,v 1.2 2008/06/25 05:43:42 qcheng Exp $
  *
- */
-/**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.password.ui;
@@ -97,6 +95,7 @@ public class PWResetServlet extends ApplicationServletBase implements Constants
     {
         try {
             HttpServletRequest req = requestContext.getRequest();
+            req.setCharacterEncoding("UTF-8");
             HttpSession session = req.getSession(false);
             String sessLocale = null;
             if (session != null) {
@@ -107,9 +106,7 @@ public class PWResetServlet extends ApplicationServletBase implements Constants
                 lc.setLocale(ISLocaleContext.URL_LOCALE, sessLocale);
             }
             lc.setLocale(req);
-            String reqCharset = lc.getMIMECharset();
             String reqLocale = lc.getLocale().toString();
-            req.setCharacterEncoding(reqCharset);
             if (req.getParameter(URL_LOCALE) != null) {
                 if (session == null) {
                     session = req.getSession(true);
