@@ -53,8 +53,8 @@
         "duplicateRealm": "Duplicate realm",
         "unableToPersistPolicy": "Unable to persist policy in datastore",
         "policiesUploaded": "Policies uploaded successfully",
-        "policiesUploadFailed": "Failed to upload policies"
-
+        "policiesUploadFailed": "Failed to upload policies",
+        "policiesImportFailed": "Import Failed: __applicationName__ application not found in realm"
       }
     },
     "AppConfiguration": {
@@ -146,7 +146,7 @@
       "actions": "Actions",
       "complete": "Complete",
       "reset": "Reset",
-      "copyright": "Copyright &copy; 2010-14 ForgeRock. All rights reserved.",
+      "copyright": "Copyright &copy; 2010-15 ForgeRock. All rights reserved.",
       "sessionExpired": "Session Expired",
       "enableCookies": "Cookies must be enabled to login",
       "reloadGrid": "Reload Grid",
@@ -311,9 +311,9 @@
       }
     },
 
-      "documentation": {
-         "tooltip": "Click to read more (opens in new tab)"
-      },
+    "documentation": {
+       "tooltip": "Click to read more (opens in new tab)"
+    },
 
     "manageApplications": {
       "add": "Add New Application",

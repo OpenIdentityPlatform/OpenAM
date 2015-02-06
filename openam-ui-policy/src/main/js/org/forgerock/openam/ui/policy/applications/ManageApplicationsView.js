@@ -190,8 +190,17 @@ define("org/forgerock/openam/ui/policy/applications/ManageApplicationsView", [
                 .done(function () {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploaded");
                 })
-                .fail(function () {
-                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploadFailed");
+                .fail(function (e) {
+                    var applicationNotFoundInRealm = " application not found in realm",
+                        responseText = e ? e.responseText : '',
+                        message = $($.parseXML(responseText)).find('message').text(),
+                        index = message ? message.indexOf(applicationNotFoundInRealm) : -1;
+
+                    if (index > -1) {
+                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, {key: "policiesImportFailed", applicationName: message.slice(0,index)});
+                    } else {
+                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploadFailed");
+                    }
                 });
         },
 

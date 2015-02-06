@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -100,6 +100,10 @@ define("config/messages/PolicyMessages", [], function () {
         },
         "policiesUploadFailed": {
             msg: "config.messages.PolicyMessages.policiesUploadFailed",
+            type: "error"
+        },
+        "policiesImportFailed": {
+            msg: "config.messages.PolicyMessages.policiesImportFailed",
             type: "error"
         }
     };
