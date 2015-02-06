@@ -11,9 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
+/*
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ */
 package com.sun.identity.console.reststs;
 
 import com.iplanet.jato.RequestContext;
@@ -32,6 +35,7 @@ import com.sun.identity.console.base.model.AMServiceProfileModel;
 import com.sun.identity.console.reststs.model.RestSTSModel;
 import com.sun.identity.console.reststs.model.RestSTSModelImpl;
 import com.sun.identity.console.reststs.model.RestSTSModelResponse;
+import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,7 +69,10 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
     }
 
     protected void createPageTitleModel() {
-        createThreeButtonPageTitleModel();
+        ptModel = new CCPageTitleModel(getClass().getClassLoader().getResourceAsStream(
+                "com/sun/identity/console/twoBtnsPageTitle.xml"));
+        ptModel.setValue("button1", "button.create");
+        ptModel.setValue("button2", "button.cancel");
     }
 
     protected void createPropertyModel() {
@@ -105,7 +112,7 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
                     RestSTSModelResponse creationResponse = model.createInstance(configurationState, currentRealm);
                     if (creationResponse.isSuccessful()) {
                         setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", creationResponse.getMessage());
-                        disableSaveAndResetButtons();
+                        forwardToAMViewBean();
                     } else {
                         setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", creationResponse.getMessage());
                     }
@@ -122,11 +129,26 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
         forwardTo();
     }
 
-    protected void disableSaveAndResetButtons() {
-        disableButton("button1", true);
-        disableButton("button2", true);
+    /**
+     * Handles cancel button request.
+     * 
+     * @param event Request invocation event
+     */
+    public void handleButton2Request(RequestInvocationEvent event) throws ModelControlException {
+        try {
+            forwardToAMViewBean();
+        } catch (AMConsoleException e) {
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        }
     }
 
+    private void forwardToAMViewBean() throws AMConsoleException {
+        removePageSessionAttribute(PAGE_MODIFIED);
+        AMViewBeanBase vb = getPreviousPage();
+        passPgSessionMap(vb);
+        vb.forwardTo(getRequestContext());
+    }
+    
     /*
     Returns a map of all settings, including those not changed from the default values in the model.
     AMConsoleException will be thrown if passwords are mis-matched.
@@ -144,20 +166,6 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
 
     protected String getBackButtonLabel() {
         return "button.back";
-    }
-
-    /**
-     * Handles reset request.
-     *
-     * @param event Request invocation event
-     *
-     */
-    public void handleButton3Request(RequestInvocationEvent event)
-            throws ModelControlException, AMConsoleException {
-        removePageSessionAttribute(PAGE_MODIFIED);
-        AMViewBeanBase vb = getPreviousPage();
-        passPgSessionMap(vb);
-        vb.forwardTo(getRequestContext());
     }
 
     private AMViewBeanBase getPreviousPage() throws AMConsoleException {

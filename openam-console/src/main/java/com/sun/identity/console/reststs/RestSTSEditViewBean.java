@@ -11,9 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
+/*
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ */
 package com.sun.identity.console.reststs;
 
 import com.iplanet.jato.RequestContext;
@@ -100,13 +103,11 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
     }
 
     protected void createPageTitleModel() {
-        ptModel = new CCPageTitleModel(
-                getClass().getClassLoader().getResourceAsStream(
-                        "com/sun/identity/console/twoBtnsPageTitle.xml"));
-
-        ptModel.setPageTitleText("rest.sts.edit.page.title");
+        ptModel = new CCPageTitleModel(getClass().getClassLoader().getResourceAsStream(
+                "com/sun/identity/console/threeBtnsPageTitle.xml"));
         ptModel.setValue("button1", "button.save");
-        ptModel.setValue("button2", "button.back");
+        ptModel.setValue("button2", "button.reset");
+        ptModel.setValue("button3", "button.back");
     }
 
     protected void createPropertyModel() {
@@ -190,6 +191,27 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
         }
         forwardTo();
     }
+    /**
+     * Handles reset button request.
+     *
+     * @param event Request invocation event
+     */
+    public void handleButton2Request(RequestInvocationEvent event) throws ModelControlException {
+        propertySheetModel.clear();
+        forwardTo();
+    }
+
+    /**
+     * Handles back button request.
+     *
+     * @param event Request invocation event
+     */
+    public void handleButton3Request(RequestInvocationEvent event) throws ModelControlException, AMConsoleException {
+        removePageSessionAttribute(PAGE_MODIFIED);
+        AMViewBeanBase vb = getPreviousPage();
+        passPgSessionMap(vb);
+        vb.forwardTo(getRequestContext());
+    }
 
     protected void disableSaveButton() {
         disableButton("button1", true);
@@ -220,14 +242,6 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
             currentPersistedInstanceState.putAll(updatedValues);
             return currentPersistedInstanceState;
         }
-    }
-
-    public void handleButton2Request(RequestInvocationEvent event)
-            throws ModelControlException, AMConsoleException {
-        removePageSessionAttribute(PAGE_MODIFIED);
-        AMViewBeanBase vb = getPreviousPage();
-        passPgSessionMap(vb);
-        vb.forwardTo(getRequestContext());
     }
 
     private AMViewBeanBase getPreviousPage() throws AMConsoleException {
