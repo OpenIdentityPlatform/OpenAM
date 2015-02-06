@@ -57,6 +57,8 @@ public class DebugImpl implements IDebug {
         initProperties();
     }
 
+    private final static int DIR_ISSUE_ERROR_INTERVAL_IN_MS = 60 * 1000;
+    private long lastDirectoryIssue = 0l;
     private final String debugName;
     private boolean mergeAllMode = false;
 
@@ -262,8 +264,14 @@ public class DebugImpl implements IDebug {
                 try {
                     this.debugFile.writeIt(prefix, msg, th);
                 } catch (IOException e) {
-                    stdoutDebugFile.writeIt(prefix, "debug file can't be writed", e);
-                    stdoutDebugFile.writeIt(prefix, msg, th);
+                    /*
+                     * In order to have less logs for this kind of issue. It's waiting an interval of time before
+                     * printing this error again.
+                     */
+                    if (lastDirectoryIssue + DIR_ISSUE_ERROR_INTERVAL_IN_MS < System.currentTimeMillis()) {
+                        lastDirectoryIssue = System.currentTimeMillis();
+                        stdoutDebugFile.writeIt(prefix, "Debug file can't be written : " + e.getMessage(), null);
+                    }
                 }
             }
         } catch (IOException ioex) {
