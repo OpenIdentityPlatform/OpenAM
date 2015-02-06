@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.shared.debug;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.shared.debug.file.impl.DebugFileImpl;
+import com.sun.identity.shared.debug.file.impl.DebugConfigurationFromProperties;
+import com.sun.identity.shared.debug.file.impl.InvalidDebugConfigurationException;
 import com.sun.identity.shared.debug.impl.DebugImpl;
 import com.sun.identity.shared.debug.impl.DebugProviderImpl;
 import org.forgerock.util.time.TimeService;
@@ -25,7 +26,9 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
+
 
 /**
  * Unit test for DebugImpl.
@@ -65,9 +68,17 @@ public class DebugTestTemplate {
                 DEBUG_FILEMAP_FOR_TEST);
         SystemPropertiesManager.initializeProperties(DebugConstants.CONFIG_DEBUG_DIRECTORY, debugDirectory);
 
-        debugFileProvider = new DebugFileProviderForTest(TimeService.SYSTEM);
-        provider = new DebugProviderImpl(debugFileProvider);
+    }
 
+    /**
+     * Initialize the debug provider
+     *
+     * @param debugConfigPath
+     */
+    public void initializeProvider(String debugConfigPath) throws InvalidDebugConfigurationException {
+        DebugConfigurationFromProperties debugConfig = new DebugConfigurationFromProperties(debugConfigPath);
+        debugFileProvider = new DebugFileProviderForTest(debugConfig, TimeService.SYSTEM);
+        provider = new DebugProviderImpl(debugFileProvider);
     }
 
     /**
@@ -79,10 +90,23 @@ public class DebugTestTemplate {
     protected void checkLogFileStatus(boolean isCreated, String logName) {
         String fullPath = debugDirectory + File.separator + logName;
 
-        if (isCreated) {
-            Assert.assertTrue(isFileExist(logName), "Log '" + fullPath + "' doesn't exist !");
-        } else {
-            Assert.assertFalse(isFileExist(logName), "Log '" + fullPath + "' exist !");
+        if (isCreated != isFileExist(logName)) {
+            StringBuilder bugReport = new StringBuilder();
+            bugReport.append("Log '" + fullPath + "' exist != " + isCreated + " !\n");
+            File dir = new File(debugDirectory);
+            File[] files = dir.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    return true;
+                }
+            });
+
+
+            bugReport.append("Logs generated : \n");
+            for (File file : files) {
+                bugReport.append("- '" + file.getName() + "'\n");
+            }
+            Assert.fail(bugReport.toString());
         }
 
     }
@@ -151,7 +175,6 @@ public class DebugTestTemplate {
 
     protected void initializeProperties() {
         DebugImpl.initProperties();
-        DebugFileImpl.initProperties();
     }
 
 }

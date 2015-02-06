@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.shared.debug;
 
@@ -66,7 +66,7 @@ public enum DebugLevel {
      * @param strName name in string
      * @return debug level associated to this name
      * @throws IllegalArgumentException if no debug names are associated to this name,
-     *                                   an illegal argument exception is throw
+     *                                  an illegal argument exception is throw
      */
     public static DebugLevel fromName(String strName) {
 
@@ -79,7 +79,7 @@ public enum DebugLevel {
      * @param strLevel level in string
      * @return debug level associated to this level
      * @throws IllegalArgumentException if no debug names are associated to this level,
-     *                                   an illegal argument exception is throw
+     *                                  an illegal argument exception is throw
      */
     public static DebugLevel fromLevel(int strLevel) throws InvalidParameterException {
 
@@ -119,14 +119,16 @@ public enum DebugLevel {
     /**
      * Compares the debug level with the specified debug for order. Returns a negative integer, zero,
      * or a positive integer as this level is less than, equal to, or greater than the specified object.
-     * @param o  the object to be compared.
-     * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+     *
+     * @param o the object to be compared.
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than
+     * the specified object.
      */
     public int compareLevel(DebugLevel o) {
-        if(getLevel() < o.getLevel()) {
-            return -1;
-        } else if (getLevel() == o.getLevel()) {
+        if (this.level == o.level) {
             return 0;
+        } else if (this.level < o.level) {
+            return -1;
         } else {
             return 1;
         }

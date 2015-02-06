@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.shared.debug.file.impl;
 
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.DebugConstants;
+import com.sun.identity.shared.debug.file.DebugConfiguration;
 import com.sun.identity.shared.debug.file.DebugFile;
 import com.sun.identity.shared.debug.file.DebugFileProvider;
 
@@ -34,16 +35,44 @@ public class DebugFileProviderImpl implements DebugFileProvider {
 
     private Map<String, DebugFile> debugMap = new HashMap<String, DebugFile>();
 
+    private DebugConfiguration configuration;
+
+    /**
+     * Default constructor
+     */
+    public DebugFileProviderImpl() {
+
+        try {
+            this.configuration = new DebugConfigurationFromProperties(DebugConstants.CONFIG_DEBUG_PROPERTIES);
+
+        } catch (InvalidDebugConfigurationException e) {
+            StdDebugFile.printError("DebugConfiguration", "'" + DebugConstants.CONFIG_DEBUG_PROPERTIES +
+                    "isn't valid, the default configuration will be used instead.", e);
+            this.configuration = DefaultDebugConfiguration.getInstance();
+        }
+    }
+
+    /**
+     * Get debug file instance
+     *
+     * @param debugName name of the debug instance which will be returned.
+     * @return debug file
+     */
     public synchronized DebugFile getInstance(String debugName) {
         DebugFile debugFile = debugMap.get(debugName);
         if (debugFile == null) {
             String debugDirectory = SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_DIRECTORY);
-            debugFile = new DebugFileImpl(debugName, debugDirectory);
+            debugFile = new DebugFileImpl(configuration, debugName, debugDirectory);
             debugMap.put(debugName, debugFile);
         }
         return debugFile;
     }
 
+    /**
+     * Get std out debug file
+     *
+     * @return debug file
+     */
     public DebugFile getStdOutDebugFile() {
         return StdDebugFile.getInstance();
     }
