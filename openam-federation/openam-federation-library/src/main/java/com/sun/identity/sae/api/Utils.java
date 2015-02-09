@@ -24,7 +24,7 @@
  *
  * $Id: Utils.java,v 1.4 2008/11/10 22:57:00 veiming Exp $
  *
- * Portions Copyrighted 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 package com.sun.identity.sae.api;
@@ -105,7 +105,7 @@ public class Utils
             String val = request.getParameter(name);
             if (priorparam)
                 buf.append("&");
-            buf.append(name).append("=").append(ESAPI.encoder().encodeForHTML(val));
+            buf.append(name).append("=").append(val);
             priorparam = true;
         }
         return buf.toString();
