@@ -51,6 +51,7 @@ import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceNotFoundException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.*;
@@ -422,6 +423,8 @@ public final class IdentityResource implements CollectionResourceProvider {
     public void actionCollection(final ServerContext context, final ActionRequest request,
                                  final ResultHandler<JsonValue> handler) {
 
+        RestSecurity restSecurity = getRestSecurity(realm);
+
         final String action = request.getAction();
         if (action.equalsIgnoreCase("idFromSession")) {
             idFromSession(context, request, handler);
@@ -430,7 +433,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } else if(action.equalsIgnoreCase("confirm")) {
             confirmRegistration(context, request, handler);
         } else if(action.equalsIgnoreCase("anonymousCreate")) {
-            anonymousCreate(context, request, handler);
+            anonymousCreate(context, request, handler, restSecurity);
         } else if(action.equalsIgnoreCase("forgotPassword")){
             generateNewPasswordEmail(context, request, handler);
         } else if(action.equalsIgnoreCase("forgotPasswordReset")){
@@ -701,7 +704,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
 
     private void anonymousCreate(final ServerContext context, final ActionRequest request,
-                                 final ResultHandler<JsonValue> handler) {
+                                 final ResultHandler<JsonValue> handler, RestSecurity restSecurity) {
 
         final JsonValue jVal = request.getContent();
         String tokenID = null;
@@ -709,6 +712,10 @@ public final class IdentityResource implements CollectionResourceProvider {
         String email;
 
         try{
+            if (!restSecurity.isSelfRegistration()) {
+                throw new BadRequestException("Self-registration disabled");
+            }
+
             tokenID = jVal.get(TOKEN_ID).asString();
             jVal.remove(TOKEN_ID);
             confirmationId = jVal.get(CONFIRMATION_ID).asString();
@@ -764,6 +771,11 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (NotFoundException nfe){
             RestDispatcher.debug.error("IdentityResource.anonymousCreate(): Invalid tokenID : " + tokenID);
             handler.handleError(nfe);
+        } catch (ServiceNotFoundException e) {
+            // Failure from RestSecurity
+            RestDispatcher.debug.error("Internal error", e);
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, e.getMessage(), e));
+            return;
         } catch (Exception e){
             handler.handleError(new NotFoundException(e.getMessage()));
         }
