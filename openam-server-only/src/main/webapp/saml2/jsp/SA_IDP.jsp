@@ -24,7 +24,7 @@
 
    $Id: SA_IDP.jsp,v 1.10 2009/06/24 00:22:44 sean_brydon Exp $
 
-   Portions Copyrighted 2013-2014 ForgeRock AS.
+   Portions Copyrighted 2013-2015 ForgeRock AS.
 --%>
 
 <%@ page language="java" 
@@ -174,8 +174,7 @@ org.owasp.esapi.ESAPI"
     }
 
     String idpAppUrl =  request.getParameter(SecureAttrs.SAE_PARAM_IDPAPPURL);
-    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + idpAppUrl, idpAppUrl,
-        "HTTPParameterValue", 2000, true)) {
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + idpAppUrl, idpAppUrl, "HTTPURI", 2000, true)) {
         idpAppUrl = null;
     }
 
