@@ -157,14 +157,14 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
 
     obj.getReferralByName = function (name) {
         return obj.serviceCall({
-            url: "/referrals/" + name,
+            url: "/referrals/" + encodeURIComponent(name),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
     obj.updateReferral = function (name, data) {
         return obj.serviceCall({
-            url: "/referrals/" + name,
+            url: "/referrals/" + encodeURIComponent(name),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "PUT",
             data: JSON.stringify(data),
@@ -184,7 +184,7 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
 
     obj.deleteReferral = function (name) {
         return obj.serviceCall({
-            url: "/referrals/" + name,
+            url: "/referrals/" + encodeURIComponent(name),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "DELETE"
         });

@@ -376,7 +376,6 @@
 
     },
 
-
     "actions": {
       "allow": "Allow",
       "deny": "Deny",
@@ -390,11 +389,11 @@
     },
 
     "summaryReview": {
-
       "noName": "There is no name...",
       "noSubjectConditions": "There are no Subject Conditions...",
       "noSubjectAttributes": "There are no Subject attributes...",
       "noEnvironmentConditions": "There are no Environment Conditions...",
+      "invalidName": "The name isn't correct. Name can not begin with #",
       "applicationDescription": "Review the Application configuration, and then click Finish to save.",
       "policyDescription": "Review the Policy configuration, and then click Finish to save.",
       "referralDescription": "Review the Referral configuration, and then click Finish to save.",
