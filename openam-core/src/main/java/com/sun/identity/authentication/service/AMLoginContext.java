@@ -1712,7 +1712,7 @@ public class AMLoginContext {
             // that in the query. otherwise it means a call with a new org.
             HttpServletRequest hreq = loginState.getHttpServletRequest();
             boolean isTokenValid = false;
-            final boolean isFederation = indexType == AuthContext.IndexType.MODULE_INSTANCE
+            final boolean isFederation = indexType == IndexType.MODULE_INSTANCE
                     && ISAuthConstants.FEDERATION_MODULE.equals(indexName);
             if (hreq != null && !isFederation) {
                 try {
