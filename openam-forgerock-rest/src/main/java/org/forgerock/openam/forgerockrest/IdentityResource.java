@@ -16,6 +16,7 @@
 package org.forgerock.openam.forgerockrest;
 
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,6 +30,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.shared.encode.Hash;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.apache.commons.lang.RandomStringUtils;
@@ -80,6 +82,8 @@ import javax.security.auth.callback.PasswordCallback;
  */
 public final class IdentityResource implements CollectionResourceProvider {
     // TODO: filters, sorting, paged results.
+
+    private static final String AM_ENCRYPTION_PWD = "am.encryption.pwd";
 
     private final List<Attribute> idSvcsAttrList;
     private String realm;
@@ -181,14 +185,25 @@ public final class IdentityResource implements CollectionResourceProvider {
         return Hash.hash(resource + RandomStringUtils.randomAlphanumeric(32));
     }
 
+    /**
+     * Generates a CTS REST Token, including realm information in its {@code CoreTokenField.STRING_ONE} field.
+     *
+     * @param resource The resource for which the tokenID will be generated
+     * @param userId The user's ID, associated with the token
+     * @param tokenLifeTimeSeconds Length of time from now in second for the token to remain valid
+     * @param realmName The name of the realm in which this token is valid
+     * @return the generated CTS REST token
+     */
     private org.forgerock.openam.cts.api.tokens.Token generateToken(String resource, String userId,
-                                                                    Long tokenLifeTimeSeconds) {
+                                                                    Long tokenLifeTimeSeconds, String realmName) {
         Calendar ttl = Calendar.getInstance();
         org.forgerock.openam.cts.api.tokens.Token ctsToken = new org.forgerock.openam.cts.api.tokens.Token(
                 generateTokenID(resource), TokenType.REST);
         if(userId != null && !userId.isEmpty()) {
             ctsToken.setUserId(userId);
         }
+        ctsToken.setAttribute(CoreTokenField.STRING_ONE, realmName);
+
         ttl.setTimeInMillis(ttl.getTimeInMillis() + (tokenLifeTimeSeconds*1000));
         ctsToken.setExpiryTimestamp(ttl);
         return ctsToken;
@@ -241,13 +256,13 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             // Create CTS Token
             org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(emailAddress, "anonymous",
-                    tokenLifeTime);
+                    tokenLifeTime, realm);
 
             // Store token in datastore
             cts.create(ctsToken);
             tokenID = ctsToken.getTokenId();
             // Create confirmationId
-            String confirmationId = Hash.hash(tokenID + emailAddress + SystemProperties.get("am.encryption.pwd"));
+            String confirmationId = Hash.hash(tokenID + emailAddress + SystemProperties.get(AM_ENCRYPTION_PWD));
 
             // Build Confirmation URL
             String confURL = restSecurity.getSelfRegistrationConfirmationUrl();
@@ -353,7 +368,7 @@ public final class IdentityResource implements CollectionResourceProvider {
      * @param handler Result handler
      */
     private void confirmRegistration(final ServerContext context, final ActionRequest request,
-                                     final ResultHandler<JsonValue> handler){
+                                     final ResultHandler<JsonValue> handler, final String realm){
         final String METHOD = "IdentityResource.confirmationIdCheck";
         final JsonValue jVal = request.getContent();
         String tokenID;
@@ -389,19 +404,8 @@ public final class IdentityResource implements CollectionResourceProvider {
                 throw new BadRequestException("tokenId not provided");
             }
 
-            // Check Token is still in CTS
-            // Check that tokenID is not expired
-            if(cts.read(tokenID) == null){
-                throw new NotFoundException("Cannot find tokenID: " + tokenID);
-            }
+            validateToken(tokenID, realm, email, confirmationId);
 
-            // check confirmationId
-            if(!confirmationId.equalsIgnoreCase(Hash.hash(
-                    tokenID + hashComponent + SystemProperties.get("am.encryption.pwd")))){
-                RestDispatcher.debug.error("IdentityResource.confirmRegistration: Invalid confirmationId : "
-                            + confirmationId);
-                throw new BadRequestException("Invalid confirmationId", null);
-            }
             // build resource
             result.put(hashComponentAttr,hashComponent);
             result.put(TOKEN_ID, tokenID);
@@ -414,6 +418,46 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (Exception e){
             RestDispatcher.debug.error(METHOD + ": Cannot confirm registration/forgotPassword for : " + hashComponent, e);
             handler.handleError(new NotFoundException(e.getMessage()));
+        }
+    }
+
+
+    /**
+     * Validates a provided token against a selection of criteria to ensure that it's valid for the given
+     * realm. This function is the validation equiv. of
+     * {@link IdentityResource#generateToken(String, String, Long, String)}.
+     *
+     * @param tokenID The token ID to retrieve from the store, against which to perform validation
+     * @param realm The realm under which the current request is being made, must match the realm the token was
+     *              generated by
+     * @param hashComponent The hash component used to created the confirmationId
+     * @param confirmationId The confirmationId
+     * @throws NotFoundException If the token doesn't exist in the store
+     * @throws CoreTokenException If there were unexpected issues communicating with the CTS
+     * @throws BadRequestException If the realm or confirmationId were invalid for the token retrieved
+     */
+    private void validateToken(String tokenID, String realm, String hashComponent, String confirmationId)
+            throws NotFoundException, CoreTokenException, BadRequestException {
+
+        //check expiry
+        org.forgerock.openam.cts.api.tokens.Token ctsToken = cts.read(tokenID);
+
+        if (ctsToken == null) {
+            throw new NotFoundException("Cannot find tokenID: " + tokenID);
+        }
+
+        // check confirmationId
+        if (!confirmationId.equalsIgnoreCase(Hash.hash(tokenID + hashComponent +
+                SystemProperties.get(AM_ENCRYPTION_PWD)))) {
+            RestDispatcher.debug.error("IdentityResource.confirmRegistration: Invalid confirmationId : "
+                    + confirmationId);
+                throw new BadRequestException("Invalid confirmationId", null);
+        }
+
+        //check realm
+        if (!realm.equals(ctsToken.getValue(CoreTokenField.STRING_ONE))) {
+            RestDispatcher.debug.error("IdentityResource.confirmRegistration: Invalid realm : " + realm);
+            throw new BadRequestException("Invalid realm", null);
         }
     }
     /**
@@ -431,7 +475,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } else if(action.equalsIgnoreCase("register")){
             createRegistrationEmail(context,request, handler);
         } else if(action.equalsIgnoreCase("confirm")) {
-            confirmRegistration(context, request, handler);
+            confirmRegistration(context, request, handler, realm);
         } else if(action.equalsIgnoreCase("anonymousCreate")) {
             anonymousCreate(context, request, handler, restSecurity);
         } else if(action.equalsIgnoreCase("forgotPassword")){
@@ -536,13 +580,15 @@ public final class IdentityResource implements CollectionResourceProvider {
                 Long tokenLifeTime = restSecurity.getForgotPassTLT();
 
                  // Generate Token
-                 org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(email, username, tokenLifeTime);
+                 org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(email, username, tokenLifeTime,
+                         realm);
 
                  // Store token in datastore
                  cts.create(ctsToken);
     
                  // Create confirmationId
-                 String confirmationId = Hash.hash(ctsToken.getTokenId() + username + SystemProperties.get("am.encryption.pwd"));
+                String confirmationId = Hash.hash(ctsToken.getTokenId() + username +
+                        SystemProperties.get(AM_ENCRYPTION_PWD));
     
                 String confirmationLink;
                 // Build Confirmation URL
@@ -620,18 +666,8 @@ public final class IdentityResource implements CollectionResourceProvider {
                 throw new BadRequestException("new password not provided");
             }
 
-            // Check that tokenID is not expired
-            if(cts.read(tokenID) == null){
-                throw new NotFoundException("Cannot find tokenID: " + tokenID);
-            }
+            validateToken(tokenID, realm, username, confirmationId);
 
-            // check confirmationId
-            if(!confirmationId.equalsIgnoreCase(Hash.hash(
-                    tokenID + username + SystemProperties.get("am.encryption.pwd")))){
-                RestDispatcher.debug.error("IdentityResource.anonymousUpdate(): Invalid confirmationId : "
-                            + confirmationId);
-                throw new BadRequestException("Invalid confirmationId", null);
-            }
             // update Identity
             SSOToken tok = RestUtils.getToken();
             Token admin = new Token();
@@ -659,6 +695,9 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (CoreTokenException cte){
             RestDispatcher.debug.error("IdentityResource.anonymousUpdate():" + cte.getMessage());
             handler.handleError(new NotFoundException(cte.getMessage()));
+        } catch (NotFoundException nfe){
+            RestDispatcher.debug.error("IdentityResource.anonymousUpdate():" + nfe.getMessage());
+            handler.handleError(ResourceException.getException(HttpURLConnection.HTTP_GONE, nfe.getMessage(), nfe));
         } catch (Exception e){
             RestDispatcher.debug.error("IdentityResource.anonymousUpdate():" + e.getMessage());
             handler.handleError(new NotFoundException(e.getMessage()));
@@ -732,19 +771,7 @@ public final class IdentityResource implements CollectionResourceProvider {
                 throw new BadRequestException("confirmationId not provided");
             }
 
-            // Check Token is still in CTS
-            // Check that tokenID is not expired
-            if(cts.read(tokenID) == null){
-                throw new NotFoundException("Cannot find tokenID: " + tokenID);
-            }
-
-            // check confirmationId
-            if(!confirmationId.equalsIgnoreCase(Hash.hash(
-                    tokenID + email+ SystemProperties.get("am.encryption.pwd")))){
-                RestDispatcher.debug.error("IdentityResource.anonymousCreate: Invalid confirmationId : "
-                        + confirmationId);
-                throw new BadRequestException("Invalid confirmationId", null);
-            }
+            validateToken(tokenID, realm, email, confirmationId);
 
             // create an Identity
             SSOToken tok = RestUtils.getToken();
@@ -776,8 +803,9 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("Internal error", e);
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, e.getMessage(), e));
             return;
-        } catch (Exception e){
-            handler.handleError(new NotFoundException(e.getMessage()));
+        } catch (CoreTokenException cte){ // For any unexpected CTS error
+            RestDispatcher.debug.error("IdentityResource.anonymouseCreate(): CTS Error : " + cte.getMessage());
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, cte.getMessage(),cte));
         }
     }
     /**
