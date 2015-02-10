@@ -57,16 +57,21 @@
                                 <property name="build.class.path" refid="maven.compile.classpath" />
 
                                 <mkdir dir="${project.build.directory}/classes" />
+                                <mkdir dir="${project.build.directory}/generated-sources/wscompile"/>
+                                <mkdir dir="${project.build.directory}/unwanted"/>
 
-                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true" classpath="${build.class.path}">
+                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true" classpath="${build.class.path}" failonerror="true">
                                     <arg value="-g" />
                                     <arg value="-gen:server" />
+                                    <arg value="-keep" />
                                     <arg value="-d" />
-                                    <arg value="${project.build.directory}/classes" />
+                                    <arg value="${project.build.directory}/unwanted" />
+                                    <arg value="-s" />
+                                    <arg value="${project.build.directory}/generated-sources/wscompile" />
                                     <arg value="${project.basedir}/src/main/resources/xml/jaxrpc/config.xml" />
                                 </java>
 
-                                <move file="${project.build.directory}/classes/IdentityManagementServices.wsdl" tofile="${project.build.directory}/classes/jaxrpc/IdentityManagementServices.wsdl" />
+                                <move file="${project.build.directory}/unwanted/IdentityManagementServices.wsdl" tofile="${project.build.directory}/classes/jaxrpc/IdentityManagementServices.wsdl" />
 
                                 <!-- Clean-up duplicate generated WSDL and Classes -->
                                 <delete file="${project.basedir}/IdentityManagementServices.wsdl" />
@@ -75,6 +80,25 @@
                         <goals>
                             <goal>run</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/wscompile</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
