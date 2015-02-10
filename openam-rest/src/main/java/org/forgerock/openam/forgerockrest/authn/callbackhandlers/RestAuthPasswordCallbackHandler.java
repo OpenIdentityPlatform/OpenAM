@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
@@ -80,20 +80,13 @@ public class RestAuthPasswordCallbackHandler extends AbstractRestAuthCallbackHan
     public JsonValue convertToJson(PasswordCallback callback, int index) {
 
         String prompt = callback.getPrompt();
-        char[] password = callback.getPassword();
-        String passwordString;
-        if (password == null) {
-            passwordString = "";
-        } else {
-            passwordString = new String(password);
-        }
 
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("type", CALLBACK_NAME)
                 .array("output")
                 .addLast(createOutputField("prompt", prompt))
                 .array("input")
-                .addLast(createInputField(index, passwordString))
+                .addLast(createInputField(index, ""))
                 .build();
 
         return jsonValue;
