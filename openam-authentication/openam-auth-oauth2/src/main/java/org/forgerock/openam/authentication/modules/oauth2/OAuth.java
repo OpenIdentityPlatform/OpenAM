@@ -1,9 +1,9 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2014 ForgeRock AS. All rights reserved.
- * Copyright © 2011 Cybernetica AS. 
- * 
+ * Copyright © 2011-2015 ForgeRock AS.
+ * Copyright © 2011 Cybernetica AS.
+ *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
  * (the License). You may not use this file except in
@@ -26,7 +26,8 @@
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import com.iplanet.am.util.SystemProperties;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
+
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
@@ -36,7 +37,6 @@ import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 
@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -62,8 +63,14 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owasp.esapi.ESAPI;
@@ -75,23 +82,25 @@ public class OAuth extends AMLoginModule {
     private OAuthConf config;
     String serverName = "";
     private ResourceBundle bundle = null;
-    private static final SecureRandom random = new SecureRandom();    
+    private static final SecureRandom random = new SecureRandom();
     String data = "";
     String userPassword = "";
     String proxyURL = "";
-    
+    private final CTSPersistentStore ctsStore;
+
     public OAuth() {
         OAuthUtil.debugMessage("OAuth()");
+        ctsStore = InjectorHolder.getInstance(CTSPersistentStore.class);
     }
 
     public void init(Subject subject, Map sharedState, Map config) {
         this.sharedState = sharedState;
         this.config = new OAuthConf(config);
         bundle = amCache.getResBundle(BUNDLE_NAME, getLoginLocale());
-        setAuthLevel(this.config.getAuthnLevel());    
+        setAuthLevel(this.config.getAuthnLevel());
     }
 
-    
+
     public int process(Callback[] callbacks, int state) throws LoginException {
 
         OAuthUtil.debugMessage("process: state = " + state);
@@ -133,23 +142,38 @@ public class OAuth extends AMLoginModule {
 
                 // Find the domains for which we are configured
                 Set<String> domains = AuthClientUtils.getCookieDomains();
-                
+
                 String ProviderLogoutURL = config.getLogoutServiceUrl();
-                
+
+                String csrfStateTokenId = RandomStringUtils.randomAlphanumeric(32);
+                String csrfState = createAuthorizationState();
+                Token csrfStateToken = new Token(csrfStateTokenId, TokenType.GENERIC);
+                csrfStateToken.setAttribute(CoreTokenField.STRING_ONE, csrfState);
+                try {
+                    ctsStore.create(csrfStateToken);
+                } catch (CoreTokenException e) {
+                    OAuthUtil.debugError("OAuth.process(): Authorization redirect failed to be sent because the state "
+                            + "could not be stored");
+                    throw new AuthLoginException("OAuth.process(): Authorization redirect failed to be sent because "
+                            + "the state could not be stored", e);
+                }
+
                 // Set the return URL Cookie
                 // Note: The return URL cookie from the RedirectCallback can not
-                // be used because the framework changes the order of the 
-                // parameters in the query. OAuth2 requires an identical URL 
+                // be used because the framework changes the order of the
+                // parameters in the query. OAuth2 requires an identical URL
                 // when retrieving the token
                 for (String domain : domains) {
-                   CookieUtils.addCookieToResponse(response,
-                           CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
+                    CookieUtils.addCookieToResponse(response,
+                            CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
                     CookieUtils.addCookieToResponse(response,
                             CookieUtils.newCookie(COOKIE_ORIG_URL, requestedURI, "/", domain));
-                   if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
-                       CookieUtils.addCookieToResponse(response,
-                               CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", domain));
-                   }
+                    CookieUtils.addCookieToResponse(response,
+                            CookieUtils.newCookie(NONCE_TOKEN_ID, csrfStateTokenId, "/", domain));
+                    if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
+                        CookieUtils.addCookieToResponse(response,
+                                CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", domain));
+                    }
                 }
 
                 // The Proxy is used to return with a POST to the module
@@ -159,7 +183,7 @@ public class OAuth extends AMLoginModule {
                 setUserSessionProperty(SESSION_LOGOUT_BEHAVIOUR,
                         config.getLogoutBhaviour());
 
-                String authServiceUrl = config.getAuthServiceUrl(proxyURL);
+                String authServiceUrl = config.getAuthServiceUrl(proxyURL, csrfState);
                 OAuthUtil.debugMessage("OAuth.process(): New RedirectURL=" + authServiceUrl);
 
                 Callback[] callbacks1 = getCallback(2);
@@ -174,16 +198,32 @@ public class OAuth extends AMLoginModule {
             }
 
             case GET_OAUTH_TOKEN_STATE: {
-                // We are being redirected back from an OAuth 2 Identity Provider
-                code = request.getParameter(PARAM_CODE);
-                if (code == null || code.isEmpty()) {
-                        OAuthUtil.debugMessage("OAuth.process(): LOGIN_IGNORE");
-                        return ISAuthConstants.LOGIN_START;
+                final String csrfState = request.getParameter("state");
+                if (csrfState == null) {
+                    OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because there was no state "
+                            + "parameter");
+                    throw new AuthLoginException(BUNDLE_NAME, "noState", null);
                 }
-   
-                validateInput("code", code, "HTTPParameterValue", 512, false);
-                
+
                 try {
+                    Token csrfStateToken = ctsStore.read(OAuthUtil.findCookie(request, NONCE_TOKEN_ID));
+                    ctsStore.delete(csrfStateToken);
+                    String expectedCsrfState = csrfStateToken.getValue(CoreTokenField.STRING_ONE);
+                    if (!expectedCsrfState.equals(csrfState)) {
+                        OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because the state parameter "
+                                + "contained an unexpected value");
+                        throw new AuthLoginException(BUNDLE_NAME, "incorrectState", null);
+                    }
+
+                    // We are being redirected back from an OAuth 2 Identity Provider
+                    code = request.getParameter(PARAM_CODE);
+                    if (code == null || code.isEmpty()) {
+                            OAuthUtil.debugMessage("OAuth.process(): LOGIN_IGNORE");
+                            return ISAuthConstants.LOGIN_START;
+                    }
+
+                    validateInput("code", code, "HTTPParameterValue", 512, false);
+
                     OAuthUtil.debugMessage("OAuth.process(): code parameter: " + code);
 
                     String tokenSvcResponse = getContent(
@@ -207,13 +247,13 @@ public class OAuth extends AMLoginModule {
                     }
 
                     AccountMapper accountMapper = instantiateAccountMapper();
-                    Map<String, Set<String>> userNames = 
+                    Map<String, Set<String>> userNames =
                             new HashMap<String, Set<String>>();
 
                     userNames = accountMapper.getAccount(
                             config.getAccountMapperConfig(),
                             profileSvcResponse);
-                    
+
                     String user = null;
                     if (!userNames.isEmpty()) {
                       user = getUser(realm, accountMapper, userNames);
@@ -224,7 +264,7 @@ public class OAuth extends AMLoginModule {
 
                         if (authenticatedUser != null) {
                             if (config.getSaveAttributesToSessionFlag()) {
-                                Map <String, Set<String>> attributes = 
+                                Map <String, Set<String>> attributes =
                                         getAttributesMap(profileSvcResponse);
                                 saveAttributes(attributes);
                             }
@@ -277,6 +317,10 @@ public class OAuth extends AMLoginModule {
                     OAuthUtil.debugError("OAuth.process(): IdRepoException: "
                             + ire.getMessage());
                     throw new AuthLoginException(BUNDLE_NAME, "ire", null, ire);
+                } catch (CoreTokenException e) {
+                    OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because the state parameter "
+                            + "contained an unexpected value");
+                    throw new AuthLoginException(BUNDLE_NAME, "incorrectState", null, e);
                 }
                 break;
             }
@@ -286,28 +330,28 @@ public class OAuth extends AMLoginModule {
                     return ISAuthConstants.LOGIN_IGNORE;
                 }
                 userPassword = request.getParameter(PARAM_TOKEN1);
-                validateInput(PARAM_TOKEN1, userPassword, "HTTPParameterValue", 
+                validateInput(PARAM_TOKEN1, userPassword, "HTTPParameterValue",
                         512, false);
                 String userPassword2 = request.getParameter(PARAM_TOKEN2);
-                validateInput(PARAM_TOKEN2, userPassword2, "HTTPParameterValue", 
-                        512, false);               
-                
+                validateInput(PARAM_TOKEN2, userPassword2, "HTTPParameterValue",
+                        512, false);
+
                 if (!userPassword.equals(userPassword2)) {
                     OAuthUtil.debugWarning("OAuth.process(): Passwords did not match!");
                     return SET_PASSWORD_STATE;
                 }
-                
+
                 String terms = request.getParameter("terms");
                 if (!terms.equalsIgnoreCase("accept")) {
                     return SET_PASSWORD_STATE;
                 }
-                
+
                 String profileSvcResponse = getUserSessionProperty("ATTRIBUTES");
                 data = getRandomData();
                 String mail = getMail(profileSvcResponse, config.getMailAttribute());
                 OAuthUtil.debugMessage("Mail found = " + mail);
                 try {
-                    OAuthUtil.sendEmail(config.getEmailFrom(), mail, data, 
+                    OAuthUtil.sendEmail(config.getEmailFrom(), mail, data,
                             config.getSMTPConfig(), bundle, proxyURL);
                 } catch (NoEmailSentException ex) {
                     OAuthUtil.debugError("No mail sent due to error", ex);
@@ -320,7 +364,7 @@ public class OAuth extends AMLoginModule {
 
             case CREATE_USER_STATE: {
                 String activation = request.getParameter(PARAM_ACTIVATION);
-                validateInput(PARAM_ACTIVATION, activation, "HTTPParameterValue", 
+                validateInput(PARAM_ACTIVATION, activation, "HTTPParameterValue",
                         512, false);
                 OAuthUtil.debugMessage("code entered by the user: " + activation);
 
@@ -350,12 +394,16 @@ public class OAuth extends AMLoginModule {
                 return ISAuthConstants.LOGIN_IGNORE;
             }
         }
-        
+
         throw new AuthLoginException(BUNDLE_NAME, "unknownState", null);
     }
 
+    private String createAuthorizationState() {
+        return new BigInteger(160, new SecureRandom()).toString(Character.MAX_RADIX);
+    }
+
     // Search for the user in the realm, using the instantiated account mapper
-    private String getUser(String realm, AccountMapper accountMapper, 
+    private String getUser(String realm, AccountMapper accountMapper,
             Map<String, Set<String>> userNames)
             throws AuthLoginException, JSONException, SSOException, IdRepoException {
 
@@ -367,7 +415,7 @@ public class OAuth extends AMLoginModule {
                 user = userIdentity.getName();
             }
         }
-        
+
         return user;
     }
 
@@ -379,9 +427,9 @@ public class OAuth extends AMLoginModule {
      }
 
     // Create an instance of the pluggable account mapper
-    private AccountMapper instantiateAccountMapper () 
+    private AccountMapper instantiateAccountMapper ()
     throws AuthLoginException {
-                
+
         try {
             AccountMapper accountMapper =
                     Class.forName(config.getAccountMapper()).asSubclass(AccountMapper.class).
@@ -392,11 +440,11 @@ public class OAuth extends AMLoginModule {
                     + "the account mapper", ex);
         }
     }
-    
+
     // Obtain the attributes configured for the module, by using the pluggable
     // Attribute mapper
     private Map<String, Set<String>> getAttributesMap (String svcProfileResponse) {
-        
+
         Map<String, Set<String>> attributes = new HashMap<String, Set<String>>();
 
         try {
@@ -413,8 +461,8 @@ public class OAuth extends AMLoginModule {
                     + attributes);
         return attributes;
     }
-    
-    
+
+
     // Save the attributes configured for the attribute mapper as session attributes
     public void saveAttributes(Map<String, Set<String>> attributes) throws AuthLoginException {
 
@@ -430,7 +478,7 @@ public class OAuth extends AMLoginModule {
             OAuthUtil.debugMessage("OAuth.saveAttributes: NO attributes to set");
         }
     }
-    
+
     // Generate a user name, either using the anonymous user if configured or by
     // extracting the user from the userName map.
     // Return null, if nothing was found
@@ -452,8 +500,8 @@ public class OAuth extends AMLoginModule {
         }
         return dynamicUser;
     }
-    
-    
+
+
     // Obtain the user profile information from the OAuth 2.0 Identity Provider
     // Profile service configured for this module, either using first GET and
     // POST as a fall back
@@ -483,7 +531,7 @@ public class OAuth extends AMLoginModule {
 
     // Create the account in the realm, by using the pluggable account mapper and
     // the attributes configured in the attribute mapper
-    public String provisionAccountNow(String realm, String profileSvcResponse, 
+    public String provisionAccountNow(String realm, String profileSvcResponse,
             String userPassword)
             throws AuthLoginException {
 
@@ -494,7 +542,7 @@ public class OAuth extends AMLoginModule {
             }
             attributes.put("userPassword",
                     OAuthUtil.addToSet(new HashSet<String>(), userPassword));
-            attributes.put("inetuserstatus", 
+            attributes.put("inetuserstatus",
                     OAuthUtil.addToSet(new HashSet<String>(), "Active"));
             AMIdentity userIdentity =
                     accountMapper.provisionUser(getAMIdentityRepository(realm),
@@ -502,11 +550,11 @@ public class OAuth extends AMLoginModule {
             if (userIdentity != null) {
                 return userIdentity.getName().trim();
             } else {
-                return null;      
-            }     
+                return null;
+            }
     }
-    
-    
+
+
     // Obtain the Profile Service information using GET
     public InputStream getContentStreamByGET(String serviceUrl)
             throws LoginException {
@@ -527,10 +575,10 @@ public class OAuth extends AMLoginModule {
             } else {
                 // Server returned HTTP error code.
                 String errorStream = getErrorStream(connection);
-                if (OAuthUtil.debugMessageEnabled()) { 
-                  OAuthUtil.debugMessage("OAuth.getContentStreamByGET: HTTP Conn Error:\n" + 
-                        " Response code: " + connection.getResponseCode() + "\n " + 
-                        " Response message: " + connection.getResponseMessage() + "\n" + 
+                if (OAuthUtil.debugMessageEnabled()) {
+                  OAuthUtil.debugMessage("OAuth.getContentStreamByGET: HTTP Conn Error:\n" +
+                        " Response code: " + connection.getResponseCode() + "\n " +
+                        " Response message: " + connection.getResponseMessage() + "\n" +
                         " Error stream: " + errorStream + "\n");
                 }
                 is = getContentStreamByPOST(serviceUrl);
@@ -544,7 +592,7 @@ public class OAuth extends AMLoginModule {
             throw new AuthLoginException(BUNDLE_NAME,"ioe", null, ioe);
         }
     }
-    
+
     private String getErrorStream(HttpURLConnection connection) {
         InputStream errStream = connection.getErrorStream();
         if (errStream == null) {
@@ -569,8 +617,8 @@ public class OAuth extends AMLoginModule {
             }
             return buf.toString();
         }
-    }   
-    
+    }
+
     // Obtain the Profile Service information using POST
     public InputStream getContentStreamByPOST(String serviceUrl)
             throws LoginException {
@@ -597,9 +645,9 @@ public class OAuth extends AMLoginModule {
                 is = connection.getInputStream();
             } else { // Error Code
                 String data2[] = {String.valueOf(connection.getResponseCode())};
-                OAuthUtil.debugError("OAuth.getContentStreamByPOST: HTTP Conn Error:\n" + 
-                        " Response code: " + connection.getResponseCode() + "\n" + 
-                        " Response message: " + connection.getResponseMessage() + "\n" + 
+                OAuthUtil.debugError("OAuth.getContentStreamByPOST: HTTP Conn Error:\n" +
+                        " Response code: " + connection.getResponseCode() + "\n" +
+                        " Response message: " + connection.getResponseMessage() + "\n" +
                         " Error stream: " + getErrorStream(connection) + "\n");
                 throw new AuthLoginException(BUNDLE_NAME, "httpErrorCode", data2);
             }

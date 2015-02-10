@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2013 ForgeRock Inc. All rights reserved.
+ * Copyright © 2011-2015 ForgeRock AS.
  * Copyright © 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -24,11 +24,9 @@
  *
  */
 
-/* 
- * Portions Copyrighted 2013 ForgeRock Inc
- */
-
 package org.forgerock.openam.authentication.modules.oauth2;
+
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -36,7 +34,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 
 /* 
@@ -219,9 +216,9 @@ public class OAuthConf {
         return ssoProxyUrl;
     }
 
-    public String getAuthServiceUrl(String originalUrl) throws AuthLoginException {
+    public String getAuthServiceUrl(String originalUrl, String state) throws AuthLoginException {
 
-        if (authServiceUrl.indexOf("?") == -1) {
+        if (!authServiceUrl.contains("?")) {
             authServiceUrl = authServiceUrl + "?"
                     + PARAM_CLIENT_ID + "=" + clientId;
         } else {
@@ -232,7 +229,8 @@ public class OAuthConf {
             return authServiceUrl
                     + param(PARAM_SCOPE, OAuthUtil.oAuthEncode(scope))
                     + param(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(originalUrl))
-                    + param("response_type", "code");
+                    + param("response_type", "code")
+                    + param("state", state);
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getAuthServiceUrl: problems while encoding "
                     + "the scope", ex);

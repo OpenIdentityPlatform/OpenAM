@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2015 ForgeRock AS.
  * Copyright © 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -23,10 +23,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-
-/* 
- * Portions Copyrighted 2013 ForgeRock Inc
- */
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
@@ -94,6 +90,7 @@ public class OAuthParam {
     public final static String COOKIE_ORIG_URL = "ORIG_URL";
     public final static String COOKIE_PROXY_URL = "PROXY_URL";
     public final static String COOKIE_LOGOUT_URL = "OAUTH_LOGOUT_URL";
+    public final static String NONCE_TOKEN_ID = "NTID";
     
     // Login states
     public final static int LOGIN_START = 1;

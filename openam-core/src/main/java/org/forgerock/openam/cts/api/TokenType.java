@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
+/*
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -13,6 +13,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  */
+
 package org.forgerock.openam.cts.api;
 
 /**
@@ -23,8 +24,9 @@ package org.forgerock.openam.cts.api;
  * @author Robert Wapshott
  */
 public enum TokenType {
-    SESSION(),
-    SAML2(),
-    OAUTH(),
-    REST();
+    SESSION,
+    SAML2,
+    OAUTH,
+    REST,
+    GENERIC;
 }

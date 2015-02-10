@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2013 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2015 ForgeRock AS.
  * Copyright 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -66,15 +66,7 @@ public class OAuthProxy  {
         
         StringBuilder html = new StringBuilder();
         
-        try {        
-            String onLoad = "document.postform.submit()";
-
-            html.append("<html>\n").append("<body onLoad=\"")
-                .append(onLoad).append("\">\n");
-            html.append("<form name=\"postform\" action=\"")
-                .append(action).append("\" method=\"post\">\n");
-
-           
+        try {
             String code = req.getParameter(PARAM_CODE);
             if (code != null && !OAuthUtil.isEmpty(code)) {
                 if (ESAPI.validator().isValidInput(PARAM_CODE, code,
@@ -86,7 +78,19 @@ public class OAuthProxy  {
                     return getError("Request not valid");
                 }
             }
-            
+            if (action.contains("?")) {
+                action += "&" + req.getQueryString();
+            } else {
+                action += "?" + req.getQueryString();
+            }
+
+            String onLoad = "document.postform.submit()";
+
+            html.append("<html>\n").append("<body onLoad=\"")
+                .append(onLoad).append("\">\n");
+            html.append("<form name=\"postform\" action=\"")
+                .append(action).append("\" method=\"post\">\n");
+
             String activation = req.getParameter(PARAM_ACTIVATION);
             if (activation != null && !OAuthUtil.isEmpty(activation)) {
                 if (ESAPI.validator().isValidInput(PARAM_ACTIVATION, activation,
