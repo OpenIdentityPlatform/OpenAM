@@ -24,10 +24,7 @@
  *
  * $Id: AMLoginContext.java,v 1.24 2009/12/23 20:03:04 mrudul_uchil Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.service;
@@ -1715,7 +1712,9 @@ public class AMLoginContext {
             // that in the query. otherwise it means a call with a new org.
             HttpServletRequest hreq = loginState.getHttpServletRequest();
             boolean isTokenValid = false;
-            if (hreq != null) {
+            final boolean isFederation = indexType == AuthContext.IndexType.MODULE_INSTANCE
+                    && ISAuthConstants.FEDERATION_MODULE.equals(indexName);
+            if (hreq != null && !isFederation) {
                 try {
                     SSOTokenManager manager = SSOTokenManager.getInstance();
                     SSOToken ssoToken = manager.createSSOToken(hreq);
