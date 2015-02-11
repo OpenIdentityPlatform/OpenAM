@@ -36,9 +36,9 @@ import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.apache.commons.lang.RandomStringUtils;
 
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdType;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.CreateResponse;
 import com.sun.identity.idsvcs.DeleteResponse;
@@ -71,11 +71,6 @@ import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -1150,48 +1145,6 @@ public final class IdentityResource implements CollectionResourceProvider {
         }
     }
 
-    private boolean checkValidPassword(String username, char[] password, String realm) throws BadRequestException {
-        if(username == null || password == null ){
-            throw new BadRequestException("Invalid Username or Password");
-        }
-        try {
-            AuthContext lc = new AuthContext(realm);
-            lc.login();
-            while (lc.hasMoreRequirements()) {
-                Callback[] callbacks = lc.getRequirements();
-                ArrayList missing = new ArrayList();
-                // loop through the requires setting the needs..
-                for (int i = 0; i < callbacks.length; i++) {
-                    if (callbacks[i] instanceof NameCallback) {
-                        NameCallback nc = (NameCallback) callbacks[i];
-                        nc.setName(username);
-                    } else if (callbacks[i] instanceof PasswordCallback) {
-                        PasswordCallback pc = (PasswordCallback) callbacks[i];
-                        pc.setPassword(password);
-                    } else {
-                        missing.add(callbacks[i]);
-                    }
-                }
-                // there's missing requirements not filled by this
-                if (missing.size() > 0) {
-                    throw new BadRequestException("Insufficient Requirements");
-                }
-                lc.submitRequirements(callbacks);
-            }
-
-            // validate the password..
-            if (lc.getStatus() == AuthContext.Status.SUCCESS) {
-                lc.logout();
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-
-        }
-        return false;
-    }
-
     private String getPasswordFromHeader(ServerContext context){
         List<String> headerList = null;
         String oldUserPasswordHeaderName = "olduserpassword";
@@ -1218,9 +1171,6 @@ public final class IdentityResource implements CollectionResourceProvider {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateInstance(final ServerContext context, final String resourceId, final UpdateRequest request,
                                final ResultHandler<Resource> handler) {
@@ -1228,42 +1178,40 @@ public final class IdentityResource implements CollectionResourceProvider {
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
 
-        final JsonValue jVal = request.getNewContent();
-        final String rev = request.getRevision();
+        final JsonValue jsonValue = request.getNewContent();
         IdentityDetails dtls, newDtls;
         IdentityServicesImpl idsvc = new IdentityServicesImpl();
         Resource resource;
         try {
             // Retrieve details about user to be updated
             dtls = idsvc.read(resourceId, idSvcsAttrList, admin);
-            // Continue modifying the identity if read success
 
-            newDtls = jsonValueToIdentityDetails(jVal);
+            //check first if the password is modified as part of the update request, so if necessary, the password can
+            //be removed from the IdentityDetails object.
+            if (!isAdmin(context)) {
+                for (String attrName : jsonValue.keys()) {
+                    if ("userpassword".equalsIgnoreCase(attrName)) {
+                        String newPassword = jsonValue.get(attrName).asString();
+                        if (!isNullOrEmpty(newPassword)) {
+                            String oldPassword = getPasswordFromHeader(context);
+                            if (isNullOrEmpty(oldPassword)) {
+                                throw new BadRequestException("The old password is missing from the request");
+                            }
+                            //This is an end-user trying to change the password, so let's change the password by
+                            //verifying that the provided old password is correct. We also remove the password from the
+                            //list of attributes to prevent the administrative password reset via the update call.
+                            jsonValue.remove(attrName);
+                            changePassword(context, handler, resourceId, oldPassword, newPassword);
+                        }
+                        break;
+                    }
+                }
+            }
+            newDtls = jsonValueToIdentityDetails(jsonValue);
             if (newDtls.getName() != null && !resourceId.equalsIgnoreCase(newDtls.getName())) {
                 throw new BadRequestException("id in path does not match id in request body");
             }
             newDtls.setName(resourceId);
-            String userpass = null;
-            for (String attrName : jVal.keys()) {
-                if ("userpassword".equalsIgnoreCase(attrName)) {
-                    userpass = jVal.get(attrName).asString();
-                }
-            }
-            // Check that the attribute userpassword is in the json object
-            if(userpass != null && !userpass.isEmpty()) {
-                // If so password reset attempt
-                if(checkValidPassword(resourceId, userpass.toCharArray(),realm) || isAdmin(context)){
-                    // same password as before, update the attributes
-                } else {
-                    // check header to make sure that oldpassword is there check to see if it's correct
-                    String strPass = getPasswordFromHeader(context);
-                    if(strPass != null && !strPass.isEmpty() && checkValidPassword(resourceId, strPass.toCharArray(), realm)){
-                        //continue will allow password change
-                    } else{
-                        throw new BadRequestException("Invalid Password");
-                    }
-                }
-            }
 
             // update resource with new details
             UpdateResponse message = idsvc.update(newDtls, admin);
@@ -1292,10 +1240,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     generalFailure);
             handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
-        } catch (BadRequestException bre){
+        } catch (final ResourceException re){
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! "
-                    + resourceId + ":" + bre);
-            handler.handleError(bre);
+                    + resourceId + ":" + re);
+            handler.handleError(re);
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     exception);
@@ -1314,6 +1262,30 @@ public final class IdentityResource implements CollectionResourceProvider {
 
        return identityServicesAttributes;
    }
+
+    private void changePassword(ServerContext serverContext, ResultHandler<Resource> handler, String username,
+            String oldPassword, String newPassword) throws ResourceException {
+        try {
+            SSOTokenManager tokenManager = SSOTokenManager.getInstance();
+            SSOToken requesterToken = tokenManager.createSSOToken(getCookieFromServerContext(serverContext));
+            if (tokenManager.isValidToken(requesterToken)) {
+                AMIdentity userIdentity = new AMIdentity(requesterToken, username, IdType.USER, realm, null);
+                userIdentity.changePassword(oldPassword, newPassword);
+            }
+        } catch (SSOException ssoe) {
+            RestDispatcher.debug.warning("IdentityResource.changePassword() :: SSOException occurred while changing "
+                    + "the password for user: " + username, ssoe);
+            throw new PermanentException(401, "An error occurred while trying to change the password", ssoe);
+        } catch (IdRepoException ire) {
+            if ("402".equals(ire.getErrorCode())) {
+                throw new ForbiddenException("The user is not authorized to change the password");
+            } else {
+                RestDispatcher.debug.warning("IdentityResource.changePassword() :: IdRepoException occurred while "
+                        + "changing the password for user: " + username, ire);
+                throw new InternalServerErrorException("An error occurred while trying to change the password", ire);
+            }
+        }
+    }
 
     private String requestParamEncode(String toEncode) throws UnsupportedEncodingException {
         if (toEncode != null && !toEncode.isEmpty()) {
