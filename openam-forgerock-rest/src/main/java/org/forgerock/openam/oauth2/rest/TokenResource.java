@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -33,6 +33,7 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.OAuth2Constants;
+import com.sun.identity.sm.DNMapper;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -189,6 +190,7 @@ public class TokenResource implements CollectionResourceProvider {
                     uid = getUid(context);
                     if (!uid.equals(adminUserId)){
                         query.put(OAuth2Constants.CoreTokenParams.USERNAME, uid.getName());
+                        query.put(OAuth2Constants.CoreTokenParams.REALM, DNMapper.orgNameToRealmName(uid.getRealm()));
                     } else {
                         query.put(OAuth2Constants.CoreTokenParams.USERNAME, "*");
                     }
@@ -206,7 +208,7 @@ public class TokenResource implements CollectionResourceProvider {
                     }
                 }
 
-                response = oAuthTokenStore.query(query);
+                response = oAuthTokenStore.query(query, true);
             } catch (CoreTokenException e) {
                 throw new ServiceUnavailableException(e.getMessage(),e);
             }

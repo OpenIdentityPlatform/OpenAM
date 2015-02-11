@@ -1,27 +1,18 @@
 /*
- * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions copyright [year] [name of copyright owner]"
+ * Copyright 2012-2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.ext.cts.repo;
 
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -46,8 +37,6 @@ import java.util.Set;
 /**
  * Implementation of the OAuthTokenStore interface that uses the CoreTokenService for storing the tokens as JSON
  * objects.
- *
- * @author Phill Cunnington
  */
 @Singleton
 public class OAuthTokenStore {
@@ -96,7 +85,11 @@ public class OAuthTokenStore {
     }
 
     public JsonValue query(Map<String, Object> queryParameters) throws CoreTokenException {
-        Collection<Token> tokens = cts.list(convertRequest(queryParameters));
+        return query(queryParameters, false);
+    }
+
+    public JsonValue query(Map<String, Object> queryParameters, boolean and) throws CoreTokenException {
+        Collection<Token> tokens = cts.list(convertRequest(queryParameters, and));
         return convertResults(tokens);
     }
 
@@ -104,11 +97,16 @@ public class OAuthTokenStore {
      * Converts the Map of filter parameters into an LDAP filter.
      *
      * @param filters A Map of filter parameters.
+     * @param and Whether all the filter assertions needs to be satisfied.
      * @return A Mapping of CoreTokenField to Objects to query by.
      */
-    private Filter convertRequest(Map<String, Object> filters) {
-
-        QueryFilter.QueryFilterBuilder builder = queryFilter.or();
+    private Filter convertRequest(Map<String, Object> filters, boolean and) {
+        QueryFilter.QueryFilterBuilder builder;
+        if (and) {
+            builder = queryFilter.and();
+        } else {
+            builder = queryFilter.or();
+        }
         for (OAuthTokenField field : OAuthTokenField.values()) {
             if (filters.containsKey(field.getOAuthField())) {
                 builder.attribute(field.getField(), filters.get(field.getOAuthField()));
