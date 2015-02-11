@@ -26,7 +26,7 @@
 --%>
 
 <%--
-   Portions Copyrighted 2010-2013 ForgeRock, Inc.
+   Portions copyright 2010-2014 ForgeRock AS.
 --%>
 
 <%@page contentType="text/html; charset=UTF-8" %> 
@@ -39,13 +39,10 @@
 
 <%@page import="com.iplanet.sso.SSOException" %>
 <%@page import="com.iplanet.sso.SSOToken" %>
-<%@page import="com.iplanet.sso.SSOTokenManager" %>
 <%@page import="com.sun.identity.security.EncodeAction" %>
 <%@page import="com.sun.identity.shared.locale.Locale" %>
-<%@page import="com.sun.identity.sm.SMSEntry" %>
 <%@page import="java.security.AccessController" %>
 <%@page import="java.util.ResourceBundle" %>
-
 
 <body class="DefBdy">
     <div class="SkpMedGry1"><a href="#SkipAnchor3860"><img src="com_sun_web_ui/images/other/dot.gif" alt="Jump to End of Masthead" border="0" height="1" width="1" /></a></div><div class="MstDiv">
@@ -59,48 +56,50 @@
     </div>
     <table class="SkpMedGry1" border="0" cellpadding="5" cellspacing="0" width="100%"><tr><td><img src="com_sun_web_ui/images/other/dot.gif" alt="Jump to End of Masthead" border="0" height="1" width="1" /></a></td></tr></table>
     <table border="0" cellpadding="10" cellspacing="0" width="100%"><tr><td></td></tr></table>
-    <table border="0" cellpadding="10" cellspacing="0" width="100%"><tr><td>
 
+<%@ include file="/WEB-INF/jsp/admincheck.jsp" %>
 <%
-    try {
-        request.setCharacterEncoding("UTF-8");
-        SSOTokenManager manager = SSOTokenManager.getInstance();
-        SSOToken ssoToken = manager.createSSOToken(request);
-        manager.validateToken(ssoToken);
 
-        String ssoPropLocale = ssoToken.getProperty("Locale");
-        ResourceBundle rb =
-            ((ssoPropLocale != null) && (ssoPropLocale.length() > 0)) ?
-            ResourceBundle.getBundle("encode", Locale.getLocale(ssoPropLocale)):
-            ResourceBundle.getBundle("encode");
-
-        if (ssoToken.getPrincipal().getName().equalsIgnoreCase(
-            "id=amadmin,ou=user," + SMSEntry.getRootSuffix())
-        ) {
-            String strPwd = request.getParameter("password");
-
-            if ((strPwd != null) && (strPwd.trim().length() > 0))  {
-                out.println(rb.getString("result-encoded-pwd") + " ");
-                    out.println((String) AccessController.doPrivileged(
-                        new EncodeAction(strPwd.trim())));
-                out.println("<br /><br /><a href=\"encode.jsp\">" +
-                    rb.getString("encode-another-pwd") + "</a>");
-            } else {
-                out.println(
-                   "<form name=\"frm\" action=\"encode.jsp\" method=\"post\">");
-                out.println(rb.getString("prompt-pwd"));
-                out.println("<input type=\"text\" name=\"password\" autocomplete=\"off\" />");
-                out.println("<input type=\"submit\" value=\"" +
-			rb.getString("btn-encode") + "\" />");
-                out.println("</form>");
-            }
-        } else {
-            out.println(rb.getString("no.permission"));
-        }
-    } catch (SSOException e) {
-        response.sendRedirect("UI/Login?goto=../encode.jsp");
+    SSOToken ssoToken = requireAdminSSOToken(request, response, out, "showServerConfig.jsp");
+    if (ssoToken == null) {
+%>
+</body></html>
+<%
+        return;
     }
 %>
-</td></tr></table>
+    <table border="0" cellpadding="10" cellspacing="0" width="100%"><tr><td>
+<%
+    String ssoPropLocale;
+    try {
+        ssoPropLocale = ssoToken.getProperty("Locale");
+    } catch (SSOException e) {
+        response.sendRedirect("UI/Login?goto=../encode.jsp");
+        return;
+    }
+
+    request.setCharacterEncoding("UTF-8");
+
+    ResourceBundle rb =
+        ((ssoPropLocale != null) && (ssoPropLocale.length() > 0)) ?
+        ResourceBundle.getBundle("encode", Locale.getLocale(ssoPropLocale)) :
+        ResourceBundle.getBundle("encode");
+
+    String strPwd = request.getParameter("password");
+
+    if ((strPwd != null) && (strPwd.trim().length() > 0))  {
+        out.println(rb.getString("result-encoded-pwd") + " ");
+        out.println(AccessController.doPrivileged(new EncodeAction(strPwd.trim())));
+        out.println("<br /><br /><a href=\"encode.jsp\">" + rb.getString("encode-another-pwd") + "</a>");
+    } else {
+        out.println("<form name=\"frm\" action=\"encode.jsp\" method=\"post\">");
+        out.println(rb.getString("prompt-pwd"));
+        out.println("<input type=\"text\" name=\"password\" autocomplete=\"off\" />");
+        out.println("<input type=\"submit\" value=\"" + rb.getString("btn-encode") + "\" />");
+        out.println("</form>");
+    }
+
+%>
+    </td></tr></table>
 
 </body></html>
