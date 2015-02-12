@@ -1,6 +1,0 @@
-<label for="selection_{{id}}" data-title="{{title}}">{{t i18nKey}}</label>
-<select placeholder="{{t 'policy.conditionTypes.attributes.object'}}" multiple id="selection_{{id}}" class="selectize object-prop" {{#if dataSource}}data-source="{{dataSource}}"{{/if}}>
-{{#each data}}
-<option selected value="{{@key}}:{{this}}">{{@key}}:{{this}}</option>
-{{/each}}
-</select>
