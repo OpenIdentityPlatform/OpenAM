@@ -17,7 +17,7 @@
 package org.forgerock.openam.sm.datalayer.store;
 
 import static org.fest.assertions.Assertions.*;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
@@ -26,13 +26,12 @@ import java.util.Set;
 
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
-import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
-import org.forgerock.openam.sm.datalayer.impl.SimpleTaskExecutor;
+import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
 import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.openam.tokens.TokenType;
 import org.mockito.invocation.InvocationOnMock;
@@ -52,7 +51,7 @@ public class TokenDataStoreTest {
     @BeforeMethod
     public void setup() throws Exception {
         adapter = mock(JavaBeanAdapter.class);
-        taskExecutor = mock(SimpleTaskExecutor.class);
+        taskExecutor = mock(PooledTaskExecutor.class);
         taskFactory = mock(TaskFactory.class);
         this.store = new TokenDataStore<Object>(adapter, taskExecutor, taskFactory, mock(Debug.class));
     }

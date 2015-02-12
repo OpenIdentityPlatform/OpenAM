@@ -87,7 +87,7 @@ public class SimpleTaskExecutor<T> implements TaskExecutor {
     /**
      * Close the connection if it was not null.
      */
-    private synchronized void close() {
+    synchronized void close() {
         if (connection instanceof Closeable) {
             debug("Closing connection");
             try {

@@ -51,8 +51,6 @@ public class DataLayerGuiceModuleTest extends GuiceTestCase {
     @DataProvider(name = "instances")
     public Object[][] guiceInstances() {
         return new Object[][] {
-                new Object[]{TaskExecutor.class, ConnectionType.DATA_LAYER},
-                new Object[]{TaskFactory.class, ConnectionType.DATA_LAYER},
                 new Object[]{QueryFactory.class, ConnectionType.DATA_LAYER},
                 new Object[]{ConnectionFactory.class, ConnectionType.DATA_LAYER},
                 new Object[]{TaskExecutor.class, ConnectionType.CTS_ASYNC},

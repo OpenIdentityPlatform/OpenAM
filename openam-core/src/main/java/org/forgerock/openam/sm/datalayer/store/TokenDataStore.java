@@ -31,7 +31,7 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
-import org.forgerock.openam.sm.datalayer.impl.SimpleTaskExecutor;
+import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
 import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.util.Reject;
 
@@ -65,7 +65,7 @@ public class TokenDataStore<T> {
 
     @VisibleForTesting
     TokenDataStore(JavaBeanAdapter<T> adapter, TaskExecutor taskExecutor, TaskFactory taskFactory, Debug debug) {
-        Reject.ifFalse(taskExecutor instanceof SimpleTaskExecutor);
+        Reject.ifFalse(taskExecutor instanceof PooledTaskExecutor, "Task Executor must be a pool");
         this.adapter = adapter;
         this.taskExecutor = taskExecutor;
         this.taskFactory = taskFactory;

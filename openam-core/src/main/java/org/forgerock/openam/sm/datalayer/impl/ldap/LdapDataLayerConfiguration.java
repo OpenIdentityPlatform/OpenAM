@@ -28,6 +28,7 @@ import org.forgerock.openam.sm.datalayer.api.query.FilterConversion;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFilter;
+import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
 import org.forgerock.openam.sm.datalayer.impl.SimpleTaskExecutor;
 import org.forgerock.openam.sm.datalayer.providers.ConnectionFactoryProvider;
 import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
@@ -36,7 +37,6 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
 
 import com.google.inject.TypeLiteral;
-import com.sun.identity.sm.SMSEntry;
 
 /**
  * An abstract LDAP set of configuration.
@@ -64,7 +64,7 @@ public abstract class LdapDataLayerConfiguration extends LDAPConfig implements D
      */
     @Override
     public Class<? extends TaskExecutor> getTaskExecutorType() {
-        return SimpleTaskExecutor.class;
+        return PooledTaskExecutor.class;
     }
 
     @Override
