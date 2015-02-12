@@ -16,7 +16,9 @@
 package com.sun.identity.shared.debug.file.impl;
 
 import com.sun.identity.shared.debug.DebugConstants;
+import com.sun.identity.shared.debug.IDebug;
 import com.sun.identity.shared.debug.file.DebugFile;
+import com.sun.identity.shared.debug.impl.DebugImpl;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -46,8 +48,8 @@ public class StdDebugFile implements DebugFile {
     }
 
     @Override
-    public void writeIt(StringBuilder prefix, String msg, Throwable th) throws IOException {
-        StringBuilder buf = prefix;
+    public void writeIt(String prefix, String msg, Throwable th) throws IOException {
+        StringBuilder buf = new StringBuilder(prefix);
         buf.append('\n');
         buf.append(msg);
         if (th != null) {

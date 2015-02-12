@@ -58,7 +58,8 @@ public class DebugImpl implements IDebug {
     }
 
     private final static int DIR_ISSUE_ERROR_INTERVAL_IN_MS = 60 * 1000;
-    private long lastDirectoryIssue = 0l;
+    private static volatile long lastDirectoryIssue = 0l;
+
     private final String debugName;
     private boolean mergeAllMode = false;
 
@@ -236,7 +237,7 @@ public class DebugImpl implements IDebug {
         prefix.append(debugName).append(":").append(this.dateFormat.format(new Date())).append(": ").append(Thread
                 .currentThread().toString());
 
-        writeIt(prefix, msg, th);
+        writeIt(prefix.toString(), msg, th);
     }
 
     /**
@@ -248,7 +249,7 @@ public class DebugImpl implements IDebug {
      * @param th     the optional <code>java.lang.Throwable</code> which if
      *               present will be used to record the stack trace.
      */
-    private void writeIt(StringBuilder prefix, String msg, Throwable th) {
+    private void writeIt(String prefix, String msg, Throwable th) {
 
         //we create the debug file only if we need to write on it
         if (debugFile == null) {
@@ -272,6 +273,8 @@ public class DebugImpl implements IDebug {
                         lastDirectoryIssue = System.currentTimeMillis();
                         stdoutDebugFile.writeIt(prefix, "Debug file can't be written : " + e.getMessage(), null);
                     }
+                    stdoutDebugFile.writeIt(prefix, msg, th);
+
                 }
             }
         } catch (IOException ioex) {
