@@ -238,10 +238,10 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
 
     obj.getResourceSetFromId = function (id) {
         return obj.serviceCall({
-            url: "/users/" + conf.loggedUser.userid.id + "/oauth2/resourceset/" + id,
+            url: "/users/" + conf.loggedUser.userid.id + "/oauth2/resourcesets/" + id,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
-    
+
     return obj;
 });

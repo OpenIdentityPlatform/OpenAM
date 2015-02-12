@@ -31,7 +31,7 @@ define("org/forgerock/openam/ui/uma/ShareView", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
-    "org/forgerock/openam/ui/uma/utils/UmaUtils"
+    "org/forgerock/openam/ui/uma/util/UmaUtils"
 ], function(AbstractView, conf, eventManager, uiUtils, constants, policyDelegate, UmaUtils) {
 
     var ShareView = AbstractView.extend({

@@ -24,12 +24,12 @@
 
 /*global define Backgrid Backbone _ $*/
 
-define("org/forgerock/openam/ui/uma/BackgridUtils", [
+define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
   "moment",
   "org/forgerock/commons/ui/common/util/UIUtils"
 ], function (moment, uiUtils) {
     /**
-     * @exports org/forgerock/openam/ui/uma/BackgridUtils
+     * @exports org/forgerock/openam/ui/uma/util/BackgridUtils
      */
     var obj = {};
 

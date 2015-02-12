@@ -30,7 +30,7 @@ define("org/forgerock/openam/ui/uma/HistoryView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/uma/BackgridUtils"
+    "org/forgerock/openam/ui/uma/util/BackgridUtils"
 ], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils) {
 
     var HistoryView = AbstractView.extend({
@@ -67,7 +67,7 @@ define("org/forgerock/openam/ui/uma/HistoryView", [
                 parseRecords: backgridUtils.parseRecords,
                 sync: backgridUtils.sync
             });
-            
+
             historyCollection = new HistoryCollection();
 
             columns = [

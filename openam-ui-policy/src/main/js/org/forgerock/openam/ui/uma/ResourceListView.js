@@ -30,7 +30,7 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/uma/BackgridUtils"
+    "org/forgerock/openam/ui/uma/util/BackgridUtils"
 ], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils) {
 
     var ResourceListView = AbstractView.extend({
@@ -49,6 +49,8 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
 
             ResourceSetCollection = Backbone.PageableCollection.extend({
                 url: "/" + constants.context + "/json/applications",
+                //TODO : Need to get all the policies for the logged in user. This is returning a 400 atm :(
+                //url: "/" + constants.context + "/json/" + conf.loggedUser.userid.id + '/uma/policies',
                 state: {
                     pageSize: 10,
                     sortKey: "name",

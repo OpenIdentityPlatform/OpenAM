@@ -24,11 +24,11 @@
 
 /*global define Backgrid Backbone _ $*/
 
-define("org/forgerock/openam/ui/uma/utils/UmaUtils", [
+define("org/forgerock/openam/ui/uma/util/UmaUtils", [
   "org/forgerock/openam/ui/policy/delegates/PolicyDelegate"
 ], function (policyDelegate) {
     /**
-     * @exports org/forgerock/openam/ui/uma/utils/UmaUtils
+     * @exports org/forgerock/openam/ui/uma/util/UmaUtils
      */
     var obj = {};
 
