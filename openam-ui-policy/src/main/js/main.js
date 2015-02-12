@@ -29,6 +29,7 @@ require.config({
         i18next:        "libs/i18next-1.7.3-min",
         i18nGrid:       "libs/i18n/grid.locale-en",
         backbone:       "libs/backbone-1.1.2-min",
+        "backbone.paginator": "libs/backbone-paginator.min",
         underscore:     "libs/lodash-2.4.1-min",
         js2form:        "libs/js2form-2.0",
         form2js:        "libs/form2js-2.0",
@@ -45,9 +46,12 @@ require.config({
         multiselect:    "libs/ui.multiselect-0.3",
         jqgrid:         "libs/jquery.jqGrid-4.5.4-min",
         selectize:      "libs/selectize-0.11.2-min",
-        LoginDialog:    "org/forgerock/commons/ui/common/LoginDialog",
-        LoginView:      "org/forgerock/commons/ui/common/LoginView",
-        ThemeManager:   "org/forgerock/openam/ui/common/util/ThemeManager"
+        backgrid:       "libs/backgrid.min",
+        "backgrid.paginator":   "libs/backgrid-paginator.min",
+        "backgrid.filter":      "libs/backgrid-filter.min",
+        LoginDialog:            "org/forgerock/commons/ui/common/LoginDialog",
+        LoginView:              "org/forgerock/commons/ui/common/LoginView",
+        ThemeManager:           "org/forgerock/openam/ui/common/util/ThemeManager"
     },
 
     shim: {
@@ -57,6 +61,9 @@ require.config({
         backbone: {
             deps: ["underscore"],
             exports: "Backbone"
+        },
+        "backbone.paginator":{
+            deps: ["backbone"]
         },
         js2form: {
             exports: "js2form"
@@ -75,7 +82,7 @@ require.config({
             exports: "doTimeout"
         },
         handlebars: {
-            exports: "handlebars"
+            exports: "Handlebars"
         },
         sortable: {
             deps: ["jquery"]
@@ -111,6 +118,16 @@ require.config({
         },
         selectize: {
             deps: ["jquery"]
+        },
+        backgrid: {
+            deps: ["jquery", "underscore"],
+            exports: "Backgrid"
+        },
+        "backgrid.paginator": {
+            deps: ["backgrid", "backbone.paginator"]
+        },
+        "backgrid.filter": {
+            deps: ["backgrid"]
         }
 
     }
@@ -139,15 +156,20 @@ require([
     "clockPicker",
     "autosizeInput",
     "selectize",
+    "backgrid",
+    "backbone.paginator",
+    "backgrid.paginator",
+    "backgrid.filter",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main",
     "org/forgerock/openam/ui/common/main",
     "org/forgerock/openam/ui/policy/main",
+    "org/forgerock/openam/ui/uma/main",
     "ThemeManager",
     "config/main"
-], function ($, _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqueryui, multiselect, jqgrid, clockPicker, autosizeInput, selectize, i18nManager, constants, eventManager) {
+], function ($, _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqueryui, multiselect, jqgrid, clockPicker, autosizeInput, selectize, backgrid, backbonePaginator, backgridPaginator, backgridFilter, i18nManager, constants, eventManager) {
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
     window.$ = $;

@@ -11,30 +11,31 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade.steps;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.policy.Policy;
-import com.sun.identity.policy.PolicyManager;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.UpgradeUtils;
-import org.forgerock.opendj.ldap.ConnectionFactory;
+import static org.forgerock.openam.upgrade.UpgradeServices.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import javax.inject.Inject;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.UpgradeUtils;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.policy.Policy;
+import com.sun.identity.policy.PolicyManager;
 
 /**
  * This upgrade step has been implemented to explicitly handle the case when OpenAM is upgraded from 11.0.0. This is
@@ -51,7 +52,7 @@ public class ResavePoliciesStep extends AbstractUpgradeStep {
 
     @Inject
     public ResavePoliciesStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                              @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory connectionFactory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
     }
 

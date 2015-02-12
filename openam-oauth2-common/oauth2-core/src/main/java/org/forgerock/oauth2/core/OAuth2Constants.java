@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -212,6 +212,9 @@ public class OAuth2Constants {
         public static final String TOKEN_NAME = "tokenName";
         public static final String AUTH_MODULES = "authModules";
 
+        public static final String OAUTH_TOKEN_ADAPTER = "oauthTokenAdapter";
+        public static final String RESOURCE_SET_TOKEN_ADAPTER = "resourceSetTokenAdapter";
+
     }
 
     public class Token {
@@ -290,6 +293,20 @@ public class OAuth2Constants {
         public static final String SAML2_BEARER = "urn:ietf:params:oauth:grant-type:saml2-bearer";
 
         public static final String JWT_BEARER = "urn:ietf:params:oauth:grant-type:jwt-bearer";
+    }
+
+    /**
+     * @see <a href="http://tools.ietf.org/html/draft-ietf-oauth-introspection-04">Token Introspection standard</a>.
+     */
+    public class IntrospectionEndpoint {
+        public static final String TOKEN = "token";
+        public static final String TOKEN_TYPE_HINT = "token_type_hint";
+        public static final String ACCESS_TOKEN_TYPE = "access_token";
+        public static final String REFRESH_TOKEN_TYPE = "refresh_token";
+        public static final String RPT_TYPE = "requesting_party_token";
+        public static final String USER_ID = "user_id";
+        public static final String TOKEN_TYPE = "token_type";
+        public static final String ACTIVE = "active";
     }
 
     /**
@@ -753,6 +770,7 @@ public class OAuth2Constants {
          */
         public static final String LOGIN_HINT_COOKIE = "oidcLoginHint";
 
+        public static final String RSR_ENDPOINT = "resource-set-reg-endpoint";
     }
 
     public enum DisplayType {
@@ -956,5 +974,19 @@ public class OAuth2Constants {
         QUERY,
         /** The fragment part of the URL. */
         FRAGMENT
+    }
+
+    /**
+     * Constants for resource sets.
+     */
+    public static class ResourceSets {
+        public static final String RESOURCE_SET_ID = "resource_set_id";
+        public static final String POLICY_URI = "policy_uri";
+        public static final String NAME = "name";
+        public static final String URI = "uri";
+        public static final String TYPE = "type";
+        public static final String SCOPES = "scopes";
+        public static final String ICON_URI = "icon_uri";
+        public static final String CLIENT_ID = "client_id";
     }
 }

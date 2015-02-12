@@ -15,38 +15,39 @@
  */
 package org.forgerock.openam.cts.impl.query.reaper;
 
-import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.QueryBuilder;
-import org.forgerock.openam.cts.impl.query.QueryFactory;
-import org.forgerock.openam.cts.impl.query.QueryFilter;
-import org.forgerock.opendj.ldap.ByteString;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.Filter;
-import org.mockito.ArgumentCaptor;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import java.util.Calendar;
-import java.util.List;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Iterator;
+
+import org.forgerock.openam.cts.CoreTokenConfig;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
+import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
+import org.forgerock.openam.sm.datalayer.api.query.QueryFilter;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.Filter;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class ReaperImplTest {
 
-    private QueryFactory mockFactory;
+    private QueryFactory<Connection, Filter> mockFactory;
     private CoreTokenConfig mockConfig;
-    private ReaperImpl impl;
-    private QueryBuilder mockBuilder;
+    private ReaperImpl<Connection, Filter> impl;
+    private QueryBuilder<Connection, Filter> mockBuilder;
     private Connection mockConnection;
-    private QueryFilter mockQueryFilter;
-    private QueryFilter.QueryFilterBuilder mockQueryFilterBuilder;
+    private QueryFilter<Filter> mockQueryFilter;
+    private QueryFilter<Filter>.QueryFilterBuilder<Filter> mockQueryFilterBuilder;
 
     @BeforeMethod
     public void setup() {
@@ -59,6 +60,7 @@ public class ReaperImplTest {
 
         mockBuilder = mock(QueryBuilder.class);
         given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
+        given(mockBuilder.pageResultsBy(anyInt())).willReturn(mockBuilder);
         given(mockBuilder.returnTheseAttributes(any(CoreTokenField.class))).willReturn(mockBuilder);
 
         mockFactory = mock(QueryFactory.class);
@@ -70,7 +72,7 @@ public class ReaperImplTest {
         mockConfig = mock(CoreTokenConfig.class);
         given(mockConfig.getCleanupPageSize()).willReturn(1);
 
-        impl = new ReaperImpl(mockFactory, mockConfig);
+        impl = new ReaperImpl<Connection, Filter>(mockFactory, mockConfig);
     }
 
     @Test (expectedExceptions = NullPointerException.class)
@@ -80,31 +82,41 @@ public class ReaperImplTest {
 
     @Test
     public void shouldQueryForNextPage() throws CoreTokenException {
+        //given
         impl.setConnection(mockConnection);
-        impl.nextPage();
-        verify(mockBuilder).executeRawResults(mockConnection);
+        Iterator<Collection<String>> mockIterator = mock(Iterator.class);
+        given(mockIterator.hasNext()).willReturn(true);
+        given(mockIterator.next()).willReturn(Arrays.asList("fred"));
+        given(mockBuilder.executeRawResults(mockConnection, String.class)).willReturn(mockIterator);
+
+        // when
+        Collection<String> page = impl.nextPage();
+
+        // then
+        verify(mockIterator).hasNext();
+        verify(mockIterator).next();
+        assertThat(page).containsOnly("fred");
     }
 
     @Test
-    public void shouldProvideCookieOnEachQuery() throws CoreTokenException {
+    public void shouldLoopUntilIteratorEmpty() throws CoreTokenException {
         // Given
         impl.setConnection(mockConnection);
-
-        ByteString byteString = ByteString.valueOf("badger");
-        given(mockBuilder.getPagingCookie()).willReturn(byteString);
-
-        ArgumentCaptor<ByteString> captor = ArgumentCaptor.forClass(ByteString.class);
-        given(mockBuilder.pageResultsBy(anyInt(), captor.capture())).willReturn(mockBuilder);
-
-        impl.nextPage();
-        impl.nextPage();
+        Iterator<Collection<String>> mockIterator = mock(Iterator.class);
+        given(mockBuilder.executeRawResults(mockConnection, String.class)).willReturn(mockIterator);
+        given(mockIterator.hasNext()).willReturn(true, true, false);
+        given(mockIterator.next()).willReturn(Arrays.asList("fred"), Arrays.asList("barney"));
 
         // When
-        List<ByteString> results = captor.getAllValues();
+        Collection<String> page1 = impl.nextPage();
+        Collection<String> page2 = impl.nextPage();
+        Collection<String> page3 = impl.nextPage();
 
         // Then
-        assertThat(results.size()).isEqualTo(2);
-        assertThat(results.get(1)).isEqualTo(byteString);
+        assertThat(page1).containsOnly("fred");
+        assertThat(page2).containsOnly("barney");
+        assertThat(page3).isNull();
+        verify(mockIterator, times(2)).next();
     }
 
     @Test (expectedExceptions = IllegalArgumentException.class)

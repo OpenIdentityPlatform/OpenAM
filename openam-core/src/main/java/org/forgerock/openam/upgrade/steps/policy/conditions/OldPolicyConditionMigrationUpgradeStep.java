@@ -11,10 +11,29 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade.steps.policy.conditions;
+
+import static org.forgerock.openam.upgrade.UpgradeServices.*;
+
+import java.security.PrivilegedAction;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.security.auth.Subject;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.steps.AbstractUpgradeStep;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ApplicationManager;
@@ -22,22 +41,6 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
-import java.security.PrivilegedAction;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.UpgradeException;
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.steps.AbstractUpgradeStep;
-import org.forgerock.opendj.ldap.ConnectionFactory;
 
 /**
  * <p>Will attempt to migrate old policy conditions to new entitlement conditions.</p>
@@ -67,7 +70,7 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
      */
     @Inject
     public OldPolicyConditionMigrationUpgradeStep(PrivilegedAction<SSOToken> adminTokenAction,
-            @Named(DataLayerConstants.DATA_LAYER_BINDING) ConnectionFactory connectionFactory) {
+            @DataLayer(ConnectionType.DATA_LAYER) ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
         this.conditionUpgrader = new PolicyConditionUpgrader(new PolicyConditionUpgradeMap());
     }

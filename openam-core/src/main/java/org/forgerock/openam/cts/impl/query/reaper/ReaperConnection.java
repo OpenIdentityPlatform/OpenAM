@@ -11,21 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.query.reaper;
 
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import java.io.Closeable;
+import java.util.Collection;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.Collection;
+
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.exceptions.LdapInitializationFailedException;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+import org.forgerock.openam.utils.IOUtils;
 
 /**
  * This implementation delegates to the actual implementation and manages the details
@@ -36,10 +37,10 @@ import java.util.Collection;
  * Threading Policy: This class will detect that the current thread has been interrupted
  * and close the established connection.
  */
-public class ReaperConnection implements ReaperQuery {
-    private final ConnectionFactory factory;
-    private final ReaperImpl impl;
-    private Connection connection;
+public class ReaperConnection<C extends Closeable> implements ReaperQuery {
+    private final ConnectionFactory<C> factory;
+    private final ReaperImpl<C, ?> impl;
+    private C connection;
     private boolean failed = false;
 
     /**
@@ -47,7 +48,7 @@ public class ReaperConnection implements ReaperQuery {
      * @param impl The specific implementation that will be delegated to.
      */
     @Inject
-    public ReaperConnection(@Named(DataLayerConstants.DATA_LAYER_CTS_REAPER_BINDING) ConnectionFactory factory, ReaperImpl impl) {
+    public ReaperConnection(@DataLayer(ConnectionType.CTS_REAPER) ConnectionFactory factory, ReaperImpl impl) {
         this.factory = factory;
         this.impl = impl;
     }
@@ -89,15 +90,15 @@ public class ReaperConnection implements ReaperQuery {
     /**
      * If this is the first call, then initialise the connection.
      *
-     * @throws LDAPOperationFailedException If there was an error getting the connection.
+     * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException If there was an error getting the connection.
      */
-    private void initConnection() throws LDAPOperationFailedException {
+    private void initConnection() throws LdapInitializationFailedException {
         if (connection == null) {
             try {
-                connection = factory.getConnection();
+                connection = factory.create();
                 impl.setConnection(connection);
-            } catch (ErrorResultException e) {
-                throw new LDAPOperationFailedException(e.getResult());
+            } catch (DataLayerException e) {
+                throw new LdapInitializationFailedException(e);
             }
         }
     }

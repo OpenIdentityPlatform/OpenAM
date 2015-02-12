@@ -11,15 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.indextree;
 
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ServiceManagementDAO;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import javax.inject.Inject;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.FutureResult;
 import org.forgerock.opendj.ldap.SearchResultHandler;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -29,8 +30,8 @@ import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.ServiceManagementDAO;
 
 /**
  * This monitor implementation acquires a connection against the data source and uses a persistent search to listen for
@@ -42,7 +43,7 @@ public class IndexChangeMonitorImpl implements IndexChangeMonitor {
     private static final Debug DEBUG = Debug.getInstance("amEntitlements");
 
     private final SearchResultHandler handler;
-    private final ConnectionFactory factory;
+    private final ConnectionFactory<Connection> factory;
 
     private final SearchRequest request;
 
@@ -51,7 +52,7 @@ public class IndexChangeMonitorImpl implements IndexChangeMonitor {
 
     @Inject
     public IndexChangeMonitorImpl(SearchResultHandler handler,
-                                  @Named(DataLayerConstants.DATA_LAYER_BINDING) ConnectionFactory factory,
+                                  @DataLayer(ConnectionType.DATA_LAYER) ConnectionFactory factory,
                                   ServiceManagementDAO smDAO) {
         this.handler = handler;
         this.factory = factory;
@@ -73,7 +74,7 @@ public class IndexChangeMonitorImpl implements IndexChangeMonitor {
      */
     public synchronized void start() throws ChangeMonitorException {
         try {
-            connection = factory.getConnection();
+            connection = factory.create();
             // Start the persistence search.
             searchStatus = connection.searchAsync(request, null, handler);
 

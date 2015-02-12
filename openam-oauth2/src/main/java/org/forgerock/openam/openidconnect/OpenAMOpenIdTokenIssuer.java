@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.openidconnect;
@@ -20,13 +20,9 @@ import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.openidconnect.OpenIDTokenIssuer;
 import org.forgerock.openidconnect.OpenIdConnectTokenStore;
-import org.forgerock.openam.oauth2.OpenAMSettings;
-import org.restlet.Request;
-import org.restlet.ext.servlet.ServletUtils;
+import org.forgerock.openam.utils.OpenAMSettings;
 
 import javax.inject.Inject;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Issues OpenId Connect tokens and stores them in the OpenID Connect Token Store, when an access token is required

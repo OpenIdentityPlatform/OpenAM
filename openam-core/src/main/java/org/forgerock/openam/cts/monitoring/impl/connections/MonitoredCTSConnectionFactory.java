@@ -11,32 +11,39 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.cts.monitoring.impl.connections;
 
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.FutureResult;
-import org.forgerock.opendj.ldap.ResultHandler;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+import org.forgerock.util.promise.FailureHandler;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.SuccessHandler;
 
 /**
  * A wrapper for the CTSConnectionFactory which tracks the success/failure
  * of connection attempts requested through this factory. The tracked values are
  * stored in a data structure which is shared by the monitoring system.
  */
-public class MonitoredCTSConnectionFactory implements ConnectionFactory {
+public class MonitoredCTSConnectionFactory<C> implements ConnectionFactory<C> {
 
     private final CTSConnectionMonitoringStore monitorStore;
-    private final ConnectionFactory connectionFactory;
-    private final WrappedHandlerFactory handlerFactory;
+    private final ConnectionFactory<C> connectionFactory;
+    private final FailureHandler<DataLayerException> creationFailureHandler = new FailureHandler<DataLayerException>() {
+        @Override
+        public void handleError(DataLayerException error) {
+            monitorStore.addConnection(false);
+        }
+    };
+    private final SuccessHandler<C> creationSuccessHandler = new SuccessHandler<C>() {
+        @Override
+        public void handleResult(C result) {
+            monitorStore.addConnection(true);
+        }
+    };
 
     /**
      * The connection factory registers as a config listener in case these settings change.
@@ -44,14 +51,10 @@ public class MonitoredCTSConnectionFactory implements ConnectionFactory {
      * @param connectionFactory The ConnectionFactory to use to generate connections
      * @param monitorStore The data structure in which to count connection success/failures
      */
-    @Inject
-    public MonitoredCTSConnectionFactory(@Named(DataLayerConstants.DATA_LAYER_CTS_ASYNC_BINDING)
-                                         ConnectionFactory connectionFactory,
-                                         CTSConnectionMonitoringStore monitorStore,
-                                         WrappedHandlerFactory handlerFactory) {
+    public MonitoredCTSConnectionFactory(ConnectionFactory<C> connectionFactory,
+                                         CTSConnectionMonitoringStore monitorStore) {
         this.connectionFactory = connectionFactory;
         this.monitorStore = monitorStore;
-        this.handlerFactory = handlerFactory;
     }
 
     /**
@@ -60,12 +63,12 @@ public class MonitoredCTSConnectionFactory implements ConnectionFactory {
      * and stores in the provided structure.
      *
      * @return a connection to the token store.
-     * @throws org.forgerock.opendj.ldap.ErrorResultException unable to provide a connection.
+     * @throws DataLayerException unable to provide a connection.
      */
-    public Connection getConnection() throws ErrorResultException {
+    public C create() throws DataLayerException {
         boolean success = false;
         try {
-            Connection response = connectionFactory.getConnection();
+            C response = connectionFactory.create();
             success = true;
             return response;
         } finally {
@@ -73,20 +76,18 @@ public class MonitoredCTSConnectionFactory implements ConnectionFactory {
         }
     }
 
-    /**
-     * Provides an asynchronous connection to the token store.
-     * @param resultHandler the result handler.
-     * @return an asynchronous connection.
-     */
-    public FutureResult<Connection> getConnectionAsync(final ResultHandler<? super Connection> resultHandler) {
-
-        ResultHandler<? super Connection> wrappingHandler = handlerFactory.build(resultHandler);
-
-        return connectionFactory.getConnectionAsync(wrappingHandler);
+    @Override
+    public Promise<C, DataLayerException> createAsync() {
+        return connectionFactory.createAsync().onFailure(creationFailureHandler).onSuccess(creationSuccessHandler);
     }
 
     @Override
     public void close() {
         connectionFactory.close();
+    }
+
+    @Override
+    public boolean isValid(C connection) {
+        return connectionFactory.isValid(connection);
     }
 }

@@ -50,7 +50,7 @@ import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
-import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.utils.TimeUtils;
 
 import java.net.URL;

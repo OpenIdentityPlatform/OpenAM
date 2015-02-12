@@ -11,68 +11,66 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.cts.monitoring.impl.connections;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.verifyZeroInteractions;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+import org.forgerock.util.promise.PromiseImpl;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertTrue;
 
 public class MonitoredCTSConnectionFactoryTest {
 
     private CTSConnectionMonitoringStore monitoringStore;
 
-    private ConnectionFactory connectionFactory;
+    private ConnectionFactory<Object> connectionFactory;
     private MonitoredCTSConnectionFactory monitoredConnectionFactory;
-    private WrappedHandlerFactory handlerFactory;
 
     @BeforeMethod
     public void setUp() {
 
         connectionFactory = mock(ConnectionFactory.class);
         monitoringStore = mock(CTSConnectionMonitoringStore.class);
-        handlerFactory = mock(WrappedHandlerFactory.class);
 
-        monitoredConnectionFactory = new MonitoredCTSConnectionFactory(connectionFactory, monitoringStore, handlerFactory);
+        monitoredConnectionFactory = new MonitoredCTSConnectionFactory(connectionFactory, monitoringStore);
 
     }
 
     @Test
-    public void shouldAddToFailedConnectionOnError() throws ErrorResultException {
+    public void shouldAddToFailedConnectionOnError() throws Exception {
         //given
-        boolean success = false;
-        boolean errorCaught = false;
-
-        doThrow(mock(ErrorResultException.class)).when(connectionFactory).getConnection();
+        doThrow(Exception.class).when(connectionFactory).create();
 
         //when
         try {
-            monitoredConnectionFactory.getConnection();
-        } catch (ErrorResultException e) {
-            errorCaught = true;
+            monitoredConnectionFactory.create();
+            fail("Should throw exception");
+        } catch (Exception e) {
+            // expected
         }
 
         //then
-        verify(monitoringStore).addConnection(success);
-        assertTrue(errorCaught);
+        verify(monitoringStore).addConnection(false);
     }
 
     @Test
-    public void shouldAddToSuccessfulConnection() throws ErrorResultException {
+    public void shouldAddToSuccessfulConnection() throws Exception {
 
         //given
         boolean success = true;
 
         //when
-        monitoredConnectionFactory.getConnection();
+        monitoredConnectionFactory.create();
 
         //then
         verify(monitoringStore).addConnection(success);
@@ -81,16 +79,17 @@ public class MonitoredCTSConnectionFactoryTest {
     @Test
     public void shouldWrapHandlerWhenCalledAsync() {
         //given
-        ResultHandler resultHandler = mock(ResultHandler.class);
-        ResultHandler wrappedHandler = mock(ResultHandler.class);
-
-        given(handlerFactory.build(resultHandler)).willReturn(wrappedHandler);
+        PromiseImpl<Object, DataLayerException> promise = PromiseImpl.create();
+        given(connectionFactory.createAsync()).willReturn(promise);
 
         //when
-        monitoredConnectionFactory.getConnectionAsync(resultHandler);
+        monitoredConnectionFactory.createAsync();
 
         //then
-        verify(connectionFactory).getConnectionAsync(wrappedHandler);
+        verify(connectionFactory).createAsync();
+        verifyZeroInteractions(monitoringStore);
+        promise.handleError(new DataLayerException("reason"));
+        verify(monitoringStore).addConnection(false);
     }
 
 }

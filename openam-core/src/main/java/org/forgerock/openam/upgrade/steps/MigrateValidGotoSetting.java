@@ -11,9 +11,29 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade.steps;
+
+import static org.forgerock.openam.upgrade.UpgradeServices.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.PrivilegedAction;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeServices;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -27,24 +47,6 @@ import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeServices;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.security.PrivilegedAction;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 
 /**
  * Migrates the list of valid goto domains from iPlanetAMAuthService to validationService and also updates the
@@ -65,7 +67,7 @@ public class MigrateValidGotoSetting extends AbstractUpgradeStep {
 
     @Inject
     public MigrateValidGotoSetting(PrivilegedAction<SSOToken> adminTokenAction,
-                                   @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory factory) {
         super(adminTokenAction, factory);
     }
 

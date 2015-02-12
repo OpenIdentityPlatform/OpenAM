@@ -25,10 +25,15 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.tokens.Converter;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.Field;
@@ -44,23 +49,26 @@ import org.forgerock.util.Reject;
 public class JavaBeanAdapter<T> implements TokenAdapter<T> {
 
     private final Class<T> beanClass;
+    private final TokenIdGenerator idGenerator;
     private TokenType tokenType;
     private final List<FieldDetails> fields = new ArrayList<FieldDetails>();
+    private final Map<String, FieldDetails> fieldsMap = new HashMap<String, FieldDetails>();
     private FieldDetails idField;
-    private boolean initialised = false;
 
-    JavaBeanAdapter(Class<T> beanClass) {
+    public JavaBeanAdapter(Class<T> beanClass, TokenIdGenerator idGenerator) {
         Type type = beanClass.getAnnotation(Type.class);
         if (type == null || type.value() == null) {
             throw new IllegalArgumentException("Token class does not declare token type: " + beanClass.getName());
         }
         this.beanClass = beanClass;
+        this.idGenerator = idGenerator;
+        initialise();
     }
 
     /**
      * Process the annotations on the bean class, and throw exceptions for invalid configuration.
      */
-    void initialise() {
+    private void initialise() {
         this.tokenType = beanClass.getAnnotation(Type.class).value();
         BeanInfo beanInfo;
         try {
@@ -95,11 +103,16 @@ public class JavaBeanAdapter<T> implements TokenAdapter<T> {
                     }
                     validateConverterType(attributeType, beanFieldType, converterType);
                     Converter converter = InjectorHolder.getInstance(converterType);
-                    FieldDetails field = new FieldDetails(tokenField, readMethod, writeMethod, converter);
+                    boolean generated = f.generated();
+                    FieldDetails field = new FieldDetails(tokenField, readMethod, writeMethod, converter, generated);
                     if (tokenField == CoreTokenField.TOKEN_ID) {
                         idField = field;
                     } else {
+                        if (generated) {
+                            throw new IllegalStateException("Non-id values cannot be generated: " + f.toString());
+                        }
                         fields.add(field);
+                        fieldsMap.put(pd.getName(), field);
                     }
                 }
             }
@@ -107,7 +120,6 @@ public class JavaBeanAdapter<T> implements TokenAdapter<T> {
         if (idField == null) {
             throw new IllegalStateException("The bean class does not declare an ID field");
         }
-        initialised = true;
     }
 
     /**
@@ -152,22 +164,26 @@ public class JavaBeanAdapter<T> implements TokenAdapter<T> {
 
     @Override
     public Token toToken(T o) {
-        if (!initialised) {
-            throw new IllegalStateException("Not initialised");
-        }
         Reject.ifTrue(o == null, "Object must not be null");
-        Token token = new Token((String) idField.read(o), tokenType);
+        String tokenId = (String) idField.read(o);
+        if (tokenId == null && idField.generated) {
+            tokenId = idGenerator.generateTokenId(null);
+            idField.write(tokenId, o);
+        } else if (tokenId == null) {
+            throw new IllegalArgumentException("ID field is not generated and is null");
+        }
+        Token token = new Token(tokenId, tokenType);
         for (FieldDetails details : fields) {
-            token.setAttribute(details.tokenField, details.read(o));
+            Object value = details.read(o);
+            if (value != null) {
+                token.setAttribute(details.tokenField, value);
+            }
         }
         return token;
     }
 
     @Override
     public T fromToken(Token token) {
-        if (!initialised) {
-            throw new IllegalStateException("Not initialised");
-        }
         Reject.ifTrue(token == null, "Object must not be null");
         if (token.getType() != tokenType) {
             throw new IllegalArgumentException("Wrong token type (" + token.getType().name() + ") - expecting " +
@@ -196,18 +212,37 @@ public class JavaBeanAdapter<T> implements TokenAdapter<T> {
         }
     }
 
+    /**
+     * Use the bean mappings that have been parsed to turn a query keyed by bean property names into a query keyed by
+     * token property names.
+     * @param beanQuery The query keyed by bean property names.
+     * @return The transformed query keyed by token property names.
+     */
+    public TokenFilter toTokenQuery(Map<String, Object> beanQuery, TokenFilter.Type type) {
+        TokenFilterBuilder.FilterAttributeBuilder builder = new TokenFilterBuilder().type(type);
+        if (type == TokenFilter.Type.AND) {
+            builder.withAttribute(CoreTokenField.TOKEN_TYPE, tokenType);
+        }
+        for (Map.Entry entry : beanQuery.entrySet()) {
+            builder.withAttribute(fieldsMap.get(entry.getKey()).tokenField, entry.getValue());
+        }
+        return builder.build();
+    }
+
     private static class FieldDetails {
         private final CoreTokenField tokenField;
         private final Method readMethod;
         private final Method writeMethod;
         private final Converter converter;
+        private final boolean generated;
 
         FieldDetails(CoreTokenField tokenField, Method readMethod, Method writeMethod,
-                Converter converter) {
+                Converter converter, boolean generated) {
             this.tokenField = tokenField;
             this.readMethod = readMethod;
             this.writeMethod = writeMethod;
             this.converter = converter;
+            this.generated = generated;
         }
 
         Object read(Object o) {

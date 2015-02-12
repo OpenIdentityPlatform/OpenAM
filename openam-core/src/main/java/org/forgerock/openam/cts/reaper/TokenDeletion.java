@@ -11,12 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.reaper;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.queue.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 
 import javax.inject.Inject;
@@ -52,7 +52,7 @@ public class TokenDeletion {
      */
     public CountDownLatch deleteBatch(Collection<String> tokens) throws CoreTokenException {
         CountDownLatch latch = new CountDownLatch(tokens.size());
-        ResultHandler<String> handler = new CountdownHandler(latch);
+        ResultHandler<String, CoreTokenException> handler = new CountdownHandler(latch);
         for (String token : tokens) {
             queue.delete(token, handler);
         }
@@ -62,7 +62,7 @@ public class TokenDeletion {
     /**
      * Internal implementation to ensure that delete operations count down the latch.
      */
-    private static class CountdownHandler implements ResultHandler<String> {
+    private static class CountdownHandler implements ResultHandler<String, CoreTokenException> {
         private final CountDownLatch latch;
         public CountdownHandler(CountDownLatch latch) {
             this.latch = latch;
@@ -79,7 +79,7 @@ public class TokenDeletion {
         }
 
         @Override
-        public void processError(CoreTokenException error) {
+        public void processError(Exception error) {
             latch.countDown();
         }
     }

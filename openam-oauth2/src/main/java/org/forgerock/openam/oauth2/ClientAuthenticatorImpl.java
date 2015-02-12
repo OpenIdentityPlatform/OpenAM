@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 /*
@@ -33,13 +33,13 @@ import org.forgerock.oauth2.core.ClientAuthenticator;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Jwt;
-import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.util.Reject;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
@@ -87,10 +87,10 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
     /**
      * {@inheritDoc}
      */
-    public ClientRegistration authenticate(OAuth2Request request) throws InvalidClientException,
+    public ClientRegistration authenticate(OAuth2Request request, String endpoint) throws InvalidClientException,
             InvalidRequestException, ClientAuthenticationFailedException, NotFoundException {
 
-        final ClientCredentials clientCredentials = extractCredentials(request);
+        final ClientCredentials clientCredentials = extractCredentials(request, endpoint);
         Reject.ifTrue(isEmpty(clientCredentials.clientId), "Missing parameter, 'client_id'");
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter("realm"));
@@ -140,7 +140,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
      * @throws InvalidRequestException If the request contains multiple client credentials.
      * @throws InvalidClientException If the request does not contain the client's id.
      */
-    private ClientCredentials extractCredentials(OAuth2Request request) throws InvalidRequestException,
+    private ClientCredentials extractCredentials(OAuth2Request request, String endpoint) throws InvalidRequestException,
             InvalidClientException, NotFoundException {
 
         final Request req = request.getRequest();
@@ -150,7 +150,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
         }
 
         if (JWT_PROFILE_CLIENT_ASSERTION_TYPE.equalsIgnoreCase(request.<String>getParameter(CLIENT_ASSERTION_TYPE))) {
-            return verifyJwtBearer(request, basicAuth);
+            return verifyJwtBearer(request, basicAuth, endpoint);
         }
 
         String clientId = request.getParameter("client_id");
@@ -180,14 +180,13 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
                 basicAuth);
     }
 
-    private ClientCredentials verifyJwtBearer(OAuth2Request request, boolean basicAuth) throws InvalidClientException,
-            InvalidRequestException, NotFoundException {
+    private ClientCredentials verifyJwtBearer(OAuth2Request request, boolean basicAuth, String endpoint)
+            throws InvalidClientException, InvalidRequestException, NotFoundException {
 
         OAuth2Jwt jwt = OAuth2Jwt.create(request.<String>getParameter(CLIENT_ASSERTION));
 
         ClientRegistration clientRegistration = clientRegistrationStore.get(jwt.getSubject(), request);
 
-        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         SigningHandler signingHandler = clientRegistration.getClientJwtSigningHandler();
 
         if (!jwt.isValid(signingHandler)) {
@@ -199,7 +198,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
             throw new InvalidRequestException("Client authentication failed");
         }
 
-        if (!jwt.isIntendedForAudience(providerSettings.getTokenEndpoint())) {
+        if (!jwt.isIntendedForAudience(endpoint)) {
             throw new InvalidClientException("Audience validation failed");
         }
 

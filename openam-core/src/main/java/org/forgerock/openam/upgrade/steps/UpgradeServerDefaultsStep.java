@@ -11,22 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade.steps;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.configuration.ServerConfiguration;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.ServerUpgrade;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.UpgradeUtils;
-import org.forgerock.opendj.ldap.ConnectionFactory;
+import static com.sun.identity.common.configuration.ServerConfiguration.*;
+import static org.forgerock.openam.upgrade.UpgradeServices.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,10 +25,19 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import static com.sun.identity.common.configuration.ServerConfiguration.DEFAULT_SERVER_CONFIG;
-import static com.sun.identity.common.configuration.ServerConfiguration.DEFAULT_SERVER_ID;
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import javax.inject.Inject;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.ServerUpgrade;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.UpgradeUtils;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.configuration.ServerConfiguration;
 
 /**
  * Detects changes made to default server properties and upgrades them if required.
@@ -56,8 +56,7 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
 
     @Inject
     public UpgradeServerDefaultsStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                                     @Named(DataLayerConstants.DATA_LAYER_BINDING)
-                                        final ConnectionFactory connectionFactory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
     }
 

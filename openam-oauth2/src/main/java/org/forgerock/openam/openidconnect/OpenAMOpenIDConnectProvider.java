@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.openidconnect;
@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
@@ -58,7 +59,7 @@ public class OpenAMOpenIDConnectProvider implements OpenIDConnectProvider {
      */
     @Inject
     public OpenAMOpenIDConnectProvider(SSOTokenManager tokenManager, IdentityManager identityManager,
-            CTSPersistentStore cts, TokenAdapter<JsonValue> tokenAdapter) {
+            CTSPersistentStore cts, @Named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER) TokenAdapter<JsonValue> tokenAdapter) {
         this.tokenManager = tokenManager;
         this.identityManager = identityManager;
         this.cts = cts;

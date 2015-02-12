@@ -11,18 +11,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.utils;
 
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.StoreMode;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.text.MessageFormat;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.fest.assertions.Assertions.assertThat;
+import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
+import org.forgerock.openam.sm.SMSDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.api.StoreMode;
+import org.forgerock.openam.sm.datalayer.impl.ResourceSetDataLayerConfiguration;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class ConnectionCountTest {
 
@@ -30,7 +38,14 @@ public class ConnectionCountTest {
 
     @BeforeMethod
     public void setup() {
-        count = new ConnectionCount(StoreMode.DEFAULT);
+        DataLayerConfiguration ctsConfiguration = mock(DataLayerConfiguration.class);
+        DataLayerConfiguration resourceSetConfiguration = mock(DataLayerConfiguration.class);
+        when(ctsConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
+        when(resourceSetConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
+        Map<ConnectionType, DataLayerConfiguration> configMap = new HashMap<ConnectionType, DataLayerConfiguration>();
+        configMap.put(ConnectionType.CTS_ASYNC, ctsConfiguration);
+        configMap.put(ConnectionType.RESOURCE_SETS, resourceSetConfiguration);
+        count = new ConnectionCount(configMap);
     }
 
     @Test
@@ -48,7 +63,7 @@ public class ConnectionCountTest {
 
     @Test (expectedExceptions = IllegalArgumentException.class)
     public void shouldRejectAMinimumCount() {
-        count.getConnectionCount(3, ConnectionType.CTS_ASYNC);
+        count.getConnectionCount(6, ConnectionType.CTS_ASYNC);
     }
 
     @Test
@@ -81,7 +96,10 @@ public class ConnectionCountTest {
     }
 
     public static void main(String... args) {
-        ConnectionCount count = new ConnectionCount(StoreMode.DEFAULT);
+        Map<ConnectionType, DataLayerConfiguration> configMap = new HashMap<ConnectionType, DataLayerConfiguration>();
+        configMap.put(ConnectionType.CTS_ASYNC, new CTSDataLayerConfiguration(null, "ou=root-dn"));
+        configMap.put(ConnectionType.RESOURCE_SETS, new ResourceSetDataLayerConfiguration("ou=root-dn"));
+        ConnectionCount count = new ConnectionCount(configMap);
         System.out.println("Total = Async:Reaper:Data");
         for (int ii = ConnectionCount.MINIMUM_CONNECTIONS; ii < 1000; ii++) {
             int a = count.getConnectionCount(ii, ConnectionType.CTS_ASYNC);

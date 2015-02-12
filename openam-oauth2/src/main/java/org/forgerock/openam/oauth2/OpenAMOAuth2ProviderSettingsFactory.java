@@ -11,23 +11,27 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
 
-import org.forgerock.oauth2.core.OAuth2ProviderSettings;
-import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.PEMDecoder;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.openam.rest.service.RestletRealmRouter;
-import org.restlet.Request;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
+import org.forgerock.openam.utils.RealmNormaliser;
+import org.restlet.Request;
+import org.restlet.ext.servlet.ServletUtils;
 
 /**
  * A factory for creating/retrieving OpenAMOAuth2ProviderSettings instances.
@@ -40,21 +44,21 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
     private final Map<String, OAuth2ProviderSettings> providerSettingsMap = new HashMap<String, OAuth2ProviderSettings>();
     private final RealmNormaliser realmNormaliser;
     private final CookieExtractor cookieExtractor;
-    private final PEMDecoder pemDecoder;
+    private final ResourceSetStoreFactory resourceSetStoreFactory;
 
     /**
      * Contructs a new OpenAMOAuth2ProviderSettingsFactory.
      *
      * @param realmNormaliser An instance of the RealmNormaliser.
      * @param cookieExtractor An instance of the CookieExtractor.
-     * @param pemDecoder An instance of the PEMDecoder.
+     * @param resourceSetStoreFactory An instance of the ResourceSetStoreFactory.
      */
     @Inject
     public OpenAMOAuth2ProviderSettingsFactory(RealmNormaliser realmNormaliser, CookieExtractor cookieExtractor,
-            PEMDecoder pemDecoder) {
+            ResourceSetStoreFactory resourceSetStoreFactory) {
         this.realmNormaliser = realmNormaliser;
         this.cookieExtractor = cookieExtractor;
-        this.pemDecoder = pemDecoder;
+        this.resourceSetStoreFactory = resourceSetStoreFactory;
     }
 
     /**
@@ -62,16 +66,14 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
      */
     public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
         final String realm = request.getParameter("realm");
-        final Request req = request.getRequest();
-        String urlPattern = (String) req.getAttributes().get(RestletRealmRouter.REALM_URL);
-        if (urlPattern.endsWith("/")) {
-            urlPattern = urlPattern.substring(0, urlPattern.length() - 1);
+        final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
+        String contextPath = req.getContextPath();
+        String requestUrl = req.getRequestURL().toString();
+        String baseUrlPattern = requestUrl.substring(0, requestUrl.indexOf(contextPath) + contextPath.length());
+        if (baseUrlPattern.endsWith("/")) {
+            baseUrlPattern = baseUrlPattern.substring(0, baseUrlPattern.length() - 1);
         }
-        String queryRealm = req.getResourceRef().getQueryAsForm().getFirstValue("realm");
-        if (queryRealm != null && !"/".equals(queryRealm) && urlPattern.endsWith("/oauth2")) {
-            urlPattern += realmNormaliser.normalise(queryRealm);
-        }
-        return getInstance(realmNormaliser.normalise(realm), urlPattern);
+        return getInstance(realmNormaliser.normalise(realm), baseUrlPattern);
     }
 
     /**
@@ -90,14 +92,17 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
      * Cache each provider settings on the realm it was created for.
      *
      * @param realm The realm.
-     * @param deploymentUrl The deployment url.
+     * @param baseDeploymentUri The base deployment url.
      * @return The OAuth2ProviderSettings instance.
      */
-    private OAuth2ProviderSettings getInstance(String realm, String deploymentUrl) throws NotFoundException {
+    private OAuth2ProviderSettings getInstance(String realm, String baseDeploymentUri)
+            throws NotFoundException {
         synchronized (providerSettingsMap) {
             OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realm);
             if (providerSettings == null) {
-                providerSettings = new OpenAMOAuth2ProviderSettings(realm, deploymentUrl, cookieExtractor, pemDecoder);
+                ResourceSetStore resourceSetStore = resourceSetStoreFactory.create(realm);
+                providerSettings = new OpenAMOAuth2ProviderSettings(realm, baseDeploymentUri, resourceSetStore,
+                        cookieExtractor);
                 if (providerSettings.exists()) {
                     providerSettingsMap.put(realm, providerSettings);
                 } else {

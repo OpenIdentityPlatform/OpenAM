@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -37,26 +37,22 @@ import static org.forgerock.oauth2.core.Utils.joinScope;
  *
  * @since 12.0.0
  */
-public class JwtBearerGrantTypeHandler implements GrantTypeHandler {
+public class JwtBearerGrantTypeHandler extends GrantTypeHandler {
 
-    private final ClientAuthenticator clientAuthenticator;
     private final TokenStore tokenStore;
-    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     @Inject
     public JwtBearerGrantTypeHandler(ClientAuthenticator clientAuthenticator, TokenStore tokenStore,
             OAuth2ProviderSettingsFactory providerSettingsFactory) {
-        this.clientAuthenticator = clientAuthenticator;
+        super(providerSettingsFactory, clientAuthenticator);
         this.tokenStore = tokenStore;
-        this.providerSettingsFactory = providerSettingsFactory;
     }
 
     @Override
-    public AccessToken handle(OAuth2Request request) throws RedirectUriMismatchException, InvalidClientException,
-            InvalidRequestException, ClientAuthenticationFailedException, InvalidGrantException, InvalidCodeException,
+    public AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration,
+            OAuth2ProviderSettings providerSettings) throws RedirectUriMismatchException,
+            InvalidRequestException, InvalidGrantException, InvalidCodeException,
             ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException {
-
-        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request);
 
         final String jwtParameter = request.getParameter("assertion");
         final OAuth2Jwt jwt = OAuth2Jwt.create(jwtParameter);
@@ -66,10 +62,7 @@ public class JwtBearerGrantTypeHandler implements GrantTypeHandler {
         }
 
         final String redirectUri = request.getParameter("redirect_uri");
-
         final String grantType = request.getParameter("grant_type");
-
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
         Set<String> scopes = Utils.splitScope(request.<String>getParameter("scope"));
         Set<String> authorizationScope = providerSettings.validateAccessTokenScope(clientRegistration, scopes, request);

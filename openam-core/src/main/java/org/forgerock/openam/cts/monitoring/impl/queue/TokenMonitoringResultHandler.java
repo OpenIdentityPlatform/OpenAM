@@ -11,21 +11,21 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.monitoring.impl.queue;
 
 import org.forgerock.openam.cts.CTSOperation;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.queue.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 
 /**
  * A monitoring based handler suitable for monitoring token based operations.
  */
-public class TokenMonitoringResultHandler implements ResultHandler<Token> {
-    private final ResultHandler<Token> handler;
+public class TokenMonitoringResultHandler implements ResultHandler<Token, CoreTokenException> {
+    private final ResultHandler<Token, CoreTokenException> handler;
     private final CTSOperationsMonitoringStore store;
     private final CTSOperation operation;
 
@@ -34,7 +34,7 @@ public class TokenMonitoringResultHandler implements ResultHandler<Token> {
      * @param store Non null store to report operations to.
      * @param operation Non null operation type to signal to the store.
      */
-    public TokenMonitoringResultHandler(ResultHandler<Token> handler, CTSOperationsMonitoringStore store,
+    public TokenMonitoringResultHandler(ResultHandler<Token, CoreTokenException> handler, CTSOperationsMonitoringStore store,
                                         CTSOperation operation) {
         this.handler = handler;
         this.store = store;
@@ -63,7 +63,7 @@ public class TokenMonitoringResultHandler implements ResultHandler<Token> {
      * @param error The error to log in the monitoring store, then delegate to the wrapped handler.
      */
     @Override
-    public void processError(CoreTokenException error) {
+    public void processError(Exception error) {
         store.addTokenOperation(null, operation, false);
         handler.processError(error);
     }

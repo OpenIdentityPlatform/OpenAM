@@ -11,15 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.monitoring.impl.queue;
 
 import org.forgerock.openam.cts.CTSOperation;
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.cts.impl.queue.AsyncResultHandlerFactory;
-import org.forgerock.openam.cts.impl.queue.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 
@@ -48,7 +49,7 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
      * @return A monitoring enabled handler wrapping the delegated implementation.
      */
     @Override
-    public ResultHandler<Token> getCreateHandler() {
+    public ResultHandler<Token, CoreTokenException> getCreateHandler() {
         return new TokenMonitoringResultHandler(factory.getCreateHandler(), store, CTSOperation.CREATE);
     }
 
@@ -56,7 +57,7 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
      * @return A monitoring enabled handler wrapping the delegated implementation.
      */
     @Override
-    public ResultHandler<Token> getReadHandler() {
+    public ResultHandler<Token, CoreTokenException> getReadHandler() {
         return new TokenMonitoringResultHandler(factory.getReadHandler(), store, CTSOperation.READ);
     }
 
@@ -64,7 +65,7 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
      * @return A monitoring enabled handler wrapping the delegated implementation.
      */
     @Override
-    public ResultHandler<Token> getUpdateHandler() {
+    public ResultHandler<Token, CoreTokenException> getUpdateHandler() {
         return new TokenMonitoringResultHandler(factory.getUpdateHandler(), store, CTSOperation.UPDATE);
     }
 
@@ -72,16 +73,16 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
      * @return A monitoring enabled handler wrapping the delegated implementation.
      */
     @Override
-    public ResultHandler<String> getDeleteHandler() {
-        return new DefaultMonitoringResultHandler<String>(factory.getDeleteHandler(), store, CTSOperation.DELETE);
+    public ResultHandler<String, CoreTokenException> getDeleteHandler() {
+        return new DefaultMonitoringResultHandler<String, CoreTokenException>(factory.getDeleteHandler(), store, CTSOperation.DELETE);
     }
 
     /**
      * @return A monitoring enabled handler wrapping the delegated implementation.
      */
     @Override
-    public ResultHandler<Collection<Token>> getQueryHandler() {
-        return new DefaultMonitoringResultHandler<Collection<Token>>(
+    public ResultHandler<Collection<Token>, CoreTokenException> getQueryHandler() {
+        return new DefaultMonitoringResultHandler<Collection<Token>, CoreTokenException>(
                 factory.getQueryHandler(), store, CTSOperation.LIST);
     }
 
@@ -89,8 +90,8 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
      * @return A monitoring enabled handler wrapping the delegated implementation.
      */
     @Override
-    public ResultHandler<Collection<PartialToken>> getPartialQueryHandler() {
-        return new DefaultMonitoringResultHandler<Collection<PartialToken>>(
+    public ResultHandler<Collection<PartialToken>, CoreTokenException> getPartialQueryHandler() {
+        return new DefaultMonitoringResultHandler<Collection<PartialToken>, CoreTokenException>(
                 factory.getPartialQueryHandler(), store, CTSOperation.LIST);
     }
 
@@ -98,8 +99,8 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
      * @return A non monitored handler as this is a composite operation.
      */
     @Override
-    public ResultHandler<Collection<PartialToken>> getDeleteOnQueryHandler() {
-        return new DefaultMonitoringResultHandler<Collection<PartialToken>>(
+    public ResultHandler<Collection<PartialToken>, CoreTokenException> getDeleteOnQueryHandler() {
+        return new DefaultMonitoringResultHandler<Collection<PartialToken>, CoreTokenException>(
                 factory.getDeleteOnQueryHandler(), store, CTSOperation.LIST);
     }
 }

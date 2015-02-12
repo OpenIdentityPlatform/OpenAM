@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.openidconnect;
@@ -26,6 +26,7 @@ import java.util.Map;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
@@ -40,14 +41,12 @@ import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
-import org.forgerock.openam.oauth2.OpenAMSettings;
+import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openidconnect.CheckSession;
-import org.restlet.Request;
 
 /**
  * Defines what is needed to do the OpenID Connect check session endpoint.
@@ -73,7 +72,7 @@ public class CheckSessionImpl implements CheckSession {
         signingManager = InjectorHolder.getInstance(SigningManager.class);
         clientRegistrationStore = InjectorHolder.getInstance(ClientRegistrationStore.class);
         cts = InjectorHolder.getInstance(CTSPersistentStore.class);
-        tokenAdapter = InjectorHolder.getInstance(Key.get(new TypeLiteral<TokenAdapter<JsonValue>>() { }));
+        tokenAdapter = InjectorHolder.getInstance(Key.get(new TypeLiteral<TokenAdapter<JsonValue>>() { }, Names.named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER)));
     }
 
     /**

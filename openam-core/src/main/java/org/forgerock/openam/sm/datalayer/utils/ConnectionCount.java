@@ -11,16 +11,19 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.utils;
 
-import org.forgerock.openam.cts.impl.queue.QueueSelector;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.StoreMode;
-import org.forgerock.util.Reject;
+import java.util.Map;
 
 import javax.inject.Inject;
+
+import org.forgerock.openam.cts.impl.queue.QueueSelector;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.api.StoreMode;
+import org.forgerock.util.Reject;
 
 /**
  * Logic to resolve the number of connections used by the three main users of the Service Management layer.
@@ -28,17 +31,18 @@ import javax.inject.Inject;
  * @see ConnectionType
  */
 public class ConnectionCount {
-    static final int MINIMUM_CONNECTIONS = 6;
-    private final StoreMode storeMode;
+    static final int MINIMUM_CONNECTIONS = 7;
+    private final Map<ConnectionType, DataLayerConfiguration> dataLayerConfiguration;
 
     /**
      * Guice initialised constructor.
      *
-     * @param storeMode Non null required for calculating connections.
+     * @param dataLayerConfiguration Configuration object from which the StoreMode (required for calculating
+     *                               connections) can be obtained.
      */
     @Inject
-    public ConnectionCount(StoreMode storeMode) {
-        this.storeMode = storeMode;
+    public ConnectionCount(Map<ConnectionType, DataLayerConfiguration> dataLayerConfiguration) {
+        this.dataLayerConfiguration = dataLayerConfiguration;
     }
 
     /**
@@ -59,14 +63,19 @@ public class ConnectionCount {
         Reject.ifTrue(max < MINIMUM_CONNECTIONS);
         switch (type) {
             case CTS_ASYNC:
-                if (storeMode == StoreMode.DEFAULT) {
-                    max = max / 2;
+                if (dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
+                    max = (max - 1) / 3;
                 } else {
                     max = max - 2;
                 }
                 return findPowerOfTwo(max);
             case CTS_REAPER:
                 return 1;
+            case RESOURCE_SETS:
+                if (dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
+                    max = (max - 1) / 3;
+                }
+                return max;
             case DATA_LAYER:
                 /**
                   * Ensure that the DATA_LAYER connection type fits into the available
@@ -74,6 +83,7 @@ public class ConnectionCount {
                   */
                 int async = getConnectionCount(max, ConnectionType.CTS_ASYNC);
                 int reaper = getConnectionCount(max, ConnectionType.CTS_REAPER);
+                int resourceSets = getConnectionCount(max, ConnectionType.RESOURCE_SETS);
                 return max - (async + reaper);
             default:
                 throw new IllegalStateException();

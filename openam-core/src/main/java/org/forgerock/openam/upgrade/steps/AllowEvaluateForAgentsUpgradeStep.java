@@ -11,9 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade.steps;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.PrivilegedAction;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeServices;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -22,20 +38,6 @@ import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.ServicesDefaultValues;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeServices;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.security.PrivilegedAction;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This upgrade step check whether the new privilege for agents already exists and if it doesn't creates it. This
@@ -62,8 +64,7 @@ public class AllowEvaluateForAgentsUpgradeStep extends AbstractUpgradeStep {
 
     @Inject
     public AllowEvaluateForAgentsUpgradeStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                                             @Named(DataLayerConstants.DATA_LAYER_BINDING)
-                                             final ConnectionFactory connectionFactory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
     }
 

@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.monitoring.impl.queue;
 
 import org.forgerock.openam.cts.CTSOperation;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.queue.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class TokenMonitoringResultHandlerTest {
-    private ResultHandler<Token> mockResultHandler;
+    private ResultHandler<Token, CoreTokenException> mockResultHandler;
     private CTSOperationsMonitoringStore mockStore;
     private TokenMonitoringResultHandler handler;
     private CTSOperation operation;
@@ -43,7 +43,7 @@ public class TokenMonitoringResultHandlerTest {
     }
 
     @Test
-    public void shouldDelegateToHandlerForGetResults() throws CoreTokenException {
+    public void shouldDelegateToHandlerForGetResults() throws Exception {
         handler.getResults();
         verify(mockResultHandler).getResults();
     }

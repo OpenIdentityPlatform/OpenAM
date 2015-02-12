@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -40,14 +40,12 @@ import static org.forgerock.oauth2.core.Utils.joinScope;
  * @since 12.0.0
  */
 @Singleton
-public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
+public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final List<AuthorizationCodeRequestValidator> requestValidators;
-    private final ClientAuthenticator clientAuthenticator;
     private final TokenStore tokenStore;
     private final TokenInvalidator tokenInvalidator;
-    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     /**
      * Constructs a new AuthorizationCodeGrantTypeHandler.
@@ -62,21 +60,19 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
     public AuthorizationCodeGrantTypeHandler(List<AuthorizationCodeRequestValidator> requestValidators,
             ClientAuthenticator clientAuthenticator, TokenStore tokenStore, TokenInvalidator tokenInvalidator,
             OAuth2ProviderSettingsFactory providerSettingsFactory) {
+        super(providerSettingsFactory, clientAuthenticator);
         this.requestValidators = requestValidators;
-        this.clientAuthenticator = clientAuthenticator;
         this.tokenStore = tokenStore;
         this.tokenInvalidator = tokenInvalidator;
-        this.providerSettingsFactory = providerSettingsFactory;
     }
 
     /**
      * {@inheritDoc}
      */
-    public AccessToken handle(OAuth2Request request) throws RedirectUriMismatchException, InvalidClientException,
-            InvalidRequestException, ClientAuthenticationFailedException, InvalidCodeException, InvalidGrantException,
+    public AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration,
+            OAuth2ProviderSettings providerSettings) throws RedirectUriMismatchException, InvalidClientException,
+            InvalidRequestException,  InvalidCodeException, InvalidGrantException,
             ServerException, NotFoundException {
-
-        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request);
 
         for (final AuthorizationCodeRequestValidator requestValidator : requestValidators) {
             requestValidator.validateRequest(request, clientRegistration);
@@ -94,7 +90,6 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
 
         RefreshToken refreshToken = null;
         AccessToken accessToken;
-        OAuth2ProviderSettings providerSettings;
         Set<String> authorizationScope;
         // Only allow one request per code through here at a time, to prevent replay.
         synchronized (code) {
@@ -126,7 +121,6 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
             authorizationScope = authorizationCode.getScope();
             final String resourceOwnerId = authorizationCode.getResourceOwnerId();
 
-            providerSettings = providerSettingsFactory.get(request);
             if (providerSettings.issueRefreshTokens()) {
                 refreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
                         resourceOwnerId, redirectUri, authorizationScope, request);

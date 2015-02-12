@@ -28,19 +28,16 @@
  */
 package com.sun.identity.sm;
 
-import com.iplanet.am.util.SystemProperties;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
-import com.sun.identity.shared.ldap.util.DN;
-
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
@@ -52,6 +49,7 @@ import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.plugins.internal.AgentsRepo;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * The class <code>OrganizationConfigManager</code> provides interfaces to
@@ -69,10 +67,6 @@ import com.sun.identity.shared.Constants;
  * @supported.all.api
  */
 public class OrganizationConfigManager {
-    /**
-     * Set of forbidden realm names due to clashes with REST endpoints or other reasons.
-     */
-    private static final Set<String> INVALID_REALM_NAMES = new CopyOnWriteArraySet<String>();
 
     // Instance variables
     private SSOToken token;
@@ -450,22 +444,12 @@ public class OrganizationConfigManager {
             realm = realm.substring(idx+1);
         }
 
-        if (getInvalidRealmNames().contains(realm)) {
+        if (InvalidRealmNameManager.getInvalidRealmNames().contains(realm)) {
             SMSEntry.debug.error("OrganizationConfigManager::createSubOrganization() : Invalid realm name: " +
                     subOrgName + " - clashes with REST endpoint");
             throw new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
                     SMSEntry.bundle.getString("sms-invalid-org-name"), new Object[]{ subOrgName });
         }
-    }
-
-    /**
-     * Returns a <em>mutable</em> set of realm names that should be black-listed to prevent conflicts with REST
-     * endpoints or other functionality. The returned set can be safely modified from concurrent threads.
-     *
-     * @return the set of invalid realm names.
-     */
-    public static Set<String> getInvalidRealmNames() {
-        return INVALID_REALM_NAMES;
     }
 
 

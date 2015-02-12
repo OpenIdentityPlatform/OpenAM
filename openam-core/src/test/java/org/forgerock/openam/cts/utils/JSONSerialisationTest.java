@@ -15,41 +15,36 @@
  */
 package org.forgerock.openam.cts.utils;
 
-import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.TokenRestriction;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.session.util.SessionUtils;
-import com.sun.identity.shared.debug.Debug;
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
+
 import java.lang.reflect.Field;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.forgerock.openam.core.guice.DataLayerGuiceModule;
 import org.forgerock.openam.cts.TokenTestUtils;
+import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
 import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.utils.IOUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.TokenRestriction;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.shared.debug.Debug;
 
 @GuiceModules({CoreGuiceModule.class, SharedGuiceModule.class, DataLayerGuiceModule.class})
 public class JSONSerialisationTest extends GuiceTestCase {

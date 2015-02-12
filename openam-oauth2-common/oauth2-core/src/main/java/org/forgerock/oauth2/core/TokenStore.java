@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -142,8 +142,9 @@ public interface TokenStore {
      * @param tokenId The token identifier.
      * @return The Access Token.
      * @throws InvalidGrantException If the read token is not an Access Token.
+     * @throws ServerException If the token could not be read by the server.
      */
-    AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException, BadRequestException,
+    AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException,
             InvalidGrantException;
 
     /**
@@ -153,7 +154,8 @@ public interface TokenStore {
      * @param tokenId The token identifier.
      * @return The Refresh Token.
      * @throws InvalidGrantException If the read token is not a Refresh Token.
+     * @throws ServerException If the token could not be read by the server.
      */
-    RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws BadRequestException, InvalidRequestException,
+    RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws ServerException,
             InvalidGrantException;
 }

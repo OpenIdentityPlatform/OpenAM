@@ -11,20 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.mockito.Matchers;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.mockito.BDDMockito.*;
+import static org.testng.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,9 +25,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertEquals;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.mockito.Matchers;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @since 12.0.0
@@ -78,7 +72,8 @@ public class PasswordCredentialsGrantTypeHandlerTest {
         Set<String> validatedScope = new HashSet<String>();
         AccessToken accessToken = mock(AccessToken.class);
 
-        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(resourceOwnerAuthenticator.authenticate(request)).willReturn(resourceOwner);
         given(resourceOwner.getId()).willReturn("RESOURCE_OWNER_ID");
@@ -108,7 +103,8 @@ public class PasswordCredentialsGrantTypeHandlerTest {
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         ResourceOwner resourceOwner = null;
 
-        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(resourceOwnerAuthenticator.authenticate(request)).willReturn(resourceOwner);
 
         //When
@@ -129,7 +125,8 @@ public class PasswordCredentialsGrantTypeHandlerTest {
         RefreshToken refreshToken = mock(RefreshToken.class);
         AccessToken accessToken = mock(AccessToken.class);
 
-        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(resourceOwnerAuthenticator.authenticate(request)).willReturn(resourceOwner);
         given(resourceOwner.getId()).willReturn("RESOURCE_OWNER_ID");
@@ -164,7 +161,8 @@ public class PasswordCredentialsGrantTypeHandlerTest {
         Set<String> validatedScope = Collections.singleton("SCOPE");
         AccessToken accessToken = mock(AccessToken.class);
 
-        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(resourceOwnerAuthenticator.authenticate(request)).willReturn(resourceOwner);
         given(resourceOwner.getId()).willReturn("RESOURCE_OWNER_ID");

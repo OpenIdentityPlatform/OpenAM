@@ -11,16 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade.steps;
 
-import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
-import static com.sun.identity.shared.xml.XMLUtils.parseAttributeValuePairTags;
-import static org.forgerock.openam.utils.CollectionUtils.transformSet;
+import static com.sun.identity.shared.xml.XMLUtils.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.InputStream;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -30,6 +27,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeServices;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.util.promise.Function;
+import org.forgerock.util.promise.NeverThrowsException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.delegation.DelegationManager;
@@ -37,19 +52,6 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeServices;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.UpgradeUtils;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.util.promise.Function;
-import org.forgerock.util.promise.NeverThrowsException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Upgrade step looks at the delegation XML (amDelegation.xml) and compares it against the current service model to
@@ -102,7 +104,7 @@ public class DelegationConfigUpgradeStep extends AbstractUpgradeStep {
             @Named(DelegationManager.DELEGATION_SERVICE) final ServiceConfigManager configManager,
             @Named("tagSwapFunc") final Function<String, String, NeverThrowsException> tagSwapFunc,
             final PrivilegedAction<SSOToken> adminTokenAction,
-            @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory connectionFactory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
 
         this.configManager = configManager;

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
@@ -15,23 +15,24 @@
  */
 package org.forgerock.openam.cts.utils;
 
+import static org.mockito.BDDMockito.*;
+import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertFalse;
+
+import java.util.Calendar;
+
 import org.forgerock.openam.cts.TokenTestUtils;
-import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.impl.LDAPConfig;
+import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.AttributeDescription;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.LinkedHashMapEntry;
 import org.testng.annotations.Test;
-
-import java.util.Calendar;
-
-import static org.mockito.BDDMockito.*;
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.assertFalse;
 
 /**
  * @author robert.wapshott@forgerock.com
@@ -41,16 +42,16 @@ public class TokenAttributeConversionTest {
     public void shouldProduceDNWithTokenId() {
         // Given
         String tokenId = "badger";
-        LDAPConfig constants = mock(LDAPConfig.class);
-        given(constants.getTokenStoreRootSuffix()).willReturn(DN.rootDN());
+        LdapDataLayerConfiguration config = mock(LdapDataLayerConfiguration.class);
+        given(config.getTokenStoreRootSuffix()).willReturn(DN.rootDN());
         LDAPDataConversion dataConversion = new LDAPDataConversion();
-        TokenAttributeConversion conversion = new TokenAttributeConversion(constants, dataConversion);
+        LdapTokenAttributeConversion conversion = new LdapTokenAttributeConversion(dataConversion, config);
 
         // When
         DN dn = conversion.generateTokenDN(tokenId);
 
         // Then
-        verify(constants).getTokenStoreRootSuffix();
+        verify(config).getTokenStoreRootSuffix();
         assertTrue(dn.toString().contains(tokenId));
     }
 
@@ -61,7 +62,7 @@ public class TokenAttributeConversionTest {
         given(entry.getAttribute(anyString())).willReturn(null);
 
         // When
-        TokenAttributeConversion.stripObjectClass(entry);
+        LdapTokenAttributeConversion.stripObjectClass(entry);
 
         // Then
         verify(entry, times(0)).removeAttribute(anyString(), any());
@@ -78,7 +79,7 @@ public class TokenAttributeConversionTest {
         given(attribute.getAttributeDescription()).willReturn(description);
 
         // When
-        TokenAttributeConversion.stripObjectClass(entry);
+        LdapTokenAttributeConversion.stripObjectClass(entry);
 
         // Then
         verify(entry).removeAttribute(description);
@@ -92,7 +93,7 @@ public class TokenAttributeConversionTest {
         given(entry.getAttribute(anyString())).willReturn(attribute);
 
         // When
-        TokenAttributeConversion.addObjectClass(entry);
+        LdapTokenAttributeConversion.addObjectClass(entry);
 
         // Then
         verify(entry, times(0)).addAttribute(anyString(), any());
@@ -105,7 +106,7 @@ public class TokenAttributeConversionTest {
         given(entry.getAttribute(anyString())).willReturn(null);
 
         // When
-        TokenAttributeConversion.addObjectClass(entry);
+        LdapTokenAttributeConversion.addObjectClass(entry);
 
         // Then
         verify(entry).addAttribute(anyString(), any());
@@ -114,7 +115,7 @@ public class TokenAttributeConversionTest {
     @Test
     public void shouldConvertTokenToEntryAndBack() {
         // Given
-        TokenAttributeConversion conversion = generateTokenAttributeConversion();
+        LdapTokenAttributeConversion conversion = generateTokenAttributeConversion();
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(LDAPDataConversionTest.BERLIN);
@@ -140,7 +141,7 @@ public class TokenAttributeConversionTest {
         Token token = new Token("id", TokenType.OAUTH);
         token.setAttribute(CoreTokenField.STRING_ONE, "");
 
-        TokenAttributeConversion conversion = generateTokenAttributeConversion();
+        LdapTokenAttributeConversion conversion = generateTokenAttributeConversion();
 
         // When
         Entry result = conversion.getEntry(token);
@@ -157,9 +158,9 @@ public class TokenAttributeConversionTest {
         Entry entry = new LinkedHashMapEntry();
         entry.addAttribute(CoreTokenField.TOKEN_ID.toString(), "id");
         entry.addAttribute(CoreTokenField.TOKEN_TYPE.toString(), TokenType.OAUTH.toString());
-        entry.addAttribute(CoreTokenField.STRING_ONE.toString(), TokenAttributeConversion.EMPTY);
+        entry.addAttribute(CoreTokenField.STRING_ONE.toString(), LdapTokenAttributeConversion.EMPTY);
 
-        TokenAttributeConversion conversion = generateTokenAttributeConversion();
+        LdapTokenAttributeConversion conversion = generateTokenAttributeConversion();
 
         // When
         Token result = conversion.tokenFromEntry(entry);
@@ -172,14 +173,14 @@ public class TokenAttributeConversionTest {
     @Test
     public void shouldAllowPlusSignInDN() {
         // Given
-        TokenAttributeConversion conversion = generateTokenAttributeConversion();
+        LdapTokenAttributeConversion conversion = generateTokenAttributeConversion();
         // When / Then
         conversion.generateTokenDN("Badger+");
     }
 
-    private TokenAttributeConversion generateTokenAttributeConversion() {
-        LDAPConfig constants = new LDAPConfig("dn=rootDN");
+    private LdapTokenAttributeConversion generateTokenAttributeConversion() {
+        LdapDataLayerConfiguration config = new CTSDataLayerConfiguration(null, "ou=test-case");
         LDAPDataConversion dataConversion = new LDAPDataConversion();
-        return new TokenAttributeConversion(constants, dataConversion);
+        return new LdapTokenAttributeConversion(dataConversion, config);
     }
 }

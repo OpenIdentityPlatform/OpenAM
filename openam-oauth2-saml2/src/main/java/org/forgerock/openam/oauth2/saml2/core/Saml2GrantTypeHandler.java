@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.saml2.core;
@@ -37,11 +37,14 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.util.Reject;
 import org.forgerock.util.encode.Base64;
 import org.restlet.Request;
@@ -60,7 +63,7 @@ import static org.forgerock.oauth2.core.Utils.splitScope;
 /**
  * @since 12.0.0
  */
-public class Saml2GrantTypeHandler implements GrantTypeHandler {
+public class Saml2GrantTypeHandler extends GrantTypeHandler {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final ClientRegistrationStore clientRegistrationStore;
@@ -70,6 +73,7 @@ public class Saml2GrantTypeHandler implements GrantTypeHandler {
     @Inject
     public Saml2GrantTypeHandler(ClientRegistrationStore clientRegistrationStore, TokenStore tokenStore,
             OAuth2ProviderSettingsFactory providerSettingsFactory) {
+        super(null, null);
         this.clientRegistrationStore = clientRegistrationStore;
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
@@ -134,6 +138,11 @@ public class Saml2GrantTypeHandler implements GrantTypeHandler {
         }
 
         return accessToken;
+    }
+
+    @Override
+    protected AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration, OAuth2ProviderSettings providerSettings) throws RedirectUriMismatchException, InvalidRequestException, InvalidGrantException, InvalidCodeException, ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException, InvalidClientException {
+        throw new UnsupportedOperationException();
     }
 
     private String getDeploymentUrl(OAuth2Request request) {

@@ -11,28 +11,31 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.query.reaper;
 
+import static org.mockito.BDDMockito.eq;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.times;
+import static org.mockito.BDDMockito.verify;
+import static org.mockito.Mockito.mock;
+import static org.testng.AssertJUnit.*;
+
+import java.io.Closeable;
+
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.mock;
-import static org.testng.AssertJUnit.fail;
 
 public class ReaperConnectionTest {
 
     private ConnectionFactory mockFactory;
     private ReaperImpl mockImpl;
     private ReaperConnection connection;
-    private Connection mockConnection;
+    private Closeable mockConnection;
 
     @BeforeMethod
     public void setup() {
@@ -40,7 +43,7 @@ public class ReaperConnectionTest {
         mockImpl = mock(ReaperImpl.class);
         connection = new ReaperConnection(mockFactory, mockImpl);
 
-        mockConnection = mock(Connection.class);
+        mockConnection = mock(Closeable.class);
     }
 
     @AfterMethod
@@ -57,23 +60,23 @@ public class ReaperConnectionTest {
     }
 
     @Test
-    public void shouldOpenConnectionOnFirstCall() throws CoreTokenException, ErrorResultException {
-        given(mockFactory.getConnection()).willReturn(mockConnection);
+    public void shouldOpenConnectionOnFirstCall() throws Exception {
+        given(mockFactory.create()).willReturn(mockConnection);
         connection.nextPage();
         verify(mockImpl).setConnection(eq(mockConnection));
     }
 
     @Test
-    public void shouldCloseConnectionOnLastCall() throws CoreTokenException, ErrorResultException {
-        given(mockFactory.getConnection()).willReturn(mockConnection);
+    public void shouldCloseConnectionOnLastCall() throws Exception {
+        given(mockFactory.create()).willReturn(mockConnection);
         given(mockImpl.nextPage()).willReturn(null);
         connection.nextPage();
         verify(mockConnection).close();
     }
 
     @Test
-    public void shouldCloseConnectionOnException() throws CoreTokenException, ErrorResultException {
-        given(mockFactory.getConnection()).willReturn(mockConnection);
+    public void shouldCloseConnectionOnException() throws Exception {
+        given(mockFactory.create()).willReturn(mockConnection);
         given(mockImpl.nextPage()).willThrow(new CoreTokenException(""));
         try {
             connection.nextPage();
@@ -84,8 +87,8 @@ public class ReaperConnectionTest {
     }
 
     @Test (expectedExceptions = IllegalStateException.class)
-    public void shouldNotReturnFurtherPagesOnceFailed() throws CoreTokenException, ErrorResultException {
-        given(mockFactory.getConnection()).willReturn(mockConnection);
+    public void shouldNotReturnFurtherPagesOnceFailed() throws Exception {
+        given(mockFactory.create()).willReturn(mockConnection);
         given(mockImpl.nextPage()).willThrow(new CoreTokenException(""));
         try {
             connection.nextPage();

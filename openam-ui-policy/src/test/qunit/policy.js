@@ -33,7 +33,7 @@ define([
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/policy/login/LoginHelper",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/policy/PolicyDelegate",
+    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
     "org/forgerock/openam/ui/policy/EditApplicationView",
     "org/forgerock/openam/ui/policy/EditPolicyView",
     "org/forgerock/openam/ui/policy/ResourcesListView",

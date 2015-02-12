@@ -22,8 +22,8 @@ import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.PartialToken;
-import org.forgerock.openam.cts.impl.queue.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.reaper.CTSReaperInit;
@@ -74,12 +74,12 @@ public class CoreTokenAdapterTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void shouldReadToken() throws CoreTokenException, ErrorResultException {
+    public void shouldReadToken() throws Exception {
         // Given
         String tokenId = "badger";
         Token token = new Token(tokenId, TokenType.SESSION);
 
-        ResultHandler<Token> mockResultHandler = mock(ResultHandler.class);
+        ResultHandler<Token, CoreTokenException> mockResultHandler = mock(ResultHandler.class);
         given(mockResultHandler.getResults()).willReturn(token);
         given(mockResultHandlerFactory.getReadHandler()).willReturn(mockResultHandler);
 
@@ -100,7 +100,7 @@ public class CoreTokenAdapterTest {
         // Given
         Collection<Token> tokens = new ArrayList<Token>();
 
-        ResultHandler<Collection<Token>> mockResultHandler = mock(ResultHandler.class);
+        ResultHandler<Collection<Token>, CoreTokenException> mockResultHandler = mock(ResultHandler.class);
         given(mockResultHandler.getResults()).willReturn(tokens);
         given(mockResultHandlerFactory.getQueryHandler()).willReturn(mockResultHandler);
 
@@ -118,7 +118,7 @@ public class CoreTokenAdapterTest {
         // Given
         Collection<PartialToken> partialTokens = new ArrayList<PartialToken>();
 
-        ResultHandler<Collection<PartialToken>> mockResultHandler = mock(ResultHandler.class);
+        ResultHandler<Collection<PartialToken>, CoreTokenException> mockResultHandler = mock(ResultHandler.class);
         given(mockResultHandler.getResults()).willReturn(partialTokens);
         given(mockResultHandlerFactory.getPartialQueryHandler()).willReturn(mockResultHandler);
 

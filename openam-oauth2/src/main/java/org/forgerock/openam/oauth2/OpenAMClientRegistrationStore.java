@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
@@ -29,6 +29,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 

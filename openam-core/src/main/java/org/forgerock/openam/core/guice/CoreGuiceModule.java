@@ -13,7 +13,74 @@
  *
  * Copyright 2013-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.core.guice;
+
+import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.Version;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.DeserializationProblemHandler;
+import org.codehaus.jackson.map.JsonDeserializer;
+import org.codehaus.jackson.map.KeyDeserializer;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.module.SimpleModule;
+import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.CTSPersistentStoreImpl;
+import org.forgerock.openam.cts.CoreTokenConfig;
+import org.forgerock.openam.cts.adapters.OAuthAdapter;
+import org.forgerock.openam.cts.adapters.SAMLAdapter;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.tokens.SAMLToken;
+import org.forgerock.openam.cts.impl.LDAPConfig;
+import org.forgerock.openam.cts.impl.query.reaper.ReaperConnection;
+import org.forgerock.openam.cts.impl.query.reaper.ReaperQuery;
+import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
+import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
+import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
+import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
+import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
+import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFactory;
+import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
+import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
+import org.forgerock.openam.entitlement.indextree.IndexChangeManagerImpl;
+import org.forgerock.openam.entitlement.indextree.IndexChangeMonitor;
+import org.forgerock.openam.entitlement.indextree.IndexChangeMonitorImpl;
+import org.forgerock.openam.entitlement.indextree.IndexTreeService;
+import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
+import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
+import org.forgerock.openam.sm.SMSConfigurationFactory;
+import org.forgerock.openam.sm.ServerGroupConfiguration;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
+import org.forgerock.openam.utils.Config;
+import org.forgerock.opendj.ldap.SearchResultHandler;
+import org.forgerock.util.promise.Function;
+import org.forgerock.util.promise.NeverThrowsException;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -48,69 +115,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.DeserializationProblemHandler;
-import org.codehaus.jackson.map.JsonDeserializer;
-import org.codehaus.jackson.map.KeyDeserializer;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.map.module.SimpleModule;
-import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.CTSPersistentStoreImpl;
-import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.cts.adapters.OAuthAdapter;
-import org.forgerock.openam.cts.adapters.SAMLAdapter;
-import org.forgerock.openam.cts.adapters.TokenAdapter;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.api.tokens.SAMLToken;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.LDAPConfig;
-import org.forgerock.openam.cts.impl.query.reaper.ReaperConnection;
-import org.forgerock.openam.cts.impl.query.reaper.ReaperQuery;
-import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
-import org.forgerock.openam.cts.impl.queue.config.QueueConfiguration;
-import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
-import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
-import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
-import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
-import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFactory;
-import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
-import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
-import org.forgerock.openam.entitlement.indextree.IndexChangeManagerImpl;
-import org.forgerock.openam.entitlement.indextree.IndexChangeMonitor;
-import org.forgerock.openam.entitlement.indextree.IndexChangeMonitorImpl;
-import org.forgerock.openam.entitlement.indextree.IndexTreeService;
-import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
-import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
-import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
-import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
-import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
-import org.forgerock.openam.sm.ExternalCTSConfig;
-import org.forgerock.openam.sm.SMSConfigurationFactory;
-import org.forgerock.openam.sm.ServerGroupConfiguration;
-import org.forgerock.openam.utils.Config;
-import org.forgerock.opendj.ldap.SearchResultHandler;
-import org.forgerock.util.promise.Function;
-import org.forgerock.util.promise.NeverThrowsException;
-import org.forgerock.util.thread.ExecutorServiceFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
  */
@@ -127,7 +131,10 @@ public class CoreGuiceModule extends AbstractModule {
         bind(IndexChangeManager.class).to(IndexChangeManagerImpl.class).in(Singleton.class);
         bind(IndexChangeMonitor.class).to(IndexChangeMonitorImpl.class).in(Singleton.class);
         bind(IndexTreeService.class).to(IndexTreeServiceImpl.class).in(Singleton.class);
-        bind(new TypeLiteral<TokenAdapter<JsonValue>>(){}).to(OAuthAdapter.class);
+
+        bind(new TypeLiteral<TokenAdapter<JsonValue>>(){})
+                .annotatedWith(Names.named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER))
+                .to(OAuthAdapter.class);
 
         bind(EntitlementConfiguration.class).toProvider(new Provider<EntitlementConfiguration>() {
 
@@ -161,6 +168,8 @@ public class CoreGuiceModule extends AbstractModule {
                 .toInstance(Debug.getInstance(CoreTokenConstants.CTS_ASYNC_DEBUG));
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_MONITOR_DEBUG))
                 .toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
+        bind(Debug.class).annotatedWith(Names.named(DataLayerConstants.DATA_LAYER_DEBUG))
+                .toInstance(Debug.getInstance(DataLayerConstants.DATA_LAYER_DEBUG));
 
         bind(Debug.class).annotatedWith(Names.named(PolicyMonitor.POLICY_MONITOR_DEBUG))
                 .toInstance(Debug.getInstance(PolicyMonitor.POLICY_MONITOR_DEBUG));
@@ -169,12 +178,11 @@ public class CoreGuiceModule extends AbstractModule {
         bind(CoreTokenConfig.class).in(Singleton.class);
 
         // CTS Connection Management
-        bind(LDAPConfig.class).toProvider(new Provider<LDAPConfig>() {
-            public LDAPConfig get() {
-                return new LDAPConfig(SMSEntry.getRootSuffix());
+        bind(String.class).annotatedWith(Names.named(DataLayerConstants.ROOT_DN_SUFFIX)).toProvider(new Provider<String>() {
+            public String get() {
+                return SMSEntry.getRootSuffix();
             }
         }).in(Singleton.class);
-        bind(ExternalCTSConfig.class).in(Singleton.class);
         bind(ConfigurationObserver.class).toProvider(new Provider<ConfigurationObserver>() {
             public ConfigurationObserver get() {
                 return ConfigurationObserver.getInstance();
@@ -268,11 +276,12 @@ public class CoreGuiceModule extends AbstractModule {
      * @throws java.lang.RuntimeException If there was an error resolving the configuration.
      */
     @Provides @Inject @Named(CoreTokenConstants.CTS_WORKER_POOL)
-    ExecutorService getCTSWorkerExecutorService(ExecutorServiceFactory esf, QueueConfiguration queueConfiguration) {
+    ExecutorService getCTSWorkerExecutorService(ExecutorServiceFactory esf,
+            @DataLayer(ConnectionType.CTS_ASYNC) QueueConfiguration queueConfiguration) {
         try {
             int size = queueConfiguration.getProcessors();
             return esf.createFixedThreadPool(size, CoreTokenConstants.CTS_WORKER_POOL);
-        } catch (CoreTokenException e) {
+        } catch (DataLayerException e) {
             throw new RuntimeException(e);
         }
     }

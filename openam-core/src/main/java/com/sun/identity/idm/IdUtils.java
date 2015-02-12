@@ -42,6 +42,7 @@ import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.security.AdminTokenAction;
@@ -812,7 +813,55 @@ public final class IdUtils {
             }
         }
         return (username);
-    } 
+    }
+
+    /**
+     * Gets the AMIdentity of a user with username equal to uName that exists in realm
+     *
+     * @param uName username of the user to get.
+     * @param realm realm the user belongs to.
+     * @return The AMIdentity of user with username equal to uName.
+     */
+    public static AMIdentity getIdentity(String uName, String realm) {
+        AMIdentity theID = null;
+
+        AMIdentityRepository amIdRepo = getAMIdentityRepository(DNMapper.orgNameToDN(realm));
+
+        IdSearchControl idsc = new IdSearchControl();
+        idsc.setRecursive(true);
+        idsc.setAllReturnAttributes(true);
+        // search for the identity
+        Set<AMIdentity> results = Collections.EMPTY_SET;
+        try {
+            idsc.setMaxResults(0);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, uName, idsc);
+            if (searchResults != null) {
+                results = searchResults.getSearchResults();
+            }
+
+            if (results == null || results.size() != 1) {
+                throw new IdRepoException("IdUtils" +
+                        ".getIdentity : " +
+                        "More than one user found");
+            }
+            theID = results.iterator().next();
+        } catch (IdRepoException e) {
+            debug.warning("Error searching for user identity");
+        } catch (SSOException e) {
+            debug.warning("User's ssoToken has expired");
+        }
+        return theID;
+    }
+
+    /**
+     * Returns <code>AMIdentityRepostiory</code> handle for an organization.
+     *
+     * @param orgDN the organization name.
+     * @return <code>AMIdentityRepostiory</code> object
+     */
+    public static AMIdentityRepository getAMIdentityRepository(String orgDN) {
+        return AuthD.getAuth().getAMIdentityRepository(orgDN);
+    }
     
     // SMS service listener to reinitialize if IdRepo service changes
     static class IdUtilsListener implements com.sun.identity.sm.ServiceListener 
@@ -833,4 +882,5 @@ public final class IdUtils {
             clearOrganizationNamesCache();
         }
     }
+
 }

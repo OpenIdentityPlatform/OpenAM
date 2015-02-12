@@ -11,35 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade.steps;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationType;
-import com.sun.identity.entitlement.DenyOverride;
-import com.sun.identity.entitlement.EntitlementCombiner;
-import com.sun.identity.entitlement.EntitlementConfiguration;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.sm.SMSUtils;
-import org.forgerock.openam.entitlement.utils.EntitlementUtils;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeServices;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.UpgradeUtils;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.util.Reject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import static com.sun.identity.shared.xml.XMLUtils.*;
+import static org.forgerock.openam.upgrade.UpgradeServices.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.InputStream;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -51,9 +30,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
-import static com.sun.identity.shared.xml.XMLUtils.parseAttributeValuePairTags;
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
+import javax.inject.Inject;
+
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeServices;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.util.Reject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationType;
+import com.sun.identity.entitlement.DenyOverride;
+import com.sun.identity.entitlement.EntitlementCombiner;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.sm.SMSUtils;
 
 /**
  * Upgrade step is responsible for ensuring any new application types and/or applications defined in the
@@ -100,9 +101,8 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
     @Inject
     public UpgradeEntitlementSubConfigsStep(final EntitlementConfiguration entitlementService,
-                                            final PrivilegedAction<SSOToken> adminTokenAction,
-                                            @Named(DataLayerConstants.DATA_LAYER_BINDING)
-                                                final ConnectionFactory connectionFactory) {
+            final PrivilegedAction<SSOToken> adminTokenAction,
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
         this.entitlementService = entitlementService;
         missingTypes = new ArrayList<Node>();

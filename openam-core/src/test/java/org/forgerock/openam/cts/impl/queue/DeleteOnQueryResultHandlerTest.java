@@ -19,9 +19,11 @@ import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

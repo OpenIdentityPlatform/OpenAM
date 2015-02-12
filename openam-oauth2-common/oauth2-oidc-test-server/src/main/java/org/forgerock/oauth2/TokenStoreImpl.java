@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2;
@@ -149,13 +149,13 @@ public class TokenStoreImpl implements TokenStore {
         refreshTokens.remove(refreshTokenId);
     }
 
-    public AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException, BadRequestException {
+    public AccessToken readAccessToken(OAuth2Request request, String tokenId) {
         AccessToken token = accessTokens.get(tokenId);
         request.setToken(AccessToken.class, token);
         return token;
     }
 
-    public RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws BadRequestException, InvalidRequestException {
+    public RefreshToken readRefreshToken(OAuth2Request request, String tokenId) {
         RefreshToken token = refreshTokens.get(tokenId);
         request.setToken(RefreshToken.class, token);
         return token;

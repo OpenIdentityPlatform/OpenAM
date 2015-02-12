@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -20,6 +20,7 @@ import org.forgerock.opendj.ldap.DN;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -34,13 +35,15 @@ import static org.testng.Assert.assertNotEquals;
 @PrepareForTest(SystemProperties.class)
 public class LDAPConfigTest extends PowerMockTestCase {
 
+    private LDAPConfig config;
+
     @Test
     public void shouldIndicateHasChanged() {
         // Given
         PowerMockito.mockStatic(SystemProperties.class);
-        given(SystemProperties.get(anyString())).willReturn("badger");
+        given(SystemProperties.get("test-root-suffix")).willReturn("badger");
 
-        LDAPConfig config = new LDAPConfig("");
+        LDAPConfig config = new TestLDAPConfig();
 
         // Then
         assertThat(config.hasChanged()).isTrue();
@@ -50,9 +53,9 @@ public class LDAPConfigTest extends PowerMockTestCase {
     public void shouldIndicateHasNotChanged() {
         // Given
         PowerMockito.mockStatic(SystemProperties.class);
-        given(SystemProperties.get(anyString())).willReturn(null);
+        given(SystemProperties.get("test-root-suffix")).willReturn(null);
 
-        LDAPConfig config = new LDAPConfig("");
+        LDAPConfig config = new TestLDAPConfig();
 
         // Then
         assertThat(config.hasChanged()).isFalse();
@@ -62,11 +65,11 @@ public class LDAPConfigTest extends PowerMockTestCase {
     public void shouldReturnDefaultRootSuffix() {
         // Given
         PowerMockito.mockStatic(SystemProperties.class);
-        given(SystemProperties.get(anyString())).willReturn(null);
+        given(SystemProperties.get("test-root-suffix")).willReturn(null);
 
-        LDAPConfig config = new LDAPConfig("");
+        LDAPConfig config = new TestLDAPConfig();
 
-        DN defaultRootSuffix = config.getDefaultCTSRootSuffix();
+        DN defaultRootSuffix = config.getDefaultRootSuffix();
         DN returnedRootSuffix = config.getTokenStoreRootSuffix();
 
         // Then
@@ -77,14 +80,31 @@ public class LDAPConfigTest extends PowerMockTestCase {
     public void shouldReturnExternalRootSuffix() {
         // Given
         PowerMockito.mockStatic(SystemProperties.class);
-        given(SystemProperties.get(anyString())).willReturn("dc=google,dc=com");
+        given(SystemProperties.get("test-root-suffix")).willReturn("dc=google,dc=com");
 
-        LDAPConfig config = new LDAPConfig("");
+        LDAPConfig config = new TestLDAPConfig();
 
-        DN defaultRootSuffix = config.getDefaultCTSRootSuffix();
+        DN defaultRootSuffix = config.getDefaultRootSuffix();
         DN returnedRootSuffix = config.getTokenStoreRootSuffix();
 
         // Then
         assertNotEquals(defaultRootSuffix, returnedRootSuffix);
+    }
+
+    private static class TestLDAPConfig extends LDAPConfig {
+
+        public TestLDAPConfig() {
+            super("ou=unit-test");
+        }
+
+        @Override
+        protected DN setDefaultTokenDNPrefix(DN root) {
+            return root.child("ou=config-test");
+        }
+
+        @Override
+        protected String getCustomTokenRootSuffixProperty() {
+            return "test-root-suffix";
+        }
     }
 }

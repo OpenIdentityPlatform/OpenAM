@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.exceptions;
 
@@ -20,7 +20,7 @@ import java.text.MessageFormat;
 /**
  * Thrown when attempting to configure a Connection Pool with an invalid configuration.
  */
-public class InvalidConfigurationException extends Exception {
+public class InvalidConfigurationException extends RuntimeException {
     public InvalidConfigurationException(String detail) {
         super(MessageFormat.format("Invalid Configuration:\n{0}", detail));
     }

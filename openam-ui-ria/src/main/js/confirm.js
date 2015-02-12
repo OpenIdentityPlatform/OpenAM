@@ -30,7 +30,7 @@
  */
 
 require.config({
-    paths: { 
+    paths: {
 
         i18next: "libs/i18next-1.7.3-min",
         backbone: "libs/backbone-1.1.2-min",
@@ -100,7 +100,7 @@ require([
     "org/forgerock/openam/ui/user/main"
 ], function($, _, Backbone, constants,serviceInvoker,uiUtils,cookieHelper,realmHelper) {
 
-    var 
+    var
         conf = {
             defaultHeaders: {}
         },
@@ -119,7 +119,7 @@ require([
         callParams = {
             url: host + realmHelper.cleanRealm(urlParams.realm) + '/serverinfo/*',
             type: "GET",
-            headers: {"Cache-Control": "no-cache"}, 
+            headers: {"Cache-Control": "no-cache"},
             success: function() {
                 location.href = uiUtils.getCurrentUrlBasePart() + "/"+ constants.context + '/XUI/#continueRegister/&' + searchParams;
             },
@@ -128,13 +128,13 @@ require([
                 if (responseMessage.indexOf("Invalid realm") > -1) {
 
                     cookieHelper.cookiesEnabled();
-                    var 
+                    var
                         expire = new Date(),
                         cookieVal =  {
                             realmName : urlParams.realm,
-                            valid : false 
+                            valid : false
                         };
-                    
+
                     expire.setDate(expire.getDate() + 1);
                     cookieHelper.setCookie("invalidRealm",cookieVal,expire);
                     location.href = uiUtils.getCurrentUrlBasePart() + "/"+ constants.context +'/XUI/#login';

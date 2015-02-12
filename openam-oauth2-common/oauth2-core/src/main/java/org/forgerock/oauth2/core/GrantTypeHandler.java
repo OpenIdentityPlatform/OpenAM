@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -32,7 +32,16 @@ import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
  *
  * @since 12.0.0
  */
-public interface GrantTypeHandler {
+public abstract class GrantTypeHandler {
+
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final ClientAuthenticator clientAuthenticator;
+
+    protected GrantTypeHandler(OAuth2ProviderSettingsFactory providerSettingsFactory,
+            ClientAuthenticator clientAuthenticator) {
+        this.providerSettingsFactory = providerSettingsFactory;
+        this.clientAuthenticator = clientAuthenticator;
+    }
 
     /**
      * Handles an access token request for a specific OAuth2 grant type. Will validate that the OAuth2 request is valid
@@ -54,7 +63,18 @@ public interface GrantTypeHandler {
      * @throws IllegalArgumentException If the request is missing any required parameters.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    AccessToken handle(OAuth2Request request) throws RedirectUriMismatchException, InvalidClientException,
-            InvalidRequestException, ClientAuthenticationFailedException, InvalidGrantException, InvalidCodeException,
-            ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException;
+    public AccessToken handle(OAuth2Request request) throws RedirectUriMismatchException,
+            InvalidClientException, InvalidRequestException, ClientAuthenticationFailedException, InvalidGrantException,
+            InvalidCodeException, ServerException, UnauthorizedClientException, InvalidScopeException,
+            NotFoundException {
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request,
+                providerSettings.getTokenEndpoint());
+        return handle(request, clientRegistration, providerSettings);
+    }
+
+    protected abstract AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration,
+            OAuth2ProviderSettings providerSettings) throws RedirectUriMismatchException, InvalidRequestException,
+            InvalidGrantException, InvalidCodeException, ServerException, UnauthorizedClientException,
+            InvalidScopeException, NotFoundException, InvalidClientException;
 }

@@ -11,23 +11,27 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.providers;
 
-import com.sun.identity.shared.debug.Debug;
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
-import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import com.sun.identity.shared.debug.Debug;
 
 public class DataLayerConnectionFactoryCacheTest {
 
@@ -35,7 +39,7 @@ public class DataLayerConnectionFactoryCacheTest {
     private ShutdownManager mockShutdown;
     private DataLayerConnectionFactoryCache provider;
     private ArgumentCaptor<ShutdownListener> listenerCaptor;
-    private DataLayerConnectionFactoryProvider mockFactoryProvider;
+    private LdapConnectionFactoryProvider mockFactoryProvider;
 
     @BeforeMethod
     public void setup() throws InvalidConfigurationException {
@@ -44,10 +48,10 @@ public class DataLayerConnectionFactoryCacheTest {
         doNothing().when(mockShutdown).addShutdownListener(listenerCaptor.capture());
 
         mockFactory = mock(ConnectionFactory.class);
-        mockFactoryProvider = mock(DataLayerConnectionFactoryProvider.class);
-        given(mockFactoryProvider.createFactory(any(ConnectionType.class))).willReturn(mockFactory);
+        mockFactoryProvider = mock(LdapConnectionFactoryProvider.class);
+        given(mockFactoryProvider.createFactory()).willReturn(mockFactory);
 
-        provider = new DataLayerConnectionFactoryCache(mockShutdown, mockFactoryProvider, mock(Debug.class));
+        provider = new DataLayerConnectionFactoryCache(ConnectionType.DATA_LAYER, mockShutdown, mockFactoryProvider, mock(Debug.class));
     }
 
     @Test
@@ -58,7 +62,7 @@ public class DataLayerConnectionFactoryCacheTest {
         // When
         IllegalStateException result = null;
         try {
-            provider.createFactory(ConnectionType.DATA_LAYER);
+            provider.get();
         } catch (IllegalStateException e) {
             result = e;
         }
@@ -70,7 +74,7 @@ public class DataLayerConnectionFactoryCacheTest {
     @Test
     public void shouldShutdownFactoryDuringShutdown() throws InvalidConfigurationException {
         // Given
-        provider.createFactory(ConnectionType.DATA_LAYER);
+        provider.get();
 
         // When
         listenerCaptor.getValue().shutdown();
@@ -82,13 +86,12 @@ public class DataLayerConnectionFactoryCacheTest {
     @Test
     public void shouldOnlyCallCreateFactoryOncePerType() throws InvalidConfigurationException {
         // Given
-        ConnectionType type = ConnectionType.DATA_LAYER;
-        provider.createFactory(type);
+        provider.get();
 
         // When
-        provider.createFactory(type);
+        provider.get();
 
         // Then
-        verify(mockFactoryProvider, times(1)).createFactory(any(ConnectionType.class));
+        verify(mockFactoryProvider, times(1)).createFactory();
     }
 }

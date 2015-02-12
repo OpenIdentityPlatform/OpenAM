@@ -47,12 +47,14 @@ public class RestEndpointServletTest {
     private RestletServiceServlet restletXACMLServiceServlet;
     private RestEndpointManager endpointManager;
     private RestletServiceServlet restletOAuth2ServiceServlet;
+    private RestletServiceServlet restletUMAServiceServlet;
 
     @BeforeClass
     public void setupMocks() {
         restletJSONServiceServlet = mock(RestletServiceServlet.class);
         restletXACMLServiceServlet = mock(RestletServiceServlet.class);
         restletOAuth2ServiceServlet = mock(RestletServiceServlet.class);
+        restletUMAServiceServlet = mock(RestletServiceServlet.class);
     }
 
     @BeforeMethod
@@ -62,10 +64,11 @@ public class RestEndpointServletTest {
         reset(restletJSONServiceServlet);
         reset(restletXACMLServiceServlet);
         reset(restletOAuth2ServiceServlet);
+        reset(restletUMAServiceServlet);
         endpointManager = mock(RestEndpointManager.class);
 
         restEndpointServlet = new RestEndpointServlet(crestServlet, restletJSONServiceServlet,
-                restletXACMLServiceServlet, restletOAuth2ServiceServlet, endpointManager);
+                restletXACMLServiceServlet, restletOAuth2ServiceServlet, restletUMAServiceServlet, endpointManager);
     }
 
     @Test
@@ -80,6 +83,8 @@ public class RestEndpointServletTest {
         verify(crestServlet).init();
         verifyZeroInteractions(restletJSONServiceServlet);
         verifyZeroInteractions(restletXACMLServiceServlet);
+        verifyZeroInteractions(restletOAuth2ServiceServlet);
+        verifyZeroInteractions(restletUMAServiceServlet);
     }
 
     @Test(expectedExceptions = ServletException.class)
@@ -118,6 +123,8 @@ public class RestEndpointServletTest {
         verify(endpointManager).findEndpoint("/users/demo/roles");
         verify(restletJSONServiceServlet).service(Matchers.<HttpServletRequest>anyObject(), eq(response));
         verifyZeroInteractions(restletXACMLServiceServlet);
+        verifyZeroInteractions(restletOAuth2ServiceServlet);
+        verifyZeroInteractions(restletUMAServiceServlet);
         verifyZeroInteractions(crestServlet);
     }
 
@@ -125,7 +132,8 @@ public class RestEndpointServletTest {
     public Object[][] restletPathData() {
         return new Object[][] {
                 {"/xacml", restletXACMLServiceServlet},
-                {"/oauth2", restletOAuth2ServiceServlet}
+                {"/oauth2", restletOAuth2ServiceServlet},
+                {"/uma", restletUMAServiceServlet}
         };
     }
 
@@ -143,7 +151,8 @@ public class RestEndpointServletTest {
 
         //Then
         verify(servlet).service(Matchers.<HttpServletRequest>anyObject(), eq(response));
-        for (RestletServiceServlet s : Arrays.asList(restletJSONServiceServlet, restletXACMLServiceServlet, restletOAuth2ServiceServlet)) {
+        for (RestletServiceServlet s : Arrays.asList(restletJSONServiceServlet, restletXACMLServiceServlet,
+                restletOAuth2ServiceServlet, restletUMAServiceServlet)) {
             if (s != servlet) {
                 verifyZeroInteractions(s);
             }
@@ -171,6 +180,8 @@ public class RestEndpointServletTest {
         verify(crestServlet).service(request, response);
         verifyZeroInteractions(restletJSONServiceServlet);
         verifyZeroInteractions(restletXACMLServiceServlet);
+        verifyZeroInteractions(restletOAuth2ServiceServlet);
+        verifyZeroInteractions(restletUMAServiceServlet);
     }
 
     @Test(expectedExceptions = ServletException.class)
@@ -203,5 +214,7 @@ public class RestEndpointServletTest {
         verify(crestServlet).destroy();
         verify(restletJSONServiceServlet).destroy();
         verify(restletXACMLServiceServlet).destroy();
+        verify(restletOAuth2ServiceServlet).destroy();
+        verify(restletUMAServiceServlet).destroy();
     }
 }

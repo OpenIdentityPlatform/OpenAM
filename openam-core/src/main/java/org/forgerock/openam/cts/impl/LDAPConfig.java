@@ -12,7 +12,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl;
 
@@ -25,6 +25,7 @@ import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Responsible for storing the configuration required by the LDAP implementation of the
@@ -33,20 +34,24 @@ import javax.inject.Inject;
  * Note: This configuration data is partitioned into the impl package as it represents the
  * boundary of LDAP concepts within the Core Token Service code.
  */
-public class LDAPConfig {
+public abstract class LDAPConfig {
 
-    private final DN defaultCTSRootSuffix;
+    private final DN defaultRootSuffix;
 
     private ModifiedProperty<String> tokenStoreRootSuffix = new ModifiedProperty<String>();
 
     @Inject
     public LDAPConfig(String rootSuffix) {
-        defaultCTSRootSuffix = DN.valueOf(rootSuffix)
-                .child("ou=tokens")
-                .child("ou=openam-session")
-                .child("ou=famrecords");
+        defaultRootSuffix = setDefaultTokenDNPrefix(DN.valueOf(rootSuffix));
         update();
     }
+
+    /**
+     * This method should return a DN that is the default root for the token store, based on the provided OpenAM root.
+     * @param root The OpenAM root.
+     * @return The token store default root DN.
+     */
+    protected abstract DN setDefaultTokenDNPrefix(DN root);
 
     /**
      * The Core Token Service Root Token Suffix.
@@ -57,7 +62,7 @@ public class LDAPConfig {
     public DN getTokenStoreRootSuffix() {
         String value = tokenStoreRootSuffix.get();
         if (StringUtils.isEmpty(value)) {
-            return defaultCTSRootSuffix;
+            return defaultRootSuffix;
         }
         return DN.valueOf(value);
     }
@@ -75,14 +80,22 @@ public class LDAPConfig {
      * Will update its configuration from the System Properties.
      */
     public void update() {
-        tokenStoreRootSuffix.set(SystemProperties.get(CoreTokenConstants.CTS_ROOT_SUFFIX));
+        String customTokenRootSuffixProperty = getCustomTokenRootSuffixProperty();
+        if (customTokenRootSuffixProperty != null) {
+            tokenStoreRootSuffix.set(SystemProperties.get(customTokenRootSuffixProperty));
+        }
     }
+
+    /**
+     * The system property that will contain a custom token store root, if one has been set.
+     */
+    protected abstract String getCustomTokenRootSuffixProperty();
 
     /**
      * @return the value of the default CTS root suffix
      */
     @VisibleForTesting
-    DN getDefaultCTSRootSuffix() {
-        return defaultCTSRootSuffix;
+    DN getDefaultRootSuffix() {
+        return defaultRootSuffix;
     }
 }

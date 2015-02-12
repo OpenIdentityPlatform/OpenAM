@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -32,7 +32,7 @@ import static org.forgerock.oauth2.core.Utils.isEmpty;
  *
  * @since 12.0.0
  */
-public class AccessToken extends JsonValue implements Token {
+public class AccessToken extends JsonValue implements IntrospectableToken, Token {
 
     private Map<String, Object> extraData = new HashMap<String, Object>();
 
@@ -291,6 +291,14 @@ public class AccessToken extends JsonValue implements Token {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRealm() {
+        return getStringProperty(OAuth2Constants.Params.REALM);
+    }
+
+    /**
      * Gets the expiry time.
      *
      * @return The Expiry time.
@@ -322,6 +330,18 @@ public class AccessToken extends JsonValue implements Token {
     public String getGrantType() {
         if (isDefined(OAuth2Constants.Params.GRANT_TYPE)) {
             return get(OAuth2Constants.Params.GRANT_TYPE).asString();
+        }
+        return null;
+    }
+
+    /**
+     * Get a string property from the store.
+     * @param key The property key.
+     * @return The value.
+     */
+    protected String getStringProperty(String key) {
+        if (isDefined(key)) {
+            return get(key).asString();
         }
         return null;
     }

@@ -15,12 +15,18 @@
 */
 package org.forgerock.openam.forgerockrest.utils;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
 import com.sun.identity.log.messageid.LogMessageProvider;
+import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+
+import java.io.IOException;
 import java.security.AccessController;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.util.Reject;
@@ -34,14 +40,35 @@ public final class RestLog {
 
     public static final String LOG_NAME = "Rest";
 
-    private final LogMessageProvider msgProvider;
-    private final Logger accessLogger;
-    private final Logger authzLogger;
+    private String status;
+    private LogMessageProvider msgProvider;
+    private Logger accessLogger;
+    private Logger authzLogger;
 
-    public RestLog(LogMessageProvider msgProvider, Logger accessLogger, Logger authzLogger) {
+    public RestLog() {
+    }
+
+    RestLog(LogMessageProvider msgProvider, Logger accessLogger, Logger authzLogger) {
         this.msgProvider = msgProvider;
         this.accessLogger = accessLogger;
         this.authzLogger = authzLogger;
+    }
+
+    private synchronized void init() {
+        if (status == null) {
+            try {
+                status = SystemProperties.get(Constants.AM_LOGSTATUS);
+
+                if ("ACTIVE".equalsIgnoreCase(status)) {
+                    accessLogger = (Logger) Logger.getLogger(LogConstants.REST_ACCESS);
+                    authzLogger = (Logger) Logger.getLogger(LogConstants.REST_AUTHZ);
+                    msgProvider = MessageProviderFactory.getProvider(RestLog.LOG_NAME);
+                }
+
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
     }
 
     /**
@@ -56,8 +83,8 @@ public final class RestLog {
      * @return the name of the principal which requested the operation, or null if not available.
      */
     public String debugOperationAttemptAsPrincipal(String resource, String operation, ServerContext context,
-                                                          String realm, Debug debug) {
-
+            String realm, Debug debug) {
+        init();
         Reject.ifNull(resource, operation, context, debug);
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
@@ -85,6 +112,7 @@ public final class RestLog {
      * @param token The SSO token of the accessing user (null if XUI)
      */
     public void auditAccessMessage(String resource, String action, SSOToken token) {
+        init();
         if (accessLogger != null && msgProvider != null) {
             final LogRecord record = msgProvider.createLogRecord("ATTEMPT_ACCESS", new String[] { resource, action },
                     token);
@@ -103,6 +131,7 @@ public final class RestLog {
      * @param token The SSO token of the accessing user.
      */
     public void auditAccessDenied(String resource, String action, String authzModule, SSOToken token) {
+        init();
         if (authzLogger != null && msgProvider != null) {
             final LogRecord record = msgProvider.createLogRecord("ACCESS_DENY",
                     new String[] { "DENY > " + resource, action, authzModule }, token);
@@ -121,6 +150,7 @@ public final class RestLog {
      * @param token The SSO token of the accessing user.
      */
     public void auditAccessGranted(String resource, String action, String authzModule, SSOToken token) {
+        init();
         if (authzLogger != null && msgProvider != null) {
             final LogRecord record = msgProvider.createLogRecord("ACCESS_GRANT",
                     new String[] { "GRANT > " + resource, action, authzModule }, token);

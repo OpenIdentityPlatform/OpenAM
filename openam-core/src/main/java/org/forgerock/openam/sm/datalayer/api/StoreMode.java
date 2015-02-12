@@ -11,24 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.api;
 
 /**
- * Describe the two possible modes connection states the CTS can operate in.
+ * Describe the three possible modes connection states the data store can operate in.
  */
 public enum StoreMode {
     /**
-     * The CTS defers to the Data Layer for standard configuration settings. These may be
+     * The data store defers to the Data Layer for standard configuration settings. These may be
      * the internal embedded store, or a configured external store.
      */
     DEFAULT,
     /**
-     * The CTS is operating in external mode which operates alongside the Data Layer
+     * The data store is operating in external mode which operates alongside the Data Layer
      * connection to any designated server. The connection details are assumed to be assigned.
      *
-     * @see org.forgerock.openam.sm.ExternalCTSConfig
+     * @see org.forgerock.openam.sm.datalayer.impl.ldap.ExternalLdapConfig
      */
-    EXTERNAL;
+    EXTERNAL_LDAP
 }

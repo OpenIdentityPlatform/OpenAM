@@ -11,20 +11,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.queue;
 
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.impl.query.PartialToken;
-import org.forgerock.openam.cts.impl.queue.config.QueueConfiguration;
+import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.Collection;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Implementation provides an appropriate asynchronous ResultHandler implementation based on the
@@ -40,7 +46,7 @@ public class AsyncResultHandlerFactory implements ResultHandlerFactory {
      * @param debug Non null debug instance for debugging.
      */
     @Inject
-    public AsyncResultHandlerFactory(QueueConfiguration config,
+    public AsyncResultHandlerFactory(@DataLayer(ConnectionType.CTS_ASYNC) QueueConfiguration config,
                                      @Named(CoreTokenConstants.CTS_ASYNC_DEBUG)Debug debug) {
         this.config = config;
         this.debug = debug;
@@ -49,47 +55,47 @@ public class AsyncResultHandlerFactory implements ResultHandlerFactory {
     /**
      * @return Non null result handler.
      */
-    public ResultHandler<Token> getCreateHandler() {
+    public ResultHandler<Token, CoreTokenException> getCreateHandler() {
         return new AsyncResultHandler<Token>(config, debug);
     }
 
     /**
      * @return Non null result handler.
      */
-    public ResultHandler<Token> getReadHandler() {
+    public ResultHandler<Token, CoreTokenException> getReadHandler() {
         return new AsyncResultHandler<Token>(config, debug);
     }
 
     /**
      * @return Non null result handler.
      */
-    public ResultHandler<Token> getUpdateHandler() {
+    public ResultHandler<Token, CoreTokenException> getUpdateHandler() {
         return new AsyncResultHandler<Token>(config, debug);
     }
 
     /**
      * @return Non null result handler.
      */
-    public ResultHandler<String> getDeleteHandler() {
+    public ResultHandler<String, CoreTokenException> getDeleteHandler() {
         return new AsyncResultHandler<String>(config, debug);
     }
 
     /**
      * @return Non null result handler.
      */
-    public ResultHandler<Collection<Token>> getQueryHandler() {
+    public ResultHandler<Collection<Token>, CoreTokenException> getQueryHandler() {
         return new AsyncResultHandler<Collection<Token>>(config, debug);
     }
 
     /**
      * @return Non null result handler.
      */
-    public ResultHandler<Collection<PartialToken>> getPartialQueryHandler() {
+    public ResultHandler<Collection<PartialToken>, CoreTokenException> getPartialQueryHandler() {
         return new AsyncResultHandler<Collection<PartialToken>>(config, debug);
     }
 
     @Override
-    public ResultHandler<Collection<PartialToken>> getDeleteOnQueryHandler() {
+    public ResultHandler<Collection<PartialToken>, CoreTokenException> getDeleteOnQueryHandler() {
         return InjectorHolder.getInstance(DeleteOnQueryResultHandler.class);
     }
 }

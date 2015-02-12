@@ -11,73 +11,50 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.queue;
 
-import com.sun.identity.shared.debug.Debug;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.mock;
+import static org.mockito.Mockito.verify;
+
 import org.forgerock.openam.cts.api.filter.TokenFilter;
-import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.queue.config.QueueConfiguration;
-import org.forgerock.openam.cts.impl.task.CreateTask;
-import org.forgerock.openam.cts.impl.task.Task;
-import org.forgerock.openam.cts.impl.task.TaskFactory;
-import org.forgerock.openam.shared.concurrency.ThreadMonitor;
-import org.mockito.ArgumentCaptor;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.Task;
+import org.forgerock.openam.sm.datalayer.impl.SeriesTaskExecutor;
+import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 public class TaskDispatcherTest {
 
     private TaskDispatcher queue;
-    private QueueConfiguration mockConfiguration;
-    private ThreadMonitor mockMonitor;
-    private TaskProcessorFactory mockProcessorFactory;
     private TaskFactory mockTaskFactory;
-    private ExecutorService mockService;
     private Token mockToken;
     private ResultHandler mockHandler;
+    private SeriesTaskExecutor mockExecutor;
 
     @BeforeMethod
     public void setup() {
-        mockService = mock(ExecutorService.class);
         mockTaskFactory = mock(TaskFactory.class);
-        mockProcessorFactory = mock(TaskProcessorFactory.class);
-        mockMonitor = mock(ThreadMonitor.class);
+        mockExecutor = mock(SeriesTaskExecutor.class);
         mockHandler = mock(ResultHandler.class);
-
-        mockConfiguration = mock(QueueConfiguration.class);
-        given(mockConfiguration.getQueueSize()).willReturn(10);
 
         mockToken = mock(Token.class);
         given(mockToken.getTokenId()).willReturn("badger");
 
         queue = new TaskDispatcher(
-                mockService,
                 mockTaskFactory,
-                mockProcessorFactory,
-                mockMonitor,
-                mockConfiguration,
-                mock(Debug.class));
+                mockExecutor);
     }
 
     @Test
     public void shouldUseConfigurationToInitialise() throws CoreTokenException {
         queue.startDispatcher();
-        verify(mockConfiguration).getProcessors();
+        verify(mockExecutor).start();
     }
 
     @Test (expectedExceptions = NullPointerException.class)
@@ -111,80 +88,87 @@ public class TaskDispatcherTest {
     }
 
     @Test
-    public void shouldStartTaskProcessorsWithThreadMonitor() throws CoreTokenException {
+    public void shouldCreate() throws Exception {
         // Given
-        int processors = 3;
-        given(mockProcessorFactory.create(any(BlockingQueue.class))).willReturn(mock(TaskProcessor.class));
-        given(mockConfiguration.getProcessors()).willReturn(processors);
+        Token token = mock(Token.class);
+        given(token.getTokenId()).willReturn("123");
+        Task task = mock(Task.class);
+        given(mockTaskFactory.create(token, mockHandler)).willReturn(task);
 
         // When
-        queue.startDispatcher();
+        queue.create(token, mockHandler);
 
         // Then
-        verify(mockMonitor, times(processors)).watchThread(any(ExecutorService.class), any(Runnable.class));
+        verify(mockExecutor).execute("123", task);
     }
 
     @Test
-    public void shouldPlaceTaskOnQueueForEachOperation() throws CoreTokenException {
+    public void shouldUpdate() throws Exception {
         // Given
-        int processors = 2;
-
-        // Capture the blocking queue that is provided to the mock processor
-        ArgumentCaptor<BlockingQueue> captor = ArgumentCaptor.forClass(BlockingQueue.class);
-        given(mockProcessorFactory.create(captor.capture())).willReturn(mock(TaskProcessor.class));
-        given(mockConfiguration.getProcessors()).willReturn(processors);
-
-        given(mockTaskFactory.create(any(Token.class), any(ResultHandler.class))).willReturn(mock(CreateTask.class));
-
-        queue.startDispatcher();
+        Token token = mock(Token.class);
+        given(token.getTokenId()).willReturn("123");
+        Task task = mock(Task.class);
+        given(mockTaskFactory.update(token, mockHandler)).willReturn(task);
 
         // When
-        queue.create(mockToken, mockHandler);
+        queue.update(token, mockHandler);
 
         // Then
-        assertThat(captor.getValue().size()).isEqualTo(1);
+        verify(mockExecutor).execute("123", task);
     }
 
     @Test
-    public void shouldCatchTimeoutWhenOfferingTaskToQueue() throws CoreTokenException {
+    public void shouldDelete() throws Exception {
         // Given
-        given(mockConfiguration.getQueueTimeout()).willReturn(0);
-        given(mockConfiguration.getQueueSize()).willReturn(1);
-        given(mockConfiguration.getProcessors()).willReturn(2);
-
-        CreateTask task = mock(CreateTask.class);
-        given(mockTaskFactory.create(any(Token.class), any(ResultHandler.class))).willReturn(task);
-
-        queue.startDispatcher();
-        queue.create(mockToken, mockHandler); // First create fills the queue
+        Task task = mock(Task.class);
+        given(mockTaskFactory.delete("123", mockHandler)).willReturn(task);
 
         // When
-        CoreTokenException result = null;
-        try {
-            queue.create(mockToken, mockHandler); // Second create causes timeout.
-        } catch (CoreTokenException e) {
-            result = e;
-        }
+        queue.delete("123", mockHandler);
 
         // Then
-        assertThat(result).isNotNull();
+        verify(mockExecutor).execute("123", task);
     }
 
     @Test
-    public void shouldPerformPartialQuery() throws CoreTokenException {
+    public void shouldRead() throws Exception {
         // Given
-        TokenFilter filter = new TokenFilterBuilder().build();
-
-        given(mockConfiguration.getProcessors()).willReturn(2);
-        queue.startDispatcher();
-        given(mockTaskFactory.partialQuery(
-                any(TokenFilter.class),
-                any(ResultHandler.class))).willReturn(mock(Task.class));
+        Task task = mock(Task.class);
+        given(mockTaskFactory.read("123", mockHandler)).willReturn(task);
 
         // When
-        queue.partialQuery(filter, mock(ResultHandler.class));
+        queue.read("123", mockHandler);
 
         // Then
-        verify(mockTaskFactory).partialQuery(eq(filter), any(ResultHandler.class));
+        verify(mockExecutor).execute("123", task);
     }
+
+    @Test
+    public void shouldQuery() throws Exception {
+        // Given
+        TokenFilter filter = mock(TokenFilter.class);
+        Task task = mock(Task.class);
+        given(mockTaskFactory.query(filter, mockHandler)).willReturn(task);
+
+        // When
+        queue.query(filter, mockHandler);
+
+        // Then
+        verify(mockExecutor).execute(null, task);
+    }
+
+    @Test
+    public void shouldPartialQuery() throws Exception {
+        // Given
+        TokenFilter filter = mock(TokenFilter.class);
+        Task task = mock(Task.class);
+        given(mockTaskFactory.partialQuery(filter, mockHandler)).willReturn(task);
+
+        // When
+        queue.partialQuery(filter, mockHandler);
+
+        // Then
+        verify(mockExecutor).execute(null, task);
+    }
+
 }

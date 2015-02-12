@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -35,12 +35,10 @@ import java.util.Set;
  * @since 12.0.0
  */
 @Singleton
-public class ClientCredentialsGrantTypeHandler implements GrantTypeHandler {
+public class ClientCredentialsGrantTypeHandler extends GrantTypeHandler {
 
-    private final ClientAuthenticator clientAuthenticator;
     private final List<ClientCredentialsRequestValidator> requestValidators;
     private final TokenStore tokenStore;
-    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     /**
      * Constructs a new ClientCredentialsGrantTypeHandler.
@@ -54,25 +52,22 @@ public class ClientCredentialsGrantTypeHandler implements GrantTypeHandler {
     public ClientCredentialsGrantTypeHandler(ClientAuthenticator clientAuthenticator,
             List<ClientCredentialsRequestValidator> requestValidators, TokenStore tokenStore,
             OAuth2ProviderSettingsFactory providerSettingsFactory) {
-        this.clientAuthenticator = clientAuthenticator;
+        super(providerSettingsFactory, clientAuthenticator);
         this.requestValidators = requestValidators;
         this.tokenStore = tokenStore;
-        this.providerSettingsFactory = providerSettingsFactory;
     }
 
     /**
      * {@inheritDoc}
      */
-    public AccessToken handle(OAuth2Request request) throws ClientAuthenticationFailedException, InvalidClientException,
-            InvalidRequestException, ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException {
-
-        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request);
+    public AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration,
+            OAuth2ProviderSettings providerSettings) throws InvalidRequestException, ServerException,
+            UnauthorizedClientException, InvalidScopeException, NotFoundException, InvalidClientException {
 
         for (final ClientCredentialsRequestValidator requestValidator : requestValidators) {
             requestValidator.validateRequest(request, clientRegistration);
         }
 
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final Set<String> scope = Utils.splitScope(request.<String>getParameter("scope"));
         final Set<String> validatedScope = providerSettings.validateAccessTokenScope(clientRegistration, scope,
                 request);

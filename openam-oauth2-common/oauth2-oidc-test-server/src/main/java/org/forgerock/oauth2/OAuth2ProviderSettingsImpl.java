@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2;
@@ -36,6 +36,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
+import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.server.ConfigurationResource;
 
 import java.security.KeyPair;
@@ -236,7 +237,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         return "3.0";
     }
 
-    public String getOpenIDConnectIssuer() {
+    public String getIssuer() {
         return deploymentUrl;
     }
 
@@ -319,6 +320,26 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     @Override
     public Map<String, Object> getUserProfileScopeMappings() {
         return scopeToUserUserProfileAttributes;
+    }
+
+    @Override
+    public String getIntrospectionEndpoint() {
+        return deploymentUrl + "/oauth2/introspect";
+    }
+
+    @Override
+    public String getResourceSetRegistrationPolicyEndpoint(String resourceSetId) {
+        return "";
+    }
+
+    @Override
+    public String getResourceSetRegistrationEndpoint() {
+        return "";
+    }
+
+    @Override
+    public ResourceSetStore getResourceSetStore() {
+        return null;
     }
 
 }

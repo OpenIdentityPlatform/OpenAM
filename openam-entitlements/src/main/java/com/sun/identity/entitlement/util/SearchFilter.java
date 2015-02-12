@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2014 ForgeRock, AS.
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.util;

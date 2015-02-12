@@ -47,7 +47,7 @@ define("org/forgerock/openam/ui/policy/login/LoginDialog", [
 
                 $("#dialogs").append(newDialog);
                 newDialog.dialog({
-                    title: 'Session Expired',
+                    title: $.t("policy.common.sessionExpired"),
                     autoOpen: true,
                     open: function () {
                         uiUtils.renderTemplate(_this.template, $(this), _this.data, function () {

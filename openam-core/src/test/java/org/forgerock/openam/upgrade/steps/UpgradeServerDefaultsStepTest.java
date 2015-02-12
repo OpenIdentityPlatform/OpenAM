@@ -11,14 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade.steps;
 
-import com.iplanet.sso.SSOToken;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.fest.assertions.Assertions.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.security.PrivilegedAction;
@@ -27,9 +26,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.mockito.Mockito.mock;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.iplanet.sso.SSOToken;
 
 public class UpgradeServerDefaultsStepTest {
 

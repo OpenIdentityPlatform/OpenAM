@@ -8,7 +8,6 @@
 @table-hightlight-bg-color:#D7E9F8;
 @table-rollover-bg-color:#d5d5d5;
 
-
 .webkit-text-rendering-bugfix{
     -webkit-transform: translateZ(0px);
     -webkit-backface-visibility: hidden;
@@ -56,6 +55,7 @@ html body .ui-jqgrid tr.ui-widget-content{
 }
 
 .ui-jqgrid tr.ui-widget-content {
+
     border: 1px solid #ccc;
     border: 1px solid rgba(0, 0, 0, 0.2);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
@@ -373,8 +373,8 @@ html body .ui-jqgrid tr.ui-widget-content{
                 font-size: 16px;
                 background-color: white;
                 &:hover, &:focus {
-                     color: #777;
-                     box-shadow:none;
+                    color: #777;
+                    box-shadow:none;
                 }
             }
         }
@@ -448,7 +448,7 @@ html body .ui-jqgrid tr.ui-widget-content{
 
         }
 
-       &.ui-state-highlight, &.highlight {
+        &.ui-state-highlight, &.highlight {
             background: @table-hightlight-bg-color;
             border-color: rgba(0, 0, 0, 0.2);
             color: darken(@table-hightlight-bg-color,50%);
@@ -457,7 +457,7 @@ html body .ui-jqgrid tr.ui-widget-content{
                 color: darken(@table-hightlight-bg-color,50%);
                 opacity:0.5;
                 &:hover, &:focus {
-                     opacity:1;
+                    opacity:1;
                 }
             }
 
@@ -603,7 +603,7 @@ span.item-button-panel {
 
     li {
 
-         &:hover, &:focus:not(.created-items){
+        &:hover, &:focus:not(.created-items){
 
             cursor:pointer;
 
@@ -631,84 +631,147 @@ span.item-button-panel {
 
 .striped-list {
 
-  border: 1px solid #ccc;
-  border-bottom:none;
-  border-radius: 3px 3px 3px 3px;
-  margin:0 10px 0 0;
+    border: 1px solid #ccc;
+    border-bottom:none;
+    border-radius: 3px 3px 3px 3px;
+    margin:0 10px 0 0;
 
 
-  h3 {
-    font-size: 14px;
-    background:#5a646d;
-    color:#fff;
-    padding-left:8px;
-    border-radius: 3px 3px 0 0px;
-    font-weight:normal;
-  }
-
-  li {
-    padding:8px;
-    border-bottom: 1px solid #ccc;
-    &:nth-child(odd){  background-color:#eee; }
-    &:nth-child(even){ background-color:#fff; }
-
-    .icon-close, .icon-arrow-right, .icon-plus{
-        opacity:0;
-        transition: all 300ms ease-in-out;
-        color: #555;
-        display: block;
+    h3 {
+        font-size: 14px;
+        background:#5a646d;
+        color:#fff;
+        padding-left:8px;
+        border-radius: 3px 3px 0 0px;
+        font-weight:normal;
     }
 
-    .icon-arrow-right{
-        padding-right: 10px;
+    li {
+        padding:8px;
+        border-bottom: 1px solid #ccc;
+        &:nth-child(odd){  background-color:#eee; }
+        &:nth-child(even){ background-color:#fff; }
+
+        .icon-close, .icon-arrow-right, .icon-plus{
+            opacity:0;
+            transition: all 300ms ease-in-out;
+            color: #555;
+            display: block;
+        }
+
+        .icon-arrow-right{
+            padding-right: 10px;
+        }
+
+        .key{
+            font-weight: bold;
+            padding-right: 4px;
+        }
+
     }
 
-    .key{
-        font-weight: bold;
-        padding-right: 4px;
+    &.created-items {
+        border: none;
+        border-top:1px solid #ccc;
+
+        &#createdResources {
+            margin-right:0;
+            li.editing, li.editing:hover {
+                min-height: 36px;
+                line-height: 36px;
+                input {
+                    width: 27px;
+                    min-width: 27px;
+                    max-width: 300px;
+                    transition: width 0.25s ease-out;
+                }
+            }
+        }
+
+        &#selectedRealms{
+            margin-right:0;
+
+            .rules-help{
+                margin-top:11px;
+            }
+        }
+
+        &#attrTypeStatic{
+            li.editing input {
+                width: 176px;
+            }
+        }
+
+        li {
+            border: 1px solid #ccc;
+            border-top:none;
+            transition: background 1s linear;
+            word-wrap: break-word;
+            word-break: break-all;
+
+
+
+            .icon-plus {
+                opacity:0.6;
+                padding-top: 8px;
+
+                &:focus, &:hover{
+                    box-shadow:none;
+                    opacity:1;
+                    color:#80b7ab;
+                }
+            }
+
+            .icon-close {
+                opacity:0.4;
+                &:focus, &:hover{
+                    box-shadow:none;
+                    opacity:1;
+                    color:#DB8383;
+                }
+            }
+
+            &.editing {
+                background-color:#eee;
+                box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+                margin-top: 20px;
+                border: 1px solid #ccc;
+                border-radius: 3px;
+                transition: background-color 200ms linear;
+
+                input {
+                    margin: 3px 5px;
+                    padding: 5px 0 5px 5px;
+                    border-radius: 0;
+                }
+            }
+
+            &.invalid {
+                .invalid-background;
+                transition: background-color 200ms linear;
+
+                .icon-plus {
+
+                    &:focus, &:hover{
+                        opacity:0.6;
+                        color:#555;
+                        cursor:default;
+                    }
+                }
+
+                input[type="text"]:invalid:required {
+                    background:white;
+                }
+            }
+
+
+        }
+
+
+
     }
 
-  }
-
-  &.created-items {
-    border: none;
-    border-top:1px solid #ccc;
-
-      &#createdResources {
-          margin-right:0;
-          li.editing, li.editing:hover {
-              min-height: 36px;
-              line-height: 36px;
-              input {
-                  width: 27px;
-                  min-width: 27px;
-                  max-width: 300px;
-                  transition: width 0.25s ease-out;
-              }
-          }
-      }
-
-      &#selectedRealms{
-          margin-right:0;
-
-          .rules-help{
-              margin-top:11px;
-          }
-      }
-
-      &#attrTypeStatic{
-          li.editing input {
-              width: 176px;
-          }
-      }
-
-     li {
-        border: 1px solid #ccc;
-        border-top:none;
-        transition: background 1s linear;
-        word-wrap: break-word;
-        word-break: break-all;
-
+    li {
         &.highlight-info {
             background:#ffc;
             transition: background 0.2s linear;
@@ -723,61 +786,7 @@ span.item-button-panel {
             background:#CCFFDE;
             transition: background 0.2s linear;
         }
-
-        .icon-plus {
-            opacity:0.6;
-            padding-top: 8px;
-
-            &:focus, &:hover{
-                box-shadow:none;
-                opacity:1;
-                color:#80b7ab;
-            }
-        }
-
-        .icon-close {
-            opacity:0.4;
-            &:focus, &:hover{
-                box-shadow:none;
-                opacity:1;
-                color:#DB8383;
-            }
-        }
-
-        &.editing {
-            background-color:#eee;
-            box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            transition: background-color 200ms linear;
-
-            input {
-                margin: 3px 5px;
-                padding: 5px 0 5px 5px;
-                border-radius: 0;
-            }
-        }
-
-        &.invalid {
-            .invalid-background;
-            transition: background-color 200ms linear;
-
-            .icon-plus {
-
-                &:focus, &:hover{
-                    opacity:0.6;
-                    color:#555;
-                    cursor:default;
-                }
-            }
-
-            input[type="text"]:invalid:required {
-                background:white;
-            }
-        }
     }
-  }
 }
 input[type="text"]:invalid:required, input[type="text"].invalid{
     .invalid-background;
@@ -794,39 +803,38 @@ input[type="text"]:invalid:required, input[type="text"].invalid{
 }
 
 .content-bg {
-
     padding: 20px 10px;
+}
 
-    .policy-content {
-        margin: 0 10px;
+.policy-content {
+    margin: 0 10px;
+}
+
+.policy-header {
+    padding:0 0 30px;
+    margin: 0 10px;
+    h1 {
+        font-weight:normal;
+        padding:0 0 10px;
+        span, a{
+            font-weight:bold;
+            text-decoration:none;
+        }
     }
 
-    .policy-header {
-        padding:0 0 30px;
-        margin: 0 10px;
-        h1 {
+    h2 {
+        font-weight: normal;
+        line-height: 18px;
+        font-style: italic;
+        font-size: 12px;
+
+        span {
             font-weight:normal;
-            padding:0 0 10px;
-            span, a{
-                font-weight:bold;
-                text-decoration:none;
-            }
+            color: #999;
         }
-
-        h2 {
-            font-weight: normal;
-            line-height: 18px;
-            font-style: italic;
-            font-size: 12px;
-
-            span {
-                font-weight:normal;
-                color: #999;
-            }
-            a {
-                font-weight:normal;
-                text-decoration:none;
-            }
+        a {
+            font-weight:normal;
+            text-decoration:none;
         }
     }
 }
@@ -972,11 +980,11 @@ span.realm,.content-bg .policy-header h2 span.realm  {
 
 
         .inactive-tab {
-           height: 0;
-           overflow: hidden;
-           position:absolute;
-           top:-1000px;
-           left:-1000px;
+            height: 0;
+            overflow: hidden;
+            position:absolute;
+            top:-1000px;
+            left:-1000px;
         }
 
         p {
@@ -991,15 +999,15 @@ span.realm,.content-bg .policy-header h2 span.realm  {
 }
 body{
     /* This will prevent to sudden shift of content which can sometimes occur
-     * when navigating between them long views which require a scroll bar and
-     * short ones which do not.
-     */
+    * when navigating between them long views which require a scroll bar and
+    * short ones which do not.
+    */
     overflow-y: scroll;
 }
 
 body.dragging,
 body.dragging *{
-        cursor: move !important;
+    cursor: move !important;
 }
 
 body.editing{
@@ -1330,7 +1338,7 @@ body.editing{
             }
         }
 
-         div.field-float-selectize {
+        div.field-float-selectize {
             position: relative;
             float: left;
             min-width: 145px;
@@ -1561,7 +1569,7 @@ section.active-step{
         margin-right:0;
 
         div.float-left {
-        float: left;
+            float: left;
             border-right: 1px solid #eee;
 
             &:last-of-type{
@@ -1574,4 +1582,215 @@ section.active-step{
         }
     }
 
+}
+
+
+#uma{
+
+    margin-bottom: 40px;
+
+    .policy-content {
+        min-height:100px;
+    }
+
+    #selectUser{
+        width: 370px;
+        margin: 0 15px 10px 0;
+    }
+
+    #selectPermission{
+        min-width:370px;
+        margin: 0 15px 10px 0;
+    }
+
+    #resourceList{
+        margin-bottom:30px;
+    }
+
+    input.button{
+        padding-top: 5px;
+        padding-bottom: 5px;
+        margin: 26px 0 0 0;
+    }
+
+    label {
+        display: block;
+        padding: 0 0 4px 2px;
+        color: grey;
+    }
+
+    .backgrid-container {
+        width: 100%;
+        overflow-x: scroll;
+    }
+
+    .backgrid{
+
+        .string-cell, .uri-cell, .email-cell,  .string-cell.editor input[type=text],  .uri-cell.editor input[type=text], .email-cell.editor input[type=text], .datetime-cell {
+            text-align: left;
+        }
+
+        th {
+            text-align: left;
+            a {
+                color:#777;
+                margin-bottom:34px;
+            }
+
+            &.filter-header-cell a {
+                margin-bottom:0;
+            }
+            background-color: white;
+        }
+
+        tbody tr {
+            background-color: #eee;
+
+            &:nth-child(even) {
+                background-color: #fff;
+            }
+
+            &.empty {
+                background-color: transparent;
+                td{
+                    display: table-cell;
+                    padding:10px;
+                }
+            }
+
+            td {
+
+                // required for tooltips
+                overflow:visible;
+
+                a {
+                    color: #777;
+                    text-decoration: none;
+                    font-weight:bold;
+
+                    &:hover{
+                        text-decoration: underline;
+                    }
+                }
+            }
+
+            &:hover{
+                background-color: #d7e9f8;
+                color: #1f6fb1;
+
+                td a {
+                    color: #1f6fb1;
+                }
+            }
+
+
+
+
+
+        }
+        .ascending .sort-caret{
+            border-bottom: 4px solid #80b7ab;
+        }
+
+        .descending .sort-caret {
+            border-top: 4px solid #80b7ab;
+        }
+
+
+
+        max-width: none;
+        overflow: hidden;
+        position: relative;
+
+    }
+
+    .backgrid-container{
+        height:auto;
+        overflow: auto;
+        border: 1px solid rgb(226, 223, 223);
+        min-height: 369px; // the height of 10 records
+        background-color: #ddd;
+    }
+
+    .backgrid-filter.form-search {
+        margin: 0 0 5px;
+        .hideSearchCloseBtn;
+    }
+
+    .selectize-cell {
+      width: 300px;
+    }
+
+    .search {
+        &:after {
+            background-color: #80b7ab;
+        }
+        &:before {
+            border: 3px solid #80b7ab;
+        }
+    }
+
+    .selectize-control.multi .selectize-input, .selectize-control.single .selectize-input{
+        margin: 5px 0 0 0;
+    }
+
+
+    span.tooltips:hover span, span.tooltips:focus span {
+        width: 200px;
+        margin-left: -100px;
+    }
+
+
+    span.tooltips span {
+
+        color: #d7e9f8;
+        background-color: #1f6fb1;
+        padding: 6px 5px;
+        background-image: -webkit-linear-gradient(top, lighten(#1f6fb1, 10%), #1f6fb1);
+    }
+
+    span.tooltips span:after {
+        border-top: 8px solid #1f6fb1;
+    }
+
+}
+
+#default-base{
+    width:100%;
+    max-width:980px;
+}
+
+.menubar {
+    margin: 0 5px 0;
+}
+
+#menu {
+    .menu {
+        margin:0 0 15px 0;
+    }
+}
+
+.content {
+    padding: 0px 10px;
+}
+
+.submenubar {
+    clear: both;
+    border: none;
+    margin: 0 5px 0;
+
+    li a {
+        text-decoration:none;
+        color: #777;
+    }
+
+    a:hover,  .active a{
+        border-radius: 0;
+        background-color: transparent;
+        color: #80b7ab;
+    }
+}
+
+#dialog-background.show {
+    opacity: 0.5;
 }

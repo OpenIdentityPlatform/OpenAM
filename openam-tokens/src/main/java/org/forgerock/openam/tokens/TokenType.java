@@ -29,6 +29,10 @@ public enum TokenType {
     SAML2,
     OAUTH,
     REST,
-    GENERIC
+    GENERIC,
+    RESOURCE_SET,
+    PERMISSION_TICKET,
+    REQUESTING_PARTY,
+    UMA_AUDIT_ENTRY
 
 }

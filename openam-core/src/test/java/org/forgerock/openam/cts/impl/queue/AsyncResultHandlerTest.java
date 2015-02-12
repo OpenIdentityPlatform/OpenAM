@@ -11,35 +11,36 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.queue;
 
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.queue.config.QueueConfiguration;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.queue.config.CTSQueueConfiguration;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.sun.identity.shared.debug.Debug;
 
 public class AsyncResultHandlerTest {
 
     private String badger;
     private AsyncResultHandler<String> handler;
-    private QueueConfiguration mockConfig;
+    private CTSQueueConfiguration mockConfig;
     private Debug mockDebug;
 
     @BeforeMethod
     public void setup() {
         badger = "Badger";
 
-        mockConfig = mock(QueueConfiguration.class);
+        mockConfig = mock(CTSQueueConfiguration.class);
         mockDebug = mock(Debug.class);
 
         handler = new AsyncResultHandler<String>(mockConfig, mockDebug);
@@ -70,11 +71,11 @@ public class AsyncResultHandlerTest {
     }
 
     @Test (timeOut = 1000)
-    public void shouldWaitOnResultHandler() throws CoreTokenException {
+    public void shouldWaitOnResultHandler() throws Exception {
         // Given
         given(mockConfig.getQueueTimeout()).willReturn(1);
         final String key = "badgers!";
-        final ResultHandler<String>[] ref = new ResultHandler[1];
+        final ResultHandler<String, ?>[] ref = new ResultHandler[1];
 
         final Thread resultThread = new Thread(new Runnable() {
             @Override
@@ -115,10 +116,10 @@ public class AsyncResultHandlerTest {
         assertThat(error).isNotNull();
     }
 
-    private Object await(ResultHandler<?> handler) {
+    private Object await(ResultHandler<?, ?> handler) {
         try {
             return handler.getResults();
-        } catch (CoreTokenException e) {
+        } catch (Exception e) {
             return e;
         }
     }

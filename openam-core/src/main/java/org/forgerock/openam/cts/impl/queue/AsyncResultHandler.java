@@ -11,20 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.queue;
-
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.api.filter.TokenFilter;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.queue.config.QueueConfiguration;
 
 import java.text.MessageFormat;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * AsyncResultHandler is an asynchronous implementation of the ResultHandler.
@@ -37,12 +39,12 @@ import java.util.concurrent.TimeUnit;
  * is sized to one to enforce the usage of this ResultHandler as being used only
  * once.
  *
- * @see TaskDispatcher#read(String, ResultHandler)
- * @see TaskDispatcher#query(TokenFilter, ResultHandler)
+ * @see TaskDispatcher#read(String, org.forgerock.openam.sm.datalayer.api.ResultHandler)
+ * @see TaskDispatcher#query(TokenFilter, org.forgerock.openam.sm.datalayer.api.ResultHandler)
  *
  * @param <T> {@inheritDoc}
  */
-public class AsyncResultHandler<T> implements ResultHandler<T> {
+public class AsyncResultHandler<T> implements ResultHandler<T, CoreTokenException> {
     private static final String NULL_SIGNAL = "--NULL--";
 
     private final BlockingQueue<Object> syncQueue;
@@ -122,7 +124,7 @@ public class AsyncResultHandler<T> implements ResultHandler<T> {
     /**
      * @param error The error to store in this result handler.
      */
-    public void processError(CoreTokenException error) {
+    public void processError(Exception error) {
         debug("Received: Error {0}", error.getMessage());
         syncQueue.offer(error);
     }

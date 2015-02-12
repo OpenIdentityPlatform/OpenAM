@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.cts.impl.query;
 
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.testng.annotations.Test;
 

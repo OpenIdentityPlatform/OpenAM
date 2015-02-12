@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,40 +15,9 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.naming.WebtopNaming;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.configuration.ServerConfiguration;
-import com.sun.identity.setup.BootstrapData;
-import com.sun.identity.setup.IHttpServletRequest;
-import com.sun.identity.setup.JCECrypt;
-import com.sun.identity.setup.ServicesDefaultValues;
-import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.sm.AttributeSchemaImpl;
-import com.sun.identity.sm.ServiceSchemaModifications;
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.NewServiceWrapper;
-import org.forgerock.openam.upgrade.NewSubSchemaWrapper;
-import org.forgerock.openam.upgrade.SchemaUpgradeWrapper;
-import org.forgerock.openam.upgrade.ServerUpgrade;
-import org.forgerock.openam.upgrade.ServiceSchemaModificationWrapper;
-import org.forgerock.openam.upgrade.ServiceSchemaUpgradeWrapper;
-import org.forgerock.openam.upgrade.SubSchemaModificationWrapper;
-import org.forgerock.openam.upgrade.SubSchemaUpgradeWrapper;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeHttpServletRequest;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.UpgradeUtils;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.w3c.dom.Document;
+import static org.forgerock.openam.upgrade.UpgradeServices.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -63,9 +32,41 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
-import static org.forgerock.openam.utils.CollectionUtils.asOrderedSet;
+import javax.inject.Inject;
+
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.NewServiceWrapper;
+import org.forgerock.openam.upgrade.NewSubSchemaWrapper;
+import org.forgerock.openam.upgrade.SchemaUpgradeWrapper;
+import org.forgerock.openam.upgrade.ServerUpgrade;
+import org.forgerock.openam.upgrade.ServiceSchemaModificationWrapper;
+import org.forgerock.openam.upgrade.ServiceSchemaUpgradeWrapper;
+import org.forgerock.openam.upgrade.SubSchemaModificationWrapper;
+import org.forgerock.openam.upgrade.SubSchemaUpgradeWrapper;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeHttpServletRequest;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.utils.IOUtils;
+import org.w3c.dom.Document;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.configuration.ServerConfiguration;
+import com.sun.identity.setup.BootstrapData;
+import com.sun.identity.setup.IHttpServletRequest;
+import com.sun.identity.setup.JCECrypt;
+import com.sun.identity.setup.ServicesDefaultValues;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.sm.AttributeSchemaImpl;
+import com.sun.identity.sm.ServiceSchemaModifications;
 
 /**
  * Detects changes in the service schema and upgrades them if required.
@@ -96,7 +97,7 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
 
     @Inject
     public UpgradeServiceSchemaStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                                    @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory factory) {
         super(adminTokenAction, factory);
     }
 

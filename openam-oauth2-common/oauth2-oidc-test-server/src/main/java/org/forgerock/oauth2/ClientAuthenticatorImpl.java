@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2;
@@ -49,7 +49,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
         this.clientStore = clientStore;
     }
 
-    public ClientRegistration authenticate(OAuth2Request request) throws InvalidClientException, InvalidRequestException, ClientAuthenticationFailedException {
+    public ClientRegistration authenticate(OAuth2Request request, String endpoint) throws InvalidClientException, InvalidRequestException, ClientAuthenticationFailedException {
 
         final ClientCredentials clientCredentials = extractCredentials(request);
         Reject.ifTrue(isEmpty(clientCredentials.clientId), "Missing parameter, 'client_id'");

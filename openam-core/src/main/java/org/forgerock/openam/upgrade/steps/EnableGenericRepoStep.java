@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,26 +15,28 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
+import static org.forgerock.openam.upgrade.UpgradeServices.*;
+
+import java.security.PrivilegedAction;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeServices;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeServices;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.security.PrivilegedAction;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 
 /**
  * A very simple step to reenable the Generic LDAPv3 data store (i.e. making it available on the admin console as an
@@ -50,7 +52,7 @@ public class EnableGenericRepoStep extends AbstractUpgradeStep {
 
     @Inject
     public EnableGenericRepoStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                                 @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory factory) {
         super(adminTokenAction, factory);
     }
 

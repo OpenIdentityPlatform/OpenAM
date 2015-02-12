@@ -17,6 +17,7 @@
 package org.forgerock.openam.oauth2;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
@@ -27,6 +28,7 @@ import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.HashSet;
@@ -54,8 +56,8 @@ public class OAuthTokenStore {
      * @param tokenIdFactory An instance of the TokenIdFactory.
      */
     @Inject
-    public OAuthTokenStore(CTSPersistentStore cts, TokenAdapter<JsonValue> tokenAdapter,
-            TokenIdFactory tokenIdFactory) {
+    public OAuthTokenStore(CTSPersistentStore cts, TokenIdFactory tokenIdFactory,
+            @Named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER) TokenAdapter<JsonValue> tokenAdapter) {
         this.cts = cts;
         this.tokenAdapter = tokenAdapter;
         this.tokenIdFactory = tokenIdFactory;

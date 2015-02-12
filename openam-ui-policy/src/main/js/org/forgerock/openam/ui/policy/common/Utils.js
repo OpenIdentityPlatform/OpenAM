@@ -68,8 +68,8 @@ define("org/forgerock/openam/ui/policy/common/Utils", [
         }
 
         if (baseSplit.length === 2) {
-            title = $.t("policy.common.viewAllApplications") +' ('+ $.t("policy.common.topLeveRealm") + ')';
-            result ='<span class="realm toplevel">/</span> <a title="'+ title +'" href="'+ baseSplit[0] +'">('+  $.t("policy.common.topLeveRealm") +')</a>' + result;
+            title = $.t("policy.common.viewAllApplications") +' ('+ $.t("policy.common.topLevelRealm") + ')';
+            result ='<span class="realm toplevel">/</span> <a title="'+ title +'" href="'+ baseSplit[0] +'">('+  $.t("policy.common.topLevelRealm") +')</a>' + result;
         } else {
             result = '<span class="realm toplevel">/</span> (Top Level Realm)' + result;
         }

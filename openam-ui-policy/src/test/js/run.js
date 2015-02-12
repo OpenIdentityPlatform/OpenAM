@@ -24,6 +24,9 @@
 
 /*global $, require, QUnit */
 
+
+
+
 require.config({
     paths: {
         sinon: "../test/libs/sinon-1.10.3",

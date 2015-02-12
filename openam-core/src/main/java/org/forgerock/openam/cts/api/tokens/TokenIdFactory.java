@@ -26,7 +26,7 @@ import java.util.UUID;
 /**
  * Responsible for generating Token Ids and for converting objects into their corresponding Token Ids.
  */
-public class TokenIdFactory {
+public class TokenIdFactory implements TokenIdGenerator {
 
     private final KeyConversion encoding;
     public static final String ID = OAuthTokenField.ID.getOAuthField();
@@ -98,6 +98,7 @@ public class TokenIdFactory {
      * @param existingId The existing ID of the token.
      * @return Non-null Token Id.
      */
+    @Override
     public String generateTokenId(String existingId) {
 
         if (existingId != null){

@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.queue;
 
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.impl.CoreTokenAdapter;
-import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 
 import java.util.Collection;
 
@@ -29,37 +30,37 @@ public interface ResultHandlerFactory {
     /**
      * @return Handler suitable for a create operation.
      */
-    ResultHandler<Token> getCreateHandler();
+    ResultHandler<Token, CoreTokenException> getCreateHandler();
 
     /**
      * @return Handler suitable for a read operation.
      */
-    ResultHandler<Token> getReadHandler();
+    ResultHandler<Token, CoreTokenException> getReadHandler();
 
     /**
      * @return Handler suitable for an update operation.
      */
-    ResultHandler<Token> getUpdateHandler();
+    ResultHandler<Token, CoreTokenException> getUpdateHandler();
 
     /**
      * @return Handler suitable for a delete operation.
      */
-    ResultHandler<String> getDeleteHandler();
+    ResultHandler<String, CoreTokenException> getDeleteHandler();
 
     /**
      * @return Handler suitable for a query operation.
      */
-    ResultHandler<Collection<Token>> getQueryHandler();
+    ResultHandler<Collection<Token>, CoreTokenException> getQueryHandler();
 
     /**
      * @return Handler suitable for a partial query operation.
      */
-    ResultHandler<Collection<PartialToken>> getPartialQueryHandler();
+    ResultHandler<Collection<PartialToken>, CoreTokenException> getPartialQueryHandler();
 
     /**
      * Returns a {@link ResultHandler} that performs a delete operation on the query's results.
      *
      * @return Handler suitable for delete on query operation.
      */
-    ResultHandler<Collection<PartialToken>> getDeleteOnQueryHandler();
+    ResultHandler<Collection<PartialToken>, CoreTokenException> getDeleteOnQueryHandler();
 }

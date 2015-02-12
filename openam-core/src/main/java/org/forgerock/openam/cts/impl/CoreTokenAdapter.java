@@ -22,8 +22,8 @@ import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.*;
-import org.forgerock.openam.cts.impl.query.PartialToken;
-import org.forgerock.openam.cts.impl.queue.ResultHandler;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.reaper.CTSReaperInit;
@@ -87,7 +87,7 @@ public class CoreTokenAdapter {
      */
     public Token read(String tokenId) throws CoreTokenException {
         debug("Read: queued {0}", tokenId);
-        ResultHandler<Token> handler = handlerFactory.getReadHandler();
+        ResultHandler<Token, CoreTokenException> handler = handlerFactory.getReadHandler();
         dispatcher.read(tokenId, handler);
 
         try {
@@ -146,7 +146,7 @@ public class CoreTokenAdapter {
      */
     public Collection<Token> query(final TokenFilter tokenFilter) throws CoreTokenException {
         debug("Query: queued with Filter: {0}", tokenFilter);
-        ResultHandler<Collection<Token>> handler = handlerFactory.getQueryHandler();
+        ResultHandler<Collection<Token>, CoreTokenException> handler = handlerFactory.getQueryHandler();
         dispatcher.query(tokenFilter, handler);
         try {
             Collection<Token> tokens = handler.getResults();
@@ -173,7 +173,7 @@ public class CoreTokenAdapter {
     public Collection<PartialToken> attributeQuery(final TokenFilter filter)
             throws CoreTokenException, IllegalArgumentException {
 
-        ResultHandler<Collection<PartialToken>> handler = handlerFactory.getPartialQueryHandler();
+        ResultHandler<Collection<PartialToken>, CoreTokenException> handler = handlerFactory.getPartialQueryHandler();
         try {
             attributeQueryWithHandler(filter, handler);
             Collection<PartialToken> partialTokens = handler.getResults();
@@ -195,7 +195,7 @@ public class CoreTokenAdapter {
     public void deleteOnQuery(final TokenFilter filter) throws CoreTokenException, IllegalArgumentException {
         //Token ID should be always retrieved in order to be able to delete the returned tokens.
         filter.addReturnAttribute(CoreTokenField.TOKEN_ID);
-        ResultHandler<Collection<PartialToken>> handler = handlerFactory.getDeleteOnQueryHandler();
+        ResultHandler<Collection<PartialToken>, CoreTokenException> handler = handlerFactory.getDeleteOnQueryHandler();
         try {
             attributeQueryWithHandler(filter, handler);
         } catch (CoreTokenException e) {
@@ -204,7 +204,7 @@ public class CoreTokenAdapter {
     }
 
     private void attributeQueryWithHandler(final TokenFilter filter,
-            final ResultHandler<Collection<PartialToken>> handler) throws CoreTokenException {
+            final ResultHandler<Collection<PartialToken>, CoreTokenException> handler) throws CoreTokenException {
         Reject.ifTrue(filter.getReturnFields().isEmpty(), "Must define return fields for attribute query.");
 
         debug("Attribute Query: queued with Filter: {0}", filter);

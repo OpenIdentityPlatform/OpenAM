@@ -11,26 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
-
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+
 /**
  * Models a OAuth2 Refresh Token.
  *
  * @since 12.0.0
  */
-public class RefreshToken extends JsonValue implements Token {
+public class RefreshToken extends JsonValue implements IntrospectableToken, Token {
 
     /**
      * Constructs a new RefreshToken backed with the data in the specified JsonValue.
@@ -241,6 +240,14 @@ public class RefreshToken extends JsonValue implements Token {
      */
     public final boolean isExpired() {
         return (System.currentTimeMillis() > getExpiryTime());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getRealm() {
+        return getStringProperty(OAuth2Constants.Params.REALM);
     }
 
     /**

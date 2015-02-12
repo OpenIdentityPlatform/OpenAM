@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.service;
@@ -21,6 +21,8 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.resource.Finder;
 import org.restlet.resource.ServerResource;
+
+import com.google.inject.Key;
 
 /**
  * Utility methods for dealing with Restlet resources.
@@ -36,6 +38,16 @@ public class RestletUtils {
      * @return The injected instance.
      */
     public static Finder wrap(final Class<? extends ServerResource> resource) {
+        return wrap(Key.get(resource));
+    }
+
+    /**
+     * Creates a Finder instance that returns the specified instance of a resource. Prevents multiple instances of
+     * the same resource class being created unnecessarily.
+     * @param resource The resource.
+     * @return The injected instance.
+     */
+    public static Finder wrap(final Key<? extends ServerResource> resource) {
         return new Finder() {
             @Override
             public ServerResource create(Request request, Response response) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,24 +15,25 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.setup.AMSetupServlet;
-import com.sun.identity.setup.EmbeddedOpenDS;
-import com.sun.identity.sm.SMSEntry;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.opendj.ldap.ConnectionFactory;
+import static org.forgerock.openam.upgrade.UpgradeServices.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import javax.inject.Inject;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.EmbeddedOpenDS;
+import com.sun.identity.sm.SMSEntry;
 
 /**
  * This upgrade step is meant to upgrade the directory schema/content for external configuration stores. For the
@@ -48,7 +49,7 @@ public class UpgradeDirectoryContentStep extends AbstractUpgradeStep {
 
     @Inject
     public UpgradeDirectoryContentStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                                       @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+                                       @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory factory) {
         super(adminTokenAction, factory);
     }
 

@@ -26,7 +26,7 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.cts.impl.CoreTokenAdapter;
-import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
 import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
 
@@ -253,7 +253,7 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
      *
      * This function is useful for example, finding all Token IDs that match a certain criteria.
      *
-     * @see org.forgerock.openam.cts.impl.query.PartialToken
+     * @see org.forgerock.openam.sm.datalayer.api.query.PartialToken
      *
      * @param tokenFilter Non null TokenFilter, with the return attributes defined.
      * @return A non null, but possibly empty collection.

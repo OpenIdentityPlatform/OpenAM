@@ -11,28 +11,30 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade.steps;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.opendj.ldap.ConnectionFactory;
+import static org.forgerock.openam.upgrade.UpgradeServices.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.openam.upgrade.UpgradeServices.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+import javax.inject.Inject;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 
 /**
  * This upgrade step looks in OAuth2 auth module config for uses of DefaultAccountMapper and DefaultAttributeMapper,
@@ -58,7 +60,7 @@ public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
 
     @Inject
     public UpgradeOAuth2AuthModulesStep(final PrivilegedAction<SSOToken> adminTokenAction,
-            @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory factory) {
         super(adminTokenAction, factory);
     }
 

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -129,7 +129,8 @@ public class AccessTokenServiceImplTest {
         RefreshToken refreshToken = null;
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
 
         //When
@@ -148,7 +149,8 @@ public class AccessTokenServiceImplTest {
         RefreshToken refreshToken = mock(RefreshToken.class);
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("OTHER_CLIENT_ID");
@@ -169,7 +171,8 @@ public class AccessTokenServiceImplTest {
         RefreshToken refreshToken = mock(RefreshToken.class);
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
@@ -193,7 +196,8 @@ public class AccessTokenServiceImplTest {
         AccessToken accessToken = mock(AccessToken.class);
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
@@ -224,7 +228,8 @@ public class AccessTokenServiceImplTest {
         AccessToken accessToken = mock(AccessToken.class);
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
@@ -260,7 +265,8 @@ public class AccessTokenServiceImplTest {
         String newRefreshTokenId = "NEW_REFRESH_TOKEN_ID";
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
-        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");

@@ -21,7 +21,7 @@ import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
 import javax.inject.Singleton;
 import java.util.Collection;

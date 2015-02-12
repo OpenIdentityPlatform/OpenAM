@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.utils;
 
@@ -43,6 +43,8 @@ public class TimeoutConfig {
                 return SystemProperties.getAsInt(DataLayerConstants.CORE_TOKEN_REAPER_TIMEOUT, NO_TIMEOUT);
             case DATA_LAYER:
                 return SystemProperties.getAsInt(DataLayerConstants.DATA_LAYER_TIMEOUT, 10);
+            case RESOURCE_SETS:
+                return SystemProperties.getAsInt(DataLayerConstants.RESOURCE_SETS_TIMEOUT, getTimeout(ConnectionType.DATA_LAYER));
             default:
                 throw new IllegalStateException();
         }

@@ -20,7 +20,7 @@ import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
 import java.util.Collection;
 import java.util.Map;
@@ -137,7 +137,7 @@ public interface CTSPersistentStore {
      *
      * @see org.forgerock.openam.cts.api.filter.TokenFilter#addReturnAttribute(org.forgerock.openam.tokens.CoreTokenField)
      * @see org.forgerock.openam.cts.api.filter.TokenFilterBuilder
-     * @see org.forgerock.openam.cts.impl.query.PartialToken
+     * @see org.forgerock.openam.sm.datalayer.api.query.PartialToken
      *
      * @param tokenFilter Non null TokenFilter, with the return attributes defined.
      * @throws CoreTokenException If there was any error whilst performing the query.

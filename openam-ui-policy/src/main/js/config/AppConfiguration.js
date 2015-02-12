@@ -37,7 +37,8 @@ define("config/AppConfiguration", function () {
                 moduleClass: "org/forgerock/commons/ui/common/main/GenericRouteInterfaceMap",
                 configuration: {
                     LoginView: "org/forgerock/openam/ui/policy/login/LoginView",
-                    LoginDialog: "org/forgerock/openam/ui/policy/login/LoginDialog"
+                    LoginDialog: "org/forgerock/openam/ui/policy/login/LoginDialog",
+                    ResourceEditDialog : "org/forgerock/openam/ui/uma/ResourceEditDialog"
                 }
             },
 
@@ -136,6 +137,45 @@ define("config/AppConfiguration", function () {
                     loader: [
                         {"validators": "config/validators/CommonValidators"}
                     ]
+                }
+            },
+            {
+                moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
+                configuration: {
+                    links: {
+                        "user" : {
+                            "urls": {
+                                "policyEditor": {
+                                    "url": "#apps/",
+                                    "icon": "glyph-icon-th-list",
+                                    "name": "config.AppConfiguration.Navigation.links.policyEditor"
+                                },
+                                "uma": {
+                                    "url": "#uma/resources/",
+                                    "icon": "glyph-icon-user",
+                                    "name": "config.AppConfiguration.Navigation.links.uma",
+                                    "urls": {
+                                        "resources": {
+                                            "url": "#uma/resources/",
+                                            "name": "config.AppConfiguration.Navigation.links.umaLinks.resources"
+                                        },
+                                        "history": {
+                                            "url": "#uma/history/",
+                                            "name": "config.AppConfiguration.Navigation.links.umaLinks.history"
+                                        },
+                                        "users": {
+                                            "url": "#uma/users/",
+                                            "name": "config.AppConfiguration.Navigation.links.umaLinks.users"
+                                        },
+                                        "apps": {
+                                            "url": "#uma/apps/",
+                                            "name": "config.AppConfiguration.Navigation.links.umaLinks.apps"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         ],

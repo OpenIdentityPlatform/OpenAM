@@ -339,6 +339,7 @@
         <!-- OpenAM OAuth2 Token Service -->
         <module>openam-oauth2-common</module>
         <module>openam-oauth2</module>
+        <module>openam-uma</module>
 
         <module>openam-common-auth-ui</module>
 
@@ -731,6 +732,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-oauth2-saml2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-uma</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1688,6 +1694,11 @@
                 <artifactId>forgerock-guava-collect</artifactId>
                 <version>${forgerock.guava.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons.guava</groupId>
+                <artifactId>forgerock-guava-cache</artifactId>
+                <version>${forgerock.guava.version}</version>
+            </dependency>
 
             <!-- JASPIC -->
             <dependency>
@@ -2031,6 +2042,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
                 <configuration>
                     <argLine>${java.surefire.options}</argLine>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>

@@ -17,13 +17,21 @@ package org.forgerock.openam.rest;
 
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
-import com.sun.identity.sm.OrganizationConfigManager;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Set;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+import com.sun.identity.sm.InvalidRealmNameManager;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.VersionSelector;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
 import org.forgerock.oauth2.restlet.AuthorizeEndpointFilter;
 import org.forgerock.oauth2.restlet.AuthorizeResource;
 import org.forgerock.oauth2.restlet.TokenEndpointFilter;
+import org.forgerock.oauth2.restlet.TokenIntrospectionResource;
 import org.forgerock.oauth2.restlet.ValidationServerResource;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
@@ -45,6 +53,7 @@ import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 import org.forgerock.openam.rest.authz.SessionResourceAuthzModule;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.dashboard.TrustedDevicesResource;
@@ -52,21 +61,26 @@ import org.forgerock.openam.rest.fluent.FluentRealmRouter;
 import org.forgerock.openam.rest.fluent.FluentRoute;
 import org.forgerock.openam.rest.fluent.FluentRouter;
 import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
+import org.forgerock.openam.rest.oauth2.ResourceSetResource;
 import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.ServiceRouter;
+import org.forgerock.openam.sm.datalayer.api.query.QueryFilter;
+import org.forgerock.openam.uma.UmaConstants;
+import org.forgerock.openam.uma.UmaExceptionFilter;
+import org.forgerock.openam.rest.uma.UmaPolicyResource;
+import org.forgerock.openam.uma.UmaWellKnownConfigurationEndpoint;
+import org.forgerock.openam.forgerockrest.AuditHistory;
+import org.forgerock.openam.uma.audit.UmaAuditEntry;
 import org.forgerock.openidconnect.restlet.ConnectClientRegistration;
 import org.forgerock.openidconnect.restlet.EndSession;
 import org.forgerock.openidconnect.restlet.OpenIDConnectConfiguration;
 import org.forgerock.openidconnect.restlet.OpenIDConnectJWKEndpoint;
 import org.forgerock.openidconnect.restlet.UserInfo;
+import org.restlet.Restlet;
 import org.restlet.routing.Router;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.Set;
 
 /**
  * Singleton class which contains both the routers for CREST resources and Restlet service endpoints.
@@ -82,6 +96,7 @@ public class RestEndpoints {
     private final CrestRouter resourceRouter;
     private final ServiceRouter jsonServiceRouter;
     private final ServiceRouter xacmlServiceRouter;
+    private final Router umaServiceRouter;
     private final Router oauth2ServiceRouter;
 
     /**
@@ -92,7 +107,7 @@ public class RestEndpoints {
      */
     @Inject
     public RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper) {
-        this(realmValidator, versionSelector, coreWrapper, OrganizationConfigManager.getInvalidRealmNames());
+        this(realmValidator, versionSelector, coreWrapper, InvalidRealmNameManager.getInvalidRealmNames());
     }
 
     RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper,
@@ -104,6 +119,7 @@ public class RestEndpoints {
         this.resourceRouter = createResourceRouter(invalidRealmNames);
         this.jsonServiceRouter = createJSONServiceRouter(invalidRealmNames);
         this.xacmlServiceRouter = createXACMLServiceRouter(invalidRealmNames);
+        this.umaServiceRouter = createUMAServiceRouter();
         this.oauth2ServiceRouter = createOAuth2Router();
     }
 
@@ -129,6 +145,14 @@ public class RestEndpoints {
      */
     public ServiceRouter getXACMLServiceRouter() {
         return xacmlServiceRouter;
+    }
+
+    /**
+     * Gets the UMA restlet service router.
+     * @return The router.
+     */
+    public Router getUMAServiceRouter() {
+        return umaServiceRouter;
     }
 
     /**
@@ -174,6 +198,17 @@ public class RestEndpoints {
 
         dynamicRealmRouter.route("/users/{user}/devices/trusted")
                 .forVersion("1.0").to(TrustedDevicesResource.class);
+
+        dynamicRealmRouter.route("/users/{user}/oauth2/resourcesets")
+                .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
+                .forVersion("1.0").to(ResourceSetResource.class);
+
+        dynamicRealmRouter.route("/users/{user}/uma/policies")
+                .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
+                .forVersion("1.0").to(UmaPolicyResource.class);
+
+        dynamicRealmRouter.route("/users/{user}/uma/auditHistory")
+                .forVersion("1.0").to(AuditHistory.class);
 
         //protected
         dynamicRealmRouter.route("/policies")
@@ -263,6 +298,25 @@ public class RestEndpoints {
         return router;
     }
 
+    private Router createUMAServiceRouter() {
+
+        Router router = new RestletRealmRouter(realmValidator, coreWrapper);
+
+        router.attach("/permission_request", getRestlet(UmaConstants.PERMISSION_REQUEST_ENDPOINT));
+        router.attach("/authz_request", getRestlet(UmaConstants.AUTHORIZATION_REQUEST_ENDPOINT));
+
+        // Well-Known Discovery
+
+        router.attach("/.well-known/uma-configuration",
+                new UmaExceptionFilter(wrap(UmaWellKnownConfigurationEndpoint.class)));
+
+        return router;
+    }
+
+    private Restlet getRestlet(String name) {
+        return InjectorHolder.getInstance(Key.get(Restlet.class, Names.named(name)));
+    }
+
     private Router createOAuth2Router() {
         final Router router = new RestletRealmRouter(realmValidator, coreWrapper);
 
@@ -272,12 +326,22 @@ public class RestEndpoints {
         router.attach("/access_token", new TokenEndpointFilter(new AccessTokenFlowFinder()));
         router.attach("/tokeninfo", wrap(ValidationServerResource.class));
 
+        // OAuth 2.0 Token Introspection Endpoint
+        router.attach("/introspect", wrap(TokenIntrospectionResource.class));
+
         // OpenID Connect endpoints
 
         router.attach("/connect/register", wrap(ConnectClientRegistration.class));
         router.attach("/userinfo", wrap(UserInfo.class));
         router.attach("/connect/endSession", wrap(EndSession.class));
         router.attach("/connect/jwk_uri", wrap(OpenIDConnectJWKEndpoint.class));
+
+        // Resource Set Registration
+
+        Restlet resourceSetRegistrationEndpoint = getRestlet(OAuth2Constants.Custom.RSR_ENDPOINT);
+        router.attach("/resource_set/{rsid}", resourceSetRegistrationEndpoint);
+        router.attach("/resource_set", resourceSetRegistrationEndpoint);
+        router.attach("/resource_set/", resourceSetRegistrationEndpoint);
 
         // OpenID Connect Discovery
 

@@ -17,7 +17,6 @@ package org.forgerock.openam.cts.api.fields;
 
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
 import org.forgerock.openam.tokens.CoreTokenField;
 
 import java.text.MessageFormat;
@@ -41,7 +40,7 @@ public class CoreTokenFieldTypes {
      * Validate a collection of key/value mappings.
      *
      * @param types A mapping of CoreTokenField to value. Non null, may be empty.
-     * @throws org.forgerock.openam.cts.exceptions.LDAPOperationFailedException If one of the values was invalid for the CoreTokenField field.
+     * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException If one of the values was invalid for the CoreTokenField field.
      */
     public static void validateTypes(Map<CoreTokenField, Object> types) throws CoreTokenException {
         for (Map.Entry<CoreTokenField, Object> entry : types.entrySet()) {
@@ -54,11 +53,11 @@ public class CoreTokenFieldTypes {
      *
      * @param field The CoreTokenField to validate against.
      * @param value The value to verify. Non null.
-     * @throws org.forgerock.openam.cts.exceptions.LDAPOperationFailedException
+     * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException
      */
     public static void validateType(CoreTokenField field, Object value) throws CoreTokenException {
         if (value == null) {
-            throw new LDAPOperationFailedException(MessageFormat.format(
+            throw new CoreTokenException(MessageFormat.format(
                     "\n" +
                             CoreTokenConstants.DEBUG_HEADER +
                             "Value field cannot be null!" +
@@ -67,20 +66,21 @@ public class CoreTokenFieldTypes {
                     field.name()));
         }
 
-        try {
-            if (isString(field)) {
-                assertClass(value, String.class);
-            } else if (isInteger(field)) {
-                assertClass(value, Integer.class);
-            } else if (isCalendar(field)) {
-                assertClass(value, Calendar.class);
-            } else if (isByteArray(field)) {
-                assertClass(value, byte[].class);
-            } else {
-                throw new IllegalStateException("Unknown field: " + field.name());
-            }
-        } catch (LDAPOperationFailedException e) {
-            throw new LDAPOperationFailedException(MessageFormat.format(
+        Class<?> expectedType;
+        if (isString(field)) {
+            expectedType = String.class;
+        } else if (isInteger(field)) {
+            expectedType = Integer.class;
+        } else if (isCalendar(field)) {
+            expectedType = Calendar.class;
+        } else if (isByteArray(field)) {
+            expectedType = byte[].class;
+        } else {
+            throw new IllegalStateException("Unknown field: " + field.name());
+        }
+
+        if (!expectedType.isAssignableFrom(value.getClass())) {
+            throw new CoreTokenException(MessageFormat.format(
                     "\n" +
                     CoreTokenConstants.DEBUG_HEADER +
                     "Value was not the correct type:\n" +
@@ -89,9 +89,8 @@ public class CoreTokenFieldTypes {
                     "  Actual Class: {3}",
                     CoreTokenField.class.getSimpleName(),
                     field.name(),
-                    e.getMessage(),
-                    value.getClass().getName()),
-                    e);
+                    expectedType.getName(),
+                    value.getClass().getName()));
         }
     }
 
@@ -175,15 +174,4 @@ public class CoreTokenFieldTypes {
         return CoreTokenField.BLOB.equals(field);
     }
 
-    /**
-     * Perform a simple class assertion.
-     * @param value Non null value to assert.
-     * @param clazz Non null class to assert against.
-     * @throws org.forgerock.openam.cts.exceptions.LDAPOperationFailedException If the value was not assignable from the clazz.
-     */
-    private static void assertClass(Object value, Class clazz) throws LDAPOperationFailedException {
-        if (!clazz.isAssignableFrom(value.getClass())) {
-            throw new LDAPOperationFailedException(clazz.getName());
-        }
-    }
 }

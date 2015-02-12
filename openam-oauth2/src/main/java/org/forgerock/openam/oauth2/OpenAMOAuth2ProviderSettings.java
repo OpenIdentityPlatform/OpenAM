@@ -11,10 +11,32 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
+
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.oauth2.core.Utils.isEmpty;
+import static org.forgerock.oauth2.core.Utils.joinScope;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.security.AccessController;
+import java.security.KeyPair;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -40,7 +62,6 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResponseTypeHandler;
 import org.forgerock.oauth2.core.ScopeValidator;
@@ -51,6 +72,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
+import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.legacy.CoreToken;
 import org.forgerock.openam.oauth2.legacy.LegacyAccessTokenAdapter;
 import org.forgerock.openam.oauth2.legacy.LegacyCoreTokenAdapter;
@@ -58,29 +80,10 @@ import org.forgerock.openam.oauth2.legacy.LegacyResponseTypeHandler;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.utils.MappingUtils;
+import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.util.encode.Base64url;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import java.security.AccessController;
-import java.security.KeyPair;
-import java.security.PublicKey;
-import java.security.interfaces.RSAPublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
-
-import static org.forgerock.json.fluent.JsonValue.*;
-import static org.forgerock.oauth2.core.Utils.*;
 
 /**
  * Models all of the possible settings the OpenAM OAuth2 provider can have and that can be configured.
@@ -93,8 +96,8 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     private String issuer;
     private final String realm;
     private final String deploymentUrl;
+    private final ResourceSetStore resourceSetStore;
     private final CookieExtractor cookieExtractor;
-    private final PEMDecoder pemDecoder;
     private ScopeValidator scopeValidator;
     private Map<String, Object> scopeToUserUserProfileAttributes;
 
@@ -102,17 +105,17 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * Constructs a new OpenAMOAuth2ProviderSettings.
      *
      * @param realm The realm.
-     * @param deploymentUrl The deployment url.
+     * @param baseDeploymentUri The base deployment url.
+     * @param resourceSetStore An instance of the ResourceSetStore for the current realm.
      * @param cookieExtractor An instance of the CookieExtractor.
-     * @param pemDecoder An instance of the PEMDecoder.
      */
-    public OpenAMOAuth2ProviderSettings(String realm, String deploymentUrl, CookieExtractor cookieExtractor,
-            PEMDecoder pemDecoder) {
+    public OpenAMOAuth2ProviderSettings(String realm, String baseDeploymentUri, ResourceSetStore resourceSetStore,
+            CookieExtractor cookieExtractor) {
         super(OAuth2ProviderService.NAME, OAuth2ProviderService.VERSION);
         this.realm = realm;
-        this.deploymentUrl = deploymentUrl;
+        this.deploymentUrl = baseDeploymentUri;
+        this.resourceSetStore = resourceSetStore;
         this.cookieExtractor = cookieExtractor;
-        this.pemDecoder = pemDecoder;
         addServiceListener();
         setUserProfileScopeMappings();
     }
@@ -632,7 +635,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     /**
      * {@inheritDoc}
      */
-    public String getOpenIDConnectIssuer() throws ServerException {
+    public String getIssuer() throws ServerException {
         if (issuer == null) {
             synchronized (this) {
                 final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
@@ -644,7 +647,14 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                     if (aliases.isEmpty()) {
                         issuer = deploymentUrl;
                     } else {
-                        issuer = aliases.iterator().next();
+                        Iterator<String> iterator = aliases.iterator();
+                        issuer = iterator.next();
+                        while (!issuer.contains(".") && iterator.hasNext()) {
+                            issuer = iterator.next();
+                        }
+                        if (!issuer.contains(".")) {
+                            issuer = deploymentUrl;
+                        }
                     }
                 } catch (SMSException e) {
                     throw new ServerException(e);
@@ -654,39 +664,79 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         return issuer;
     }
 
+    private String getOAuth2BaseUrl() {
+        return getBaseUrl("/oauth2");
+    }
+
+    private String getBaseUrl(String context) {
+        String uri = deploymentUrl + context + realm;
+        if (uri.endsWith("/")) {
+            uri = uri.substring(0, uri.length() - 1);
+        }
+        return uri;
+    }
+
     /**
      * {@inheritDoc}
      */
     public String getAuthorizationEndpoint() {
-        return deploymentUrl + "/authorize";
+        return getOAuth2BaseUrl()+ "/authorize";
     }
 
     /**
      * {@inheritDoc}
      */
     public String getTokenEndpoint() {
-        return deploymentUrl + "/access_token";
+        return getOAuth2BaseUrl() + "/access_token";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getIntrospectionEndpoint() {
+        return getOAuth2BaseUrl() + "/introspect";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getResourceSetRegistrationPolicyEndpoint(String resourceSetId) {
+        return getBaseUrl("/policyEditor") + "?resource_set_uid=" + resourceSetId + "#uma/";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getResourceSetRegistrationEndpoint() {
+        return getOAuth2BaseUrl() + "/resource_set";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ResourceSetStore getResourceSetStore() {
+        return resourceSetStore;
     }
 
     /**
      * {@inheritDoc}
      */
     public String getUserInfoEndpoint() {
-        return deploymentUrl + "/userinfo";
+        return getOAuth2BaseUrl() + "/userinfo";
     }
 
     /**
      * {@inheritDoc}
      */
     public String getCheckSessionEndpoint() {
-        return deploymentUrl + "/connect/checkSession";
+        return getOAuth2BaseUrl() + "/connect/checkSession";
     }
 
     /**
      * {@inheritDoc}
      */
     public String getEndSessionEndpoint() {
-        return deploymentUrl + "/connect/endSession";
+        return getOAuth2BaseUrl() + "/connect/endSession";
     }
 
     /**
@@ -699,7 +749,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
                 return userDefinedJWKUri;
             }
 
-            return deploymentUrl + "/connect/jwk_uri";
+            return getOAuth2BaseUrl() + "/connect/jwk_uri";
         } catch (SMSException e) {
             logger.error(e.getMessage());
             throw new ServerException(e);
@@ -753,7 +803,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public String getClientRegistrationEndpoint() {
-        return deploymentUrl + "/connect/register";
+        return getOAuth2BaseUrl() + "/connect/register";
     }
 
     /**
@@ -868,7 +918,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             Set<String> profileMappings = getSetting(realm, OAuth2ProviderService.PROFILE_MAPPINGS);
             scopeToUserUserProfileAttributes.put("profile", MappingUtils.parseMappings(profileMappings));
         } catch (Exception e) {
-            logger.error("Could not load user profile attributes for realm "+realm, e);
+            logger.error("Could not load user profile attributes for realm " + realm, e);
         }
     }
 

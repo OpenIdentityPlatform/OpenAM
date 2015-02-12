@@ -18,25 +18,28 @@ package org.forgerock.openam.upgrade.steps;
 import static org.forgerock.openam.upgrade.UpgradeServices.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.IdConstants;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
 import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.inject.Inject;
-import javax.inject.Named;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.opendj.ldap.ConnectionFactory;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.IdConstants;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 
 /**
  * The agent group information is no longer stored in the labeledUri setting, hence existing agent groups needs to be
@@ -52,7 +55,7 @@ public class MigrateAgentGroups extends AbstractUpgradeStep {
 
     @Inject
     public MigrateAgentGroups(final PrivilegedAction<SSOToken> adminTokenAction,
-            @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory factory) {
         super(adminTokenAction, factory);
     }
 

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.api;
 
@@ -26,17 +26,18 @@ public class DataLayerConstants {
     public static final String CORE_TOKEN_ASYNC_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.cts.async";
     public static final String CORE_TOKEN_REAPER_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.cts.reaper";
     public static final String DATA_LAYER_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout";
-
-    /**
-     * Guice binding for ConnectionFactory instances
-     */
-    public static final String DATA_LAYER_CTS_ASYNC_BINDING = "DataLayerCTSAsyncBinding";
-    public static final String DATA_LAYER_CTS_REAPER_BINDING = "DataLayerCTSReaperBinding";
-    public static final String DATA_LAYER_BINDING = "DataLayerBinding";
+    public static final String RESOURCE_SETS_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.resourcesets";
 
     /**
      * Guice bindings for ConnectionConfig instances
      */
     public static final String SERVICE_MANAGER_CONFIG = "DataLayerConfig";
-    public static final String EXTERNAL_CTS_CONFIG = "ExternalCTSConfig";
+    public static final String EXTERNAL_CONFIG = "ExternalConfig";
+
+    /**
+     * Debug instance name for all CTS debugging.
+     */
+    public static final String DATA_LAYER_DEBUG = "tokenDataLayer";
+
+    public static final String ROOT_DN_SUFFIX = "root-dn-suffix";
 }

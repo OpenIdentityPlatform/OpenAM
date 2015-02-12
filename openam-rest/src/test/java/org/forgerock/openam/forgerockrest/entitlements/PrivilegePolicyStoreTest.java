@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements;
@@ -213,7 +213,7 @@ public class PrivilegePolicyStoreTest {
     @DataProvider(name = "UnsupportedOperators")
     public static Object[][] unsupportedQueryOperators() {
         // We do not support starts-with, contains or any extended operators
-        return new Object[][] {{ "sw" }, { "co" }, { "someExtendedOperator" }};
+        return new Object[][] { { "sw" }, { "co" }, { "someExtendedOperator" }};
     }
 
     @Test(dataProvider = "UnsupportedOperators", expectedExceptions = EntitlementException.class,

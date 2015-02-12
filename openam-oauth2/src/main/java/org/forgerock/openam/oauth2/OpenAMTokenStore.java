@@ -51,7 +51,6 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.RefreshToken;
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -60,6 +59,7 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
+import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.openidconnect.OpenIdConnectToken;
@@ -176,7 +176,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
 
-        final String iss = providerSettings.getOpenIDConnectIssuer();
+        final String iss = providerSettings.getIssuer();
 
         final List<String> amr = getAMRFromAuthModules(request, providerSettings);
 
@@ -524,7 +524,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     /**
      * {@inheritDoc}
      */
-    public AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException, BadRequestException,
+    public AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException,
             InvalidGrantException {
 
         logger.message("Reading access token");
@@ -555,7 +555,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     /**
      * {@inheritDoc}
      */
-    public RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws BadRequestException, InvalidRequestException,
+    public RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws ServerException,
             InvalidGrantException {
 
         logger.message("Read refresh token");
@@ -565,7 +565,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             token = tokenStore.read(tokenId);
         } catch (CoreTokenException e) {
             logger.error("Unable to read refresh token corresponding to id: " + tokenId, e);
-            throw new InvalidRequestException();
+            throw new ServerException("Could not read token in CTS: " + e.getMessage());
         }
 
         if (token == null) {

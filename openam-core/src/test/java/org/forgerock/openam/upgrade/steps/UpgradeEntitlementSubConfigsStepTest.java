@@ -11,10 +11,30 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade.steps;
+
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.mockito.ArgumentMatcher;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.w3c.dom.Document;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
@@ -29,25 +49,6 @@ import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.mockito.ArgumentMatcher;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-import org.w3c.dom.Document;
-
-import java.security.PrivilegedAction;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit test to exercise the behaviour of {@link UpgradeEntitlementSubConfigsStep}.

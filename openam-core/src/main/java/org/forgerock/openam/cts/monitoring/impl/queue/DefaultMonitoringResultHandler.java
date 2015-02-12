@@ -11,22 +11,21 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.monitoring.impl.queue;
 
 import org.forgerock.openam.cts.CTSOperation;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.queue.ResultHandler;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 
 /**
  * A ResultHandler implementation intended for use with CTS monitored operations
  * that do not specifically have access to the Token in the operation. This
  * includes Delete, and both Query operations.
  */
-public class DefaultMonitoringResultHandler<T> implements ResultHandler<T> {
-    private final ResultHandler<T> handler;
+public class DefaultMonitoringResultHandler<T, E extends Exception> implements ResultHandler<T, E> {
+    private final ResultHandler<T, E> handler;
     private final CTSOperationsMonitoringStore store;
     private final CTSOperation operation;
 
@@ -35,7 +34,7 @@ public class DefaultMonitoringResultHandler<T> implements ResultHandler<T> {
      * @param store The monitoring store to notify.
      * @param operation The CTS Operation to report to the store.
      */
-    public DefaultMonitoringResultHandler(ResultHandler<T> handler, CTSOperationsMonitoringStore store, CTSOperation operation) {
+    public DefaultMonitoringResultHandler(ResultHandler<T, E> handler, CTSOperationsMonitoringStore store, CTSOperation operation) {
         this.handler = handler;
         this.store = store;
         this.operation = operation;
@@ -44,10 +43,10 @@ public class DefaultMonitoringResultHandler<T> implements ResultHandler<T> {
     /**
      * Defers to wrapped handler.
      * @return {@inheritDoc}
-     * @throws CoreTokenException {@inheritDoc}
+     * @throws E {@inheritDoc}
      */
     @Override
-    public T getResults() throws CoreTokenException {
+    public T getResults() throws E {
         return handler.getResults();
     }
 
@@ -66,7 +65,7 @@ public class DefaultMonitoringResultHandler<T> implements ResultHandler<T> {
      * @param error {@inheritDoc}
      */
     @Override
-    public void processError(CoreTokenException error) {
+    public void processError(Exception error) {
         store.addTokenOperation(null, operation, false);
         handler.processError(error);
     }

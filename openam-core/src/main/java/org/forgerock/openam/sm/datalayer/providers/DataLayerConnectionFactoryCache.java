@@ -11,24 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.providers;
 
-import com.iplanet.dpro.session.service.SessionConstants;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
+import java.text.MessageFormat;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.text.MessageFormat;
-import java.util.EnumMap;
-import java.util.Map;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Abstraction for the ConnectionFactory provider implementations.
@@ -39,16 +40,16 @@ import java.util.Map;
  * will automatically respond to the system wide shutdown signal.
  *
  * This cache needs to be {@link Singleton} because it will establish connections to
- * the LDAP server. Multiple instances would be inappropriate.
+ * the database server. Multiple instances would be inappropriate.
  */
 @Singleton
-public class DataLayerConnectionFactoryCache implements ConnectionFactoryProvider, ShutdownListener {
+public class DataLayerConnectionFactoryCache implements Provider<ConnectionFactory>, ShutdownListener {
     // Injected
     private final ConnectionFactoryProvider connectionFactoryProvider;
     private final Debug debug;
+    private final ConnectionType connectionType;
 
-    private final Map<ConnectionType, ConnectionFactory> factories =
-            new EnumMap<ConnectionType, ConnectionFactory>(ConnectionType.class);
+    private ConnectionFactory factory = null;
 
     private boolean shutdown;
 
@@ -59,9 +60,11 @@ public class DataLayerConnectionFactoryCache implements ConnectionFactoryProvide
      * @param debug Non null.
      */
     @Inject
-    public DataLayerConnectionFactoryCache(ShutdownManager shutdownManager,
-                                           DataLayerConnectionFactoryProvider connectionFactoryProvider,
-                                           @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
+    public DataLayerConnectionFactoryCache(ConnectionType connectionType,
+            ShutdownManager shutdownManager,
+            ConnectionFactoryProvider connectionFactoryProvider,
+            @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug) {
+        this.connectionType = connectionType;
         this.connectionFactoryProvider = connectionFactoryProvider;
         shutdownManager.addShutdownListener(this);
         this.debug = debug;
@@ -71,8 +74,6 @@ public class DataLayerConnectionFactoryCache implements ConnectionFactoryProvide
      * Get the requested ConnectionFactory. If this factory has not been previously
      * requested it will be created on this call.
      *
-     * @param type The type of ConnectionFactory to return.
-     *
      * @return Non null connection factory.
      *
      * @throws IllegalStateException If this method is called after the system
@@ -80,17 +81,16 @@ public class DataLayerConnectionFactoryCache implements ConnectionFactoryProvide
      *
      * @throws InvalidConfigurationException If there was a problem with the configuration.
      */
-    public synchronized ConnectionFactory createFactory(ConnectionType type) throws InvalidConfigurationException {
+    public synchronized ConnectionFactory get() throws InvalidConfigurationException {
         if (shutdown) {
             throw new IllegalStateException("Shutdown requested");
         }
 
-        debug("Requesting ConnectionFactory for type {0}", type.name());
-        if (!factories.containsKey(type)) {
-            debug("Creating factory for type {0}", type.name());
-            factories.put(type, connectionFactoryProvider.createFactory(type));
+        debug("Requesting ConnectionFactory for type {0}", connectionType.name());
+        if (factory == null) {
+            factory = connectionFactoryProvider.createFactory();
         }
-        return factories.get(type);
+        return factory;
     }
 
     /**
@@ -100,12 +100,10 @@ public class DataLayerConnectionFactoryCache implements ConnectionFactoryProvide
     public synchronized void shutdown() {
         shutdown = true;
         debug("Shutdown triggered");
-        for (ConnectionFactory factory : factories.values()) {
-            try {
-                factory.close();
-            } catch (RuntimeException e) {
-                debug.error("Error whilst shutting down a Connection Factory", e);
-            }
+        try {
+            factory.close();
+        } catch (RuntimeException e) {
+            debug.error("Error whilst shutting down a Connection Factory", e);
         }
     }
 

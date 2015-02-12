@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,30 +15,31 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.IdConstants;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Filter;
+import static org.forgerock.openam.upgrade.UpgradeServices.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import javax.inject.Inject;
+
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.opendj.ldap.Filter;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.IdConstants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 
 /**
  * This upgrade steps if there is any data store configured to use the Netscape LDAPv3Repo implementation, and if there
@@ -58,7 +59,7 @@ public class UpgradeIdRepoSubConfigs extends AbstractUpgradeStep {
 
     @Inject
     public UpgradeIdRepoSubConfigs(final PrivilegedAction<SSOToken> adminTokenAction,
-                                   @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory connectionFactory) {
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
     }
 

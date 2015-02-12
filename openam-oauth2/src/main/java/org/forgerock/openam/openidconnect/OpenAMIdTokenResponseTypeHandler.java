@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.openidconnect;
@@ -19,7 +19,7 @@ package org.forgerock.openam.openidconnect;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.openidconnect.IdTokenResponseTypeHandler;
 import org.forgerock.openidconnect.OpenIdConnectTokenStore;
-import org.forgerock.openam.oauth2.OpenAMSettings;
+import org.forgerock.openam.utils.OpenAMSettings;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
 

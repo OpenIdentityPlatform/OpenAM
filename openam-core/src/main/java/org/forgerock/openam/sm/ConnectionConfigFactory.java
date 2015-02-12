@@ -11,18 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm;
 
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
-import org.forgerock.openam.sm.datalayer.api.StoreMode;
-import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
-import org.forgerock.openam.sm.utils.ConfigurationValidator;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
+import org.forgerock.openam.sm.utils.ConfigurationValidator;
 
 /**
  * The factory used for acquiring the configuration used by the Service Manager data layer.
@@ -36,26 +35,25 @@ import javax.inject.Named;
 public class ConnectionConfigFactory {
     private final ConnectionConfig externalTokenConfig;
     private final ConnectionConfig smsConfiguration;
-    private final StoreMode storeMode;
     private final ConfigurationValidator validator;
+    private final DataLayerConfiguration dataLayerConfiguration;
 
     /**
      * Guice initialised constructor.
      *
      * @param datalayerConfig Non null default configuration.
-     * @param externalCTSConfig Non null External CTS configuration.
-     * @param storeMode Required to indicate the mode of the CTS configuration.
+     * @param externalTokenConfig Non null External CTS configuration.
      * @param validator Required for validation.
      */
     @Inject
     public ConnectionConfigFactory(@Named(DataLayerConstants.SERVICE_MANAGER_CONFIG) ConnectionConfig datalayerConfig,
-                                   @Named(DataLayerConstants.EXTERNAL_CTS_CONFIG) ConnectionConfig externalCTSConfig,
-                                   StoreMode storeMode,
-                                   ConfigurationValidator validator) {
+            @Named(DataLayerConstants.EXTERNAL_CONFIG) ConnectionConfig externalTokenConfig,
+            DataLayerConfiguration dataLayerConfiguration,
+            ConfigurationValidator validator) {
         this.smsConfiguration = datalayerConfig;
-        this.externalTokenConfig = externalCTSConfig;
-        this.storeMode = storeMode;
+        this.externalTokenConfig = externalTokenConfig;
         this.validator = validator;
+        this.dataLayerConfiguration = dataLayerConfiguration;
     }
 
     /**
@@ -64,23 +62,18 @@ public class ConnectionConfigFactory {
      * The connection configuration will be validated before returning to the caller
      * to ensure there are no obvious errors with the configuration.
      *
-     * @param type Non null type of the connection required.
      * @return Non null configuration for that configuration type.
      *
      * @throws InvalidConfigurationException If there was a validation error with the configuration.
      */
-    public ConnectionConfig getConfig(ConnectionType type) throws InvalidConfigurationException {
+    public ConnectionConfig getConfig() throws InvalidConfigurationException {
         ConnectionConfig configuration;
-        switch (storeMode) {
+        switch (dataLayerConfiguration.getStoreMode()) {
             case DEFAULT:
                 configuration = smsConfiguration;
                 break;
-            case EXTERNAL:
-                if (type == ConnectionType.DATA_LAYER) {
-                    configuration = smsConfiguration;
-                } else {
-                    configuration = externalTokenConfig;
-                }
+            case EXTERNAL_LDAP:
+                configuration = externalTokenConfig;
                 break;
             default:
                 throw new IllegalStateException();

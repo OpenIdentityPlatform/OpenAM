@@ -31,6 +31,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.Field;
 import org.forgerock.openam.tokens.MapToJsonBytesConverter;
@@ -57,13 +58,12 @@ public class JavaBeanAdapterTest extends GuiceTestCase {
 
     @BeforeMethod
     public void setup() throws Exception {
-        adapter = new JavaBeanAdapter<DummyBean>(DummyBean.class);
+        adapter = new JavaBeanAdapter<DummyBean>(DummyBean.class, new TokenIdFactory(null));
     }
 
     @Test
     public void testRoundTrip() throws Exception {
         //Given
-        adapter.initialise();
         DummyBean b = new DummyBean();
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("fred", Arrays.asList("one", "two"));
@@ -100,10 +100,33 @@ public class JavaBeanAdapterTest extends GuiceTestCase {
     }
 
     @Test
+    public void testGenerateId() throws Exception {
+        //Given
+        DummyBean b = new DummyBean();
+
+        //When
+        Token t = adapter.toToken(b);
+
+        //Then
+        assertThat(b.getId()).matches("[0-9a-f-]{36}");
+        assertThat(b.getId()).isEqualTo(t.getTokenId());
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testNonGeneratedNullId() throws Exception {
+        // Given
+        JavaBeanAdapter<GuicedBean> guicedBeanAdapter = new JavaBeanAdapter<GuicedBean>(GuicedBean.class, null);
+
+        GuicedBean b = new GuicedBean("123");
+
+        // When
+        guicedBeanAdapter.toToken(b);
+    }
+
+    @Test
     public void guicedTokenBean() throws Exception {
         // Given
-        JavaBeanAdapter<GuicedBean> guicedBeanAdapter = new JavaBeanAdapter<GuicedBean>(GuicedBean.class);
-        guicedBeanAdapter.initialise();
+        JavaBeanAdapter<GuicedBean> guicedBeanAdapter = new JavaBeanAdapter<GuicedBean>(GuicedBean.class, null);
 
         Token token = new Token("abc123", TokenType.GENERIC);
         token.setAttribute(CoreTokenField.STRING_ONE, "fred");
@@ -118,7 +141,6 @@ public class JavaBeanAdapterTest extends GuiceTestCase {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void wrongTokenTypeFails() throws Exception {
         // Given
-        adapter.initialise();
         Token token = new Token("abc123", TokenType.REST);
 
         // When
@@ -130,7 +152,6 @@ public class JavaBeanAdapterTest extends GuiceTestCase {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void nullFailsFromToken() throws Exception {
         // Given
-        adapter.initialise();
 
         // When
         adapter.fromToken(null);
@@ -141,24 +162,7 @@ public class JavaBeanAdapterTest extends GuiceTestCase {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void nullFailsToToken() throws Exception {
         // Given
-        adapter.initialise();
 
-        // When
-        adapter.toToken(null);
-
-        // Then exception
-    }
-
-    @Test(expectedExceptions = IllegalStateException.class)
-    public void uninitialisedFailsFromToken() throws Exception {
-        // When
-        adapter.fromToken(null);
-
-        // Then exception
-    }
-
-    @Test(expectedExceptions = IllegalStateException.class)
-    public void uninitialisedFailsToToken() throws Exception {
         // When
         adapter.toToken(null);
 
@@ -168,7 +172,7 @@ public class JavaBeanAdapterTest extends GuiceTestCase {
     @Test(expectedExceptions = IllegalStateException.class)
     public void initialiseFailsWrongConverter() throws Exception {
         // When
-        new JavaBeanAdapter<WrongConverterBean>(WrongConverterBean.class).initialise();
+        new JavaBeanAdapter<WrongConverterBean>(WrongConverterBean.class, null);
 
         // Then exception
     }
@@ -176,7 +180,15 @@ public class JavaBeanAdapterTest extends GuiceTestCase {
     @Test(expectedExceptions = IllegalStateException.class)
     public void initialiseFailsInvalidType() throws Exception {
         // When
-        new JavaBeanAdapter<InvalidTypeBean>(InvalidTypeBean.class).initialise();
+        new JavaBeanAdapter<InvalidTypeBean>(InvalidTypeBean.class, null);
+
+        // Then exception
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void initialiseFailsCannotGenerateNonId() throws Exception {
+        // When
+        new JavaBeanAdapter<CannotGenerateNonIdBean>(CannotGenerateNonIdBean.class, null);
 
         // Then exception
     }
@@ -184,7 +196,7 @@ public class JavaBeanAdapterTest extends GuiceTestCase {
     @Test(expectedExceptions = IllegalStateException.class)
     public void initialiseFailsNoId() throws Exception {
         // When
-        new JavaBeanAdapter<NoIdBean>(NoIdBean.class).initialise();
+        new JavaBeanAdapter<NoIdBean>(NoIdBean.class, null);
 
         // Then exception
     }
@@ -208,7 +220,7 @@ public class JavaBeanAdapterTest extends GuiceTestCase {
             this.complexField = complexField;
         }
 
-        @Field(field = CoreTokenField.TOKEN_ID)
+        @Field(field = CoreTokenField.TOKEN_ID, generated = true)
         public String getId() {
             return id;
         }
@@ -281,6 +293,27 @@ public class JavaBeanAdapterTest extends GuiceTestCase {
         }
         public void setId(String id) {
             this.id = id;
+        }
+    }
+
+    @Type(TokenType.GENERIC)
+    public static class CannotGenerateNonIdBean {
+        @Field(field = CoreTokenField.STRING_ONE, generated = true)
+        private String myString;
+        @Field(field = CoreTokenField.TOKEN_ID)
+        private String id;
+
+        public String getId() {
+            return id;
+        }
+        public void setId(String id) {
+            this.id = id;
+        }
+        public String getMyString() {
+            return myString;
+        }
+        public void setMyString(String myString) {
+            this.myString = myString;
         }
     }
 

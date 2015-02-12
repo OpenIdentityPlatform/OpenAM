@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -23,6 +23,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
+import org.forgerock.oauth2.resources.ResourceSetStore;
 
 import java.security.KeyPair;
 import java.util.Map;
@@ -247,11 +248,11 @@ public interface OAuth2ProviderSettings {
     String getOpenIDConnectVersion();
 
     /**
-     * Gets the URI of this OpenID Connect issuer.
+     * Gets the identifier of this issuer.
      *
-     * @return The OpenID Connect issuer.
+     * @return The issuer.
      */
-    String getOpenIDConnectIssuer() throws ServerException;
+    String getIssuer() throws ServerException;
 
     /**
      * Gets the URI for the OAuth2 authorize endpoint.
@@ -378,4 +379,32 @@ public interface OAuth2ProviderSettings {
      * @return A map of attributes.
      */
     Map<String,Object> getUserProfileScopeMappings();
+
+    /**
+     * Returns the default URL for this provider's token introspection endpoint.
+     * @return The URL.
+     */
+    String getIntrospectionEndpoint();
+
+    /**
+     * Returns the default URL for this provider's Resource Set Registration policy endpoint.
+     *
+     * @return The URL.
+     */
+    String getResourceSetRegistrationPolicyEndpoint(String resourceSetId);
+
+    /**
+     * Returns the default URL for this provider's Resource Set Registration endpoint.
+     *
+     * @return The URL.
+     */
+    String getResourceSetRegistrationEndpoint();
+
+    /**
+     * Returns the ResourceSetStore instance for the realm.
+     *
+     * @return The ResourceSetStore instance.
+     */
+    ResourceSetStore getResourceSetStore();
+
 }

@@ -88,7 +88,7 @@ require.config({
  * required synchronously
  */
 require([
-    "org/forgerock/commons/ui/common/util/Constants", 
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "jquery",
     "underscore",
@@ -104,7 +104,7 @@ require([
     "org/forgerock/openam/ui/common/util/ThemeManager",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "config/main",
-    "org/forgerock/openam/ui/common/main", 
+    "org/forgerock/openam/ui/common/main",
     "org/forgerock/openam/ui/user/main",
     "org/forgerock/openam/ui/dashboard/main",
     "UserDelegate",

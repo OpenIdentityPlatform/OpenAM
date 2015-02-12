@@ -16,20 +16,26 @@
 
 package org.forgerock.openam.upgrade;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import com.sun.identity.setup.AMSetupServlet;
-import com.sun.identity.setup.EmbeddedOpenDS;
-import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.debug.Debug;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
 import org.forgerock.openam.cts.impl.LDAPConfig;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.EntryNotFoundException;
 import org.forgerock.opendj.ldap.ErrorResultException;
@@ -39,14 +45,11 @@ import org.forgerock.opendj.ldif.ChangeRecordWriter;
 import org.forgerock.opendj.ldif.ConnectionChangeRecordWriter;
 import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.google.inject.Key;
+import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.EmbeddedOpenDS;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class is aiming to upgrade the content of the configuration store. The possible changes may involve directory
@@ -69,7 +72,7 @@ public class DirectoryContentUpgrader {
     private static final String DASHBOARD_OC = "forgerock-am-dashboard-service";
     private static final String DEVICE_PRINT_OC = "devicePrintProfilesContainer";
     private final List<Upgrader> upgraders = new ArrayList<Upgrader>();
-    private final ConnectionFactory connFactory;
+    private final ConnectionFactory<Connection> connFactory;
     private final String baseDir;
     private final String baseDN;
 
@@ -85,9 +88,8 @@ public class DirectoryContentUpgrader {
         this.baseDir = baseDir;
         this.baseDN = baseDN;
 
-        Key<ConnectionFactory> key = Key.get(ConnectionFactory.class, Names.named(DataLayerConstants.DATA_LAYER_BINDING));
+        Key<ConnectionFactory> key = Key.get(ConnectionFactory.class, DataLayer.Types.typed(ConnectionType.DATA_LAYER));
         connFactory = InjectorHolder.getInstance(key);
-
 
         upgraders.add(new AddCTSSchema());
         upgraders.add(new CreateCTSContainer());
@@ -95,10 +97,12 @@ public class DirectoryContentUpgrader {
             upgraders.add(new CreateCTSIndexes());
             upgraders.add(new AddDashboardSchema());
             upgraders.add(new AddDevicePrintSchema());
+            upgraders.add(new AddUmaAuditSchema());
+            upgraders.add(new AddResourceSetsSchema());
         }
         Connection conn = null;
         try {
-            conn = connFactory.getConnection();
+            conn = connFactory.create();
             Schema schema = null;
             try {
                 schema = Schema.readSchemaForEntry(conn, DN.valueOf(baseDN)).asStrictSchema();
@@ -111,7 +115,7 @@ public class DirectoryContentUpgrader {
                     it.remove();
                 }
             }
-        } catch (ErrorResultException ere) {
+        } catch (DataLayerException ere) {
             DEBUG.error("An error occurred while trying to get a connection", ere);
             throw new UpgradeException(ere);
         } finally {
@@ -207,11 +211,11 @@ public class DirectoryContentUpgrader {
     public void upgrade() throws UpgradeException {
         Connection conn = null;
         try {
-            conn = connFactory.getConnection();
+            conn = connFactory.create();
             for (Upgrader upgrader : upgraders) {
                 processLDIF(conn, upgrader.getLDIFPath());
             }
-        } catch (ErrorResultException ere) {
+        } catch (DataLayerException ere) {
             DEBUG.error("An error occurred while trying to get a connection", ere);
             throw new UpgradeException(ere);
         } finally {
@@ -277,7 +281,7 @@ public class DirectoryContentUpgrader {
 
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
-            return !entryExists(conn, new LDAPConfig(baseDN).getTokenStoreRootSuffix());
+            return !entryExists(conn, CTSDataLayerConfiguration.getTokenRootDN(DN.valueOf(baseDN)));
         }
     }
 
@@ -319,6 +323,32 @@ public class DirectoryContentUpgrader {
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
             return !schema.hasObjectClass(DEVICE_PRINT_OC);
+        }
+    }
+
+    private class AddUmaAuditSchema implements Upgrader {
+
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/opendj/opendj_uma_audit.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+            return !schema.hasObjectClass("uma_audit");
+        }
+    }
+
+    private class AddResourceSetsSchema implements Upgrader {
+
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/opendj/opendj_uma_resource_sets.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+            return !schema.hasObjectClass("resource_sets");
         }
     }
 }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -39,13 +39,11 @@ import java.util.Set;
  * @since 12.0.0
  */
 @Singleton
-public class PasswordCredentialsGrantTypeHandler implements GrantTypeHandler {
+public class PasswordCredentialsGrantTypeHandler extends GrantTypeHandler {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
-    private final ClientAuthenticator clientAuthenticator;
     private final List<PasswordCredentialsRequestValidator> requestValidators;
     private final ResourceOwnerAuthenticator resourceOwnerAuthenticator;
-    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final TokenStore tokenStore;
 
     /**
@@ -62,21 +60,19 @@ public class PasswordCredentialsGrantTypeHandler implements GrantTypeHandler {
             List<PasswordCredentialsRequestValidator> requestValidators,
             ResourceOwnerAuthenticator resourceOwnerAuthenticator,
             OAuth2ProviderSettingsFactory providerSettingsFactory, TokenStore tokenStore) {
-        this.clientAuthenticator = clientAuthenticator;
+        super(providerSettingsFactory, clientAuthenticator);
         this.requestValidators = requestValidators;
         this.resourceOwnerAuthenticator = resourceOwnerAuthenticator;
-        this.providerSettingsFactory = providerSettingsFactory;
         this.tokenStore = tokenStore;
     }
 
     /**
      * {@inheritDoc}
      */
-    public AccessToken handle(OAuth2Request request) throws ClientAuthenticationFailedException, InvalidClientException,
+    public AccessToken handle(OAuth2Request request, ClientRegistration clientRegistration,
+            OAuth2ProviderSettings providerSettings) throws InvalidClientException,
             InvalidRequestException, UnauthorizedClientException, InvalidGrantException, ServerException,
             InvalidScopeException, NotFoundException {
-
-        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request);
 
         for (final PasswordCredentialsRequestValidator requestValidator : requestValidators) {
             requestValidator.validateRequest(request, clientRegistration);
@@ -88,7 +84,6 @@ public class PasswordCredentialsGrantTypeHandler implements GrantTypeHandler {
             throw new InvalidGrantException();
         }
 
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final Set<String> scope = Utils.splitScope(request.<String>getParameter("scope"));
         final Set<String> validatedScope = providerSettings.validateAccessTokenScope(clientRegistration, scope,
                 request);

@@ -97,7 +97,9 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 
         Reject.ifTrue(isEmpty(request.<String>getParameter("refresh_token")), "Missing parameter, 'refresh_token'");
 
-        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request);
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request,
+                providerSettings.getTokenEndpoint());
 
         final String tokenId = request.getParameter("refresh_token");
         final RefreshToken refreshToken = tokenStore.readRefreshToken(request, tokenId);
@@ -127,7 +129,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
             tokenScope = new TreeSet<String>();
         }
 
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final Set<String> validatedScope = providerSettings.validateRefreshTokenScope(clientRegistration,
                 Collections.unmodifiableSet(scope), Collections.unmodifiableSet(tokenScope),
                 request);

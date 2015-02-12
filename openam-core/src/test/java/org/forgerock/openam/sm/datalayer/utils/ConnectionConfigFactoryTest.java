@@ -11,41 +11,62 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.utils;
 
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
+
 import org.forgerock.openam.sm.ConnectionConfig;
 import org.forgerock.openam.sm.ConnectionConfigFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 import org.forgerock.openam.sm.utils.ConfigurationValidator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.mock;
-
 public class ConnectionConfigFactoryTest {
 
     private ConnectionConfig mockDataLayerConfig;
     private ConnectionConfig mockExternalCTSConfig;
     private ConfigurationValidator mockConfigurationValidator;
+    private DataLayerConfiguration mockDataLayerConfiguration;
 
     @BeforeMethod
     public void setup() {
         mockDataLayerConfig = mock(ConnectionConfig.class);
         mockExternalCTSConfig = mock(ConnectionConfig.class);
         mockConfigurationValidator = mock(ConfigurationValidator.class);
+        mockDataLayerConfiguration = mock(DataLayerConfiguration.class);
     }
 
     @Test
-    public void shouldReturnConfigForEachType() throws InvalidConfigurationException {
+    public void shouldReturnConfigForDefaultStoreMode() throws InvalidConfigurationException {
+        // given
         ConnectionConfigFactory factory = new ConnectionConfigFactory(
-                mockDataLayerConfig, mockExternalCTSConfig, StoreMode.DEFAULT, mockConfigurationValidator);
-        for (ConnectionType type : ConnectionType.values()) {
-            assertThat(factory.getConfig(type)).isNotNull();
-        }
+                mockDataLayerConfig, mockExternalCTSConfig, mockDataLayerConfiguration, mockConfigurationValidator);
+        when(mockDataLayerConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
+
+        // when
+        ConnectionConfig config = factory.getConfig();
+
+        // then
+        assertThat(config).isSameAs(mockDataLayerConfig);
+    }
+
+    @Test
+    public void shouldReturnConfigForExternalStoreMode() throws InvalidConfigurationException {
+        // given
+        ConnectionConfigFactory factory = new ConnectionConfigFactory(
+                mockDataLayerConfig, mockExternalCTSConfig, mockDataLayerConfiguration, mockConfigurationValidator);
+        when(mockDataLayerConfiguration.getStoreMode()).thenReturn(StoreMode.EXTERNAL_LDAP);
+
+        // when
+        ConnectionConfig config = factory.getConfig();
+
+        // then
+        assertThat(config).isSameAs(mockExternalCTSConfig);
     }
 }

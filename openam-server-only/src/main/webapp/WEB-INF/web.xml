@@ -1150,6 +1150,10 @@
         <servlet-name>ForgeRockRest</servlet-name>
         <url-pattern>/oauth2/*</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ForgeRockRest</servlet-name>
+        <url-pattern>/uma/*</url-pattern>
+    </servlet-mapping>
 
     <!-- Setup favicon.ico extension type -->
     <mime-mapping>

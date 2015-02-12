@@ -15,53 +15,50 @@
  */
 package org.forgerock.openam.cts.impl.query.reaper;
 
-import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.QueryBuilder;
-import org.forgerock.openam.cts.impl.query.QueryFactory;
-import org.forgerock.opendj.ldap.ByteString;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.util.Reject;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Iterator;
+
+import javax.inject.Inject;
+
+import org.forgerock.openam.cts.CoreTokenConfig;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.DataLayer;
+import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
+import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.util.Reject;
 
 /**
  * This implementation will construct an appropriate filter to use for querying the persistence layer
  * and then perform the query.
  */
-public class ReaperImpl implements ReaperQuery {
-    // Represents the start and end state of the paged query.
-    public static final ByteString EMPTY = QueryBuilder.getEmptyPagingCookie();
+public class ReaperImpl<C, F> implements ReaperQuery {
 
-    private final QueryBuilder builder;
-    private final int pageSize;
-
-    private Connection connection;
-    private ByteString cookie = null;
+    private Iterator<Collection<String>> results;
+    private final QueryBuilder<C, F> query;
+    private C connection;
 
     @Inject
-    public ReaperImpl(QueryFactory queryFactory, CoreTokenConfig config) {
+    public ReaperImpl(@DataLayer(ConnectionType.CTS_REAPER) QueryFactory queryFactory, CoreTokenConfig config) {
+        QueryFactory<C, F> queryFactoryProvided = queryFactory;
         Reject.ifTrue(config.getCleanupPageSize() <= 0);
-        pageSize = config.getCleanupPageSize();
+        int pageSize = config.getCleanupPageSize();
 
         Calendar calendar = Calendar.getInstance();
 
-        Filter expired = queryFactory.createFilter().and().beforeDate(calendar).build();
-        builder = queryFactory.createInstance()
+        F expired = queryFactoryProvided.createFilter().and().beforeDate(calendar).build();
+        query = queryFactoryProvided.createInstance()
                 .withFilter(expired)
+                .pageResultsBy(pageSize)
                 .returnTheseAttributes(CoreTokenField.TOKEN_ID);
     }
 
     /**
      * @param connection Non null connection to use for query.
      */
-    public void setConnection(Connection connection) {
+    public void setConnection(C connection) {
         Reject.ifNull(connection);
         this.connection = connection;
     }
@@ -82,20 +79,15 @@ public class ReaperImpl implements ReaperQuery {
     public Collection<String> nextPage() throws CoreTokenException {
         Reject.ifTrue(connection == null, "Connection must be assigned before use");
 
+        if (results == null) {
+            results = query.executeRawResults(connection, String.class);
+        }
+
         if (isQueryComplete()) {
             return null;
         }
 
-        builder.pageResultsBy(pageSize, cookie);
-
-        Collection<String> results = new ArrayList<String>();
-        for (Entry entry : builder.executeRawResults(connection)) {
-            String tokenId = entry.getAttribute(CoreTokenField.TOKEN_ID.toString()).firstValueAsString();
-            results.add(tokenId);
-        }
-
-        cookie = builder.getPagingCookie();
-        return results;
+        return results.next();
     }
 
     /**
@@ -106,10 +98,6 @@ public class ReaperImpl implements ReaperQuery {
      * @return True if the paged query has reached the end. Otherwise false.
      */
     private boolean isQueryComplete() {
-        if (cookie == null) {
-            cookie = EMPTY;
-            return false;
-        }
-        return cookie.length() == EMPTY.length();
+        return !results.hasNext();
     }
 }

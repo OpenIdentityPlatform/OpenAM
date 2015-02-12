@@ -20,20 +20,21 @@ import com.sun.identity.shared.debug.Debug;
 import java.util.Collection;
 import javax.inject.Inject;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
 /**
- * This is a {@link ResultHandler} implementation that grabs the results of a Partial Query and for each token found
+ * This is a {@link org.forgerock.openam.sm.datalayer.api.ResultHandler} implementation that grabs the results of a Partial Query and for each token found
  * performs an asynchronous delete operation. This can come in handy if there is a need to find tokens based on
  * secondary storage keys or other arbitrary information and the matching tokens needs to be deleted right away.
  *
- * @see TaskDispatcher#read(String, ResultHandler)
- * @see TaskDispatcher#query(TokenFilter, ResultHandler)
+ * @see TaskDispatcher#read(String, org.forgerock.openam.sm.datalayer.api.ResultHandler)
+ * @see TaskDispatcher#query(TokenFilter, org.forgerock.openam.sm.datalayer.api.ResultHandler)
  */
-public class DeleteOnQueryResultHandler implements ResultHandler<Collection<PartialToken>> {
+public class DeleteOnQueryResultHandler implements ResultHandler<Collection<PartialToken>, CoreTokenException> {
 
     private final TaskDispatcher taskDispatcher;
     private final ResultHandlerFactory resultHandlerFactory;
@@ -66,7 +67,7 @@ public class DeleteOnQueryResultHandler implements ResultHandler<Collection<Part
     }
 
     @Override
-    public void processError(CoreTokenException exception) {
+    public void processError(Exception exception) {
         // Nothing to do, the error is already logged in TaskProcessor
     }
 }

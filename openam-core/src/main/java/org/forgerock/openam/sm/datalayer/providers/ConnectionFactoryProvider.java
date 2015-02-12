@@ -11,26 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.providers;
 
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
-import org.forgerock.opendj.ldap.ConnectionFactory;
 
 /**
  * Represents the ability to generate ConnectionFactory instances.
  */
-public interface ConnectionFactoryProvider {
+public interface ConnectionFactoryProvider<C> {
     /**
-     * Create an instance of a ConnectionFactory based on the given Type.
+     * Create an instance of a ConnectionFactory.
      *
-     * @param type Non null type indicator.
      * @return Non null ConnectionFactory.
      *
      * @throws InvalidConfigurationException If there was a problem with the configuration that
      * prevented the ConnectionFactory being instantiated.
      */
-    ConnectionFactory createFactory(ConnectionType type) throws InvalidConfigurationException;
+    ConnectionFactory<C> createFactory() throws InvalidConfigurationException;
 }
