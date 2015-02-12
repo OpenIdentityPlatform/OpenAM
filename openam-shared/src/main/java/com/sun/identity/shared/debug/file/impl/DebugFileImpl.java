@@ -31,6 +31,7 @@
  */
 package com.sun.identity.shared.debug.file.impl;
 
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.DebugConstants;
 import com.sun.identity.shared.debug.file.DebugConfiguration;
 import com.sun.identity.shared.debug.file.DebugFile;
@@ -61,8 +62,6 @@ public class DebugFileImpl implements DebugFile {
 
     private final String debugName;
 
-    private final String debugDirectory;
-
     private PrintWriter debugWriter = null;
 
     private long fileCreationTime = 0;
@@ -80,10 +79,9 @@ public class DebugFileImpl implements DebugFile {
      *
      * @param configuration debug configuration
      * @param debugName     log file name
-     * @param debugFilePath log file path
      */
-    public DebugFileImpl(DebugConfiguration configuration, String debugName, String debugFilePath) {
-        this(configuration, debugName, debugFilePath, TimeService.SYSTEM);
+    public DebugFileImpl(DebugConfiguration configuration, String debugName) {
+        this(configuration, debugName, TimeService.SYSTEM);
     }
 
     /**
@@ -91,12 +89,10 @@ public class DebugFileImpl implements DebugFile {
      *
      * @param configuration debug configuration
      * @param debugName     log file name
-     * @param debugFilePath log file path
      * @param clock         Clock used to generate date
      */
-    public DebugFileImpl(DebugConfiguration configuration, String debugName, String debugFilePath, TimeService clock) {
+    public DebugFileImpl(DebugConfiguration configuration, String debugName, TimeService clock) {
         this.debugName = debugName;
-        this.debugDirectory = debugFilePath;
         this.clock = clock;
         this.configuration = configuration;
 
@@ -117,13 +113,15 @@ public class DebugFileImpl implements DebugFile {
     }
 
     @Override
-    public void writeIt(StringBuilder buf, String msg, Throwable th) throws IOException {
+    public void writeIt(String prefix, String msg, Throwable th) throws IOException {
 
         if (debugWriter == null) {
             initialize();
         } else if (needsRotate()) {
             rotate();
         }
+        StringBuilder buf = new StringBuilder();
+        buf.append(prefix);
         buf.append('\n');
         buf.append(msg);
         if (th != null) {
@@ -194,6 +192,8 @@ public class DebugFileImpl implements DebugFile {
             fileCreationTime -= fileCreationTime % (1000 * 60);
 
             nextRotation = fileCreationTime + configuration.getRotationInterval() * 60 * 1000;
+
+            String debugDirectory = SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_DIRECTORY);
 
             //Create the log directory
             boolean directoryAvailable = false;
@@ -268,7 +268,6 @@ public class DebugFileImpl implements DebugFile {
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss:SSS a zzz");
         return "DebugFileImpl{" +
                 "debugName='" + debugName + '\'' +
-                ", debugDirectory='" + debugDirectory + '\'' +
                 ", fileCreationTime=" + dateFormat.format(new Date(fileCreationTime)) +
                 '}';
 

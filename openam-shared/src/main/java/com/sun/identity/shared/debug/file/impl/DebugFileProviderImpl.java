@@ -16,7 +16,6 @@
 package com.sun.identity.shared.debug.file.impl;
 
 
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.DebugConstants;
 import com.sun.identity.shared.debug.file.DebugConfiguration;
 import com.sun.identity.shared.debug.file.DebugFile;
@@ -61,8 +60,7 @@ public class DebugFileProviderImpl implements DebugFileProvider {
     public synchronized DebugFile getInstance(String debugName) {
         DebugFile debugFile = debugMap.get(debugName);
         if (debugFile == null) {
-            String debugDirectory = SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_DIRECTORY);
-            debugFile = new DebugFileImpl(configuration, debugName, debugDirectory);
+            debugFile = new DebugFileImpl(configuration, debugName);
             debugMap.put(debugName, debugFile);
         }
         return debugFile;

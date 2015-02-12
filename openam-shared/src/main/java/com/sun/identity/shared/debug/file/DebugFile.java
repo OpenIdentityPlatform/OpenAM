@@ -49,6 +49,6 @@ public interface DebugFile {
      *               present will be used to record the stack trace.
      * @throws IOException
      */
-    public void writeIt(StringBuilder prefix, String msg, Throwable th) throws IOException;
+    public void writeIt(String prefix, String msg, Throwable th) throws IOException;
 
 }
