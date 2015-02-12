@@ -24,6 +24,7 @@
 
    $Id: UMChangeUserPassword.jsp,v 1.2 2008/06/25 05:44:55 qcheng Exp $
 
+   Portions Copyrighted 2015 ForgeRock AS.
 --%>
 
 
@@ -62,6 +63,7 @@
 <cc:pagetitle name="pgtitle" bundleID="amConsole" pageTitleText="page.title.user.change.password" showPageTitleSeparator="true" viewMenuLabel="" pageTitleHelpMessage="" showPageButtonsTop="true" showPageButtonsBottom="false" />
 
 <cc:propertysheet name="propertyAttributes" bundleID="amConsole" />
+<input type="hidden" name="frmToken" value="<jato:text name="frmToken" />" />
 </cc:form>
 
 </cc:header>

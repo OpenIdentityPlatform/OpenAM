@@ -24,9 +24,7 @@
  *
  * $Id: UMChangeUserPasswordViewBean.java,v 1.6 2009/12/12 01:34:11 babysunil Exp $
  *
- */
-/**
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.console.user;
 
@@ -34,6 +32,8 @@ import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
+import com.iplanet.jato.view.html.StaticTextField;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.CloseWindowViewBean;
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -44,6 +44,7 @@ import com.sun.identity.console.idm.EntityEditViewBean;
 import com.sun.identity.console.realm.RMRealmViewBeanBase;
 import com.sun.identity.console.user.model.UMChangeUserPasswordModel;
 import com.sun.identity.console.user.model.UMChangeUserPasswordModelImpl;
+import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
@@ -64,6 +65,7 @@ public class UMChangeUserPasswordViewBean
     private static final String ATTR_PASSWORD = "tfPassword";
     private static final String REENTER_PASSWORD = "tfConfirmPassword";
     private static final String ATTR_OLD_PASSWORD = "tfOldPassword";
+    private static final String FORM_TOKEN = "frmToken";
     private static boolean oldapicall = true;
 
     private CCPageTitleModel ptModel;
@@ -106,6 +108,7 @@ public class UMChangeUserPasswordViewBean
         registerChild(PAGETITLE, CCPageTitle.class);
         ptModel.registerChildren(this);
         registerChild(PROPERTY_ATTRIBUTE, AMPropertySheet.class);
+        registerChild(FORM_TOKEN, StaticTextField.class);
         propertySheetModel.registerChildren(this);
     }
 
@@ -120,6 +123,8 @@ public class UMChangeUserPasswordViewBean
             view = propertySheetModel.createChild(this, name, getModel());
         } else if (ptModel.isChildSupported(name)) {
             view = ptModel.createChild(this, name);
+        } else if (name.equals(FORM_TOKEN)) {
+            view = new StaticTextField(this, FORM_TOKEN, getFormToken());
         } else {
             view = super.createChild(name);
         }
@@ -127,12 +132,23 @@ public class UMChangeUserPasswordViewBean
         return view;
     }
 
+    private String getFormToken() {
+        SSOToken userToken = getModel().getUserSSOToken();
+        String value = "";
+        if (userToken != null) {
+            value = Hash.hash(userToken.getTokenID().toString());
+        }
+        return value;
+    }
+
     public void beginDisplay(DisplayEvent event)
         throws ModelControlException {
         super.beginDisplay(event);
-        String userId = (String) getPageSessionAttribute(
-            EntityEditViewBean.UNIVERSAL_ID);
         UMChangeUserPasswordModel model = (UMChangeUserPasswordModel) getModel();
+        String userId = (String) getPageSessionAttribute(EntityEditViewBean.UNIVERSAL_ID);
+        if (userId == null) {
+            userId = model.getUserName();
+        }
         String loggedinUser = model.getUserName();
         Set val = null;
 
@@ -180,10 +196,18 @@ public class UMChangeUserPasswordViewBean
     public void handleButton1Request(RequestInvocationEvent event)
         throws ModelControlException {
         submitCycle = true;
-        UMChangeUserPasswordModel model =
-            (UMChangeUserPasswordModel) getModel();
-        String userId = (String) getPageSessionAttribute(
-            EntityEditViewBean.UNIVERSAL_ID);
+        HttpServletRequest req = event.getRequestContext().getRequest();
+        String formToken = req.getParameter(FORM_TOKEN);
+        if (formToken == null || formToken.isEmpty() || !formToken.equals(getFormToken())) {
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", "Invalid form token");
+            forwardTo();
+            return;
+        }
+        UMChangeUserPasswordModel model = (UMChangeUserPasswordModel) getModel();
+        String userId = (String) getPageSessionAttribute(EntityEditViewBean.UNIVERSAL_ID);
+        if (userId == null) {
+            userId = model.getUserName();
+        }
         String pwd = (String) propertySheetModel.getValue(ATTR_PASSWORD);
         String reenter = (String) propertySheetModel.getValue(REENTER_PASSWORD);
         String oldPwd = (String) propertySheetModel.getValue(ATTR_OLD_PASSWORD);
