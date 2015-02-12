@@ -71,6 +71,7 @@ import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
+import org.forgerock.openam.utils.TimeUtils;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -437,7 +438,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         //check expiry
         org.forgerock.openam.cts.api.tokens.Token ctsToken = cts.read(tokenID);
 
-        if (ctsToken == null) {
+        if (ctsToken == null || TimeUtils.toUnixTime(ctsToken.getExpiryTimestamp()) < TimeUtils.currentUnixTime()) {
             throw new NotFoundException("Cannot find tokenID: " + tokenID);
         }
 
