@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 ForgeRock, AS.
+/*
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -50,8 +50,6 @@ import java.util.List;
  *
  * Uses Token as its main means of expressing the data returned from LDAP and so is intended for use
  * with the Core Token Service.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class QueryBuilder {
     // Injected
@@ -203,7 +201,15 @@ public class QueryBuilder {
             try {
                 SimplePagedResultsControl control = result.getControl(
                         SimplePagedResultsControl.DECODER, new DecodeOptions());
-                pagingCookie = control.getCookie();
+                if (control == null) {
+                    if (debug.warningEnabled()) {
+                        debug.warning("There was no paged result control in the search response, it is recommended to "
+                                + "set the CTS user's size-limit at least to " + (pageSize + 1));
+                    }
+                    pagingCookie = getEmptyPagingCookie();
+                } else {
+                    pagingCookie = control.getCookie();
+                }
             } catch (DecodeException e) {
                 throw new CoreTokenException("Failed to decode Paging Cookie", e);
             }

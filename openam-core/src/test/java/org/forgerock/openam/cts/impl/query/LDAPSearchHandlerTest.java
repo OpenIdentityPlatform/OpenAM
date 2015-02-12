@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,30 +15,27 @@
  */
 package org.forgerock.openam.cts.impl.query;
 
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
+
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.ErrorResultIOException;
-import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class LDAPSearchHandlerTest {
 
     private LDAPConfig mockConstants;
@@ -46,6 +43,7 @@ public class LDAPSearchHandlerTest {
     private Connection mockConnection;
     private SearchRequest mockRequest;
     private LDAPSearchHandler handler;
+    private Debug debug;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -53,8 +51,9 @@ public class LDAPSearchHandlerTest {
         mockFactory = mock(ConnectionFactory.class);
         mockConnection = mock(Connection.class);
         mockRequest = mock(SearchRequest.class);
+        debug = mock(Debug.class);
 
-        handler = new LDAPSearchHandler(mockFactory, mockConstants);
+        handler = new LDAPSearchHandler(mockFactory, mockConstants, debug);
 
         given(mockFactory.getConnection()).willReturn(mockConnection);
     }
@@ -72,12 +71,24 @@ public class LDAPSearchHandlerTest {
     }
 
     @Test(expectedExceptions = QueryFailedException.class)
-    public void shouldHandleException() throws ErrorResultException, SearchResultReferenceIOException, ErrorResultIOException, QueryFailedException {
+    public void shouldHandleException() throws Exception {
         // Given
         given(mockFactory.getConnection()).willThrow(ErrorResultException.class);
 
         // When / Then
-        handler.performSearch(mockRequest, mock(Collection.class));
+        handler.performSearch(mockRequest, new ArrayList<Entry>(0));
+    }
+
+    @Test
+    public void shouldNotFailWithExceptionIfEntriesWerePresent() throws Exception {
+        // Given
+        given(mockFactory.getConnection()).willReturn(mockConnection);
+        List<Entry> entries = new ArrayList<Entry>();
+        entries.add(null);
+        given(mockConnection.search(mockRequest, entries)).willThrow(ErrorResultException.class);
+
+        // When / Then
+        handler.performSearch(mockRequest, new ArrayList<Entry>(0));
     }
 
     @Test

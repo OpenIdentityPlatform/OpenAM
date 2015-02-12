@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,7 +15,10 @@
  */
 package org.forgerock.openam.cts.impl.query;
 
+import com.google.inject.name.Named;
+import com.sun.identity.shared.debug.Debug;
 import javax.inject.Inject;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.utils.IOUtils;
@@ -34,19 +37,20 @@ import java.util.Collection;
  *
  * This class smooths over the issues around trying to create unit testable code for
  * the search methods of the Connection.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class LDAPSearchHandler {
     // Injected
     private final ConnectionFactory connectionFactory;
     private final LDAPConfig constants;
+    private final Debug debug;
     private Result result;
 
     @Inject
-    public LDAPSearchHandler(ConnectionFactory connectionFactory, LDAPConfig constants) {
+    public LDAPSearchHandler(ConnectionFactory connectionFactory, LDAPConfig constants,
+            @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         this.connectionFactory = connectionFactory;
         this.constants = constants;
+        this.debug = debug;
     }
 
     /**
@@ -67,6 +71,12 @@ public class LDAPSearchHandler {
             result = connection.search(request, entries);
             return result;
         } catch (ErrorResultException e) {
+            if (!entries.isEmpty()) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Partial search result has been received due to the following error:", e);
+                }
+                return e.getResult();
+            }
             throw new QueryFailedException(connection, constants.getTokenStoreRootSuffix(), filter, e);
         } finally {
             IOUtils.closeIfNotNull(connection);
