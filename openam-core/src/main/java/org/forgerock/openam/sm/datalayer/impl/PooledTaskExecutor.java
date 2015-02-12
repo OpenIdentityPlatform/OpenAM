@@ -77,7 +77,6 @@ public class PooledTaskExecutor implements TaskExecutor {
                 executor = pool.poll(100, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 debug.message("Interrupted while waiting for an executor", e);
-                Thread.interrupted();
             }
         }
         try {
