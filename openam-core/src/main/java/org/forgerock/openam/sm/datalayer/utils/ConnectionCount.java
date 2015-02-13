@@ -21,8 +21,8 @@ import javax.inject.Inject;
 
 import org.forgerock.openam.cts.impl.queue.QueueSelector;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.forgerock.util.Reject;
 
 /**
@@ -32,7 +32,7 @@ import org.forgerock.util.Reject;
  */
 public class ConnectionCount {
     static final int MINIMUM_CONNECTIONS = 7;
-    private final Map<ConnectionType, DataLayerConfiguration> dataLayerConfiguration;
+    private final Map<ConnectionType, LdapDataLayerConfiguration> dataLayerConfiguration;
 
     /**
      * Guice initialised constructor.
@@ -41,7 +41,7 @@ public class ConnectionCount {
      *                               connections) can be obtained.
      */
     @Inject
-    public ConnectionCount(Map<ConnectionType, DataLayerConfiguration> dataLayerConfiguration) {
+    public ConnectionCount(Map<ConnectionType, LdapDataLayerConfiguration> dataLayerConfiguration) {
         this.dataLayerConfiguration = dataLayerConfiguration;
     }
 

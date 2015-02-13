@@ -20,8 +20,8 @@ import static org.mockito.BDDMockito.*;
 
 import org.forgerock.openam.sm.ConnectionConfig;
 import org.forgerock.openam.sm.ConnectionConfigFactory;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 import org.forgerock.openam.sm.utils.ConfigurationValidator;
 import org.testng.annotations.BeforeMethod;
@@ -32,14 +32,14 @@ public class ConnectionConfigFactoryTest {
     private ConnectionConfig mockDataLayerConfig;
     private ConnectionConfig mockExternalCTSConfig;
     private ConfigurationValidator mockConfigurationValidator;
-    private DataLayerConfiguration mockDataLayerConfiguration;
+    private LdapDataLayerConfiguration mockDataLayerConfiguration;
 
     @BeforeMethod
     public void setup() {
         mockDataLayerConfig = mock(ConnectionConfig.class);
         mockExternalCTSConfig = mock(ConnectionConfig.class);
         mockConfigurationValidator = mock(ConfigurationValidator.class);
-        mockDataLayerConfiguration = mock(DataLayerConfiguration.class);
+        mockDataLayerConfiguration = mock(LdapDataLayerConfiguration.class);
     }
 
     @Test

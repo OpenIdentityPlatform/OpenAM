@@ -16,6 +16,7 @@
 package org.forgerock.openam.cts.impl.queue.config;
 
 import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.anyObject;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 
@@ -24,9 +25,9 @@ import java.util.Map;
 import org.forgerock.openam.sm.ConnectionConfig;
 import org.forgerock.openam.sm.ConnectionConfigFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 import org.testng.annotations.BeforeMethod;
@@ -46,9 +47,9 @@ public class CTSQueueConfigurationTest {
         mockConfigFactory = mock(ConnectionConfigFactory.class);
         mockConfig = mock(ConnectionConfig.class);
         given(mockConfigFactory.getConfig()).willReturn(mockConfig);
-        DataLayerConfiguration dataLayerConfiguration = mock(DataLayerConfiguration.class);
+        LdapDataLayerConfiguration dataLayerConfiguration = mock(LdapDataLayerConfiguration.class);
         given(dataLayerConfiguration.getStoreMode()).willReturn(StoreMode.DEFAULT);
-        Map<ConnectionType, DataLayerConfiguration> configMap = mock(Map.class);
+        Map<ConnectionType, LdapDataLayerConfiguration> configMap = mock(Map.class);
         given(configMap.get(anyObject())).willReturn(dataLayerConfiguration);
         connectionCount = new ConnectionCount(configMap);
         config = new CTSQueueConfiguration(mockConfigFactory, connectionCount, mock(Debug.class));

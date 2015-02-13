@@ -42,7 +42,7 @@ public class LdapSearchHandlerTest {
         mockConnection = mock(Connection.class);
         mockRequest = mock(SearchRequest.class);
 
-        handler = new LdapSearchHandler(new CTSDataLayerConfiguration(null, "ou=test-case"));
+        handler = new LdapSearchHandler(new CTSDataLayerConfiguration("ou=test-case"));
     }
 
     @Test

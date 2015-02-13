@@ -18,8 +18,8 @@ package org.forgerock.openam.sm;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 import org.forgerock.openam.sm.utils.ConfigurationValidator;
 
@@ -36,7 +36,7 @@ public class ConnectionConfigFactory {
     private final ConnectionConfig externalTokenConfig;
     private final ConnectionConfig smsConfiguration;
     private final ConfigurationValidator validator;
-    private final DataLayerConfiguration dataLayerConfiguration;
+    private final LdapDataLayerConfiguration dataLayerConfiguration;
 
     /**
      * Guice initialised constructor.
@@ -48,7 +48,7 @@ public class ConnectionConfigFactory {
     @Inject
     public ConnectionConfigFactory(@Named(DataLayerConstants.SERVICE_MANAGER_CONFIG) ConnectionConfig datalayerConfig,
             @Named(DataLayerConstants.EXTERNAL_CONFIG) ConnectionConfig externalTokenConfig,
-            DataLayerConfiguration dataLayerConfiguration,
+            LdapDataLayerConfiguration dataLayerConfiguration,
             ConfigurationValidator validator) {
         this.smsConfiguration = datalayerConfig;
         this.externalTokenConfig = externalTokenConfig;

@@ -20,12 +20,15 @@ import static org.mockito.Mockito.*;
 
 import java.util.concurrent.ExecutorService;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
+import org.forgerock.openam.sm.ConnectionConfig;
+import org.forgerock.openam.sm.ConnectionConfigFactory;
 import org.forgerock.openam.sm.SMSConfigurationFactory;
 import org.forgerock.openam.sm.ServerGroupConfiguration;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
@@ -37,11 +40,14 @@ import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.sm.datalayer.impl.ldap.ExternalLdapConfig;
 import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
+import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
+import org.forgerock.openam.sm.utils.ConfigurationValidator;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
+import com.google.inject.Provider;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
 
@@ -61,6 +67,11 @@ public class DataLayerGuiceModuleTest extends GuiceTestCase {
                 new Object[]{TaskFactory.class, ConnectionType.CTS_REAPER},
                 new Object[]{QueryFactory.class, ConnectionType.CTS_REAPER},
                 new Object[]{ConnectionFactory.class, ConnectionType.CTS_REAPER},
+                new Object[]{TaskExecutor.class, ConnectionType.RESOURCE_SETS},
+                new Object[]{TaskFactory.class, ConnectionType.RESOURCE_SETS},
+                new Object[]{QueryFactory.class, ConnectionType.RESOURCE_SETS},
+                new Object[]{ConnectionFactory.class, ConnectionType.RESOURCE_SETS},
+                new Object[]{TokenDataStore.class, ConnectionType.RESOURCE_SETS},
         };
     }
 
@@ -87,9 +98,26 @@ public class DataLayerGuiceModuleTest extends GuiceTestCase {
             when(factoryProvider.createFactory()).thenReturn(mock(ConnectionFactory.class));
             bind(LdapConnectionFactoryProvider.class).toInstance(factoryProvider);
 
-            bind(ExecutorService.class).annotatedWith(Names.named(CoreTokenConstants.CTS_WORKER_POOL)).toInstance(mock(ExecutorService.class));
+            bind(ExecutorService.class).annotatedWith(Names.named(CoreTokenConstants.CTS_WORKER_POOL)).toProvider(new Provider<ExecutorService>() {
+                @Override
+                public ExecutorService get() {
+                    return mock(ExecutorService.class);
+                }
+            });
 
             bind(String.class).annotatedWith(Names.named(DataLayerConstants.ROOT_DN_SUFFIX)).toInstance("ou=root-dn");
+
+            ConfigurationValidator validator = mock(ConfigurationValidator.class);
+            doNothing().when(validator).validate(any(ConnectionConfig.class));
+            bind(ConfigurationValidator.class).toInstance(validator);
+
+            ConnectionConfigFactory connectionConfigFactory = mock(ConnectionConfigFactory.class);
+            ConnectionConfig config = mock(ConnectionConfig.class);
+            when(connectionConfigFactory.getConfig()).thenReturn(config);
+            when(config.getMaxConnections()).thenReturn(10);
+            bind(ConnectionConfigFactory.class).toInstance(connectionConfigFactory);
+
+            bind(ObjectMapper.class).annotatedWith(Names.named("cts-json-object-mapper")).toInstance(new ObjectMapper());
         }
 
     }

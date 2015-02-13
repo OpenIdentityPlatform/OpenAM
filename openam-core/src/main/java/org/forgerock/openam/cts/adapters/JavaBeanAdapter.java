@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
@@ -40,6 +42,8 @@ import org.forgerock.openam.tokens.Field;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.Type;
 import org.forgerock.util.Reject;
+
+import com.google.inject.assistedinject.Assisted;
 
 /**
  * A TokenAdapter that can adapt Java bean-compliant POJOs that have been annotated with the annotations in
@@ -55,7 +59,8 @@ public class JavaBeanAdapter<T> implements TokenAdapter<T> {
     private final Map<String, FieldDetails> fieldsMap = new HashMap<String, FieldDetails>();
     private FieldDetails idField;
 
-    public JavaBeanAdapter(Class<T> beanClass, TokenIdGenerator idGenerator) {
+    @Inject
+    public JavaBeanAdapter(@Assisted Class<T> beanClass, TokenIdGenerator idGenerator) {
         Type type = beanClass.getAnnotation(Type.class);
         if (type == null || type.value() == null) {
             throw new IllegalArgumentException("Token class does not declare token type: " + beanClass.getName());

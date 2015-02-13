@@ -15,18 +15,17 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
+import java.util.Collection;
+
+import javax.inject.Inject;
+
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
-import org.forgerock.util.Reject;
-
-import javax.inject.Inject;
-import java.util.Collection;
 
 /**
  * Performs a search against an LDAP Connection.
@@ -36,9 +35,8 @@ public class LdapSearchHandler {
     private final LDAPConfig ldapConfig;
 
     @Inject
-    public LdapSearchHandler(DataLayerConfiguration ldapConfig) {
-        Reject.ifFalse(ldapConfig instanceof LdapDataLayerConfiguration);
-        this.ldapConfig = (LDAPConfig) ldapConfig;
+    public LdapSearchHandler(LdapDataLayerConfiguration ldapConfig) {
+        this.ldapConfig = ldapConfig;
     }
 
     /**

@@ -19,16 +19,14 @@ import static org.fest.assertions.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.text.MessageFormat;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
-import org.forgerock.openam.sm.SMSDataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
 import org.forgerock.openam.sm.datalayer.impl.ResourceSetDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -38,11 +36,11 @@ public class ConnectionCountTest {
 
     @BeforeMethod
     public void setup() {
-        DataLayerConfiguration ctsConfiguration = mock(DataLayerConfiguration.class);
-        DataLayerConfiguration resourceSetConfiguration = mock(DataLayerConfiguration.class);
+        LdapDataLayerConfiguration ctsConfiguration = mock(LdapDataLayerConfiguration.class);
+        LdapDataLayerConfiguration resourceSetConfiguration = mock(LdapDataLayerConfiguration.class);
         when(ctsConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         when(resourceSetConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
-        Map<ConnectionType, DataLayerConfiguration> configMap = new HashMap<ConnectionType, DataLayerConfiguration>();
+        Map<ConnectionType, LdapDataLayerConfiguration> configMap = new HashMap<ConnectionType, LdapDataLayerConfiguration>();
         configMap.put(ConnectionType.CTS_ASYNC, ctsConfiguration);
         configMap.put(ConnectionType.RESOURCE_SETS, resourceSetConfiguration);
         count = new ConnectionCount(configMap);
@@ -96,8 +94,8 @@ public class ConnectionCountTest {
     }
 
     public static void main(String... args) {
-        Map<ConnectionType, DataLayerConfiguration> configMap = new HashMap<ConnectionType, DataLayerConfiguration>();
-        configMap.put(ConnectionType.CTS_ASYNC, new CTSDataLayerConfiguration(null, "ou=root-dn"));
+        Map<ConnectionType, LdapDataLayerConfiguration> configMap = new HashMap<ConnectionType, LdapDataLayerConfiguration>();
+        configMap.put(ConnectionType.CTS_ASYNC, new CTSDataLayerConfiguration("ou=root-dn"));
         configMap.put(ConnectionType.RESOURCE_SETS, new ResourceSetDataLayerConfiguration("ou=root-dn"));
         ConnectionCount count = new ConnectionCount(configMap);
         System.out.println("Total = Async:Reaper:Data");

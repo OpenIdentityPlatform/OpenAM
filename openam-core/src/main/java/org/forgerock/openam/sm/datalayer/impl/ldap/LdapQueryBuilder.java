@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
@@ -62,11 +61,11 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
      * @param dataLayerConfiguration Required for data store dataLayerConfiguration.
      */
     @Inject
-    public LdapQueryBuilder(DataLayerConfiguration dataLayerConfiguration, LdapSearchHandler handler,
+    public LdapQueryBuilder(LdapDataLayerConfiguration dataLayerConfiguration, LdapSearchHandler handler,
             @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug,
             Map<Class, EntryConverter> converterMap) {
         super(debug);
-        this.dataLayerConfiguration = (LdapDataLayerConfiguration) dataLayerConfiguration;
+        this.dataLayerConfiguration = dataLayerConfiguration;
         this.handler = handler;
         this.converterMap = converterMap;
     }

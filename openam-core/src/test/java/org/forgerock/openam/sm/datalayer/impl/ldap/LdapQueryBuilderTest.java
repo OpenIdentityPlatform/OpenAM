@@ -57,7 +57,7 @@ public class LdapQueryBuilderTest {
 
     @BeforeMethod
     public void setUp() throws Exception {
-        config = new CTSDataLayerConfiguration(null, "ou=test-case");
+        config = new CTSDataLayerConfiguration("ou=test-case");
         searchHandler = mock(LdapSearchHandler.class);
         mockConnection = mock(Connection.class);
         partialTokenEntryConverter = mock(EntryConverter.class);

@@ -88,7 +88,7 @@ import org.forgerock.openam.oauth2.OpenAMResourceOwnerSessionValidator;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.oauth2.resources.OpenAMResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
-import org.forgerock.openam.oauth2.resources.ResourceSetTokenIdGenerator;
+import org.forgerock.openam.sm.datalayer.utils.ThreadSafeTokenIdGenerator;
 import org.forgerock.openam.openidconnect.OpenAMOpenIDConnectProvider;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectClientRegistrationService;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdTokenIssuer;
@@ -188,7 +188,7 @@ public class OAuth2GuiceModule extends AbstractModule {
                 .implement(ResourceSetStore.class, OpenAMResourceSetStore.class)
                 .build(ResourceSetStoreFactory.class));
 
-        bind(TokenIdGenerator.class).to(ResourceSetTokenIdGenerator.class);
+        bind(TokenIdGenerator.class).to(ThreadSafeTokenIdGenerator.class);
 
         Multibinder.newSetBinder(binder(), TokenIntrospectionHandler.class)
                 .addBinding().to(OAuth2TokenIntrospectionHandler.class);

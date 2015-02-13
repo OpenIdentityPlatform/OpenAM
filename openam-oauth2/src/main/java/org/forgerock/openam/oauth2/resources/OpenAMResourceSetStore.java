@@ -30,13 +30,10 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
-import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
-import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 
 import com.google.inject.assistedinject.Assisted;
@@ -63,15 +60,7 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
      */
     @Inject
     public OpenAMResourceSetStore(@Assisted String realm, OAuth2ProviderSettingsFactory providerSettingsFactory,
-            TokenIdGenerator idGenerator, @DataLayer(ConnectionType.RESOURCE_SETS) TaskExecutor taskExecutor,
-            @DataLayer(ConnectionType.RESOURCE_SETS) TaskFactory taskFactory,
-            JavaBeanAdapter<ResourceSetDescription> adapter) {
-        this(realm, providerSettingsFactory, idGenerator,
-                new TokenDataStore<ResourceSetDescription>(adapter, taskExecutor, taskFactory));
-    }
-
-    OpenAMResourceSetStore(String realm, OAuth2ProviderSettingsFactory providerSettingsFactory, TokenIdGenerator idGenerator,
-            TokenDataStore<ResourceSetDescription> delegate) {
+            TokenIdGenerator idGenerator, @DataLayer(ConnectionType.RESOURCE_SETS) TokenDataStore delegate) {
         this.realm = realm;
         this.providerSettingsFactory = providerSettingsFactory;
         this.delegate = delegate;

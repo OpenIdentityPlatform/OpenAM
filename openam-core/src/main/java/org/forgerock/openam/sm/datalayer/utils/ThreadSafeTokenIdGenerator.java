@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.oauth2.resources;
+package org.forgerock.openam.sm.datalayer.utils;
 
 import java.util.UUID;
 
@@ -28,7 +28,7 @@ import org.forgerock.openam.utils.PerThreadCache;
  * representation of that UUID.
  */
 @Singleton
-public class ResourceSetTokenIdGenerator implements TokenIdGenerator {
+public class ThreadSafeTokenIdGenerator implements TokenIdGenerator {
 
     private static final PerThreadCache<IdCache, RuntimeException> ID_CACHE =
             new PerThreadCache<IdCache, RuntimeException>(Integer.MAX_VALUE) {

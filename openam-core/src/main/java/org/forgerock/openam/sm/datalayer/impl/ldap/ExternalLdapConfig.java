@@ -27,9 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.ldap.LDAPURL;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.sm.ConnectionConfig;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
 import org.forgerock.openam.utils.ModifiedProperty;
-import org.forgerock.util.Reject;
 
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
@@ -157,11 +155,7 @@ public class ExternalLdapConfig implements ConnectionConfig {
     /**
      * Causes this instance to refresh its configuration.
      */
-    public void update(DataLayerConfiguration configuration) {
-        if (!(configuration instanceof LdapDataLayerConfiguration)) {
-            throw new IllegalArgumentException("configuration param must be an instance of LdapDataLayerConfiguration");
-        }
-        LdapDataLayerConfiguration config = (LdapDataLayerConfiguration) configuration;
+    public void update(LdapDataLayerConfiguration config) {
         config.updateExternalLdapConfiguration(hosts, username, password, maxConnections, sslMode, heartbeat);
     }
 

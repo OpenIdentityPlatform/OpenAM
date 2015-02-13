@@ -179,7 +179,7 @@ public class TokenAttributeConversionTest {
     }
 
     private LdapTokenAttributeConversion generateTokenAttributeConversion() {
-        LdapDataLayerConfiguration config = new CTSDataLayerConfiguration(null, "ou=test-case");
+        LdapDataLayerConfiguration config = new CTSDataLayerConfiguration("ou=test-case");
         LDAPDataConversion dataConversion = new LDAPDataConversion();
         return new LdapTokenAttributeConversion(dataConversion, config);
     }

@@ -30,8 +30,8 @@ public class UmaAuditLogger {
     private JavaBeanAdapter<UmaAuditEntry> umaAuditEntryAdapter;
 
     @Inject
-    public UmaAuditLogger(@DataLayer(ConnectionType.DATA_LAYER) TaskExecutor taskDispatcher, @DataLayer
-            (ConnectionType.DATA_LAYER) TaskFactory taskFactory, JavaBeanAdapter<UmaAuditEntry>
+    public UmaAuditLogger(@DataLayer(ConnectionType.RESOURCE_SETS) TaskExecutor taskDispatcher, @DataLayer
+            (ConnectionType.RESOURCE_SETS) TaskFactory taskFactory, JavaBeanAdapter<UmaAuditEntry>
             umaAuditEntryAdapter) {
         this.taskDispatcher = taskDispatcher;
         this.taskFactory = taskFactory;

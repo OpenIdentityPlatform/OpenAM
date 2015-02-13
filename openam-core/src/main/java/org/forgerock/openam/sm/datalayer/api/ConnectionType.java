@@ -15,11 +15,15 @@
  */
 package org.forgerock.openam.sm.datalayer.api;
 
+import org.forgerock.openam.cts.impl.CTSConnectionModule;
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
+import org.forgerock.openam.cts.impl.CTSAsyncConnectionModule;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.reaper.CTSReaper;
 import org.forgerock.openam.entitlement.indextree.IndexTreeService;
+import org.forgerock.openam.sm.SMSConnectionModule;
 import org.forgerock.openam.sm.SMSDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.impl.ResourceSetConnectionModule;
 import org.forgerock.openam.sm.datalayer.impl.ResourceSetDataLayerConfiguration;
 import org.forgerock.openam.utils.StringUtils;
 
@@ -43,33 +47,33 @@ public enum ConnectionType {
     /**
      * @see TaskDispatcher
      */
-    CTS_ASYNC(CTSDataLayerConfiguration.class),
+    CTS_ASYNC(CTSAsyncConnectionModule.class),
     /**
      * @see CTSReaper
      */
-    CTS_REAPER(CTSDataLayerConfiguration.class),
+    CTS_REAPER(CTSConnectionModule.class),
     /**
      * @see IndexTreeService
      */
-    DATA_LAYER(SMSDataLayerConfiguration.class),
+    DATA_LAYER(SMSConnectionModule.class),
     /**
      * @see org.forgerock.oauth2.resources.ResourceSetStore
      */
-    RESOURCE_SETS(ResourceSetDataLayerConfiguration.class);
+    RESOURCE_SETS(ResourceSetConnectionModule.class);
 
-    private static final String CONFIGURATION_CLASS_PROPERTY_PREFIX = "org.forgerock.openam.sm.datalayer.";
-    private final Class<? extends DataLayerConfiguration> configurationClass;
+    private static final String CONFIGURATION_CLASS_PROPERTY_PREFIX = "org.forgerock.openam.sm.datalayer.module.";
+    private final Class<? extends DataLayerConnectionModule> configurationClass;
 
-    private ConnectionType(Class<? extends DataLayerConfiguration> defaultConfigurationClass) {
+    private ConnectionType(Class<? extends DataLayerConnectionModule> defaultConfigurationClass) {
         this.configurationClass = defaultConfigurationClass;
     }
 
-    public Class<? extends DataLayerConfiguration> getConfigurationClass() {
+    public Class<? extends DataLayerConnectionModule> getConfigurationClass() {
         String configuredTypeKey = CONFIGURATION_CLASS_PROPERTY_PREFIX + this.name();
         String configuredType = SystemProperties.get(configuredTypeKey);
         if (StringUtils.isNotBlank(configuredType)) {
             try {
-                return Class.forName(configuredType).asSubclass(DataLayerConfiguration.class);
+                return Class.forName(configuredType).asSubclass(DataLayerConnectionModule.class);
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException("Configured data layer configuration type does not exist: " +
                         configuredTypeKey + " is configured as " + configuredType);

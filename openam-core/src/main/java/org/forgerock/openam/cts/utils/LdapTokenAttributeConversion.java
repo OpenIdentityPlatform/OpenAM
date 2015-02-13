@@ -15,26 +15,24 @@
  */
 package org.forgerock.openam.cts.utils;
 
+import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
+
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
-import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
-import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.impl.LDAPConfig;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.AttributeDescription;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.LinkedHashMapEntry;
-import org.forgerock.util.Reject;
-
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Responsible for the conversion to and from LDAP Entry and Token.
@@ -61,10 +59,9 @@ public class LdapTokenAttributeConversion {
 
     @Inject
     public LdapTokenAttributeConversion(LDAPDataConversion conversion,
-            DataLayerConfiguration dataLayerConfiguration) {
-        Reject.ifFalse(dataLayerConfiguration instanceof LdapDataLayerConfiguration);
+            LdapDataLayerConfiguration dataLayerConfiguration) {
         this.conversion = conversion;
-        this.dataLayerConfiguration = (LdapDataLayerConfiguration) dataLayerConfiguration;
+        this.dataLayerConfiguration = dataLayerConfiguration;
     }
 
     /**

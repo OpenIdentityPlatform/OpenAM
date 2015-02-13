@@ -30,7 +30,6 @@ import java.util.Set;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
 import org.forgerock.openam.ldap.LDAPURL;
-import org.forgerock.openam.sm.datalayer.api.DataLayerConfiguration;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
@@ -45,12 +44,12 @@ import com.sun.identity.shared.debug.Debug;
 public class ExternalLdapConfigTest extends PowerMockTestCase {
 
     private Debug debug;
-    private DataLayerConfiguration dataLayerConfiguration;
+    private LdapDataLayerConfiguration dataLayerConfiguration;
 
     @BeforeMethod
     public void setup() {
         this.debug = mock(Debug.class);
-        this.dataLayerConfiguration = spy(new CTSDataLayerConfiguration(null, "ou=root-dn"));
+        this.dataLayerConfiguration = spy(new CTSDataLayerConfiguration("ou=root-dn"));
     }
 
     @Test
