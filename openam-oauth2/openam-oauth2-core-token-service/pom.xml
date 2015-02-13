@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-oauth2</artifactId>
-        <version>11.0.3</version>
+        <version>11.0.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>openam-oauth2-core-token-service</artifactId>

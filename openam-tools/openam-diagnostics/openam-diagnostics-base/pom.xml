@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-diagnostics</artifactId>
-        <version>11.0.3</version>
+        <version>11.0.4-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
