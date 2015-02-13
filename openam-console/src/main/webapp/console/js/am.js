@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyright 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 /**
@@ -72,7 +73,7 @@ function submitValidate(btn, val) {
  * @param val The name of the attribute for which the validation is needed.
  */
 function submitFileUpload(btn, val) {
-    var uploadWindow = window.open(SCRIPT_UPLOAD_URL, val, 'height=300,width=650');
+    var uploadWindow = window.open("../authentication/" + SCRIPT_UPLOAD_URL, val, 'height=300,width=650');
     uploadWindow.focus();
 }
 

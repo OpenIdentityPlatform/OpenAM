@@ -27,31 +27,44 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.console.service;
 
-import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.NavigationException;
 import com.iplanet.jato.RequestContext;
+import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.sun.identity.authentication.util.AMAuthUtils;
+import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.AMServiceProfile;
-import com.sun.identity.console.base.AMServiceProfileViewBeanBase;
+import com.sun.identity.console.base.ScriptValidatorViewBean;
+import com.sun.identity.console.base.model.AMAdminConstants;
+import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.base.model.AMServiceProfileModel;
 import com.sun.identity.console.base.model.SMSubConfig;
 import com.sun.identity.console.components.view.html.SerializedField;
+import com.sun.identity.console.service.model.SubConfigModel;
+import com.sun.identity.console.service.model.SubConfigModelImpl;
 import com.sun.identity.console.service.model.SubSchemaModel;
 import com.sun.identity.console.service.model.SubSchemaModelImpl;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.DynamicAttributeValidator;
+import com.sun.identity.sm.SMSEntry;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.view.alert.CCAlert;
+import com.sun.web.ui.view.html.CCRadioButton;
 import com.sun.web.ui.view.table.CCActionTable;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,17 +73,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import com.sun.identity.console.base.model.AMAdminConstants; 
-import com.sun.identity.console.service.model.SubConfigModel;
-import com.sun.identity.console.service.model.SubConfigModelImpl;
-import com.sun.identity.sm.SMSEntry;
-import com.sun.web.ui.view.html.CCRadioButton;
 
-public class SCServiceProfileViewBean extends AMServiceProfileViewBeanBase {
+public class SCServiceProfileViewBean extends ScriptValidatorViewBean {
     public static final String DEFAULT_DISPLAY_URL =
         "/console/service/SCServiceProfile.jsp";
     public static final String PAGE_NAME = "SCServiceProfile";
 
+    private static final String validatorAttributeName = "ScriptValidator";
     private boolean populatedSubConfigTable;
 
     /**
@@ -152,12 +161,11 @@ public class SCServiceProfileViewBean extends AMServiceProfileViewBeanBase {
         super.forwardTo(reqContext);
     }
 
-     public void beginDisplay(DisplayEvent event)
-        throws ModelControlException {
+    public void beginDisplay(DisplayEvent event) throws ModelControlException {
         super.beginDisplay(event);
 
-        SubSchemaModel model = (SubSchemaModel)getModel();
-        if (model.hasGlobalSubSchema()){
+        SubSchemaModel model = (SubSchemaModel) getModel();
+        if (model.hasGlobalSubSchema()) {
             if (!submitCycle) {
                 populateTableModel(model.getSubConfigurations());
             }
@@ -165,45 +173,48 @@ public class SCServiceProfileViewBean extends AMServiceProfileViewBeanBase {
 
             Map createable = model.getCreateableSubSchemaNames();
             if (createable.isEmpty()) {
-                resetButtonState(
-                    AMPropertySheetModel.TBL_SUB_CONFIG_BUTTON_ADD);
+                resetButtonState(AMPropertySheetModel.TBL_SUB_CONFIG_BUTTON_ADD);
             } else {
-                SubConfigModel scModel = getSubConfigModel(); 
+                SubConfigModel scModel = getSubConfigModel();
                 boolean canCreate = false;
-                for (Iterator i = createable.keySet().iterator(); 
-                    i.hasNext() && !canCreate;
-                ) {
-                    String name = (String)i.next();
-                    String plugin = scModel.getSelectableSubConfigNamesPlugin(
-                        name);
+                for (Iterator i = createable.keySet().iterator(); i.hasNext() && !canCreate;) {
+                    String name = (String) i.next();
+                    String plugin = scModel.getSelectableSubConfigNamesPlugin(name);
                     if (plugin == null) {
                         canCreate = true;
                     } else {
-                        Set subconfigNames = scModel.getSelectableConfigNames(
-                            name);
-                        canCreate = (subconfigNames != null) && 
-                            !subconfigNames.isEmpty();
+                        Set subconfigNames = scModel.getSelectableConfigNames(name);
+                        canCreate = (subconfigNames != null) && !subconfigNames.isEmpty();
                     }
                 }
-                disableButton(AMPropertySheetModel.TBL_SUB_CONFIG_BUTTON_ADD,
-                    !canCreate);              
+                disableButton(AMPropertySheetModel.TBL_SUB_CONFIG_BUTTON_ADD, !canCreate);
             }
         }
-        if(serviceName.equals("iPlanetAMAuthHTTPBasicService")){
-             CCRadioButton radio = (CCRadioButton)getChild(
-                            "iplanet-am-auth-http-basic-module-configured");             
-            if((radio.getValue()==null) || (radio.getValue().equals(""))){
-                String defaultModule = new String();                               
+        final AMPropertySheet propertySheet = (AMPropertySheet) getChild(PROPERTY_ATTRIBUTE);
+        Map<String, Set<String>> valueMap = unpersistedValueMap;
+
+        if (serviceName.equals("iPlanetAMAuthHTTPBasicService")) {
+            CCRadioButton radio = (CCRadioButton) getChild("iplanet-am-auth-http-basic-module-configured");
+            if ((radio.getValue() == null) || (radio.getValue().equals(""))) {
+                String defaultModule = new String();
                 String realmName = SMSEntry.getRootSuffix();
                 if (realmName != null) {
-                    List moduleList = 
-                        AMAuthUtils.getModuleInstancesForHttpBasic(realmName);                 
-                if (!moduleList.isEmpty()){
-                    defaultModule =  (String) moduleList.get(0);                   
-                    radio.setValue(defaultModule);
+                    List moduleList = AMAuthUtils.getModuleInstancesForHttpBasic(realmName);
+                    if (!moduleList.isEmpty()) {
+                        defaultModule = (String) moduleList.get(0);
+                        radio.setValue(defaultModule);
+                    }
                 }
-                }
-             }
+            }
+        } else if (serviceName.equals("iPlanetAMAuthDeviceIdMatchService")
+                || serviceName.equals("iPlanetAMAuthScriptedService")) {
+            // If this is not a dynamic request the UI is set with persisted values
+            if (!dynamicRequest) {
+                valueMap = model.getAttributeValues();
+            }
+            if (valueMap != null) {
+                propertySheet.setAttributeValues(valueMap, model);
+            }
         }
     }
 
@@ -357,19 +368,6 @@ public class SCServiceProfileViewBean extends AMServiceProfileViewBeanBase {
         vb.forwardTo(getRequestContext());
     }
 
-    protected String getBreadCrumbDisplayName() {
-        AMModel model = (AMModel)getModel();
-        String serviceName = (String)getPageSessionAttribute(
-            AMServiceProfile.SERVICE_NAME);
-        Object[] arg = {model.getLocalizedServiceName(serviceName)};
-        return MessageFormat.format(model.getLocalizedString(
-            "breadcrumbs.services.edit"), arg);
-    }
-
-    protected boolean startPageTrail() {
-        return false;
-    }
-
     // button1 (Save) request done in AMServiceProfileViewBean
     // button2 (Reset) request done in AMServiceProfileViewBean
 
@@ -390,5 +388,47 @@ public class SCServiceProfileViewBean extends AMServiceProfileViewBeanBase {
         } catch (ClassNotFoundException e) {
             debug.warning("SCServiceProfileViewBean.handleButton3Request:", e);
         }
+    }
+
+    protected String getBreadCrumbDisplayName() {
+        AMModel model = (AMModel) getModel();
+        String serviceName = (String) getPageSessionAttribute(AMServiceProfile.SERVICE_NAME);
+        Object[] arg = { model.getLocalizedServiceName(serviceName) };
+        return MessageFormat.format(model.getLocalizedString("breadcrumbs.services.edit"), arg);
+    }
+
+    protected boolean startPageTrail() {
+        return false;
+    }
+
+    /**
+     * Retrieve the validators specified for the attribute, invoke their
+     * validate methods and display the validation messages if any are present.
+     * 
+     * @param attributeName The name of the attribute for which the validation should be done.
+     */
+    protected void handleDynamicValidationRequest(String attributeName) {
+
+        try {
+            ServiceSchemaManager serviceSchemaManager = new ServiceSchemaManager(serviceName,
+                    AMAdminUtils.getSuperAdminSSOToken());
+            ServiceSchema organizationSchema = serviceSchemaManager.getOrganizationSchema();
+            AttributeSchema attributeSchema = organizationSchema.getAttributeSchema(validatorAttributeName);
+            Set<?> defaultValues = attributeSchema.getDefaultValues();
+            final Iterator<?> javaClasses = defaultValues.iterator();
+            final List<DynamicAttributeValidator> validatorList = new ArrayList<DynamicAttributeValidator>();
+            while (javaClasses.hasNext()) {
+                final String javaClass = (String) javaClasses.next();
+                final Class<?> clazz = Class.forName(javaClass);
+                if (DynamicAttributeValidator.class.isAssignableFrom(clazz)) {
+                    validatorList.add((DynamicAttributeValidator) clazz.newInstance());
+                }
+            }
+            validateScript(attributeName, "", validatorList);
+
+        } catch (Exception e) {
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        }
+        forwardTo();
     }
 }

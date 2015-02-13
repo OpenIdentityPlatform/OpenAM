@@ -26,8 +26,9 @@
  *
  */
 
-/**
- * Portions Copyright 2014 ForgeRock AS
+/*
+ * Portions Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package com.sun.identity.console.authentication;
@@ -42,39 +43,25 @@ import com.sun.identity.console.authentication.model.AuthPropertiesModel;
 import com.sun.identity.console.authentication.model.AuthPropertiesModelImpl;
 import com.sun.identity.console.authentication.model.AuthProfileModelImpl;
 import com.sun.identity.console.base.AMPropertySheet;
-import com.sun.identity.console.base.AMServiceProfileViewBeanBase;
+import com.sun.identity.console.base.AMServiceProfile;
+import com.sun.identity.console.base.ScriptValidatorViewBean;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.sm.DynamicAttributeValidator;
 import com.sun.web.ui.view.alert.CCAlert;
-import org.owasp.esapi.ESAPI;
-import org.owasp.esapi.Encoder;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
-public class EditAuthTypeViewBean
-    extends AMServiceProfileViewBeanBase
-{
+public class EditAuthTypeViewBean extends ScriptValidatorViewBean {
+
     public static final String DEFAULT_DISPLAY_URL = "/console/authentication/EditAuthType.jsp";
     public static final String SERVICE_TYPE = "authServiceType";
 
-    private static final String DYNAMIC_VALIDATION = "dynamic_validation";
-    private static final String ATTRIBUTE_NAME = "attrname";
-    private static final String HTML_BREAK = "<br>";
-
     private AuthPropertiesModel authModel = null;
-    private boolean dynamicRequest = false;
-    private Map<String, Set<String>> unpersistedValueMap;
 
     /**
      * Creates a authentication module edit view bean.
@@ -106,87 +93,22 @@ public class EditAuthTypeViewBean
     }
 
     /**
-     * Checks to see if this is a dynamic validator request, if not execution is passed to the parent.
-     *
-     * @param event Request invocation event.
-     */
-    public void handleDynLinkRequest(RequestInvocationEvent event) {
-        final HttpServletRequest request = event.getRequestContext().getRequest();
-        final String attributeName = request.getParameter(ATTRIBUTE_NAME);
-
-        if (Boolean.parseBoolean(request.getParameter(DYNAMIC_VALIDATION))) {
-            handleDynamicValidationRequest(attributeName);
-        } else {
-            super.handleDynLinkRequest(event);
-        }
-    }
-
-    /**
      * Retrieve the validators specified for the attribute, invoke their validate methods
      * and display the validation messages if any are present.
-     *
+     * 
      * @param attributeName The name of the attribute for which the validation should be done.
      */
-    private void handleDynamicValidationRequest(String attributeName) {
+    protected void handleDynamicValidationRequest(String attributeName) {
         try {
-            // Store the current attribute values from the UI to render when beginDisplay is called
-            unpersistedValueMap = getUnpersistedValueMap();
-            dynamicRequest = true;
             final String instance = (String) getPageSessionAttribute(SERVICE_TYPE);
-            final List<DynamicAttributeValidator> validatorList = getAuthModel().
-                    getDynamicValidators(instance, attributeName);
-            final StringBuilder messageBuilder = new StringBuilder();
-            final Encoder encoder = ESAPI.encoder();
+            final List<DynamicAttributeValidator> validatorList = getAuthModel().getDynamicValidators(instance,
+                    attributeName);
+            validateScript(attributeName, instance,  validatorList);
 
-            for (DynamicAttributeValidator validator : validatorList) {
-                if (!validator.validate(instance, attributeName, unpersistedValueMap)) {
-                    final String message = validator.getValidationMessage();
-                    if (message != null) {
-                        final String[] messageLines = validator.getValidationMessage().split("\n");
-                        for (String line : messageLines) {
-                            if (line != null && !line.trim().isEmpty()) {
-                                messageBuilder.append(encoder.encodeForHTML(line));
-                                messageBuilder.append(HTML_BREAK);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (messageBuilder.length() > 0) {
-                final String message = messageBuilder.substring(0, messageBuilder.length() - HTML_BREAK.length());
-                setInlineAlertMessage(CCAlert.TYPE_WARNING, "message.warning", message, false);
-            } else {
-                setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", "message.validation.success");
-            }
-        } catch (AMConsoleException e) {
+        } catch (Exception e) {
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
         }
         forwardTo();
-    }
-
-    /**
-     * Converts the Attribute Value map to a checked map.
-     * @return A checked attribute value map.
-     */
-    private Map<String, Set<String>> getUnpersistedValueMap() {
-        final Map<String, Set<String>> checkedValueMap = new HashMap<String, Set<String>>();
-
-        if (propertySheetModel != null) {
-            final Map uncheckedValueMap = propertySheetModel.getAttributeValueMap();
-            final Iterator<Map.Entry> oldIterator = uncheckedValueMap.entrySet().iterator();
-
-            while (oldIterator.hasNext()) {
-                final Map.Entry entry = oldIterator.next();
-                final Set<String> valueSet = new HashSet<String>();
-                final Object[] objectValues = (Object[]) entry.getValue();
-                final String[] stringValues = Arrays.copyOf(objectValues, objectValues.length, String[].class);
-                Collections.addAll(valueSet, stringValues);
-                checkedValueMap.put((String) entry.getKey(), valueSet);
-            }
-        }
-
-        return checkedValueMap;
     }
 
     /**
@@ -260,7 +182,7 @@ public class EditAuthTypeViewBean
     }
 
     /**
-     * Handles save request.
+     * Handles reset request.
      * 
      * @param event Request invocation event.
      */
@@ -285,8 +207,8 @@ public class EditAuthTypeViewBean
     }  
 
     /**
-     * Handles reset request.
-     *
+     * Handles back request.
+     * 
      * @param event Request invocation event
      */
     public void handleButton3Request(RequestInvocationEvent event) {
@@ -303,6 +225,17 @@ public class EditAuthTypeViewBean
         }
         passPgSessionMap(vb);
         vb.forwardTo(getRequestContext());
+    }
+
+    protected String getBreadCrumbDisplayName() {
+        AMModel model = (AMModel) getModel();
+        String serviceName = (String) getPageSessionAttribute(AMServiceProfile.SERVICE_NAME);
+        Object[] arg = { model.getLocalizedServiceName(serviceName) };
+        return MessageFormat.format(model.getLocalizedString("breadcrumbs.services.edit"), arg);
+    }
+
+    protected boolean startPageTrail() {
+        return false;
     }
 
     protected Map getValues()
@@ -336,18 +269,6 @@ public class EditAuthTypeViewBean
                 rc.getRequest(), getPageSessionAttributes());
         }
         return authModel;
-    }
-
-    protected String getBreadCrumbDisplayName() {
-        String instance = (String)getPageSessionAttribute(SERVICE_TYPE);
-        String[] arg = {instance};
-        AuthPropertiesModel model = getAuthModel();
-        return MessageFormat.format(model.getLocalizedString(
-            "breadcrumbs.auth.editInstance"), (Object[])arg);
-    }
-
-    protected boolean startPageTrail() {
-        return false;
     }
 
     protected AMModel getModelInternal() {
