@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
         },
        revokeAll: function() {
            // TODO Use i18n
-            uiUtils.jqConfirm($.t("policy.uma.revokeMessage"), function() {
+            uiUtils.jqConfirm($.t("policy.uma.resources.show.revokeAllMessage"), function() {
                 // TODO: Make a call to the policy delegate to revoke all access
             }, 325);
         },
@@ -128,17 +128,18 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
             grid = new Backgrid.Grid({
                 columns: [{
                     name: "name",
-                    label: $.t("policy.uma.resources.resourceGrid.name"),
+                    label: $.t("policy.uma.resources.show.grid.0"),
                     cell: Backgrid.StringCell,
+                    headerCell: backgridUtils.FilterHeaderCell,
                     editable: false
                 }, {
-                    name: "lastModifiedBy",
-                    label: $.t("policy.uma.resources.resourceGrid.lastModifiedBy"),
+                    name: "lastModifiedDate",
+                    label: $.t("policy.uma.resources.show.grid.1"),
                     cell: backgridUtils.DatetimeAgoCell,
                     editable: false
                 }, {
                     name: "permissions",
-                    label: $.t("policy.uma.resources.resourceGrid.permissions"),
+                    label: $.t("policy.uma.resources.show.grid.2"),
                     cell: SelectizeCell,
                     editable: false
                 }, {
@@ -147,7 +148,8 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
                     cell: RevokeCell,
                     editable: false
                 }],
-                collection: userResources
+                collection: userResources,
+                emptyText: $.t("policy.uma.all.grid.empty")
             });
 
             paginator = new Backgrid.Extension.Paginator({

@@ -73,7 +73,7 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
             columns = [
                 {
                     name: "name",
-                    label: $.t("policy.uma.resources.grid.name"),
+                    label: $.t("policy.uma.resources.list.grid.0"),
                     cell: backgridUtils.UriExtCell,
                     headerCell: backgridUtils.FilterHeaderCell,
                     href: function(rawValue, formattedValue, model){
@@ -85,20 +85,20 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
                 },
                 {
                     name: "lastModifiedBy",
-                    label: $.t("policy.uma.resources.grid.lastModifiedBy"),
+                    label: $.t("policy.uma.resources.list.grid.1"),
                     editable: false,
                     headerCell: backgridUtils.FilterHeaderCell,
                     cell: backgridUtils.UnversalIdToUsername
                 },
                 {
                     name: "lastModifiedDate",
-                    label: $.t("policy.uma.resources.grid.creationDate"),
+                    label: $.t("policy.uma.resources.list.grid.2"),
                     cell: "datetime",
                     editable: false
                 },
                 {
                     name: "resources",
-                    label: $.t("policy.uma.resources.grid.resources"),
+                    label: $.t("policy.uma.resources.list.grid.3"),
                     editable: false,
                     cell: backgridUtils.UriExtCell,
                     href: function(rawValue, formattedValue, model){
@@ -111,7 +111,7 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
             grid = new Backgrid.Grid({
                 columns: columns,
                 collection: resourceSetCollection,
-                emptyText: "No results..." // localisation
+                emptyText: $.t("policy.uma.all.grid.empty")
             });
 
             paginator = new Backgrid.Extension.Paginator({

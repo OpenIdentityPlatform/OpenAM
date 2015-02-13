@@ -73,7 +73,7 @@ define("org/forgerock/openam/ui/uma/HistoryView", [
             columns = [
                 {
                     name: "username_who_accessed",
-                    label: $.t("policy.uma.history.grid.userName"),
+                    label: $.t("policy.uma.history.grid.0"),
                     cell: backgridUtils.UriExtCell,
                     href: function(rawValue, formattedValue, model){
                         return "#uma/users/" + formattedValue + "/activity/";
@@ -82,13 +82,13 @@ define("org/forgerock/openam/ui/uma/HistoryView", [
                 },
                 {
                     name: "resource_name",
-                    label: $.t("policy.uma.history.grid.resourceName"),
+                    label: $.t("policy.uma.history.grid.1"),
                     cell: 'string',
                     editable: false
                 },
                 {
                     name: "appname",
-                    label: $.t("policy.uma.history.grid.appName"),
+                    label: $.t("policy.uma.history.grid.2"),
                     cell: 'uri',
                     href: function(rawValue, formattedValue, model){
                         return "#uma/apps/" + formattedValue + "/activity/";
@@ -97,7 +97,7 @@ define("org/forgerock/openam/ui/uma/HistoryView", [
                 },
                 {
                     name: "lastModifiedDate",
-                    label: $.t("policy.uma.history.grid.creationDate"),
+                    label: $.t("policy.uma.history.grid.3"),
                     cell: backgridUtils.DatetimeAgoCell,
                     editable: false
                 }
@@ -106,7 +106,7 @@ define("org/forgerock/openam/ui/uma/HistoryView", [
 
             grid = new Backgrid.Grid({
                 columns: columns,
-                emptyText: $.t("policy.uma.noResults"),
+                emptyText: $.t("policy.uma.all.grid.empty"),
                 collection: historyCollection
             });
 

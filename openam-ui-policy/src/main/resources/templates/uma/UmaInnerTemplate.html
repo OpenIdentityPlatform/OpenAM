@@ -5,11 +5,11 @@
 <div class="policy-content clear-fix" id="uma">
     {{#if resourceSet}}
     <div id="selectUser" class="float-left">
-        <label>{{t 'policy.uma.searchPeople'}}</label>
+        <label>{{t 'policy.uma.share.people'}}</label>
         <select placeholder="{{t 'common.form.startTypingToSearch'}}"></select>
     </div>
     <div id="selectPermission" class="float-left">
-        <label>{{t 'policy.uma.selectPermission'}}</label>
+        <label>{{t 'policy.uma.share.permission'}}</label>
         <select multiple class="selectize">
             <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
             {{#each resourceSet.scopes}}
@@ -18,11 +18,11 @@
         </select>
     </div>
 
-    <input type="button" value="{{t 'policy.uma.share'}}" id="shareButton" class="button" disabled/>
+    <input type="button" value="{{t 'policy.uma.share.share'}}" id="shareButton" class="button" disabled/>
 
     {{else}}
     <div class="striped-list" id="resourceList">
-        <ul><li class="highlight-warning">{{t 'policy.uma.notSpecifiedResource'}}</li></ul>
+        <ul><li class="highlight-warning">{{t 'policy.uma.share.notSpecifiedResource'}}</li></ul>
     </div>
     {{/if}}
 

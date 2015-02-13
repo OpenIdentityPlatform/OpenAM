@@ -106,7 +106,7 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
         render: function() {
             var filter = new Backgrid.Extension.ServerSideFilter({
                 name: this.column.get("name"),
-                placeholder: $.t('policy.uma.filterBy') + ' ' + this.column.get("label"),
+                placeholder: $.t('policy.uma.resources.all.grid.filter', { header: this.column.get("label") }),
                 collection: this.collection
             });
             this.collection.state.filters = this.collection.state.filters ? this.collection.state.filters : [];
