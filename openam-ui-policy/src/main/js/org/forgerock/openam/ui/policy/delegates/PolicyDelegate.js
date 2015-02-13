@@ -236,9 +236,16 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
         });
     };
 
-    obj.getResourceSetFromId = function (id) {
+    obj.getResourceSetFromId = function (uid) {
         return obj.serviceCall({
-            url: "/users/" + conf.loggedUser.userid.id + "/oauth2/resourcesets/" + id,
+            url: "/users/" + conf.loggedUser.userid.id + "/oauth2/resourcesets/" + uid,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+        });
+    };
+
+    obj.getPoliciesById = function (uid) {
+        return obj.serviceCall({
+            url: "/users/" + conf.loggedUser.userid.id + "/uma/policies/" + uid,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };

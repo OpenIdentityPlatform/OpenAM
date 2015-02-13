@@ -32,14 +32,15 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
     "org/forgerock/openam/ui/uma/util/UmaUtils",
-    "org/forgerock/commons/ui/common/main/Router"
-], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, UmaUtils, router) {
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate"
+], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, UmaUtils, router, policyDelegate) {
     var ResourceView = AbstractView.extend({
         template: "templates/uma/ResourceTemplate.html",
         baseTemplate: "templates/policy/BaseTemplate.html",
         events: {
-          "click a#revokeAll": "revokeAll",
-          "click a#share": "share"
+            "click a#revokeAll": "revokeAll",
+            "click a#share": "share"
         },
        revokeAll: function() {
            // TODO Use i18n
@@ -49,22 +50,27 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
         },
         share: function(e) {
             e.preventDefault();
-            eventManager.sendEvent(constants.EVENT_SHOW_DIALOG,
-            {
+            eventManager.sendEvent(constants.EVENT_SHOW_DIALOG,{
                 route: router.configuration.routes.resourceEdit,
-                args: [this.data.resourceSet.uid] // TODO : May need to pass in more infor
+                args: [this.data.policy.policyId]
             });
         },
         render: function(args, callback) {
             var self = this,
                 grid,
                 paginator,
-                userResources,
+                userPolicies,
                 RevokeCell,
                 SelectizeCell,
-                UserResourcesCollection,
-                promise = UmaUtils.getResourceSet(args[0], self.data.resourceSet);
+                UserPoliciesCollection;
 
+            UserPoliciesCollection = Backbone.PageableCollection.extend({
+                url: "/" + constants.context + "/json/users/" + conf.loggedUser.userid.id + "/uma/policies/" + args[0],
+                parseRecords: function (data, options) {
+                    return data.permissions;
+                },
+                sync: backgridUtils.sync
+            });
 
             RevokeCell = backgridUtils.TemplateCell.extend({
                 template: "templates/uma/RevokeCellTemplate.html",
@@ -104,73 +110,56 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
                 }
             });
 
-            UserResourcesCollection = Backbone.PageableCollection.extend({
-                url: "/" + constants.context + "/json/applications", //TODO: /json/users/USERNAME/uma/policies > crudq
-                state: {
-                    pageSize: 10,
-                    sortKey: "name",
-                    _pagedResultsOffset : 0
-                },
-                queryParams: {
-                    pageSize: "_pageSize",
-                    sortKey: "_sortKeys",
-                    _queryFilter: backgridUtils.queryFilter,
-                    _pagedResultsOffset:  backgridUtils.pagedResultsOffset
-                },
+                userPolicies = new UserPoliciesCollection();
 
-                parseState: backgridUtils.parseState,
-                parseRecords: backgridUtils.parseRecords,
-                sync: backgridUtils.sync
-            });
+                grid = new Backgrid.Grid({
+                    columns: [
+                    {
+                        name: "subject",
+                        label: $.t("policy.uma.resources.show.grid.0"),
+                        cell: backgridUtils.UnversalIdToUsername,
+                        headerCell: backgridUtils.FilterHeaderCell,
+                        editable: false
+                    },
+                    {
+                        name: "lastModifiedBy",
+                        label: $.t("policy.uma.resources.show.grid.1"),
+                        cell: backgridUtils.DatetimeAgoCell,
+                        editable: false
+                    },
+                    {
+                        name: "permissions",
+                        label: $.t("policy.uma.resources.show.grid.2"),
+                        cell: SelectizeCell,
+                        editable: false
+                    },
+                    {
+                        name: "edit",
+                        label: "",
+                        cell: RevokeCell,
+                        editable: false
+                    }],
 
-            userResources = new UserResourcesCollection();
+                    collection: userPolicies,
+                    emptyText: $.t("policy.uma.all.grid.empty")
+                });
 
-            grid = new Backgrid.Grid({
-                columns: [{
-                    name: "name",
-                    label: $.t("policy.uma.resources.show.grid.0"),
-                    cell: Backgrid.StringCell,
-                    headerCell: backgridUtils.FilterHeaderCell,
-                    editable: false
-                }, {
-                    name: "lastModifiedDate",
-                    label: $.t("policy.uma.resources.show.grid.1"),
-                    cell: backgridUtils.DatetimeAgoCell,
-                    editable: false
-                }, {
-                    name: "permissions",
-                    label: $.t("policy.uma.resources.show.grid.2"),
-                    cell: SelectizeCell,
-                    editable: false
-                }, {
-                    name: "edit",
-                    label: "",
-                    cell: RevokeCell,
-                    editable: false
-                }],
-                collection: userResources,
-                emptyText: $.t("policy.uma.all.grid.empty")
-            });
+                paginator = new Backgrid.Extension.Paginator({
+                    collection: userPolicies,
+                    windowSize: 3
+                });
 
-            paginator = new Backgrid.Extension.Paginator({
-                collection: userResources,
-                windowSize: 3
-            });
-
-            $.when(promise).done(function(resourceSet){
-
-                self.data.resourceSet = resourceSet;
 
                 self.parentRender(function() {
                     self.$el.find("#backgridContainer").append( grid.render().el );
                     self.$el.find("#paginationContainer").append( paginator.render().el );
-                    userResources.fetch({reset: true, processData: false});
+                    userPolicies.fetch({reset: true, processData: false});
 
-                    if(callback) { callback(); }
+                    if (callback) { callback(); }
                 });
-            });
-        }
-    });
 
-    return new ResourceView();
-});
+            }
+        });
+
+        return new ResourceView();
+    });

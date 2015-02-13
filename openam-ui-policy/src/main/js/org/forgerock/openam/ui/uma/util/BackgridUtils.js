@@ -53,7 +53,6 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
     });
 
     obj.UnversalIdToUsername = Backgrid.Cell.extend({
-
         formatter: {
             fromRaw: function(rawData, model) {
                 return rawData.substring(3,rawData.indexOf(',ou=user'));
@@ -91,11 +90,17 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
             var rawValue = this.model.get(this.column.get("name")),
             formattedValue = this.formatter.fromRaw(rawValue, this.model),
             href = _.isFunction(this.column.get("href")) ? this.column.get('href')(rawValue, formattedValue, this.model) : this.column.get('href');
+
             this.$el.append($("<a>", {
                 tabIndex: -1,
                 href: href || rawValue,
                 title: this.title || formattedValue
             }).text(formattedValue));
+
+            if (this.column.get("model")) {
+                this.$el.data(this.model.attributes);
+            }
+
             this.delegateEvents();
             return this;
         }
@@ -141,7 +146,7 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
         var params = [];
 
         _.forIn(options.data, function(val, key){
-            if(!_.include(['page', 'total_pages', 'total_entries', 'order'], key)) {
+            if(!_.include(['page', 'total_pages', 'total_entries', 'order', 'per_page'], key)) {
                 params.push(key + '=' + val);
             }
         });

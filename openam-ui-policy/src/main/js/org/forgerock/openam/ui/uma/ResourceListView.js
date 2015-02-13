@@ -30,45 +30,44 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/uma/util/BackgridUtils"
-], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils) {
+    "org/forgerock/openam/ui/uma/util/BackgridUtils",
+    "org/forgerock/commons/ui/common/main/Router"
+], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, router) {
 
     var ResourceListView = AbstractView.extend({
         template: "templates/uma/ResourceListTemplate.html",
         baseTemplate: 'templates/policy/BaseTemplate.html',
-        events: {},
+        events: {
+            'click tr a': 'openPolicy'
+        },
 
         render: function(args, callback) {
 
             var self = this,
-                resourceSetCollection,
                 columns,
                 grid,
                 paginator,
                 ResourceSetCollection;
 
             ResourceSetCollection = Backbone.PageableCollection.extend({
-                url: "/" + constants.context + "/json/applications",
-                //TODO : Need to get all the policies for the logged in user. This is returning a 400 atm :(
-                //url: "/" + constants.context + "/json/" + conf.loggedUser.userid.id + '/uma/policies',
+                url: "/" + constants.context + "/json/users/" + conf.loggedUser.userid.id + '/uma/policies',
                 state: {
                     pageSize: 10,
-                    sortKey: "name",
-                    _pagedResultsOffset : 0
+                    sortKey: "name"
                 },
                 queryParams: {
                     pageSize: "_pageSize",
                     sortKey: "_sortKeys",
-                    _queryFilter: backgridUtils.queryFilter,
-                    _pagedResultsOffset:  backgridUtils.pagedResultsOffset
+                    _queryFilter: 'resourceServer+eq+"agent"'
+                    /* TODO : Temp until endpoint working
+                    // backgridUtils.queryFilter=true,
+                    //_pagedResultsOffset:  backgridUtils.pagedResultsOffset*/
                 },
 
                 parseState: backgridUtils.parseState,
                 parseRecords: backgridUtils.parseRecords,
                 sync: backgridUtils.sync
             });
-
-            resourceSetCollection = new ResourceSetCollection();
 
             columns = [
                 {
@@ -77,19 +76,11 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
                     cell: backgridUtils.UriExtCell,
                     headerCell: backgridUtils.FilterHeaderCell,
                     href: function(rawValue, formattedValue, model){
-                        var resourceSetUid = model.get('resourceset');
-                        resourceSetUid = "5b6453e2-eb64-4f73-bc32-b7d5063133a80"; //temp until endpoint returning data
-                        return "#uma/resources/" + resourceSetUid + "/activity/";
+                        return "#uma/resources/" +  model.get('policyId') + "/activity/";
                     },
+                    model: true,
                     editable: false
-                },
-                {
-                    name: "lastModifiedBy",
-                    label: $.t("policy.uma.resources.list.grid.1"),
-                    editable: false,
-                    headerCell: backgridUtils.FilterHeaderCell,
-                    cell: backgridUtils.UnversalIdToUsername
-                },
+                }/*,
                 {
                     name: "lastModifiedDate",
                     label: $.t("policy.uma.resources.list.grid.2"),
@@ -104,30 +95,36 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
                     href: function(rawValue, formattedValue, model){
                         return "#uma/apps/" + formattedValue;
                     }
-                }
+                }*/
 
             ];
 
+            self.data.resourceSetCollection = new ResourceSetCollection();
+
             grid = new Backgrid.Grid({
                 columns: columns,
-                collection: resourceSetCollection,
+                collection: self.data.resourceSetCollection,
                 emptyText: $.t("policy.uma.all.grid.empty")
             });
 
             paginator = new Backgrid.Extension.Paginator({
-                collection: resourceSetCollection,
+                collection: self.data.resourceSetCollection,
                 windowSize: 3
             });
 
             self.parentRender(function() {
                 self.$el.find("#backgridContainer").append( grid.render().el );
                 self.$el.find("#paginationContainer").append( paginator.render().el );
-                resourceSetCollection.fetch({reset: true, processData: false});
+                self.data.resourceSetCollection.fetch({reset: true, processData: false});
 
-                if(callback){
-                    callback();
-                }
+                if (callback) { callback();}
             });
+        },
+
+        openPolicy: function(e) {
+            e.preventDefault();
+            this.data.policy = $(e.target).parent().data();
+            router.routeTo( router.configuration.routes.resourceActivity, {args: [this.data.policy.policyId], trigger: true});
         }
 
     });
