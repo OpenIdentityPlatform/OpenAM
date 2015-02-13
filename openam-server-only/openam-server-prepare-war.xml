@@ -198,6 +198,7 @@
         <copy todir="${project.build.directory}/classes" overwrite="false">
             <fileset dir="${server.resources}/services">
                 <include name="*.*"/>
+                <exclude name="amAuth.xml"/>
             </fileset>
         </copy>
 
@@ -207,6 +208,7 @@
                 <include name="*.htm"/>
                 <include name="*.properties"/>
                 <include name="license.txt"/>
+                <exclude name="serviceNames.properties"/>
             </fileset>
         </copy>
         <copy todir="${project.build.directory}/classes" overwrite="false" filtering="true">
