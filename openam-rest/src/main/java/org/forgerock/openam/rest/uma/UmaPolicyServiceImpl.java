@@ -260,7 +260,11 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         }
 
                         try {
-                            PolicySearch policySearch = umaQueryRequest.getQueryFilter().accept(
+                            QueryFilter queryFilter = umaQueryRequest.getQueryFilter();
+                            if (queryFilter == null) {
+                                queryFilter = QueryFilter.alwaysTrue();
+                            }
+                            PolicySearch policySearch = queryFilter.accept(
                                     new UmaPolicyQueryFilterVisitor(), new PolicySearch(umaPolicies));
                             List<UmaPolicy> sortedPolicies = new ArrayList<UmaPolicy>(policySearch.getPolicies());
                             for (SortKey key : umaQueryRequest.getSortKeys()) {
