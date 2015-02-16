@@ -42,6 +42,7 @@ public class ConnectionCountTest {
         when(resourceSetConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         Map<ConnectionType, LdapDataLayerConfiguration> configMap = new HashMap<ConnectionType, LdapDataLayerConfiguration>();
         configMap.put(ConnectionType.CTS_ASYNC, ctsConfiguration);
+        configMap.put(ConnectionType.CTS_REAPER, ctsConfiguration);
         configMap.put(ConnectionType.RESOURCE_SETS, resourceSetConfiguration);
         count = new ConnectionCount(configMap);
     }
@@ -76,6 +77,7 @@ public class ConnectionCountTest {
         int max = 10;
         int total = count.getConnectionCount(max, ConnectionType.CTS_ASYNC) +
                 count.getConnectionCount(max, ConnectionType.CTS_REAPER) +
+                count.getConnectionCount(max, ConnectionType.RESOURCE_SETS) +
                 count.getConnectionCount(max, ConnectionType.DATA_LAYER);
         assertThat(total).isEqualTo(max);
     }
