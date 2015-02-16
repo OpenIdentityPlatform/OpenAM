@@ -22,25 +22,44 @@
     <cc:header name="hdrCommon" pageTitle="webconsole.title" bundleID="amConsole" copyrightYear="2007" fireDisplayEvents="true">
         <script language="javascript">
             // Field names.
-            var storeLocationRadioButtonName = 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-location';
-            var sslEnableCheckBoxName = 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-ssl-enabled';
-            var directoryNameFieldName = 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-directory-name';
-            var portFieldName = 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-port';
-            var loginIdFieldName = 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-loginid';
-            var passwordFieldName = 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-password';
-            var maxConnectionsFieldName = 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-max-connections';
-            var heartbeat = 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-heartbeat';
+            var fields = {
+                resourcesets: {
+                        storeLocationRadioButtonName: 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-location',
+                        sslEnableCheckBoxName: 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-ssl-enabled',
+                        directoryNameFieldName: 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-directory-name',
+                        portFieldName: 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-port',
+                        loginIdFieldName: 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-loginid',
+                        passwordFieldName: 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-password',
+                        maxConnectionsFieldName: 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-max-connections',
+                        heartbeat: 'ServerEditUMA.cscorg-forgerock-services-resourcesets-store-heartbeat'
+                },
+                audit: {
+                        storeLocationRadioButtonName: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-location',
+                        sslEnableCheckBoxName: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-ssl-enabled',
+                        directoryNameFieldName: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-directory-name',
+                        portFieldName: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-port',
+                        loginIdFieldName: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-loginid',
+                        passwordFieldName: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-password',
+                        maxConnectionsFieldName: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-max-connections',
+                        heartbeat: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-heartbeat'
+                }
+            };
 
             window.onload = function() {
+                setState(fields.audit);
+                setState(fields.resourcesets);
+            };
+
+            function setState(fieldset) {
                 // Set the initial state of the fields.
-                var radioBtns = document.getElementsByName(storeLocationRadioButtonName);
+                var radioBtns = document.getElementsByName(fieldset.storeLocationRadioButtonName);
 
                 if (radioBtns.length != 2) {
                     // Do nothing, there must be two radio buttons.
                     return;
                 }
 
-                toggleExternalConfig((radioBtns[0].checked) ? radioBtns[0] : radioBtns[1]);
+                toggleExternalConfig(fieldset, (radioBtns[0].checked) ? radioBtns[0] : radioBtns[1]);
             }
 
             // Retrieves the first element of the given name.
@@ -50,15 +69,15 @@
             }
 
             // Toggles the status of the external configuration fields.
-            function toggleExternalConfig(storeLocationRadioButton) {
-                var readonly = storeLocationRadioButton.value == 'default';
-                toggleField(sslEnableCheckBoxName, readonly);
-                toggleField(directoryNameFieldName, readonly);
-                toggleField(portFieldName, readonly);
-                toggleField(loginIdFieldName, readonly);
-                toggleField(passwordFieldName, readonly);
-                toggleField(maxConnectionsFieldName, readonly);
-                toggleField(heartbeat, readonly);
+            function toggleExternalConfig(fieldset, storeLocationRadioButton) {
+                var readonly = storeLocationRadioButton.value === 'default';
+                toggleField(fieldset.sslEnableCheckBoxName, readonly);
+                toggleField(fieldset.directoryNameFieldName, readonly);
+                toggleField(fieldset.portFieldName, readonly);
+                toggleField(fieldset.loginIdFieldName, readonly);
+                toggleField(fieldset.passwordFieldName, readonly);
+                toggleField(fieldset.maxConnectionsFieldName, readonly);
+                toggleField(fieldset.heartbeat, readonly);
             }
 
             // Toggles the status of a given field.

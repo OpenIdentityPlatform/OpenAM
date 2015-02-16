@@ -81,13 +81,26 @@ public class ConnectionCount {
                   * Ensure that the DATA_LAYER connection type fits into the available
                   * connection space alongside CTS_REAPER and CTS_ASYNC
                   */
-                int async = getConnectionCount(max, ConnectionType.CTS_ASYNC);
-                int reaper = getConnectionCount(max, ConnectionType.CTS_REAPER);
-                int resourceSets = getConnectionCount(max, ConnectionType.RESOURCE_SETS);
+                int async = getSMSConnectionCount(max, ConnectionType.CTS_ASYNC);
+                int reaper = getSMSConnectionCount(max, ConnectionType.CTS_REAPER);
+                int resourceSets = getSMSConnectionCount(max, ConnectionType.RESOURCE_SETS);
                 return max - (async + reaper + resourceSets);
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    /**
+     *
+     * @param max
+     * @param type
+     * @return
+     */
+    private int getSMSConnectionCount(int max, ConnectionType type) {
+        if (dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
+            return getConnectionCount(max, type);
+        }
+        return 0;
     }
 
     /**
