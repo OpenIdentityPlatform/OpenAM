@@ -1658,17 +1658,18 @@ section.active-step{
             }
 
             td {
-                // required for tooltips
+                // Required for tooltips
                 overflow:visible;
+
+                // Add the click event to the td so that the entire cell is clickable
+                &:hover a{
+                    text-decoration: underline;
+                }
 
                 a {
                     color: #777;
                     text-decoration: none;
                     font-weight:bold;
-
-                    &:hover{
-                        text-decoration: underline;
-                    }
                 }
             }
 

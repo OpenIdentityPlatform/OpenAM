@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
         template: "templates/uma/ResourceListTemplate.html",
         baseTemplate: 'templates/policy/BaseTemplate.html',
         events: {
-            'click tr a': 'openPolicy'
+            'click td': 'openPolicy'
         },
 
         render: function(args, callback) {
@@ -123,7 +123,7 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
 
         openPolicy: function(e) {
             e.preventDefault();
-            this.data.policy = $(e.target).parent().data();
+            this.data.policy = $(e.currentTarget).data();
             router.routeTo( router.configuration.routes.resourceActivity, {args: [this.data.policy.policyId], trigger: true});
         }
 

@@ -44,13 +44,13 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
         },
         render: function(args, callback) {
             var self = this,
-            grid,
-            paginator,
-            userPolicies,
-            RevokeCell,
-            SelectizeCell,
-            UserPoliciesCollection,
-            resourcesetPromise = umaUtils.getResourceSet(args[0], self.data.resourceSet);
+                grid,
+                paginator,
+                userPolicies,
+                RevokeCell,
+                SelectizeCell,
+                UserPoliciesCollection,
+                resourcesetPromise = umaUtils.getResourceSet(args[0], self.data.resourceSet);
 
             $.when(resourcesetPromise).done(function(resourceSet){
 
@@ -58,7 +58,7 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
 
                 var options = [];
                 _.each(resourceSet.scopes, function(option){
-                    options.push({text:option.name, value:option.name});
+                    options.push({text:option.displayName, value:option.name});
                 });
 
                 UserPoliciesCollection = Backbone.PageableCollection.extend({
@@ -70,7 +70,7 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
                 });
 
                 RevokeCell = backgridUtils.TemplateCell.extend({
-                    template: "templates/uma/RevokeCellTemplate.html",
+                    template: "templates/uma/backgrid/cell/RevokeCell.html",
                     events: {
                         "click": "revoke"
                     },
@@ -81,98 +81,91 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
                 });
 
                 SelectizeCell = Backgrid.Cell.extend({
-                    className: 'selectize-cell',
-                    template: _.template( // TODO : Move to template
-                        "<select multiple class='selectize'>" +
-                            "<option disabled selected value>Please select</option>" +
-                        "</select>"),
-                        render: function() {
-
-                            var items = this.model.get('scopes') ;
-
-                            this.$el.html(this.template());
-                            this.$el.find("select").selectize({
-                                create: false,
-                                delimiter: ",",
-                                dropdownParent: "body",
-                                hideSelected: true,
-                                persist: false,
-                                plugins: ["restore_on_backspace"],
-                                items: items,
-                                options: options
-
-
-                            });
-                            this.delegateEvents();
-                            return this;
-                        }
-                    });
-
-                    userPolicies = new UserPoliciesCollection();
-
-                    grid = new Backgrid.Grid({
-                        columns: [
-                        {
-                            name: "subject",
-                            label: $.t("policy.uma.resources.show.grid.0"),
-                            cell: backgridUtils.UnversalIdToUsername,
-                            headerCell: backgridUtils.FilterHeaderCell,
-                            editable: false
-                        },
-                        {
-                            name: "lastModifiedBy",
-                            label: $.t("policy.uma.resources.show.grid.1"),
-                            cell: backgridUtils.DatetimeAgoCell,
-                            editable: false
-                        },
-                        {
-                            name: "permissions",
-                            label: $.t("policy.uma.resources.show.grid.2"),
-                            cell: SelectizeCell,
-                            editable: false
-                        },
-                        {
-                            name: "edit",
-                            label: "",
-                            cell: RevokeCell,
-                            editable: false
-                        }],
-
-                        collection: userPolicies,
-                        emptyText: $.t("policy.uma.all.grid.empty")
-                    });
-
-                    paginator = new Backgrid.Extension.Paginator({
-                        collection: userPolicies,
-                        windowSize: 3
-                    });
-
-                    self.parentRender(function() {
-                        self.$el.find("#backgridContainer").append( grid.render().el );
-                        self.$el.find("#paginationContainer").append( paginator.render().el );
-                        userPolicies.fetch({reset: true, processData: false});
-
-                        if (callback) { callback(); }
-                    });
-
+                    className: "selectize-cell",
+                    template: "templates/uma/backgrid/cell/SelectizeCell.html",
+                    render: function() {
+                        var items = this.model.get('scopes') ;
+                        this.$el.html(uiUtils.fillTemplateWithData(this.template));
+                        this.$el.find("select").selectize({
+                            create: false,
+                            delimiter: ",",
+                            dropdownParent: "body",
+                            hideSelected: true,
+                            persist: false,
+                            plugins: ["restore_on_backspace"],
+                            items: items,
+                            options: options
+                        });
+                        this.delegateEvents();
+                        return this;
+                    }
                 });
-            },
 
-            revokeAll: function() {
-                // TODO Use i18n
-                uiUtils.jqConfirm($.t("policy.uma.resources.show.revokeAllMessage"), function() {
-                    // TODO: Make a call to the policy delegate to revoke all access
-                }, 325);
-            },
+                userPolicies = new UserPoliciesCollection();
 
-            share: function(e) {
-                e.preventDefault();
-                eventManager.sendEvent(constants.EVENT_SHOW_DIALOG,{
-                    route: router.configuration.routes.resourceEdit,
-                    args: [this.data.policy.policyId]
+                grid = new Backgrid.Grid({
+                    columns: [
+                    {
+                        name: "subject",
+                        label: $.t("policy.uma.resources.show.grid.0"),
+                        cell: backgridUtils.UnversalIdToUsername,
+                        headerCell: backgridUtils.FilterHeaderCell,
+                        editable: false
+                    },
+                    {
+                        name: "lastModifiedBy",
+                        label: $.t("policy.uma.resources.show.grid.1"),
+                        cell: backgridUtils.DatetimeAgoCell,
+                        editable: false
+                    },
+                    {
+                        name: "permissions",
+                        label: $.t("policy.uma.resources.show.grid.2"),
+                        cell: SelectizeCell,
+                        editable: false
+                    },
+                    {
+                        name: "edit",
+                        label: "",
+                        cell: RevokeCell,
+                        editable: false
+                    }],
+
+                    collection: userPolicies,
+                    emptyText: $.t("policy.uma.all.grid.empty")
                 });
-            }
-        });
 
-        return new ResourceView();
+                paginator = new Backgrid.Extension.Paginator({
+                    collection: userPolicies,
+                    windowSize: 3
+                });
+
+                self.parentRender(function() {
+                    self.$el.find("#backgridContainer").append( grid.render().el );
+                    self.$el.find("#paginationContainer").append( paginator.render().el );
+                    userPolicies.fetch({reset: true, processData: false});
+
+                    if (callback) { callback(); }
+                });
+
+            });
+        },
+
+        revokeAll: function() {
+            // TODO Use i18n
+            uiUtils.jqConfirm($.t("policy.uma.resources.show.revokeAllMessage"), function() {
+                // TODO: Make a call to the policy delegate to revoke all access
+            }, 325);
+        },
+
+        share: function(e) {
+            e.preventDefault();
+            eventManager.sendEvent(constants.EVENT_SHOW_DIALOG,{
+                route: router.configuration.routes.resourceEdit,
+                args: [this.data.policy.policyId]
+            });
+        }
     });
+
+    return new ResourceView();
+});

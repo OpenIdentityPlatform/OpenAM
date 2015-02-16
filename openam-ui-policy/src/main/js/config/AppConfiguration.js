@@ -115,7 +115,9 @@ define("config/AppConfiguration", function () {
                         "templates/policy/applications/ManageAppsGridCellActionsTemplate.html",
                         "templates/policy/applications/ManageAppsGridActionsTemplate.html",
                         "templates/policy/policies/ManagePoliciesGridActionsTemplate.html",
-                        "templates/policy/referrals/ManageRefsGridActionsTemplate.html"
+                        "templates/policy/referrals/ManageRefsGridActionsTemplate.html",
+                        "templates/uma/backgrid/cell/RevokeCell.html",
+                        "templates/uma/backgrid/cell/SelectizeCell.html"
                     ]
                 }
             },
