@@ -24,6 +24,7 @@
  *
  * $Id: ServerEditAdvancedViewBean.java,v 1.5 2009/07/06 18:20:04 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.service;
@@ -98,6 +99,7 @@ public class ServerEditAdvancedViewBean
         set.add("propertyServerEditAdvanced.xml");
         set.add("propertyServerEditSDK.xml");
         set.add("propertyServerEditCTS.xml");
+        set.add("propertyServerEditUMA.xml");
         set.add("propertyServerEditGeneral.xml");
         getDealtWithProperties(set);
         getHiddenProperties();

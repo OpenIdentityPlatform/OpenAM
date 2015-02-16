@@ -107,11 +107,6 @@ public class CoreTokenConstants {
     public static final String CTS_STORE_HOSTNAME = "org.forgerock.services.cts.store.directory.name";
 
     /**
-     * Port upon which to connect to the token store.
-     */
-    public static final String CTS_STORE_PORT = "org.forgerock.services.cts.store.port";
-
-    /**
      * Username for the token store connection.
      */
     public static final String CTS_STORE_USERNAME = "org.forgerock.services.cts.store.loginid";

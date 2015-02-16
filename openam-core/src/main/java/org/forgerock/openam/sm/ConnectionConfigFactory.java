@@ -72,7 +72,7 @@ public class ConnectionConfigFactory {
             case DEFAULT:
                 configuration = smsConfiguration;
                 break;
-            case EXTERNAL_LDAP:
+            case EXTERNAL:
                 configuration = externalTokenConfig;
                 break;
             default:

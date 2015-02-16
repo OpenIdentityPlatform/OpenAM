@@ -61,7 +61,7 @@ public class ConnectionConfigFactoryTest {
         // given
         ConnectionConfigFactory factory = new ConnectionConfigFactory(
                 mockDataLayerConfig, mockExternalCTSConfig, mockDataLayerConfiguration, mockConfigurationValidator);
-        when(mockDataLayerConfiguration.getStoreMode()).thenReturn(StoreMode.EXTERNAL_LDAP);
+        when(mockDataLayerConfiguration.getStoreMode()).thenReturn(StoreMode.EXTERNAL);
 
         // when
         ConnectionConfig config = factory.getConfig();

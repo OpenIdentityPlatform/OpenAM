@@ -30,5 +30,5 @@ public enum StoreMode {
      *
      * @see org.forgerock.openam.sm.datalayer.impl.ldap.ExternalLdapConfig
      */
-    EXTERNAL_LDAP
+    EXTERNAL
 }

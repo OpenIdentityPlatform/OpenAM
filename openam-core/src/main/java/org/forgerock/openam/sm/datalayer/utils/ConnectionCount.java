@@ -84,7 +84,7 @@ public class ConnectionCount {
                 int async = getConnectionCount(max, ConnectionType.CTS_ASYNC);
                 int reaper = getConnectionCount(max, ConnectionType.CTS_REAPER);
                 int resourceSets = getConnectionCount(max, ConnectionType.RESOURCE_SETS);
-                return max - (async + reaper);
+                return max - (async + reaper + resourceSets);
             default:
                 throw new IllegalStateException();
         }
