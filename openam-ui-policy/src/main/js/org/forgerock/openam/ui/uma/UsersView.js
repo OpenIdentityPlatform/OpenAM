@@ -30,8 +30,8 @@ define("org/forgerock/openam/ui/uma/UsersView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate"
-], function(AbstractView, conf, eventManager, uiUtils, constants, policyDelegate) {
+    "org/forgerock/openam/ui/uma/delegates/UmaDelegate"
+], function(AbstractView, conf, eventManager, uiUtils, constants, umaDelegate) {
 
     var UsersView = AbstractView.extend({
         template: "templates/uma/UsersTemplate.html",

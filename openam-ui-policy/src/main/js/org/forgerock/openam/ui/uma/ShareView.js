@@ -30,9 +30,9 @@ define("org/forgerock/openam/ui/uma/ShareView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
+    "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
     "org/forgerock/openam/ui/uma/util/UmaUtils"
-], function(AbstractView, conf, eventManager, uiUtils, constants, policyDelegate, UmaUtils) {
+], function(AbstractView, conf, eventManager, uiUtils, constants, umaDelegate, umaUtils) {
 
     var ShareView = AbstractView.extend({
 
@@ -41,7 +41,7 @@ define("org/forgerock/openam/ui/uma/ShareView", [
         render: function(args, callback) {
 
             var self = this,
-                promise = UmaUtils.getResourceSet(args[0], self.data.resourceSet);
+                promise = umaUtils.getResourceSet(args[0], self.data.resourceSet);
 
             $.when(promise).done(function(resourceSet){
 
@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/uma/ShareView", [
                                 return callback();
                             }
                             var selectize = this, list, obj;
-                            policyDelegate.queryIdentities('users', query).done(function(data){
+                            umaDelegate.queryIdentities('users', query).done(function(data){
                                 list = [];
                                 _.each(data.result, function(result){
                                     obj = {};

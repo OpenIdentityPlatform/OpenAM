@@ -25,8 +25,8 @@
 /*global define Backgrid Backbone _ $*/
 
 define("org/forgerock/openam/ui/uma/util/UmaUtils", [
-  "org/forgerock/openam/ui/policy/delegates/PolicyDelegate"
-], function (policyDelegate) {
+  "org/forgerock/openam/ui/uma/delegates/UmaDelegate"
+], function (umaDelegate) {
     /**
      * @exports org/forgerock/openam/ui/uma/util/UmaUtils
      */
@@ -40,7 +40,7 @@ define("org/forgerock/openam/ui/uma/util/UmaUtils", [
         if (curResourceSet && curResourceSet.uid === uid) {
              return promise.apply().resolve(curResourceSet);
         } else {
-            newPromise = policyDelegate.getResourceSetFromId(uid);
+            newPromise = umaDelegate.getResourceSetFromId(uid);
             $.when(newPromise).done(function(resourceSet){
                 if (resourceSet) {
                     resourceSet.uid = uid;
