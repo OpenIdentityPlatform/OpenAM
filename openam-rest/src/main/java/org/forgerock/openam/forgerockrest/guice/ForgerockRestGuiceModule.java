@@ -68,6 +68,10 @@ import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvi
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
+import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentity;
+import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentityImpl;
+import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
+import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentityImpl;
 import org.forgerock.openam.rest.RestEndpointServlet;
 import org.forgerock.openam.rest.RestEndpoints;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
@@ -151,6 +155,8 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         bind(DelegationEvaluator.class).to(DelegationEvaluatorProxy.class).in(Singleton.class);
 
         bind(UmaPolicyService.class).to(UmaPolicyServiceImpl.class);
+        bind(SoapSTSAgentIdentity.class).to(SoapSTSAgentIdentityImpl.class);
+        bind(SpecialUserIdentity.class).to(SpecialUserIdentityImpl.class);
     }
 
     @Provides

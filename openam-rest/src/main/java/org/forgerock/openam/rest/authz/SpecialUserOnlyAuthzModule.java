@@ -11,14 +11,13 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 
 package org.forgerock.openam.rest.authz;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
@@ -31,6 +30,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -47,10 +47,12 @@ import java.net.HttpURLConnection;
 public class SpecialUserOnlyAuthzModule implements CrestAuthorizationModule {
     public static final String NAME = "SpecialUserOnlyFilter";
 
+    protected SpecialUserIdentity specialUserIdentity;
     protected final Debug debug;
 
     @Inject
-    public SpecialUserOnlyAuthzModule( @Named("frRest") Debug debug) {
+    public SpecialUserOnlyAuthzModule(SpecialUserIdentity specialUserIdentity, @Named("frRest") Debug debug) {
+        this.specialUserIdentity = specialUserIdentity;
         this.debug = debug;
     }
 
@@ -90,31 +92,28 @@ public class SpecialUserOnlyAuthzModule implements CrestAuthorizationModule {
     }
 
     Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
-
         SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
-
         String userId;
         try {
             SSOToken token = tokenContext.getCallerSSOToken();
             userId = token.getPrincipal().getName();
+            if (specialUserIdentity.isSpecialUser(token)) {
+                if (debug.messageEnabled()) {
+                    debug.message("SpecialUserOnlyAuthzModule :: User, " + userId + " accepted as Special user.");
+                }
+                return Promises.newSuccessfulPromise(AuthorizationResult.accessPermitted());
+            } else {
+                if (debug.warningEnabled()) {
+                    debug.warning("SpecialUserOnlyAuthzModule :: Denied access to " + userId);
+                }
+                return Promises.newSuccessfulPromise(AuthorizationResult.accessDenied("User is not a Special user."));
+            }
         } catch (SSOException e) {
             if (debug.messageEnabled()) {
                 debug.message("SpecialUserOnlyAuthzModule :: Unable to authorize as Special user using SSO Token.", e);
             }
             return Promises.newFailedPromise(ResourceException
                     .getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e));
-        }
-
-        if (AuthD.getAuth().isSpecialUser(userId)) {
-            if (debug.messageEnabled()) {
-                debug.message("SpecialUserOnlyAuthzModule :: User, " + userId + " accepted as Special user.");
-            }
-            return Promises.newSuccessfulPromise(AuthorizationResult.success());
-        } else {
-            if (debug.warningEnabled()) {
-                debug.warning("SpecialUserOnlyAuthzModule :: Denied access to " + userId);
-            }
-            return Promises.newSuccessfulPromise(AuthorizationResult.failure("User is not a Special user."));
         }
     }
 }

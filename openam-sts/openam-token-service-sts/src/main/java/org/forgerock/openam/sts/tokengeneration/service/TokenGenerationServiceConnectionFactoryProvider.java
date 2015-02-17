@@ -22,7 +22,7 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.SingletonResourceProvider;
-import org.forgerock.openam.rest.authz.SpecialUserOnlyAuthzModule;
+import org.forgerock.openam.rest.authz.STSTokenGenerationServiceAuthzModule;
 import org.forgerock.openam.rest.fluent.FluentRouter;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationServiceInjectorHolder;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceState;
@@ -45,8 +45,7 @@ public class TokenGenerationServiceConnectionFactoryProvider {
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<SoapSTSInstanceState>>(){})),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(Logger.class)));
         router.route("/issue/")
-                //TODO: authz must be of a token type which remotely-deployed soap-sts instances can present - see AME-5401
-                .through(SpecialUserOnlyAuthzModule.class, SpecialUserOnlyAuthzModule.NAME)
+                .through(STSTokenGenerationServiceAuthzModule.class, STSTokenGenerationServiceAuthzModule.NAME)
                 .forVersion(VERSION_STRING)
                 .to(tokenGenerationService);
         return Resources.newInternalConnectionFactory(router);

@@ -23,7 +23,7 @@ import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.RoutingMode;
-import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.openam.rest.authz.STSPublishServiceAuthzModule;
 import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.sts.InstanceConfigMarshaller;
@@ -49,7 +49,7 @@ public class STSPublishServiceConnectionFactoryProvider {
                     STSPublishInjectorHolder.getInstance(Key.get(new TypeLiteral<InstanceConfigMarshaller<RestSTSInstanceConfig>>() {})),
                     STSPublishInjectorHolder.getInstance(Key.get(Logger.class)));
         router.route("/rest")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(STSPublishServiceAuthzModule.class, STSPublishServiceAuthzModule.NAME)
                 .forVersion(VERSION_STRING)
                 .to(RoutingMode.STARTS_WITH, restPublishRequestHandler);
         final RequestHandler soapPublishRequestHandler =
@@ -59,7 +59,7 @@ public class STSPublishServiceConnectionFactoryProvider {
                         STSPublishInjectorHolder.getInstance(Key.get(new TypeLiteral<InstanceConfigMarshaller<SoapSTSInstanceConfig>>() {})),
                         STSPublishInjectorHolder.getInstance(Key.get(Logger.class)));
         router.route("/soap")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(STSPublishServiceAuthzModule.class, STSPublishServiceAuthzModule.NAME)
                 .forVersion(VERSION_STRING)
                 .to(RoutingMode.STARTS_WITH, soapPublishRequestHandler);
         return Resources.newInternalConnectionFactory(router);
