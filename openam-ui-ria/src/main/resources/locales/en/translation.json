@@ -392,6 +392,10 @@
             "people": "Search for people",
             "permission": "Select Permission",
             "share": "Share",
+            "messages": {
+                "success": "Resource successfully shared",
+                "fail": "Failed to share resource"
+            },
             "notSpecifiedResource": "You have not specified a resource to share."
         },
         "resources": {

@@ -65,21 +65,40 @@ define("org/forgerock/openam/ui/uma/delegates/UmaDelegate", [
 
     obj.getResourceSetFromId = function (uid) {
         return obj.serviceCall({
-            url: "/users/" + conf.loggedUser.uid + "/oauth2/resourcesets/" + uid,
+            url: "/users/" + conf.loggedUser.userid.id + "/oauth2/resourcesets/" + uid,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
     obj.getPoliciesById = function (uid) {
         return obj.serviceCall({
-            url: "/users/" + conf.loggedUser.uid + "/uma/policies/" + uid,
+            url: "/users/" + conf.loggedUser.userid.id + "/uma/policies/" + uid,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
-    obj.queryIdentities = function (name, query) {
+    obj.createPolicy = function(username, policyId, permissions) {
+      return obj.serviceCall({
+          url: "/users/" + username + "/uma/policies?_action=create",
+          type: "POST",
+          data: JSON.stringify({
+              policyId: policyId,
+              permissions: permissions
+          }),
+          errorsHandlers: obj.ERROR_HANDLERS
+      });
+    };
+
+    obj.getUser = function(username) {
         return obj.serviceCall({
-            url: "/" + name + "?_queryId=" + query + "*",
+            url: "/users/" + username,
+            headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=2.0" }
+        });
+    };
+
+    obj.searchUsers = function(query) {
+        return obj.serviceCall({
+            url: "/users?_queryId=" + query + "*",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };

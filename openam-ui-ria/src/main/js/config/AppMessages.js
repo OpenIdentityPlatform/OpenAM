@@ -34,6 +34,14 @@ define("config/AppMessages", [
         "invalidRealm": {
             msg: "config.messages.AppMessages.invalidRealm",
             type: "error"
+        },
+        "policyCreatedSuccess": {
+            msg: "policy.uma.share.messages.success",
+            type: "info"
+        },
+        "policyCreatedFail": {
+            msg: "policy.uma.share.messages.fail",
+            type: "error"
         }
     };
 });

@@ -13,7 +13,7 @@
         <select multiple class="selectize">
             <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
             {{#each resourceSet.scopes}}
-            <option {{#if selected}}selected{{/if}} value="{{name}}">{{name}}</option>
+            <option {{#if selected}}selected{{/if}} value="{{name}}">{{displayName}}</option>
             {{/each}}
         </select>
     </div>

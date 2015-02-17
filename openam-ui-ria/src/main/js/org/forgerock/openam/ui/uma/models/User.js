@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,14 +24,14 @@
 
 /*global define*/
 
-define([
-    "./HistoryView",
-    "./ResourceListView",
-    "./ResourceView",
-    "./ResourceEditView",
-    "./ResourceEditDialog",
-    "./UsersView",
-    "./AppsView",
+define("org/forgerock/openam/ui/uma/models/User", [
+  'backbone'
+], function(Backbone) {
+    var User = Backbone.Model.extend({
+        initialize: function(username) {
+            this.username = username;
+        }
+    });
 
-    "./models/User"
-]);
+    return User;
+});

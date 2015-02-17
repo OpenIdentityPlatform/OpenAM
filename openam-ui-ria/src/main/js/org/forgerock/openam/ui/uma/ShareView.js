@@ -31,80 +31,108 @@ define("org/forgerock/openam/ui/uma/ShareView", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
-    "org/forgerock/openam/ui/uma/util/UmaUtils"
-], function(AbstractView, conf, eventManager, uiUtils, constants, umaDelegate, umaUtils) {
-
+    "org/forgerock/openam/ui/uma/util/UmaUtils",
+    "org/forgerock/openam/ui/uma/models/User"
+], function(AbstractView, conf, eventManager, uiUtils, constants, umaDelegate, umaUtils, User) {
     var ShareView = AbstractView.extend({
-
         template: "templates/uma/UmaInnerTemplate.html",
-        events: {},
-        render: function(args, callback) {
+        events: {
+          "click input#shareButton": "onShareButtonClicked"
+        },
 
+        render: function(args, callback) {
             var self = this,
                 promise = umaUtils.getResourceSet(args[0], self.data.resourceSet);
 
-            $.when(promise).done(function(resourceSet){
+            self.data.policyId = args[0];
+            self.data.selected = {};
 
+            $.when(promise).done(function(resourceSet){
                 self.data.resourceSet = resourceSet;
 
                 self.parentRender(function(){
-
                     self.$el.find('#selectUser select').selectize({
-                        valueField: 'name',
-                        labelField: 'name',
-                        searchField: 'name',
+                        valueField: 'username',
+                        labelField: 'username',
+                        searchField: 'username',
                         create: false,
                         load: function(query, callback) {
-                            if (query.length < self.MIN_QUERY_LENGTH) {
-                                return callback();
-                            }
-                            var selectize = this, list, obj;
-                            umaDelegate.queryIdentities('users', query).done(function(data){
-                                list = [];
-                                _.each(data.result, function(result){
-                                    obj = {};
-                                    obj.name = result;
-                                    list.push(obj);
+                            if (query.length < self.MIN_QUERY_LENGTH) { return callback(); }
+
+                            umaDelegate.searchUsers(query)
+                            .then(function(data) {
+                                return _.map(data.result, function(username) {
+                                    return new User(username);
                                 });
-                                callback(list);
-                            }).error(function(e){
-                                console.error('error', e);
+                            })
+                            .done(function(users) {
+                                callback(users);
+                            })
+                            .fail(function(event){
+                                console.error('error', event);
                                 callback();
                             });
                         },
 
-                        onChange: function(value){
+                        onChange: function(value) {
+                            if (value === "") {
+                                self.data.selected.user = null;
+                            } else {
+                              umaDelegate.getUser(value)
+                              .done(function(data) {
+                                  var user = new User(data.username);
+                                      user.universalid = data.universalid[0];
+
+                                  self.data.selected.user = user;
+                              })
+                              .fail(function() {
+                                  self.$el.find("#selectUser select")[0].selectize.clear();
+                                  self.enableShareButton();
+                              });
+                            }
+
                             self.enableShareButton();
                         }
                     });
 
                     self.$el.find('#selectPermission select').selectize({
-
                         plugins: ['restore_on_backspace'],
                         delimiter: ',',
                         persist: false,
                         create: false,
                         hideSelected: true,
                         onChange: function(value){
+                            self.data.selected.permissions = value;
                             self.enableShareButton();
                         }
                     });
-
                 });
-
             });
         },
 
         enableShareButton: function(){
-            var disabled = false;
-            _.each(this.$el.find('.selectize-input'), function(selectize){
-                if (! $(selectize).hasClass('has-items')){
-                    disabled = true;
-                }
+            var complete = _.every(this.$el.find(".selectize-input"), function(element) {
+                return $(element).hasClass("has-items");
             });
-            this.$el.find('input#shareButton').prop('disabled', disabled);
-        }
+            this.$el.find('input#shareButton').prop('disabled', !complete);
+        },
 
+        onShareButtonClicked: function() {
+          var self = this,
+              permissions = [{
+                  subject: this.data.selected.user.universalid,
+                  scopes: this.data.selected.permissions
+              }];
+
+          umaDelegate.createPolicy(conf.loggedUser.userid.id, this.data.policyId, permissions).done(function(data, textStatus, xhr) {
+              eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
+
+              self.$el.find("#selectUser select")[0].selectize.clear();
+              self.$el.find("#selectPermission select")[0].selectize.clear();
+          }).fail(function(xhr, textStatus, errorThrown) {
+              eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedFail");
+          });
+        }
     });
 
     return ShareView;
