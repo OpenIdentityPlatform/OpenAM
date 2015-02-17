@@ -33,6 +33,7 @@ require.config({
     paths: {
         i18next: "libs/i18next-1.7.3-min",
         backbone: "libs/backbone-1.1.2-min",
+        "backbone.paginator": "libs/backbone-paginator.min",
         underscore: "libs/lodash-2.4.1-min",
         js2form: "libs/js2form-2.0",
         form2js: "libs/form2js-2.0",
@@ -42,6 +43,10 @@ require.config({
         doTimeout: "libs/jquery.ba-dotimeout-1.0-min",
         handlebars: "libs/handlebars-1.3.0-min",
         moment: "libs/moment-2.8.1-min",
+        selectize:      "libs/selectize-0.11.2-min",
+        backgrid:       "libs/backgrid.min",
+        "backgrid.paginator":   "libs/backgrid-paginator.min",
+        "backgrid.filter":      "libs/backgrid-filter.min",
         ThemeManager: "org/forgerock/openam/ui/common/util/ThemeManager",
         UserDelegate: "org/forgerock/openam/ui/user/delegates/UserDelegate"
     },
@@ -53,6 +58,9 @@ require.config({
         backbone: {
             deps: ["underscore"],
             exports: "Backbone"
+        },
+        "backbone.paginator":{
+            deps: ["backbone"]
         },
         js2form: {
             exports: "js2form"
@@ -79,6 +87,19 @@ require.config({
         },
         moment: {
             exports: "moment"
+        },
+        selectize: {
+            deps: ["jquery"]
+        },
+        backgrid: {
+            deps: ["jquery", "underscore"],
+            exports: "Backgrid"
+        },
+        "backgrid.paginator": {
+            deps: ["backgrid", "backbone.paginator"]
+        },
+        "backgrid.filter": {
+            deps: ["backgrid"]
         }
     }
 });
@@ -110,7 +131,13 @@ require([
     "UserDelegate",
     "ThemeManager",
     "org/forgerock/commons/ui/user/main",
-    "org/forgerock/commons/ui/common/main"
+    "org/forgerock/commons/ui/common/main",
+    "selectize",
+    "backgrid",
+    "backbone.paginator",
+    "backgrid.paginator",
+    "backgrid.filter",
+    "org/forgerock/openam/ui/uma/main"
 ], function(constants, eventManager, $, _, Backbone) {
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:

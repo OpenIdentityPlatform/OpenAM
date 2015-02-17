@@ -95,7 +95,6 @@
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
-
     </dependencies>
 
     <build>

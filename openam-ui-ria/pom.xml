@@ -55,6 +55,13 @@
             <type>js</type>
             <classifier>min</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>selectize</artifactId>
+            <version>0.11.2</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
     </dependencies>
 
     <build>

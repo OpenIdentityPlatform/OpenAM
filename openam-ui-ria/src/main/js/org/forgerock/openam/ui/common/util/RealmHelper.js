@@ -57,8 +57,8 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
      */
     obj.getRealm = function() {
         var urlQueryStringRealm = (uiUtils.convertQueryParametersToJSON(uiUtils.getURIQueryString()).realm || '').trim(),
-            fragmentRealm = ((uiUtils.getURIFragment().split('/')[1] || '').split('&')[0] || '').trim(),
             fragmentQueryStringRealm = (uiUtils.convertQueryParametersToJSON(uiUtils.getURIFragmentQueryString()).realm || '').trim(),
+            fragmentRealm = (uiUtils.getURIFragment() === 'login/') ?  ((uiUtils.getURIFragment().split('/')[1] || '').split('&')[0] || '').trim() : '',
             realm = '/', // Default to root realm
             realms = _.compact(_.uniq([urlQueryStringRealm, fragmentRealm, fragmentQueryStringRealm]));
 

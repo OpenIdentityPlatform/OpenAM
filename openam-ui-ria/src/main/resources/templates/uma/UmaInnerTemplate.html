@@ -1,0 +1,29 @@
+<div class="policy-header">
+    <h1>{{resourceSet.name}}</h1>
+</div>
+
+<div class="policy-content clear-fix" id="uma">
+    {{#if resourceSet}}
+    <div id="selectUser" class="float-left">
+        <label>{{t 'uma.share.people'}}</label>
+        <select placeholder="{{t 'common.form.startTypingToSearch'}}"></select>
+    </div>
+    <div id="selectPermission" class="float-left">
+        <label>{{t 'uma.share.permission'}}</label>
+        <select multiple class="selectize">
+            <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
+            {{#each resourceSet.scopes}}
+            <option {{#if selected}}selected{{/if}} value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </div>
+
+    <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class="button" disabled/>
+
+    {{else}}
+    <div class="striped-list" id="resourceList">
+        <ul><li class="highlight-warning">{{t 'uma.share.notSpecifiedResource'}}</li></ul>
+    </div>
+    {{/if}}
+
+</div>
