@@ -4503,6 +4503,46 @@
                         </ChoiceValues>
                     </AttributeSchema>
                 </SubSchema>
+                <SubSchema name="SoapSTSAgent" inheritance="multiple">
+                    <AttributeSchema
+                            name="agentgroup"
+                            type="single"
+                            syntax="string"
+                            i18nKey="">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema
+                            name="userpassword"
+                            type="single"
+                            syntax="password"
+                            validator="RequiredValueValidator"
+                            i18nKey="a100">
+                        <DefaultValues>
+                            <Value>&#x00A0;</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="publish-service-poll-interval"
+                                     type="single"
+                                     syntax="number"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="soap.sts.agent.publish.service.poll.interval">
+                        <DefaultValues>
+                            <Value>300</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="RequiredValueValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+
             </Organization>
         </Schema>
         <Configuration>
