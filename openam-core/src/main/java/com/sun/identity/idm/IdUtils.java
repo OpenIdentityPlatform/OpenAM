@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.idm;
@@ -460,9 +460,6 @@ public final class IdUtils {
      */
     public static String getOrganization(SSOToken token, String orgIdentifier)
             throws IdRepoException, SSOException {
-        if (orgIdentifier != null && !orgIdentifier.equals("/") && orgIdentifier.startsWith("/")) {
-            orgIdentifier = orgIdentifier.substring(1);
-        }
         // Check in cache first
         String id = null;
         if ((id = (String) orgIdentifierToOrgName.get(orgIdentifier)) != null) {
@@ -478,6 +475,16 @@ public final class IdUtils {
                 || orgIdentifier.equals("/")) {
             // Return base DN
             id = DNMapper.orgNameToDN("/");
+        } else if (orgIdentifier.startsWith("/")) {
+            // If orgIdentifier is in "/" format covert to DN and return
+            id = DNMapper.orgNameToDN(orgIdentifier);
+            try {
+                new OrganizationConfigManager(token, orgIdentifier);
+            } catch (SMSException e) {
+                debug.message("IdUtils.getOrganization Exception in getting org name from SMS", e);
+                Object[] args = { orgIdentifier };
+                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "401", args);
+            }
         } else if (DN.isDN(orgIdentifier)) {
             id = orgIdentifier;
             try {
