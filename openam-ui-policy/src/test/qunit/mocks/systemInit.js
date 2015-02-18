@@ -86,7 +86,7 @@ define([
 
         server.respondWith(
             "POST",
-            new RegExp("/openam/json/users\\?_action=idFromSession$"),
+            new RegExp("/json/users\\?_action=idFromSession$"),
             [
                 200,
                 { },
