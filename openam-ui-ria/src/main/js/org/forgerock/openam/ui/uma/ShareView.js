@@ -124,7 +124,7 @@ define("org/forgerock/openam/ui/uma/ShareView", [
                   scopes: this.data.selected.permissions
               }];
 
-          umaDelegate.createPolicy(conf.loggedUser.userid.id, this.data.policyId, permissions).done(function(data, textStatus, xhr) {
+          umaDelegate.createPolicy(conf.loggedUser.username, this.data.policyId, permissions).done(function(data, textStatus, xhr) {
               eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
 
               self.$el.find("#selectUser select")[0].selectize.clear();

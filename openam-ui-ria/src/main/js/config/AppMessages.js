@@ -36,11 +36,11 @@ define("config/AppMessages", [
             type: "error"
         },
         "policyCreatedSuccess": {
-            msg: "policy.uma.share.messages.success",
+            msg: "uma.share.messages.success",
             type: "info"
         },
         "policyCreatedFail": {
-            msg: "policy.uma.share.messages.fail",
+            msg: "uma.share.messages.fail",
             type: "error"
         }
     };
