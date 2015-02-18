@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,8 +24,6 @@
 
 /*global require, define, QUnit, $ */
 
-
-
 define([
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -34,22 +32,20 @@ define([
     "org/forgerock/openam/ui/policy/login/LoginHelper",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
-    "org/forgerock/openam/ui/policy/EditApplicationView",
-    "org/forgerock/openam/ui/policy/EditPolicyView",
-    "org/forgerock/openam/ui/policy/ResourcesListView",
-    "org/forgerock/openam/ui/policy/AddNewResourceView",
-    "org/forgerock/openam/ui/policy/ManageApplicationsView",
-    "org/forgerock/openam/ui/policy/ManagePoliciesView",
-    "org/forgerock/openam/ui/policy/ActionsView",
-    "org/forgerock/openam/ui/policy/ManageResponseAttrsView",
-    "org/forgerock/openam/ui/policy/ResponseAttrsUserView",
-    "org/forgerock/openam/ui/policy/ReviewInfoView",
-    "org/forgerock/openam/ui/policy/EditEnvironmentView",
-    "org/forgerock/openam/ui/policy/EditSubjectView",
-    "org/forgerock/openam/ui/policy/ManageEnvironmentsView",
-    "org/forgerock/openam/ui/policy/ManageSubjectsView",
-    "org/forgerock/openam/ui/policy/OperatorRulesView"
-], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolView, resListView, selectPatternsView, manageAppsView, managePolView, actionsView, responseAttrsStaticView, responseAttrsUserView, reviewInfoView) {
+    "org/forgerock/openam/ui/policy/applications/EditApplicationView",
+    "org/forgerock/openam/ui/policy/policies/EditPolicyView",
+    "org/forgerock/openam/ui/policy/applications/ManageApplicationsView",
+    "org/forgerock/openam/ui/policy/policies/ManagePoliciesView",
+    "org/forgerock/openam/ui/policy/policies/ActionsView",
+    "org/forgerock/openam/ui/policy/policies/attributes/ManageResponseAttrsView",
+    "org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsUserView",
+    "org/forgerock/openam/ui/policy/common/ReviewInfoView",
+    "org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
+    "org/forgerock/openam/ui/policy/policies/conditions/EditSubjectView",
+    "org/forgerock/openam/ui/policy/policies/conditions/ManageEnvironmentsView",
+    "org/forgerock/openam/ui/policy/policies/conditions/ManageSubjectsView",
+    "org/forgerock/openam/ui/policy/policies/conditions/OperatorRulesView"
+], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolView, manageAppsView, managePolView, actionsView, responseAttrsStaticView, responseAttrsUserView) {
     return {
         executeAll: function (server) {
 

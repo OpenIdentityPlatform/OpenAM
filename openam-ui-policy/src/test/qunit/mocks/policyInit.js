@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,77 +24,101 @@
 
 /*global require, define*/
 define([
-    "text!templates/policy/ActionsTemplate.html",
-    "text!templates/policy/AddNewResourceTemplate.html",
     "text!templates/policy/BaseTemplate.html",
-    "text!templates/policy/ConditionAttrArray.html",
-    "text!templates/policy/ConditionAttrBoolean.html",
-    "text!templates/policy/ConditionAttrEnum.html",
-    "text!templates/policy/ConditionAttrString.html",
-    "text!templates/policy/ConditionAttrTimeDate.html",
-    "text!templates/policy/EditApplicationTemplate.html",
-    "text!templates/policy/EditEnvironmentTemplate.html",
-    "text!templates/policy/EditPolicyTemplate.html",
-    "text!templates/policy/EditReferralTemplate.html",
-    "text!templates/policy/EditSubjectTemplate.html",
-    "text!templates/policy/LegacyListItem.html",
-    "text!templates/policy/ListItem.html",
-    "text!templates/policy/LoginDialog.html",
-    "text!templates/policy/ManageAppsGridActionsTemplate.html",
-    "text!templates/policy/ManageAppsGridCellActionsTemplate.html",
-    "text!templates/policy/ManageAppsGridTemplate.html",
-    "text!templates/policy/ManageAppsTemplate.html",
-    "text!templates/policy/ManagePoliciesGridActionsTemplate.html",
-    "text!templates/policy/ManagePoliciesGridTemplate.html",
-    "text!templates/policy/ManagePoliciesTemplate.html",
-    "text!templates/policy/ManageRefsGridActionsTemplate.html",
-    "text!templates/policy/ManageRefsGridTemplate.html",
-    "text!templates/policy/ManageRulesTemplate.html",
-    "text!templates/policy/OperatorRulesTemplate.html",
-    "text!templates/policy/ResourcesListTemplate.html",
-    "text!templates/policy/ResponseAttrsUser.html",
-    "text!templates/policy/ReviewApplicationStepTemplate.html",
-    "text!templates/policy/ReviewPolicyStepTemplate.html" ,
-    "text!templates/policy/ReviewReferralStepTemplate.html" ,
-    "text!templates/policy/SelectRealmsTemplate.html",
+
+    "text!templates/policy/applications/EditApplicationTemplate.html",
+    "text!templates/policy/applications/ManageAppsGridActionsTemplate.html",
+    "text!templates/policy/applications/ManageAppsGridCellActionsTemplate.html",
+    "text!templates/policy/applications/ManageAppsGridTemplate.html",
+    "text!templates/policy/applications/ManageAppsTemplate.html",
+    "text!templates/policy/applications/ReviewApplicationStepTemplate.html",
+
+    "text!templates/policy/policies/ActionsTemplate.html",
+    "text!templates/policy/common/HelpLinkTemplate.html",
+
+    "text!templates/policy/login/LoginDialog.html",
+
+    "text!templates/policy/policies/attributes/ResponseAttrsStatic.html",
+    "text!templates/policy/policies/attributes/ResponseAttrsUser.html",
+
+    "text!templates/policy/policies/conditions/ConditionAttrArray.html",
+    "text!templates/policy/policies/conditions/ConditionAttrBoolean.html",
+    "text!templates/policy/policies/conditions/ConditionAttrDate.html",
+    "text!templates/policy/policies/conditions/ConditionAttrDay.html",
+    "text!templates/policy/policies/conditions/ConditionAttrEnum.html",
+    "text!templates/policy/policies/conditions/ConditionAttrObject.html",
+    "text!templates/policy/policies/conditions/ConditionAttrString.html",
+    "text!templates/policy/policies/conditions/ConditionAttrTime.html",
+    "text!templates/policy/policies/conditions/ConditionAttrTimeZone.html",
+    "text!templates/policy/policies/conditions/EditEnvironmentTemplate.html",
+    "text!templates/policy/policies/conditions/EditSubjectTemplate.html",
+    "text!templates/policy/policies/conditions/LegacyListItem.html",
+    "text!templates/policy/policies/conditions/ListItem.html",
+    "text!templates/policy/policies/conditions/ManageRulesTemplate.html",
+    "text!templates/policy/policies/conditions/OperatorRulesTemplate.html",
+
+    "text!templates/policy/policies/EditPolicyTemplate.html",
+    "text!templates/policy/policies/ManagePoliciesGridActionsTemplate.html",
+    "text!templates/policy/policies/ManagePoliciesGridTemplate.html",
+    "text!templates/policy/policies/ManagePoliciesTemplate.html",
+    "text!templates/policy/policies/ReviewPolicyStepTemplate.html",
+
+    "text!templates/policy/referrals/EditReferralTemplate.html",
+    "text!templates/policy/referrals/ManageRefsGridActionsTemplate.html",
+    "text!templates/policy/referrals/ManageRefsGridTemplate.html",
+    "text!templates/policy/referrals/ReviewReferralStepTemplate.html",
+    "text!templates/policy/referrals/SelectRealmsTemplate.html",
+
     "text!configuration.json"
 ], function () {
     /* an unfortunate need to duplicate the file names here, but I haven't
      yet found a way to fool requirejs into doing dynamic dependencies */
     var staticFiles = [
-            "templates/policy/ActionsTemplate.html",
-            "templates/policy/AddNewResourceTemplate.html",
             "templates/policy/BaseTemplate.html",
-            "templates/policy/ConditionAttrArray.html",
-            "templates/policy/ConditionAttrBoolean.html",
-            "templates/policy/ConditionAttrEnum.html",
-            "templates/policy/ConditionAttrString.html",
-            "templates/policy/ConditionAttrTimeDate.html",
-            "templates/policy/EditApplicationTemplate.html",
-            "templates/policy/EditEnvironmentTemplate.html",
-            "templates/policy/EditPolicyTemplate.html",
-            "templates/policy/EditReferralTemplate.html",
-            "templates/policy/EditSubjectTemplate.html",
-            "templates/policy/LegacyListItem.html",
-            "templates/policy/ListItem.html",
-            "templates/policy/LoginDialog.html",
-            "templates/policy/ManageAppsGridActionsTemplate.html",
-            "templates/policy/ManageAppsGridCellActionsTemplate.html",
-            "templates/policy/ManageAppsGridTemplate.html",
-            "templates/policy/ManageAppsTemplate.html",
-            "templates/policy/ManagePoliciesGridActionsTemplate.html",
-            "templates/policy/ManagePoliciesGridTemplate.html",
-            "templates/policy/ManagePoliciesTemplate.html",
-            "templates/policy/ManageRefsGridActionsTemplate.html",
-            "templates/policy/ManageRefsGridTemplate.html",
-            "templates/policy/ManageRulesTemplate.html",
-            "templates/policy/OperatorRulesTemplate.html",
-            "templates/policy/ResourcesListTemplate.html",
-            "templates/policy/ResponseAttrsUser.html",
-            "templates/policy/ReviewApplicationStepTemplate.html",
-            "templates/policy/ReviewPolicyStepTemplate.html" ,
-            "templates/policy/ReviewReferralStepTemplate.html" ,
-            "templates/policy/SelectRealmsTemplate.html",
+
+            "templates/policy/applications/EditApplicationTemplate.html",
+            "templates/policy/applications/ManageAppsGridActionsTemplate.html",
+            "templates/policy/applications/ManageAppsGridCellActionsTemplate.html",
+            "templates/policy/applications/ManageAppsGridTemplate.html",
+            "templates/policy/applications/ManageAppsTemplate.html",
+            "templates/policy/applications/ReviewApplicationStepTemplate.html",
+
+            "templates/policy/policies/ActionsTemplate.html",
+            "templates/policy/common/HelpLinkTemplate.html",
+
+            "templates/policy/login/LoginDialog.html",
+
+            "templates/policy/policies/attributes/ResponseAttrsStatic.html",
+            "templates/policy/policies/attributes/ResponseAttrsUser.html",
+
+            "templates/policy/policies/conditions/ConditionAttrArray.html",
+            "templates/policy/policies/conditions/ConditionAttrBoolean.html",
+            "templates/policy/policies/conditions/ConditionAttrDate.html",
+            "templates/policy/policies/conditions/ConditionAttrDay.html",
+            "templates/policy/policies/conditions/ConditionAttrEnum.html",
+            "templates/policy/policies/conditions/ConditionAttrObject.html",
+            "templates/policy/policies/conditions/ConditionAttrString.html",
+            "templates/policy/policies/conditions/ConditionAttrTime.html",
+            "templates/policy/policies/conditions/ConditionAttrTimeZone.html",
+            "templates/policy/policies/conditions/EditEnvironmentTemplate.html",
+            "templates/policy/policies/conditions/EditSubjectTemplate.html",
+            "templates/policy/policies/conditions/LegacyListItem.html",
+            "templates/policy/policies/conditions/ListItem.html",
+            "templates/policy/policies/conditions/ManageRulesTemplate.html",
+            "templates/policy/policies/conditions/OperatorRulesTemplate.html",
+
+            "templates/policy/policies/EditPolicyTemplate.html",
+            "templates/policy/policies/ManagePoliciesGridActionsTemplate.html",
+            "templates/policy/policies/ManagePoliciesGridTemplate.html",
+            "templates/policy/policies/ManagePoliciesTemplate.html",
+            "templates/policy/policies/ReviewPolicyStepTemplate.html",
+
+            "templates/policy/referrals/EditReferralTemplate.html",
+            "templates/policy/referrals/ManageRefsGridActionsTemplate.html",
+            "templates/policy/referrals/ManageRefsGridTemplate.html",
+            "templates/policy/referrals/ReviewReferralStepTemplate.html",
+            "templates/policy/referrals/SelectRealmsTemplate.html",
+
             "configuration.json"
         ],
         deps = arguments;

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,22 +24,39 @@
 
 /*global $, require, QUnit */
 
-define([
-    "jquery",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "../test/tests/policy"
-], function ($, constants, eventManager, policyTests) {
-    return function (server) {
-        eventManager.registerListener(constants.EVENT_APP_INTIALIZED, function () {
-            $.doTimeout = function (name, time, func) {
-                func(); // run the function immediately rather than delayed.
-            };
-
-            require("ThemeManager").getTheme().then(function () {
-                QUnit.start();
-                policyTests.executeAll(server);
-            });
-        });
+require.config({
+    baseUrl: '../www',
+    paths: {
+        jquery: "libs/jquery-2.1.1-min",
+        underscore: "libs/lodash-2.4.1-min",
+        sinon: "../test/libs/sinon-1.10.3",
+        text: "../test/text"
+    },
+    shim: {
+        underscore: {
+            exports: "_"
+        },
+        sinon: {
+            exports: "sinon"
+        }
     }
+});
+
+require([
+    "underscore",
+    "sinon",
+    "../test/tests/mocks/systemInit",
+    "../test/tests/mocks/policyInit"
+], function (_, sinon, systemInit, policyInit) {
+
+    var server = sinon.fakeServer.create();
+    server.autoRespond = true;
+    systemInit(server);
+    policyInit(server);
+
+    require(['../www/main', '../test/run'], function (appMain, run) {
+        run(server);
+    });
+
+    return server;
 });

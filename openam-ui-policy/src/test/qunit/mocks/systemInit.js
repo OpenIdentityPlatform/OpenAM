@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,6 +27,7 @@ define([
     "text!locales/en/translation.json",
     "text!themeConfig.json",
     "text!libs/less-1.5.1-min.js",
+    "text!libs/jquery.autosize.input.min.js",
     "text!css/styles.less",
     "text!css/common/config.less",
     "text!css/common/helpers.less",
@@ -50,6 +51,7 @@ define([
             "locales/en/translation.json",
             "themeConfig.json",
             "libs/less-1.5.1-min.js",
+            "libs/jquery.autosize.input.min.js",
             "css/styles.less",
             "css/common/config.less",
             "css/common/helpers.less",
