@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,9 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DataStore.java,v 1.13 2010/01/20 17:01:35 veiming Exp $
- */
-/**
- * Portions Copyrighted 2012-2014 ForgeRock AS
+ *
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -920,11 +919,11 @@ public class DataStore {
 
         if (PrivilegeManager.debug.messageEnabled()) {
             PrivilegeManager.debug.message(
-                "[PolicyEval] DataStore.searchPrivileges", null);
+                "[PolicyEval] DataStore.searchPrivileges");
             PrivilegeManager.debug.message(
-                "[PolicyEval] search filter: " + filter, null);
+                "[PolicyEval] search filter: " + filter);
             PrivilegeManager.debug.message(
-                "[PolicyEval] search DN: " + baseDN, null);
+                "[PolicyEval] search DN: " + baseDN);
         }
 
         if (filter != null) {
@@ -986,11 +985,11 @@ public class DataStore {
 
         if (PrivilegeManager.debug.messageEnabled()) {
             PrivilegeManager.debug.message(
-                "[PolicyEval] DataStore.searchReferral", null);
+                "[PolicyEval] DataStore.searchReferral");
             PrivilegeManager.debug.message(
-                "[PolicyEval] search filter: " + filter, null);
+                "[PolicyEval] search filter: " + filter);
             PrivilegeManager.debug.message(
-                "[PolicyEval] search DN: " + baseDN, null);
+                "[PolicyEval] search DN: " + baseDN);
         }
 
         if (filter != null) {

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: Debugger.java,v 1.2 2008/06/25 05:42:08 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.cli;
 
@@ -63,7 +60,7 @@ public class Debugger {
      */
     public static void message(CommandManager mgr, String msg) {
         dumpToOutput(mgr, msg, null);
-        mgr.getDebugger().message(msg, null);
+        mgr.getDebugger().message(msg);
     }
 
     /**
@@ -129,7 +126,7 @@ public class Debugger {
      */
     public static void warning(CommandManager mgr, String msg) {
         dumpToOutput(mgr, msg, null);
-        mgr.getDebugger().warning(msg, null);
+        mgr.getDebugger().warning(msg);
     }
 
     /**
@@ -185,7 +182,7 @@ public class Debugger {
      */
     public static void error(CommandManager mgr, String msg) {
         dumpToOutput(mgr, msg, null);
-        mgr.getDebugger().error(msg, null);
+        mgr.getDebugger().error(msg);
     }
 
     /**

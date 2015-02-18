@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: Entitlement.java,v 1.7 2010/01/25 23:48:14 veiming Exp $
  *
- * Portions copyright 2010-2013 ForgeRock, Inc.
+ * Portions copyright 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -800,7 +800,7 @@ public class Entitlement {
         }
         if (application == null) {
             PrivilegeManager.debug.error("Entitlement.getApplication null"
-                    + "realm=" + realm + " applicationname=" + applicationName, null);
+                    + "realm=" + realm + " applicationname=" + applicationName);
         }
         return application;
     }

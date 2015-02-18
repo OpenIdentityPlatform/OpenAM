@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: Privilege.java,v 1.14 2010/01/08 22:20:47 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock, AS.
+ *
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -618,12 +616,12 @@ public abstract class Privilege implements IPrivilege {
         if (PrivilegeManager.debug.messageEnabled()) {
             if (result) {
                 PrivilegeManager.debug.message(
-                    "[PolicyEval] Privilege.doesSubjectMatch: true", null);
+                    "[PolicyEval] Privilege.doesSubjectMatch: true");
             } else {
                 PrivilegeManager.debug.message(
-                    "[PolicyEval] Privilege.doesSubjectMatch: false", null);
+                    "[PolicyEval] Privilege.doesSubjectMatch: false");
                 PrivilegeManager.debug.message("[PolicyEval] Advices: " +
-                    resultAdvices.toString(), null);
+                    resultAdvices.toString());
             }
         }
         return result;
@@ -654,12 +652,12 @@ public abstract class Privilege implements IPrivilege {
         if (PrivilegeManager.debug.messageEnabled()) {
             if (result) {
                 PrivilegeManager.debug.message(
-                    "[PolicyEval] Privilege.doesConditionMatch: true", null);
+                    "[PolicyEval] Privilege.doesConditionMatch: true");
             } else {
                 PrivilegeManager.debug.message(
-                    "[PolicyEval] Privilege.doesConditionMatch: false", null);
+                    "[PolicyEval] Privilege.doesConditionMatch: false");
                 PrivilegeManager.debug.message("[PolicyEval] Advices: " +
-                    resultAdvices.toString(), null);
+                    resultAdvices.toString());
             }
         }
 

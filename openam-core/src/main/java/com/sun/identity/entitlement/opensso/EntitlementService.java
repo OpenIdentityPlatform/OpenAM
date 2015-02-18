@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EntitlementService.java,v 1.13 2010/01/08 23:59:32 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -162,7 +160,7 @@ public class EntitlementService extends EntitlementConfiguration {
             } else {
                 PrivilegeManager.debug.error(
                     "EntitlementService.getAttributeValues: " +
-                    "admin token is missing", null);
+                    "admin token is missing");
             }
         } catch (SMSException ex) {
             PrivilegeManager.debug.error(
@@ -188,7 +186,7 @@ public class EntitlementService extends EntitlementConfiguration {
             } else {
                 PrivilegeManager.debug.error(
                     "EntitlementService.getAttributeValues: " +
-                    "admin token is missing", null);
+                    "admin token is missing");
             }
         } catch (SMSException ex) {
             PrivilegeManager.debug.error(
@@ -212,7 +210,7 @@ public class EntitlementService extends EntitlementConfiguration {
             if (token == null) {
                 PrivilegeManager.debug.error(
                     "EntitlementService.getApplicationTypes : "+
-                    "admin sso token is absent", null);
+                    "admin sso token is absent");
             } else {
                 ServiceConfig conf = getApplicationTypeCollectionConfig(
                     token);
@@ -447,8 +445,7 @@ public class EntitlementService extends EntitlementConfiguration {
                 }
             } else {
                 PrivilegeManager.debug.error(
-                    "EntitlementService.getApplications, admin token is missing",
-                    null);
+                    "EntitlementService.getApplications, admin token is missing");
             }
         } catch (EntitlementException ex) {
             PrivilegeManager.debug.error(
@@ -994,7 +991,7 @@ public class EntitlementService extends EntitlementConfiguration {
             } else {
                 PrivilegeManager.debug.error(
                     "EntitlementService.getSubjectAttributesCollectorNames: " +
-                    "admin sso token is absent", null);
+                    "admin sso token is absent");
                 throw new EntitlementException(285);
             }
         } catch (SMSException ex) {
@@ -1071,7 +1068,7 @@ public class EntitlementService extends EntitlementConfiguration {
             } else {
                 PrivilegeManager.debug.error(
                 "EntitlementService.getSubjectAttributesCollectorConfiguration:"
-                    + "admin sso token is absent", null);
+                    + "admin sso token is absent");
                 Object[] arg = {name};
                 throw new EntitlementException(287, arg);
             }
@@ -1134,7 +1131,7 @@ public class EntitlementService extends EntitlementConfiguration {
             } else {
                 PrivilegeManager.debug.error(
                 "EntitlementService.setSubjectAttributesCollectorConfiguration:"
-                    + "admin sso token is absent", null);
+                    + "admin sso token is absent");
                 Object[] arg = {name};
                 throw new EntitlementException(289, arg);
             }

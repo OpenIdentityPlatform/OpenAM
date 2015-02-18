@@ -24,20 +24,22 @@
  *
  * $Id: Debug.java,v 1.6 2009/08/19 05:41:17 veiming Exp $
  *
- * Portions Copyrighted 2013-2014 Forgerock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  *
  */
 
 package com.sun.identity.shared.debug;
 
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.shared.debug.file.impl.StdDebugFile;
-import com.sun.identity.shared.debug.impl.DebugProviderImpl;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import org.slf4j.helpers.MessageFormatter;
+
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.file.impl.StdDebugFile;
+import com.sun.identity.shared.debug.impl.DebugProviderImpl;
 
 
 // NOTE: Since JVM specs guarantee atomic access/updates to int variables
@@ -455,6 +457,36 @@ public class Debug {
     }
 
     /**
+     * A convenience method for message debug statements. The message will only be formatted
+     * if the debug level is greater than {@link #WARNING}, and then it will be formatted using
+     * the {@link org.slf4j.helpers.MessageFormatter} class. The relevant {@code message} method is then
+     * called depending on whether the last parameter is an instance of {@code Throwable}.
+     * <p>
+     * This method is convenient way of issuing warning level debug statements without having
+     * to guard the call with a check to {@link #messageEnabled()}, as that check is done
+     * before evaluating the method parameters.
+     * <p>
+     * For this optimisation to work properly, this method should not be called using string
+     * concatenation. If concatenation is required, it can be achieved using format patterns.
+     * <p>
+     * In this way, the only cost to execution is the assembly of the varargs parameter.
+     * @param msg The debug message format, using {@link MessageFormatter} style format patterns.
+     * @param params The parameters to the message, optionally with a {@code Throwable} as
+     *               the last parameter.
+     */
+    public void message(String msg, Object... params) {
+        IDebug debug = getDebugServiceInstance();
+        if (debug.messageEnabled()) {
+            String message = MessageFormatter.arrayFormat(msg, params).getMessage();
+            if (params[params.length - 1] instanceof Throwable) {
+                debug.message(message, (Throwable) params[params.length - 1]);
+            } else {
+                debug.message(message, null);
+            }
+        }
+    }
+
+    /**
      * Prints warning messages only when debug level is greater than
      * Debug.ERROR.
      * <p/>
@@ -526,6 +558,36 @@ public class Debug {
     }
 
     /**
+     * A convenience method for warning debug statements. The message will only be formatted
+     * if the debug level is greater than {@link #ERROR}, and then it will be formatted using
+     * the {@link org.slf4j.helpers.MessageFormatter} class. The relevant {@code warning} method is then
+     * called depending on whether the last parameter is an instance of {@code Throwable}.
+     * <p>
+     * This method is convenient way of issuing warning level debug statements without having
+     * to guard the call with a check to {@link #warningEnabled()}, as that check is done
+     * before evaluating the method parameters.
+     * <p>
+     * For this optimisation to work properly, this method should not be called using string
+     * concatenation. If concatenation is required, it can be achieved using format patterns.
+     * <p>
+     * In this way, the only cost to execution is the assembly of the varargs parameter.
+     * @param msg The debug message format, using {@link MessageFormatter} style format patterns.
+     * @param params The parameters to the message, optionally with a {@code Throwable} as
+     *               the last parameter.
+     */
+    public void warning(String msg, Object... params) {
+        IDebug debug = getDebugServiceInstance();
+        if (debug.warningEnabled()) {
+            String message = MessageFormatter.arrayFormat(msg, params).getMessage();
+            if (params[params.length - 1] instanceof Throwable) {
+                debug.warning(message, (Throwable) params[params.length - 1]);
+            } else {
+                debug.warning(message, null);
+            }
+        }
+    }
+
+    /**
      * Prints error messages only when debug level is greater than DEBUG.OFF.
      *
      * @param msg message to be printed. A newline will be appended to the
@@ -568,6 +630,36 @@ public class Debug {
      */
     public void error(String msg, Throwable t) {
         getDebugServiceInstance().error(msg, t);
+    }
+
+    /**
+     * A convenience method for error debug statements. The message will only be formatted
+     * if the debug level is greater than {@link #OFF}, and then it will be formatted using
+     * the {@link org.slf4j.helpers.MessageFormatter} class. The relevant {@code error} method is then
+     * called depending on whether the last parameter is an instance of {@code Throwable}.
+     * <p>
+     * This method is convenient way of issuing warning level debug statements without having
+     * to guard the call with a check to {@link #errorEnabled()}, as that check is done
+     * before evaluating the method parameters.
+     * <p>
+     * For this optimisation to work properly, this method should not be called using string
+     * concatenation. If concatenation is required, it can be achieved using format patterns.
+     * <p>
+     * In this way, the only cost to execution is the assembly of the varargs parameter.
+     * @param msg The debug message format, using {@link MessageFormatter} style format patterns.
+     * @param params The parameters to the message, optionally with a {@code Throwable} as
+     *               the last parameter.
+     */
+    public void error(String msg, Object... params) {
+        IDebug debug = getDebugServiceInstance();
+        if (debug.errorEnabled()) {
+            String message = MessageFormatter.arrayFormat(msg, params).getMessage();
+            if (params[params.length - 1] instanceof Throwable) {
+                debug.error(message, (Throwable) params[params.length - 1]);
+            } else {
+                debug.error(message, null);
+            }
+        }
     }
 
     /**

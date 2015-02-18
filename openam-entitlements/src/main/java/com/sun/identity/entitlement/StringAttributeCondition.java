@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,8 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: StringAttributeCondition.java,v 1.3 2009/08/31 19:48:14 veiming Exp $
- */
-/*
+ *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
@@ -132,8 +131,7 @@ public class StringAttributeCondition extends EntitlementConditionAdaptor {
             }
         } else {
             PrivilegeManager.debug.error(
-                "StringAttributeCondition cannot be evaluated because either attribute name or value is null"
-                , null);
+                "StringAttributeCondition cannot be evaluated because either attribute name or value is null");
         }
 
         if (!allowed && (attributeName != null) && (attributeName.length() > 0)
