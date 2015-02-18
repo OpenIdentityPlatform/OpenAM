@@ -47,7 +47,8 @@ define("config/AppConfiguration", [
                         LoginDialog : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
                         RegisterView : "org/forgerock/openam/ui/user/profile/RegisterView",
                         ChangeSecurityDataDialog : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
-                        ConfirmPasswordDialog : "org/forgerock/commons/ui/user/profile/ConfirmPasswordDialog"
+                        ConfirmPasswordDialog : "org/forgerock/commons/ui/user/profile/ConfirmPasswordDialog",
+                        ResourceEditDialog : "org/forgerock/openam/ui/uma/ResourceEditDialog"
                     }
                 },
                 {

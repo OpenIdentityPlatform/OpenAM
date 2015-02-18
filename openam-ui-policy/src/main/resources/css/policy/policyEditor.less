@@ -1475,6 +1475,101 @@ body.editing{
         }
     }
 
+    ol.condition-management-group ul.buttonControl{
+
+        margin-top: 16px;
+        font-size: 0;
+        width: 100px;
+        position: absolute;
+
+        li{
+            border:none;
+            display:inline-block;
+            margin:0;
+            padding:0;
+
+            a.button{
+                border-radius:0;
+                margin-left:0;
+                background-color:lighten(@color-inactive, 5%);
+                transition:background 100ms;
+
+                &:not(.selected){
+                    border-color:@color-inactive;
+                    background-image:none;
+
+                    &:hover{
+                        background-color:average(@color-active, @color-inactive)
+                    }
+                }
+
+                &.selected:hover{
+                    .linear-gradient(top, @color-active, darken(@color-active, 10%));
+                }
+            }
+
+            &:first-of-type{
+                a.button{
+                    border-radius:5px 0 0 5px;
+                }
+            }
+
+            &:last-of-type{
+                a.button{
+                    border-radius:0 5px 5px 0;
+                }
+            }
+        }
+
+        a.button {
+            line-height:12px;
+        }
+    }
+
+    .item-data > div span.inline-right {
+        padding: 0;
+        position: absolute;
+        right: 4px;
+        bottom: 1px;
+        color: #ddd;
+    }
+
+    .item-data div.field-float-pattern.time-field {
+        min-width: 82px;
+        input {
+            width: 70px;
+        }
+    }
+
+    .item-data div.field-float-select.day-field {
+        min-width: 100px;
+        select {
+            width:100px;
+            min-width:0;
+        }
+    }
+
+    .item-data {
+
+        > div#conditionAttrTimeDate {
+            border-right: none;
+            margin-right:0;
+
+            div.float-left {
+                float: left;
+                border-right: 1px solid #eee;
+
+                &:last-of-type{
+                    border-right: none;
+                }
+            }
+
+            .datePicker{
+                width:100px;
+            }
+        }
+    }
+
 }
 
 /*Overrides for accordion states*/
@@ -1484,308 +1579,4 @@ section.active-step{
     #condition-management #pickUpArea ol#pickUpItem li.rule:not(.dragged) {
         display: block;
     }
-}
-
-
-#condition-management ol.condition-management-group ul.buttonControl{
-
-    margin-top: 16px;
-    font-size: 0;
-    width: 100px;
-    position: absolute;
-
-    li{
-        border:none;
-        display:inline-block;
-        margin:0;
-        padding:0;
-
-        a.button{
-            border-radius:0;
-            margin-left:0;
-            background-color:lighten(@color-inactive, 5%);
-            transition:background 100ms;
-
-            &:not(.selected){
-                border-color:@color-inactive;
-                background-image:none;
-
-                &:hover{
-                    background-color:average(@color-active, @color-inactive)
-                }
-            }
-
-            &.selected:hover{
-                .linear-gradient(top, @color-active, darken(@color-active, 10%));
-            }
-        }
-
-        &:first-of-type{
-            a.button{
-                border-radius:5px 0 0 5px;
-            }
-        }
-
-        &:last-of-type{
-            a.button{
-                border-radius:0 5px 5px 0;
-            }
-        }
-
-    }
-
-    a.button {
-        line-height:12px;
-    }
-}
-
-#condition-management .item-data > div span.inline-right {
-    padding: 0;
-    position: absolute;
-    right: 4px;
-    bottom: 1px;
-    color: #ddd;
-}
-
-#condition-management .item-data div.field-float-pattern.time-field {
-    min-width: 82px;
-    input {
-        width: 70px;
-    }
-}
-
-#condition-management .item-data div.field-float-select.day-field {
-    min-width: 100px;
-    select {
-        width:100px;
-        min-width:0;
-    }
-}
-
-#condition-management .item-data {
-
-    > div#conditionAttrTimeDate {
-        border-right: none;
-        margin-right:0;
-
-        div.float-left {
-            float: left;
-            border-right: 1px solid #eee;
-
-            &:last-of-type{
-                border-right: none;
-            }
-        }
-
-        .datePicker{
-            width:100px;
-        }
-    }
-
-}
-
-
-#uma{
-
-    margin-bottom: 40px;
-
-    .policy-content {
-        min-height:100px;
-    }
-
-    #selectUser{
-        width: 370px;
-        margin: 0 15px 10px 0;
-    }
-
-    #selectPermission{
-        min-width:370px;
-        margin: 0 15px 10px 0;
-    }
-
-    #resourceList{
-        margin-bottom:30px;
-    }
-
-    input.button{
-        padding-top: 5px;
-        padding-bottom: 5px;
-        margin: 26px 0 0 0;
-    }
-
-    label {
-        display: block;
-        padding: 0 0 4px 2px;
-        color: grey;
-    }
-
-    .backgrid-container {
-        width: 100%;
-        overflow-x: scroll;
-    }
-
-    .backgrid{
-        .string-cell, .uri-cell, .email-cell,  .string-cell.editor input[type=text],  .uri-cell.editor input[type=text], .email-cell.editor input[type=text], .datetime-cell {
-            text-align: left;
-        }
-
-        th {
-            text-align: left;
-            a {
-                color:#777;
-                margin-bottom:34px;
-            }
-
-            &.filter-header-cell a {
-                margin-bottom:0;
-            }
-            background-color: white;
-        }
-
-        tbody tr {
-            background-color: #eee;
-
-            &:nth-child(even) {
-                background-color: #fff;
-            }
-
-            &.empty {
-                background-color: transparent;
-                td{
-                    display: table-cell;
-                    padding:10px;
-                }
-            }
-
-            td {
-                // Required for tooltips
-                overflow:visible;
-
-                // Add the click event to the td so that the entire cell is clickable
-                &:hover a{
-                    text-decoration: underline;
-                }
-
-                a {
-                    color: #777;
-                    text-decoration: none;
-                    font-weight:bold;
-                }
-            }
-
-            &:hover:not(.empty){
-                background-color: #d7e9f8;
-                color: #1f6fb1;
-
-                td a {
-                    color: #1f6fb1;
-                }
-            }
-        }
-        .ascending .sort-caret{
-            border-bottom: 4px solid #80b7ab;
-        }
-
-        .descending .sort-caret {
-            border-top: 4px solid #80b7ab;
-        }
-
-        max-width: none;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .backgrid-container{
-        height:auto;
-        overflow: auto;
-        border: 1px solid rgb(226, 223, 223);
-        min-height: 369px; // the height of 10 records
-        background-color: #ddd;
-    }
-
-    .backgrid-filter.form-search {
-        margin: 0 0 5px;
-        .hideSearchCloseBtn;
-    }
-
-    .backgrid-revoke-cell {
-        font-size: 12px;
-    }
-
-    .selectize-cell {
-      width: 300px;
-    }
-
-    .search {
-        &:after {
-            background-color: #80b7ab;
-        }
-        &:before {
-            border: 3px solid #80b7ab;
-        }
-    }
-
-    .selectize-control.multi .selectize-input, .selectize-control.single .selectize-input{
-        margin: 5px 0 0 0;
-    }
-
-
-    span.tooltips:hover span, span.tooltips:focus span {
-        width: 200px;
-        margin-left: -100px;
-    }
-
-
-    span.tooltips span {
-
-        color: #d7e9f8;
-        background-color: #1f6fb1;
-        padding: 6px 5px;
-        background-image: -webkit-linear-gradient(top, lighten(#1f6fb1, 10%), #1f6fb1);
-    }
-
-    span.tooltips span:after {
-        border-top: 8px solid #1f6fb1;
-    }
-
-}
-
-#default-base{
-    width:100%;
-    max-width:980px;
-}
-
-.menubar {
-    margin: 0 5px 0;
-}
-
-#menu {
-    .menu {
-        margin:0 0 15px 0;
-    }
-}
-
-.content {
-    padding: 0px 10px;
-}
-
-.submenubar {
-    clear: both;
-    border: none;
-    margin: 0 5px 0;
-
-    li a {
-        text-decoration:none;
-        color: #777;
-    }
-
-    a:hover,  .active a{
-        border-radius: 0;
-        background-color: transparent;
-        color: #80b7ab;
-    }
-}
-
-#dialog-background.show {
-    opacity: 0.5;
 }

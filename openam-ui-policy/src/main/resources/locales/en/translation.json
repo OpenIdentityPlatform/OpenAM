@@ -59,16 +59,7 @@
         },
         "AppConfiguration": {
             "Navigation": {
-                "links": {
-                    "policyEditor" : "Policy Editor",
-                    "uma" : "User Managed Access",
-                    "umaLinks": {
-                        "history" : "History",
-                        "resources" : "Resources",
-                        "users" : "Users",
-                        "apps" : "Apps"
-                    }
-                }
+                "links": {}
             }
         }
     },
@@ -559,52 +550,6 @@
             "legacyFormat": "This condition is in a legacy format, and should be replaced.",
             "attributes": {
                 "object": "key:value[,value2,...]"
-            }
-        },
-
-        "uma": {
-            "all": {
-                "grid": {
-                    "empty": "No results..."
-                }
-            },
-            "share": {
-                "people": "Search for people",
-                "permission": "Select Permission",
-                "share": "Share",
-                "notSpecifiedResource": "You have not specified a resource to share."
-            },
-            "resources": {
-                "all": {
-                    "grid": {
-                        "filter": "Filter by __header__"
-                    }
-                },
-                "list": {
-                    "title": "Resources",
-                    "subtitle": "All shared resources",
-                    "grid": ["Resources", "Modified By", "Last accessed", "Host"]
-                },
-                "show": {
-                    "subtitle": "Users allowed to access this resource and their permissions",
-                    "grid": ["User", "Last accessed", "Permissions"],
-                    "share": "Share",
-                    "revokeAll": "Revoke All",
-                    "revokeAllMessage": "Are you sure you want to revoke all access?"
-                }
-            },
-            "history": {
-                "title": "History",
-                "subtitle": "Who has accessed and when",
-                "grid": ["User who accessed", "Resource name", "Application name", "Last accessed"]
-            },
-            "users": {
-                "title": "Users",
-                "subtitle": "..."
-            },
-            "apps": {
-                "title": "Apps",
-                "subtitle": "..."
             }
         }
     }

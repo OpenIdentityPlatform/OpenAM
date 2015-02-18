@@ -69,67 +69,6 @@ define("config/routes/PolicyRoutesConfig", [
         "amConsole": {
             url: "console",
             event: constants.EVENT_RETURN_TO_AM_CONSOLE
-        },
-
-        "uma": {
-            view: "org/forgerock/openam/ui/uma/ResourceEditView",
-            url: /^uma\//,
-            pattern: "uma/",
-            role: "ui-user,ui-admin"
-        },
-
-        "share": {
-            view: "org/forgerock/openam/ui/uma/ResourceEditView",
-            url: /^uma\/share\/(.*?)(?:\/){0,1}$/,
-            pattern: "uma/share/?",
-            defaults: [""],
-            role: "ui-user,ui-admin"
-        },
-
-        "resourceList": {
-            view: "org/forgerock/openam/ui/uma/ResourceListView",
-            url: /^uma\/resources\/(.*?)(?:\/){0,1}$/,
-            defaults: [""],
-            role: "ui-user,ui-admin",
-            pattern: "uma/resources/?"
-        },
-        "resourceActivity": {
-            view: "org/forgerock/openam/ui/uma/ResourceView",
-            url: /^uma\/resources\/(.+?)\/(activity)\//,
-            role: "ui-user,ui-admin",
-            pattern: "uma/resources/?/activity/"
-        },
-        "resourceUsers": {
-            view: "org/forgerock/openam/ui/uma/ResourceView",
-            url: /^uma\/resources\/(.+?)\/(users)\//,
-            role: "ui-user,ui-admin",
-            pattern: "uma/resources/?/users/"
-        },
-        "resourceEdit": {
-            base: "resourceActivity",
-            dialog: "org/forgerock/openam/ui/uma/ResourceEditDialog",
-            role: "ui-admin,ui-admin",
-            url: /^uma\/resources\/(.+?)\/(edit)\//,
-            pattern: "uma/resources/?/edit/"
-        },
-        "history": {
-            view: "org/forgerock/openam/ui/uma/HistoryView",
-            role: "ui-user,ui-admin",
-            url: /^uma\/history\/$/,
-            pattern: "uma/history/"
-        },
-        "users": {
-            view: "org/forgerock/openam/ui/uma/UsersView",
-            role: "ui-user,ui-admin",
-            url: /^uma\/users\/$/,
-            pattern: "uma/users/"
-        },
-        "apps": {
-            view: "org/forgerock/openam/ui/uma/AppsView",
-            role: "ui-user,ui-admin",
-            defaults: [""],
-            url: /^uma\/apps\/(.*?)(?:\/){0,1}$/,
-            pattern: "uma/apps/?"
         }
     };
 });

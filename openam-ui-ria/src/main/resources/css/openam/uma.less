@@ -213,11 +213,7 @@ span.item-button-panel {
                 }
             }
 
-
         }
-
-
-
     }
 
     li {
@@ -236,19 +232,6 @@ span.item-button-panel {
             transition: background 0.2s linear;
         }
     }
-}
-input[type="text"]:invalid:required, input[type="text"].invalid{
-    .invalid-background;
-    transition: background-color 200ms linear;
-}
-
-
-.ui-state-default .ui-element .dragged{
-    margin-top:-300px;
-}
-
-.global-actions {
-    margin: 20px 0 0 -5px;
 }
 
 .content-bg {
@@ -358,6 +341,11 @@ body{
 
 
 #uma{
+
+    input[type="text"]:invalid:required, input[type="text"].invalid{
+        .invalid-background;
+        transition: background-color 200ms linear;
+    }
 
     margin-bottom: 40px;
 
@@ -522,11 +510,8 @@ body{
 
 }
 
-#default-base{
-    width:100%;
-    max-width:980px;
-}
 
+/* new submenu style */
 .menubar {
     margin: 0 5px 0;
 }
@@ -560,4 +545,56 @@ body{
 
 #dialog-background.show {
     opacity: 0.5;
+}
+
+/* enable responsive layout*/
+#default-base {
+    width:100%;
+    max-width:980px;
+}
+
+@media screen and (max-width: 1000px) {
+    #default-base {
+        width:900px;
+        #userProfileForm .group-field-block {
+            label{
+                text-align: left;
+            }
+            input{
+                width:380px;
+            }
+        }
+    }
+}
+
+
+@media screen and (max-width: 920px) {
+    .col2{
+        width:100%;
+    }
+    #default-base {
+        width:700px;
+        #userProfileForm .group-field-block input{
+            width:440px;
+        }
+    }
+
+}
+
+@media screen and (max-width: 720px) {
+    #default-base {
+        width:500px;
+        #userProfileForm .group-field-block input{
+            width:420px;
+        }
+    }
+}
+
+@media screen and (max-width: 520px) {
+    #default-base {
+        width:360px;
+        #userProfileForm .group-field-block input{
+            width:280px;
+        }
+    }
 }

@@ -37,8 +37,7 @@ define("config/AppConfiguration", function () {
                 moduleClass: "org/forgerock/commons/ui/common/main/GenericRouteInterfaceMap",
                 configuration: {
                     LoginView: "org/forgerock/openam/ui/policy/login/LoginView",
-                    LoginDialog: "org/forgerock/openam/ui/policy/login/LoginDialog",
-                    ResourceEditDialog : "org/forgerock/openam/ui/uma/ResourceEditDialog"
+                    LoginDialog: "org/forgerock/openam/ui/policy/login/LoginDialog"
                 }
             },
 
@@ -115,9 +114,7 @@ define("config/AppConfiguration", function () {
                         "templates/policy/applications/ManageAppsGridCellActionsTemplate.html",
                         "templates/policy/applications/ManageAppsGridActionsTemplate.html",
                         "templates/policy/policies/ManagePoliciesGridActionsTemplate.html",
-                        "templates/policy/referrals/ManageRefsGridActionsTemplate.html",
-                        "templates/uma/backgrid/cell/RevokeCell.html",
-                        "templates/uma/backgrid/cell/SelectizeCell.html"
+                        "templates/policy/referrals/ManageRefsGridActionsTemplate.html"
                     ]
                 }
             },
@@ -147,34 +144,7 @@ define("config/AppConfiguration", function () {
                     links: {
                         "user" : {
                             "urls": {
-                                "policyEditor": {
-                                    "url": "#apps/",
-                                    "icon": "glyph-icon-th-list",
-                                    "name": "config.AppConfiguration.Navigation.links.policyEditor"
-                                },
-                                "uma": {
-                                    "url": "#uma/resources/",
-                                    "icon": "glyph-icon-user",
-                                    "name": "config.AppConfiguration.Navigation.links.uma",
-                                    "urls": {
-                                        "resources": {
-                                            "url": "#uma/resources/",
-                                            "name": "config.AppConfiguration.Navigation.links.umaLinks.resources"
-                                        },
-                                        "history": {
-                                            "url": "#uma/history/",
-                                            "name": "config.AppConfiguration.Navigation.links.umaLinks.history"
-                                        },
-                                        "users": {
-                                            "url": "#uma/users/",
-                                            "name": "config.AppConfiguration.Navigation.links.umaLinks.users"
-                                        },
-                                        "apps": {
-                                            "url": "#uma/apps/",
-                                            "name": "config.AppConfiguration.Navigation.links.umaLinks.apps"
-                                        }
-                                    }
-                                }
+
                             }
                         }
                     }
