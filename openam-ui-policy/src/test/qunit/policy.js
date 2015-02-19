@@ -39,13 +39,15 @@ define([
     "org/forgerock/openam/ui/policy/policies/ActionsView",
     "org/forgerock/openam/ui/policy/policies/attributes/ManageResponseAttrsView",
     "org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsUserView",
+    "org/forgerock/openam/ui/policy/resources/ResourcesListView",
+    "org/forgerock/openam/ui/policy/resources/AddNewResourceView",
     "org/forgerock/openam/ui/policy/common/ReviewInfoView",
     "org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
     "org/forgerock/openam/ui/policy/policies/conditions/EditSubjectView",
     "org/forgerock/openam/ui/policy/policies/conditions/ManageEnvironmentsView",
     "org/forgerock/openam/ui/policy/policies/conditions/ManageSubjectsView",
     "org/forgerock/openam/ui/policy/policies/conditions/OperatorRulesView"
-], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolView, manageAppsView, policyListView, actionsView, responseAttrsStaticView, responseAttrsUserView) {
+], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolView, manageAppsView, policyListView, actionsView, responseAttrsStaticView, responseAttrsUserView, resListView, selectPatternsView) {
     return {
         executeAll: function (server) {
 
@@ -97,7 +99,7 @@ define([
                             var editing = resListView.$el.find('.editing'),
                                 listItems = resListView.$el.find('#createdResources ul li:not(.editing)'),
                                 plusButton = editing.find('.icon-plus'),
-                                resourceLength = entity.resources.length;
+                                resourceLength = entity.resources.length,
                                 values = [],
                                 valid = true,
                                 NEW_RESOURCE = 'newResource';
@@ -126,9 +128,8 @@ define([
                             plusButton.trigger('click');
                             QUnit.ok(  _.uniq(entity.resources).length === entity.resources.length,  "Duplicate resource not added");
 
-                            // Adding a NEW_RESOURCE.
+                            // Adding a NEW_RESOURCE. 
                             // Testing last input enter key trigger
-                            resourceLength = entity.resources.length;
                             editing.find('input')[ editing.find('input').length-1 ].value = NEW_RESOURCE;
                             var event = jQuery.Event("keyup");
                                 event.keyCode = 13 //enter key
@@ -152,10 +153,11 @@ define([
 
                             // Step 3
                             $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data, function () {
-
+                                
                                 var resources = [];
 
-                                QUnit.ok(editAppView.$el.find('#reviewName').html() === entity.name, "Correct name is displayed in the review step");
+                                QUnit.ok(editAppView.$el.find('#reviewName').html().trim() === entity.name, "Correct name is displayed in the review step");
+                                QUnit.ok(!editAppView.$el.find('#reviewName').parents('.review-row').hasClass('.invalid'), "Validate isn't displayed in the review step");
 
                                 if ((!editAppView.$el.find('#reviewDescr').html()) && (!entity.description)) {
                                     // both are undefined.
@@ -163,8 +165,6 @@ define([
                                 } else {
                                     QUnit.ok(editAppView.$el.find('#reviewDesc').html() === (entity.description ? entity.description : ''), "Correct description is displayed in the review step");
                                 }
-
-
 
                                 // Resources
                                 if (entity.resources.length) {
@@ -175,8 +175,9 @@ define([
                                     QUnit.ok(_.isEqual(resources, entity.resources), "Correct resources are displayed in the review step");
                                 }
 
-                                QUnit.start();
+                                QUnit.ok(!editAppView.$el.find('input[name="submitForm"]').is(':disabled'), "Finish button isn't disabled");
 
+                                QUnit.start();
                             }));
 
                         });
@@ -190,7 +191,6 @@ define([
                 editAppView.element = $("<div>")[0];
 
                 editAppView.render([], function () {
-
                     var entity = editAppView.data.entity;
 
                     resListView.element = '<div></div>';
@@ -207,7 +207,13 @@ define([
                     resListView.render([], function () {
                         var resources = resListView.$el.find('.res-name');
                         QUnit.ok(resources.length === 0, "No resources present");
-                        QUnit.start();
+
+                        $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data, function () {
+                            QUnit.ok(editAppView.$el.find('#reviewName').hasClass('invalid'), "Validate is displayed in the review step");
+                            QUnit.ok(editAppView.$el.find('input[name="submitForm"]').is(':disabled'), "Finish button is disabled");
+
+                            QUnit.start();
+                        }));
                     });
                 });
             });
@@ -218,7 +224,7 @@ define([
                 $("#qunit-fixture").append(manageAppsView.element);
 
                 manageAppsView.render([], function () {
-                    var table = $('#manageApps', manageAppsView.$el),
+                    var table = $('#apps', manageAppsView.$el),
                         postedData = table.jqGrid('getGridParam', 'postData'),
                         rowData = table.jqGrid('getRowData'),
                         recordsTotal = table.jqGrid('getGridParam', 'records'),
@@ -228,7 +234,7 @@ define([
                         remaining = table.jqGrid('getGridParam', 'userData').remaining;
 
 
-                    QUnit.ok(conf.globalData.policyEditorConfig, 'Configuration file loaded');
+                    QUnit.ok(conf.globalData.policyEditor, 'Configuration file loaded');
 
                     QUnit.ok(rowData.length > 0, "At least one application listed in the table");
                     QUnit.ok(rowData.length === table.find("tr[id]").length, "Number of rows in grid match number displayed");
@@ -237,10 +243,10 @@ define([
                         'Total number of columns displayed matches number of columns requested');
 
                     // sorting
-                    QUnit.ok(manageAppsView.$el.find('#manageApps_name').find('.s-ico').length === 1,
+                    QUnit.ok(manageAppsView.$el.find('#apps_name').find('.s-ico').length === 1,
                         'Sort icon is present for the name column');
 
-                    QUnit.ok(manageAppsView.$el.find('#manageApps_name').find('span[sort=desc]').hasClass('ui-state-disabled'),
+                    QUnit.ok(manageAppsView.$el.find('#apps_name').find('span[sort=desc]').hasClass('ui-state-disabled'),
                         'Name is sorted in ascending order');
 
                     // Pagination
@@ -275,7 +281,6 @@ define([
                 $("#qunit-fixture").append(editPolView.element);
 
                 editPolView.render(['sunIdentityServerLibertyPPService', 'anotherxamplePolicy'], function () {
-
                     var entity = editPolView.data.entity,
                         options = editPolView.data.options;
 
@@ -294,11 +299,10 @@ define([
 
                     // Step 2
                     resListView.render([], function () {
-
                         var listItems = resListView.$el.find('#createdResources ul li'),
                             valid = true;
 
-                         _.each(listItems, function (item) {
+                        _.each(listItems, function (item) {
                             valid = valid && $(item).text() === item.dataset.resource &&_.contains(entity.resources, item.dataset.resource);
                         });
 
@@ -313,10 +317,10 @@ define([
                         var element = selectPatternsView.$el,
                             listItems = element.find('.striped-list ul li'),
                             selectedItem = element.find('.addPattern:eq(2)');
-                            values = [];
+                        values = [];
 
                         _.each(listItems, function (item) {
-                             values.push($(item).find('.pattern').text());
+                            values.push($(item).find('.pattern').text());
                         });
 
                         // check number of rendered patterns = options.resourcePatterns.length
@@ -338,7 +342,6 @@ define([
                                 NEW_STR = 'newResource',
                                 INVALID_STR = 'invalid/Resource';
 
-
                             _.each(listItems, function (item) {
                                 values.push(item.dataset.resource);
                                 if($(item).text() !== item.dataset.resource){
@@ -348,12 +351,11 @@ define([
 
                             valid = _.difference(values, entity.resources).length === 0 ? valid : false;
 
-                             _.each(listItems, function (item) {
+                            _.each(listItems, function (item) {
                                 valid = valid && $(item).text() === item.dataset.resource && _.contains(entity.resources, item.dataset.resource);
                             });
 
                             QUnit.ok(valid, "All resources are displayed correctly");
-
                             QUnit.ok( options.newPattern === editing.data().resource, "Selected pattern displayed correctly");
 
                             // Testing new resource can be added.
@@ -361,7 +363,6 @@ define([
                             editing.find('input')[1].value = NEW_STR;
                             plusButton.trigger('click');
                             QUnit.ok(  _.contains(entity.resources, 'http://www.hello.com/'+ NEW_STR +'/world/'+ NEW_STR),  "Unique resource added");
-
 
                             // Testing duplication by trying to re-add the previous resource
                             editing.find('input')[0].value = NEW_STR;
@@ -382,10 +383,8 @@ define([
                             resourceLength = entity.resources.length;
                             listItems = resListView.$el.find('#createdResources ul li:not(.editing)');
                             var lastAddedItem = listItems.eq(listItems.length-1);
-
                             lastAddedItem.find('.icon-close').trigger('click');
                             QUnit.ok( entity.resources.length === resourceLength - 1 && !_.contains(entity.resources, lastAddedItem.data().resource), 'Resource deleted');
-
                         });
                     });
 
@@ -435,7 +434,6 @@ define([
                         addBtn.trigger('click');
 
                         QUnit.ok(!_.find(responseAttrsStaticView.data.staticAttributes, { propertyName: "incompleteVal" }), "Static attributes with no key can't be added");
-
                         editing = responseAttrsStaticView.$el.find('.editing');
                         key = editing.find('[data-attr-add-key]');
                         val = editing.find('[data-attr-add-val]');
@@ -445,7 +443,6 @@ define([
                         addBtn.trigger('click');
 
                         QUnit.ok(!_.find(responseAttrsStaticView.data.staticAttributes, { propertyName: "incompleteKey" }), "Static attributes with no value can't be added");
-
                     });
 
                     // Step 3
@@ -545,26 +542,26 @@ define([
                         }
 
                         /* TODO
-                        // Subject Conditions
-                        if (pol.subjects.length) {
-                            var subjects = [];
-                            _.each(editPolView.$el.find('ul#reviewSubjects').find('li'), function (value, key) {
-                                subjects[key] = value.innerHTML;
-                            });
+                         // Subject Conditions
+                         if (pol.subjects.length) {
+                         var subjects = [];
+                         _.each(editPolView.$el.find('ul#reviewSubjects').find('li'), function (value, key) {
+                         subjects[key] = value.innerHTML;
+                         });
 
-                            QUnit.ok(_.isEqual(subjects, pol.subjects), "Correct subject conditions are displayed in the review step");
-                        }
+                         QUnit.ok(_.isEqual(subjects, pol.subjects), "Correct subject conditions are displayed in the review step");
+                         }
 
-                        // Environment Conditions
-                        if (pol.conditions.length) {
-                            var envConditions = [];
-                            _.each(editPolView.$el.find('ul#reviewEnvConditions').find('li'), function (value, key) {
-                                envConditions[key] = value.innerHTML;
-                            });
+                         // Environment Conditions
+                         if (pol.conditions.length) {
+                         var envConditions = [];
+                         _.each(editPolView.$el.find('ul#reviewEnvConditions').find('li'), function (value, key) {
+                         envConditions[key] = value.innerHTML;
+                         });
 
-                            QUnit.ok(_.isEqual(envConditions, pol.conditions), "Correct environment conditions are displayed in the review step");
-                        }
-                        */
+                         QUnit.ok(_.isEqual(envConditions, pol.conditions), "Correct environment conditions are displayed in the review step");
+                         }
+                         */
 
 
                         QUnit.start();
@@ -577,7 +574,6 @@ define([
                 editPolView.element = $("<div>")[0];
 
                 editPolView.render(['sunIdentityServerLibertyPPService'], function () {
-
                     resListView.element = '<div></div>';
                     selectPatternsView.element = '<div></div>';
                     actionsView.element = '<div></div>';
@@ -698,7 +694,6 @@ define([
                 QUnit.equal(router.getLink(router.configuration.routes.editPolicy, ["calendar", null]), "app/calendar/policy/", "Add policy with one argument provided");
                 QUnit.equal(router.getLink(router.configuration.routes.editPolicy, ["calendar", "testPolicy"]), "app/calendar/policy/testPolicy", "Edit policy with two arguments provided");
             });
-
 
         }
     }

@@ -69,7 +69,10 @@ define([
     "text!templates/policy/referrals/ManageRefsGridTemplate.html",
     "text!templates/policy/referrals/ReviewReferralStepTemplate.html",
     "text!templates/policy/referrals/SelectRealmsTemplate.html",
-    
+
+    "text!templates/policy/resources/AddNewResourceTemplate.html",
+    "text!templates/policy/resources/ResourcesListTemplate.html",
+
     "text!configuration.json"
 ], function () {
     /* an unfortunate need to duplicate the file names here, but I haven't
@@ -120,6 +123,9 @@ define([
             "templates/policy/referrals/ManageRefsGridTemplate.html",
             "templates/policy/referrals/ReviewReferralStepTemplate.html",
             "templates/policy/referrals/SelectRealmsTemplate.html",
+
+            "templates/policy/resources/AddNewResourceTemplate.html",
+            "templates/policy/resources/ResourcesListTemplate.html",
 
             "configuration.json"
         ],
