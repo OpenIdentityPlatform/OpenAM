@@ -92,7 +92,6 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
             href = _.isFunction(this.column.get("href")) ? this.column.get('href')(rawValue, formattedValue, this.model) : this.column.get('href');
 
             this.$el.append($("<a>", {
-                tabIndex: -1,
                 href: href || rawValue,
                 title: this.title || formattedValue
             }).text(formattedValue));

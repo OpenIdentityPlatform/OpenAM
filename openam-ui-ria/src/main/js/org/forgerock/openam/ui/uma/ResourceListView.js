@@ -50,7 +50,7 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
                 ResourceSetCollection;
 
             ResourceSetCollection = Backbone.PageableCollection.extend({
-                url: "/" + constants.context + "/json/users/" + conf.loggedUser.uid + '/uma/policies',
+                url: "/" + constants.context + "/json/users/" + conf.loggedUser.username + '/uma/policies',
                 state: {
                     pageSize: 10,
                     sortKey: "name"
@@ -116,7 +116,6 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
                 self.$el.find("#backgridContainer").append( grid.render().el );
                 self.$el.find("#paginationContainer").append( paginator.render().el );
                 self.data.resourceSetCollection.fetch({reset: true, processData: false});
-
                 if (callback) { callback();}
             });
         },

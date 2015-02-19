@@ -62,7 +62,7 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
                 });
 
                 UserPoliciesCollection = Backbone.PageableCollection.extend({
-                    url: "/" + constants.context + "/json/users/" + conf.loggedUser.uid + "/uma/policies/" + args[0],
+                    url: "/" + constants.context + "/json/users/" + conf.loggedUser.username + "/uma/policies/" + args[0],
                     parseRecords: function (data, options) {
                         return data.permissions;
                     },
@@ -84,18 +84,48 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
                     className: "selectize-cell",
                     template: "templates/uma/backgrid/cell/SelectizeCell.html",
                     render: function() {
-                        var items = this.model.get('scopes') ;
+                        var items = this.model.get('scopes'),
+                            $select = null,
+                            opts = {};
+
                         this.$el.html(uiUtils.fillTemplateWithData(this.template));
-                        this.$el.find("select").selectize({
+
+                        opts = {
                             create: false,
                             delimiter: ",",
-                            dropdownParent: "body",
+                            dropdownParent: '#uma',
                             hideSelected: true,
                             persist: false,
                             plugins: ["restore_on_backspace"],
                             items: items,
                             options: options
-                        });
+                        };
+
+                        $select = this.$el.find('select').selectize(opts)[0];
+
+                        /* This an extention of the original positionDropdown method within Selectize. The override is
+                         * required because using the dropdownParent 'body' places the dropdown out of scope of the
+                         * containing backbone view. However adding the dropdownParent as any other element, has problems
+                         * due the offsets and/positioning being incorrecly calucaluted in orignal positionDropdown method.
+                         */
+                        $select.selectize.positionDropdown = function() {
+                            var $control = this.$control,
+                                offset = this.settings.dropdownParent ? $control.offset() : $control.position();
+
+                            if (this.settings.dropdownParent) {
+                                offset.top  -= ($control.outerHeight(true)*2) + $(this.settings.dropdownParent).position().top;
+                                offset.left -= $(this.settings.dropdownParent).offset().left + $(this.settings.dropdownParent).outerWidth() - $(this.settings.dropdownParent).outerWidth(true);
+                            } else {
+                                offset.top += $control.outerHeight(true);
+                            }
+
+                            this.$dropdown.css({
+                                width : $control.outerWidth(),
+                                top   : offset.top,
+                                left  : offset.left
+                            });
+                        };
+
                         this.delegateEvents();
                         return this;
                     }

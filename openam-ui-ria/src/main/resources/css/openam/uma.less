@@ -1,12 +1,5 @@
 /* VARIABLES */
-
-@or-color:      #DDE9FF;
-@and-color:     #C3DFC5;
-@not-color:     #E7D1CB;
-@subject-color: #CCC;
-@grabber-image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAFCAYAAABvsz2cAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACNJREFUeNpiZGBg8AViBhYQ8f///3pGIHEGxAExGFAYAAEGABbSDZWLLysMAAAAAElFTkSuQmCC";
-@table-hightlight-bg-color:#D7E9F8;
-@table-rollover-bg-color:#d5d5d5;
+@table-base-color: #1f6fb1;
 
 .webkit-text-rendering-bugfix{
     -webkit-transform: translateZ(0px);
@@ -16,7 +9,6 @@
 .invalid-background(@bgcolor: #ffd4d4){
     background-color:@bgcolor;
     background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(60, 60, 60, 0.1) 35px, rgba(60, 60, 60, 0.1) 70px);
-    .webkit-text-rendering-bugfix;
 }
 
 .wordwrap{
@@ -133,89 +125,6 @@ span.item-button-panel {
 
     }
 
-    &.created-items {
-        border: none;
-        border-top:1px solid #ccc;
-
-        &#createdResources {
-            margin-right:0;
-            li.editing, li.editing:hover {
-                min-height: 36px;
-                line-height: 36px;
-                input {
-                    width: 27px;
-                    min-width: 27px;
-                    max-width: 300px;
-                    transition: width 0.25s ease-out;
-                }
-            }
-        }
-
-            li {
-            border: 1px solid #ccc;
-            border-top:none;
-            transition: background 1s linear;
-            word-wrap: break-word;
-            word-break: break-all;
-
-
-
-            .icon-plus {
-                opacity:0.6;
-                padding-top: 8px;
-
-                &:focus, &:hover{
-                    box-shadow:none;
-                    opacity:1;
-                    color:#80b7ab;
-                }
-            }
-
-            .icon-close {
-                opacity:0.4;
-                &:focus, &:hover{
-                    box-shadow:none;
-                    opacity:1;
-                    color:#DB8383;
-                }
-            }
-
-            &.editing {
-                background-color:#eee;
-                box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
-                margin-top: 20px;
-                border: 1px solid #ccc;
-                border-radius: 3px;
-                transition: background-color 200ms linear;
-
-                input {
-                    margin: 3px 5px;
-                    padding: 5px 0 5px 5px;
-                    border-radius: 0;
-                }
-            }
-
-            &.invalid {
-                .invalid-background;
-                transition: background-color 200ms linear;
-
-                .icon-plus {
-
-                    &:focus, &:hover{
-                        opacity:0.6;
-                        color:#555;
-                        cursor:default;
-                    }
-                }
-
-                input[type="text"]:invalid:required {
-                    background:white;
-                }
-            }
-
-        }
-    }
-
     li {
         &.highlight-info {
             background:#ffc;
@@ -299,10 +208,16 @@ html .selectize-dropdown .optgroup-header{
     cursor: pointer;
     margin: 0 2px 2px 0;
     padding: 1px 5px 0;
-    background: #1f6fb1;
+    background: @table-base-color;
     color: #d7e9f8;
-    border: 1px solid #d0d0d0;
+    border: 1px solid @table-base-color;
     border-radius: 2px;
+
+    &:hover{
+        background:#d97986;
+        border: 1px solid #ce5162;
+        color: #fff;
+    }
 }
 
 .selectize-control.single .selectize-input{
@@ -379,38 +294,76 @@ body{
         color: grey;
     }
 
-    .backgrid-container {
-        width: 100%;
-        overflow-x: scroll;
-    }
 
     .backgrid{
+
+        max-width: none;
+        //overflow: hidden;
+        position: relative;
+
         .string-cell, .uri-cell, .email-cell,  .string-cell.editor input[type=text],  .uri-cell.editor input[type=text], .email-cell.editor input[type=text], .datetime-cell {
             text-align: left;
         }
 
+        td.uri-cell{
+            padding:13px 5px;
+            .transition(background, 0.2s);
+            &:hover{
+                background-color: #B0DCFF;
+                cursor:pointer;
+            }
+
+        }
+
+        td:not(.uri-cell){
+            // Adds the click event to the td so that the entire cell is clickable so underline not needed
+            a {
+                text-decoration: underline;
+            }
+        }
+
         th {
             text-align: left;
+            background-color: white;
+            border-bottom: none;
+            font-weight: normal;
+            font-size: 15px;
             a {
-                color:#777;
+                color: #777;
                 margin-bottom:34px;
             }
 
             &.filter-header-cell a {
                 margin-bottom:0;
             }
-            background-color: white;
+
+            &.sortable a {
+                padding-right:8px;
+            }
+
+            &.descending a, &.ascending a {
+                color: @table-base-color;
+                padding-right:0;
+            }
+
+        }
+
+        thead tr {
+            border-bottom: 1px solid lighten(@table-base-color, 45%);
         }
 
         tbody tr {
-            background-color: #eee;
+            background-color: lighten(@table-base-color, 50%);
+            border-bottom: 1px solid  lighten(@table-base-color, 45%);
+            color: @table-base-color;
 
             &:nth-child(even) {
-                background-color: #fff;
+                background-color: lighten(@table-base-color, 55%);
             }
 
             &.empty {
-                background-color: transparent;
+                .invalid-background(lighten(@table-base-color, 45%));
+                border-top: 1px solid lighten(@table-base-color, 45%);
                 td{
                     display: table-cell;
                     padding:10px;
@@ -420,47 +373,33 @@ body{
             td {
                 // Required for tooltips
                 overflow:visible;
-
-                // Add the click event to the td so that the entire cell is clickable
-                &:hover a{
-                    text-decoration: underline;
-                }
+                border-bottom: 1px solid lighten(@table-base-color, 45%);
 
                 a {
-                    color: #777;
+                    color: @table-base-color;
                     text-decoration: none;
                     font-weight:bold;
                 }
             }
 
-            &:hover:not(.empty){
-                background-color: #d7e9f8;
-                color: #1f6fb1;
-
-                td a {
-                    color: #1f6fb1;
-                }
-            }
         }
         .ascending .sort-caret{
-            border-bottom: 4px solid #80b7ab;
+            border-bottom: 4px solid @table-base-color;
         }
 
         .descending .sort-caret {
-            border-top: 4px solid #80b7ab;
+            border-top: 4px solid @table-base-color;
         }
-
-        max-width: none;
-        overflow: hidden;
-        position: relative;
     }
 
     .backgrid-container{
+        width: 100%;
+        overflow-x: scroll;
+        border: 1px solid lighten(@table-base-color, 45%);
+        border-bottom:none;
         height:auto;
         overflow: auto;
-        border: 1px solid rgb(226, 223, 223);
-        min-height: 369px; // the height of 10 records
-        background-color: #ddd;
+
     }
 
     .backgrid-filter.form-search {
@@ -470,18 +409,22 @@ body{
 
     .backgrid-revoke-cell {
         font-size: 12px;
+        padding: 13px 2px 13px 10px;
+        &:hover, &:focus{
+            color: @color-error;
+        }
     }
 
     .selectize-cell {
-      width: 300px;
+        width: 300px;
     }
 
     .search {
         &:after {
-            background-color: #80b7ab;
+            background-color: @table-base-color;
         }
         &:before {
-            border: 3px solid #80b7ab;
+            border: 3px solid @table-base-color;
         }
     }
 
@@ -495,17 +438,16 @@ body{
         margin-left: -100px;
     }
 
-
     span.tooltips span {
 
         color: #d7e9f8;
-        background-color: #1f6fb1;
+        background-color: @table-base-color;
         padding: 6px 5px;
-        background-image: -webkit-linear-gradient(top, lighten(#1f6fb1, 10%), #1f6fb1);
+        background-image: -webkit-linear-gradient(top, lighten(@table-base-color, 10%), @table-base-color);
     }
 
     span.tooltips span:after {
-        border-top: 8px solid #1f6fb1;
+        border-top: 8px solid @table-base-color;
     }
 
 }
@@ -536,7 +478,7 @@ body{
         color: #777;
     }
 
-    a:hover,  .active a{
+    a:hover, .active a{
         border-radius: 0;
         background-color: transparent;
         color: #80b7ab;
@@ -595,6 +537,10 @@ body{
         width:360px;
         #userProfileForm .group-field-block input{
             width:280px;
+        }
+
+        li:not(.active) .glyph-title {
+            display: none;
         }
     }
 }
