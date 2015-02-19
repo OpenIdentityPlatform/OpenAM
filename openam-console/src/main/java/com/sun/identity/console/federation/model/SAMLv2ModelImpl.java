@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package com.sun.identity.console.federation.model;
@@ -78,6 +79,9 @@ import com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.console.federation.SAMLv2AuthContexts;
 import javax.xml.bind.JAXBException;
+
+import org.forgerock.openam.utils.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -686,13 +690,13 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     }
     
     /**
-     *Returns the metaAlias of the entity.
+     * Returns the metaAlias of the entity.
      *
-     *@param realm to which the entity belongs.
-     *@param entityName is the entity id.
-     *@param role the Role of entity.
-     *@return the metaAlias of the entity.
-     *@throws AMConsoleException if unable to retrieve metaAlias.
+     * @param realm to which the entity belongs.
+     * @param entityName is the entity id.
+     * @param role the Role of entity.
+     * @return the metaAlias of the entity.
+     * @throws AMConsoleException if unable to retrieve metaAlias.
      */
     public String getMetaalias(
             String realm,
@@ -1000,7 +1004,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     String artLocation = getResult(
                             idpStdValues, ART_RES_LOCATION);
                     String indexValue = getResult(idpStdValues, ART_RES_INDEX);
-                    if (indexValue.length() == 0 || indexValue == null) {
+                    if (StringUtils.isEmpty(indexValue)) {
                         indexValue = "0";
                     }
                     boolean isDefault =
@@ -1890,7 +1894,6 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
      * @return a boolean value which indicates entity has dual role or not.
      */
     private boolean isDualRole(EntityDescriptorElement entityDescriptor) {
-        List roles = new ArrayList();
         boolean dual = false;
         if (entityDescriptor != null) {
             if ( (SAML2MetaUtils.getSPSSODescriptor(
@@ -2647,7 +2650,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttribAuthority-Ext", strError};
-            logEvent("FEDERATION_EXCEPTION_ATTR_AUTH_ATTR_VALUES",
+            logEvent("FEDERATION_EXCEPTION_GET_ATTR_AUTH_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
         }
@@ -2732,7 +2735,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             String entityName
             ) throws AMConsoleException {
         String[] params = {realm, entityName, "SAMLv2", "AuthnAuthority-Ext"};
-        logEvent("ATTEMPT_GET_AUTHN_AUTH_VALUES", params);
+        logEvent("ATTEMPT_GET_AUTHN_AUTH_ATTR_VALUES", params);
         Map map = null;
         AuthnAuthorityConfigElement authnAuthorityConfig = null;
         try {
@@ -2751,7 +2754,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AuthnAuthority-Ext", strError};
-            logEvent("FEDERATION_EXCEPTION_AUTHN_AUTH_ATTR_VALUES",
+            logEvent("FEDERATION_EXCEPTION_GET_AUTHN_AUTH_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
         }
@@ -2811,7 +2814,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             String entityName
             ) throws AMConsoleException {
         String[] params = {realm, entityName, "SAMLv2", "AttrQuery-Ext"};
-        logEvent("ATTEMPT_GET_ATTR_QUERY_VALUES", params);
+        logEvent("ATTEMPT_GET_ATTR_QUERY_ATTR_VALUES", params);
         Map map = null;
         AttributeQueryConfigElement attrQueryConfig = null;
         try {
@@ -2830,7 +2833,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttrQuery-Ext", strError};
-            logEvent("FEDERATION_EXCEPTION_ATTR_QUERY_ATTR_VALUES",
+            logEvent("FEDERATION_EXCEPTION_GET_ATTR_QUERY_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
         }
@@ -2854,7 +2857,6 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         com.sun.identity.saml2.jaxb.metadata.ObjectFactory objFact = new 
                 com.sun.identity.saml2.jaxb.metadata.ObjectFactory();
         logEvent("ATTEMPT_MODIFY_ATTR_AUTH_ATTR_VALUES", params);
-        Map map = new HashMap();
         AttributeAuthorityDescriptorElement attrauthDescriptor = null;
         try {
             SAML2MetaManager samlManager = getSAML2MetaManager();
@@ -2936,14 +2938,14 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 samlManager.setEntityDescriptor(realm, entityDescriptor);
             }
             
-            logEvent("SUCCEED_MODIFY_ENTITY_DESCRIPTOR", params);
+            logEvent("SUCCEED_MODIFY_ATTR_AUTH_ATTR_VALUES", params);
         } catch (SAML2MetaException e) {
             debug.warning
                     ("SAMLv2ModelImpl.setStdAttributeAuthorityValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttribAuthority-Std", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_AUTH_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
         } catch (JAXBException e) {
@@ -2951,7 +2953,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttribAuthority-Std", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_AUTH_ATTR_VALUES",
                     paramsEx);
         }
     }
@@ -2995,27 +2997,27 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             
             //saves the attributes by passing the new entityConfig object
             samlManager.setEntityConfig(realm,entityConfig);
-            logEvent("SUCCEED_MODIFY_ENTITY_DESCRIPTOR", params);
+            logEvent("SUCCEED_MODIFY_ATTR_AUTH_ATTR_VALUES", params);
         } catch (SAML2MetaException e) {
             debug.error("SAMLv2ModelImpl.setExtAttributeAuthorityValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttribAuthority-Ext", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_AUTH_ATTR_VALUES",
                     paramsEx);
         } catch (JAXBException e) {
             debug.error("SAMLv2ModelImpl.setExtAttributeAuthorityValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttribAuthority-Extended", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_AUTH_ATTR_VALUES",
                     paramsEx);
         } catch (AMConsoleException e) {
             debug.error("SAMLv2ModelImpl.setExtAttributeAuthorityValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttribAuthority-Ext", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_AUTH_ATTR_VALUES",
                     paramsEx);
         }
     }
@@ -3037,7 +3039,6 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         logEvent("ATTEMPT_MODIFY_AUTHN_AUTH_ATTR_VALUES", params);
         com.sun.identity.saml2.jaxb.metadata.ObjectFactory objFact = new 
                 com.sun.identity.saml2.jaxb.metadata.ObjectFactory();
-        Map map = new HashMap();
         AuthnAuthorityDescriptorElement authnauthDescriptor = null;
         try {
             SAML2MetaManager samlManager = getSAML2MetaManager();
@@ -3090,14 +3091,14 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 
                 samlManager.setEntityDescriptor(realm, entityDescriptor);
             }
-            logEvent("SUCCEED_MODIFY_ENTITY_DESCRIPTOR", params);
+            logEvent("SUCCEED_MODIFY_AUTHN_AUTH_ATTR_VALUES", params);
         } catch (SAML2MetaException e) {
             debug.warning
                     ("SAMLv2ModelImpl.setStdAuthnAuthorityValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AuthnAuthority-Std", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_AUTHN_AUTH_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
         } catch (JAXBException e) {
@@ -3105,7 +3106,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttribAuthority-Std", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_AUTHN_AUTH_ATTR_VALUES",
                     paramsEx);
         }
     }
@@ -3151,27 +3152,27 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             
             //saves the attributes by passing the new entityConfig object
             samlManager.setEntityConfig(realm,entityConfig);
-            logEvent("SUCCEED_MODIFY_ENTITY_DESCRIPTOR", params);
+            logEvent("SUCCEED_MODIFY_AUTHN_AUTH_ATTR_VALUES", params);
         } catch (SAML2MetaException e) {
             debug.error("SAMLv2ModelImpl.setExtauthnAuthValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AuthnAuthority-Ext", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_AUTHN_AUTH_ATTR_VALUES",
                     paramsEx);
         } catch (JAXBException e) {
             debug.error("SAMLv2ModelImpl.setExtauthnAuthValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AuthnAuthority-Extended", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_AUTHN_AUTH_ATTR_VALUES",
                     paramsEx);
         } catch (AMConsoleException e) {
             debug.error("SAMLv2ModelImpl.setExtauthnAuthValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AuthnAuthority-Ext", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_AUTHN_AUTH_ATTR_VALUES",
                     paramsEx);
         }
     }
@@ -3190,8 +3191,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             Map attrQueryValues
             ) throws AMConsoleException  {
         String[] params = {realm, entityName,"SAMLv2", "AttribQuery-Std"};
-        logEvent("ATTEMPT_MODIFY_ATTR_QUERY_VALUES", params);
-        Map map = new HashMap();
+        logEvent("ATTEMPT_MODIFY_ATTR_QUERY_ATTR_VALUES", params);
         AttributeQueryDescriptorElement attrQueryDescriptor = null;
         try {
             SAML2MetaManager samlManager = getSAML2MetaManager();
@@ -3218,14 +3218,14 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 samlManager.setEntityDescriptor(realm, entityDescriptor);
             }
             
-            logEvent("SUCCEED_MODIFY_ENTITY_DESCRIPTOR", params);
+            logEvent("SUCCEED_MODIFY_ATTR_QUERY_ATTR_VALUES", params);
         } catch (SAML2MetaException e) {
             debug.warning
                     ("SAMLv2ModelImpl.setStdAttributeQueryValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttribQuery-Std", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_QUERY_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
         }
@@ -3247,7 +3247,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             String location
             ) throws AMConsoleException {
         String[] params = {realm, entityName, "SAMLv2", "AttribQuery-Ext"};
-        logEvent("ATTEMPT_MODIFY_ATTR_QUERY_VALUES", params);
+        logEvent("ATTEMPT_MODIFY_ATTR_QUERY_ATTR_VALUES", params);
         String role = EntityModel.SAML_ATTRQUERY;
         try {
             SAML2MetaManager samlManager = getSAML2MetaManager();
@@ -3271,27 +3271,27 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             
             //saves the attributes by passing the new entityConfig object
             samlManager.setEntityConfig(realm,entityConfig);
-            logEvent("SUCCEED_MODIFY_ENTITY_DESCRIPTOR", params);
+            logEvent("SUCCEED_MODIFY_ATTR_QUERY_ATTR_VALUES", params);
         } catch (SAML2MetaException e) {
             debug.error("SAMLv2ModelImpl.setExtAttributeQueryValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttribQuery-Ext", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_QUERY_ATTR_VALUES",
                     paramsEx);
         } catch (JAXBException e) {
             debug.error("SAMLv2ModelImpl.setExtAttributeQueryValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttribQuery-Extended", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_QUERY_ATTR_VALUES",
                     paramsEx);
         } catch (AMConsoleException e) {
             debug.error("SAMLv2ModelImpl.setExtAttributeQueryValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "AttribQuery-Ext", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_QUERY_ATTR_VALUES",
                     paramsEx);
         }
     }
@@ -3356,7 +3356,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         String entityName
         ) throws AMConsoleException {;
         String[] params = {realm, entityName, "SAMLv2", "Affiliation-Ext"};
-        logEvent("ATTEMPT_GET_AFFILIATION_VALUES", params);
+        logEvent("ATTEMPT_GET_AFFILIATION_ATTR_VALUES", params);
         Map map = null;
         AffiliationConfigElement atffilConfig = null;
         try {
@@ -3383,7 +3383,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "Affiliation-Ext", strError};
-            logEvent("FEDERATION_EXCEPTION_AFFILIATION_ATTR_VALUES",
+            logEvent("FEDERATION_EXCEPTION_GET_AFFILIATION_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
         }
@@ -3408,8 +3408,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         ) throws AMConsoleException {
         
         String[] params = {realm, entityName,"SAMLv2", "Affiliation-Std"};
-        logEvent("ATTEMPT_MODIFY_AFFILIATION_VALUES", params);
-        Map map = new HashMap();
+        logEvent("ATTEMPT_MODIFY_AFFILIATION_ATTR_VALUES", params);
         AffiliationDescriptorType affiliationDescriptor = null;
         try {
             SAML2MetaManager samlManager = getSAML2MetaManager();
@@ -3438,14 +3437,14 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 samlManager.setEntityDescriptor(realm, entityDescriptor);
             }
             
-            logEvent("SUCCEED_MODIFY_ENTITY_DESCRIPTOR", params);
+            logEvent("SUCCEED_MODIFY_AFFILIATION_ATTR_VALUES", params);
         } catch (SAML2MetaException e) {
             debug.warning
                     ("SAMLv2ModelImpl.setStdAffilationValues:", e);
             String strError = getErrorString(e);
             String[] paramsEx =
             {realm, entityName, "SAMLv2", "Affilaition-Std", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR",
+            logEvent("FEDERATION_EXCEPTION_MODIFY_AFFILIATION_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
         }

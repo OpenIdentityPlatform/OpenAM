@@ -26,7 +26,8 @@
 
 -->
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2015 ForgeRock AS
+    Portions Copyrighted 2015 Nomura Research Institute, Ltd.
 -->
 
 <!DOCTYPE logmessages
@@ -6039,6 +6040,429 @@ PUBLIC "OpenSSO Log Message DTD/EN"
         </triggers>
         <actions>
             <item>Look under service management log for more information.</item>
+        </actions>
+    </logmessage>
+
+ <!-- 13101 - 13110 are reserved for getting attribute values of affiliation -->
+ <logmessage name="ATTEMPT_GET_AFFILIATION_ATTR_VALUES" id="13101"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values of an affiliation.">
+        <datainfo>            
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>View SAMLv2 Affiliate page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCEED_GET_AFFILIATION_ATTR_VALUES" id="13102"
+                loglevel="LL_INFO"
+                description="Getting attribute values of affiliation succeeded.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>View SAMLv2 Affiliate page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FEDERATION_EXCEPTION_GET_AFFILIATION_ATTR_VALUES" id="13103"
+                loglevel="LL_SEVERE"
+                description="Getting attribute values of affiliation failed.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to get attribute values of affiliation due to federation SDK related errors.</item>
+        </triggers>
+        <actions>
+            <item>Look under federation log for more information.</item>
+        </actions>
+    </logmessage>
+
+ <!-- 13111 - 13120 are reserved for modifying affiliation -->
+ <logmessage name="ATTEMPT_MODIFY_AFFILIATION_ATTR_VALUES" id="13111"
+             loglevel="LL_INFO"
+             description="Attempt to modify affiliation.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+        <item>Click on Save button in SAMLv2 Affiliate page.</item>
+       </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCEED_MODIFY_AFFILIATION_ATTR_VALUES" id="13112"
+                loglevel="LL_INFO"
+                description="Modification of affiliation succeeded.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>Click on Save button in SAMLv2 Affiliate page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FEDERATION_EXCEPTION_MODIFY_AFFILIATION_ATTR_VALUES" id="13113"
+                loglevel="LL_SEVERE"
+                description="Modification of affiliation failed.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to modify affiliation due to federation SDK related errors.</item>
+        </triggers>
+        <actions>
+            <item>Look under federation log for more information.</item>
+        </actions>
+    </logmessage>
+
+ <!-- 13121 - 13130 are reserved for getting attribute values of attribute authority -->
+ <logmessage name="ATTEMPT_GET_ATTR_AUTH_ATTR_VALUES" id="13121"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values of an attribute authority.">
+        <datainfo>            
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>View SAMLv2 AttrAuthority page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCEED_GET_ATTR_AUTH_ATTR_VALUES" id="13122"
+                loglevel="LL_INFO"
+                description="Getting attribute values of attribute authority succeeded.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>View SAMLv2 AttrAuthority page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FEDERATION_EXCEPTION_GET_ATTR_AUTH_ATTR_VALUES" id="13123"
+                loglevel="LL_SEVERE"
+                description="Getting attribute values of attribute authority failed.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to get attribute values of attribute authority due to federation SDK related errors.</item>
+        </triggers>
+        <actions>
+            <item>Look under federation log for more information.</item>
+        </actions>
+    </logmessage>
+
+ <!-- 13131 - 13140 are reserved for modifying attribute authority -->
+ <logmessage name="ATTEMPT_MODIFY_ATTR_AUTH_ATTR_VALUES" id="13131"
+             loglevel="LL_INFO"
+             description="Attempt to modify attribute authority.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+        <item>Click on Save button in SAMLv2 AttrAuthority page.</item>
+       </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCEED_MODIFY_ATTR_AUTH_ATTR_VALUES" id="13132"
+                loglevel="LL_INFO"
+                description="Modification of attribute authority succeeded.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>Click on Save button in SAMLv2 AttrAuthority page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FEDERATION_EXCEPTION_MODIFY_ATTR_AUTH_ATTR_VALUES" id="13133"
+                loglevel="LL_SEVERE"
+                description="Modification of attribute authority failed.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to modify attribute authority due to federation SDK related errors.</item>
+        </triggers>
+        <actions>
+            <item>Look under federation log for more information.</item>
+        </actions>
+    </logmessage>
+
+ <!-- 13141 - 13150 are reserved for getting attribute values of attribute query -->
+ <logmessage name="ATTEMPT_GET_ATTR_QUERY_ATTR_VALUES" id="13141"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values of an attribute query.">
+        <datainfo>            
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>View SAMLv2 AttrQuery page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCEED_GET_ATTR_QUERY_ATTR_VALUES" id="13142"
+                loglevel="LL_INFO"
+                description="Getting attribute values of attribute query succeeded.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>View SAMLv2 AttrQuery page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FEDERATION_EXCEPTION_GET_ATTR_QUERY_ATTR_VALUES" id="13143"
+                loglevel="LL_SEVERE"
+                description="Getting attribute values of attribute query failed.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to get attribute values of attribute query due to federation SDK related errors.</item>
+        </triggers>
+        <actions>
+            <item>Look under federation log for more information.</item>
+        </actions>
+    </logmessage>
+
+ <!-- 13151 - 13160 are reserved for modifying attribute query -->
+ <logmessage name="ATTEMPT_MODIFY_ATTR_QUERY_ATTR_VALUES" id="13151"
+             loglevel="LL_INFO"
+             description="Attempt to modify attribute query.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+        <item>Click on Save button in SAMLv2 AttrQuery page.</item>
+       </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCEED_MODIFY_ATTR_QUERY_ATTR_VALUES" id="13152"
+                loglevel="LL_INFO"
+                description="Modification of attribute query succeeded.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>Click on Save button in SAMLv2 AttrQuery page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FEDERATION_EXCEPTION_MODIFY_ATTR_QUERY_ATTR_VALUES" id="13153"
+                loglevel="LL_SEVERE"
+                description="Modification of attribute query failed.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to modify attribute query due to federation SDK related errors.</item>
+        </triggers>
+        <actions>
+            <item>Look under federation log for more information.</item>
+        </actions>
+    </logmessage>
+
+ <!-- 13161 - 13170 are reserved for getting attribute values of authn authority -->
+ <logmessage name="ATTEMPT_GET_AUTHN_AUTH_ATTR_VALUES" id="13161"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values of an authn authority.">
+        <datainfo>            
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>View SAMLv2 AuthnAuthority page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCEED_GET_AUTHN_AUTH_ATTR_VALUES" id="13162"
+                loglevel="LL_INFO"
+                description="Getting attribute values of authn authority succeeded.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>View SAMLv2 AuthnAuthority page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FEDERATION_EXCEPTION_GET_AUTHN_AUTH_ATTR_VALUES" id="13163"
+                loglevel="LL_SEVERE"
+                description="Getting attribute values of authn authority failed.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to get attribute values of authn authority due to federation SDK related errors.</item>
+        </triggers>
+        <actions>
+            <item>Look under federation log for more information.</item>
+        </actions>
+    </logmessage>
+
+ <!-- 13171 - 13180 are reserved for modifying authn authority -->
+ <logmessage name="ATTEMPT_MODIFY_AUTHN_AUTH_ATTR_VALUES" id="13171"
+             loglevel="LL_INFO"
+             description="Attempt to modify authn authority.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+        <item>Click on Save button in SAMLv2 AuthnAuthority page.</item>
+       </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCEED_MODIFY_AUTHN_AUTH_ATTR_VALUES" id="13172"
+                loglevel="LL_INFO"
+                description="Modification of authn authority succeeded.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>Click on Save button in SAMLv2 AuthnAuthority page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FEDERATION_EXCEPTION_MODIFY_AUTHN_AUTH_ATTR_VALUES" id="13173"
+                loglevel="LL_SEVERE"
+                description="Modification of authn authority failed.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to modify authn authority due to federation SDK related errors.</item>
+        </triggers>
+        <actions>
+            <item>Look under federation log for more information.</item>
+        </actions>
+    </logmessage>
+
+ <!-- 13181 - 13190 are reserved for getting meta alias -->
+ <logmessage name="ATTEMPT_GET_METAALIAS" id="13181"
+             loglevel="LL_INFO"
+             description="Attempt to get a meta alias.">
+        <datainfo>            
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>View SAMLv2 IDP Services page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCEED_GET_METAALIAS" id="13182"
+                loglevel="LL_INFO"
+                description="Getting meta alias succeeded.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+        </datainfo>
+        <triggers>
+            <item>View SAMLv2 IDP Services page.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FEDERATION_EXCEPTION_GET_METAALIAS" id="13183"
+                loglevel="LL_SEVERE"
+                description="Getting meta alias failed.">
+        <datainfo>
+            <item>descriptor realm</item>
+            <item>descriptor name</item>
+            <item>descriptor protocol</item>
+            <item>descriptor type</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to get meta alias due to federation SDK related errors.</item>
+        </triggers>
+        <actions>
+            <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
 
