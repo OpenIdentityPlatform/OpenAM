@@ -56,23 +56,27 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
      * @returns Realm with leading forward slash (e.g. <code>/realmA'</code>) or <code>null</code> if realm was inconsistent
      */
     obj.getRealm = function() {
+        // If not a realm aware view then return null. Currently the only known realm aware view is 'login'.
+        if ( !_.include( ['login'], uiUtils.getURIFragment().split('/')[0] ) ){
+            return null;
+        }
+
         var urlQueryStringRealm = (uiUtils.convertQueryParametersToJSON(uiUtils.getURIQueryString()).realm || '').trim(),
             fragmentQueryStringRealm = (uiUtils.convertQueryParametersToJSON(uiUtils.getURIFragmentQueryString()).realm || '').trim(),
-            fragmentRealm = (uiUtils.getURIFragment() === 'login/') ?  ((uiUtils.getURIFragment().split('/')[1] || '').split('&')[0] || '').trim() : '',
+            fragmentRealm = ((uiUtils.getURIFragment().split('/')[1] || '').split('&')[0] || '').trim(),
             realm = '/', // Default to root realm
             realms = _.compact(_.uniq([urlQueryStringRealm, fragmentRealm, fragmentQueryStringRealm]));
 
-        if(realms.length > 1) {
-          return null;
+        if (realms.length > 1) {
+            return null;
         } else if(realms.length === 1) {
-          realm = realms[0];
+            realm = realms[0];
         }
 
-        if(realm[0] !== '/') { realm = '/' + realm; }
+        if (realm[0] !== '/') { realm = '/' + realm; }
 
         return realm;
     };
-
 
     return obj;
 });
