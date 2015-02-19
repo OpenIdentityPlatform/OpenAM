@@ -103,4 +103,28 @@ public class BaseURLResourceNameTest {
             return new Exception();
         }
     }
+
+    @Test
+    public void shouldCreateSortedQueryParamsNormalisedURLs() throws Exception {
+        // given
+        String url1 = "http://example.com:80/index.html?param2=*&param1=*";
+        String url2 = "http://example.com:80/index.html?param2=*&param1=*&*";
+        String url3 = "http://example.com:80/index.html?param2=*&*&param1=*";
+        String url4 = "http://example.com:80/index.html?*&param2=true&param1=false";
+        String url5 = "http://example.com:80/index.html?param1=*&*";
+
+        // when
+        String normalisedUrl1 = resourceName.canonicalize(url1);
+        String normalisedUrl2 = resourceName.canonicalize(url2);
+        String normalisedUrl3 = resourceName.canonicalize(url3);
+        String normalisedUrl4 = resourceName.canonicalize(url4);
+        String normalisedUrl5 = resourceName.canonicalize(url5);
+
+        // then
+        assertEquals(normalisedUrl1, "http://example.com:80/index.html?param1=*&param2=*");
+        assertEquals(normalisedUrl2, "http://example.com:80/index.html?param1=*&param2=*&*");
+        assertEquals(normalisedUrl3, "http://example.com:80/index.html?param1=*&param2=*&*");
+        assertEquals(normalisedUrl4, "http://example.com:80/index.html?param1=false&param2=true&*");
+        assertEquals(normalisedUrl5, "http://example.com:80/index.html?param1=*&*");
+    }
 }

@@ -53,6 +53,7 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
     private static final String SECURE_WEB_PROTOCOL = "https";
     private static final String DEFAULT_PORT = "80";
     private static final String SECURE_PORT = "443";
+    private static final String WILDCARD = "*";
     private static final Pattern ACCEPTABLE_URLS = Pattern.compile("^(http|https)\\**://.*$");
 
     /**
@@ -496,6 +497,15 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
                     }
                 }
             }
+
+            // We want to make sure that the wildcard always comes out last in sorting
+            if (WILDCARD.equals(var1)) {
+                return 1;
+            }
+            if (WILDCARD.equals(var2)) {
+                return -1;
+            }
+
             return result;
         }
     }
