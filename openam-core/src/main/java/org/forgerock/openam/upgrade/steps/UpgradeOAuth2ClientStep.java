@@ -153,6 +153,8 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
             configurations = new HashMap<String, Set<String>>();
             configurations.put(subConfig, new HashSet<String>());
             map.put(type, configurations);
+        } else if (!configurations.containsKey(subConfig)) {
+            configurations.put(subConfig, new HashSet<String>());
         }
         configurations.get(subConfig).add(attrName);
         upgradableConfigs.put(realm, map);
