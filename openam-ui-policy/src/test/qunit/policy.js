@@ -41,13 +41,11 @@ define([
     "org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsUserView",
     "org/forgerock/openam/ui/policy/resources/ResourcesListView",
     "org/forgerock/openam/ui/policy/resources/AddNewResourceView",
-    "org/forgerock/openam/ui/policy/common/ReviewInfoView",
-    "org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
-    "org/forgerock/openam/ui/policy/policies/conditions/EditSubjectView",
     "org/forgerock/openam/ui/policy/policies/conditions/ManageEnvironmentsView",
-    "org/forgerock/openam/ui/policy/policies/conditions/ManageSubjectsView",
-    "org/forgerock/openam/ui/policy/policies/conditions/OperatorRulesView"
-], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolView, manageAppsView, policyListView, actionsView, responseAttrsStaticView, responseAttrsUserView, resListView, selectPatternsView) {
+    "org/forgerock/openam/ui/policy/policies/conditions/ManageSubjectsView"
+], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolicyView,
+             manageAppsView, policyListView, actionsView, responseAttrsStaticView, responseAttrsUserView, resListView,
+             addNewResourceView, manageEnvironmentsView, manageSubjectsView) {
     return {
         executeAll: function (server) {
 
@@ -62,7 +60,7 @@ define([
                          options = editAppView.data.options;
 
                     resListView.element = '<div></div>';
-                    selectPatternsView.element = '<div></div>';
+                    addNewResourceView.element = '<div></div>';
 
                     QUnit.ok(editAppView.accordion.getActive() === 2, "Last step of accordion is selected");
                     QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
@@ -72,11 +70,11 @@ define([
                     QUnit.ok(editAppView.$el.find('#appDescription').val() === (entity.description ? entity.description : ''), "Description is set");
 
                     // Step 2
-                    selectPatternsView.render([], function () {
+                    addNewResourceView.render([], function () {
 
-                        var element = selectPatternsView.$el,
+                        var element = addNewResourceView.$el,
                             listItems = element.find('.striped-list ul li'),
-                            selectedItem = element.find('.addPattern:eq(0)');
+                            selectedItem = element.find('.addPattern:eq(0)'),
                             values = [];
 
                         _.each(listItems, function (item) {
@@ -86,8 +84,8 @@ define([
                         QUnit.ok(listItems.length >= 1, "At least one available pattern");
 
                         // check number of rendered patterns = options.resourcePatterns.length
-                        // check options.resourcePatterns and avalible patterns are the same
-                        QUnit.ok( _.difference(values, options.resourcePatterns).length === 0, "All avaliable patterns are displayed correctly");
+                        // check options.resourcePatterns and available patterns are the same
+                        QUnit.ok( _.difference(values, options.resourcePatterns).length === 0, "All available patterns are displayed correctly");
 
                         // clicking on a pattern reloads the resource creation tool
                         selectedItem.trigger('click');
@@ -132,7 +130,7 @@ define([
                             // Testing last input enter key trigger
                             editing.find('input')[ editing.find('input').length-1 ].value = NEW_RESOURCE;
                             var event = jQuery.Event("keyup");
-                                event.keyCode = 13 //enter key
+                            event.keyCode = 13; //enter key
                             editing.find('input:last-of-type').trigger(event);
 
                             valid = (entity.resources.length === (resourceLength + 1) && _.contains(entity.resources, NEW_RESOURCE) );
@@ -152,7 +150,7 @@ define([
 
 
                             // Step 3
-                            $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data, function () {
+                            $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/applications/ReviewApplicationStepTemplate.html', editAppView.data, function () {
                                 
                                 var resources = [];
 
@@ -179,11 +177,8 @@ define([
 
                                 QUnit.start();
                             }));
-
                         });
-
                     });
-
                 });
             });
 
@@ -191,10 +186,8 @@ define([
                 editAppView.element = $("<div>")[0];
 
                 editAppView.render([], function () {
-                    var entity = editAppView.data.entity;
-
                     resListView.element = '<div></div>';
-                    selectPatternsView.element = '<div></div>';
+                    addNewResourceView.element = '<div></div>';
 
                     QUnit.ok(editAppView.accordion.getActive() === 0, "First step of accordion is selected");
                     QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
@@ -208,7 +201,7 @@ define([
                         var resources = resListView.$el.find('.res-name');
                         QUnit.ok(resources.length === 0, "No resources present");
 
-                        $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data, function () {
+                        $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/applications/ReviewApplicationStepTemplate.html', editAppView.data, function () {
                             QUnit.ok(editAppView.$el.find('#reviewName').hasClass('invalid'), "Validate is displayed in the review step");
                             QUnit.ok(editAppView.$el.find('input[name="submitForm"]').is(':disabled'), "Finish button is disabled");
 
@@ -276,28 +269,34 @@ define([
             module('Policies');
 
             QUnit.asyncTest("Edit Policy", function () {
-                editPolView.element = $("<div>")[0];
+                var appName = 'iPlanetAMWebAgentService',
+                    policyName = 'test_pol';
 
-                $("#qunit-fixture").append(editPolView.element);
+                editPolicyView.element = $("<div>")[0];
+                $("#qunit-fixture").append(editPolicyView.element);
 
-                editPolView.render(['sunIdentityServerLibertyPPService', 'anotherxamplePolicy'], function () {
-                    var entity = editPolView.data.entity,
-                        options = editPolView.data.options;
+                editPolicyView.render([appName, policyName], function () {
+                    var entity = editPolicyView.data.entity,
+                        options = editPolicyView.data.options;
 
                     resListView.element = '<div></div>';
-                    selectPatternsView.element = '<div></div>';
+                    addNewResourceView.element = '<div></div>';
                     actionsView.element = '<div></div>';
                     responseAttrsStaticView.element = '<div></div>';
                     responseAttrsUserView.element = '<div></div>';
+                    manageSubjectsView.element = '<div></div>';
+                    manageEnvironmentsView.element = '<div></div>';
 
-                    QUnit.ok(editPolView.accordion.getActive() === 6, "Last step of accordion is selected");
-                    QUnit.ok(editPolView.$el.find('#cancelButton').length, "Cancel button is available");
+                    QUnit.ok(editPolicyView.validationFields && editPolicyView.validationFields.length > 0, 'Validation is present');
+                    QUnit.equal(editPolicyView.$el.find('[name="submitForm"]').is(':disabled'), false, 'Submit button is enabled');
 
-                    // Step 1
-                    QUnit.ok(editPolView.$el.find('#policyName').val() === entity.name, "Name is set");
-                    QUnit.ok(editPolView.$el.find('#description').val() === (entity.description ? entity.description : ''), "Description is set");
+                    QUnit.equal(editPolicyView.accordion.getActive(), 6, "Last step of accordion is selected");
+                    QUnit.equal(editPolicyView.$el.find('#cancelButton').length, 1, "Cancel button is present");
 
-                    // Step 2
+                    QUnit.equal(editPolicyView.$el.find('#policyName').val(), entity.name, "Name is set");
+
+                    QUnit.ok(editPolicyView.$el.find('#description').val() === (entity.description ? entity.description : ''), "Description is set");
+
                     resListView.render([], function () {
                         var listItems = resListView.$el.find('#createdResources ul li'),
                             valid = true;
@@ -306,30 +305,28 @@ define([
                             valid = valid && $(item).text() === item.dataset.resource &&_.contains(entity.resources, item.dataset.resource);
                         });
 
-                        QUnit.ok(listItems.length === entity.resources.length, "Correct number of resources are displayed");
+                        QUnit.equal(listItems.length, entity.resources.length, "Correct number of resources are displayed");
                         QUnit.ok(valid, "Resources are displayed correctly");
-
-
                     });
 
-                    selectPatternsView.render([], function () {
+                    addNewResourceView.render([], function () {
 
-                        var element = selectPatternsView.$el,
+                        var element = addNewResourceView.$el,
                             listItems = element.find('.striped-list ul li'),
-                            selectedItem = element.find('.addPattern:eq(2)');
-                        values = [];
+                            selectedItem = element.find('.addPattern:eq(1)'),
+                            values = [];
 
                         _.each(listItems, function (item) {
                             values.push($(item).find('.pattern').text());
                         });
 
                         // check number of rendered patterns = options.resourcePatterns.length
-                        // check options.resourcePatterns and avalible patterns are the same
-                        QUnit.ok( _.difference(values, options.resourcePatterns).length === 0, "All avaliable patterns are displayed correctly");
+                        // check options.resourcePatterns and available patterns are the same
+                        QUnit.equal(_.difference(values, options.resourcePatterns).length, 0, "All available patterns are displayed correctly");
 
                         // clicking on a pattern reloads the resource creation tool
                         selectedItem.trigger('click');
-                        QUnit.ok( options.newPattern === selectedItem.find('.pattern').text(), "New pattern selected");
+                        QUnit.equal(selectedItem.find('.pattern').text(), options.newPattern, "New pattern selected");
 
                         resListView.render([], function () {
 
@@ -344,7 +341,7 @@ define([
 
                             _.each(listItems, function (item) {
                                 values.push(item.dataset.resource);
-                                if($(item).text() !== item.dataset.resource){
+                                if ($(item).text() !== item.dataset.resource) {
                                     valid = false;
                                 }
                             });
@@ -356,39 +353,50 @@ define([
                             });
 
                             QUnit.ok(valid, "All resources are displayed correctly");
-                            QUnit.ok( options.newPattern === editing.data().resource, "Selected pattern displayed correctly");
 
+                            QUnit.equal(editing.data().resource, options.newPattern, "Selected pattern displayed correctly");
+
+                            // newPattern is *://*:*/*?*
                             // Testing new resource can be added.
                             editing.find('input')[0].value = NEW_STR;
-                            editing.find('input')[1].value = NEW_STR;
                             plusButton.trigger('click');
-                            QUnit.ok(  _.contains(entity.resources, 'http://www.hello.com/'+ NEW_STR +'/world/'+ NEW_STR),  "Unique resource added");
+                            QUnit.ok(_.contains(entity.resources, NEW_STR + '://*:*/*?*'), "Unique resource added");
 
                             // Testing duplication by trying to re-add the previous resource
                             editing.find('input')[0].value = NEW_STR;
-                            editing.find('input')[1].value = NEW_STR;
                             plusButton.trigger('click');
-                            QUnit.ok(  _.uniq(entity.resources).length === entity.resources.length,  "Duplicate resource not added");
-
+                            QUnit.equal(entity.resources.length, _.uniq(entity.resources).length, "Duplicate resource not added");
 
                             // checking for invalid inputs
                             resourceLength = entity.resources.length;
                             editing.find('input')[0].value = INVALID_STR;
-                            editing.find('input')[1].value = NEW_STR;
                             plusButton.trigger('click');
-                            QUnit.ok( resListView.validate( editing.find('input')) === false,  "Invalid resource not added");
-
+                            QUnit.equal(entity.resources.length, resourceLength, "Invalid resource not added");
 
                             // Delete the NEW_RESOURCE
                             resourceLength = entity.resources.length;
                             listItems = resListView.$el.find('#createdResources ul li:not(.editing)');
-                            var lastAddedItem = listItems.eq(listItems.length-1);
+                            var lastAddedItem = listItems.eq(listItems.length - 1);
+
                             lastAddedItem.find('.icon-close').trigger('click');
-                            QUnit.ok( entity.resources.length === resourceLength - 1 && !_.contains(entity.resources, lastAddedItem.data().resource), 'Resource deleted');
+                            QUnit.ok(entity.resources.length === resourceLength - 1 && !_.contains(entity.resources, lastAddedItem.data().resource), 'Resource deleted');
                         });
                     });
 
-                    responseAttrsStaticView.render([], function(){
+                    var staticAttributes = _.where(entity.resourceAttributes, {type: responseAttrsStaticView.attrType});
+                    staticAttributes = responseAttrsStaticView.splitAttrs(staticAttributes);
+
+                    var userAttributes = _.where(entity.resourceAttributes, {type: responseAttrsUserView.attrType});
+
+                    $.when(policyDelegate.getAllUserAttributes()).done(function (allUserAttributes) {
+                        allUserAttributes = _.sortBy(allUserAttributes.result);
+
+                        responseAttrsUserView.render([userAttributes, allUserAttributes], function () {
+                            QUnit.equal(responseAttrsUserView.$el.find('.selectize-input').find('.item').length,userAttributes.length,'User attributes are selected correctly');
+                        });
+                    });
+
+                    responseAttrsStaticView.render([staticAttributes], function () {
                         var editing = responseAttrsStaticView.$el.find('.editing'),
                             key = editing.find('[data-attr-add-key]'),
                             val = editing.find('[data-attr-add-val]'),
@@ -461,10 +469,10 @@ define([
                         QUnit.ok(actionsPresent, "Actions are displayed correctly (available for selected application type)");
 
                         // Toggle all actions
-                        var toggleAll = actionsView.$el.find('.toggle-all-actions').prop('checked', true),
+                        var toggleAll = actionsView.$el.find('.toggle-all').prop('checked', true),
                             allChecked = true;
 
-                        actionsView.toggleAllActions({target: actionsView.$el.find('.toggle-all-actions')[0]});
+                        actionsView.toggleAllActions({target: actionsView.$el.find('.toggle-all')[0]});
 
                         _.each(actionsView.data.entity.actions, function (action) {
                             allChecked = allChecked && action.selected;
@@ -472,11 +480,11 @@ define([
                         QUnit.ok(allChecked, "All actions are marked as selected in a JS object after Toggle All checkbox is selected");
 
                         toggleAll.prop('checked', false);
-                        actionsView.toggleAllActions({target: actionsView.$el.find('.toggle-all-actions')[0]});
+                        actionsView.toggleAllActions({target: actionsView.$el.find('.toggle-all')[0]});
 
-                        allChecked = true;
+                        allChecked = false;
                         _.each(actionsView.data.entity.actions, function (action) {
-                            allChecked = allChecked && !action.selected;
+                            allChecked = allChecked || action.selected;
                         });
                         QUnit.ok(!allChecked, "All actions are marked as deselected in a JS object after Toggle All checkbox is deselected");
 
@@ -493,23 +501,33 @@ define([
                         QUnit.ok(correctPermissions, "All permissions are selected correctly");
 
                         // Selecting individual actions
-                        var toggleSingleAction = actionsView.$el.find('.toggle-action');
-                        _.each(toggleSingleAction, function (val, key, list) {
-                            $(val).attr('checked', 'checked').trigger('click');
-                        });
-                        allChecked = true;
-                        _.each(actionsView.data.entity.actions, function (action) {
-                            allChecked = allChecked && action.selected;
-                        });
-                        QUnit.ok(allChecked, "All actions are marked as selected in a JS object after selecting corresponding checkboxes");
+                        var row = actionsView.$el.find('.striped-list li:first-of-type'),
+                            actionName = row.data('action-name');
+                        QUnit.ok(!_.findWhere(entity.actions, {action: actionName}).selected, "Action is not selected");
+                        row.trigger('click');
+                        QUnit.ok(_.findWhere(entity.actions, {action: actionName}).selected, "Action is selected after clicking on row");
 
                         // Reload review step
-                        $('#reviewPolicyInfo', editPolView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewPolicyStepTemplate.html', editPolView.data));
+                        $('#reviewInfo', editPolicyView.$el).html(uiUtils.fillTemplateWithData('templates/policy/policies/ReviewPolicyStepTemplate.html', editPolicyView.data), function () {
+                            // Actions
+                            if (entity.actions.length) {
+                                var actions = [],
+                                    polSelectedActions = _.where(entity.actions, {selected: true}),
+                                    actionPair;
+
+                                _.each(editPolicyView.$el.find('#reviewActions').find('li'), function (value) {
+                                    actionPair = value.innerHTML.split(':');
+                                    actions.push({action: actionPair[0].trim(), value: actionPair[1].trim() === 'Allowed', selected: true});
+                                });
+
+                                QUnit.ok(_.isEqual(actions, polSelectedActions), "Correct actions are displayed in the review step");
+                            }
+                        });
                     });
 
-                    $('#reviewPolicyInfo', editPolView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewPolicyStepTemplate.html', editPolView.data, function () {
-                        QUnit.ok(editPolView.$el.find('#reviewName').html() === entity.name, "Correct name is displayed in the review step");
-                        if ((!editPolView.$el.find('#reviewDesc').html()) && (!entity.description)) {
+                    $('#reviewInfo', editPolicyView.$el).html(uiUtils.fillTemplateWithData('templates/policy/policies/ReviewPolicyStepTemplate.html', editPolicyView.data, function () {
+                        QUnit.ok(editPolicyView.$el.find('#reviewName').text().trim() === entity.name, "Correct name is displayed in the review step");
+                        if ((!editPolicyView.$el.find('#reviewDesc').html()) && (!entity.description)) {
                             // both are undefined.
                             QUnit.ok(true, "Correct description is displayed in the review step");
                         } else {
@@ -519,71 +537,62 @@ define([
                         // Resources
                         if (entity.resources.length) {
                             var resources = [];
-                            _.each(editPolView.$el.find('ul#reviewRes').find('li'), function (value, key) {
+                            _.each(editPolicyView.$el.find('ul#reviewRes').find('li'), function (value, key) {
                                 resources[key] = value.innerHTML;
                             });
 
                             QUnit.ok(_.isEqual(resources, entity.resources), "Correct resources are displayed in the review step");
                         }
 
+                        // Subject Conditions
+                        QUnit.equal(editPolicyView.$el.find('#subjectContainer').find('#addCondition').length, 1, 'Add subject button is present');
+                        QUnit.equal(editPolicyView.$el.find('#subjectContainer').find('#addOperator').length, 1, 'Add operator button is present');
+                        QUnit.ok(editPolicyView.$el.find('#subjectContainer').find('#pickUpItem').empty(), 'Pick up item is empty');
+                        QUnit.ok(editPolicyView.$el.find('#subjectContainer').find('#clear').hasClass('inactive'), 'Clear button is disabled');
 
-                        // Actions
-                        if (entity.actions.length) {
-                            var actions = [],
-                                polSelectedActions = _.where(entity.actions, {selected: true}),
-                                actionPair;
+                        editPolicyView.$el.find('#subjectContainer').find('#addCondition').trigger('click');
+                        QUnit.ok(editPolicyView.$el.find('#subjectContainer').find('#pickUpItem').children().length > 0, 'Pick up item is not empty');
+                        QUnit.ok(!editPolicyView.$el.find('#subjectContainer').find('#clear').hasClass('inactive'), 'Clear button is enabled');
 
-                            _.each(editPolView.$el.find('#reviewActions').find('li'), function (value) {
-                                actionPair = value.innerHTML.split(':');
-                                actions.push({action: actionPair[0].trim(), value: actionPair[1].trim() === 'Allowed', selected: true});
-                            });
-
-                            QUnit.ok(_.isEqual(actions, polSelectedActions), "Correct actions are displayed in the review step");
+                        if (entity.subject) {
+                            var reviewSubj = JSON.parse(editPolicyView.$el.find('#reviewSubj').text());
+                            QUnit.ok(_.isEqual(reviewSubj, entity.subject), "Correct environment conditions are displayed in the review step");
                         }
 
-                        /* TODO
-                         // Subject Conditions
-                         if (pol.subjects.length) {
-                         var subjects = [];
-                         _.each(editPolView.$el.find('ul#reviewSubjects').find('li'), function (value, key) {
-                         subjects[key] = value.innerHTML;
-                         });
+                        // Environment Conditions
+                        QUnit.equal(editPolicyView.$el.find('#environmentContainer').find('#addCondition').length, 1, 'Add condition button is present');
+                        QUnit.equal(editPolicyView.$el.find('#environmentContainer').find('#addOperator').length, 1, 'Add operator button is present');
+                        QUnit.ok(editPolicyView.$el.find('#environmentContainer').find('#pickUpItem').empty(), 'Pick up item is empty');
+                        QUnit.ok(editPolicyView.$el.find('#environmentContainer').find('#clear').hasClass('inactive'), 'Clear button is disabled');
 
-                         QUnit.ok(_.isEqual(subjects, pol.subjects), "Correct subject conditions are displayed in the review step");
-                         }
+                        editPolicyView.$el.find('#environmentContainer').find('#addCondition').trigger('click');
+                        QUnit.ok(editPolicyView.$el.find('#environmentContainer').find('#pickUpItem').children().length > 0, 'Pick up item is not empty');
+                        QUnit.ok(!editPolicyView.$el.find('#environmentContainer').find('#clear').hasClass('inactive'), 'Clear button is enabled');
 
-                         // Environment Conditions
-                         if (pol.conditions.length) {
-                         var envConditions = [];
-                         _.each(editPolView.$el.find('ul#reviewEnvConditions').find('li'), function (value, key) {
-                         envConditions[key] = value.innerHTML;
-                         });
-
-                         QUnit.ok(_.isEqual(envConditions, pol.conditions), "Correct environment conditions are displayed in the review step");
-                         }
-                         */
-
+                        if (entity.condition) {
+                            var reviewEnv = JSON.parse(editPolicyView.$el.find('#reviewEnv').text());
+                            QUnit.ok(_.isEqual(reviewEnv, entity.condition), "Correct environment conditions are displayed in the review step");
+                        }
 
                         QUnit.start();
                     }));
-
                 });
             });
 
             QUnit.asyncTest("Create new policy", function () {
-                editPolView.element = $("<div>")[0];
+                editPolicyView.element = $("<div>")[0];
 
-                editPolView.render(['sunIdentityServerLibertyPPService'], function () {
+                editPolicyView.render(['iPlanetAMWebAgentService'], function () {
                     resListView.element = '<div></div>';
-                    selectPatternsView.element = '<div></div>';
+                    addNewResourceView.element = '<div></div>';
                     actionsView.element = '<div></div>';
 
-                    QUnit.ok(editPolView.accordion.getActive() === 0, "First step of accordion is selected");
-                    QUnit.ok(editPolView.$el.find('#cancelButton').length, "Cancel button is available");
+                    QUnit.ok(editPolicyView.accordion.getActive() === 0, "First step of accordion is selected");
+                    QUnit.ok(editPolicyView.$el.find('#cancelButton').length, "Cancel button is available");
 
                     // Step 1
-                    QUnit.ok(editPolView.$el.find('#policyName').val() === '', "Name is empty");
-                    QUnit.ok(editPolView.$el.find('#description').val() === '', "Description is empty");
+                    QUnit.ok(editPolicyView.$el.find('#policyName').val() === '', "Name is empty");
+                    QUnit.ok(editPolicyView.$el.find('#description').val() === '', "Description is empty");
 
                     // Step 2
                     resListView.render([], function () {
@@ -604,8 +613,15 @@ define([
                             });
                         });
                         QUnit.ok(actionsPresent, "Actions are displayed correctly (available for selected application type)");
-                        QUnit.start();
                     });
+
+                    $('#reviewInfo', editPolicyView.$el).html(uiUtils.fillTemplateWithData('templates/policy/policies/ReviewPolicyStepTemplate.html', editPolicyView.data, function () {
+                        QUnit.ok(editPolicyView.$el.find('#reviewName').hasClass('invalid'), 'Name field is marked as invalid');
+                        QUnit.equal(editPolicyView.$el.find('#reviewRes').length,0, 'Resources field is not displayed in review step as it is invalid');
+                        QUnit.ok(editPolicyView.$el.find('[name="submitForm"]').is(':disabled'), 'Submit button is disabled');
+
+                        QUnit.start();
+                    }));
                 });
             });
 
@@ -661,30 +677,37 @@ define([
             module('Common');
 
             QUnit.asyncTest("Unauthorized GET Request", function () {
+                var viewManager=require('org/forgerock/commons/ui/common/main/ViewManager');
                 conf.loggedUser = {"roles": ["ui-admin"]};
                 eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {
                     route: router.configuration.routes.manageApps,
                     callback: function () {
-                        sinon.stub(loginHelper, "logout", function () {
-                            QUnit.ok(true, "Logout helper method called");
+                        sinon.stub(viewManager, 'showDialog', function () {
+                            QUnit.ok(true, "Login dialog is shown");
                             QUnit.start();
+                            delete conf.globalData.authorizationFailurePending;
+                            viewManager.showDialog.restore();
                         });
 
-                        eventManager.sendEvent(constants.EVENT_UNAUTHORIZED, {error: {type:"GET"} });
+                        eventManager.sendEvent(constants.EVENT_UNAUTHORIZED, {error: {type: "GET"} });
                     }
                 });
             });
 
-            QUnit.asyncTest("Unauthorized non-GET Request", function () {
-                var loginDialog = require("LoginDialog"),
-                    loginDialogSpy = sinon.spy(loginDialog, 'render');
+            QUnit.asyncTest("Unauthorized POST Request", function () {
+                var viewManager=require('org/forgerock/commons/ui/common/main/ViewManager');
 
-                QUnit.ok(!loginDialogSpy.called, "Login Dialog render function has not yet been called");
+                sinon.stub(viewManager, 'showDialog', function () {
+                    QUnit.ok(true, "Login dialog is shown");
+                    QUnit.start();
+                    delete conf.globalData.authorizationFailurePending;
+                    viewManager.showDialog.restore();
+                });
+
+                QUnit.ok(!viewManager.showDialog.called, "Login Dialog render function has not yet been called");
                 conf.loggedUser = {"roles": ["ui-admin"]};
                 eventManager.sendEvent(constants.EVENT_UNAUTHORIZED, {error: {type:"POST"} });
                 QUnit.ok(conf.loggedUser !== null, "User info should be retained after UNAUTHORIZED POST error");
-                QUnit.ok(loginDialogSpy.called, "Login Dialog render function was called");
-                QUnit.start();
             });
 
             QUnit.test("Add/Edit routes with different input", function () {
@@ -694,7 +717,6 @@ define([
                 QUnit.equal(router.getLink(router.configuration.routes.editPolicy, ["calendar", null]), "app/calendar/policy/", "Add policy with one argument provided");
                 QUnit.equal(router.getLink(router.configuration.routes.editPolicy, ["calendar", "testPolicy"]), "app/calendar/policy/testPolicy", "Edit policy with two arguments provided");
             });
-
         }
     }
 });

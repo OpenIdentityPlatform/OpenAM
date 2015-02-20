@@ -25,6 +25,8 @@
 /*global require, define*/
 define([
     "text!templates/policy/BaseTemplate.html",
+    "text!templates/policy/common/HelpLinkTemplate.html",
+    "text!templates/policy/login/LoginDialog.html",
 
     "text!templates/policy/applications/EditApplicationTemplate.html",
     "text!templates/policy/applications/ManageAppsGridActionsTemplate.html",
@@ -32,11 +34,6 @@ define([
     "text!templates/policy/applications/ManageAppsGridTemplate.html",
     "text!templates/policy/applications/ManageAppsTemplate.html",
     "text!templates/policy/applications/ReviewApplicationStepTemplate.html",
-
-    "text!templates/policy/policies/ActionsTemplate.html",
-    "text!templates/policy/common/HelpLinkTemplate.html",
-
-    "text!templates/policy/login/LoginDialog.html",
 
     "text!templates/policy/policies/attributes/ResponseAttrsStatic.html",
     "text!templates/policy/policies/attributes/ResponseAttrsUser.html",
@@ -57,6 +54,7 @@ define([
     "text!templates/policy/policies/conditions/ManageRulesTemplate.html",
     "text!templates/policy/policies/conditions/OperatorRulesTemplate.html",
 
+    "text!templates/policy/policies/ActionsTemplate.html",
     "text!templates/policy/policies/EditPolicyTemplate.html",
     "text!templates/policy/policies/ManagePoliciesGridActionsTemplate.html",
     "text!templates/policy/policies/ManagePoliciesGridTemplate.html",
@@ -79,6 +77,8 @@ define([
      yet found a way to fool requirejs into doing dynamic dependencies */
     var staticFiles = [
             "templates/policy/BaseTemplate.html",
+            "templates/policy/common/HelpLinkTemplate.html",
+            "templates/policy/login/LoginDialog.html",
 
             "templates/policy/applications/EditApplicationTemplate.html",
             "templates/policy/applications/ManageAppsGridActionsTemplate.html",
@@ -86,11 +86,6 @@ define([
             "templates/policy/applications/ManageAppsGridTemplate.html",
             "templates/policy/applications/ManageAppsTemplate.html",
             "templates/policy/applications/ReviewApplicationStepTemplate.html",
-
-            "templates/policy/policies/ActionsTemplate.html",
-            "templates/policy/common/HelpLinkTemplate.html",
-
-            "templates/policy/login/LoginDialog.html",
 
             "templates/policy/policies/attributes/ResponseAttrsStatic.html",
             "templates/policy/policies/attributes/ResponseAttrsUser.html",
@@ -111,6 +106,7 @@ define([
             "templates/policy/policies/conditions/ManageRulesTemplate.html",
             "templates/policy/policies/conditions/OperatorRulesTemplate.html",
 
+            "templates/policy/policies/ActionsTemplate.html",
             "templates/policy/policies/EditPolicyTemplate.html",
             "templates/policy/policies/ManagePoliciesGridActionsTemplate.html",
             "templates/policy/policies/ManagePoliciesGridTemplate.html",
@@ -247,6 +243,23 @@ define([
                     "Content-Type": "application/json;charset=UTF-8"
                 },
                 "{\"result\":[{\"title\":\"AMIdentityMembership\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"amIdentityName\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}}},{\"title\":\"AND\",\"logical\":true,\"config\":{\"type\":\"object\",\"properties\":{\"conditions\":{\"type\":\"array\",\"items\":{\"type\":\"any\"}}}}},{\"title\":\"AuthLevel\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"authLevel\":{\"type\":\"integer\"}}}},{\"title\":\"AuthScheme\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"authScheme\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"applicationIdleTimeout\":{\"type\":\"integer\"},\"applicationName\":{\"type\":\"string\"}}}},{\"title\":\"AuthenticateToRealm\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"authenticateToRealm\":{\"type\":\"string\"}}}},{\"title\":\"AuthenticateToService\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"authenticateToService\":{\"type\":\"string\"}}}},{\"title\":\"IPv4\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"startIp\":{\"type\":\"string\"},\"endIp\":{\"type\":\"string\"},\"dnsName\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}}},{\"title\":\"IPv6\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"startIp\":{\"type\":\"string\"},\"endIp\":{\"type\":\"string\"},\"dnsName\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}}},{\"title\":\"LDAPFilter\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"ldapFilter\":{\"type\":\"string\"}}}},{\"title\":\"LEAuthLevel\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"authLevel\":{\"type\":\"integer\"}}}},{\"title\":\"NOT\",\"logical\":true,\"config\":{\"type\":\"object\",\"properties\":{\"condition\":{\"type\":\"object\",\"properties\":{}}}}},{\"title\":\"OAuth2Scope\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"requiredScopes\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}}},{\"title\":\"OR\",\"logical\":true,\"config\":{\"type\":\"object\",\"properties\":{\"conditions\":{\"type\":\"array\",\"items\":{\"type\":\"any\"}}}}},{\"title\":\"Policy\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"className\":{\"type\":\"string\"},\"properties\":{\"type\":\"object\"}}}},{\"title\":\"ResourceEnvIP\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"resourceEnvIPConditionValue\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}}},{\"title\":\"Session\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"maxSessionTime\":{\"type\":\"number\"},\"terminateSession\":{\"type\":\"boolean\",\"required\":true}}}},{\"title\":\"SessionProperty\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"ignoreValueCase\":{\"type\":\"boolean\",\"required\":true},\"properties\":{\"type\":\"object\"}}}},{\"title\":\"SimpleTime\",\"logical\":false,\"config\":{\"type\":\"object\",\"properties\":{\"startTime\":{\"type\":\"string\"},\"endTime\":{\"type\":\"string\"},\"startDay\":{\"type\":\"string\"},\"endDay\":{\"type\":\"string\"},\"startDate\":{\"type\":\"string\"},\"endDate\":{\"type\":\"string\"},\"enforcementTimeZone\":{\"type\":\"string\"}}}}],\"resultCount\":18,\"pagedResultsCookie\":null,\"remainingPagedResults\":0}"
+            ]
+        );
+
+        server.respondWith(
+            "GET",
+            /\/json\/decisioncombiners\/\?_queryId=&_fields=title/,
+            [
+                200,
+                {
+                    "Date": "Thu, 19 Feb 2015 08:30:40 GMT",
+                    "Cache-Control": "no-cache",
+                    "Server": "Apache-Coyote/1.1",
+                    "Content-Length": "105",
+                    "Content-API-Version": "protocol=1.0,resource=1.0",
+                    "Content-Type": "application/json;charset=UTF-8"
+                },
+                "{\"result\":[{\"title\":\"DenyOverride\"}],\"resultCount\":1,\"pagedResultsCookie\":null,\"remainingPagedResults\":0}"
             ]
         );
 

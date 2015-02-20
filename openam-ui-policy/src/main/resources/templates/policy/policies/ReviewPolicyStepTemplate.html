@@ -76,7 +76,7 @@
         {{/unless}}
         <div class="advanced-mode">
             {{#if subjectString}}
-            <pre>{{subjectString}}</pre>
+            <pre id="reviewSubj">{{subjectString}}</pre>
             {{else}}
             <p>{{t "policy.summaryReview.noSubjectConditions"}}</p>
             {{/if}}
@@ -90,7 +90,7 @@
         {{/unless}}
         <div class="advanced-mode">
             {{#if environmentString}}
-            <pre>{{environmentString}}</pre>
+            <pre id="reviewEnv">{{environmentString}}</pre>
             {{else}}
             <p>{{t "policy.summaryReview.noEnvironmentConditions"}}</p>
             {{/if}}
