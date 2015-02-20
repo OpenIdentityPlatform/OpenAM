@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -152,6 +152,8 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
             configurations = new HashMap<String, Set<String>>();
             configurations.put(subConfig, new HashSet<String>());
             map.put(type, configurations);
+        } else if (!configurations.containsKey(subConfig)) {
+            configurations.put(subConfig, new HashSet<String>());
         }
         configurations.get(subConfig).add(attrName);
         upgradableConfigs.put(realm, map);
