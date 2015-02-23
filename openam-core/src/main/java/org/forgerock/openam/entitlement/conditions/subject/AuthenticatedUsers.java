@@ -12,9 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2006 Sun Microsystems Inc
- */
-/*
- * Portions Copyright 2014 ForgeRock AS
+ *
+ * Portions Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.subject;
@@ -83,13 +82,16 @@ public class AuthenticatedUsers implements EntitlementSubject {
     @Override
     public SubjectDecision evaluate(String realm, SubjectAttributesManager mgr, javax.security.auth.Subject subject,
             String resourceName, Map<String, Set<String>> environment) throws EntitlementException {
-        SSOToken token = SubjectUtils.getSSOToken(subject);
-        try {
-            return new SubjectDecision(SSOTokenManager.getInstance().isValidToken(token),
-                    Collections.<String, Set<String>>emptyMap());
-        } catch (SSOException e) {
-            throw new EntitlementException(508, e);
+        boolean isValid = true;
+        if (subject != null) {
+            SSOToken token = SubjectUtils.getSSOToken(subject);
+            try {
+                isValid = SSOTokenManager.getInstance().isValidToken(token);
+            } catch (SSOException e) {
+                throw new EntitlementException(508, e);
+            }
         }
+        return new SubjectDecision(isValid, Collections.<String, Set<String>>emptyMap());
     }
 
     /**
