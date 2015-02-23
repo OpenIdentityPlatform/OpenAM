@@ -26,6 +26,7 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.DNMapper;
 
 import org.forgerock.openam.core.CoreWrapper;
@@ -179,7 +180,9 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
      */
     private String getRealmAwareService(String authenticateToService, String realm) {
         //make sure the passed realm is not DN format
-        realm = DNMapper.orgNameToRealmName(realm);
+        if (DN.isDN(realm)) {
+            realm = DNMapper.orgNameToRealmName(realm);
+        }
         if (!authenticateToService.contains(ISAuthConstants.COLON)) {
             return realm + ISAuthConstants.COLON + authenticateToService;
         }
