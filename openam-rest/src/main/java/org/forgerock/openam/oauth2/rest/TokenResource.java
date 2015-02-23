@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -301,8 +301,6 @@ public class TokenResource implements CollectionResourceProvider {
                 if (!uid.equals(adminUserId)) {
                     query.put(USERNAME, uid.getName());
                     query.put(REALM, DNMapper.orgNameToRealmName(uid.getRealm()));
-                } else {
-                    query.put(USERNAME, "*");
                 }
             } catch (Exception e) {
                 if (debug.errorEnabled()) {
@@ -318,7 +316,7 @@ public class TokenResource implements CollectionResourceProvider {
             if (id.equals("access_token")) {
                 queryString = "tokenName=access_token";
             } else {
-                queryString = "";
+                queryString = id;
             }
 
             String[] constraints = queryString.split("\\,");
