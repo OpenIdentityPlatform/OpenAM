@@ -30,8 +30,8 @@
 
 define("org/forgerock/openam/ui/policy/referrals/EditReferralView", [
     "org/forgerock/openam/ui/policy/common/AbstractEditView",
-    "org/forgerock/openam/ui/policy/resources/ResourcesListView",
-    "org/forgerock/openam/ui/policy/resources/AddNewResourceView",
+    "org/forgerock/openam/ui/policy/resources/CreatedResourcesView",
+    "org/forgerock/openam/ui/policy/common/StripedListView",
     "org/forgerock/openam/ui/policy/common/ReviewInfoView",
     "org/forgerock/openam/ui/policy/referrals/SelectRealmsView",
     "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
@@ -41,7 +41,7 @@ define("org/forgerock/openam/ui/policy/referrals/EditReferralView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/components/Messages"
-], function (AbstractEditView, resourcesListView, addNewResourceView, reviewInfoView, selectRealmsView, policyDelegate, uiUtils, Accordion, constants, eventManager, router, messager) {
+], function (AbstractEditView, createdResources, StripedList, reviewInfoView, selectRealmsView, policyDelegate, uiUtils, Accordion, constants, eventManager, router, messager) {
     var EditReferralView = AbstractEditView.extend({
         template: "templates/policy/referrals/EditReferralTemplate.html",
         reviewTemplate: "templates/policy/referrals/ReviewReferralStepTemplate.html",
@@ -76,9 +76,15 @@ define("org/forgerock/openam/ui/policy/referrals/EditReferralView", [
                 data.options.filteredRealms =  self.filterRealms(allRealms[0].result);
 
                 self.parentRender(function () {
+                    self.availableResourcesView = new StripedList();
+                    self.availableResourcesView.render({
+                        title: $.t('policy.common.availablePatterns'),
+                        items: data.options.resourcePatterns,
+                        clickItem: self.addPattern.bind(self)
+                    }, '#patterns');
 
-                    addNewResourceView.render(data);
-                    resourcesListView.render(data);
+                    createdResources.render(data);
+
                     selectRealmsView.render(data);
                     self.validateThenRenderReview();
                     self.initAccordion();
@@ -87,9 +93,12 @@ define("org/forgerock/openam/ui/policy/referrals/EditReferralView", [
                         callback();
                     }
                 });
-
             });
+        },
 
+        addPattern: function (item) {
+            this.data.options.newPattern = item;
+            createdResources.render(this.data);
         },
 
         updateFields: function () {

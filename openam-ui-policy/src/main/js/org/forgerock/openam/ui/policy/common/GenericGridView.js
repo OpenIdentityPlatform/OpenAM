@@ -54,11 +54,12 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
             this.element = options.element;
             this.template = options.tpl;
             this.gridId = options.gridId;
+            this.rowUid = options.rowUid;
 
             this.data[this.gridId] = {};
 
             this.actionsTpl = options.actionsTpl;
-            this.storageKey = constants.OPENAM_STORAGE_KEY_PREFIX + options.storageKey;
+            this.storageKey = constants.OPENAM_STORAGE_KEY_PREFIX + options.additionalOptions.storageKey;
 
             storedItems = JSON.parse(sessionStorage.getItem(this.storageKey));
             this.selectedItems = storedItems ? storedItems : [];
@@ -94,12 +95,12 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
 
             if (!checked) {
                 $chB.removeClass(this.checkBoxUncheckedClass).addClass(this.checkBoxCheckedClass);
-                this.selectedItems.push(this.data[this.gridId].result[rowid - 1].name);
+                this.selectedItems.push(this.data[this.gridId].result[rowid - 1][this.rowUid]);
                 $target.closest('tr').addClass("highlight");
                 this.grid.find('tr[id=' + rowid + ']').addClass("highlight");
             } else {
                 $chB.removeClass(this.checkBoxCheckedClass).addClass(this.checkBoxUncheckedClass);
-                this.selectedItems = _.without(this.selectedItems, this.data[this.gridId].result[rowid - 1].name);
+                this.selectedItems = _.without(this.selectedItems, this.data[this.gridId].result[rowid - 1][this.rowUid]);
                 this.grid.jqGrid('resetSelection', rowid);
                 $target.closest('tr').removeClass("highlight");
                 this.grid.find('tr[id=' + rowid + ']').removeClass("highlight");
@@ -111,8 +112,8 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
         },
 
         selectRow: function (e, rowid, rowdata) {
-            if (this.selectedItems) {
-                if (this.selectedItems.indexOf(rowdata.name) !== -1) {
+            if (this.selectedItems.length) {
+                if (_.contains(this.selectedItems, rowdata[this.rowUid])) {
                     var tr = this.grid.find('tr[id=' + rowid + ']');
                     tr.find(this.checkBox).removeClass(this.checkBoxUncheckedClass).addClass(this.checkBoxCheckedClass);
                     tr.addClass("highlight");
@@ -186,7 +187,6 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
 
             return filter;
         }
-
     });
 
     return GenericGridView;

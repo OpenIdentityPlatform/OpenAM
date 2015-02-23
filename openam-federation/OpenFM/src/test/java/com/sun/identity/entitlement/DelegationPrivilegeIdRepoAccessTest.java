@@ -24,7 +24,7 @@
  *
  * $Id: DelegationPrivilegeIdRepoAccessTest.java,v 1.3 2009/12/18 21:56:56 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -101,9 +101,10 @@ public class DelegationPrivilegeIdRepoAccessTest {
             ApplicationTypeManager.getAppplicationType(
                 PrivilegeManager.superAdminSubject,
                 ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));
-        Set<String> resources = new HashSet<String>();
-        resources.add(DELEGATED_RESOURCE);
-        appl.setResources(resources);
+        // Test disabled, unable to make model change.
+        // Set<String> resources = new HashSet<String>();
+        // resources.add(DELEGATED_RESOURCE);
+        // appl.setResources(resources);
         appl.setEntitlementCombiner(DenyOverride.class);
         ApplicationManager.saveApplication(
             SubjectUtils.createSuperAdminSubject(), SUB_REALM, appl);

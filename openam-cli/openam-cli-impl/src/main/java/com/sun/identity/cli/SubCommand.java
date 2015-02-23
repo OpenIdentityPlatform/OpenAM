@@ -29,6 +29,8 @@
 package com.sun.identity.cli;
 
 import com.iplanet.sso.SSOToken;
+import org.forgerock.guice.core.InjectorHolder;
+
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -289,15 +291,9 @@ public class SubCommand {
         }
 
         try {
-            Class clazz = Class.forName(implClassName);
-            CLICommand cmd = (CLICommand)clazz.newInstance();
+            Class<? extends CLICommand> clazz = Class.forName(implClassName).asSubclass(CLICommand.class);
+            CLICommand cmd = InjectorHolder.getInstance(clazz);
             cmd.handleRequest(rc);
-        } catch (IllegalAccessException e) {
-            throw new CLIException(e.getMessage(),
-                ExitCodes.SUBCOMMAND_IMPLEMENT_CLASS_ILLEGAL_ACCESS);
-        } catch (InstantiationException e) {
-            throw new CLIException(e.getMessage(),
-                ExitCodes.SUBCOMMAND_IMPLEMENT_CLASS_CANNOT_INSTANTIATE);
         } catch (ClassNotFoundException e) {
             throw new CLIException(e.getMessage(),
                 ExitCodes.SUBCOMMAND_IMPLEMENT_CLASS_NOTFOUND);

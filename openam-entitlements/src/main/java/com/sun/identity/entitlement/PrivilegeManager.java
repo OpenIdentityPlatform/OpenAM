@@ -24,12 +24,18 @@
  *
  * $Id: PrivilegeManager.java,v 1.8 2010/01/26 20:10:15 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 package com.sun.identity.entitlement;
 
+import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+
+import javax.security.auth.Subject;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,7 +43,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.security.auth.Subject;
 
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
@@ -57,6 +62,8 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     private String realm;
     private Subject adminSubject;
 
+    private final ResourceTypeService resourceTypeService;
+
     /**
      * Returns instance of configured <code>PrivilegeManager</code>
      * @param subject subject that would be used for the privilege management operations
@@ -68,26 +75,27 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
             throw new UnsupportedOperationException(
                 "Updating of DITs is required before using the entitlement service");
         }
-        PrivilegeManager pm = null;
+
         try {
-            //RFE: read the class name from configuration
-            Class clazz = Class.forName("com.sun.identity.entitlement.opensso.PolicyPrivilegeManager");
-            pm = (PrivilegeManager)clazz.newInstance();
-            pm.initialize(realm, subject);
+            final Class<? extends PrivilegeManager> clazz = Class
+                    .forName("com.sun.identity.entitlement.opensso.PolicyPrivilegeManager")
+                    .asSubclass(PrivilegeManager.class);
+            final PrivilegeManager privilegeManager = InjectorHolder.getInstance(clazz);
+            privilegeManager.initialize(realm, subject);
+            return privilegeManager;
+
         } catch (ClassNotFoundException e) {
             debug.error("PrivilegeManager.getInstance", e);
-        } catch (InstantiationException e) {
-            debug.error("PrivilegeManager.getInstance", e);
-        } catch (IllegalAccessException e) {
-            debug.error("PrivilegeManager.getInstance", e);
         }
-        return pm;
+
+        return null;
     }
 
     /**
      * Constructor.
      */
-    protected PrivilegeManager() {
+    public PrivilegeManager(final ResourceTypeService resourceTypeService) {
+        this.resourceTypeService = resourceTypeService;
     }
 
     /**
@@ -123,17 +131,104 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
         return !searchNames(asSet(filter)).isEmpty();
     }
 
+    /**
+     * Validates the passed policy.
+     *
+     * @param privilege
+     *         the policy instance
+     *
+     * @throws EntitlementException
+     *         should validation fail
+     */
     protected void validate(Privilege privilege) throws EntitlementException {
-        String pName = privilege.getName();
-        if ((pName == null) || (pName.trim().length() == 0)) {
-            throw new EntitlementException(3);
+        final String pName = privilege.getName();
+        if (pName == null || pName.trim().isEmpty()) {
+            throw new EntitlementException(EntitlementException.EMPTY_PRIVILEGE_NAME);
         }
 
-        if (privilege.getEntitlement() == null) {
-            throw new EntitlementException(4);
+        final Entitlement entitlement = privilege.getEntitlement();
+        if (entitlement == null) {
+            throw new EntitlementException(EntitlementException.NULL_ENTITLEMENT);
         }
 
         privilege.validateSubject(privilege.getSubject());
+
+        final ResourceType resourceType = resourceTypeService
+                .getResourceType(adminSubject, realm, privilege.getResourceTypeUuid());
+
+        if (resourceType == null) {
+            throw new EntitlementException(
+                    EntitlementException.NO_SUCH_RESOURCE_TYPE, privilege.getResourceTypeUuid(), realm);
+        }
+
+        final Set<String> patterns = resourceType.getPatterns();
+
+        final ResourceName resourceHandler = entitlement.getResourceComparator(adminSubject, realm);
+
+        for (String resource : entitlement.getResourceNames()) {
+            final String normalisedResource = resourceHandler.canonicalize(resource);
+            final ValidateResourceResult result = validateResourceNames(normalisedResource, patterns, resourceHandler);
+
+            if (!result.isValid()) {
+                throw new EntitlementException(EntitlementException.INVALID_RESOURCE, resource);
+            }
+        }
+    }
+
+    /**
+     * Validates the configured resource against the patterns defined in the resource type.
+     *
+     * @param resource
+     *         the resource
+     * @param patterns
+     *         the set of patterns
+     * @param comparator
+     *         the comparator responsible for doing the matching
+     *
+     * @return a validation result
+     *
+     * @throws EntitlementException
+     *         should validation fail
+     */
+    private ValidateResourceResult validateResourceNames(
+            final String resource, final Set<String> patterns, final ResourceName comparator)
+            throws EntitlementException {
+
+        if (comparator instanceof RegExResourceName) {
+            for (String pattern : patterns) {
+                final ResourceMatch rm = comparator.compare(pattern, resource, true);
+
+                if (rm.equals(ResourceMatch.EXACT_MATCH)
+                        || rm.equals(ResourceMatch.WILDCARD_MATCH)
+                        || rm.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
+                    // Valid match.
+                    return new ValidateResourceResult(ValidateResourceResult.VALID_CODE_VALID, "");
+                }
+            }
+        } else {
+            for (String pattern : patterns) {
+                ResourceMatch match = comparator.compare(comparator.canonicalize(pattern), resource, false);
+
+                if (match.equals(ResourceMatch.EXACT_MATCH)
+                        || match.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
+                    // Valid match.
+                    return new ValidateResourceResult(ValidateResourceResult.VALID_CODE_VALID, "");
+
+                } else {
+                    match = comparator.compare(resource, comparator.canonicalize(pattern), true);
+
+                    if (match.equals(ResourceMatch.WILDCARD_MATCH)) {
+                        // Valid match.
+                        return new ValidateResourceResult(ValidateResourceResult.VALID_CODE_VALID, "");
+                    }
+                }
+            }
+        }
+
+        // Match failed.
+        return new ValidateResourceResult(
+                ValidateResourceResult.VALID_CODE_DOES_NOT_MATCH_VALID_RESOURCES,
+                "resource.validation.does.not.match.valid.resources", resource);
     }
 
     /**
@@ -146,7 +241,6 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     public void add(Privilege privilege) throws EntitlementException {
         validate(privilege);
         Date date = new Date();
-        privilege.validateResourceNames(adminSubject, realm);
         privilege.setCreationDate(date.getTime());
         privilege.setLastModifiedDate(date.getTime());
 

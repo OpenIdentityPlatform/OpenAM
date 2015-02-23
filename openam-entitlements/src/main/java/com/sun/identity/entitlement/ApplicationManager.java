@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2013-2014 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS
  */
 package com.sun.identity.entitlement;
 
@@ -262,8 +262,6 @@ public final class ApplicationManager {
             Application cloned = app.clone();
 
             if (accessibleApplicationNames.contains(applicationName)) {
-                cloned.setResources(apm.getResources(applicationName,
-                    ApplicationPrivilege.Action.READ));
                 accessible.add(cloned);
             }
         }

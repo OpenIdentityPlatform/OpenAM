@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DenyOverride.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
+ *
+ * Copyright 2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -35,21 +37,37 @@ import java.util.Set;
  * <code>true</code>.
  */
 public class DenyOverride extends EntitlementCombiner {
+
     @Override
     protected boolean combine(Boolean b1, Boolean b2) {
         return b1.booleanValue() && b2.booleanValue();
     }
 
+    /**
+     * Attempts to inform the caller whether process can complete early. If passed actions have been passed to the
+     * engine and all are present and set to deny in the merged policy decision, then in the case of deny overrides
+     * there is no point processing any remaining policies.
+     *
+     * @return whether enough is known such that evaluation can complete early.
+     */
     @Override
     protected boolean isCompleted() {
-        Entitlement e = getRootE();
-        Set<String> actions = getActions();
-        for (String a : actions) {
-            Boolean result = e.getActionValue(a);
-            if ((result == null) || result.booleanValue()) {
+        final Set<String> actions = getActions();
+
+        if (actions.isEmpty()) {
+            return false;
+        }
+
+        final Entitlement mergedEntitlement = getRootE();
+
+        for (String action : actions) {
+            final Boolean actionValue = mergedEntitlement.getActionValue(action);
+
+            if (actionValue == null || actionValue) {
                 return false;
             }
         }
+
         return true;
     }
 }

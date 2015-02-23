@@ -32,6 +32,8 @@
 
 package com.sun.identity.setup;
 
+import org.forgerock.openam.utils.IOUtils;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -150,11 +152,7 @@ public class SetupProgress {
     }
 
     public static void closeOutputStream() {
-        try {
-            writer.close();
-        } catch (IOException ex) {
-            //ignore
-        }
+        IOUtils.closeIfNotNull(writer);
     }
 
     /**

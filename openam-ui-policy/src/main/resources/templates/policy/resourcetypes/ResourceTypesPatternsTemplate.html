@@ -1,0 +1,22 @@
+<p>{{t "policy.editResourceType.specifyPatterns"}}</p>
+
+<div class="striped-list created-items">
+    <h3>{{t "policy.common.patterns"}}</h3>
+    <ul>
+        {{#if items}}
+        {{#each items}}
+        <li {{#equals this ../../options.justAdded}}class="highlight-good"{{/equals}} data-item-name="{{this}}">
+        <span tabindex="0" class="icon-close float-right"></span>
+        <span class="key">{{this}}</span>
+        </li>
+        {{/each}}
+        {{else}}
+        <li class="disabled">{{t "policy.common.noPatterns"}}</li>
+        {{/if}}
+
+        <li class="editing clearfix" data-item-name>
+            <input type="text" placeholder="{{t 'policy.editResourceType.addNewPattern'}}" data-attr-add />
+            <span tabindex="0" class="icon-plus float-right"></span>
+        </li>
+    </ul>
+</div>

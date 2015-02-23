@@ -20,14 +20,6 @@ import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeTyp
 import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
 import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
@@ -88,6 +80,14 @@ import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.SignatureUtil;
 import org.restlet.routing.Router;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Guice Module for configuring bindings for the AuthenticationRestService classes.
@@ -323,9 +323,14 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.APP_NOT_CREATED_POLICIES_EXIST, ResourceException.CONFLICT);
             handlers.put(EntitlementException.INVALID_APP_TYPE, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.INVALID_APP_REALM, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.INVALID_RESOURCE_TYPE_REALM, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.PROPERTY_CONTAINS_BLANK_VALUE, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.APPLICATION_NAME_MISMATCH, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.INVALID_CLASS, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.RESOURCE_TYPE_ALREADY_EXISTS, ResourceException.CONFLICT);
+            handlers.put(EntitlementException.NO_SUCH_RESOURCE_TYPE, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.RESOURCE_TYPE_IN_USE, ResourceException.CONFLICT);
+            handlers.put(EntitlementException.MISSING_RESOURCE_TYPE_NAME, ResourceException.BAD_REQUEST);
 
             return handlers;
         }

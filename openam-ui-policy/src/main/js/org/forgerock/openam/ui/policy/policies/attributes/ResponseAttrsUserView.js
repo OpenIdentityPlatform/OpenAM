@@ -64,14 +64,11 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsUserView
 
         getAttrs: function () {
             var data = [],
-                attr,
-                i,
-                length,
-                self = this;
+                attr;
 
             _.each(this.data.selectedUserAttributes, function (value) {
                 attr = {};
-                attr.type = self.attrType;
+                attr.type = this.attrType;
                 attr.propertyName = value.propertyName || value;
                 data.push(attr);
             });

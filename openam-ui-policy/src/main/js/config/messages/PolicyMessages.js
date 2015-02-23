@@ -90,6 +90,10 @@ define("config/messages/PolicyMessages", [], function () {
             msg: "config.messages.PolicyMessages.duplicateRealm",
             type: "error"
         },
+        "duplicateItem": {
+            msg: "config.messages.PolicyMessages.duplicateItem",
+            type: "error"
+        },
         "unableToPersistPolicy": {
             msg: "config.messages.PolicyMessages.unableToPersistPolicy",
             type: "error"
@@ -105,6 +109,14 @@ define("config/messages/PolicyMessages", [], function () {
         "policiesImportFailed": {
             msg: "config.messages.PolicyMessages.policiesImportFailed",
             type: "error"
+        },
+        "resourceTypeCreated": {
+            msg: "config.messages.PolicyMessages.resourceTypeCreated",
+            type: "info"
+        },
+        "resourceTypeUpdated": {
+            msg: "config.messages.PolicyMessages.resourceTypeUpdated",
+            type: "info"
         }
     };
 });

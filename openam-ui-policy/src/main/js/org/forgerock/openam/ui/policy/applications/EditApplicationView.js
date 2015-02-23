@@ -29,8 +29,7 @@
 /*global window, define, $, _, document, console */
 define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
     "org/forgerock/openam/ui/policy/common/AbstractEditView",
-    "org/forgerock/openam/ui/policy/resources/ResourcesListView",
-    "org/forgerock/openam/ui/policy/resources/AddNewResourceView",
+    "org/forgerock/openam/ui/policy/common/StripedListView",
     "org/forgerock/openam/ui/policy/common/ReviewInfoView",
     "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils",
@@ -39,13 +38,13 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/components/Messages"
-], function (AbstractEditView, resourcesListView, addNewResourceView, reviewInfoView, policyDelegate, uiUtils, Accordion, constants, conf, eventManager, messager) {
+], function (AbstractEditView, StripedList, reviewInfoView, policyDelegate, uiUtils, Accordion, constants, conf, eventManager, messager) {
     var EditApplicationView = AbstractEditView.extend({
         template: "templates/policy/applications/EditApplicationTemplate.html",
         reviewTemplate: "templates/policy/applications/ReviewApplicationStepTemplate.html",
         data: {},
         APPLICATION_TYPE: "iPlanetAMWebAgentService",
-        validationFields: ["name", "resources"],
+        validationFields: ["name", "resourceTypeUuids"],
 
         render: function (args, callback) {
 
@@ -56,10 +55,11 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
                 envConditionsPromise = policyDelegate.getEnvironmentConditions(),
                 subjConditionsPromise = policyDelegate.getSubjectConditions(),
                 decisionCombinersPromise = policyDelegate.getDecisionCombiners(),
-                appPromise = this.getApplication(appName);
+                appPromise = this.getApplication(appName),
+                resourceTypesPromise = policyDelegate.listResourceTypes();
 
-            $.when(appTypePromise, envConditionsPromise, subjConditionsPromise, decisionCombinersPromise, appPromise).done(
-                function (appType, envConditions, subjConditions, decisionCombiners) {
+            $.when(appTypePromise, envConditionsPromise, subjConditionsPromise, decisionCombinersPromise, resourceTypesPromise, appPromise).done(
+                function (appType, envConditions, subjConditions, decisionCombiners, resourceTypes) {
                     if (!data.entity.applicationType) {
                         data.entity.applicationType = self.APPLICATION_TYPE;
                     }
@@ -70,16 +70,16 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
 
                     self.processConditions(data, envConditions[0].result, subjConditions[0].result);
 
-                    data.options = {};
                     data.entity.entitlementCombiner = self.getAvailableDecisionCombiner(decisionCombiners);
 
-                    // Available resource patterns are supposed to be defined by the selected application type. For now we
-                    // assume any resource might be created, hence we hard code the '*'.
-                    data.options.resourcePatterns = ['*'];
+                    data.options = {};
+                    data.options.allResourceTypes = resourceTypes[0].result;
+                    data.options.availableResourceTypes = _.filter(resourceTypes[0].result, function (item) {
+                        return !_.contains(self.data.entity.resourceTypeUuids, item.uuid);
+                    });
 
                     self.parentRender(function () {
-                        resourcesListView.render(data);
-                        addNewResourceView.render(data);
+                        self.buildResourceTypesList();
 
                         self.validateThenRenderReview();
                         self.initAccordion();
@@ -91,13 +91,57 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
                 });
         },
 
-        /**
-         * Retrieves application in case it's an existing application,
-         * provides an empty object if it is a new application.
-         *
-         * @param appName application name
-         * @returns {Object} application
-         */
+        buildResourceTypesList: function () {
+            var availableNames = _.pluck(this.data.options.availableResourceTypes, 'name'),
+                selected = _.findByValues(this.data.options.allResourceTypes, 'uuid', this.data.entity.resourceTypeUuids);
+
+            this.data.options.selectedResourceTypeNames = _.pluck(selected, 'name').sort();
+
+            this.resourceTypesListView = new StripedList();
+            this.resourceTypesListView.render({
+                items: availableNames,
+                title: $.t('policy.resourceTypes.availableResourceTypes'),
+                filter: true,
+                clickItem: this.selectResourceType.bind(this)
+            }, '#availableResTypes');
+
+            this.resourceTypesListSelectedView = new StripedList();
+            this.resourceTypesListSelectedView.render({
+                items: this.data.options.selectedResourceTypeNames,
+                title: $.t('policy.resourceTypes.selectedResourceTypes'),
+                created: true,
+                clickItem: this.deselectResourceType.bind(this)
+            }, '#selectedResTypes');
+        },
+
+        selectResourceType: function (item) {
+            this.moveSelected(item, this.resourceTypesListView, this.resourceTypesListSelectedView);
+
+            // todo for now two RTs in the same realm are not allowed to have the same name, but the following should be changed to use UUIDs, not names
+            var selected = _.findWhere(this.data.options.allResourceTypes, {name: item});
+            this.data.entity.resourceTypeUuids = this.data.entity.resourceTypeUuids.concat(selected.uuid);
+            this.data.options.selectedResourceTypeNames = this.data.options.selectedResourceTypeNames.concat(selected.name).sort();
+
+        },
+
+        deselectResourceType: function (item) {
+            this.resourceTypesListView.emptyFilter();
+            this.moveSelected(item, this.resourceTypesListSelectedView, this.resourceTypesListView);
+
+            // todo for now two RTs in the same realm are not allowed to have the same name, but the following should be changed to use UUIDs, not names
+            var selected = _.findWhere(this.data.options.allResourceTypes, {name: item});
+            this.data.entity.resourceTypeUuids = _.without(this.data.entity.resourceTypeUuids, selected.uuid);
+            this.data.options.selectedResourceTypeNames = _.without(this.data.options.selectedResourceTypeNames, selected.name);
+        },
+
+        moveSelected: function (item, fromView, toView) {
+            fromView.removeItem(item);
+            fromView.renderItems();
+
+            toView.addItem(item);
+            toView.renderItems();
+        },
+
         getApplication: function (appName) {
             var self = this,
                 deferred = $.Deferred();
@@ -111,6 +155,7 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
                 });
             } else {
                 self.data.entity = {};
+                self.data.entity.resourceTypeUuids = [];
                 self.data.entityName = null;
                 deferred.resolve();
             }
@@ -156,7 +201,6 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
             });
         },
 
-
         submitForm: function () {
             var app = this.data.entity,
                 persistedApp = _.clone(app),
@@ -189,8 +233,8 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
                 invalidResourceText = "Invalid Resource";
 
             if (e.status === 500) {
-               console.error(e.responseJSON, e.responseText, e);
-               messager.messages.addMessage( obj );
+                console.error(e.responseJSON, e.responseText, e);
+                messager.messages.addMessage(obj);
             } else if (e.status === 400 || e.status === 404) {
 
                 if ( uiUtils.responseMessageMatch( e.responseText, invalidResourceText) ) {
@@ -201,7 +245,7 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
 
                 } else {
                     console.log(e.responseJSON, e.responseText, e);
-                    messager.messages.addMessage( obj );
+                    messager.messages.addMessage(obj);
                 }
             } else if (e.status === 409) {
                 // duplicate name
@@ -212,7 +256,7 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
 
             } else {
                 console.log(e.responseJSON, e.responseText, e);
-                messager.messages.addMessage( obj );
+                messager.messages.addMessage(obj);
             }
         }
     });

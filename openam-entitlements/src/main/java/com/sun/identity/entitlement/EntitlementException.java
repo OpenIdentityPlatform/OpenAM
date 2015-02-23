@@ -24,7 +24,7 @@
  *
  * $Id: EntitlementException.java,v 1.2 2009/09/03 17:06:23 veiming Exp $
  *
- * Portions copyright 2010-2014 ForgeRock AS.
+ * Portions copyright 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -63,9 +63,18 @@ public class EntitlementException extends Exception {
     public static final int UNABLE_TO_SERIALIZE_OBJECT = 200;
     public static final int NO_SUCH_POLICY = 203;
     public static final int POLICY_ALREADY_EXISTS = 217;
+    public static final int RESOURCE_TYPE_ALREADY_EXISTS = 218;
+    public static final int NO_SUCH_RESOURCE_TYPE = 219;
+    public static final int RESOURCE_TYPE_IN_USE = 223;
+    public static final int RESOURCE_TYPE_RETRIEVAL_ERROR = 224;
     public static final int APPLICATION_ALREADY_EXISTS = 228;
     public static final int APPLICATION_NAME_MISMATCH = 229;
+    public static final int REMOVE_APPLICATION_FAIL = 230;
+    public static final int MODIFY_APPLICATION_FAIL = 231;
+    public static final int REMOVE_RESOURCE_TYPE_FAIL = 232;
+    public static final int MODIFY_RESOURCE_TYPE_FAIL = 233;
     public static final int APP_RETRIEVAL_ERROR = 248;
+    public static final int MISSING_RESOURCE_TYPE_NAME = 249;
     public static final int NO_SUCH_REFERRAL_PRIVILEGE = 263;
 
     public static final int INCONSISTENT_WILDCARDS = 300;
@@ -77,6 +86,7 @@ public class EntitlementException extends Exception {
 
     public static final int INVALID_APP_TYPE = 317;
     public static final int INVALID_APP_REALM = 318;
+    public static final int INVALID_RESOURCE_TYPE_REALM = 319;
 
     public static final int NO_SUCH_APPLICATION = 321;
     public static final int NOT_FOUND = 325;
@@ -140,7 +150,7 @@ public class EntitlementException extends Exception {
 
     /**
      * Creates an entitlement exception.
-     * 
+     *
      * @param errorCode Error code.
      * @param params Parameters for formatting the message string.
      */
@@ -183,7 +193,7 @@ public class EntitlementException extends Exception {
 
     /**
      * Returns error code.
-     * 
+     *
      * @return error code.
      */
     public int getErrorCode() {

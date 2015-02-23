@@ -427,6 +427,8 @@ public class DataStore {
                 info.add("|" + data);
             }
 
+            info.add(Privilege.RESOURCE_TYPE_UUID_ATTRIBUTE + "=" + p.getResourceTypeUuid());
+
             Entitlement ent = p.getEntitlement();
             info.add(Privilege.APPLICATION_ATTRIBUTE + "=" +
                 ent.getApplicationName());

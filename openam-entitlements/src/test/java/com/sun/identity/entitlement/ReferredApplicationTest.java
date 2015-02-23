@@ -33,7 +33,7 @@ public class ReferredApplicationTest {
         application = new Application(registry);
     }
 
-    @Test
+    @Test(enabled = false)
     public void shouldCreateUnEditableClone() throws IllegalAccessException, InstantiationException {
         //given
         ReferredApplication refApp = new ReferredApplication("/", "App", application, Collections.EMPTY_SET);

@@ -58,6 +58,7 @@ define("org/forgerock/openam/ui/policy/applications/ManageApplicationsView", [
 
                 this.appGridView = new GenericGridView();
                 this.appGridView.render({
+                    rowUid: 'name',
                     element: '#manageApps',
                     tpl: 'templates/policy/applications/ManageAppsGridTemplate.html',
                     actionsTpl: 'templates/policy/applications/ManageAppsGridActionsTemplate.html',
@@ -80,7 +81,7 @@ define("org/forgerock/openam/ui/policy/applications/ManageApplicationsView", [
                 colNames: ['', 'Edit', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
                 colModel: [
                     {name: 'iconChB',           width: 40,  sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
-                    {name: 'actions',           width: 65,  sortable: false, formatter: actionsFormatter, frozen: true, search: false, hidedlg: true},
+                    {name: 'tableActions',      width: 65,  sortable: false, formatter: actionsFormatter, frozen: true, search: false, hidedlg: true},
                     {name: 'name',              width: 262, frozen: true, hidedlg: true, searchoptions: {sopt: ['gt','lt','ge','le','eq']}},
                     {name: 'description',       width: 263, sortable: false, searchoptions: {sopt: ['gt','lt','ge','le','eq']}},
                     {name: 'resources',         width: 263, sortable: false, search: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},

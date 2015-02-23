@@ -332,4 +332,17 @@ public class CollectionUtils {
 
         return hc;
     }
+
+    /**
+     * Given a collection determines whether it contains some values.
+     *
+     * @param collection
+     *         collection in question
+     *
+     * @return whether the collection contains any values
+     */
+    public static boolean isNotEmpty(final Collection<?> collection) {
+        return collection != null && !collection.isEmpty();
+    }
+
 }

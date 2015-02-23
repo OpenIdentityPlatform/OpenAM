@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ListApplicationPrivileges.java,v 1.1 2009/11/10 19:01:04 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.cli.entitlement;
@@ -34,9 +36,12 @@ import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
+import javax.inject.Inject;
 import javax.security.auth.Subject;
 
 /**
@@ -44,6 +49,12 @@ import javax.security.auth.Subject;
  * @author dennis
  */
 public class ListApplicationPrivileges extends ApplicationPrivilegeBase {
+
+    @Inject
+    public ListApplicationPrivileges(ResourceTypeService resourceTypeService) {
+        super(resourceTypeService);
+    }
+
     /**
      * Services a Commandline Request.
      *

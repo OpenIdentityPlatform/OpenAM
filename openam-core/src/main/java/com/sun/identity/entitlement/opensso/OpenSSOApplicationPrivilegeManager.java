@@ -24,11 +24,7 @@
  *
  * $Id: OpenSSOApplicationPrivilegeManager.java,v 1.16 2010/01/11 20:15:46 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
- */
-
-/**
- * Portions copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -64,7 +60,9 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
+import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -110,9 +108,12 @@ public class OpenSSOApplicationPrivilegeManager extends
             AdminTokenAction.getInstance());
     private Subject dsameUserSubject = SubjectUtils.createSubject(adminToken);
 
-    public OpenSSOApplicationPrivilegeManager(String realm, Subject caller)
-        throws EntitlementException {
+    private final ResourceTypeService resourceTypeService;
+
+    public OpenSSOApplicationPrivilegeManager(String realm, Subject caller, ResourceTypeService resourceTypeService)
+            throws EntitlementException {
         super();
+        this.resourceTypeService = resourceTypeService;
         this.realm = realm;
         this.caller = caller;
         bPolicyAdmin = isPolicyAdmin();
@@ -662,8 +663,8 @@ public class OpenSSOApplicationPrivilegeManager extends
                 resources.add(URLDecoder.decode(s, "UTF-8"));
             } catch (UnsupportedEncodingException ex) {
                 PrivilegeManager.debug.error(
-                    "OpenSSOApplicationPrivilegeManager " +
-                        ".getApplicationPrivilegeResourceNames", ex);
+                        "OpenSSOApplicationPrivilegeManager " +
+                                ".getApplicationPrivilegeResourceNames", ex);
                 return Collections.EMPTY_MAP;
             }
         }
@@ -919,11 +920,37 @@ public class OpenSSOApplicationPrivilegeManager extends
                 PrivilegeManager.superAdminSubject, realm);
 
             for (String s : applNames) {
-                Application appl = ApplicationManager.getApplication(
-                    PrivilegeManager.superAdminSubject, realm, s);
-                map.put(s, appl.getResources());
+                Application appl = ApplicationManager.getApplication(PrivilegeManager.superAdminSubject, realm, s);
+                map.put(s, getAllBaseResource(appl));
             }
             return map;
+        }
+
+        /**
+         * Retrieve all the base resources associated with the passed application.
+         *
+         * @param application
+         *      the application
+         * @return all base resources
+         *
+         * @throws EntitlementException
+         *      should an error occur retrieving the base resources
+         */
+        private Set<String> getAllBaseResource(final Application application) throws EntitlementException {
+            final Set<String> baseResources = new HashSet<String>();
+
+            for (String resourceTypeUuid : application.getResourceTypeUuids()) {
+                final ResourceType resourceType = resourceTypeService
+                        .getResourceType(PrivilegeManager.superAdminSubject, realm, resourceTypeUuid);
+
+                if (resourceType == null) {
+                    throw new EntitlementException(EntitlementException.NO_SUCH_RESOURCE_TYPE, resourceTypeUuid, realm);
+                }
+
+                baseResources.addAll(resourceType.getPatterns());
+            }
+
+            return baseResources;
         }
 
         private void evaluate(Privilege p, boolean subResource) {

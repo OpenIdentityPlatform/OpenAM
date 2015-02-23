@@ -1,0 +1,36 @@
+<p>{{t "policy.editResourceType.addActions"}}</p>
+
+<div class="striped-list created-items">
+    <h3>{{t "policy.common.actions"}}</h3>
+    <ul>
+        {{#if items}}
+        {{#each items}}
+        <li {{#equals this ../../options.justAdded}}class="highlight-good"{{/equals}} data-item-name="{{name}}">
+        <span tabindex="0" class="icon-close float-right"></span>
+        <span class="float-right radio-btn-set">
+                <span class='{{#if value}} icon-radio-checked {{/if}} {{#unless value}} icon-radio-unchecked {{/unless}}' tabindex='0' data-action-permission="true"></span>
+                <span class="action-permission">{{t "policy.actions.allow"}}</span>
+                <span class='{{#unless value}} icon-radio-checked {{/unless}} {{#if value}} icon-radio-unchecked {{/if}}' tabindex='0' data-action-permission="false"></span>
+                <span class="action-permission">{{t "policy.actions.deny"}}</span>
+            </span>
+        <span class="key">{{name}}</span>
+        </li>
+        {{/each}}
+        {{else}}
+        <li class="disabled">{{t "policy.common.noActions"}}</li>
+        {{/if}}
+
+        <li class="editing clearfix" data-item-name>
+            <input type="text" placeholder="{{t 'policy.actions.addNew'}}" data-attr-add-key />
+
+            <span tabindex="0" class="icon-plus float-right"></span>
+
+            <span class="float-right radio-btn-set">
+                <span class='icon-radio-checked' tabindex='0' data-action-permission="true" data-attr-add-val></span>
+                <span class="action-permission">{{t "policy.actions.allow"}}</span>
+                <span class='icon-radio-unchecked' tabindex='0' data-action-permission="false" data-attr-add-val></span>
+                <span class="action-permission">{{t "policy.actions.deny"}}</span>
+            </span>
+        </li>
+    </ul>
+</div>

@@ -90,6 +90,20 @@ define("config/AppConfiguration", function () {
                 moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
                 configuration: {
                     links: {
+                        admin: {
+                            urls: {
+                                applications: {
+                                    url: "#apps/",
+                                    name: "config.AppConfiguration.Navigation.links.applications",
+                                    inactive: false
+                                },
+                                resourceTypes: {
+                                    url: "#resourceTypes/",
+                                    name: "config.AppConfiguration.Navigation.links.resourceTypes",
+                                    inactive: false
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -114,7 +128,9 @@ define("config/AppConfiguration", function () {
                         "templates/policy/applications/ManageAppsGridCellActionsTemplate.html",
                         "templates/policy/applications/ManageAppsGridActionsTemplate.html",
                         "templates/policy/policies/ManagePoliciesGridActionsTemplate.html",
-                        "templates/policy/referrals/ManageRefsGridActionsTemplate.html"
+                        "templates/policy/referrals/ManageReferralsGridActionsTemplate.html",
+                        "templates/policy/resourcetypes/ManageResourceTypesGridActionsTemplate.html",
+                        "templates/policy/common/StripedListTemplate.html"
                     ]
                 }
             },
@@ -142,6 +158,20 @@ define("config/AppConfiguration", function () {
                 moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
                 configuration: {
                     links: {
+                        admin: {
+                            urls: {
+                                applications: {
+                                    url: "#apps/",
+                                    name: "config.AppConfiguration.Navigation.links.applications",
+                                    inactive: false
+                                },
+                                resourceTypes: {
+                                    url: "#resourceTypes/",
+                                    name: "config.AppConfiguration.Navigation.links.resourceTypes",
+                                    inactive: false
+                                }
+                            }
+                        },
                         "user" : {
                             "urls": {
 

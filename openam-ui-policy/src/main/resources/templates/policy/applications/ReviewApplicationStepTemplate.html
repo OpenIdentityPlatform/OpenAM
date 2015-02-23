@@ -9,11 +9,9 @@
     <div class="review-row clearfix{{#equals '' entity.name}} invalid{{/equals}}{{#if options.invalidName}} invalid{{/if}}{{#if options.incorrectName}} invalid{{/if}}" tabindex="0" >
         <h2>{{t "policy.common.name"}}</h2>
         {{#unless advancedMode}}
-        {{#if entity.name}}
-        {{#unless options.invalidName}} 
-        <span class="icon-arrow-down2"></span>
-        {{/unless}}
-        {{/if}} 
+            {{#if entity.name}}
+                {{#unless options.invalidName}}<span class="icon-arrow-down2"></span>{{/unless}}
+            {{/if}}
         {{/unless}}
         <div class="advanced-mode">
             <p id="reviewName" {{#unless entity.name}} class="invalid"{{/unless}}>
@@ -37,20 +35,20 @@
 </div>
 
 <div class="col2">
-    <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resources}} invalid{{/unless}}" tabindex="0" >
-        <h2>{{t "policy.common.applicationBase"}}</h2>
+    <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resourceTypeUuids}} invalid{{/unless}}" tabindex="0" >
+        <h2>{{t "policy.common.resourceTypes"}}</h2>
         {{#unless advancedMode}}
-        {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>{{/if}}
+        {{#if entity.resourceTypeUuids}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>{{/if}}
         {{/unless}}
         <div class="advanced-mode">
-            {{#if entity.resources}}
+            {{#if entity.resourceTypeUuids}}
             <ul id="reviewRes">
-                {{#each entity.resources}}
+                {{#each options.selectedResourceTypeNames}}
                 <li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>
                 {{/each}}
             </ul>
             {{else}}
-            <p class="invalid">{{t "policy.common.noResources"}}</p>
+            <p class="invalid">{{t "policy.common.noResourceTypes"}}</p>
             {{/if}}
         </div>
     </div>

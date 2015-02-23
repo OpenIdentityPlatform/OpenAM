@@ -39,13 +39,21 @@
                     <span class="help-link" data-help-key="policy.resources"></span>
                 </h1>
                 <section class="accordion-step clearfix">
+                    <p>{{t "policy.editPolicies.selectResourceTypeHelper"}}</p>
 
-                    <div class="clearfix">
-                        <div class="col2" id="patterns"></div>
-                        <div class="col2" id="resourcesList"></div>
-                    </div>
+                    {{#if options.availableResourceTypes}}
+                    <select id="availableResTypes">
+                        <option value="">{{t "policy.editPolicies.selectResourceType"}}</option>
+                        {{#each options.availableResourceTypes}}
+                        <option {{#equals this.uuid ../entity.resourceTypeUuid}}selected{{/equals}} value="{{this.uuid}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                    {{else}}
+                    {{t "policy.common.noResourceTypesAvailable"}}
+                    {{/if}}
+
+                    <div id="editResources"></div>
                     <input class="button" type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton">
-
                 </section>
 
                 <h1 class="accordion-header" tabindex="0">
@@ -53,10 +61,8 @@
                     <span class="help-link" data-help-key="policy.actions"></span>
                 </h1>
                 <section class="accordion-step clearfix">
-
                     <div id="actions"></div>
                     <input class="button" type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton">
-
                 </section>
 
                 <h1 class="accordion-header" tabindex="0">

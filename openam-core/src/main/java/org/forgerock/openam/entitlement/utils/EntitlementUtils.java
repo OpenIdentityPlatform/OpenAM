@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  * 
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.utils;
 
@@ -32,16 +32,22 @@ import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_CON
 import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_ENTITLEMENT_COMBINER;
 import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_RESOURCES;
 import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_RESOURCE_COMP_IMPL;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_RESOURCE_TYPE_UUIDS;
 import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SAVE_INDEX_IMPL;
 import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SEARCH_INDEX_IMPL;
 import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SUBJECTS;
+
+import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import java.security.AccessController;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.forgerock.util.Reject;
+
+import javax.security.auth.Subject;
 
 /**
  * Utility methods for managing entitlements.
@@ -95,18 +101,9 @@ public final class EntitlementUtils {
         EntitlementException {
         Application app = ApplicationManager.newApplication(realm, name, applicationType);
 
-        Map<String, Boolean> actions = getActions(data); //if the app doesn't come with actions, use applicationType's
-        if (actions == null || actions.isEmpty()) {
-            actions = applicationType.getActions();
-        }
-
-        if (actions != null && !actions.isEmpty()) {
-            app.setActions(actions);
-        }
-
-        Set<String> resources = data.get(CONFIG_RESOURCES);
-        if (resources != null) {
-            app.setResources(resources);
+        final Set<String> resourceTypeUuids = data.get(CONFIG_RESOURCE_TYPE_UUIDS);
+        if (resourceTypeUuids != null) {
+            app.addAllResourceTypeUuids(resourceTypeUuids);
         }
 
         String description = getAttribute(data, CONFIG_APPLICATION_DESC);
@@ -278,12 +275,56 @@ public final class EntitlementUtils {
     }
 
     /**
+     * Returns the first attribute value for the corresponding attributeName in the data map.
+     *
+     * @param data The map where the attribute should be retrieved from.
+     * @param attributeName The name of the attribute that should be retrieved from the map.
+     * @param defaultValue The value to return if the requested value is null.
+     * @return The attribute from the map corresponding to the provided attribute name, or defaultValue if no such
+     * attribute is present in the map.
+     */
+    public static String getAttribute(Map<String, Set<String>> data, String attributeName, String defaultValue) {
+        final Set<String> set = data.get(attributeName);
+        final String attr = (set != null && !set.isEmpty()) ? set.iterator().next() : null;
+        return  attr == null ? defaultValue : attr;
+    }
+
+    /**
+     * Returns the first attribute value for the corresponding attributeName in the data map and parses it to a long.
+     *
+     * @param data The map where the attribute should be retrieved from.
+     * @param attributeName The name of the attribute that should be retrieved from the map.
+     * @return The attribute from the map corresponding to the provided attribute name, parsed to a long.
+     * If the attribute does not exist the current date time will be returned.
+     */
+    public static long getDateAttributeAsLong(Map<String, Set<String>> data, String attributeName) {
+        try {
+            return Long.parseLong(getAttribute(data, attributeName));
+        } catch (NumberFormatException e) {
+            PrivilegeManager.debug.error("EntitlementService.getDateAttributeAsLong", e);
+            return new Date().getTime();
+        }
+    }
+
+    /**
      * Returns an admin SSO token for administrative actions.
      *
      * @return An administrative SSO token.
      */
     public static SSOToken getAdminToken() {
         return AccessController.doPrivileged(AdminTokenAction.getInstance());
+    }
+
+    /**
+     * Returns the SSO token for the given subject.
+     * @param subject The subject for which the token is required.
+     * @return An SSO token.
+     */
+    public static SSOToken getSSOToken(Subject subject) {
+        if (subject == PrivilegeManager.superAdminSubject) {
+            return getAdminToken();
+        }
+        return SubjectUtils.getSSOToken(subject);
     }
 
     /**

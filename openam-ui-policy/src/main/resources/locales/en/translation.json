@@ -51,15 +51,21 @@
                 "duplicateResource": "Duplicate resource",
                 "duplicateAttribute": "Duplicate attribute",
                 "duplicateRealm": "Duplicate realm",
+                "duplicateItem": "Duplicate item",
                 "unableToPersistPolicy": "Unable to persist policy in datastore",
                 "policiesUploaded": "Policies uploaded successfully",
                 "policiesUploadFailed": "Failed to upload policies",
-                "policiesImportFailed": "Import Failed: __applicationName__ application not found in realm"
+                "policiesImportFailed": "Import Failed: __applicationName__ application not found in realm",
+                "resourceTypeCreated": "Resource Type created successfully",
+                "resourceTypeUpdated": "Resource Type updated successfully"
             }
         },
         "AppConfiguration": {
             "Navigation": {
-                "links": {}
+                "links": {
+                    "applications": "Applications",
+                    "resourceTypes": "Resource Types"
+                }
             }
         }
     },
@@ -253,7 +259,9 @@
 
             "realm": "Realm",
             "application": "Application",
+            "applications": "Applications",
             "applicationBase": "Application Base",
+            "patterns": "Patterns",
 
             "responseAttributes": "Response attributes",
             "subjectAttributes": "Subject attributes",
@@ -265,13 +273,20 @@
             "resources": "Resources",
             "subjects": "Subjects",
             "environments": "Environments",
+            "resourceTypes": "Resource Types",
+            "pattern": "Pattern",
 
             "noRealms": "There are no selected realms...",
             "noActions": "There are no selected actions...",
             "noResources": "There are no selected resources...",
 
+            "noResourceTypes": "There are no selected resources types...",
             "noStaticAttributes": "There are no Static attributes...",
             "noSubjectAttributes": "There are no Subject attributes...",
+            "noApplications": "There are no selected applications...",
+            "noPatterns": "Patterns are not specified...",
+            "noResourceTypesAvailable": "There are no available resource types...",
+            "noApplicationsAvailable": "There are no available applications...",
 
             "viewAllApplications": "View all Applications inside",
             "topLevelRealm": "Top Level Realm",
@@ -315,6 +330,11 @@
             }
         },
 
+        "stripedList": {
+            "filterPlaceholder": "Select or search for available items",
+            "noItems": "There are no items ..."
+        },
+
         "documentation": {
             "tooltip": "Click to read more (opens in new tab)"
         },
@@ -332,7 +352,7 @@
             "title": "Create Application",
             "description": "To configure an Application, begin with Step 1 and progress through to Step 3. Modifications can be made after the Application has been created.",
             "step1": "Step 1: Name the Application",
-            "step2": "Step 2: Define Resource Patterns",
+            "step2": "Step 2: Specify Resource Types",
             "step3": "Step 3: Review Configuration and Finish",
             "viewPolicies": "View Policies"
         },
@@ -356,7 +376,11 @@
             "step7": "Step 7: Review Configuration and Finish",
             "deleteLogical": "Deleting will also remove any child objects",
             "manageRulesDescription": "To define rules, click the Condition or Logical buttons above, enter the relevant options, and then drag the block into place in the rule set above. Each block can be configured both before and after is has been moved. Only rules inside the rule set section will be included in the created policy. To edit a Condition, click the pencil icon, or double-click the item.",
-            "logical": "Logical"
+            "logical": "Logical",
+            "selectResourceTypeHelper": "Select one of the available Resource Types",
+            "selectResourceType" : "Select Resource Type",
+            "noResourceTypeNoActions": "No actions can be selected until Resource Type is defined",
+            "selectPattern": "Select a pattern from the list below"
         },
 
         "manageReferrals": {
@@ -380,7 +404,30 @@
 
         },
 
+        "manageResourceTypes": {
+            "title": "Resource Types",
+            "add":"Add New Resource Type"
+        },
+
+        "editResourceType": {
+            "edit": "Edit Resource Type",
+            "create": "Create Resource Type",
+            "step1": "Step 1: Name the Resource Type",
+            "step2": "Step 2: Specify Patterns and Actions",
+            "step3": "Step 3: Review Configuration and Finish",
+            "addActions": "Specify actions along with their default states",
+            "specifyPatterns": "Specify patterns",
+            "addNewPattern": "Add new pattern"
+        },
+
+        "resourceTypes": {
+            "addResourceTypes": "Use the drop down list or start typing to add Resource Types",
+            "availableResourceTypes": "Available Resource Types",
+            "selectedResourceTypes": "Selected Resource Types"
+        },
+
         "actions": {
+            "addNew": "Add new action",
             "allow": "Allow",
             "deny": "Deny",
             "allowed": "Allowed",
@@ -388,7 +435,8 @@
         },
 
         "responseAttributes": {
-            "subjectAttributesDescription": "Use the drop down list or start typing to search for Subject attributes.",
+            "addStaticAttributes": "Add Static attributes",
+            "subjectAttributesDescription": "Use the drop down list or start typing to search for Subject attributes",
             "subjectAttributesPlaceholder": "Select or search for Subject attributes"
         },
 
@@ -401,6 +449,7 @@
             "applicationDescription": "Review the Application configuration, and then click Finish to save.",
             "policyDescription": "Review the Policy configuration, and then click Finish to save.",
             "referralDescription": "Review the Referral configuration, and then click Finish to save.",
+            "resourceTypeDescription": "Review the Resource Type configuration, and then click Finish to save.",
             "advancedFalse": "Switch to <a href='#' id='toggleAdvanced'>maximized</a> view.",
             "advancedTrue": "Switch to <a href='#' id='toggleAdvanced'>minimized</a> view."
         },
@@ -548,6 +597,7 @@
 
             "ipHelper": "Enter at least one of Start IP, End IP or DNS Name.<br>To match a single IP, enter it in either Start IP or End IP. Start IP must be less than or equal to End IP.<br>DNS Name is an explicit match, or you can use a wildcard in the lowest sub-domain.",
             "legacyFormat": "This condition is in a legacy format, and should be replaced.",
+            "nothingSelected": "Nothing selected",
             "attributes": {
                 "object": "key:value[,value2,...]"
             }

@@ -28,12 +28,12 @@
 
 /*global window, define, $, _, document, console */
 
-define("org/forgerock/openam/ui/policy/policies/ActionsView", [
+define("org/forgerock/openam/ui/policy/common/ActionsView", [
     "org/forgerock/commons/ui/common/main/AbstractView"
 ], function (AbstractView) {
     var ActionsView = AbstractView.extend({
         element: "#actions",
-        template: "templates/policy/policies/ActionsTemplate.html",
+        template: "templates/policy/common/ActionsTemplate.html",
         noBaseTemplate: true,
         events: {
             'click .striped-list li': 'toggleAction',

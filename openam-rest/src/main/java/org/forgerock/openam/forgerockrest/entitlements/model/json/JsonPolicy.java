@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -38,7 +38,7 @@ import org.forgerock.util.Reject;
  * @since 12.0.0
  */
 @JsonPropertyOrder({
-        "name", "active", "description", "entitlement", "subject", "condition",
+        "name", "active", "description", "entitlement", "subject", "condition", "resourceTypeUuid",
         "resourceAttributes", "lastModifiedBy", "lastModifiedDate", "createdBy", "creationDate"
 })
 public final class JsonPolicy {
@@ -242,6 +242,25 @@ public final class JsonPolicy {
      */
     public void setSubject(EntitlementSubject subject) throws EntitlementException {
         privilege.setSubject(subject);
+    }
+
+    /**
+     * Sets the associated resource type uuid.
+     *
+     * @param resourceTypeUuid
+     *         The associated resource type uuid.
+     */
+    public void setResourceTypeUuid(final String resourceTypeUuid) {
+        privilege.setResourceTypeUuid(resourceTypeUuid);
+    }
+
+    /**
+     * Retrieves the associated resource type uuid.
+     *
+     * @return the associated resource type uuid.
+     */
+    public String getResourceTypeUuid() {
+        return privilege.getResourceTypeUuid();
     }
 
     /**

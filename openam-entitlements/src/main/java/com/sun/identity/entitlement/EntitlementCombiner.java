@@ -24,7 +24,7 @@
  *
  * $Id: EntitlementCombiner.java,v 1.4 2009/12/07 19:46:45 veiming Exp $
  *
- * Portions copyright 2010-2014 ForgeRock AS.
+ * Portions copyright 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -90,22 +90,11 @@ public abstract class EntitlementCombiner {
     public void init(String normalisedResourceName, String requestedResourceName, Set<String> actions,
                      boolean isRecursive, Application application) throws EntitlementException {
         this.isRecursive = isRecursive;
-        this.actions = new HashSet<String>();
+        this.actions = new HashSet<String>(actions);
 
         rootE = new Entitlement(application.getName(), normalisedResourceName, Collections.EMPTY_MAP);
         rootE.setRequestedResourceName(requestedResourceName);
         resourceComparator = application.getResourceComparator();
-
-        if (!isRecursive) { // single level
-            if (actions != null && !actions.isEmpty()) {
-                this.actions.addAll(actions);
-            } else {
-                this.actions.addAll(application.getActions().keySet());
-            }
-        } else {
-            this.actions.addAll(application.getActions().keySet());
-        }
-
         results.add(rootE);
     }
 

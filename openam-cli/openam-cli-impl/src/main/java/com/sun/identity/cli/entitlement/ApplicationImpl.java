@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ApplicationImpl.java,v 1.2 2009/09/25 05:52:53 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.cli.entitlement;
@@ -50,8 +52,7 @@ public class ApplicationImpl extends AuthenticatedCommand {
     public static final String PARAM_APPL_NAME = "name";
     public static final String PARAM_APPL_NAMES = "names";
     public static final String ATTR_APPLICATIONTYPE = "applicationType";
-    public static final String ATTR_ACTIONS = "actions";
-    public static final String ATTR_RESOURCES = "resources";
+    public static final String ATTR_RESOURCE_TYPE_UUIDS = "resourceTypeUuids";
     public static final String ATTR_SUBJECTS = "subjects";
     public static final String ATTR_CONDITIONS = "conditions";
     public static final String ATTR_ENTITLEMENT_COMBINER = 
@@ -112,19 +113,14 @@ public class ApplicationImpl extends AuthenticatedCommand {
         Map<String, Set<String>> attributeValues,
         boolean bCreate) throws CLIException {
 
-        Map<String, Boolean> actions = getActions(attributeValues);
-        if (actions != null) {
-            appl.setActions(actions);
-        }
-
-        Set<String> resources = attributeValues.get(ATTR_RESOURCES);
-        if ((resources == null) || resources.isEmpty()) {
+        Set<String> resourceTypeUuids = attributeValues.get(ATTR_RESOURCE_TYPE_UUIDS);
+        if ((resourceTypeUuids == null) || resourceTypeUuids.isEmpty()) {
             if (bCreate) {
-                throw new CLIException(getResourceString("resources-required"),
+                throw new CLIException(getResourceString("resourceTypeUuids-required"),
                     ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
         } else {
-            appl.setResources(resources);
+            appl.addAllResourceTypeUuids(resourceTypeUuids);
         }
 
         Set<String> subjects = attributeValues.get(ATTR_SUBJECTS);
@@ -202,27 +198,6 @@ public class ApplicationImpl extends AuthenticatedCommand {
                     ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
         }
-    }
-
-    private Map<String, Boolean> getActions(
-        Map<String, Set<String>> attributeValues) {
-        Set<String> actions = attributeValues.get(ATTR_ACTIONS);
-        if ((actions == null) || actions.isEmpty()) {
-            return null;
-        }
-        Map<String, Boolean> results = new HashMap<String, Boolean>();
-        for (String action : actions) {
-            action = action.trim();
-            int idx = action.indexOf('=');
-            if (idx == -1) {
-                results.put(action, true);
-            } else {
-                String a = action.substring(0, idx);
-                String v = action.substring(idx+1);
-                results.put(a, Boolean.parseBoolean(v));
-            }
-        }
-        return results;
     }
 
     private Class getEntitlementCombiner(

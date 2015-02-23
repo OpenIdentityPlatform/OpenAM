@@ -23,9 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ReferredApplication.java,v 1.1 2009/11/19 01:02:03 veiming Exp $
- */
-
-/*
+ *
  * Portions Copyrighted 2015 ForgeRock AS
  */
 
@@ -39,6 +37,7 @@ import java.util.Set;
  *
  * @author dennis
  */
+@Deprecated
 public class ReferredApplication extends Application {
     private Map<String, Integer> mapResourcesToCount;
 
@@ -57,10 +56,8 @@ public class ReferredApplication extends Application {
         for (String r : res) {
             this.mapResourcesToCount.put(r, 1);
         }
-        super.setResources(mapResourcesToCount.keySet());
     }
 
-    @Override
     public void addResources(Set<String> res) {
         for (String r : res) {
             Integer cnt = mapResourcesToCount.get(r);
@@ -71,10 +68,8 @@ public class ReferredApplication extends Application {
                 mapResourcesToCount.put(r, 1);
             }
         }
-        super.setResources(mapResourcesToCount.keySet());
     }
 
-    @Override
     public void removeResources(Set<String> res) {
         for (String r : res) {
             Integer cnt = mapResourcesToCount.get(r);
@@ -87,7 +82,6 @@ public class ReferredApplication extends Application {
                 }
             }
         }
-        super.setResources(mapResourcesToCount.keySet());
     }
 
     public boolean hasResources() {
@@ -103,7 +97,6 @@ public class ReferredApplication extends Application {
     public Application clone() {
         final ReferredApplication clone = new ReferredApplication();
         cloneAppl(clone);
-        mapResourcesToCount(getResources());
         return clone;
     }
 }

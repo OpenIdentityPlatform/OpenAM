@@ -48,7 +48,7 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
     obj.serviceCall = function (args) {
         var realm = conf.globalData.auth.realm;
         if (realm !== "/" && // prevents urls like /openam/json//applicationtypes
-            _.find(["/applications", "/policies", "/referrals", "/users", "/groups", "/subjectattributes"], function (w) { // the only endpoints that are currently realm "aware"
+            _.find(["/applications", "/policies", "/referrals", "/users", "/groups", "/subjectattributes", "/resourcetypes"], function (w) { // the only endpoints that are currently realm "aware"
                 return args.url.indexOf(w) === 0;
             })) {
             args.url = realm + args.url;
@@ -222,10 +222,53 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
         var subrealm = conf.globalData.auth.realm !== "/" ? conf.globalData.auth.realm : "";
         return obj.serviceCall({
             serviceUrl: constants.host + "/" + constants.context,
-            url: "/xacml" + subrealm +"/policies",
+            url: "/xacml" + subrealm + "/policies",
             type: "POST",
             data: data,
             errorsHandlers: obj.ERROR_HANDLERS
+        });
+    };
+
+    obj.getResourceType = function (uuid) {
+        return obj.serviceCall({
+            url: "/resourcetypes/" + uuid,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+        });
+    };
+
+    obj.createResourceType = function (data) {
+        return obj.serviceCall({
+            url: "/resourcetypes?_action=create",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            type: "POST",
+            data: JSON.stringify(data),
+            errorsHandlers: obj.ERROR_HANDLERS
+        });
+    };
+
+    obj.deleteResourceType = function (uuid) {
+        return obj.serviceCall({
+            url: "/resourcetypes/" + uuid,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            type: "DELETE",
+            errorsHandlers: obj.ERROR_HANDLERS
+        });
+    };
+
+    obj.updateResourceType = function (data) {
+        return obj.serviceCall({
+            url: "/resourcetypes/" + data.uuid,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            type: "PUT",
+            data: JSON.stringify(data),
+            errorsHandlers: obj.ERROR_HANDLERS
+        });
+    };
+
+    obj.listResourceTypes = function () {
+        return obj.serviceCall({
+            url: "/resourcetypes?_queryFilter=true",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
     

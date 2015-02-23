@@ -512,7 +512,7 @@ public class UpgradeUtils {
             for (Map.Entry<String, NewSubSchemaWrapper> newSubSchema : ssMod.entrySet()) {
                 addSubSchema(serviceName, newSubSchema.getValue().getSubSchemaName(), serviceSchema, newSubSchema.getValue().getSubSchemaNode());
 
-                if (ssMod.getSubSchema().hasSubSchema()) {
+                if (ssMod.getSubSchema() != null && ssMod.getSubSchema().hasSubSchema()) {
                     ServiceSchema subSchema = null;
 
                     try {

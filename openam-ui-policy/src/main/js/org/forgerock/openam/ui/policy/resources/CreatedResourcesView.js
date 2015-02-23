@@ -28,15 +28,15 @@
 
 /*global window, define, $, _, document, console */
 
-define("org/forgerock/openam/ui/policy/resources/ResourcesListView", [
+define("org/forgerock/openam/ui/policy/resources/CreatedResourcesView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants"
 ], function (AbstractView,eventManager,constants) {
 
-    var ResourcesListView = AbstractView.extend({
+    var CreatedResourcesView = AbstractView.extend({
         element: "#resourcesList",
-        template: "templates/policy/resources/ResourcesListTemplate.html",
+        template: "templates/policy/resources/CreatedResourcesTemplate.html",
         noBaseTemplate: true,
         events: {
             'click .icon-plus': 'addResource',
@@ -75,7 +75,7 @@ define("org/forgerock/openam/ui/policy/resources/ResourcesListView", [
             // This is very simple native validation for supporting browsers for now. 
             // More complexity to come later.
             var self = this;
-                self.valid = true;
+            self.valid = true;
 
             _.find(inputs, function(input){
                 // unsupporting browsers will return undefined not false
@@ -147,5 +147,5 @@ define("org/forgerock/openam/ui/policy/resources/ResourcesListView", [
 
     });
 
-    return new ResourcesListView();
+    return new CreatedResourcesView();
 });

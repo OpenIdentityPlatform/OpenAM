@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DeleteApplicationPrivilege.java,v 1.1 2009/11/10 19:01:03 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.cli.entitlement;
@@ -35,8 +37,11 @@ import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+
 import java.util.List;
 import java.util.logging.Level;
+import javax.inject.Inject;
 import javax.security.auth.Subject;
 
 /**
@@ -45,6 +50,12 @@ import javax.security.auth.Subject;
  */
 public class DeleteApplicationPrivilege extends ApplicationPrivilegeBase {
     public static final String PARAM_NAMES = "names";
+
+
+    @Inject
+    public DeleteApplicationPrivilege(ResourceTypeService resourceTypeService) {
+        super(resourceTypeService);
+    }
 
     /**
      * Services a Commandline Request.

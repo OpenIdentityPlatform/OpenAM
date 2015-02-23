@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ValidateResourceResult.java,v 1.2 2009/11/12 18:37:38 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -63,7 +65,7 @@ public class ValidateResourceResult {
      * @param message Message.
      * @param args Arguments for the message.
      */
-    public ValidateResourceResult(int validCode, String message, Object[] args){
+    public ValidateResourceResult(int validCode, String message, Object ... args){
         this.validCode = validCode;
         this.message = message;
         this.args = args;

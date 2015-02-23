@@ -49,12 +49,15 @@ import com.sun.identity.policy.PolicyEvent;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import javax.inject.Inject;
 import javax.security.auth.Subject;
 
 /**
@@ -89,7 +92,9 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
     /**
      * Creates instance of <code>PolicyPrivilegeManager</code>
      */
-    public PolicyPrivilegeManager() {
+    @Inject
+    public PolicyPrivilegeManager(final ResourceTypeService resourceTypeService) {
+        super(resourceTypeService);
     }
 
     /**
@@ -262,7 +267,6 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
     @Override
     public void modify(String existingName, Privilege privilege) throws EntitlementException {
         validate(privilege);
-        privilege.validateResourceNames(dsameUserSubject, realm);
         updateMetaInfo(existingName, privilege);
 
         try {

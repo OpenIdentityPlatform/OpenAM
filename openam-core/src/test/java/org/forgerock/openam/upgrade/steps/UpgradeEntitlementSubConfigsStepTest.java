@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -66,6 +67,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
     private EntitlementConfiguration entitlementService;
     private PrivilegedAction<SSOToken> adminTokenAction;
     private ConnectionFactory connectionFactory;
+    private ResourceTypeService resourceTypeService;
 
     private Set<ApplicationType> mockTypes;
     private Set<Application> mockApplications;
@@ -100,8 +102,9 @@ public class UpgradeEntitlementSubConfigsStepTest {
         entitlementService = mock(EntitlementConfiguration.class);
         adminTokenAction = mock(PrivilegedAction.class);
         connectionFactory = mock(ConnectionFactory.class);
+        resourceTypeService = mock(ResourceTypeService.class);
         upgradeStep = new SafeUpgradeEntitlementSubConfigsStep(
-                entitlementService, adminTokenAction, connectionFactory);
+                entitlementService, resourceTypeService, adminTokenAction, connectionFactory);
 
         final HashSet<String> conditions = new HashSet<String>();
         conditions.add("condition.entry.1");
@@ -118,7 +121,6 @@ public class UpgradeEntitlementSubConfigsStepTest {
         app = newApplication("application4", type1);
         app.setConditions(conditions);
         app.setSubjects(subjects);
-        app.setResources(resources);
         app.setEntitlementCombinerName(DEFAULT_COMBINER);
     }
 
@@ -142,7 +144,6 @@ public class UpgradeEntitlementSubConfigsStepTest {
 
         verify(entitlementService, atMost(2)).getApplicationTypes();
         verify(entitlementService, times(2)).getApplications();
-        verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
     }
 
     @Test
@@ -165,7 +166,6 @@ public class UpgradeEntitlementSubConfigsStepTest {
         verify(entitlementService, atMost(2)).getApplicationTypes();
         verify(entitlementService, atMost(5)).getApplications();
         verify(entitlementService).storeApplicationType(argThat(new TypeMatch()));
-        verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
     }
 
     @Test
@@ -237,27 +237,6 @@ public class UpgradeEntitlementSubConfigsStepTest {
     }
 
     @Test
-    public void shouldUpdateApplicationResourcePatterns() throws Exception {
-        // Given
-        ApplicationType appType = newType("type4");
-        Application app = newApplication("application4", appType);
-        final Set<String> oldResources = CollectionUtils.asSet("one", "two", "three");
-        final Set<String> newResources = CollectionUtils.asSet("http://*", "https://*"); // test-entitlement.xml
-        app.setResources(oldResources);
-
-        when(entitlementService.getApplicationTypes()).thenReturn(Collections.singleton(appType));
-        when(entitlementService.getApplications()).thenReturn(Collections.singleton(app));
-
-        // When
-        upgradeStep.initialize();
-        upgradeStep.perform();
-
-        // Then
-        assertThat(app.getResources()).isEqualTo(newResources);
-        verify(entitlementService, atLeastOnce()).storeApplication(app);
-    }
-
-    @Test
     public void newApplicationDescriptionNoNewTypesOrApplications() throws UpgradeException, InstantiationException,
             IllegalAccessException, EntitlementException {
         // Both application type 4 and app (application 4) exist, no need to add either.
@@ -280,7 +259,6 @@ public class UpgradeEntitlementSubConfigsStepTest {
         verify(entitlementService, atMost(2)).getApplicationTypes();
         verify(entitlementService, times(3)).getApplications();
         verify(entitlementService, atLeastOnce()).storeApplication(argThat(new ApplicationMatch()));
-        verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
     }
 
     // Used to match the application as defined in the test xml.
@@ -292,8 +270,6 @@ public class UpgradeEntitlementSubConfigsStepTest {
             final Application application = (Application)argument;
             matches &= "application4".equals(application.getName());
             matches &= "type1".equals(application.getApplicationType().getName());
-            matches &= collectionMatch(
-                    Arrays.asList("http://*", "https://*"), application.getResources());
             matches &= collectionMatch(
                     Arrays.asList("subject.entry.1", "subject.entry.2"), application.getSubjects());
             matches &= collectionMatch(
@@ -396,9 +372,10 @@ public class UpgradeEntitlementSubConfigsStepTest {
     private static final class SafeUpgradeEntitlementSubConfigsStep extends UpgradeEntitlementSubConfigsStep {
 
         public SafeUpgradeEntitlementSubConfigsStep(final EntitlementConfiguration entitlementService,
+                                                    final ResourceTypeService resourceTypeService,
                                                     final PrivilegedAction<SSOToken> adminTokenAction,
                                                     final ConnectionFactory connectionFactory) {
-            super(entitlementService, adminTokenAction, connectionFactory);
+            super(entitlementService, resourceTypeService, adminTokenAction, connectionFactory);
         }
 
         @Override

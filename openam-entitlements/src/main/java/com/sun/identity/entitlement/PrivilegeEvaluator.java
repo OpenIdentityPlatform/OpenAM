@@ -41,8 +41,10 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.security.auth.Subject;
+
 import org.forgerock.openam.entitlement.PrivilegeEvaluatorContext;
 import org.forgerock.openam.session.util.AppTokenHandler;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * This class evaluates entitlements of a subject for a given resource
@@ -73,7 +75,6 @@ class PrivilegeEvaluator {
     private static final int TASKS_PER_THREAD = 5;
 
     private static final IThreadPool threadPool;
-    private static final IThreadPool referralThreadPool;
     private static final boolean isMultiThreaded;
 
     static {
@@ -94,7 +95,6 @@ class PrivilegeEvaluator {
         }
         isMultiThreaded = evalThreadSize > 1;
         threadPool = isMultiThreaded ? new EntitlementThreadPool(evalThreadSize) : new SequentialThreadPool();
-        referralThreadPool = isMultiThreaded ? new EntitlementThreadPool(evalThreadSize) : new SequentialThreadPool();
     }
 
     /**
@@ -130,16 +130,12 @@ class PrivilegeEvaluator {
         this.normalisedResourceName = normalisedResourceName;
         this.requestedResourceName = requestedResourceName;
         this.envParameters = envParameters;
-
-        Application appl = getApplication();
-        
         this.actionNames = new HashSet<String>();
-        if ((actions == null) || actions.isEmpty()) {
-            this.actionNames.addAll(appl.getActions().keySet());
-        } else {
+        if (CollectionUtils.isNotEmpty(actions)) {
             this.actionNames.addAll(actions);
         }
 
+        Application appl = getApplication();
         entitlementCombiner = appl.getEntitlementCombiner();
         entitlementCombiner.init(realm, applicationName, normalisedResourceName, requestedResourceName,
                 this.actionNames, recursive);
@@ -250,91 +246,91 @@ class PrivilegeEvaluator {
 
 
     }
-    
-    private List<Entitlement> evaluate(String realm)
-        throws EntitlementException {
 
-        // Subject index
-        SubjectAttributesManager sam = SubjectAttributesManager.getInstance(
-            adminSubject, realm);
+    /**
+     * Responsible for the core evaluation of policies associated with the request resource.
+     *
+     * @param realm
+     *         the evaluation realm
+     *
+     * @return a list of applicable entitlements
+     *
+     * @throws EntitlementException
+     */
+    private List<Entitlement> evaluate(String realm) throws EntitlementException {
+        final Debug debug = PrivilegeManager.debug;
 
-        // Search for policies
-        PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
-            adminSubject, realm);
-        Iterator<IPrivilege> i = pis.search(realm, indexes,
-            sam.getSubjectSearchFilter(subject, applicationName), recursive);
-
-        // Submit the privileges for evaluation
-        // First collect tasks to be evaluated locally
-        Set<IPrivilege> localPrivileges = new HashSet<IPrivilege>(2 * TASKS_PER_THREAD);
-        Debug debug = PrivilegeManager.debug;
+        // Search for relevant policies.
+        final SubjectAttributesManager sam = SubjectAttributesManager.getInstance(adminSubject, realm);
+        final Set<String> subjectIndexes = sam.getSubjectSearchFilter(subject, applicationName);
+        final PrivilegeIndexStore indexStore = PrivilegeIndexStore.getInstance(adminSubject, realm);
+        final Iterator<IPrivilege> policyIterator = indexStore.search(realm, indexes, subjectIndexes, recursive);
 
         int totalCount = 0;
-        while (totalCount != TASKS_PER_THREAD) {
-            if (i.hasNext()) {
-                IPrivilege p = i.next();
-                if (debug.messageEnabled()) {
-                    debug.message("[PolicyEval] PolicyEvaluator.evaluate");
-                    debug.message("[PolicyEval] search result: privilege=" +
-                        p.getName());
-                }
-                localPrivileges.add(p);
-                totalCount++;
-            } else {
-                break;
-            }
-        }
-        // Submit additional privilges to be executed by worker threads
-        Set<IPrivilege> privileges = null;
-        Set<IPrivilege> referralPrivileges = null;
-        boolean tasksSubmitted = false;
-        PrivilegeEvaluatorContext ctx =
-                new PrivilegeEvaluatorContext(realm, normalisedResourceName, applicationName);
-        Object appToken = AppTokenHandler.getAndClear();
+        IPrivilege policy;
 
-        while (true) {
-            if (!i.hasNext()) {
-                break;
+        // First collect policies to be evaluated locally.
+        final Set<IPrivilege> localBatch = new HashSet<IPrivilege>(2 * TASKS_PER_THREAD);
+        while (totalCount < TASKS_PER_THREAD && policyIterator.hasNext()) {
+            policy = policyIterator.next();
+
+            if (policy instanceof ReferralPrivilege) {
+                // We want to ignore referrals - deprecated.
+                continue;
             }
-            if (privileges == null) {
-                privileges = new HashSet<IPrivilege>(2 * TASKS_PER_THREAD);
-                tasksSubmitted = true;
-            }
-            if (referralPrivileges == null) {
-                referralPrivileges = new HashSet<IPrivilege>(2 * TASKS_PER_THREAD);
-                tasksSubmitted = true;
-            }
-            IPrivilege p = i.next();
+
             if (debug.messageEnabled()) {
                 debug.message("[PolicyEval] PolicyEvaluator.evaluate");
-                debug.message("[PolicyEval] search result: privilege=" +
-                    p.getName());
+                debug.message("[PolicyEval] search result: privilege=" + policy.getName());
             }
-            if (p instanceof ReferralPrivilege) {
-                referralPrivileges.add(p);
-            } else {
-                privileges.add(p);
-            }
-            totalCount++;
-            if (!privileges.isEmpty() && (privileges.size() % TASKS_PER_THREAD) == 0) {
-                threadPool.submit(new PrivilegeTask(this, privileges, isMultiThreaded, appToken, ctx));
-                privileges.clear();
-            }
-            if (!referralPrivileges.isEmpty() && (referralPrivileges.size() % TASKS_PER_THREAD) == 0) {
-                referralThreadPool.submit(new PrivilegeTask(this, referralPrivileges, isMultiThreaded, appToken, ctx));
-                referralPrivileges.clear();
-            }
-        }
-        if (privileges != null && !privileges.isEmpty()) {
-            threadPool.submit(new PrivilegeTask(this, privileges, isMultiThreaded, appToken, ctx));
-        }
-        if (referralPrivileges != null && !referralPrivileges.isEmpty()) {
-            referralThreadPool.submit(new PrivilegeTask(this, referralPrivileges, isMultiThreaded, appToken, ctx));
-        }
-        // IPrivilege privileges locally
-        (new PrivilegeTask(this, localPrivileges, tasksSubmitted, appToken, ctx)).run();
 
-        // Wait for submitted threads to complete evaluation
+            localBatch.add(policy);
+            totalCount++;
+        }
+
+        // Define an evaluation context.
+        final PrivilegeEvaluatorContext context =
+                new PrivilegeEvaluatorContext(realm, normalisedResourceName, applicationName);
+        final Object appToken = AppTokenHandler.getAndClear();
+
+        // Submit additional policies to be executed by worker threads.
+        final Set<IPrivilege> threadBatch = new HashSet<IPrivilege>(2 * TASKS_PER_THREAD);
+        boolean tasksSubmitted = false;
+
+        while (policyIterator.hasNext()) {
+            tasksSubmitted = true;
+            policy = policyIterator.next();
+
+            if (policy instanceof ReferralPrivilege) {
+                // We want to ignore referrals - deprecated.
+                continue;
+            }
+
+            if (debug.messageEnabled()) {
+                debug.message("[PolicyEval] PolicyEvaluator.evaluate");
+                debug.message("[PolicyEval] search result: privilege=" + policy.getName());
+            }
+
+            threadBatch.add(policy);
+            totalCount++;
+
+            if (threadBatch.size() == TASKS_PER_THREAD) {
+                final Set<IPrivilege> copiedBatch = new HashSet<IPrivilege>(threadBatch);
+                threadPool.submit(new PrivilegeTask(this, copiedBatch, isMultiThreaded, appToken, context));
+                threadBatch.clear();
+            }
+        }
+
+        if (!threadBatch.isEmpty()) {
+            // Submit any remaining policies.
+            threadPool.submit(new PrivilegeTask(this, threadBatch, isMultiThreaded, appToken, context));
+        }
+
+        // Submit the local policies.
+        final Runnable localTask = new PrivilegeTask(this, localBatch, tasksSubmitted, appToken, context);
+        localTask.run();
+
+        // Wait for submitted threads to complete evaluation.
         if (tasksSubmitted) {
             if (isMultiThreaded) {
                 receiveEvalResults(totalCount);
@@ -354,11 +350,11 @@ class PrivilegeEvaluator {
         }
 
         if (eException != null) {
+            // Throw caught exception.
             throw eException;
         }
 
-        List<Entitlement> ents = entitlementCombiner.getResults();
-        return ents;
+        return entitlementCombiner.getResults();
     }
 
     private void receiveEvalResults(int totalCount) {
@@ -400,16 +396,15 @@ class PrivilegeEvaluator {
 
     class PrivilegeTask implements Runnable {
         final PrivilegeEvaluator parent;
-        private Set<IPrivilege> privileges;
-        private boolean isThreaded;
-        private Object context;
-        private PrivilegeEvaluatorContext ctx;
+        private final Set<IPrivilege> privileges;
+        private final boolean isThreaded;
+        private final Object context;
+        private final PrivilegeEvaluatorContext ctx;
 
         PrivilegeTask(PrivilegeEvaluator parent, Set<IPrivilege> privileges,
             boolean isThreaded, Object context, PrivilegeEvaluatorContext ctx) {
             this.parent = parent;
-            this.privileges = new HashSet<IPrivilege>(privileges.size() *2);
-            this.privileges.addAll(privileges);
+            this.privileges = privileges;
             this.isThreaded = isThreaded;
             this.context = context;
             this.ctx = ctx;

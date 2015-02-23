@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.cli.entitlement;
@@ -46,6 +46,8 @@ import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdType;
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -77,8 +79,7 @@ public abstract class ApplicationPrivilegeBase extends AuthenticatedCommand {
     public static final String PARAM_SUBJECT_USER = "User";
     public static final String PARAM_SUBJECT_GROUP = "Group";
 
-
-    private static Map<String, ApplicationPrivilege.PossibleAction> 
+    private static Map<String, ApplicationPrivilege.PossibleAction>
         mapActionsToEnum = new HashMap<String,
         ApplicationPrivilege.PossibleAction>();
     private static Map<ApplicationPrivilege.PossibleAction, String>
@@ -105,6 +106,12 @@ public abstract class ApplicationPrivilegeBase extends AuthenticatedCommand {
             ApplicationPrivilege.PossibleAction.READ_MODIFY_DELEGATE,
             PARAM_ACTION_ALL);
 
+    }
+
+    private final ResourceTypeService resourceTypeService;
+
+    public ApplicationPrivilegeBase(final ResourceTypeService resourceTypeService) {
+        this.resourceTypeService = resourceTypeService;
     }
 
     /**
@@ -172,7 +179,7 @@ public abstract class ApplicationPrivilegeBase extends AuthenticatedCommand {
         
         // if resources is not provided, delegate all resources
         if ((resources == null) || resources.isEmpty()) {
-            delResources.addAll(application.getResources());
+            delResources.addAll(getAllBaseResources(subject, realm, application));
         } else {
             delResources.addAll(resources);
         }
@@ -182,6 +189,38 @@ public abstract class ApplicationPrivilegeBase extends AuthenticatedCommand {
         return map;
     }
 
+    /**
+     * Given an application retrieves all base resources associated via the applications resource types.
+     *
+     * @param subject
+     *         the calling subject
+     * @param realm
+     *         the realm that the application resides
+     * @param application
+     *         the application instance
+     *
+     * @return set of all base resources associated with the application
+     *
+     * @throws EntitlementException
+     *         should an error occur reading the base resources
+     */
+    private Set<String> getAllBaseResources(final Subject subject, final String realm, final Application application)
+            throws EntitlementException {
+
+        final Set<String> baseResources = new HashSet<String>();
+
+        for (String resourceTypeUuid : application.getResourceTypeUuids()) {
+            final ResourceType resourceType = resourceTypeService.getResourceType(subject, realm, resourceTypeUuid);
+
+            if (resourceType == null) {
+                throw new EntitlementException(EntitlementException.NO_SUCH_RESOURCE_TYPE, resourceTypeUuid, realm);
+            }
+
+            baseResources.addAll(resourceType.getPatterns());
+        }
+
+        return baseResources;
+    }
 
     private boolean isUserSubject() throws CLIException {
         String subjectType = getStringOptionValue(PARAM_SUBJECT_TYPE);

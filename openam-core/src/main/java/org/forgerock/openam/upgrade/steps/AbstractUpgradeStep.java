@@ -21,7 +21,9 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.security.auth.Subject;
 
+import com.sun.identity.entitlement.opensso.SubjectUtils;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -62,6 +64,19 @@ public abstract class AbstractUpgradeStep implements UpgradeStep {
      */
     protected final SSOToken getAdminToken() {
         return AccessController.doPrivileged(adminTokenAction);
+    }
+
+    /**
+     * Return an admin subject built out of the admin token.
+     *
+     * @return an admin subject.
+     */
+    protected final Subject getAdminSubject() {
+        final SSOToken adminToken = getAdminToken();
+        if (adminToken == null) {
+            return null;
+        }
+        return SubjectUtils.createSubject(adminToken);
     }
 
     /**

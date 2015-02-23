@@ -24,7 +24,7 @@
  *
  * $Id: Application.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  *
- * Portions copyright 2013-2014 ForgeRock, Inc.
+ * Portions copyright 2013-2015 ForgeRock, Inc.
  */
 package com.sun.identity.entitlement;
 
@@ -35,9 +35,7 @@ import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.util.Reject;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -90,10 +88,9 @@ public class Application implements Cloneable {
     private String name;
     private String description;
     private ApplicationType applicationType;
-    private Map<String, Boolean> actions = new HashMap<String, Boolean>();
     private Set<String> conditions;
     private Set<String> subjects;
-    private Set<String> resources;
+    private final Set<String> resourceTypeUuids;
 
     private Class entitlementCombiner;
     private Class searchIndex;
@@ -119,6 +116,7 @@ public class Application implements Cloneable {
      */
     Application(EntitlementRegistry registry) {
         this.registry = registry;
+        resourceTypeUuids = new HashSet<String>();
     }
 
     /**
@@ -178,11 +176,6 @@ public class Application implements Cloneable {
         clone.description = description;
         clone.applicationType = applicationType;
 
-        if (actions != null) {
-            clone.actions = new HashMap<String, Boolean>();
-            clone.actions.putAll(actions);
-        }
-
         if (conditions != null) {
             clone.conditions = new HashSet<String>();
             clone.conditions.addAll(conditions);
@@ -193,10 +186,7 @@ public class Application implements Cloneable {
             clone.subjects.addAll(subjects);
         }
 
-        if (resources != null) {
-            clone.resources = new HashSet<String>();
-            clone.resources.addAll(resources);
-        }
+        clone.addAllResourceTypeUuids(resourceTypeUuids);
 
         clone.entitlementCombiner = entitlementCombiner;
         clone.searchIndex = searchIndex;
@@ -215,19 +205,6 @@ public class Application implements Cloneable {
         clone.creationDate = creationDate;
         clone.lastModifiedBy = lastModifiedBy;
         clone.lastModifiedDate = lastModifiedDate;
-    }
-
-    /**
-     * Returns a set of supported actions and its default value.
-     *
-     * @return set of supported actions and its default value.
-     */
-    public Map<String, Boolean> getActions() {
-        Map<String, Boolean> results = new HashMap<String, Boolean>();
-        if (actions != null) {
-            results.putAll(actions);
-        }
-        return results;
     }
 
     /**
@@ -296,19 +273,6 @@ public class Application implements Cloneable {
     }
 
     /**
-     * Sets supported action names and its default values.
-     *
-     * @param actions Set of supported action names and its default values.
-     */
-    public void setActions(Map<String, Boolean> actions) {
-        this.actions.clear();
-
-        if (actions != null) {
-            this.actions.putAll(actions);
-        }
-    }
-
-    /**
      * Sets supported condition class names.
      *
      * @param conditions Supported condition class names.
@@ -367,42 +331,6 @@ public class Application implements Cloneable {
     }
 
     /**
-     * Sets resource names.
-     *
-     * @param resources resource names
-     */
-    public void setResources(Set<String> resources) {
-        this.resources = new HashSet<String>();
-        if (resources != null) {
-            this.resources.addAll(resources);
-        }
-    }
-
-    /**
-     * Adds resource names.
-     *
-     * @param resources resource names to be added.
-     */
-    public void addResources(Set<String> resources) {
-        if (this.resources == null) {
-            this.resources = new HashSet<String>();
-        }
-        this.resources.addAll(resources);
-
-    }
-
-    /**
-     * Removes resource names.
-     *
-     * @param resources resource names to be removed.
-     */
-    public void removeResources(Set<String> resources) {
-        if (this.resources != null) {
-            this.resources.removeAll(resources);
-        }
-    }
-
-    /**
      * Sets entitlement combiner.
      *
      * @param entitlementCombiner entitlement combiner.
@@ -438,12 +366,22 @@ public class Application implements Cloneable {
     }
 
     /**
-     * Returns set of resource names.
+     * Retrieves the resource type UUIDs associated with the application.
      *
-     * @return set of resource names.
+     * @return the set of associated resource type UUIDs
      */
-    public Set<String> getResources() {
-        return resources;
+    public Set<String> getResourceTypeUuids() {
+        return resourceTypeUuids;
+    }
+
+    /**
+     * Adds the passed set of resource type UUIDs to the application.
+     *
+     * @param resourceTypeUuids
+     *         the set of resource type UUIDs
+     */
+    public void addAllResourceTypeUuids(final Set<String> resourceTypeUuids) {
+        this.resourceTypeUuids.addAll(resourceTypeUuids);
     }
 
     /**
@@ -530,33 +468,6 @@ public class Application implements Cloneable {
     }
 
     /**
-     * Adds a new action with its default value.
-     *
-     * @param name Action name.
-     * @param val Default value.
-     * @throws EntitlementException if action cannot be added.
-     */
-    public void addAction(String name, boolean val)
-        throws EntitlementException {
-        if (actions == null) {
-            actions = new HashMap<String, Boolean>();
-        }
-        actions.put(name, val);
-    }
-
-    /**
-     * Removes an action.
-     *
-     * @param name Action name.
-     */
-    public void removeAction(String name)
-        throws EntitlementException {
-        if (actions != null) {
-            actions.remove(name);
-        }
-    }
-
-    /**
      * Sets attribute names.
      *
      * @param names Attribute names.
@@ -607,76 +518,6 @@ public class Application implements Cloneable {
      */
     public Set<String> getAttributeNames() {
         return attributeNames;
-    }
-
-    /**
-     * Returns the results of validating resource name.
-     *
-     * @param resource Resource to be validated.
-     * @return the results of validating resource name.
-     */
-    public ValidateResourceResult validateResourceName(String resource) {
-        ResourceName resComp = getResourceComparator();
-        boolean match = false;
-
-        try {
-            String res = resComp.canonicalize(resource);
-
-            if ((resources != null) && !resources.isEmpty()) {
-                if (resComp instanceof RegExResourceName) {
-                    for (String r : resources) {
-                        ResourceMatch rm = resComp.compare(r, res, true);
-                        if (rm.equals(ResourceMatch.EXACT_MATCH) ||
-                            rm.equals(ResourceMatch.WILDCARD_MATCH) ||
-                            rm.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
-                            match = true;
-                            break;
-                        }
-                    }
-                } else {
-                    for (String r : resources) {
-                        ResourceMatch rm = resComp.compare(resComp.canonicalize(
-                            r),
-                            res, false);
-                        if (rm.equals(ResourceMatch.EXACT_MATCH) ||
-                            rm.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
-                            match = true;
-                            break;
-                        } else {
-                            rm = resComp.compare(res, resComp.canonicalize(r),
-                                true);
-                            if (rm.equals(ResourceMatch.WILDCARD_MATCH)) {
-                                match = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (EntitlementException ex) {
-            Object[] args = {resource};
-            return new ValidateResourceResult(
-                ValidateResourceResult.VALID_CODE_INVALID,
-                "resource.validation.invalid.resource", args);
-        }
-        
-        if (!match) {
-            Object[] args = {resource};
-            return new ValidateResourceResult(
-                ValidateResourceResult.VALID_CODE_DOES_NOT_MATCH_VALID_RESOURCES,
-                "resource.validation.does.not.match.valid.resources", args);
-        }
-
-        return new ValidateResourceResult(
-            ValidateResourceResult.VALID_CODE_VALID, "");
-    }
-
-    public Application refers(String realm, Set<String> res) {
-        Application clone = clone();
-        clone.realm = realm;
-        clone.resources.clear();
-        clone.resources.addAll(res);
-        return clone;
     }
 
     /**

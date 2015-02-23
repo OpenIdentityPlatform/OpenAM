@@ -91,6 +91,7 @@ public class EntitlementService extends EntitlementConfiguration {
     public static final String CONFIG_RESOURCES = "resources";
     public static final String CONFIG_CONDITIONS = "conditions";
     public static final String CONFIG_SUBJECTS = "subjects";
+    public static final String CONFIG_RESOURCE_TYPE_UUIDS = "resourceTypeUuids";
     public static final String CONFIG_ENTITLEMENT_COMBINER = "entitlementCombiner";
     public static final String CONFIG_SEARCH_INDEX_IMPL = "searchIndexImpl";
     public static final String CONFIG_SAVE_INDEX_IMPL = "saveIndexImpl";
@@ -347,61 +348,8 @@ public class EntitlementService extends EntitlementConfiguration {
      * @return a set of registered applications.
      */
     public Set<Application> getApplications() {
-        boolean hasWebAgent = false;
-
-        Set<Application> results = getApplications(realm);
-        for (Application app : results) {
-            if (!hasWebAgent) {
-                hasWebAgent = app.getName().equals(
-                    ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
-            }
-        }
-
         SSOToken token = getSSOToken();
-        if (OpenSSOIndexStore.isOrgAliasMappingResourceEnabled(token) &&
-            !hasWebAgent) {
-            Set<Application> rootApps = getApplications("/");
-            for (Application a : rootApps) {
-                if (a.getName().equals(
-                    ApplicationTypeManager.URL_APPLICATION_TYPE_NAME)) {
-                    try {
-                        Set<String> resources =
-                            OpenSSOIndexStore.getOrgAliasMappingResources(
-                            realm,
-                            ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
-                        Application clone = a.refers(realm, resources);
-                        results.add(clone);
-
-                    } catch (SMSException ex) {
-                        PrivilegeManager.debug.error(
-                            "EntitlementService.getApplications", ex);
-                    }
-                    break;
-                }
-            }
-        }
-        return results;
-    }
-
-    private Set<Application> getApplications(String curRealm) {
-        SSOToken token = getSSOToken();
-
-        Set<Application> results = getRawApplications(token, curRealm);
-        for (Application app : results) {
-            Set<String> resources = app.getResources();
-            Set<String> res = new HashSet<String>();
-
-            for (String r : resources) {
-                int idx = r.indexOf('\t');
-                if (idx != -1) {
-                    res.add(r.substring(idx+1));
-                } else {
-                    res.add(r);
-                }
-            }
-            app.setResources(res);
-        }
-        return results;
+        return getRawApplications(token, realm);
     }
 
     /**
@@ -640,13 +588,13 @@ public class EntitlementService extends EntitlementConfiguration {
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
                 "FAILED_REMOVE_APPLICATION", logParams, getAdminSubject());
             Object[] args = {name};
-            throw new EntitlementException(230, args);
+            throw new EntitlementException(EntitlementException.REMOVE_APPLICATION_FAIL, args);
         } catch (SSOException ex) {
             String[] logParams = {realm, name, ex.getMessage()};
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.MESSAGE, Level.INFO,
                 "FAILED_REMOVE_APPLICATION", logParams, getAdminSubject());
             Object[] args = {name};
-            throw new EntitlementException(230, args);
+            throw new EntitlementException(EntitlementException.REMOVE_APPLICATION_FAIL, args);
         }
     }
 
@@ -740,13 +688,13 @@ public class EntitlementService extends EntitlementConfiguration {
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.ERROR, Level.INFO,
                 "FAILED_SAVE_APPLICATION", logParams, getAdminSubject());
             Object[] arg = {appl.getName()};
-            throw new EntitlementException(231, arg, ex);
+            throw new EntitlementException(EntitlementException.MODIFY_APPLICATION_FAIL, arg, ex);
         } catch (SSOException ex) {
             String[] logParams = {realm, appl.getName(), ex.getMessage()};
             OpenSSOLogger.log(OpenSSOLogger.LogLevel.ERROR, Level.INFO,
                 "FAILED_SAVE_APPLICATION", logParams, getAdminSubject());
             Object[] arg = {appl.getName()};
-            throw new EntitlementException(231, arg, ex);
+            throw new EntitlementException(EntitlementException.MODIFY_APPLICATION_FAIL, arg, ex);
         }
     }
 
@@ -817,8 +765,6 @@ public class EntitlementService extends EntitlementConfiguration {
     }
 
     private Map<String, Set<String>> getApplicationData(Application appl) {
-        Set<String> resources = appl.getResources();
-
         Map<String, Set<String>> map = new HashMap<String, Set<String>>();
         Set<String> setServiceID = new HashSet<String>(2);
         map.put(SMSEntry.ATTR_SERVICE_ID, setServiceID);
@@ -839,16 +785,8 @@ public class EntitlementService extends EntitlementConfiguration {
             data.add(CONFIG_APPLICATION_DESC + "=");
         }
 
-        for (String s : getActionSet(appl.getActions())) {
-            data.add(CONFIG_ACTIONS + "=" + s);
-        }
-
-        if ((resources != null) && !resources.isEmpty()) {
-            for (String r : resources) {
-                data.add(CONFIG_RESOURCES + "=" + r);
-            }
-        } else {
-            data.add(CONFIG_RESOURCES + "=");
+        for (String resourceTypeUuid : appl.getResourceTypeUuids()) {
+            data.add(CONFIG_RESOURCE_TYPE_UUIDS + "=" + resourceTypeUuid);
         }
 
         data.add(CONFIG_ENTITLEMENT_COMBINER + "=" +

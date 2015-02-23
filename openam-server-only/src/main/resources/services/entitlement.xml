@@ -212,6 +212,42 @@
                 </SubSchema>
             </Global>
             <Organization>
+                <SubSchema name="resourceTypes" inheritance="multiple">
+                    <SubSchema name="resourceType" inheritance="multiple">
+                        <AttributeSchema name="name"
+                             type="single"
+                             syntax="string"
+                             i18nKey="" />
+                        <AttributeSchema name="description"
+                             type="single"
+                             syntax="string"
+                             i18nKey="" />
+                        <AttributeSchema name="patterns"
+                             type="list"
+                             syntax="string"
+                             i18nKey="" />
+                        <AttributeSchema name="actions"
+                             type="list"
+                             syntax="string"
+                             i18nKey="" />
+                        <AttributeSchema name="createdBy"
+                             type="single"
+                             syntax="string"
+                             i18nKey="" />
+                        <AttributeSchema name="creationDate"
+                             type="single"
+                             syntax="string"
+                             i18nKey="" />
+                        <AttributeSchema name="lastModifiedBy"
+                             type="single"
+                             syntax="string"
+                             i18nKey="" />
+                        <AttributeSchema name="lastModifiedDate"
+                             type="single"
+                             syntax="string"
+                             i18nKey="" />
+                    </SubSchema>
+                </SubSchema>
                 <SubSchema name="applications" inheritance="multiple">
                     <SubSchema name="application" inheritance="multiple">
                         <AttributeSchema name="applicationType"
@@ -222,14 +258,10 @@
                             type="single"
                             syntax="string"
                             i18nKey="" />
-                        <AttributeSchema name="actions"
-                            type="list"
-                            syntax="string"
-                            i18nKey="" />
-                        <AttributeSchema name="resources"
-                            type="list"
-                            syntax="string"
-                            i18nKey="" />
+                        <AttributeSchema name="resourceTypeUuids"
+                                         type="list"
+                                         syntax="string"
+                                         i18nKey="" />
                         <AttributeSchema name="subjects"
                             type="list"
                             syntax="string"
@@ -443,28 +475,446 @@
                             <Value>com.sun.identity.entitlement.ExactMatchResourceName</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
-                    <SubConfiguration name="webservices"
-                        id="applicationType">
-                        <AttributeValuePair>
-                            <Attribute name="applicationClassName" />
-                            <Value>com.sun.identity.entitlement.WebServiceApplication</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="searchIndexImpl" />
-                            <Value>com.sun.identity.entitlement.util.ResourceNameSplitter</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="saveIndexImpl" />
-                            <Value>com.sun.identity.entitlement.util.ResourceNameIndexGenerator</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="resourceComparator" />
-                            <Value>com.sun.identity.entitlement.URLResourceName</Value>
-                        </AttributeValuePair>
-                    </SubConfiguration>
                 </SubConfiguration>
             </GlobalConfiguration>
             <OrganizationConfiguration name="/">
+                <SubConfiguration name="registeredResourceTypes" id="resourceTypes">
+                    <SubConfiguration name="76656a38-5f8e-401b-83aa-4ccb74ce88d2" id="resourceType">
+                        <AttributeValuePair>
+                            <Attribute name="name" />
+                            <Value>URL</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in URL Resource Type available to OpenAM Policies.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="patterns" />
+                            <Value>*://*:*/*</Value>
+                            <Value>*://*:*/*?*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>GET=true</Value>
+                            <Value>POST=true</Value>
+                            <Value>PUT=true</Value>
+                            <Value>DELETE=true</Value>
+                            <Value>HEAD=true</Value>
+                            <Value>OPTIONS=true</Value>
+                            <Value>PATCH=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="createdBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="creationDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="6a90eabe-9638-4333-b688-3223aec7f58a" id="resourceType">
+                        <AttributeValuePair>
+                            <Attribute name="name" />
+                            <Value>CREST</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in CREST Resource Type available to OpenAM Policies.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="patterns" />
+                            <Value>http://*:*/*</Value>
+                            <Value>http://*:*/*?*</Value>
+                            <Value>https://*:*/*</Value>
+                            <Value>https://*:*/*?*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>CREATE=true</Value>
+                            <Value>READ=true</Value>
+                            <Value>UPDATE=true</Value>
+                            <Value>DELETE=true</Value>
+                            <Value>PATCH=true</Value>
+                            <Value>ACTION=true</Value>
+                            <Value>QUERY=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="createdBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="creationDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="1491322b-5c50-4133-8c40-1646e1170cbb" id="resourceType">
+                        <AttributeValuePair>
+                            <Attribute name="name" />
+                            <Value>Discovery Service</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in discovery Resource Type available to OpenAM Policies.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="patterns" />
+                            <Value>http://*:*/*</Value>
+                            <Value>http://*:*/*?*</Value>
+                            <Value>https://*:*/*</Value>
+                            <Value>https://*:*/*?*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>LOOKUP=true</Value>
+                            <Value>UPDATE=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="createdBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="creationDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="09496ad8-26e3-4002-b90e-24facc2e78c1" id="resourceType">
+                        <AttributeValuePair>
+                            <Attribute name="name" />
+                            <Value>Liberty Service</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in liberty Resource Type available to OpenAM Policies.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="patterns" />
+                            <Value>*://*:*/*</Value>
+                            <Value>*://*:*/*?*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>QUERY_allow=true</Value>
+                            <Value>QUERY_deny=false</Value>
+                            <Value>QUERY_interactForValue=false</Value>
+                            <Value>QUERY_interactForConsent=false</Value>
+                            <Value>MODIFY_allow=true</Value>
+                            <Value>MODIFY_deny=false</Value>
+                            <Value>MODIFY_interactForValue=false</Value>
+                            <Value>MODIFY_interactForConsent=false</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="createdBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="creationDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="20a13582-1f32-4f83-905f-f71ff4e2e00d" id="resourceType">
+                        <AttributeValuePair>
+                            <Attribute name="name" />
+                            <Value>Delegation Service</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in delegation Resource Type available to OpenAM Policies.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="patterns" />
+                            <Value>sms://*:*/*</Value>
+                            <Value>sms://*:*/*?*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ=true</Value>
+                            <Value>MODIFY=true</Value>
+                            <Value>DELEGATE=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="createdBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="creationDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="b5ceba86-4346-4cf5-a5f2-1d2884d1a025" id="resourceType">
+                        <AttributeValuePair>
+                            <Attribute name="name" />
+                            <Value>Provisioning Service</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in provisioning Resource Type available to OpenAM Policies.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="patterns" />
+                            <Value>/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>CREATE=true</Value>
+                            <Value>READ=true</Value>
+                            <Value>UPDATE=true</Value>
+                            <Value>DELETE=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="createdBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="creationDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="13b27ffe-0415-4751-821c-b81675c7acc8" id="resourceType">
+                        <AttributeValuePair>
+                            <Attribute name="name" />
+                            <Value>Paycheck</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in paycheck Resource Type available to OpenAM Policies.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="patterns" />
+                            <Value>http://paycheck.sun.com:8081/*</Value>
+                            <Value>http://paycheck.sun.com:8081/*/private</Value>
+                            <Value>http://paycheck.sun.com:8081/*/users/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>GET=true</Value>
+                            <Value>POST=true</Value>
+                            <Value>PUT=true</Value>
+                            <Value>DELETE=true</Value>
+                            <Value>HEAD=true</Value>
+                            <Value>OPTIONS=true</Value>
+                            <Value>PATCH=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="createdBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="creationDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="504fe694-f1e3-4fdf-8d69-fcf2a4fce06b" id="resourceType">
+                        <AttributeValuePair>
+                            <Attribute name="name" />
+                            <Value>IM</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in IM Resource Type available to OpenAM Policies.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="patterns" />
+                            <Value>http://im.sun.com/register</Value>
+                            <Value>http://im.sun.com/im.jnlp</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>GET=true</Value>
+                            <Value>POST=true</Value>
+                            <Value>PUT=true</Value>
+                            <Value>DELETE=true</Value>
+                            <Value>HEAD=true</Value>
+                            <Value>OPTIONS=true</Value>
+                            <Value>PATCH=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="createdBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="creationDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="74e62178-ab00-45cb-94e5-29dedbd617a5" id="resourceType">
+                        <AttributeValuePair>
+                            <Attribute name="name" />
+                            <Value>Calendar</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in calendar Resource Type available to OpenAM Policies.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="patterns" />
+                            <Value>http://calendar.sun.com/*</Value>
+                            <Value>http://calendar.sun.com/my/*</Value>
+                            <Value>http://calendar.sun.com/admin</Value>
+                            <Value>http://calendar.sun.com/*/calendars?calId=*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>GET=true</Value>
+                            <Value>POST=true</Value>
+                            <Value>PUT=true</Value>
+                            <Value>DELETE=true</Value>
+                            <Value>HEAD=true</Value>
+                            <Value>OPTIONS=true</Value>
+                            <Value>PATCH=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="createdBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="creationDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="398207e2-a643-4f8c-b46b-42da0f7dc63f" id="resourceType">
+                        <AttributeValuePair>
+                            <Attribute name="name" />
+                            <Value>Bank</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in bank Resource Type available to OpenAM Policies.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="patterns" />
+                            <Value>*://*:*/*</Value>
+                            <Value>*://*:*/*?*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>TRANSFER=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="createdBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="creationDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="93a563eb-1f43-4cca-89f3-9a85e83401b9" id="resourceType">
+                        <AttributeValuePair>
+                            <Attribute name="name" />
+                            <Value>Button</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in Button Resource Type available to OpenAM Policies.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="patterns" />
+                            <Value>btn://*:*/*</Value>
+                            <Value>btn://*:*/*?*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>VISIBLE=true</Value>
+                            <Value>SELECTED=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="createdBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="creationDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedBy" />
+                            <Value>id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="lastModifiedDate" />
+                            <Value>1422892465848</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
                 <SubConfiguration name="registeredApplications"
                     id="applications">
                     <SubConfiguration name="iPlanetAMWebAgentService"
@@ -478,9 +928,8 @@
                             <Value>iPlanetAMWebAgentService</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
-                            <Attribute name="resources" />
-                            <Value>*://*:*/*</Value>
-                            <Value>*://*:*/*?*</Value>
+                            <Attribute name="resourceTypeUuids"/>
+                            <Value>76656a38-5f8e-401b-83aa-4ccb74ce88d2</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
@@ -524,9 +973,8 @@
                             <Value>crestPolicyService</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
-                            <Attribute name="resources" />
-                            <Value>http://*</Value>
-                            <Value>https://*</Value>
+                            <Attribute name="resourceTypeUuids" />
+                            <Value>6a90eabe-9638-4333-b688-3223aec7f58a</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
@@ -570,9 +1018,8 @@
                             <Value>sunIdentityServerDiscoveryService</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
-                            <Attribute name="resources" />
-                            <Value>http://*</Value>
-                            <Value>https://*</Value>
+                            <Attribute name="resourceTypeUuids" />
+                            <Value>1491322b-5c50-4133-8c40-1646e1170cbb</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
@@ -616,8 +1063,8 @@
                             <Value>sunIdentityServerLibertyPPService</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
-                            <Attribute name="resources" />
-                            <Value>*</Value>
+                            <Attribute name="resourceTypeUuids" />
+                            <Value>09496ad8-26e3-4002-b90e-24facc2e78c1</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
@@ -661,8 +1108,8 @@
                             <Value>sunAMDelegationService</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
-                            <Attribute name="resources" />
-                            <Value>sms://*</Value>
+                            <Attribute name="resourceTypeUuids" />
+                            <Value>20a13582-1f32-4f83-905f-f71ff4e2e00d</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
@@ -685,8 +1132,8 @@
                             <Value>openProvisioning</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
-                            <Attribute name="resources" />
-                            <Value>/*</Value>
+                            <Attribute name="resourceTypeUuids" />
+                            <Value>b5ceba86-4346-4cf5-a5f2-1d2884d1a025</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
@@ -701,10 +1148,8 @@
                             <Value>iPlanetAMWebAgentService</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
-                            <Attribute name="resources" />
-                            <Value>http://paycheck.sun.com:8081/*</Value>
-                            <Value>http://paycheck.sun.com:8081/*/private</Value>
-                            <Value>http://paycheck.sun.com:8081/*/users/*</Value>
+                            <Attribute name="resourceTypeUuids" />
+                            <Value>13b27ffe-0415-4751-821c-b81675c7acc8</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
@@ -748,11 +1193,8 @@
                             <Value>iPlanetAMWebAgentService</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
-                            <Attribute name="resources" />
-                            <Value>http://calendar.sun.com/*</Value>
-                            <Value>http://calendar.sun.com/my/*</Value>
-                            <Value>http://calendar.sun.com/admin</Value>
-                            <Value>http://calendar.sun.com/*/calendars?calId=*</Value>
+                            <Attribute name="resourceTypeUuids" />
+                            <Value>74e62178-ab00-45cb-94e5-29dedbd617a5</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
@@ -796,9 +1238,8 @@
                             <Value>iPlanetAMWebAgentService</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
-                            <Attribute name="resources" />
-                            <Value>http://im.sun.com/register</Value>
-                            <Value>http://im.sun.com/im.jnlp</Value>
+                            <Attribute name="resourceTypeUuids" />
+                            <Value>504fe694-f1e3-4fdf-8d69-fcf2a4fce06b</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
@@ -842,8 +1283,8 @@
                             <Value>banking</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
-                            <Attribute name="resources" />
-                            <Value>*</Value>
+                            <Attribute name="resourceTypeUuids" />
+                            <Value>398207e2-a643-4f8c-b46b-42da0f7dc63f</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />

@@ -73,6 +73,7 @@ define("org/forgerock/openam/ui/policy/policies/ManagePoliciesView", [
 
                 this.policyGridView = new GenericGridView();
                 this.policyGridView.render({
+                    rowUid: 'name',
                     element: '#managePolicies',
                     tpl: 'templates/policy/policies/ManagePoliciesGridTemplate.html',
                     actionsTpl: 'templates/policy/policies/ManagePoliciesGridActionsTemplate.html',
@@ -84,9 +85,10 @@ define("org/forgerock/openam/ui/policy/policies/ManagePoliciesView", [
                 if (this.data.referralsEnabled) {
                     this.refGridView = new GenericGridView();
                     this.refGridView.render({
+                        rowUid: 'name',
                         element: '#manageRefs',
-                        tpl: 'templates/policy/referrals/ManageRefsGridTemplate.html',
-                        actionsTpl: 'templates/policy/referrals/ManageRefsGridActionsTemplate.html',
+                        tpl: 'templates/policy/referrals/ManageReferralsGridTemplate.html',
+                        actionsTpl: 'templates/policy/referrals/ManageReferralsGridActionsTemplate.html',
                         gridId: 'refs',
                         initOptions: this.getRefGridInitOptions(),
                         additionalOptions: this.getRefGridAdditionalOptions()

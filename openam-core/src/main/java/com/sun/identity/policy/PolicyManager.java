@@ -1620,14 +1620,8 @@ public final class PolicyManager {
     }
 
     public Set getManagedResourceNamesE(String serviceName) {
-        try {
-            Application appl = ApplicationManager.getApplication(
-                PrivilegeManager.superAdminSubject, org, serviceName);
-            return (appl == null) ? Collections.EMPTY_SET : appl.getResources();
-        } catch (EntitlementException ex) {
-            debug.error("PolicyManager.getManagedResourceNamesE", ex);
-            return Collections.EMPTY_SET;
-        }
+        // Legacy code and application model has changed. Simply returning an empty set.
+        return Collections.emptySet();
     }
 
 

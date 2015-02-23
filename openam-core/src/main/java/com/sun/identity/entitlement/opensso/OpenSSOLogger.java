@@ -47,10 +47,28 @@ import javax.security.auth.Subject;
  */
 public class OpenSSOLogger {
     public enum LogLevel {ERROR, MESSAGE};
+    public enum Message {
+        APPLICATION_ATTEMPT_SAVE,
+        APPLICATION_SUCCEEDED_SAVE,
+        APPLICATION_ATTEMPT_REMOVE,
+        APPLICATION_SUCCEEDED_REMOVE,
+        APPLICATION_FAILED_SAVE,
+        APPLICATION_FAILED_REMOVE,
+        RESOURCE_TYPE_ATTEMPT_SAVE,
+        RESOURCE_TYPE_SUCCEEDED_SAVE,
+        RESOURCE_TYPE_ATTEMPT_REMOVE,
+        RESOURCE_TYPE_SUCCEEDED_REMOVE,
+        RESOURCE_TYPE_FAILED_SAVE,
+        RESOURCE_TYPE_FAILED_REMOVE
+    };
     private static final String LOG_MSG_XML = "Entitlement";
     private static final String LOG_NAME = "entitlement";
 
     private OpenSSOLogger() {
+    }
+
+    public static void log(LogLevel type, Level level, Message message, String[] messageData, Subject logFor) {
+        log(type, level, message.name(), messageData, logFor);
     }
 
     public static void log(

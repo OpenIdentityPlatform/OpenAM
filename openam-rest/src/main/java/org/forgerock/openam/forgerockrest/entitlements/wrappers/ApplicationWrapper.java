@@ -18,10 +18,8 @@ package org.forgerock.openam.forgerockrest.entitlements.wrappers;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.ReferredApplication;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -128,16 +126,6 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         return application.getApplicationType().getName();
     }
 
-    @JsonProperty("actions")
-    public void setActions(Map<String, Boolean> actions) {
-        application.setActions(actions);
-    }
-
-    @JsonProperty("actions")
-    public Map<String, Boolean> getActions() {
-        return application.getActions();
-    }
-
     @JsonProperty("conditions")
     public void setConditions(Set<String> conditions) {
         application.setConditions(conditions);
@@ -158,14 +146,14 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         return application.getSubjects();
     }
 
-    @JsonProperty("resources")
-    public void setResources(Set<String> resources) {
-        application.setResources(resources);
+    @JsonProperty("resourceTypeUuids")
+    public void setResourceTypeUuids(final Set<String> resourceTypeUuids) {
+        application.addAllResourceTypeUuids(resourceTypeUuids);
     }
 
-    @JsonProperty("resources")
-    public Set<String> getResources() {
-        return application.getResources();
+    @JsonProperty("resourceTypeUuids")
+    public Set<String> getResourceTypeUuids() {
+        return application.getResourceTypeUuids();
     }
 
     @JsonProperty("entitlementCombiner")

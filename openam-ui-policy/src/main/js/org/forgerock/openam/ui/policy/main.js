@@ -44,7 +44,7 @@ define([
     "./policies/ManagePoliciesView",
     "./policies/EditPolicyView",
 
-    "./policies/attributes/ManageResponseAttrsView",
+    "./policies/attributes/ResponseAttrsStaticView",
     "./policies/attributes/ResponseAttrsUserView",
 
     "./policies/conditions/ManageRulesView",
@@ -54,6 +54,9 @@ define([
     "./policies/conditions/EditEnvironmentView",
     "./policies/conditions/LegacyListItemView",
     "./policies/conditions/OperatorRulesView",
+
+    "./resourcetypes/EditResourceTypeView",
+    "./resourcetypes/ManageResourceTypesView",
 
     "./referrals/EditReferralView",
     "./referrals/SelectRealmsView"

@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: RemoveApplicationPrivilegeSubjects.java,v 1.1 2009/11/10 19:01:04 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.cli.entitlement;
@@ -37,9 +39,12 @@ import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.SubjectImplementation;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+
 import java.text.MessageFormat;
 import java.util.Set;
 import java.util.logging.Level;
+import javax.inject.Inject;
 import javax.security.auth.Subject;
 
 /**
@@ -47,6 +52,12 @@ import javax.security.auth.Subject;
  * @author dennis
  */
 public class RemoveApplicationPrivilegeSubjects extends ApplicationPrivilegeBase {
+
+    @Inject
+    public RemoveApplicationPrivilegeSubjects(ResourceTypeService resourceTypeService) {
+        super(resourceTypeService);
+    }
+
     /**
      * Services a Commandline Request.
      *

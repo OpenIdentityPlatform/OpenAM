@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -435,13 +436,22 @@ public class Entitlement {
         boolean recursive)
     throws EntitlementException {
 
-        for (String a : actionNames) {
-            if (actionValues.keySet().contains(a)) {
-                return getMatchingResources(adminSubject, realm,
-                    subject, applicationName, resourceName, recursive);
+        if (CollectionUtils.isNotEmpty(actionNames)) {
+            boolean passedActionFound = false;
+
+            for (String actionName : actionNames) {
+                if (actionValues.keySet().contains(actionName)) {
+                    passedActionFound = true;
+                    break;
+                }
+            }
+
+            if (!passedActionFound) {
+                return Collections.emptySet();
             }
         }
-        return Collections.EMPTY_SET;
+
+        return getMatchingResources(adminSubject, realm, subject, applicationName, resourceName, recursive);
     }
 
     protected Set<String> getMatchingResources(
@@ -805,28 +815,14 @@ public class Entitlement {
         return application;
     }
 
-    ResourceName getResourceComparator(Subject adminSubject, String realm)
-        throws EntitlementException {
-        return getApplication(PrivilegeManager.superAdminSubject, realm).getResourceComparator();
-    }
+    ResourceName getResourceComparator(Subject adminSubject, String realm) throws EntitlementException {
+        final Application application = getApplication(PrivilegeManager.superAdminSubject, realm);
 
-    void validateResourceNames(Subject adminSubject, String realm) throws EntitlementException {
-        if ((resourceNames != null) && !resourceNames.isEmpty()) {
-            Application app = getApplication(adminSubject, realm);
-
-            if (app == null) {
-                throw new EntitlementException(EntitlementException.NO_SUCH_APPLICATION,
-                        new Object[] { applicationName });
-            }
-
-            for (String r : resourceNames) {
-                ValidateResourceResult result = app.validateResourceName(r);
-                if (!result.isValid()) {
-                    Object[] args = {r};
-                    throw new EntitlementException(303, args);
-                }
-            }
+        if (application == null) {
+            throw new EntitlementException(EntitlementException.NO_SUCH_APPLICATION, applicationName);
         }
+
+        return application.getResourceComparator();
     }
 
     /**

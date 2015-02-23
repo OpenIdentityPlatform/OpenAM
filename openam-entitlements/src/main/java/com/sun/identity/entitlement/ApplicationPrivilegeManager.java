@@ -23,11 +23,16 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ApplicationPrivilegeManager.java,v 1.5 2010/01/07 00:19:10 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.util.SearchFilter;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
@@ -45,16 +50,14 @@ public abstract class ApplicationPrivilegeManager {
         ApplicationPrivilege.Action.DELEGATE.toString();
 
     // RFE: implementation class to be pluggable
-    private static String DEFAULT_IMPL_CLASS =
-        "com.sun.identity.entitlement.opensso.OpenSSOApplicationPrivilegeManager";
-    private static Class DEFAULT_IMPL;
+    private static String DEFAULT_IMPL_CLASS = "com.sun.identity.entitlement.opensso.OpenSSOApplicationPrivilegeManager";
+    private static Class<? extends ApplicationPrivilegeManager> DEFAULT_IMPL;
 
     static {
         try {
-            DEFAULT_IMPL = Class.forName(DEFAULT_IMPL_CLASS);
+            DEFAULT_IMPL = Class.forName(DEFAULT_IMPL_CLASS).asSubclass(ApplicationPrivilegeManager.class);
         } catch (ClassNotFoundException ex) {
-            PrivilegeManager.debug.error("ApplicationPrivilegeManager.<init>",
-                ex);
+            PrivilegeManager.debug.error("ApplicationPrivilegeManager.<init>", ex);
         }
     }
 
@@ -167,39 +170,38 @@ public abstract class ApplicationPrivilegeManager {
     /**
      * Returns an instance of application privilege manager.
      *
-     * @param realm Realm name.
-     * @param caller Administrator subject.
+     * @param realm
+     *         Realm name.
+     * @param caller
+     *         Administrator subject.
+     *
      * @return an instance of application privilege manager.
      */
-    public static ApplicationPrivilegeManager getInstance(
-        String realm, Subject caller) {
-        Class[] parameterTypes = {String.class, Subject.class};
-        Constructor c;
-        ApplicationPrivilegeManager instance = null;
+    public static ApplicationPrivilegeManager getInstance(String realm, Subject caller) {
         try {
-            c = DEFAULT_IMPL.getConstructor(parameterTypes);
-            instance =(ApplicationPrivilegeManager)
-                c.newInstance(realm, caller);
+            final Class[] parameterTypes = {String.class, Subject.class, ResourceTypeService.class};
+            final Constructor<? extends ApplicationPrivilegeManager> constructor =
+                    DEFAULT_IMPL.getConstructor(parameterTypes);
+
+            final ResourceTypeService resourceTypeService = InjectorHolder.getInstance(ResourceTypeService.class);
+            return constructor.newInstance(realm, caller, resourceTypeService);
+
         } catch (InstantiationException ex) {
-            PrivilegeManager.debug.error(
-                "ApplicationPrivilegeManager.getInstance", ex);
+            PrivilegeManager.debug.error("ApplicationPrivilegeManager.getInstance", ex);
         } catch (IllegalAccessException ex) {
-            PrivilegeManager.debug.error(
-                "ApplicationPrivilegeManager.getInstance", ex);
+            PrivilegeManager.debug.error("ApplicationPrivilegeManager.getInstance", ex);
         } catch (IllegalArgumentException ex) {
-            PrivilegeManager.debug.error(
-                "ApplicationPrivilegeManager.getInstance", ex);
+            PrivilegeManager.debug.error("ApplicationPrivilegeManager.getInstance", ex);
         } catch (InvocationTargetException ex) {
-            PrivilegeManager.debug.error(
-                "ApplicationPrivilegeManager.getInstance", ex);
+            PrivilegeManager.debug.error("ApplicationPrivilegeManager.getInstance", ex);
         } catch (NoSuchMethodException ex) {
-            PrivilegeManager.debug.error(
-                "ApplicationPrivilegeManager.getInstance", ex);
+            PrivilegeManager.debug.error("ApplicationPrivilegeManager.getInstance", ex);
         } catch (SecurityException ex) {
-            PrivilegeManager.debug.error(
-                "ApplicationPrivilegeManager.getInstance", ex);
+            PrivilegeManager.debug.error("ApplicationPrivilegeManager.getInstance", ex);
         }
-        return instance;
+
+        return null;
     }
+
 }
 

@@ -66,6 +66,18 @@ define("config/routes/PolicyRoutesConfig", [
             role: "ui-admin",
             pattern: "app/?/referral/?"
         },
+        "manageResourceTypes": {
+            view: "org/forgerock/openam/ui/policy/resourcetypes/ManageResourceTypesView",
+            url: "resourceTypes/",
+            role: "ui-admin"
+        },
+        "editResourceType": {
+            view: "org/forgerock/openam/ui/policy/resourcetypes/EditResourceTypeView",
+            url: /^resourceType\/(.*?)(?:\/){0,1}$/,
+            defaults: [""],
+            role: "ui-admin",
+            pattern: "resourceType/?"
+        },
         "amConsole": {
             url: "console",
             event: constants.EVENT_RETURN_TO_AM_CONSOLE

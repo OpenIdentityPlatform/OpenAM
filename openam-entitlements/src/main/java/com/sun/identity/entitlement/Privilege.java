@@ -93,6 +93,11 @@ public abstract class Privilege implements IPrivilege {
     public static final String NAME_ATTRIBUTE = "name";
 
     /**
+     * Resource type uuid reference.
+     */
+    public static final String RESOURCE_TYPE_UUID_ATTRIBUTE = "resourceTypeUuid";
+
+    /**
      * Macro used in resource name
      */
     public static final String RESOURCE_MACRO_SELF = "$SELF";
@@ -117,6 +122,7 @@ public abstract class Privilege implements IPrivilege {
     private EntitlementSubject eSubject;
     private EntitlementCondition eCondition;
     private Set<ResourceAttribute> eResourceAttributes;
+    private String resourceTypeUuid;
 
     private String createdBy;
     private String lastModifiedBy;
@@ -156,11 +162,6 @@ public abstract class Privilege implements IPrivilege {
     public Privilege() {
     }
 
-
-    public void validateResourceNames(Subject adminSubject, String realm
-        ) throws EntitlementException {
-        entitlement.validateResourceNames(adminSubject, realm);
-    }
 
     /**
      * Sets entitlement subject.
@@ -240,6 +241,25 @@ public abstract class Privilege implements IPrivilege {
      */
     public Entitlement getEntitlement() {
         return entitlement;
+    }
+
+    /**
+     * Sets the resource type uuid that this policy makes reference to.
+     *
+     * @param resourceTypeUuid
+     *         the resource type uuid.
+     */
+    public void setResourceTypeUuid(final String resourceTypeUuid) {
+        this.resourceTypeUuid = resourceTypeUuid;
+    }
+
+    /**
+     * Retrieves the resource type uuid that is associated with this policy.
+     *
+     * @return the resource type uuid
+     */
+    public String getResourceTypeUuid() {
+        return resourceTypeUuid;
     }
 
     /**
@@ -345,6 +365,7 @@ public abstract class Privilege implements IPrivilege {
         JSONObject jo = toMinimalJSONObject();
         jo.put("className", getClass().getName());
         jo.put("active", Boolean.toString(active));
+        jo.put(RESOURCE_TYPE_UUID_ATTRIBUTE, resourceTypeUuid);
 
         if (description != null) {
             jo.put("description", description);
@@ -370,6 +391,7 @@ public abstract class Privilege implements IPrivilege {
             Privilege privilege = (Privilege)clazz.newInstance();
             privilege.name = jo.optString("name");
             privilege.active = Boolean.parseBoolean(jo.optString("active"));
+            privilege.resourceTypeUuid = jo.optString(RESOURCE_TYPE_UUID_ATTRIBUTE);
             privilege.description = jo.optString("description");
             privilege.createdBy = jo.optString("createdBy");
             privilege.lastModifiedBy = jo.optString("lastModifiedBy");

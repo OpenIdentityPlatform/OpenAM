@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id4
+ *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.cli.entitlement;
@@ -100,17 +102,9 @@ public class ShowApplication extends ApplicationImpl {
         writer.printlnMessage(ATTR_LAST_MODIFICATION_DATE + "=" +
             appl.getLastModifiedDate());
 
-        Map<String, Boolean> actions = appl.getActions();
-        if ((actions != null) && !actions.isEmpty()) {
-            for (String k : actions.keySet()) {
-                writer.printlnMessage(ATTR_ACTIONS + "=" + k + "=" +
-                    actions.get(k).toString());
-            }
-        }
-
         displayAttributes(writer, ATTR_SUBJECT_ATTRIBUTE_NAMES,
             appl.getAttributeNames());
-        displayAttributes(writer, ATTR_RESOURCES, appl.getResources());
+        displayAttributes(writer, ATTR_RESOURCE_TYPE_UUIDS, appl.getResourceTypeUuids());
         displayAttributes(writer, ATTR_CONDITIONS, appl.getConditions());
         displayAttributes(writer, ATTR_SUBJECTS, appl.getSubjects());
 

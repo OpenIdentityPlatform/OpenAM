@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ReferredApplicationManager.java,v 1.2 2010/01/20 17:01:35 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2013 ForgeRock AS
+ *
+ * Portions Copyrighted 2013-2015 ForgeRock AS
  */
 package com.sun.identity.entitlement;
 
@@ -43,6 +41,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * This singleton contains information of all referred applications.
  */
+@Deprecated
 public class ReferredApplicationManager {
     private static final ReferredApplicationManager instance = new
         ReferredApplicationManager();
@@ -139,8 +138,6 @@ public class ReferredApplicationManager {
                         appl, res);
                     tmpMap.put(applName, ra);
                     applications.add(ra);
-                } else {
-                    ra.addResources(res);
                 }
             }
         }

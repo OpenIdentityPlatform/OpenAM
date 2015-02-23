@@ -41,10 +41,11 @@
                     <span class="help-link" data-help-key="app.resources"></span>
                 </h1>
                 <section class="accordion-step clearfix">
+                    <p>{{t "policy.resourceTypes.addResourceTypes"}}</p>
 
                     <div class="clearfix">
-                        <div class="col2" id="patterns"></div>
-                        <div class="col2" id="resourcesList"></div>
+                        <div class="col2"><div id="availableResTypes"></div></div>
+                        <div class="col2"><div id="selectedResTypes"></div></div>
                     </div>
 
                     <input type="button" class="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton"/>
