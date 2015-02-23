@@ -8,7 +8,7 @@
         },
         "messages": {
             "CommonMessages": {
-                "authenticationFailed": "Login/password combination is invalid.",
+                "authenticationFailed": "User name/password combination is invalid.",
                 "serviceUnavailable": "Service unavailable",
                 "unknown": "Unknown error. Please contact the administrator",
                 "loggedIn": "You have been successfully logged in.",

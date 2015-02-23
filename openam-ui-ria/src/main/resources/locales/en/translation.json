@@ -12,7 +12,7 @@
                 "inconsistentRealm": "The realm is inconsistent"
             },
             "CommonMessages" : {
-                "authenticationFailed" : "Login/password combination is invalid.",
+                "authenticationFailed" : "User name/password combination is invalid.",
                 "loginFailureLockout" : "Your password has expired. Please contact service desk to reset your password",
                 "maxSessionsLimitOrSessionQuota": "Maximum sessions limit reached or session quota has exhausted.",
                 "serviceUnavailable" : "Service unavailable",
@@ -148,7 +148,7 @@
                 "haveAccoutQuestion" : "Already have an account?",
                 "agreeToTerms" : "I agree to the %sterms of use%s",
                 "emailSubject" : "OpenAM Registration",
-                "emailMessage" : "Please goto the link below to continue the registration process:",
+                "emailMessage" : "Please go to the link below to continue the registration process:",
                 "emailSent" : "We have sent you an e-mail, please follow the link in the e-mail to complete the registration process.",
                 "registrationComplete" : "Registration complete"
             },
@@ -492,9 +492,9 @@
                     }
                 },
                 "BaseApplicationsView" : {
-                    "noApplicationsHere" : "Your have no apps here",
-                    "noDefaultApplications" : "Your have no default apps",
-                    "noFrequentlyUsedApplications" : "Your have no frequently used apps"
+                    "noApplicationsHere" : "You have no apps here",
+                    "noDefaultApplications" : "You have no default apps",
+                    "noFrequentlyUsedApplications" : "You have no frequently used apps"
                 },
                 "UsersApplicationsView" : {
                     "noApplications" : "You have no applications"
