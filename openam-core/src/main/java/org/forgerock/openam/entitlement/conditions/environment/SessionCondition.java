@@ -136,7 +136,7 @@ public class SessionCondition extends EntitlementConditionAdaptor {
 
         SSOToken token = (subject == null) ? null : (SSOToken) getValue(subject.getPrivateCredentials());
         if (token == null) {
-            return new ConditionDecision(false, Collections.<String, Set<String>>emptyMap(), Long.MAX_VALUE);
+            return new ConditionDecision(true, Collections.<String, Set<String>>emptyMap(), Long.MAX_VALUE);
         }
 
         String requestSessionCreationTime = getValue(env.get(REQUEST_SESSION_CREATION_TIME));
