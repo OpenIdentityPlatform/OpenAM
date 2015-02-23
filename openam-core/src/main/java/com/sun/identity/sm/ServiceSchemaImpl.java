@@ -24,10 +24,7 @@
  *
  * $Id: ServiceSchemaImpl.java,v 1.7 2008/06/25 05:44:05 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012-2014 ForgeRock Inc
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -92,6 +89,8 @@ class ServiceSchemaImpl {
     boolean isOrgAttrSchema;
 
     String serviceName;
+    
+    private volatile boolean valid = false;
 
     // Debug class
     static Debug debug = SMSEntry.debug;
@@ -412,6 +411,7 @@ class ServiceSchemaImpl {
         attrReadOnlyDefaults = Collections
                 .unmodifiableMap(tempUnmodifiableDefaults);
         subSchemas = newSubSchemas;
+        valid = true;
     }
     
     synchronized void clear() {
@@ -435,6 +435,8 @@ class ServiceSchemaImpl {
         
         //finally clear all subschemas
         subSchemas.clear();
+        //when clear is called, this object is no longer valid.
+        valid = false;
     }
 
     AttributeValidator getAttributeValidator(String attrName) {
@@ -700,5 +702,9 @@ class ServiceSchemaImpl {
             throw new InvalidAttributeValueException(
                 IUMSConstants.UMS_BUNDLE_NAME, message, args);
         }
+    }
+    
+    boolean isValid() {
+        return valid;
     }
 }
