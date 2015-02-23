@@ -314,6 +314,11 @@ class ServiceConfigImpl implements ServiceListener {
      * Checks if the entry is still valid
      */
     boolean isValid() {
+        // check if ServiceSchemaImpl is stale
+        if (!ss.isValid()) {
+            return false;
+        }
+
         if (smsEntry.isValid() && smsEntry.isDirty()) {
             smsEntry.refresh();
         }
