@@ -321,7 +321,7 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
         String ip = null;
         if (!allowed) {
             ip = getRequestIp(env);
-            if (ip == null) {
+            if (ip == null && subject != null) {
                 debugMessage("ConditionDecision: IP not provided in request, using session IP");
                 ip = getSessionIp(subject);
             }

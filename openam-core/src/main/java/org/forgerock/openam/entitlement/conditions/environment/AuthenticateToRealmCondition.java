@@ -111,8 +111,11 @@ public class AuthenticateToRealmCondition extends EntitlementConditionAdaptor {
                             + "request = " + requestAuthnRealms);
                 }
         } else {
-            SSOToken token = (SSOToken) subject.getPrivateCredentials().iterator().next();
-            Set<String> authenticatedRealms = entitlementCoreWrapper.getAuthenticatedRealms(token);
+            Set<String> authenticatedRealms = null;
+            SSOToken token = (subject == null) ? null : (SSOToken) subject.getPrivateCredentials().iterator().next();
+            if (token != null) {
+                authenticatedRealms = entitlementCoreWrapper.getAuthenticatedRealms(token);
+            }
             if (authenticatedRealms != null) {
                 requestAuthnRealms.addAll(authenticatedRealms);
             }

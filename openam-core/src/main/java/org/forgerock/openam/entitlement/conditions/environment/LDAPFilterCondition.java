@@ -83,6 +83,10 @@ public class LDAPFilterCondition extends EntitlementConditionAdaptor {
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName, Map<String, Set<String>> env)
             throws EntitlementException {
 
+        if (subject == null) {
+            return new ConditionDecision(false, Collections.<String, Set<String>>emptyMap());
+        }
+        
         SSOToken token = (SSOToken) getValue(subject.getPrivateCredentials());
         try {
             com.sun.identity.policy.ConditionDecision decision = condition.getConditionDecision(token, env);

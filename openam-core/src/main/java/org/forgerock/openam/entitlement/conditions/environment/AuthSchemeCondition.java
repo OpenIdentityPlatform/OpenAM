@@ -148,7 +148,7 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
         }
         Set<String> requestAuthSchemes = null;
         Set<String> requestAuthSchemesIgnoreRealm = null;
-        SSOToken token = (SSOToken) getValue(subject.getPrivateCredentials());
+        SSOToken token = (subject == null) ? null : (SSOToken) getValue(subject.getPrivateCredentials());
         if (env.get(REQUEST_AUTH_SCHEMES) != null) {
             requestAuthSchemes = env.get(REQUEST_AUTH_SCHEMES);
             if (debug.messageEnabled()) {

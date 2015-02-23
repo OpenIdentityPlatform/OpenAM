@@ -26,12 +26,15 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.security.auth.Subject;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -108,6 +111,10 @@ public class AuthLevelCondition extends EntitlementConditionAdaptor {
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName, Map<String, Set<String>> env)
             throws EntitlementException {
 
+        if (subject == null) {
+            return new ConditionDecision(false, Collections.<String, Set<String>>emptyMap());
+        }
+        
         if (authLevel == null) {
             throw new EntitlementException(PROPERTY_VALUE_NOT_DEFINED, new String[]{AUTH_LEVEL}, null);
         }

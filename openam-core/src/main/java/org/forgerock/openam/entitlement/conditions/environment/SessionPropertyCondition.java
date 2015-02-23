@@ -124,6 +124,11 @@ public class SessionPropertyCondition extends EntitlementConditionAdaptor {
             debug.message("SessionPropertyCondition.evaluate():entering, ignoreValueCase= "
                     + ignoreValueCase);
         }
+        
+        if (subject == null) {
+            return new ConditionDecision(false, Collections.<String, Set<String>>emptyMap());
+        }
+        
         SSOToken token = (SSOToken) getValue(subject.getPrivateCredentials());
         if ((properties != null) && !properties.isEmpty()) {
             Set<String> names = properties.keySet();
