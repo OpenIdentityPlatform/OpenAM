@@ -238,7 +238,8 @@ public class UmaPolicy {
     }
 
     private JsonValue createPolicyJson(JsonValue aggregatePolicy) {
-        String policyName = resourceSet.getId() + " - " + aggregatePolicy.getPointer().get(0);
+        String policyName = resourceSet.getName() + " - " + resourceSet.getId() + "-"
+                + aggregatePolicy.getPointer().get(0).hashCode();
         return json(object(
                 field(BACKEND_POLICY_NAME_KEY, policyName),
                 field(BACKEND_POLICY_RESOURCES_KEY, array(UMA_POLICY_SCHEME + getId())),
