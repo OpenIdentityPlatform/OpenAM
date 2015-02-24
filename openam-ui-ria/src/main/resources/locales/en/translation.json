@@ -406,7 +406,7 @@
             },
             "list": {
                 "title": "Resources",
-                "subtitle": "All shared resources",
+                "subtitle": "All your shared resources",
                 "grid": ["Resources", "Modified By", "Last accessed", "Host"]
             },
             "show": {
@@ -414,7 +414,8 @@
                 "grid": ["User", "Last accessed", "Permissions"],
                 "share": "Share",
                 "revokeAll": "Revoke All",
-                "revokeAllMessage": "Are you sure you want to revoke all access?"
+                "revokeAllMessage": "Are you sure you want to revoke all access?",
+                "resource" : "Resource"
             }
         },
         "history": {

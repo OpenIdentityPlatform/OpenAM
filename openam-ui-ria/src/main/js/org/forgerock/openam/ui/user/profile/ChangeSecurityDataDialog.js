@@ -36,18 +36,17 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants"
 ], function(Dialog, validatorsManager, conf, userDelegate, uiUtils, eventManager, constants) {
-    var ChangeSecurityDataDialog = Dialog.extend({    
+    var ChangeSecurityDataDialog = Dialog.extend({
         contentTemplate: "templates/openam/ChangeSecurityDataDialogTemplate.html",
-        
+
         data: { },
-        
+
         events: {
             "click input[type=submit]": "formSubmit",
             "onValidate": "onValidate",
             "customValidate": "customValidate",
             "click .dialogCloseCross img": "close",
-            "click input[name='close']": "close",
-            "click .dialogContainer": "stop"
+            "click input[name='close']": "close"
         },
 
         errorsHandlers: {
@@ -56,12 +55,12 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
 
         formSubmit: function(event) {
             var data = {}, _this = this;
-            
+
             event.preventDefault();
-            
-            if (validatorsManager.formValidated(this.$el.find("#passwordChange"))) {            
+
+            if (validatorsManager.formValidated(this.$el.find("#passwordChange"))) {
                 data.username = form2js("content", '.', false).uid;
-                data.currentpassword = this.$el.find("#currentPassword").val(); 
+                data.currentpassword = this.$el.find("#currentPassword").val();
                 data.userpassword =  this.$el.find("#password").val();
                 this.delegate.changePassword(conf.loggedUser, data, _.bind(function() {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "securityDataChanged");
@@ -74,7 +73,7 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
                 },_this.errorsHandlers);
 
             }
-            
+
         },
         customValidate: function () {
             if (validatorsManager.formValidated(this.$el.find("#passwordChange")) || validatorsManager.formValidated(this.$el.find("#securityDataChange"))) {
@@ -82,7 +81,7 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
             }
             else {
                 this.$el.find("input[type=submit]").prop('disabled', true);
-            } 
+            }
         },
         render: function() {
             this.actions = [];
@@ -94,15 +93,15 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
                 validatorsManager.bindValidators(this.$el);
                 $("#dialogs").show();
                 this.reloadData();
-                
-            }, this));      
+
+            }, this));
         },
-        
+
         reloadData: function() {
             this.$el.find("input[name=_id]").val(conf.loggedUser.name);
             this.$el.find("input[type=submit]").prop('disabled', true);
         }
-    }); 
-    
+    });
+
     return new ChangeSecurityDataDialog();
 });

@@ -46,7 +46,6 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
             var self = this,
                 grid,
                 paginator,
-                userPolicies,
                 RevokeCell,
                 SelectizeCell,
                 UserPoliciesCollection,
@@ -131,7 +130,7 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
                     }
                 });
 
-                userPolicies = new UserPoliciesCollection();
+                self.data.userPolicies = new UserPoliciesCollection();
 
                 grid = new Backgrid.Grid({
                     columns: [
@@ -161,19 +160,19 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
                         editable: false
                     }],
 
-                    collection: userPolicies,
+                    collection: self.data.userPolicies,
                     emptyText: $.t("uma.all.grid.empty")
                 });
 
                 paginator = new Backgrid.Extension.Paginator({
-                    collection: userPolicies,
+                    collection: self.data.userPolicies,
                     windowSize: 3
                 });
 
                 self.parentRender(function() {
                     self.$el.find("#backgridContainer").append( grid.render().el );
                     self.$el.find("#paginationContainer").append( paginator.render().el );
-                    userPolicies.fetch({reset: true, processData: false});
+                    self.data.userPolicies.fetch({reset: true, processData: false});
 
                     if (callback) { callback(); }
                 });
