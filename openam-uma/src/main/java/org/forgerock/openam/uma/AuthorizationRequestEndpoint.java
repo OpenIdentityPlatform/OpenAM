@@ -16,10 +16,21 @@
 
 package org.forgerock.openam.uma;
 
+import static org.forgerock.json.fluent.JsonValue.*;
+
+import javax.security.auth.Subject;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.inject.Inject;
-import com.sun.identity.authentication.internal.server.AuthSPrincipal;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.JwtPrincipal;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.debug.Debug;
@@ -45,17 +56,6 @@ import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
-
-import javax.security.auth.Subject;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.forgerock.json.fluent.JsonValue.json;
 
 public class AuthorizationRequestEndpoint extends ServerResource {
 
@@ -147,9 +147,9 @@ public class AuthorizationRequestEndpoint extends ServerResource {
 
     protected Subject createSubject(String username, String realm) {
         AMIdentity identity = IdUtils.getIdentity(username, realm);
+        JwtPrincipal principal = new JwtPrincipal(json(object(field("sub", identity.getUniversalId()))));
         Set<Principal> principals = new HashSet<Principal>();
-        principals.add(new AuthSPrincipal(identity.getUniversalId()));
-
+        principals.add(principal);
         return new Subject(false, principals, Collections.emptySet(), Collections.emptySet());
     }
 

@@ -73,10 +73,15 @@ public final class UmaConstants {
     static final class BackendPolicy {
         static final String BACKEND_POLICY_NAME_KEY = "name";
         static final String BACKEND_POLICY_RESOURCES_KEY = "resources";
+        static final String BACKEND_POLICY_RESOURCE_TYPE_KEY = "resourceTypeUuid";
         static final String BACKEND_POLICY_ACTION_VALUES_KEY = "actionValues";
         static final String BACKEND_POLICY_SUBJECT_KEY = "subject";
         static final String BACKEND_POLICY_SUBJECT_TYPE_KEY = "type";
-        static final String BACKEND_POLICY_SUBJECT_TYPE = "Identity";
-        static final String BACKEND_POLICY_SUBJECT_VALUES = "subjectValues";
+        static final String BACKEND_POLICY_SUBJECT_TYPE_OR = "OR";
+        static final String BACKEND_POLICY_SUBJECT_TYPE_JWT_CLAIM = "JwtClaim";
+        static final String BACKEND_POLICY_SUBJECTS_KEY = "subjects";
+        static final String BACKEND_POLICY_SUBJECT_CLAIM_NAME_KEY = "claimName";
+        static final String BACKEND_POLICY_SUBJECT_CLAIM_NAME = "sub";
+        static final String BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY = "claimValue";
     }
 }

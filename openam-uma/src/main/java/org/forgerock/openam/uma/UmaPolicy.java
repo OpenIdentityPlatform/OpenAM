@@ -21,6 +21,7 @@ import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
 import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_SCHEME;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -116,6 +117,14 @@ public class UmaPolicy {
         }
     }
 
+    private static Set<String> getPolicySubjects(JsonValue subjectsContent) {
+        Set<String> subjects = new HashSet<String>();
+        for (JsonValue subject : subjectsContent.get(BACKEND_POLICY_SUBJECTS_KEY)) {
+            subjects.add(subject.get(BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY).asString());
+        }
+        return subjects;
+    }
+
     /**
      * Converts underlying backend policies into an {@code UmaPolicy}.
      *
@@ -133,8 +142,7 @@ public class UmaPolicy {
             underlyingPolicyIds.add(policy.getId());
             String scope = policy.getContent().get(BACKEND_POLICY_ACTION_VALUES_KEY).asMap()
                     .keySet().iterator().next();
-            for (String subject : policy.getContent().get(BACKEND_POLICY_SUBJECT_KEY)
-                    .get(BACKEND_POLICY_SUBJECT_VALUES).asList(String.class)) {
+            for (String subject : getPolicySubjects(policy.getContent().get(BACKEND_POLICY_SUBJECT_KEY))) {
                 Set<String> scopes = subjectPermissions.get(subject);
                 if (scopes == null) {
                     scopes = new HashSet<String>();
@@ -238,17 +246,24 @@ public class UmaPolicy {
     }
 
     private JsonValue createPolicyJson(JsonValue aggregatePolicy) {
-        String policyName = resourceSet.getName() + " - " + resourceSet.getId() + "-"
-                + aggregatePolicy.getPointer().get(0).hashCode();
+        String policyName = resourceSet.getId() + " - " + aggregatePolicy.getPointer().get(0);
+        List<Object> subjects = new ArrayList<Object>();
+        for (String subject : aggregatePolicy.asList(String.class)) {
+            subjects.add(object(
+                    field(BACKEND_POLICY_SUBJECT_TYPE_KEY, BACKEND_POLICY_SUBJECT_TYPE_JWT_CLAIM),
+                    field(BACKEND_POLICY_SUBJECT_CLAIM_NAME_KEY, BACKEND_POLICY_SUBJECT_CLAIM_NAME),
+                    field(BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY, subject)));
+        }
         return json(object(
                 field(BACKEND_POLICY_NAME_KEY, policyName),
+                field(BACKEND_POLICY_RESOURCE_TYPE_KEY, "76656a38-5f8e-401b-83aa-4ccb74ce88d2"), //TODO this value will change once we have an application per resource server
                 field(BACKEND_POLICY_RESOURCES_KEY, array(UMA_POLICY_SCHEME + getId())),
                 field(BACKEND_POLICY_ACTION_VALUES_KEY, object(
                                 field(aggregatePolicy.getPointer().get(0), true))
                 ),
                 field(BACKEND_POLICY_SUBJECT_KEY, object(
-                                field(BACKEND_POLICY_SUBJECT_TYPE_KEY, BACKEND_POLICY_SUBJECT_TYPE),
-                                field(BACKEND_POLICY_SUBJECT_VALUES, aggregatePolicy.asList(String.class)))
+                                field(BACKEND_POLICY_SUBJECT_TYPE_KEY, BACKEND_POLICY_SUBJECT_TYPE_OR),
+                                field(BACKEND_POLICY_SUBJECTS_KEY, subjects))
                 )
         ));
     }

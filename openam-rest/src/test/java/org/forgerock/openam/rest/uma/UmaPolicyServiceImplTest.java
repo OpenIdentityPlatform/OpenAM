@@ -123,10 +123,20 @@ public class UmaPolicyServiceImplTest {
         return json(object(
                 field("name", "POLICY_ID - SCOPE_A"),
                 field("resources", array("http://POLICY_ID")),
+                field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
                 field("actionValues", object(field("SCOPE_A", true))),
                 field("subject", object(
-                        field("type", "Identity"),
-                        field("subjectValues", array("SUBJECT_ONE", "SUBJECT_TWO"))
+                        field("type", "OR"),
+                        field("subjects", array(
+                                object(
+                                        field("type", "JwtClaim"),
+                                        field("claimName", "sub"),
+                                        field("claimValue", "SUBJECT_ONE")
+                                ), object(
+                                        field("type", "JwtClaim"),
+                                        field("claimName", "sub"),
+                                        field("claimValue", "SUBJECT_TWO")
+                                )))
                 ))
         ));
     }
@@ -135,10 +145,16 @@ public class UmaPolicyServiceImplTest {
         return json(object(
                 field("name", "POLICY_ID - SCOPE_B"),
                 field("resources", array("http://POLICY_ID")),
+                field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
                 field("actionValues", object(field("SCOPE_B", true))),
                 field("subject", object(
-                        field("type", "Identity"),
-                        field("subjectValues", array("SUBJECT_ONE"))
+                        field("type", "OR"),
+                        field("subjects", array(
+                                object(
+                                        field("type", "JwtClaim"),
+                                        field("claimName", "sub"),
+                                        field("claimValue", "SUBJECT_ONE")
+                                )))
                 ))
         ));
     }
