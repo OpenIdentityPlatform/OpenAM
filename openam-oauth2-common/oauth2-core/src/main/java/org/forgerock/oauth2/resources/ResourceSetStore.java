@@ -23,6 +23,7 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.util.query.QueryFilter;
 
 /**
  * Allows the storage of {@code ResourceSetDescription} objects in a store.
@@ -83,12 +84,11 @@ public interface ResourceSetStore {
     /**
      * Query the store for {@code ResourceSetDescription} instances.
      *
-     * @param queryParameters The criteria of the query.
-     * @param type How to join the parameters.
+     * @param query The criteria of the query.
      * @return A set of all matching resource set descriptions.
      * @throws ServerException When an error occurs when querying the store.
      */
-    Set<ResourceSetDescription> query(Map<String, Object> queryParameters, FilterType type) throws ServerException;
+    Set<ResourceSetDescription> query(QueryFilter<String> query) throws ServerException;
 
     /**
      * Different ways to combine criteria in a filter.

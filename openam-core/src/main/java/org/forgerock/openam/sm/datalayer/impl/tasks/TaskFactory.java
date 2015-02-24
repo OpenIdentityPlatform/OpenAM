@@ -17,15 +17,11 @@ package org.forgerock.openam.sm.datalayer.impl.tasks;
 
 import java.util.Collection;
 
-import javax.inject.Inject;
-
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
-import org.forgerock.openam.sm.datalayer.api.query.FilterConversion;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
-import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 
 /**
  * Generates instances of specific Task implementations.
@@ -35,18 +31,7 @@ import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
  * @see org.forgerock.openam.sm.datalayer.api.Task
  * @see org.forgerock.openam.sm.datalayer.impl.SeriesTaskExecutorThread
  */
-public class TaskFactory<T, F> {
-    private final FilterConversion<F> conversion;
-    private final QueryFactory<T, F> queryFactory;
-
-    /**
-     * @param conversion Required for queries.
-     */
-    @Inject
-    public TaskFactory(QueryFactory queryFactory, FilterConversion conversion) {
-        this.conversion = conversion;
-        this.queryFactory = queryFactory;
-    }
+public class TaskFactory {
 
     /**
      * Used to signal the creation of the given Token.
@@ -92,7 +77,7 @@ public class TaskFactory<T, F> {
      * @return Non null Token query Task.
      */
     public Task query(TokenFilter filter, ResultHandler<Collection<Token>, ?> handler) {
-        return new QueryTask<T, F>(queryFactory, conversion, filter, handler);
+        return new QueryTask(filter, handler);
     }
 
     /**
@@ -102,6 +87,6 @@ public class TaskFactory<T, F> {
      * @return Non null Token query Task.
      */
     public Task partialQuery(TokenFilter filter, ResultHandler<Collection<PartialToken>, ?> handler) {
-        return new PartialQueryTask<T, F>(queryFactory, conversion, filter, handler);
+        return new PartialQueryTask(filter, handler);
     }
 }

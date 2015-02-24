@@ -143,6 +143,7 @@ public class ResourceSetDescription {
      *
      * @return The resource set name.
      */
+    @Field(field = CoreTokenField.STRING_SIX)
     public String getName() {
         return description.get("name").asString();
     }
@@ -234,6 +235,10 @@ public class ResourceSetDescription {
 
     public void setPolicyUri(String policyUri) {
         this.policyUri = policyUri;
+    }
+
+    public void setName(String name) {
+        description.put("name", name);
     }
 
     @Override

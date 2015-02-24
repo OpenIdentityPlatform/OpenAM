@@ -15,11 +15,17 @@
  */
 package org.forgerock.openam.cts.api.filter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.util.Reject;
+import org.forgerock.util.query.QueryFilter;
 
 /**
- * Allows the assembly of {@link TokenFilter} instances for use with the {@link CTSPersistentStore}.
+ * Allows the assembly of {@link TokenFilter} instances for use with the {@link CTSPersistentStore}
+ * and other uses of the generic data layer.
  *
  * This builder will guide the caller through some of the detail around creating filter instances
  * and in particular improve code readability.
@@ -27,24 +33,28 @@ import org.forgerock.openam.tokens.CoreTokenField;
 public class TokenFilterBuilder {
     private TokenFilter tokenFilter = new TokenFilter();
 
+    private static enum Type {
+        AND, OR
+    }
+
     /**
      * @return Moves the builder into AND mode.
      */
     public FilterAttributeBuilder and() {
-        return new FilterAttributeBuilder(tokenFilter, TokenFilter.Type.AND);
+        return new FilterAttributeBuilder(tokenFilter, Type.AND);
     }
 
     /**
      * @return Moves the builder into OR mode.
      */
     public FilterAttributeBuilder or() {
-        return new FilterAttributeBuilder(tokenFilter, TokenFilter.Type.OR);
+        return new FilterAttributeBuilder(tokenFilter, Type.OR);
     }
 
     /**
      * @return Moves the builder into mode specified by type.
      */
-    public FilterAttributeBuilder type(TokenFilter.Type type) {
+    public FilterAttributeBuilder type(Type type) {
         return new FilterAttributeBuilder(tokenFilter, type);
     }
 
@@ -58,7 +68,19 @@ public class TokenFilterBuilder {
      * @return Moves the builder into AND mode, with the filter assigned.
      */
     public FilterAttributeBuilder withAttribute(CoreTokenField field, Object value) {
-        return new FilterAttributeBuilder(tokenFilter, TokenFilter.Type.AND).withAttribute(field, value);
+        return new FilterAttributeBuilder(tokenFilter, Type.AND).withAttribute(field, value);
+    }
+
+    /**
+     * Sets the query to use - cannot be followed by {@link #or()}, {@link #and()}, {@link #type(Type)} or
+     * {@link #withAttribute(org.forgerock.openam.tokens.CoreTokenField, Object)}.
+     *
+     * @param query The complex token query.
+     * @return This builder.
+     */
+    public TokenFilterBuilder withQuery(QueryFilter<CoreTokenField> query) {
+        tokenFilter.setQuery(query);
+        return this;
     }
 
     /**
@@ -82,10 +104,13 @@ public class TokenFilterBuilder {
      */
     public static class FilterAttributeBuilder {
         private final TokenFilter tokenFilter;
+        private final Type type;
+        private List<QueryFilter<CoreTokenField>> criteria = new ArrayList<QueryFilter<CoreTokenField>>();
 
-        public FilterAttributeBuilder(TokenFilter tokenFilter, TokenFilter.Type type) {
+        public FilterAttributeBuilder(TokenFilter tokenFilter, Type type) {
+            Reject.ifTrue(tokenFilter.getQuery() != null, "QueryFilter already configured");
             this.tokenFilter = tokenFilter;
-            tokenFilter.setType(type);
+            this.type = type;
         }
 
         /**
@@ -100,7 +125,7 @@ public class TokenFilterBuilder {
          * @return This FilterAttributeBuilder.
          */
         public FilterAttributeBuilder withAttribute(CoreTokenField field, Object value) {
-            tokenFilter.addFilter(field, value);
+            criteria.add(QueryFilter.equalTo(field, value));
             return this;
         }
 
@@ -108,6 +133,7 @@ public class TokenFilterBuilder {
          * @return The assembled TokenFilter.
          */
         public TokenFilter build() {
+            tokenFilter.setQuery(type == Type.AND ? QueryFilter.and(criteria) : QueryFilter.or(criteria));
             return tokenFilter;
         }
     }

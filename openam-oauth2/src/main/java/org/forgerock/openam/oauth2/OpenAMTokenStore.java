@@ -21,6 +21,7 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.util.query.QueryFilter.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -56,6 +57,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
@@ -477,13 +479,10 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         JsonValue results;
 
-        //construct the filter
-        Map<String, Object> query = new HashMap<String, Object>();
-        query.put(OAuth2Constants.CoreTokenParams.PARENT, tokenId);
-        query.put(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN, tokenId);
-
         try {
-            results = tokenStore.query(query, TokenFilter.Type.OR);
+            results = tokenStore.query(or(
+                    equalTo(OAuthTokenField.PARENT.getField(), tokenId),
+                    equalTo(OAuthTokenField.REFRESH_TOKEN.getField(), tokenId)));
         } catch (CoreTokenException e) {
             logger.error("Unable to query refresh token corresponding to id: " + tokenId, e);
             throw new InvalidRequestException();

@@ -34,6 +34,7 @@ import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
 import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
 import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.util.query.QueryFilter;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
@@ -361,9 +362,9 @@ public class TokenDataStoreTest {
     @Test
     public void testQuery() throws Exception {
         // Given
-        Map<String,Object> parameters = new HashMap<String, Object>();
+        QueryFilter<String> query = QueryFilter.alwaysTrue();
         TokenFilter tokenFilter = mock(TokenFilter.class);
-        when(adapter.toTokenQuery(parameters, TokenFilter.Type.AND)).thenReturn(tokenFilter);
+        when(adapter.toTokenQuery(query)).thenReturn(tokenFilter);
         final Token token1 = new Token("123", TokenType.GENERIC);
         final Token token2 = new Token("456", TokenType.GENERIC);
         Object o1 = new Object();
@@ -380,7 +381,7 @@ public class TokenDataStoreTest {
         });
 
         // When
-        Set<Object> result = store.query(parameters, TokenDataStore.FilterType.AND);
+        Set<Object> result = store.query(query);
 
         // Then
         verify(taskFactory).query(eq(tokenFilter), any(ResultHandler.class));
@@ -391,9 +392,9 @@ public class TokenDataStoreTest {
     @Test(expectedExceptions = ServerException.class)
     public void testQueryError() throws Exception {
         // Given
-        Map<String,Object> parameters = new HashMap<String, Object>();
+        QueryFilter<String> query = QueryFilter.alwaysTrue();
         TokenFilter tokenFilter = mock(TokenFilter.class);
-        when(adapter.toTokenQuery(parameters, TokenFilter.Type.AND)).thenReturn(tokenFilter);
+        when(adapter.toTokenQuery(query)).thenReturn(tokenFilter);
         final Token token1 = new Token("123", TokenType.GENERIC);
         final Token token2 = new Token("456", TokenType.GENERIC);
         Object o1 = new Object();
@@ -410,7 +411,7 @@ public class TokenDataStoreTest {
         });
 
         // When
-        store.query(parameters, TokenDataStore.FilterType.AND);
+        store.query(query);
 
         // Then - exception;
     }
@@ -418,9 +419,9 @@ public class TokenDataStoreTest {
     @Test(expectedExceptions = ServerException.class)
     public void testQueryExecutorError() throws Exception {
         // Given
-        Map<String,Object> parameters = new HashMap<String, Object>();
+        QueryFilter<String> query = QueryFilter.alwaysTrue();
         TokenFilter tokenFilter = mock(TokenFilter.class);
-        when(adapter.toTokenQuery(parameters, TokenFilter.Type.AND)).thenReturn(tokenFilter);
+        when(adapter.toTokenQuery(query)).thenReturn(tokenFilter);
         final Token token1 = new Token("123", TokenType.GENERIC);
         final Token token2 = new Token("456", TokenType.GENERIC);
         Object o1 = new Object();
@@ -432,7 +433,7 @@ public class TokenDataStoreTest {
         doThrow(DataLayerException.class).when(taskExecutor).execute(null, task);
 
         // When
-        store.query(parameters, TokenDataStore.FilterType.AND);
+        store.query(query);
 
         // Then - exception;
     }

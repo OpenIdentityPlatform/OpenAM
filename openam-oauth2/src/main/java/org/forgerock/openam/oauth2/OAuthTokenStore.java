@@ -26,6 +26,8 @@ import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.util.query.QueryFilter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -112,32 +114,13 @@ public class OAuthTokenStore {
     /**
      * Queries for OAuth2 tokens based on the specified query parameters.
      *
-     * @param queryParameters The query parameters.
+     * @param query The query parameters.
      * @return A JsonValue of the query results.
      * @throws CoreTokenException If there is a problem performing the query.
      */
-    public JsonValue query(Map<String, Object> queryParameters, TokenFilter.Type type) throws CoreTokenException {
-        Collection<Token> tokens = cts.query(convertRequest(queryParameters, type));
+    public JsonValue query(QueryFilter<CoreTokenField> query) throws CoreTokenException {
+        Collection<Token> tokens = cts.query(new TokenFilterBuilder().withQuery(query).build());
         return convertResults(tokens);
-    }
-
-    /**
-     * Converts the Map of filter parameters into an LDAP filter.
-     *
-     * @param filters A Map of filter parameters.
-     * @param type The type of filter required (and/or).
-     * @return A Mapping of CoreTokenField to Objects to query by.
-     */
-    private TokenFilter convertRequest(Map<String, Object> filters, TokenFilter.Type type) {
-        TokenFilterBuilder.FilterAttributeBuilder builder = new TokenFilterBuilder().type(type);
-
-        for (OAuthTokenField field : OAuthTokenField.values()) {
-            if (filters.containsKey(field.getOAuthField())) {
-                builder.withAttribute(field.getField(), filters.get(field.getOAuthField()));
-            }
-        }
-
-        return builder.build();
     }
 
     /**

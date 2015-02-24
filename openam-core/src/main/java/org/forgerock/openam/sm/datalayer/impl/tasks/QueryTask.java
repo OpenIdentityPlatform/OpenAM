@@ -15,46 +15,33 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
+import java.text.MessageFormat;
+import java.util.Collection;
+
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
-import org.forgerock.openam.sm.datalayer.api.query.FilterConversion;
-import org.forgerock.openam.sm.datalayer.impl.ldap.LdapFilterConversion;
-import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
-import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.util.Reject;
-
-import java.text.MessageFormat;
-import java.util.Collection;
 
 /**
  * Responsible for querying the persistence store for matching Tokens.
  *
  * @see PartialQueryTask
  */
-public class QueryTask<T, F> implements Task {
-    private final FilterConversion<F> conversion;
+public class QueryTask implements Task {
     private final TokenFilter tokenFilter;
     private final ResultHandler<Collection<Token>, ?> handler;
-    private final QueryFactory<T, F> factory;
 
     /**
-     * @param factory Non null.
-     * @param conversion Non null.
      * @param tokenFilter Non null and must not define any Return Attributes.
      * @param handler Non null, required for asynchronous response.
      */
-    public QueryTask(QueryFactory<T, F> factory, FilterConversion<F> conversion,
-                     TokenFilter tokenFilter, ResultHandler<Collection<Token>, ?> handler) {
-        this.conversion = conversion;
+    public QueryTask(TokenFilter tokenFilter, ResultHandler<Collection<Token>, ?> handler) {
         this.tokenFilter = tokenFilter;
         this.handler = handler;
-        this.factory = factory;
     }
 
     /**
@@ -74,17 +61,10 @@ public class QueryTask<T, F> implements Task {
     @Override
     public <C> void execute(C connection, TokenStorageAdapter<C> adapter) throws DataLayerException {
         Reject.ifFalse(tokenFilter.getReturnFields().isEmpty());
-
-        F filter = conversion.convert(tokenFilter);
-        // Perform the query.
         try {
-            // Process Query and return Collection<Tokens>
-            handler.processResults(factory.createInstance()
-                    .withFilter(filter)
-                    .execute((T) connection).next());
-        } catch (DataLayerRuntimeException e) {
+            handler.processResults(adapter.query(connection, tokenFilter));
+        } catch (DataLayerException e) {
             handler.processError(e);
-            throw new DataLayerException("Failure during filter execution", e);
         }
     }
 

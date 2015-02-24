@@ -38,6 +38,7 @@ import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.restlet.Request;
 import org.restlet.data.Status;
@@ -138,12 +139,9 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         //TODO needed?...
         boolean isConditionalRequest = isConditionalRequest();
 
-        Map<String, Object> queryParameters = new HashMap<String, Object>();
-        queryParameters.put(ResourceSetTokenField.CLIENT_ID, getClientId());
-
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        Set<ResourceSetDescription> resourceSetDescriptions = store.query(queryParameters,
-                ResourceSetStore.FilterType.AND);
+        QueryFilter<String> query = QueryFilter.equalTo(ResourceSetTokenField.CLIENT_ID, getClientId());
+        Set<ResourceSetDescription> resourceSetDescriptions = store.query(query);
 
         Set<String> resourceSetIds = new HashSet<String>();
 

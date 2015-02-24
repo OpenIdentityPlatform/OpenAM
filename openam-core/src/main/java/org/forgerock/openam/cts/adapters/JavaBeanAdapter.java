@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -42,6 +43,8 @@ import org.forgerock.openam.tokens.Field;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.Type;
 import org.forgerock.util.Reject;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 
 import com.google.inject.assistedinject.Assisted;
 
@@ -220,19 +223,98 @@ public class JavaBeanAdapter<T> implements TokenAdapter<T> {
     /**
      * Use the bean mappings that have been parsed to turn a query keyed by bean property names into a query keyed by
      * token property names.
-     * @param beanQuery The query keyed by bean property names.
-     * @return The transformed query keyed by token property names.
+     * @param filter The query keyed by bean property names.
+     * @return The transformed query keyed by token field names.
      */
-    public TokenFilter toTokenQuery(Map<String, Object> beanQuery, TokenFilter.Type type) {
-        TokenFilterBuilder.FilterAttributeBuilder builder = new TokenFilterBuilder().type(type);
-        if (type == TokenFilter.Type.AND) {
-            builder.withAttribute(CoreTokenField.TOKEN_TYPE, tokenType);
-        }
-        for (Map.Entry entry : beanQuery.entrySet()) {
-            builder.withAttribute(fieldsMap.get(entry.getKey()).tokenField, entry.getValue());
-        }
-        return builder.build();
+    public TokenFilter toTokenQuery(QueryFilter<String> filter) {
+        TokenFilterBuilder builder = new TokenFilterBuilder();
+        List<QueryFilter<CoreTokenField>> tokenFilter = new ArrayList<QueryFilter<CoreTokenField>>();
+        tokenFilter.add(filter.accept(TOKEN_QUERY_TRANSLATOR, null));
+
+        tokenFilter.add(QueryFilter.equalTo(CoreTokenField.TOKEN_TYPE, tokenType));
+
+        return builder.withQuery(QueryFilter.and(tokenFilter)).build();
     }
+
+    private final QueryFilterVisitor<QueryFilter<CoreTokenField>, Void, String> TOKEN_QUERY_TRANSLATOR =
+            new QueryFilterVisitor<QueryFilter<CoreTokenField>, Void, String>() {
+        @Override
+        public QueryFilter<CoreTokenField> visitAndFilter(Void initial, List<QueryFilter<String>> subFilters) {
+            List<QueryFilter<CoreTokenField>> queryFilters = new ArrayList<QueryFilter<CoreTokenField>>();
+            for (QueryFilter<String> filter : subFilters) {
+                queryFilters.add(filter.accept(this, null));
+            }
+            return QueryFilter.and(queryFilters);
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitBooleanLiteralFilter(Void initial, boolean value) {
+            return value ? QueryFilter.<CoreTokenField>alwaysTrue() : QueryFilter.<CoreTokenField>alwaysFalse();
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitContainsFilter(Void initial, String field, Object valueAssertion) {
+            return QueryFilter.contains(convertToTokenField(field), valueAssertion);
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitEqualsFilter(Void initial, String field, Object valueAssertion) {
+            return QueryFilter.equalTo(convertToTokenField(field), valueAssertion);
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitExtendedMatchFilter(Void initial, String field, String operator, Object valueAssertion) {
+            return QueryFilter.extendedMatch(convertToTokenField(field), operator, valueAssertion);
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitGreaterThanFilter(Void initial, String field, Object valueAssertion) {
+            return QueryFilter.greaterThan(convertToTokenField(field), valueAssertion);
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitGreaterThanOrEqualToFilter(Void initial, String field, Object valueAssertion) {
+            return QueryFilter.greaterThanOrEqualTo(convertToTokenField(field), valueAssertion);
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitLessThanFilter(Void initial, String field, Object valueAssertion) {
+            return QueryFilter.lessThan(convertToTokenField(field), valueAssertion);
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitLessThanOrEqualToFilter(Void initial, String field, Object valueAssertion) {
+            return QueryFilter.lessThanOrEqualTo(convertToTokenField(field), valueAssertion);
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitNotFilter(Void initial, QueryFilter<String> subFilter) {
+            return QueryFilter.not(subFilter.accept(this, null));
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitOrFilter(Void initial, List<QueryFilter<String>> subFilters) {
+            List<QueryFilter<CoreTokenField>> queryFilters = new ArrayList<QueryFilter<CoreTokenField>>();
+            for (QueryFilter<String> filter : subFilters) {
+                queryFilters.add(filter.accept(this, null));
+            }
+            return QueryFilter.or(queryFilters);
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitPresentFilter(Void initial, String field) {
+            return QueryFilter.present(convertToTokenField(field));
+        }
+
+        @Override
+        public QueryFilter<CoreTokenField> visitStartsWithFilter(Void initial, String field, Object valueAssertion) {
+            return QueryFilter.startsWith(convertToTokenField(field), valueAssertion);
+        }
+
+        private CoreTokenField convertToTokenField(String field) {
+            return fieldsMap.get(field).tokenField;
+        }
+    };
 
     private static class FieldDetails {
         private final CoreTokenField tokenField;

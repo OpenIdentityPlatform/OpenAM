@@ -16,25 +16,19 @@
 
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
 import org.forgerock.openam.sm.ConnectionConfig;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConnectionModule;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
-import org.forgerock.openam.sm.datalayer.api.query.FilterConversion;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
@@ -45,10 +39,8 @@ import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider
 import com.google.inject.Key;
 import com.google.inject.PrivateBinder;
 import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
-import com.google.inject.util.Types;
 
 /**
  * An abstract LDAP set of configuration.
@@ -76,11 +68,9 @@ public abstract class LdapDataLayerConnectionModule extends DataLayerConnectionM
         binder.bind(EntryTokenConverter.class);
         binder.bind(LdapQueryBuilder.class);
         binder.bind(LdapQueryFactory.class);
-        binder.bind(LdapQueryFilter.class);
         binder.bind(ConnectionConfig.class).annotatedWith(Names.named(DataLayerConstants.EXTERNAL_CONFIG))
                 .toProvider(ExternalConnectionConfigProvider.class);
         binder.bind(ConnectionFactoryProvider.class).to(LdapConnectionFactoryProvider.class);
-        binder.bind(FilterConversion.class).to(LdapFilterConversion.class);
         binder.bind(ConnectionFactory.class).toProvider(getConnectionFactoryProviderType());
 
         MapBinder<Class, EntryConverter> entryConverterBinder = MapBinder.newMapBinder(binder, Class.class,

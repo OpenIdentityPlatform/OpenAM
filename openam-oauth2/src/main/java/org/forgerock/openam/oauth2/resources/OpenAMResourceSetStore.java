@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.oauth2.resources;
 
+import static org.forgerock.util.query.QueryFilter.*;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,6 +37,7 @@ import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
+import org.forgerock.util.query.QueryFilter;
 
 import com.google.inject.assistedinject.Assisted;
 import com.sun.identity.shared.debug.Debug;
@@ -88,12 +91,11 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     }
 
     private ResourceSetDescription readResourceSet(String resourceSetId, String clientId) throws ServerException {
-        Map<String, Object> queryParameters = new HashMap<String, Object>();
-        queryParameters.put(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId);
-        queryParameters.put(ResourceSetTokenField.CLIENT_ID, clientId);
         Set<ResourceSetDescription> results;
         try {
-            results = delegate.query(queryParameters, TokenDataStore.FilterType.AND);
+            results = delegate.query(and(
+                    equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId),
+                    equalTo(ResourceSetTokenField.CLIENT_ID, clientId)));
         } catch (org.forgerock.openam.sm.datalayer.store.ServerException e) {
             throw new ServerException(e);
         }
@@ -165,12 +167,11 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     }
 
     @Override
-    public Set<ResourceSetDescription> query(Map<String, Object> queryParameters, FilterType type)
+    public Set<ResourceSetDescription> query(QueryFilter<String> query)
             throws ServerException {
         Set<ResourceSetDescription> results;
         try {
-            results = delegate.query(queryParameters,
-                    type == FilterType.AND ? TokenDataStore.FilterType.AND : TokenDataStore.FilterType.OR);
+            results = delegate.query(query);
         } catch (org.forgerock.openam.sm.datalayer.store.ServerException e) {
             throw new ServerException(e);
         }

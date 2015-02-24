@@ -16,7 +16,9 @@
 package org.forgerock.openam.cts.impl.query.reaper;
 
 import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.isNull;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -32,10 +34,10 @@ import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
-import org.forgerock.openam.sm.datalayer.api.query.QueryFilter;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.util.query.QueryFilterVisitor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -46,25 +48,22 @@ public class ReaperImplTest {
     private ReaperImpl<Connection, Filter> impl;
     private QueryBuilder<Connection, Filter> mockBuilder;
     private Connection mockConnection;
-    private QueryFilter<Filter> mockQueryFilter;
-    private QueryFilter<Filter>.QueryFilterBuilder<Filter> mockQueryFilterBuilder;
+    private QueryFilterVisitor<Filter, Void, CoreTokenField> mockQueryFilterConverter;
 
     @BeforeMethod
     public void setup() {
-        mockQueryFilterBuilder = mock(QueryFilter.QueryFilterBuilder.class);
-        given(mockQueryFilterBuilder.beforeDate(any(Calendar.class))).willReturn(mockQueryFilterBuilder);
-        given(mockQueryFilterBuilder.build()).willReturn(Filter.alwaysTrue());
-
-        mockQueryFilter = mock(QueryFilter.class);
-        given(mockQueryFilter.and()).willReturn(mockQueryFilterBuilder);
 
         mockBuilder = mock(QueryBuilder.class);
         given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
         given(mockBuilder.pageResultsBy(anyInt())).willReturn(mockBuilder);
         given(mockBuilder.returnTheseAttributes(any(CoreTokenField.class))).willReturn(mockBuilder);
 
+        mockQueryFilterConverter = mock(QueryFilterVisitor.class);
+        given(mockQueryFilterConverter.visitLessThanFilter((Void)isNull(), eq(CoreTokenField.EXPIRY_DATE), any(Calendar.class)))
+                .willReturn(Filter.alwaysTrue());
+
         mockFactory = mock(QueryFactory.class);
-        given(mockFactory.createFilter()).willReturn(mockQueryFilter);
+        given(mockFactory.createFilterConverter()).willReturn(mockQueryFilterConverter);
         given(mockFactory.createInstance()).willReturn(mockBuilder);
 
         mockConnection = mock(Connection.class);

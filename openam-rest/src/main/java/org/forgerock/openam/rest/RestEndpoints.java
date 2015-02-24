@@ -15,15 +15,13 @@
  */
 package org.forgerock.openam.rest;
 
-import static org.forgerock.openam.rest.service.RestletUtils.wrap;
+import static org.forgerock.openam.rest.service.RestletUtils.*;
+
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Set;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import com.sun.identity.sm.InvalidRealmNameManager;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -34,6 +32,7 @@ import org.forgerock.oauth2.restlet.TokenEndpointFilter;
 import org.forgerock.oauth2.restlet.TokenIntrospectionResource;
 import org.forgerock.oauth2.restlet.ValidationServerResource;
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.forgerockrest.AuditHistory;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
 import org.forgerock.openam.forgerockrest.IdentityResourceV2;
 import org.forgerock.openam.forgerockrest.RealmResource;
@@ -68,13 +67,10 @@ import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.ServiceRouter;
-import org.forgerock.openam.sm.datalayer.api.query.QueryFilter;
+import org.forgerock.openam.rest.uma.UmaPolicyResource;
 import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaExceptionFilter;
-import org.forgerock.openam.rest.uma.UmaPolicyResource;
 import org.forgerock.openam.uma.UmaWellKnownConfigurationEndpoint;
-import org.forgerock.openam.forgerockrest.AuditHistory;
-import org.forgerock.openam.uma.audit.UmaAuditEntry;
 import org.forgerock.openidconnect.restlet.ConnectClientRegistration;
 import org.forgerock.openidconnect.restlet.EndSession;
 import org.forgerock.openidconnect.restlet.OpenIDConnectConfiguration;
@@ -82,6 +78,10 @@ import org.forgerock.openidconnect.restlet.OpenIDConnectJWKEndpoint;
 import org.forgerock.openidconnect.restlet.UserInfo;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+import com.sun.identity.sm.InvalidRealmNameManager;
 
 /**
  * Singleton class which contains both the routers for CREST resources and Restlet service endpoints.

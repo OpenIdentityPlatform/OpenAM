@@ -20,22 +20,15 @@ import static org.mockito.BDDMockito.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.impl.LdapAdapter;
-import org.forgerock.openam.sm.datalayer.api.DataLayerException;
-import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
-import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
-import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
-import org.forgerock.openam.sm.datalayer.impl.ldap.LdapFilterConversion;
+import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.Filter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -43,12 +36,9 @@ public class QueryTaskTest {
 
     private QueryTask task;
     private Connection mockConnection;
-    private LdapAdapter mockAdapter;
-    private QueryFactory mockQueryFactory;
+    private TokenStorageAdapter<Connection> mockAdapter;
     private TokenFilter mockTokenFilter;
     private ResultHandler<Collection<Token>, ?> mockResultHandler;
-    private LdapFilterConversion mockFilterConversion;
-    private QueryBuilder<Connection, Filter> mockQueryBuilder;
 
     @SuppressWarnings("unchecked")
     @BeforeMethod
@@ -58,44 +48,19 @@ public class QueryTaskTest {
         mockTokenFilter = mock(TokenFilter.class);
         mockResultHandler = mock(ResultHandler.class);
 
-        // Query Factory
-        mockQueryFactory = mock(QueryFactory.class);
-        mockQueryBuilder = mock(QueryBuilder.class);
-        given(mockQueryFactory.createInstance()).willReturn(mockQueryBuilder);
-        given(mockQueryBuilder.withFilter(any(Filter.class))).willReturn(mockQueryBuilder);
-        given(mockQueryBuilder.returnTheseAttributes(any(Collection.class))).willReturn(mockQueryBuilder);
-
-        // Filter Conversion
-        mockFilterConversion = mock(LdapFilterConversion.class);
-        given(mockFilterConversion.convert(any(TokenFilter.class))).willReturn(Filter.alwaysTrue());
-
-        task = new QueryTask(mockQueryFactory, mockFilterConversion, mockTokenFilter, mockResultHandler);
+        task = new QueryTask(mockTokenFilter, mockResultHandler);
     }
 
     @Test
     public void shouldExecuteTokenQuery() throws Exception {
         // given
-        given(mockTokenFilter.getReturnFields()).willReturn(Collections.<CoreTokenField>emptySet());
-        given(mockQueryBuilder.execute(eq(mockConnection))).willReturn(
-                Arrays.asList((Collection<Token>)new ArrayList<Token>()).iterator());
+        given(mockAdapter.query(mockConnection, mockTokenFilter)).willReturn(new ArrayList<Token>());
 
         // when
         task.execute(mockConnection, mockAdapter);
 
         // then
-        verify(mockQueryBuilder).execute(eq(mockConnection));
         verify(mockResultHandler).processResults(any(ArrayList.class));
-    }
-
-    @Test (expectedExceptions = DataLayerException.class)
-    public void shouldHandleQueryFailure() throws Exception {
-        // Given
-        Iterator<Collection<Token>> iterator = mock(Iterator.class);
-        given(mockQueryBuilder.execute(any(Connection.class))).willReturn(iterator);
-        given(iterator.next()).willThrow(new DataLayerRuntimeException("test"));
-
-        // When
-        task.execute(mockConnection, mockAdapter);
     }
 
     @Test (expectedExceptions = IllegalArgumentException.class)

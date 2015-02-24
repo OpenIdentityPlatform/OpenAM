@@ -18,12 +18,12 @@ package org.forgerock.openam.sm.datalayer.impl.ldap;
 
 import javax.inject.Inject;
 
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
-import org.forgerock.openam.sm.datalayer.api.query.QueryFilter;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.util.query.QueryFilterVisitor;
 
 import com.google.inject.Injector;
 
@@ -45,7 +45,8 @@ public class LdapQueryFactory implements QueryFactory<Connection, Filter> {
     }
 
     @Override
-    public QueryFilter<Filter> createFilter() {
-        return injector.getInstance(LdapQueryFilter.class);
+    public QueryFilterVisitor<Filter, Void, CoreTokenField> createFilterConverter() {
+        return injector.getInstance(LdapQueryFilterVisitor.class);
     }
+
 }

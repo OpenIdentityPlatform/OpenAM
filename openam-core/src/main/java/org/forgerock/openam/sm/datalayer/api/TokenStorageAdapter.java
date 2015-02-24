@@ -16,7 +16,11 @@
 
 package org.forgerock.openam.sm.datalayer.api;
 
+import java.util.Collection;
+
+import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 
 /**
  * Adapts the token to some activity against the connection type, T.
@@ -61,5 +65,23 @@ public interface TokenStorageAdapter<T> {
      * @throws LdapOperationFailedException If the operation failed, this exception will capture the reason.
      */
     void delete(T connection, String tokenId) throws DataLayerException;
+
+    /**
+     * Performs a full-token query using the provided filter.
+     *
+     * @param connection Non null connection to call.
+     * @param query The non null filter specification.
+     * @throws DataLayerException If the operation failed, this exception will capture the reason.
+     */
+    Collection<Token> query(T connection, TokenFilter query) throws DataLayerException;
+
+    /**
+     * Performs a partial query using the provided filter.
+     *
+     * @param connection Non null connection to call.
+     * @param query The non null filter specification.
+     * @throws DataLayerException If the operation failed, this exception will capture the reason.
+     */
+    Collection<PartialToken> partialQuery(T connection, TokenFilter query) throws DataLayerException;
 
 }

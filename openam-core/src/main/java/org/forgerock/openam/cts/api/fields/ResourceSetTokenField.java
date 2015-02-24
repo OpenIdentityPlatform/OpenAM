@@ -13,10 +13,8 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.cts.api.fields;
 
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.openam.tokens.CoreTokenField;
+package org.forgerock.openam.cts.api.fields;
 
 /**
  * The ResourceSetTokenField provides a mapping between known ResourceSetDescription fields and the LDAP Attributes
@@ -29,4 +27,5 @@ public final class ResourceSetTokenField {
     public static final String RESOURCE_SET_ID = "resourceSetId";
     public static final String POLICY_URI = "policyUri";
     public static final String CLIENT_ID = "clientId";
+    public static final String NAME = "name";
 }

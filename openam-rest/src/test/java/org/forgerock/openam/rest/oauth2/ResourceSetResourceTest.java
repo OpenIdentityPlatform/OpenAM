@@ -16,19 +16,25 @@
 
 package org.forgerock.openam.rest.oauth2;
 
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
-import static org.mockito.BDDMockito.given;
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.Arrays;
+
+import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
@@ -40,6 +46,7 @@ import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.uma.UmaPolicyService;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -55,8 +62,9 @@ public class ResourceSetResourceTest {
 
         ResourceSetStoreFactory resourceSetStoreFactory = mock(ResourceSetStoreFactory.class);
         resourceSetStore = mock(ResourceSetStore.class);
+        UmaPolicyService policyService = mock(UmaPolicyService.class);
 
-        resource = new ResourceSetResource(resourceSetStoreFactory);
+        resource = new ResourceSetResource(resourceSetStoreFactory, policyService);
 
         given(resourceSetStoreFactory.create("REALM")).willReturn(resourceSetStore);
     }
@@ -69,6 +77,7 @@ public class ResourceSetResourceTest {
         realmContext.addDnsAlias("", "REALM");
         ServerContext context = new ServerContext(realmContext);
         ReadRequest request = mock(ReadRequest.class);
+        given(request.getFields()).willReturn(Arrays.asList(new JsonPointer("/fred")));
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceSetDescription resourceSet = new ResourceSetDescription();
         resourceSet.setDescription(json(object()));
@@ -179,11 +188,38 @@ public class ResourceSetResourceTest {
         ServerContext context = mock(ServerContext.class);
         QueryRequest request = mock(QueryRequest.class);
         QueryResultHandler handler = mock(QueryResultHandler.class);
+        given(request.getQueryFilter()).willReturn(QueryFilter.equalTo(new JsonPointer("/fred"), 5));
 
         //When
         resource.queryCollection(context, request, handler);
 
         //Then
         verify(handler).handleError(Matchers.<NotSupportedException>anyObject());
+    }
+
+    @Test
+    public void nameQueryShouldBeSupported() throws Exception {
+
+        //Given
+        RealmContext realmContext = new RealmContext(new RootContext());
+        realmContext.addDnsAlias("", "REALM");
+        ServerContext context = new ServerContext(realmContext);
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getFields()).willReturn(Arrays.asList(new JsonPointer("/fred")));
+        QueryResultHandler handler = mock(QueryResultHandler.class);
+        ResourceSetDescription resourceSet = new ResourceSetDescription();
+        resourceSet.setId("abc123");
+        resourceSet.setResourceSetId("1");
+        resourceSet.setClientId("myclient");
+        resourceSet.setDescription(json(object()));
+
+        given(request.getQueryFilter()).willReturn(QueryFilter.equalTo(new JsonPointer("/name"), 5));
+        given(resourceSetStore.query(any(org.forgerock.util.query.QueryFilter.class))).willReturn(asSet(resourceSet));
+
+        //When
+        resource.queryCollection(context, request, handler);
+
+        //Then
+        verify(handler).handleResult(any(QueryResult.class));
     }
 }

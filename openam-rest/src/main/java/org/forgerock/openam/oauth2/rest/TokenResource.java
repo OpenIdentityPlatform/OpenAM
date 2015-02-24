@@ -62,14 +62,17 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.oauth2.IdentityManager;
 import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.oauth2.OpenAMOAuth2ProviderSettingsFactory;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.ClientDAO;
+import org.forgerock.util.query.QueryFilter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -78,6 +81,7 @@ import java.security.AccessController;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -96,6 +100,8 @@ public class TokenResource implements CollectionResourceProvider {
     private static final DateFormat DATE_FORMATTER = (new SimpleDateFormat()).getDateTimeInstance(DateFormat.MEDIUM,
             DateFormat.SHORT);
     public static final String EXPIRE_TIME_KEY = "expireTime";
+    public static final CoreTokenField USERNAME_FIELD = OAuthTokenField.USER_NAME.getField();
+    public static final CoreTokenField REALM_FIELD = OAuthTokenField.REALM.getField();
     private final ClientDAO clientDao;
 
     private final OAuthTokenStore tokenStore;
@@ -292,15 +298,15 @@ public class TokenResource implements CollectionResourceProvider {
     public void queryCollection(ServerContext context, QueryRequest queryRequest, QueryResultHandler handler) {
         try {
             JsonValue response;
-            Map<String, Object> query = new HashMap<String, Object>();
+            Collection<QueryFilter<CoreTokenField>> query = new ArrayList<QueryFilter<CoreTokenField>>();
 
             //get uid of submitter
             AMIdentity uid;
             try {
                 uid = getUid(context);
                 if (!uid.equals(adminUserId)) {
-                    query.put(USERNAME, uid.getName());
-                    query.put(REALM, DNMapper.orgNameToRealmName(uid.getRealm()));
+                    query.add(QueryFilter.equalTo(USERNAME_FIELD, uid.getName()));
+                    query.add(QueryFilter.equalTo(REALM_FIELD, DNMapper.orgNameToRealmName(uid.getRealm())));
                 }
             } catch (Exception e) {
                 if (debug.errorEnabled()) {
@@ -323,11 +329,11 @@ public class TokenResource implements CollectionResourceProvider {
             for (String constraint : constraints) {
                 String[] params = constraint.split("=");
                 if (params.length == 2) {
-                    query.put(params[0], params[1]);
+                    query.add(QueryFilter.equalTo(getOAuth2TokenField(params[0]), params[1]));
                 }
             }
 
-            response = tokenStore.query(query, TokenFilter.Type.AND);
+            response = tokenStore.query(QueryFilter.and(query));
             handleResponse(handler, response, context);
 
         } catch (UnauthorizedClientException e) {
@@ -343,6 +349,15 @@ public class TokenResource implements CollectionResourceProvider {
             debug.error("TokenResource :: QUERY : Unable to query collection as realm does not have OAuth 2 provider.", e);
             handler.handleError(e);
         }
+    }
+
+    private CoreTokenField getOAuth2TokenField(String fieldname) {
+        for (OAuthTokenField field : OAuthTokenField.values()) {
+            if (field.getOAuthField().equals(fieldname)) {
+                return field.getField();
+            }
+        }
+        throw new IllegalArgumentException("I don't understand the OAuth 2.0 field called " + fieldname);
     }
 
     private void handleResponse(QueryResultHandler handler, JsonValue response, ServerContext context) throws UnauthorizedClientException,

@@ -17,6 +17,7 @@ package org.forgerock.openam.cts.api.filter;
 
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Reject;
+import org.forgerock.util.query.QueryFilter;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -30,59 +31,31 @@ import java.util.*;
  */
 public class TokenFilter {
     private Set<CoreTokenField> returnFields;
-
-    public enum Type {
-        AND,
-        OR
-    }
-
-    private Type type;
-    private Map<CoreTokenField, Object> filters;
+    private QueryFilter<CoreTokenField> query;
 
     /**
-     * Package private field to indicate that the TokenFilterBuilder is the recommended
+     * Package private field to indicate that the {@link TokenFilterBuilder} is the recommended
      * way of assembling this object.
      */
     TokenFilter() {
-        type = Type.AND;
-        filters = new HashMap<CoreTokenField, Object>();
         returnFields = new HashSet<CoreTokenField>();
-    }
-
-    /**
-     * The type of the Filter.
-     *
-     * @return AND by default, otherwise non null.
-     */
-    public Type getType() {
-        return type;
-    }
-
-    /**
-     * Assign the type to the Filter.
-     * @param type Non null Type.
-     */
-    public void setType(Type type) {
-        Reject.ifNull(type);
-        this.type = type;
     }
 
     /**
      * Inspect the CoreTokenField, Object pairs that have been assigned as filters.
      * @return An unmodifiable Map of filter components.
      */
-    public Map<CoreTokenField, Object> getFilters() {
-        return Collections.unmodifiableMap(filters);
+    public QueryFilter<CoreTokenField> getQuery() {
+        return query;
     }
 
     /**
-     * Append another filter component to the Filter.
-     * @param field Non null CoreTokenField.
-     * @param value Non null value.
+     * Set the query component to the Filter.
+     * @param query Non null query.
      */
-    public void addFilter(CoreTokenField field, Object value) {
-        Reject.ifNull(field, value);
-        filters.put(field, value);
+    public void setQuery(QueryFilter<CoreTokenField> query) {
+        Reject.ifNull(query);
+        this.query = query;
     }
 
     /**
@@ -116,22 +89,14 @@ public class TokenFilter {
      * @return Non null.
      */
     public String toString() {
-        StringBuilder f = new StringBuilder();
-        for (Map.Entry<CoreTokenField, Object> entry : getFilters().entrySet()) {
-            f.append(entry.getKey().toString())
-                    .append("=").append(entry.getValue())
-                    .append("\n");
-        }
-
         StringBuilder a = new StringBuilder();
         String separator = ",";
         for (CoreTokenField field : getReturnFields()) {
             a.append(field.toString()).append(separator);
         }
         return MessageFormat.format(
-                "TokenFilter Type: {0} Filters: {1} Attributes: {2}",
-                getType().toString(),
-                f,
+                "TokenFilter: Filter: [{0}] Attributes: {1}",
+                query,
                 a);
     }
 }

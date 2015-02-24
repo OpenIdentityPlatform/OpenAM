@@ -29,6 +29,7 @@ import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.util.Reject;
+import org.forgerock.util.query.QueryFilter;
 
 /**
  * This implementation will construct an appropriate filter to use for querying the persistence layer
@@ -48,9 +49,9 @@ public class ReaperImpl<C, F> implements ReaperQuery {
 
         Calendar calendar = Calendar.getInstance();
 
-        F expired = queryFactoryProvided.createFilter().and().beforeDate(calendar).build();
+        QueryFilter<CoreTokenField> filter = QueryFilter.lessThan(CoreTokenField.EXPIRY_DATE, calendar);
         query = queryFactoryProvided.createInstance()
-                .withFilter(expired)
+                .withFilter(filter.accept(queryFactoryProvided.createFilterConverter(), null))
                 .pageResultsBy(pageSize)
                 .returnTheseAttributes(CoreTokenField.TOKEN_ID);
     }

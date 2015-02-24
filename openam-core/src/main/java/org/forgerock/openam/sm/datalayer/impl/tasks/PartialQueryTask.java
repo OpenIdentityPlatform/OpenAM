@@ -16,21 +16,15 @@
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
 
+import java.util.Collection;
+
 import org.forgerock.openam.cts.api.filter.TokenFilter;
-import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
-import org.forgerock.openam.sm.datalayer.api.query.FilterConversion;
-import org.forgerock.openam.sm.datalayer.impl.ldap.LdapFilterConversion;
-import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
-import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
-import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.util.Reject;
-
-import java.text.MessageFormat;
-import java.util.Collection;
 
 /**
  * Performs a partial query against LDAP. Partial queries operate like normal queries
@@ -39,22 +33,15 @@ import java.util.Collection;
  *
  * @see QueryTask
  */
-public class PartialQueryTask<T, F> implements Task {
+public class PartialQueryTask implements Task {
     private final ResultHandler<Collection<PartialToken>, ?> handler;
     private final TokenFilter tokenFilter;
-    private final QueryFactory<T, F> factory;
-    private final FilterConversion<F> conversion;
 
     /**
-     * @param factory Non null.
-     * @param conversion Non null.
      * @param tokenFilter Non null and must define at least one Return Attribute.
      * @param handler Non null, required for asynchronous response.
      */
-    public PartialQueryTask(QueryFactory<T, F> factory, FilterConversion<F> conversion,
-                            TokenFilter tokenFilter, ResultHandler<Collection<PartialToken>, ?> handler) {
-        this.factory = factory;
-        this.conversion = conversion;
+    public PartialQueryTask(TokenFilter tokenFilter, ResultHandler<Collection<PartialToken>, ?> handler) {
         this.handler = handler;
         this.tokenFilter = tokenFilter;
     }
@@ -69,22 +56,15 @@ public class PartialQueryTask<T, F> implements Task {
     @Override
     public <C> void execute(C connection, TokenStorageAdapter<C> adapter) throws DataLayerException {
         Reject.ifTrue(tokenFilter.getReturnFields().isEmpty());
-
-        F filter = conversion.convert(tokenFilter);
-        // Perform the query.
         try {
-            handler.processResults(factory.createInstance()
-                    .withFilter(filter)
-                    .returnTheseAttributes(tokenFilter.getReturnFields())
-                    .executeAttributeQuery((T) connection).next());
-        } catch (DataLayerRuntimeException e) {
+            handler.processResults(adapter.partialQuery(connection, tokenFilter));
+        } catch (DataLayerException e) {
             handler.processError(e);
-            throw new DataLayerException("Failure during filter execution", e);
         }
     }
 
     @Override
     public String toString() {
-        return MessageFormat.format("PartialQueryTask: {0}", tokenFilter);
+        return "PartialQueryTask: " + tokenFilter;
     }
 }

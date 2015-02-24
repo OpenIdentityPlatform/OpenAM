@@ -16,13 +16,8 @@
 
 package org.forgerock.openam.sm.datalayer.api.query;
 
-import java.lang.reflect.ParameterizedType;
-
-import org.forgerock.guice.core.InjectorHolder;
-
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import com.google.inject.util.Types;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.util.query.QueryFilterVisitor;
 
 /**
  * Responsible for generating instances of QueryBuilder and QueryFilter to perform queries against
@@ -44,5 +39,5 @@ public interface QueryFactory<T, F> {
      *
      * @return A non null QueryFilter instance.
      */
-    public QueryFilter<F> createFilter();
+    public QueryFilterVisitor<F, Void, CoreTokenField> createFilterConverter();
 }

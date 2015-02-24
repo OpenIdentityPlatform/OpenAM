@@ -15,11 +15,18 @@
  */
 package org.forgerock.openam.cts.impl;
 
+import java.util.Collection;
+
+import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+import org.forgerock.openam.sm.datalayer.api.DataLayerRuntimeException;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
 import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
 import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFactory;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFilterVisitor;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entries;
@@ -42,14 +49,19 @@ import javax.inject.Inject;
  */
 public class LdapAdapter implements TokenStorageAdapter<Connection> {
     private final LdapTokenAttributeConversion conversion;
+    private final LdapQueryFilterVisitor queryConverter;
+    private final LdapQueryFactory queryFactory;
 
     /**
      * Create an instance of this adapter.
      * @param conversion Non null, required for Token conversion.
      */
     @Inject
-    public LdapAdapter(LdapTokenAttributeConversion conversion) {
+    public LdapAdapter(LdapTokenAttributeConversion conversion, LdapQueryFilterVisitor queryConverter,
+            LdapQueryFactory queryFactory) {
         this.conversion = conversion;
+        this.queryConverter = queryConverter;
+        this.queryFactory = queryFactory;
     }
 
     /**
@@ -141,6 +153,29 @@ public class LdapAdapter implements TokenStorageAdapter<Connection> {
                 return;
             }
             throw new LdapOperationFailedException(e.getResult());
+        }
+    }
+
+    @Override
+    public Collection<Token> query(Connection connection, TokenFilter query) throws DataLayerException {
+        try {
+            return queryFactory.createInstance()
+                    .withFilter(query.getQuery().accept(queryConverter, null))
+                    .execute(connection).next();
+        } catch (DataLayerRuntimeException e) {
+            throw new DataLayerException("Error during partial query", e);
+        }
+    }
+
+    @Override
+    public Collection<PartialToken> partialQuery(Connection connection, TokenFilter query) throws DataLayerException {
+        try {
+            return queryFactory.createInstance()
+                    .returnTheseAttributes(query.getReturnFields())
+                    .withFilter(query.getQuery().accept(queryConverter, null))
+                    .executeAttributeQuery(connection).next();
+        } catch (DataLayerRuntimeException e) {
+            throw new DataLayerException("Error during partial query", e);
         }
     }
 

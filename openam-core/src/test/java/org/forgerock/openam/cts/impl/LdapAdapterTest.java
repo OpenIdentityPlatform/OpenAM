@@ -16,7 +16,14 @@
  */
 package org.forgerock.openam.cts.impl;
 
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.sm.datalayer.api.query.QueryBuilder;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFactory;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapQueryFilterVisitor;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException;
@@ -26,31 +33,56 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
 import org.forgerock.opendj.ldap.responses.Result;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.*;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.fail;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 public class LdapAdapterTest {
+
+    private Connection mockConnection;
+    private LdapQueryFactory mockQueryFactory;
+    private LdapQueryFilterVisitor mockQueryVisitor;
+    private LdapAdapter adapter;
+    private LdapTokenAttributeConversion mockConversion;
+
+    @BeforeMethod
+    private void setup() throws Exception {
+        mockConnection = mock(Connection.class);
+        mockConversion = mock(LdapTokenAttributeConversion.class);
+        mockQueryFactory = mock(LdapQueryFactory.class);
+        mockQueryVisitor = mock(LdapQueryFilterVisitor.class);
+
+        adapter = new LdapAdapter(mockConversion, mockQueryVisitor, mockQueryFactory);
+    }
+
     @Test
-    public void shouldUseConnectionForCreate() throws LdapOperationFailedException, ErrorResultException {
+    public void shouldUseConnectionForCreate() throws Exception {
         // Given
         Token token = new Token("badger", TokenType.SESSION);
 
-        Connection mockConnection = mock(Connection.class);
         Result successResult = mockSuccessfulResult();
         given(mockConnection.add(any(Entry.class))).willReturn(successResult);
 
-        LdapTokenAttributeConversion mockConversion = mock(LdapTokenAttributeConversion.class);
         given(mockConversion.getEntry(any(Token.class))).willReturn(mock(Entry.class));
-
-        LdapAdapter adapter = new LdapAdapter(mockConversion);
 
         // When
         adapter.create(mockConnection, token);
@@ -65,11 +97,7 @@ public class LdapAdapterTest {
         String tokenId = "badger";
         DN testDN = DN.rootDN();
 
-        Connection mockConnection = mock(Connection.class);
-        LdapTokenAttributeConversion mockConversion = mock(LdapTokenAttributeConversion.class);
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
-
-        LdapAdapter adapter = new LdapAdapter(mockConversion);
 
         // When
         adapter.read(mockConnection, tokenId);
@@ -86,14 +114,10 @@ public class LdapAdapterTest {
         String tokenId = "badger";
         DN testDN = DN.rootDN();
 
-        Connection mockConnection = mock(Connection.class);
         ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.NO_SUCH_OBJECT);
         given(mockConnection.readEntry(eq(testDN))).willThrow(exception);
 
-        LdapTokenAttributeConversion mockConversion = mock(LdapTokenAttributeConversion.class);
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
-
-        LdapAdapter adapter = new LdapAdapter(mockConversion);
 
         // When
         Token result = adapter.read(mockConnection, tokenId);
@@ -108,14 +132,10 @@ public class LdapAdapterTest {
         String tokenId = "badger";
         DN testDN = DN.rootDN();
 
-        Connection mockConnection = mock(Connection.class);
         Result successResult = mockSuccessfulResult();
         given(mockConnection.delete(anyString())).willReturn(successResult);
 
-        LdapTokenAttributeConversion mockConversion = mock(LdapTokenAttributeConversion.class);
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
-
-        LdapAdapter adapter = new LdapAdapter(mockConversion);
 
         // When
         adapter.delete(mockConnection, tokenId);
@@ -132,14 +152,10 @@ public class LdapAdapterTest {
         String tokenId = "badger";
         DN testDN = DN.rootDN();
 
-        Connection mockConnection = mock(Connection.class);
         ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.NO_SUCH_OBJECT);
         given(mockConnection.delete(anyString())).willThrow(exception);
 
-        LdapTokenAttributeConversion mockConversion = mock(LdapTokenAttributeConversion.class);
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
-
-        LdapAdapter adapter = new LdapAdapter(mockConversion);
 
         // When / Then
         adapter.delete(mockConnection, tokenId);
@@ -151,14 +167,10 @@ public class LdapAdapterTest {
         String tokenId = "badger";
         DN testDN = DN.rootDN();
 
-        Connection mockConnection = mock(Connection.class);
         ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.OTHER);
         given(mockConnection.delete(anyString())).willThrow(exception);
 
-        LdapTokenAttributeConversion mockConversion = mock(LdapTokenAttributeConversion.class);
         given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
-
-        LdapAdapter adapter = new LdapAdapter(mockConversion);
 
         // When / Then
         try {
@@ -180,7 +192,7 @@ public class LdapAdapterTest {
         when(config.getTokenStoreRootSuffix()).thenReturn(DN.valueOf("ou=unit-test"));
         LDAPDataConversion dataConversion = new LDAPDataConversion();
         LdapTokenAttributeConversion conversion = new LdapTokenAttributeConversion(dataConversion, config);
-        LdapAdapter adapter = new LdapAdapter(conversion);
+        adapter = new LdapAdapter(conversion, mockQueryVisitor, mockQueryFactory);
 
         // When
         adapter.update(mockConnection, first, second);
@@ -203,13 +215,80 @@ public class LdapAdapterTest {
         when(config.getTokenStoreRootSuffix()).thenReturn(DN.valueOf("ou=unit-test"));
         LDAPDataConversion dataConversion = new LDAPDataConversion();
         LdapTokenAttributeConversion conversion = new LdapTokenAttributeConversion(dataConversion, config);
-        LdapAdapter adapter = new LdapAdapter(conversion);
+        LdapAdapter adapter = new LdapAdapter(conversion, null, null);
 
         // When
         adapter.update(mockConnection, first, second);
 
         // Then
         verify(mockConnection).modify(any(ModifyRequest.class));
+    }
+
+    @Test
+    public void shouldQuery() throws Exception {
+        // Given
+        final QueryBuilder<Connection, Filter> mockBuilder = mock(QueryBuilder.class);
+        given(mockBuilder.withFilter(any(Filter.class))).willAnswer(new Answer<QueryBuilder<Connection, Filter>>() {
+            @Override
+            public QueryBuilder<Connection, Filter> answer(InvocationOnMock invocation) throws Throwable {
+                return mockBuilder;
+            }
+        });
+        given(mockBuilder.execute(any(Connection.class)))
+                .willReturn(Arrays.asList((Collection<Token>) Arrays.asList(new Token("weasel", TokenType.OAUTH))).iterator());
+        given(mockQueryFactory.createInstance()).willReturn(mockBuilder);
+        QueryFilterVisitor<Filter, Void, CoreTokenField> visitor = mock(QueryFilterVisitor.class);
+        given(mockQueryFactory.createFilterConverter()).willReturn(visitor);
+        given(visitor.visitBooleanLiteralFilter(null, true)).willReturn(Filter.alwaysTrue());
+
+        // When
+        TokenFilter filter = new TokenFilterBuilder().withQuery(QueryFilter.<CoreTokenField>alwaysTrue()).build();
+        Collection<Token> result = adapter.query(mockConnection, filter);
+
+        // Then
+        verify(mockBuilder).withFilter(any(Filter.class));
+        verify(mockBuilder).execute(mockConnection);
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.iterator().next().getTokenId()).isEqualTo("weasel");
+    }
+
+    @Test
+    public void shouldPartialQuery() throws Exception {
+        // Given
+        final QueryBuilder<Connection, Filter> mockBuilder = mock(QueryBuilder.class);
+        given(mockBuilder.withFilter(any(Filter.class))).willAnswer(new Answer<QueryBuilder<Connection, Filter>>() {
+            @Override
+            public QueryBuilder<Connection, Filter> answer(InvocationOnMock invocation) throws Throwable {
+                return mockBuilder;
+            }
+        });
+        given(mockBuilder.returnTheseAttributes(anySetOf(CoreTokenField.class))).willAnswer(new Answer<QueryBuilder<Connection, Filter>>() {
+            @Override
+            public QueryBuilder<Connection, Filter> answer(InvocationOnMock invocation) throws Throwable {
+                return mockBuilder;
+            }
+        });
+
+        PartialToken partialToken = new PartialToken(new HashMap<CoreTokenField, Object>());
+        given(mockBuilder.executeAttributeQuery(any(Connection.class)))
+                .willReturn(Arrays.asList((Collection<PartialToken>) Arrays.asList(partialToken)).iterator());
+        given(mockQueryFactory.createInstance()).willReturn(mockBuilder);
+        QueryFilterVisitor<Filter, Void, CoreTokenField> visitor = mock(QueryFilterVisitor.class);
+        given(mockQueryFactory.createFilterConverter()).willReturn(visitor);
+        given(visitor.visitBooleanLiteralFilter(null, true)).willReturn(Filter.alwaysTrue());
+
+        // When
+        TokenFilter filter = new TokenFilterBuilder()
+                .withQuery(QueryFilter.<CoreTokenField>alwaysTrue())
+                .returnAttribute(CoreTokenField.STRING_ONE)
+                .build();
+        Collection<PartialToken> result = adapter.partialQuery(mockConnection, filter);
+
+        // Then
+        verify(mockBuilder).withFilter(any(Filter.class));
+        verify(mockBuilder).returnTheseAttributes(asSet(CoreTokenField.STRING_ONE));
+        verify(mockBuilder).executeAttributeQuery(mockConnection);
+        assertThat(result).containsOnly(partialToken);
     }
 
     private static Result mockSuccessfulResult() {

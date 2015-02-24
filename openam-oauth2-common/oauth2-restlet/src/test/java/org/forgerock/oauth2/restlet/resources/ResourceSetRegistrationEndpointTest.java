@@ -16,24 +16,26 @@
 
 package org.forgerock.oauth2.restlet.resources;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.fluent.JsonValue.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
@@ -48,8 +50,9 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.util.query.BaseQueryFilterVisitor;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;
@@ -67,6 +70,9 @@ import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ResourceSetRegistrationEndpointTest {
 
@@ -299,21 +305,31 @@ public class ResourceSetRegistrationEndpointTest {
 
         noUriResourceSetId();
         noConditions();
-        given(store.query(anyMapOf(String.class, Object.class), eq(ResourceSetStore.FilterType.AND)))
+        given(store.query(any(QueryFilter.class)))
                 .willReturn(resourceSetDescriptions);
 
         //When
         Representation responseRep = endpoint.readOrListResourceSet();
 
         //Then
-        ArgumentCaptor<Map> queryParametersCaptor =
-                ArgumentCaptor.forClass(Map.class);
-        verify(store).query(queryParametersCaptor.capture(), eq(ResourceSetStore.FilterType.AND));
-        assertThat(queryParametersCaptor.getValue()).containsExactly(
+        ArgumentCaptor<QueryFilter> queryParametersCaptor =
+                ArgumentCaptor.forClass(QueryFilter.class);
+        verify(store).query(queryParametersCaptor.capture());
+        QueryFilter<String> query = queryParametersCaptor.getValue();
+        Map<String, String> params = query.accept(QUERY_PARAMS_EXTRACTOR, new HashMap<String, String>());
+        assertThat(params).containsExactly(
                 entry(ResourceSetTokenField.CLIENT_ID, "CLIENT_ID"));
 
         List<String> responseBody = (List<String>) new ObjectMapper()
                 .readValue(responseRep.getText(), List.class);
         assertThat(responseBody).contains("RESOURCE_SET_ID", "RESOURCE_SET_ID_2");
     }
+
+    private static final QueryFilterVisitor<Map<String, String>, Map<String, String>, String> QUERY_PARAMS_EXTRACTOR =
+            new BaseQueryFilterVisitor<Map<String, String>, Map<String, String>, String>() {
+                public Map<String, String> visitEqualsFilter(Map<String, String> map, String field, Object value) {
+                    map.put(field, value.toString());
+                    return map;
+                }
+            };
 }

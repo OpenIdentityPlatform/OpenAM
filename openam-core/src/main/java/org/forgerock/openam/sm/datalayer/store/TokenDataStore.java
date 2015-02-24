@@ -36,6 +36,7 @@ import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
 import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
 import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.util.Reject;
+import org.forgerock.util.query.QueryFilter;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -179,23 +180,21 @@ public class TokenDataStore<T> {
     /**
      * Query the store for instances.
      *
-     * @param queryParameters The criteria of the query, using {@code T} bean property names as keys.
-     * @param type How to join the parameters.
+     * @param query The criteria of the query, using {@code T} bean property names as fields.
      * @return A set of all matching objects.
      * @throws ServerException When an error occurs when querying the store.
      */
-    public Set<T> query(Map<String, Object> queryParameters, FilterType type) throws ServerException {
-        TokenFilter.Type queryType = FilterType.AND == type ? TokenFilter.Type.AND : TokenFilter.Type.OR;
+    public Set<T> query(QueryFilter<String> query) throws ServerException {
         SyncResultHandler<Collection<Token>> handler = new SyncResultHandler<Collection<Token>>();
         try {
-            Task task = taskFactory.query(adapter.toTokenQuery(queryParameters, queryType), handler);
+            Task task = taskFactory.query(adapter.toTokenQuery(query), handler);
             taskExecutor.execute(null, task);
             return convertResults(handler.getResults());
         } catch (ServerException e) {
             throw e;
         } catch (DataLayerException e) {
             if (debug.warningEnabled()) {
-                debug.warning("Unable to read objects corresponding to query: " + queryParameters, e);
+                debug.warning("Unable to read objects corresponding to query: " + query, e);
             }
             throw new ServerException("Could not query tokens from data store: " + e.getMessage());
         }
