@@ -1160,6 +1160,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                     ResourceException be = new BadRequestException("id in path does not match id in request body");
                     debug.error("IdentityResource.createInstance() :: Cannot CREATE ", be);
                     handler.handleError(be);
+                    return;
                 }
             }
             identity.setName(resourceId);
