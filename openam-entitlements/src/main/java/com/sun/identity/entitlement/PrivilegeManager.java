@@ -24,7 +24,7 @@
  *
  * $Id: PrivilegeManager.java,v 1.8 2010/01/26 20:10:15 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -154,7 +154,7 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
         privilege.validateSubject(privilege.getSubject());
 
         final ResourceType resourceType = resourceTypeService
-                .getResourceType(adminSubject, realm, privilege.getResourceTypeUuid());
+                .getResourceType(PrivilegeManager.superAdminSubject, realm, privilege.getResourceTypeUuid());
 
         if (resourceType == null) {
             throw new EntitlementException(
