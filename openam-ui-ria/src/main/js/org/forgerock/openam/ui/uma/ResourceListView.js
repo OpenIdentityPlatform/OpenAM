@@ -47,10 +47,11 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
                 columns,
                 grid,
                 paginator,
-                ResourceSetCollection;
+                ResourceSetCollection,
+                realm = backgridUtils.getRealm(); 
 
             ResourceSetCollection = Backbone.PageableCollection.extend({
-                url: "/" + constants.context + "/json/users/" + conf.loggedUser.username + '/uma/policies',
+                url: "/" + constants.context + "/json" + realm + "/users/" + conf.loggedUser.username + '/uma/policies',
                 state: {
                     pageSize: 10,
                     sortKey: "name"
@@ -59,6 +60,7 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
                     pageSize: "_pageSize",
                     sortKey: "_sortKeys",
                     _queryFilter: 'resourceServer+eq+"RSClient"'
+                    //_queryFilter: backgridUtils.queryFilter
                     /* TODO : Temp until endpoint working
                     // backgridUtils.queryFilter=true,
                     //_pagedResultsOffset:  backgridUtils.pagedResultsOffset*/

@@ -45,7 +45,8 @@ define("org/forgerock/openam/ui/uma/HistoryView", [
                 columns,
                 grid,
                 paginator,
-                HistoryCollection;
+                HistoryCollection,
+                realm = backgridUtils.getRealm();
 
             HistoryCollection = Backbone.PageableCollection.extend({
                 // a link is needed
@@ -56,13 +57,7 @@ define("org/forgerock/openam/ui/uma/HistoryView", [
                     order: 1,
                     _pagedResultsOffset : 0
                 },
-                queryParams: {
-                    pageSize: "_pageSize",
-                    sortKey: "_sortKeys",
-                    _queryFilter: backgridUtils.queryFilter,
-                    _pagedResultsOffset: backgridUtils.pagedResultsOffset
-                },
-
+                queryParams : backgridUtils.getQueryParams(),
                 parseState: backgridUtils.parseState,
                 parseRecords: backgridUtils.parseRecords,
                 sync: backgridUtils.sync

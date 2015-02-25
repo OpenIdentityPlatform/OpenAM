@@ -26,8 +26,9 @@
 
 define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
   "moment",
-  "org/forgerock/commons/ui/common/util/UIUtils"
-], function (moment, uiUtils) {
+  "org/forgerock/commons/ui/common/util/UIUtils",
+  "org/forgerock/commons/ui/common/main/Configuration"
+], function (moment, uiUtils, conf) {
     /**
      * @exports org/forgerock/openam/ui/uma/util/BackgridUtils
      */
@@ -160,6 +161,24 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
 
     obj.parseRecords = function (data, options) {
         return data.result;
+    };
+
+    obj.getQueryParams = function (data) {
+        var params = {
+            pageSize: "_pageSize",
+            sortKey: "_sortKeys",
+            _queryFilter: this.queryFilter,
+            _pagedResultsOffset:  this.pagedResultsOffset
+        };
+        
+        if (data && typeof data === 'object') {
+            _.extend(params,data);
+        }
+        return params;
+    };
+
+    obj.getRealm = function() {
+        return (conf.globalData.auth.realm !== '/' ) ? conf.globalData.auth.realm : "";
     };
 
     return obj;
