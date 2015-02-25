@@ -191,14 +191,13 @@ public class ResourceSetRegistrationEndpointTest {
         noConditions();
 
         //When
-        Representation response = endpoint.createOrUpdateResourceSet(entity);
+        Representation response = endpoint.createResourceSet(entity);
 
         //Then
         ArgumentCaptor<ResourceSetDescription> resourceSetCaptor =
                 ArgumentCaptor.forClass(ResourceSetDescription.class);
         verify(store).create(Matchers.<OAuth2Request>anyObject(), resourceSetCaptor.capture());
         assertThat(resourceSetCaptor.getValue().getId()).isNotNull().isNotEmpty();
-        assertThat(resourceSetCaptor.getValue().getResourceSetId()).isEqualTo("RESOURCE_SET_ID");
         assertThat(resourceSetCaptor.getValue().getClientId()).isEqualTo("CLIENT_ID");
         assertThat(resourceSetCaptor.getValue().getName()).isEqualTo("NAME");
         assertThat(resourceSetCaptor.getValue().getUri()).isEqualTo(URI.create("URI"));
@@ -217,7 +216,7 @@ public class ResourceSetRegistrationEndpointTest {
     public void shouldReadResourceSetDescription() throws Exception {
 
         //Given
-        ResourceSetDescription resourceSetDescription = new ResourceSetDescription("ID", "RESOURCE_SET_ID", "CLIENT_ID",
+        ResourceSetDescription resourceSetDescription = new ResourceSetDescription("RESOURCE_SET_ID", "CLIENT_ID",
                 "RESOURCE_OWNER_ID", RESOURCE_SET_DESCRIPTION_CONTENT.asMap());
 
         setUriResourceSetId();
@@ -239,7 +238,7 @@ public class ResourceSetRegistrationEndpointTest {
 
         //Given
         JsonRepresentation entity = createUpdateRequestRepresentation();
-        ResourceSetDescription resourceSetDescription = new ResourceSetDescription("ID", "RESOURCE_SET_ID", "CLIENT_ID",
+        ResourceSetDescription resourceSetDescription = new ResourceSetDescription("RESOURCE_SET_ID", "CLIENT_ID",
                 "RESOURCE_OWNER_ID", RESOURCE_SET_DESCRIPTION_CONTENT.asMap());
 
         setUriResourceSetId();
@@ -247,14 +246,13 @@ public class ResourceSetRegistrationEndpointTest {
         given(store.read("RESOURCE_SET_ID", "CLIENT_ID")).willReturn(resourceSetDescription);
 
         //When
-        Representation responseRep = endpoint.createOrUpdateResourceSet(entity);
+        Representation responseRep = endpoint.updateResourceSet(entity);
 
         //Then
         ArgumentCaptor<ResourceSetDescription> resourceSetCaptor =
                 ArgumentCaptor.forClass(ResourceSetDescription.class);
         verify(store).update(resourceSetCaptor.capture());
-        assertThat(resourceSetCaptor.getValue().getId()).isNotNull().isNotEmpty();
-        assertThat(resourceSetCaptor.getValue().getResourceSetId()).isEqualTo("RESOURCE_SET_ID");
+        assertThat(resourceSetCaptor.getValue().getId()).isEqualTo("RESOURCE_SET_ID");
         assertThat(resourceSetCaptor.getValue().getClientId()).isEqualTo("CLIENT_ID");
         assertThat(resourceSetCaptor.getValue().getName()).isEqualTo("NEW_NAME");
         assertThat(resourceSetCaptor.getValue().getUri()).isEqualTo(URI.create("NEW_URI"));
@@ -292,9 +290,9 @@ public class ResourceSetRegistrationEndpointTest {
 
         //Given
         Set<ResourceSetDescription> resourceSetDescriptions = new HashSet<ResourceSetDescription>();
-        ResourceSetDescription resourceSetDescription = new ResourceSetDescription("ID", "RESOURCE_SET_ID", "CLIENT_ID",
+        ResourceSetDescription resourceSetDescription = new ResourceSetDescription("RESOURCE_SET_ID", "CLIENT_ID",
                 "RESOURCE_OWNER_ID", RESOURCE_SET_DESCRIPTION_CONTENT.asMap());
-        ResourceSetDescription resourceSetDescription2 = new ResourceSetDescription("ID_2", "RESOURCE_SET_ID_2",
+        ResourceSetDescription resourceSetDescription2 = new ResourceSetDescription("RESOURCE_SET_ID_2",
                 "CLIENT_ID",
                 "RESOURCE_OWNER_ID", RESOURCE_SET_DESCRIPTION_UPDATED_CONTENT.asMap());
         resourceSetDescriptions.add(resourceSetDescription);

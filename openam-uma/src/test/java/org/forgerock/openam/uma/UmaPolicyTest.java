@@ -37,7 +37,7 @@ public class UmaPolicyTest {
 
     @BeforeMethod
     public void setup() {
-        resourceSet = new ResourceSetDescription("RESOURCE_SET_UID", "RESOURCE_SET_ID", "CLIENT_ID",
+        resourceSet = new ResourceSetDescription("RESOURCE_SET_ID", "CLIENT_ID",
                 "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
         resourceSet.setDescription(json(object(field("name", "NAME"))));
     }
@@ -71,7 +71,7 @@ public class UmaPolicyTest {
         return json(object(
                 field("name", "NAME - " + id + "-" + "SCOPE_A".hashCode()),
                 field("applicationName", "client_id"),
-                field("resourceTypeUuid", "RESOURCE_SET_UID"),
+                field("resourceTypeUuid", "RESOURCE_SET_ID"),
                 field("resources", array("uma://POLICY_ID")),
                 field("actionValues", object(field("SCOPE_A", true))),
                 field("subject", object(
@@ -98,7 +98,7 @@ public class UmaPolicyTest {
         return json(object(
                 field("name", "NAME - " + id + "-" + "SCOPE_B".hashCode()),
                 field("applicationName", "client_id"),
-                field("resourceTypeUuid", "RESOURCE_SET_UID"),
+                field("resourceTypeUuid", "RESOURCE_SET_ID"),
                 field("resources", array("uma://POLICY_ID")),
                 field("actionValues", object(field("SCOPE_B", true))),
                 field("subject", object(
@@ -341,10 +341,10 @@ public class UmaPolicyTest {
         UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, policies);
 
         //Then
-        assertThat(umaPolicy.getId()).isEqualTo("RESOURCE_SET_UID");
+        assertThat(umaPolicy.getId()).isEqualTo("RESOURCE_SET_ID");
         assertThat(umaPolicy.getRevision()).isNotNull();
         assertThat(umaPolicy.asJson().asMap()).hasSize(3)
-                .contains(entry("policyId", "RESOURCE_SET_UID"), entry("name", "NAME"));
+                .contains(entry("policyId", "RESOURCE_SET_ID"), entry("name", "NAME"));
         JsonValue permissions = umaPolicy.asJson().get("permissions");
         assertThat(permissions.asList()).hasSize(2);
         assertThat(permissions.get(0).asMap()).contains(entry("subject", "SUBJECT_ONE"));
@@ -379,11 +379,11 @@ public class UmaPolicyTest {
         boolean foundScopeAPolicy = false;
         boolean foundScopeBPolicy = false;
         for (JsonValue policy : underlyingPolicies) {
-            if (policy.contains("NAME - RESOURCE_SET_UID-" + "SCOPE_A".hashCode())) {
-                assertThat(policy.asMap()).isEqualTo(createUnderlyingScopeAPolicyJson("RESOURCE_SET_UID").asMap());
+            if (policy.contains("NAME - RESOURCE_SET_ID-" + "SCOPE_A".hashCode())) {
+                assertThat(policy.asMap()).isEqualTo(createUnderlyingScopeAPolicyJson("RESOURCE_SET_ID").asMap());
                 foundScopeAPolicy = true;
-            } else if (policy.contains("NAME - RESOURCE_SET_UID-"+ "SCOPE_B".hashCode())) {
-                assertThat(policy.asMap()).isEqualTo(createUnderlyingScopeBPolicyJson("RESOURCE_SET_UID").asMap());
+            } else if (policy.contains("NAME - RESOURCE_SET_ID-"+ "SCOPE_B".hashCode())) {
+                assertThat(policy.asMap()).isEqualTo(createUnderlyingScopeBPolicyJson("RESOURCE_SET_ID").asMap());
                 foundScopeBPolicy = true;
             }
         }

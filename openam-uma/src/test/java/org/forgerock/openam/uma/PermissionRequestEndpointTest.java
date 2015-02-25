@@ -96,7 +96,7 @@ public class PermissionRequestEndpointTest {
 
     private void setupResourceSetStore() throws NotFoundException, ServerException {
         JsonValue description = json(object(field("scopes", array("SCOPE_A", "SCOPE_B"))));
-        ResourceSetDescription resourceSetDescription = new ResourceSetDescription("123", "RESOURCE_SET_ID",
+        ResourceSetDescription resourceSetDescription = new ResourceSetDescription("RESOURCE_SET_ID",
                 "CLIENT_ID", "RESOURCE_OWNER_ID", description.asMap());
 
         given(resourceSetStore.read("RESOURCE_SET_ID", "CLIENT_ID")).willReturn(resourceSetDescription);

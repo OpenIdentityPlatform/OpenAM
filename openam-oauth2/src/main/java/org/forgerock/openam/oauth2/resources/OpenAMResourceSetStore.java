@@ -16,15 +16,15 @@
 
 package org.forgerock.openam.oauth2.resources;
 
-import static org.forgerock.util.query.QueryFilter.*;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import static org.forgerock.util.query.QueryFilter.and;
+import static org.forgerock.util.query.QueryFilter.equalTo;
 
 import javax.inject.Inject;
+import java.util.Iterator;
+import java.util.Set;
 
+import com.google.inject.assistedinject.Assisted;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
@@ -38,9 +38,6 @@ import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 import org.forgerock.util.query.QueryFilter;
-
-import com.google.inject.assistedinject.Assisted;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Stores {@code ResourceSetDescription} objects in the CTS.
@@ -73,11 +70,6 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     @Override
     public void create(OAuth2Request request, ResourceSetDescription resourceSetDescription) throws ServerException,
             BadRequestException, NotFoundException {
-        if (readResourceSet(resourceSetDescription.getResourceSetId(),
-                resourceSetDescription.getClientId()) != null) {
-            throw new BadRequestException("A ResourceSet with the id, " + resourceSetDescription.getResourceSetId()
-                    + ", has already been registered");
-        }
         resourceSetDescription.setId(idGenerator.generateTokenId(null));
         String policyEndpoint = providerSettingsFactory.get(request)
                 .getResourceSetRegistrationPolicyEndpoint(resourceSetDescription.getId());

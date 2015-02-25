@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -37,11 +36,11 @@ public class PolicySearchTest {
 
     @BeforeMethod
     public void setup() {
-        resourceSet1 = new ResourceSetDescription("RESOURCE_SET_UID_1", "RESOURCE_SET_ID_1", "CLIENT_ID_1",
+        resourceSet1 = new ResourceSetDescription("RESOURCE_SET_ID_1", "CLIENT_ID_1",
                 "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
         resourceSet1.setDescription(json(object(field("name", "NAME_1"))));
 
-        resourceSet2 = new ResourceSetDescription("RESOURCE_SET_UID_2", "RESOURCE_SET_ID_2", "CLIENT_ID_2",
+        resourceSet2 = new ResourceSetDescription("RESOURCE_SET_ID_2", "CLIENT_ID_2",
                 "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
         resourceSet2.setDescription(json(object(field("name", "NAME_2"))));
     }

@@ -40,14 +40,12 @@ public class ResourceSetDescription {
     @Field(field = CoreTokenField.TOKEN_ID)
     private String id;
     @Field(field = CoreTokenField.STRING_ONE)
-    private String resourceSetId;
-    @Field(field = CoreTokenField.STRING_TWO)
     private String policyUri;
-    @Field(field = CoreTokenField.STRING_THREE)
+    @Field(field = CoreTokenField.STRING_TWO)
     private String clientId;
-    @Field(field = CoreTokenField.STRING_FOUR)
+    @Field(field = CoreTokenField.STRING_THREE)
     private String realm;
-    @Field(field = CoreTokenField.STRING_FIVE)
+    @Field(field = CoreTokenField.STRING_FOUR)
     private String resourceOwnerId;
     @Field(field = CoreTokenField.BLOB, converter = JsonValueToJsonBytesConverter.class)
     private JsonValue description;
@@ -56,15 +54,13 @@ public class ResourceSetDescription {
      * Constructs a new ResourceSetDescription instance.
      *
      * @param id The unique id across all resource sets.
-     * @param resourceSetId The id of the resource set.
      * @param clientId The id of the client (resource server) which created the resource set.
      * @param resourceOwnerId The id of the user that owns this resource set.
      * @param description The description of the resource set.
      */
-    public ResourceSetDescription(String id, String resourceSetId, String clientId, String resourceOwnerId,
+    public ResourceSetDescription(String id, String clientId, String resourceOwnerId,
             Map<String, Object> description) {
         this.id = id;
-        this.resourceSetId = resourceSetId;
         this.clientId = clientId;
         this.resourceOwnerId = resourceOwnerId;
         this.description = json(description);
@@ -76,7 +72,7 @@ public class ResourceSetDescription {
     public ResourceSetDescription() {}
 
     /**
-     * Gets the unique id of the resource set across all clients (resource servers).
+     * Gets the unique resource set id of the resource set across all clients (resource servers).
      *
      * @return The unique id.
      */
@@ -100,15 +96,6 @@ public class ResourceSetDescription {
      */
     public void setRealm(String realm) {
         this.realm = realm;
-    }
-
-    /**
-     * The id of the resource set.
-     *
-     * @return The resource set id.
-     */
-    public String getResourceSetId() {
-        return resourceSetId;
     }
 
     /**
@@ -217,10 +204,6 @@ public class ResourceSetDescription {
         this.id = id;
     }
 
-    public void setResourceSetId(String resourceSetId) {
-        this.resourceSetId = resourceSetId;
-    }
-
     public void setClientId(String clientId) {
         this.clientId = clientId;
     }
@@ -256,7 +239,6 @@ public class ResourceSetDescription {
         if (!description.equals(that.description)) return false;
         if (!id.equals(that.id)) return false;
         if (policyUri != null ? !policyUri.equals(that.policyUri) : that.policyUri != null) return false;
-        if (!resourceSetId.equals(that.resourceSetId)) return false;
 
         return true;
     }
@@ -264,7 +246,6 @@ public class ResourceSetDescription {
     @Override
     public int hashCode() {
         int result = id.hashCode();
-        result = 31 * result + resourceSetId.hashCode();
         result = 31 * result + clientId.hashCode();
         result = 31 * result + (policyUri != null ? policyUri.hashCode() : 0);
         result = 31 * result + description.asMap().hashCode();

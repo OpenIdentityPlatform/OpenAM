@@ -47,6 +47,7 @@ import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
@@ -100,15 +101,44 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
      * @throws ServerException When an error occurs during creating or updating.
      * @throws BadRequestException If the request JSON is invalid.
      */
+
+    @Post
+    public Representation createResourceSet(JsonRepresentation entity) throws NotFoundException, ServerException,
+            BadRequestException {
+        ResourceSetDescription resourceSetDescription = new ResourceSetDescription(null, getClientId(),
+                getResourceOwnerId(), validator.validate(toMap(entity)));
+        OAuth2Request oAuth2Request = requestFactory.create(getRequest());
+        ResourceSetStore store = providerSettingsFactory.get(oAuth2Request).getResourceSetStore();
+        try {
+            store.create(oAuth2Request, resourceSetDescription);
+            for (ResourceSetRegistrationListener listener : listeners) {
+                listener.resourceSetCreated(oAuth2Request.<String>getParameter("realm"), resourceSetDescription);
+            }
+        } catch (ServerException e) {
+            throw e;
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (NotFoundException e) {
+            throw e;
+        }
+        getResponse().setStatus(new Status(201));
+        return createJsonResponse(resourceSetDescription, false, true);
+    }
+
     @Put
-    public Representation createOrUpdateResourceSet(JsonRepresentation entity) throws NotFoundException,
+    public Representation updateResourceSet(JsonRepresentation entity) throws NotFoundException,
             ServerException, BadRequestException {
 
         if (!isConditionalRequest()) {
-            return createResourceSet(getResourceSetId(), entity);
-        } else {
-            return updateResourceSet(getResourceSetId(), entity);
+            throw new ResourceException(512, "precondition_failed", "Require If-Match header to update Resource Set",
+                    null);
         }
+
+        ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
+        ResourceSetDescription resourceSetDescription = store.read(getResourceSetId(), getClientId())
+                .update(validator.validate(toMap(entity)));
+        store.update(resourceSetDescription);
+        return createEmptyResponse(resourceSetDescription);
     }
 
     /**
@@ -135,9 +165,6 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
     }
 
     private Representation listResourceSets() throws ServerException, NotFoundException {
-        //TODO needed?...
-        boolean isConditionalRequest = isConditionalRequest();
-
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
         QueryFilter<String> query = QueryFilter.equalTo(ResourceSetTokenField.CLIENT_ID, getClientId());
         Set<ResourceSetDescription> resourceSetDescriptions = store.query(query);
@@ -145,7 +172,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         Set<String> resourceSetIds = new HashSet<String>();
 
         for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
-            resourceSetIds.add(resourceSetDescription.getResourceSetId());
+            resourceSetIds.add(resourceSetDescription.getId());
         }
 
         return new JacksonRepresentation<Set<String>>(resourceSetIds);
@@ -178,37 +205,6 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         return !getConditions().getMatch().isEmpty();
     }
 
-    private Representation createResourceSet(String resourceSetId, JsonRepresentation entity) throws ServerException,
-            BadRequestException, NotFoundException {
-        ResourceSetDescription resourceSetDescription = new ResourceSetDescription(null, resourceSetId, getClientId(),
-                getResourceOwnerId(), validator.validate(toMap(entity)));
-        OAuth2Request oAuth2Request = requestFactory.create(getRequest());
-        ResourceSetStore store = providerSettingsFactory.get(oAuth2Request).getResourceSetStore();
-        try {
-            store.create(oAuth2Request, resourceSetDescription);
-            for (ResourceSetRegistrationListener listener : listeners) {
-                listener.resourceSetCreated(oAuth2Request.<String>getParameter("realm"), resourceSetDescription);
-            }
-        } catch (ServerException e) {
-            throw e;
-        } catch (BadRequestException e) {
-            throw e;
-        } catch (NotFoundException e) {
-            throw e;
-        }
-
-        return createJsonResponse(resourceSetDescription, false, true);
-    }
-
-    private Representation updateResourceSet(String resourceSetId, JsonRepresentation entity) throws NotFoundException,
-            ServerException, BadRequestException {
-        ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        ResourceSetDescription resourceSetDescription = store.read(resourceSetId, getClientId())
-                .update(validator.validate(toMap(entity)));
-        store.update(resourceSetDescription);
-        return createEmptyResponse(resourceSetDescription);
-    }
-
     private String getResourceSetId() {
         return (String) getRequestAttributes().get(RESOURCE_SET_ID_KEY);
     }
@@ -231,7 +227,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         if (includeResourceSet) {
             response = new HashMap<String, Object>(resourceSetDescription.asMap());
         }
-        response.put(ID_FIELD, resourceSetDescription.getResourceSetId());
+        response.put(ID_FIELD, resourceSetDescription.getId());
         if (withPolicyUri && resourceSetDescription.getPolicyUri() != null) {
             response.put(POLICY_URI_FIELD, resourceSetDescription.getPolicyUri());
         }

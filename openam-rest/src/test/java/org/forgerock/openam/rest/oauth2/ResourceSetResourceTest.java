@@ -209,7 +209,6 @@ public class ResourceSetResourceTest {
         QueryResultHandler handler = mock(QueryResultHandler.class);
         ResourceSetDescription resourceSet = new ResourceSetDescription();
         resourceSet.setId("abc123");
-        resourceSet.setResourceSetId("1");
         resourceSet.setClientId("myclient");
         resourceSet.setDescription(json(object()));
 
