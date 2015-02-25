@@ -36,16 +36,13 @@ define([
     "org/forgerock/openam/ui/policy/policies/EditPolicyView",
     "org/forgerock/openam/ui/policy/applications/ManageApplicationsView",
     "org/forgerock/openam/ui/policy/policies/ManagePoliciesView",
-    "org/forgerock/openam/ui/policy/policies/ActionsView",
-    "org/forgerock/openam/ui/policy/policies/attributes/ManageResponseAttrsView",
+    "org/forgerock/openam/ui/policy/common/ActionsView",
+    "org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticView",
     "org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsUserView",
-    "org/forgerock/openam/ui/policy/resources/ResourcesListView",
-    "org/forgerock/openam/ui/policy/resources/AddNewResourceView",
-    "org/forgerock/openam/ui/policy/policies/conditions/ManageEnvironmentsView",
-    "org/forgerock/openam/ui/policy/policies/conditions/ManageSubjectsView"
-], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolicyView,
-             manageAppsView, policyListView, actionsView, responseAttrsStaticView, responseAttrsUserView, resListView,
-             addNewResourceView, manageEnvironmentsView, manageSubjectsView) {
+    "org/forgerock/openam/ui/policy/policies/ResourcesView",
+    "org/forgerock/openam/ui/policy/resources/CreatedResourcesView",
+    "org/forgerock/openam/ui/policy/common/StripedListView"
+], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolicyView, manageAppsView, policyListView, actionsView, ResponseAttrsStaticView, responseAttrsUserView, policyResourcesView, createdResourcesView, StripedList) {
     return {
         executeAll: function (server) {
 
@@ -53,167 +50,125 @@ define([
 
             QUnit.asyncTest("Edit Application", function () {
                 editAppView.element = $("<div>")[0];
+                $("#qunit-fixture").append(editAppView.element);
 
                 editAppView.render(['iPlanetAMWebAgentService'], function () {
-
-                    var  entity = editAppView.data.entity,
-                         options = editAppView.data.options;
-
-                    resListView.element = '<div></div>';
-                    addNewResourceView.element = '<div></div>';
+                    var entity = editAppView.data.entity;
 
                     QUnit.ok(editAppView.accordion.getActive() === 2, "Last step of accordion is selected");
                     QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
 
-                    // Step 1
                     QUnit.ok(editAppView.$el.find('#appName').val() === entity.name, "Name is set");
                     QUnit.ok(editAppView.$el.find('#appDescription').val() === (entity.description ? entity.description : ''), "Description is set");
 
-                    // Step 2
-                    addNewResourceView.render([], function () {
+                    // Resource Types
+                    var availableNames = _.pluck(editAppView.data.options.availableResourceTypes, 'name'),
+                        selected = _.findByValues(editAppView.data.options.allResourceTypes, 'uuid', editAppView.data.entity.resourceTypeUuids);
 
-                        var element = addNewResourceView.$el,
-                            listItems = element.find('.striped-list ul li'),
-                            selectedItem = element.find('.addPattern:eq(0)'),
-                            values = [];
+                    editAppView.resourceTypesListView = new StripedList();
+                    editAppView.resourceTypesListView.render({
+                        items: availableNames,
+                        title: $.t('policy.resourceTypes.availableResourceTypes'),
+                        filter: true,
+                        clickItem: editAppView.selectResourceType.bind(editAppView)
+                    }, '<div></div>', function () {
 
-                        _.each(listItems, function (item) {
-                             values.push($(item).find('.pattern').text());
-                        });
+                        editAppView.resourceTypesListSelectedView = new StripedList();
+                        editAppView.resourceTypesListSelectedView.render({
+                            items: editAppView.data.options.selectedResourceTypeNames,
+                            title: $.t('policy.resourceTypes.selectedResourceTypes'),
+                            created: true,
+                            clickItem: editAppView.deselectResourceType.bind(editAppView)
+                        }, '<div></div>', function () {
 
-                        QUnit.ok(listItems.length >= 1, "At least one available pattern");
+                            var leftItems = editAppView.resourceTypesListView.$el.find('.striped-list ul li:not(.invalid)'),
+                                rightItems = editAppView.resourceTypesListSelectedView.$el.find('.striped-list ul li:not(.invalid)'),
+                                initialRight = rightItems.length;
 
-                        // check number of rendered patterns = options.resourcePatterns.length
-                        // check options.resourcePatterns and available patterns are the same
-                        QUnit.ok( _.difference(values, options.resourcePatterns).length === 0, "All available patterns are displayed correctly");
+                            // select and deselect resource types
 
-                        // clicking on a pattern reloads the resource creation tool
-                        selectedItem.trigger('click');
-                        QUnit.ok( options.newPattern === selectedItem.find('.pattern').text(), "New pattern selected");
+                            // add 2
+                            $(leftItems[0]).trigger('click');
+                            $(leftItems[1]).trigger('click');
 
+                            // remove 1
+                            $(rightItems[0]).find('.icon-close').trigger('click');
 
-                        resListView.render([], function () {
-
-                            var editing = resListView.$el.find('.editing'),
-                                listItems = resListView.$el.find('#createdResources ul li:not(.editing)'),
-                                plusButton = editing.find('.icon-plus'),
-                                resourceLength = entity.resources.length,
-                                values = [],
-                                valid = true,
-                                NEW_RESOURCE = 'newResource';
-
-
-                            _.each(listItems, function (item) {
-                                values.push(item.dataset.resource);
-                                if($(item).text() !== item.dataset.resource){
-                                    valid = false;
-                                }
-                            });
-
-                            valid = _.difference(values, entity.resources).length === 0 ? valid : false;
-
-                             _.each(listItems, function (item) {
-                                valid = valid && $(item).text() === item.dataset.resource && _.contains(entity.resources, item.dataset.resource);
-                            });
-
-                            QUnit.ok(valid, "All resources are displayed correctly");
-
-                            QUnit.ok( options.newPattern === editing.data().resource, "Selected pattern displayed correctly");
-
-                            // Testing a new resource can be added.
-                            // Testing duplication by trying to re-add entity.resources[0] the the entity.resources array.
-                            editing.find('input')[0].value = entity.resources[0];
-                            plusButton.trigger('click');
-                            QUnit.ok(  _.uniq(entity.resources).length === entity.resources.length,  "Duplicate resource not added");
-
-                            // Adding a NEW_RESOURCE. 
-                            // Testing last input enter key trigger
-                            editing.find('input')[ editing.find('input').length-1 ].value = NEW_RESOURCE;
-                            var event = jQuery.Event("keyup");
-                            event.keyCode = 13; //enter key
-                            editing.find('input:last-of-type').trigger(event);
-
-                            valid = (entity.resources.length === (resourceLength + 1) && _.contains(entity.resources, NEW_RESOURCE) );
-
-                            QUnit.ok( valid , "Pressing enter in the last inputs triggers addResource");
-                            QUnit.ok( valid , "Unique resource added");
-
-                            // Delete the NEW_RESOURCE
-                            listItems = resListView.$el.find('#createdResources ul li:not(.editing)');
-                            resourceLength = entity.resources.length;
-                            var newItem = _.find(listItems,function(item){
-                                return item.dataset.resource === NEW_RESOURCE;
-                            });
-
-                            $(newItem).find('.icon-close').trigger('click');
-                            QUnit.ok( entity.resources.length === resourceLength - 1 && !_.contains(entity.resources, NEW_RESOURCE), 'New resource deleted');
-
-
-                            // Step 3
-                            $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/applications/ReviewApplicationStepTemplate.html', editAppView.data, function () {
-                                
-                                var resources = [];
-
-                                QUnit.ok(editAppView.$el.find('#reviewName').html().trim() === entity.name, "Correct name is displayed in the review step");
-                                QUnit.ok(!editAppView.$el.find('#reviewName').parents('.review-row').hasClass('.invalid'), "Validate isn't displayed in the review step");
-
-                                if ((!editAppView.$el.find('#reviewDescr').html()) && (!entity.description)) {
-                                    // both are undefined.
-                                    QUnit.ok(true, "Correct description is displayed in the review step");
-                                } else {
-                                    QUnit.ok(editAppView.$el.find('#reviewDesc').html() === (entity.description ? entity.description : ''), "Correct description is displayed in the review step");
-                                }
-
-                                // Resources
-                                if (entity.resources.length) {
-                                    _.each(editAppView.$el.find('ul#reviewRes').find('li'), function (value, key) {
-                                        resources[key] = value.innerHTML;
-                                    });
-
-                                    QUnit.ok(_.isEqual(resources, entity.resources), "Correct resources are displayed in the review step");
-                                }
-
-                                QUnit.ok(!editAppView.$el.find('input[name="submitForm"]').is(':disabled'), "Finish button isn't disabled");
-
-                                QUnit.start();
-                            }));
+                            QUnit.equal(entity.resourceTypeUuids.length, initialRight + 1, 'Resource Types can be successfully selected and deselected');
                         });
                     });
+
+                    $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/applications/ReviewApplicationStepTemplate.html', editAppView.data, function () {
+                        QUnit.ok(editAppView.$el.find('#reviewName').html().trim() === entity.name, "Correct name is displayed in the review step");
+                        QUnit.ok(!editAppView.$el.find('#reviewName').parents('.review-row').hasClass('.invalid'), "Validate isn't displayed in the review step");
+
+                        if ((!editAppView.$el.find('#reviewDescr').html()) && (!entity.description)) {
+                            // both are undefined.
+                            QUnit.ok(true, "Correct description is displayed in the review step");
+                        } else {
+                            QUnit.ok(editAppView.$el.find('#reviewDesc').html() === (entity.description ? entity.description : ''), "Correct description is displayed in the review step");
+                        }
+
+                        QUnit.ok(!editAppView.$el.find('input[name="submitForm"]').is(':disabled'), "Finish button isn't disabled");
+
+                        QUnit.start();
+                    }));
                 });
             });
 
             QUnit.asyncTest("Create new application", function () {
                 editAppView.element = $("<div>")[0];
+                $("#qunit-fixture").append(editAppView.element);
 
                 editAppView.render([], function () {
-                    resListView.element = '<div></div>';
-                    addNewResourceView.element = '<div></div>';
 
                     QUnit.ok(editAppView.accordion.getActive() === 0, "First step of accordion is selected");
                     QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
 
-                    // Step 1
                     QUnit.ok(editAppView.$el.find('#appName').val() === '', "Name is empty");
                     QUnit.ok(editAppView.$el.find('#appDescription').val() === '', "Description is empty");
 
-                    // Step 2
-                    resListView.render([], function () {
-                        var resources = resListView.$el.find('.res-name');
-                        QUnit.ok(resources.length === 0, "No resources present");
+                    var availableNames = _.pluck(editAppView.data.options.availableResourceTypes, 'name'),
+                        selected = _.findByValues(editAppView.data.options.allResourceTypes, 'uuid', editAppView.data.entity.resourceTypeUuids);
 
-                        $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/applications/ReviewApplicationStepTemplate.html', editAppView.data, function () {
-                            QUnit.ok(editAppView.$el.find('#reviewName').hasClass('invalid'), "Validate is displayed in the review step");
-                            QUnit.ok(editAppView.$el.find('input[name="submitForm"]').is(':disabled'), "Finish button is disabled");
+                    editAppView.resourceTypesListView = new StripedList();
+                    editAppView.resourceTypesListView.render({
+                        items: availableNames,
+                        title: $.t('policy.resourceTypes.availableResourceTypes'),
+                        filter: true,
+                        clickItem: editAppView.selectResourceType.bind(editAppView)
+                    }, '<div></div>', function () {
 
-                            QUnit.start();
-                        }));
+                        editAppView.resourceTypesListSelectedView = new StripedList();
+                        editAppView.resourceTypesListSelectedView.render({
+                            items: editAppView.data.options.selectedResourceTypeNames,
+                            title: $.t('policy.resourceTypes.selectedResourceTypes'),
+                            created: true,
+                            clickItem: editAppView.deselectResourceType.bind(editAppView)
+                        }, '<div></div>', function () {
+
+                            var leftItems = editAppView.resourceTypesListView.$el.find('.striped-list ul li:not(.invalid)'),
+                                rightItems = editAppView.resourceTypesListSelectedView.$el.find('.striped-list ul li:not(.invalid)');
+
+                            QUnit.equal(rightItems.length, 0, 'No Resource Types are selected');
+                            QUnit.equal(editAppView.resourceTypesListSelectedView.$el.find('.striped-list ul li.invalid').length, 1, 'Empty list of Resource Types does not pass validation');
+
+                            $(leftItems[0]).trigger('click');
+                            QUnit.equal(editAppView.resourceTypesListSelectedView.$el.find('.striped-list ul li.invalid').length, 0, 'Validation message is not displayed for non-empty list');
+                            QUnit.equal(editAppView.data.entity.resourceTypeUuids.length, 1, 'Resource Types can be successfully selected');
+                        });
                     });
+
+                    $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/applications/ReviewApplicationStepTemplate.html', editAppView.data, function () {
+                        QUnit.ok(editAppView.$el.find('#reviewName').hasClass('invalid'), "Name does not pass validation");
+                        QUnit.ok(editAppView.$el.find('input[name="submitForm"]').is(':disabled'), "Finish button is disabled");
+                        QUnit.start();
+                    }));
                 });
             });
 
             QUnit.asyncTest("List all applications", function () {
                 manageAppsView.element = $("<div>")[0];
-
                 $("#qunit-fixture").append(manageAppsView.element);
 
                 manageAppsView.render([], function () {
@@ -225,7 +180,6 @@ define([
                         recordsPerPage = table.jqGrid('getGridParam', 'rowNum'),
                         rowList = table.jqGrid('getGridParam', 'rowList'),
                         remaining = table.jqGrid('getGridParam', 'userData').remaining;
-
 
                     QUnit.ok(conf.globalData.policyEditor, 'Configuration file loaded');
 
@@ -279,14 +233,6 @@ define([
                     var entity = editPolicyView.data.entity,
                         options = editPolicyView.data.options;
 
-                    resListView.element = '<div></div>';
-                    addNewResourceView.element = '<div></div>';
-                    actionsView.element = '<div></div>';
-                    responseAttrsStaticView.element = '<div></div>';
-                    responseAttrsUserView.element = '<div></div>';
-                    manageSubjectsView.element = '<div></div>';
-                    manageEnvironmentsView.element = '<div></div>';
-
                     QUnit.ok(editPolicyView.validationFields && editPolicyView.validationFields.length > 0, 'Validation is present');
                     QUnit.equal(editPolicyView.$el.find('[name="submitForm"]').is(':disabled'), false, 'Submit button is enabled');
 
@@ -294,46 +240,40 @@ define([
                     QUnit.equal(editPolicyView.$el.find('#cancelButton').length, 1, "Cancel button is present");
 
                     QUnit.equal(editPolicyView.$el.find('#policyName').val(), entity.name, "Name is set");
-
                     QUnit.ok(editPolicyView.$el.find('#description').val() === (entity.description ? entity.description : ''), "Description is set");
+                    QUnit.equal(editPolicyView.$el.find('#availableResTypes').val(), entity.resourceTypeUuid, "Resource type is selected");
 
-                    resListView.render([], function () {
-                        var listItems = resListView.$el.find('#createdResources ul li'),
+                    policyResourcesView.render(editPolicyView.data, function () {
+                        var listItems = policyResourcesView.$el.find('.created-items ul li'),
                             valid = true;
 
                         _.each(listItems, function (item) {
-                            valid = valid && $(item).text() === item.dataset.resource &&_.contains(entity.resources, item.dataset.resource);
+                            valid = valid && $(item).text() === item.dataset.resource && _.contains(entity.resources, item.dataset.resource);
                         });
 
                         QUnit.equal(listItems.length, entity.resources.length, "Correct number of resources are displayed");
                         QUnit.ok(valid, "Resources are displayed correctly");
-                    });
 
-                    addNewResourceView.render([], function () {
-
-                        var element = addNewResourceView.$el,
-                            listItems = element.find('.striped-list ul li'),
-                            selectedItem = element.find('.addPattern:eq(1)'),
+                        // Available Patterns
+                        var element = policyResourcesView.availablePatternsView.$el,
+                            patterns = element.find('.striped-list ul li'),
+                            pattern = element.find('.striped-list-item:eq(0)'),
                             values = [];
 
-                        _.each(listItems, function (item) {
-                            values.push($(item).find('.pattern').text());
+                        _.each(patterns, function (item) {
+                            values.push($(item).find('span:first-of-type').text());
                         });
 
-                        // check number of rendered patterns = options.resourcePatterns.length
-                        // check options.resourcePatterns and available patterns are the same
-                        QUnit.equal(_.difference(values, options.resourcePatterns).length, 0, "All available patterns are displayed correctly");
+                        QUnit.equal(_.difference(values, options.availablePatterns).length, 0, "All available patterns are displayed correctly");
 
-                        // clicking on a pattern reloads the resource creation tool
-                        selectedItem.trigger('click');
-                        QUnit.equal(selectedItem.find('.pattern').text(), options.newPattern, "New pattern selected");
+                        pattern.trigger('click');
+                        QUnit.equal(pattern.find('span:first-of-type').text(), options.newPattern, "New pattern selected");
 
-                        resListView.render([], function () {
-
-                            var editing = resListView.$el.find('.editing'),
-                                listItems = resListView.$el.find('#createdResources ul li:not(.editing)'),
+                        createdResourcesView.render(editPolicyView.data, function () {
+                            var editing = createdResourcesView.$el.find('.editing'),
+                                listItems = createdResourcesView.$el.find('#createdResources ul li:not(.editing)'),
                                 plusButton = editing.find('.icon-plus'),
-                                resourceLength = entity.resources.length,
+                                resourceLength,
                                 values = [],
                                 valid = true,
                                 NEW_STR = 'newResource',
@@ -356,11 +296,9 @@ define([
 
                             QUnit.equal(editing.data().resource, options.newPattern, "Selected pattern displayed correctly");
 
-                            // newPattern is *://*:*/*?*
                             // Testing new resource can be added.
                             editing.find('input')[0].value = NEW_STR;
                             plusButton.trigger('click');
-                            QUnit.ok(_.contains(entity.resources, NEW_STR + '://*:*/*?*'), "Unique resource added");
 
                             // Testing duplication by trying to re-add the previous resource
                             editing.find('input')[0].value = NEW_STR;
@@ -375,7 +313,7 @@ define([
 
                             // Delete the NEW_RESOURCE
                             resourceLength = entity.resources.length;
-                            listItems = resListView.$el.find('#createdResources ul li:not(.editing)');
+                            listItems = createdResourcesView.$el.find('#createdResources ul li:not(.editing)');
                             var lastAddedItem = listItems.eq(listItems.length - 1);
 
                             lastAddedItem.find('.icon-close').trigger('click');
@@ -383,77 +321,76 @@ define([
                         });
                     });
 
-                    var staticAttributes = _.where(entity.resourceAttributes, {type: responseAttrsStaticView.attrType});
-                    staticAttributes = responseAttrsStaticView.splitAttrs(staticAttributes);
-
-                    var userAttributes = _.where(entity.resourceAttributes, {type: responseAttrsUserView.attrType});
-
                     $.when(policyDelegate.getAllUserAttributes()).done(function (allUserAttributes) {
+                        var staticAttributes = _.where(editPolicyView.data.entity.resourceAttributes, {type: "Static"}),
+                            userAttributes = _.where(editPolicyView.data.entity.resourceAttributes, {type: "User"});
+
                         allUserAttributes = _.sortBy(allUserAttributes.result);
 
+                        editPolicyView.staticAttrsView = new ResponseAttrsStaticView();
+                        editPolicyView.staticAttrsView.render(editPolicyView.data.entity, staticAttributes, '#staticAttrs', function () {
+
+                            var editing = editPolicyView.staticAttrsView.$el.find('.editing'),
+                                key = editing.find('[data-attr-add-key]'),
+                                val = editing.find('[data-attr-add-val]'),
+                                addBtn = editing.find('.icon-plus'),
+                                deleteBtn,
+                                attrsLengthOld = editPolicyView.staticAttrsView.data.items.length;
+
+                            // add new static attribute
+                            key.val('testKey');
+                            val.val('testVal');
+                            addBtn.trigger('click');
+                            QUnit.ok(attrsLengthOld + 1 === editPolicyView.staticAttrsView.data.items.length, "Static attribute can be added");
+
+                            editing = editPolicyView.staticAttrsView.$el.find('.editing');
+                            key = editing.find('[data-attr-add-key]');
+                            val = editing.find('[data-attr-add-val]');
+                            addBtn = editing.find('.icon-plus');
+                            key.val('testKey');
+                            val.val('testVal');
+                            addBtn.trigger('click');
+                            QUnit.ok(attrsLengthOld + 1 === editPolicyView.staticAttrsView.data.items.length, "Can't add duplicate static attribute");
+                            attrsLengthOld++;
+
+                            editing = editPolicyView.staticAttrsView.$el.find('.editing');
+                            key = editing.find('[data-attr-add-key]');
+                            val = editing.find('[data-attr-add-val]');
+                            addBtn = editing.find('.icon-plus');
+                            key.val('testKey2');
+                            val.val('testVal2');
+                            addBtn.trigger('click');
+
+                            // delete static attribute
+                            deleteBtn = _.first(editPolicyView.staticAttrsView.$el.find('#attrTypeStatic ul li:first').find('.icon-close'));
+                            $(deleteBtn).trigger('click');
+                            QUnit.ok(attrsLengthOld === editPolicyView.staticAttrsView.data.items.length, "Static attribute can be deleted");
+
+                            editing = editPolicyView.staticAttrsView.$el.find('.editing');
+                            key = editing.find('[data-attr-add-key]');
+                            val = editing.find('[data-attr-add-val]');
+                            addBtn = editing.find('.icon-plus');
+                            key.val('');
+                            val.val('incompleteVal');
+                            addBtn.trigger('click');
+
+                            QUnit.ok(!_.find(editPolicyView.staticAttrsView.data.items, { propertyName: "incompleteVal" }), "Static attributes with no key can't be added");
+                            editing = editPolicyView.staticAttrsView.$el.find('.editing');
+                            key = editing.find('[data-attr-add-key]');
+                            val = editing.find('[data-attr-add-val]');
+                            addBtn = editing.find('.icon-plus');
+                            key.val('incompleteKey');
+                            val.val('');
+                            addBtn.trigger('click');
+
+                            QUnit.ok(!_.find(editPolicyView.staticAttrsView.data.items, { propertyName: "incompleteKey" }), "Static attributes with no value can't be added");
+                        });
+
                         responseAttrsUserView.render([userAttributes, allUserAttributes], function () {
-                            QUnit.equal(responseAttrsUserView.$el.find('.selectize-input').find('.item').length,userAttributes.length,'User attributes are selected correctly');
+                            QUnit.equal(responseAttrsUserView.$el.find('.selectize-input').find('.item').length, userAttributes.length, 'User attributes are selected correctly');
                         });
                     });
 
-                    responseAttrsStaticView.render([staticAttributes], function () {
-                        var editing = responseAttrsStaticView.$el.find('.editing'),
-                            key = editing.find('[data-attr-add-key]'),
-                            val = editing.find('[data-attr-add-val]'),
-                            addBtn = editing.find('.icon-plus'),
-                            deleteBtn,
-                            attrsLengthOld = responseAttrsStaticView.data.staticAttributes.length;
-
-                        // add new static attribute
-                        key.val('testKey');
-                        val.val('testVal');
-                        addBtn.trigger('click');
-                        QUnit.ok(attrsLengthOld + 1 === responseAttrsStaticView.data.staticAttributes.length, "Static attribute can be added");
-
-                        editing = responseAttrsStaticView.$el.find('.editing');
-                        key = editing.find('[data-attr-add-key]');
-                        val = editing.find('[data-attr-add-val]');
-                        addBtn = editing.find('.icon-plus');
-                        key.val('testKey');
-                        val.val('testVal');
-                        addBtn.trigger('click');
-                        QUnit.ok(attrsLengthOld + 1 === responseAttrsStaticView.data.staticAttributes.length, "Can't add duplicate static attribute");
-                        attrsLengthOld++;
-
-                        editing = responseAttrsStaticView.$el.find('.editing');
-                        key = editing.find('[data-attr-add-key]');
-                        val = editing.find('[data-attr-add-val]');
-                        addBtn = editing.find('.icon-plus');
-                        key.val('testKey2');
-                        val.val('testVal2');
-                        addBtn.trigger('click');
-
-                        // delete static attribute
-                        deleteBtn = _.first(responseAttrsStaticView.$el.find('#attrTypeStatic ul li:first').find('.icon-close'));
-                        $(deleteBtn).trigger('click');
-                        QUnit.ok(attrsLengthOld === responseAttrsStaticView.data.staticAttributes.length, "Static attribute can be deleted");
-
-                        editing = responseAttrsStaticView.$el.find('.editing');
-                        key = editing.find('[data-attr-add-key]');
-                        val = editing.find('[data-attr-add-val]');
-                        addBtn = editing.find('.icon-plus');
-                        key.val('');
-                        val.val('incompleteVal');
-                        addBtn.trigger('click');
-
-                        QUnit.ok(!_.find(responseAttrsStaticView.data.staticAttributes, { propertyName: "incompleteVal" }), "Static attributes with no key can't be added");
-                        editing = responseAttrsStaticView.$el.find('.editing');
-                        key = editing.find('[data-attr-add-key]');
-                        val = editing.find('[data-attr-add-val]');
-                        addBtn = editing.find('.icon-plus');
-                        key.val('incompleteKey');
-                        val.val('');
-                        addBtn.trigger('click');
-
-                        QUnit.ok(!_.find(responseAttrsStaticView.data.staticAttributes, { propertyName: "incompleteKey" }), "Static attributes with no value can't be added");
-                    });
-
-                    // Step 3
                     actionsView.render([], function () {
                         // Correct available actions are displayed
                         var availableActions = actionsView.data.options.availableActions,
@@ -531,7 +468,7 @@ define([
                             // both are undefined.
                             QUnit.ok(true, "Correct description is displayed in the review step");
                         } else {
-                            QUnit.ok(editPolView.$el.find('#reviewDesc').html() === (entity.description ? entity.description : ''), "Correct description is displayed in the review step");
+                            QUnit.ok(editPolicyView.$el.find('#reviewDesc').html() === (entity.description ? entity.description : ''), "Correct description is displayed in the review step");
                         }
 
                         // Resources
@@ -581,43 +518,27 @@ define([
 
             QUnit.asyncTest("Create new policy", function () {
                 editPolicyView.element = $("<div>")[0];
+                $("#qunit-fixture").append(editPolicyView.element);
 
                 editPolicyView.render(['iPlanetAMWebAgentService'], function () {
-                    resListView.element = '<div></div>';
-                    addNewResourceView.element = '<div></div>';
-                    actionsView.element = '<div></div>';
-
                     QUnit.ok(editPolicyView.accordion.getActive() === 0, "First step of accordion is selected");
                     QUnit.ok(editPolicyView.$el.find('#cancelButton').length, "Cancel button is available");
 
-                    // Step 1
                     QUnit.ok(editPolicyView.$el.find('#policyName').val() === '', "Name is empty");
                     QUnit.ok(editPolicyView.$el.find('#description').val() === '', "Description is empty");
 
-                    // Step 2
-                    resListView.render([], function () {
-                        var resources = resListView.$el.find('.res-name');
+                    createdResourcesView.render(editPolicyView.data, function () {
+                        var resources = createdResourcesView.$el.find('.res-name');
                         QUnit.ok(resources.length === 0, "No resources present");
                     });
 
-                    // Step 3
-                    actionsView.render([], function () {
-                        var availableActions = actionsView.data.options.availableActions,
-                            actionsCells = actionsView.$el.find('.action-name');
-                        QUnit.ok(availableActions.length === actionsCells.length, "Correct number of actions is displayed");
-
-                        var actionsPresent = true;
-                        _.each(actionsCells, function (val, key, list) {
-                            actionsPresent = actionsPresent && _.find(availableActions, function (action) {
-                                return action.action === val.innerHTML;
-                            });
-                        });
-                        QUnit.ok(actionsPresent, "Actions are displayed correctly (available for selected application type)");
+                    actionsView.render(editPolicyView.data, function () {
+                        QUnit.equal(actionsView.$el.find('.striped-list li.invalid').length, 1, 'No actions are available for selection as resource type is not selected');
                     });
 
                     $('#reviewInfo', editPolicyView.$el).html(uiUtils.fillTemplateWithData('templates/policy/policies/ReviewPolicyStepTemplate.html', editPolicyView.data, function () {
                         QUnit.ok(editPolicyView.$el.find('#reviewName').hasClass('invalid'), 'Name field is marked as invalid');
-                        QUnit.equal(editPolicyView.$el.find('#reviewRes').length,0, 'Resources field is not displayed in review step as it is invalid');
+                        QUnit.equal(editPolicyView.$el.find('#reviewRes').length, 0, 'Resources field is not displayed in review step as it is invalid');
                         QUnit.ok(editPolicyView.$el.find('[name="submitForm"]').is(':disabled'), 'Submit button is disabled');
 
                         QUnit.start();
@@ -677,7 +598,7 @@ define([
             module('Common');
 
             QUnit.asyncTest("Unauthorized GET Request", function () {
-                var viewManager=require('org/forgerock/commons/ui/common/main/ViewManager');
+                var viewManager = require('org/forgerock/commons/ui/common/main/ViewManager');
                 conf.loggedUser = {"roles": ["ui-admin"]};
                 eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {
                     route: router.configuration.routes.manageApps,
@@ -695,7 +616,7 @@ define([
             });
 
             QUnit.asyncTest("Unauthorized POST Request", function () {
-                var viewManager=require('org/forgerock/commons/ui/common/main/ViewManager');
+                var viewManager = require('org/forgerock/commons/ui/common/main/ViewManager');
 
                 sinon.stub(viewManager, 'showDialog', function () {
                     QUnit.ok(true, "Login dialog is shown");
@@ -706,7 +627,7 @@ define([
 
                 QUnit.ok(!viewManager.showDialog.called, "Login Dialog render function has not yet been called");
                 conf.loggedUser = {"roles": ["ui-admin"]};
-                eventManager.sendEvent(constants.EVENT_UNAUTHORIZED, {error: {type:"POST"} });
+                eventManager.sendEvent(constants.EVENT_UNAUTHORIZED, {error: {type: "POST"} });
                 QUnit.ok(conf.loggedUser !== null, "User info should be retained after UNAUTHORIZED POST error");
             });
 
