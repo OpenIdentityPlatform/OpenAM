@@ -56,6 +56,8 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyStore;
+import org.forgerock.openam.uma.audit.UmaAuditLogger;
+import org.forgerock.openam.utils.Config;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -77,8 +79,10 @@ public class UmaPolicyServiceImplTest {
         umaPolicyStore = mock(UmaPolicyStore.class);
         policyResourceDelegate = mock(PolicyResourceDelegate.class);
         ResourceSetStoreFactory resourceSetStoreFactory = mock(ResourceSetStoreFactory.class);
-
-        policyService = new UmaPolicyServiceImpl(umaPolicyStore, policyResourceDelegate, resourceSetStoreFactory);
+        Config<UmaAuditLogger> lazyAuditLogger = mock(Config.class);
+        UmaAuditLogger auditLogger = mock(UmaAuditLogger.class);
+        policyService = new UmaPolicyServiceImpl(umaPolicyStore, policyResourceDelegate, resourceSetStoreFactory,
+                lazyAuditLogger);
 
         ResourceSetStore resourceSetStore = mock(ResourceSetStore.class);
         resourceSet = new ResourceSetDescription("RESOURCE_SET_ID",
@@ -89,6 +93,7 @@ public class UmaPolicyServiceImplTest {
         given(resourceSetStore.read("POLICY_ID")).willReturn(resourceSet);
         doThrow(org.forgerock.oauth2.core.exceptions.NotFoundException.class).when(resourceSetStore).read("OTHER_ID");
         doThrow(ServerException.class).when(resourceSetStore).read("FAILING_ID");
+        given(lazyAuditLogger.get()).willReturn(auditLogger);
     }
 
     private ServerContext createContext() throws SSOException {

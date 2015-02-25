@@ -27,6 +27,7 @@ public class DataLayerConstants {
     public static final String CORE_TOKEN_REAPER_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.cts.reaper";
     public static final String DATA_LAYER_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout";
     public static final String RESOURCE_SETS_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.resourcesets";
+    public static final String UMA_AUDIT_ENTRY_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.umaauditentry";
 
     /**
      * Guice bindings for ConnectionConfig instances

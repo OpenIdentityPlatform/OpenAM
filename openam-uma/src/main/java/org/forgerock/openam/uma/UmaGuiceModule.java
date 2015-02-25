@@ -28,13 +28,16 @@ import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenIntrospectionHandler;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
-import org.forgerock.openam.uma.audit.UmaAuditEntry;
+import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;
+import org.forgerock.openam.uma.audit.UmaAuditLogger;
+import org.forgerock.openam.utils.Config;
 import org.restlet.Request;
 import org.restlet.Restlet;
 
@@ -51,6 +54,21 @@ public class UmaGuiceModule extends AbstractModule {
                 .addBinding().to(UmaTokenIntrospectionHandler.class);
 
         bind(UmaPolicyStore.class).to(UmaPolicyStoreImpl.class);
+    }
+
+    @Provides
+    Config<UmaAuditLogger> getUmaAuditLogger() {
+        return new Config<UmaAuditLogger>() {
+            @Override
+            public boolean isReady() {
+                return true;
+            }
+
+            @Override
+            public UmaAuditLogger get() {
+                return InjectorHolder.getInstance(UmaAuditLogger.class);
+            }
+        };
     }
 
     @Provides
