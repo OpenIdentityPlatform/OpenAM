@@ -69,10 +69,10 @@ public class UmaPolicyTest {
 
     private JsonValue createUnderlyingScopeAPolicyJson(String id) {
         return json(object(
-                field("name", id + " - SCOPE_A"),
+                field("name", "NAME - " + id + "-" + "SCOPE_A".hashCode()),
                 field("applicationName", "client_id"),
-                field("resources", array("uma://POLICY_ID")),
                 field("resourceTypeUuid", "RESOURCE_SET_UID"),
+                field("resources", array("uma://POLICY_ID")),
                 field("actionValues", object(field("SCOPE_A", true))),
                 field("subject", object(
                         field("type", "OR"),
@@ -96,10 +96,10 @@ public class UmaPolicyTest {
 
     private JsonValue createUnderlyingScopeBPolicyJson(String id) {
         return json(object(
-                field("name", id + " - SCOPE_B"),
+                field("name", "NAME - " + id + "-" + "SCOPE_B".hashCode()),
                 field("applicationName", "client_id"),
-                field("resources", array("uma://POLICY_ID")),
                 field("resourceTypeUuid", "RESOURCE_SET_UID"),
+                field("resources", array("uma://POLICY_ID")),
                 field("actionValues", object(field("SCOPE_B", true))),
                 field("subject", object(
                                 field("type", "OR"),
@@ -379,10 +379,10 @@ public class UmaPolicyTest {
         boolean foundScopeAPolicy = false;
         boolean foundScopeBPolicy = false;
         for (JsonValue policy : underlyingPolicies) {
-            if (policy.contains("RESOURCE_SET_UID - SCOPE_A")) {
+            if (policy.contains("NAME - RESOURCE_SET_UID-" + "SCOPE_A".hashCode())) {
                 assertThat(policy.asMap()).isEqualTo(createUnderlyingScopeAPolicyJson("RESOURCE_SET_UID").asMap());
                 foundScopeAPolicy = true;
-            } else if (policy.contains("RESOURCE_SET_UID - SCOPE_B")) {
+            } else if (policy.contains("NAME - RESOURCE_SET_UID-"+ "SCOPE_B".hashCode())) {
                 assertThat(policy.asMap()).isEqualTo(createUnderlyingScopeBPolicyJson("RESOURCE_SET_UID").asMap());
                 foundScopeBPolicy = true;
             }

@@ -246,7 +246,8 @@ public class UmaPolicy {
     }
 
     private JsonValue createPolicyJson(JsonValue aggregatePolicy) {
-        String policyName = resourceSet.getId() + " - " + aggregatePolicy.getPointer().get(0);
+        String policyName = resourceSet.getName() + " - " + resourceSet.getId() + "-"
+                + aggregatePolicy.getPointer().get(0).hashCode();
         List<Object> subjects = new ArrayList<Object>();
         for (String subject : aggregatePolicy.asList(String.class)) {
             subjects.add(object(
