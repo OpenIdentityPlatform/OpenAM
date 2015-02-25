@@ -24,7 +24,7 @@
  *
  * $Id: Step3.java,v 1.39 2009/12/17 17:43:39 goodearth Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
@@ -187,22 +187,8 @@ public class Step3 extends LDAPStoreWizardPage {
         if ((rootsuffix == null) || (rootsuffix.trim().length() == 0)) {
             writeToResponse(getLocalizedString("missing.required.field"));
         }
-        // Determine if we have the minimal number of high order naming attributes.
-        String[] containers = rootsuffix.split(Constants.COMMA);
-        int namedDomainContainers = 0;
-        int namedOrganizationContainers = 0;
-        for(String container : containers) {
-            if (container.startsWith(Constants.DEFAULT_ROOT_NAMING_ATTRIBUTE+Constants.EQUALS))
-                { namedDomainContainers++; }
-            else if (container.startsWith(Constants.ORGANIZATION_NAMING_ATTRIBUTE+Constants.EQUALS))
-                { namedOrganizationContainers++; }
-        }
-        if ((namedDomainContainers+namedOrganizationContainers) <= 1) {
-            writeToResponse(getLocalizedString("invalid.naming.suffix"));
-        } else if (!DN.isDN(rootsuffix)) {
+        if (!DN.isDN(rootsuffix)) {
             writeToResponse(getLocalizedString("invalid.dn"));
-        } else if (!rootsuffix.startsWith(Constants.DEFAULT_ROOT_NAMING_ATTRIBUTE+Constants.EQUALS)) {
-                writeToResponse(getLocalizedString("invalid.naming.attribute"));
         } else {
             writeToResponse("true");
             getContext().setSessionAttribute(
