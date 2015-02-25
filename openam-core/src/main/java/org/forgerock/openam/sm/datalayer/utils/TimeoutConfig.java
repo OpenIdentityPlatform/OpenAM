@@ -45,9 +45,6 @@ public class TimeoutConfig {
                 return SystemProperties.getAsInt(DataLayerConstants.DATA_LAYER_TIMEOUT, 10);
             case RESOURCE_SETS:
                 return SystemProperties.getAsInt(DataLayerConstants.RESOURCE_SETS_TIMEOUT, getTimeout(ConnectionType.DATA_LAYER));
-            case UMA_AUDIT_ENTRY:
-                return SystemProperties.getAsInt(DataLayerConstants.UMA_AUDIT_ENTRY_TIMEOUT, getTimeout(ConnectionType
-                        .DATA_LAYER));
             default:
                 throw new IllegalStateException();
         }

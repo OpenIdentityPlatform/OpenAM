@@ -37,7 +37,6 @@ import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenStore;
@@ -45,10 +44,8 @@ import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
-import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.restlet.Request;
@@ -98,32 +95,18 @@ public class AuthorizationRequestEndpoint extends ServerResource {
             throw new UmaException(400, UmaConstants.EXPIRED_TICKET_ERROR_CODE, "The permission ticket has expired");
         }
 
-        final String requestingUserId = authorisationApiToken.getResourceOwnerId();
-        final String resourceSetId = permissionTicket.getResourceSetId();
-        final Request request = getRequest();
-        final String resourceOwnerId = getResourceOwnerId(authorisationApiToken, resourceSetId);
-
-        auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.REQUEST, request, requestingUserId);
+        auditLogger.log(permissionTicket.getResourceSetId(), authorisationApiToken
+                .getResourceOwnerId(), "Request Authorisation");
 
         if (isEntitled(umaProviderSettings, permissionTicket, authorisationApiToken)) {
             getResponse().setStatus(new Status(200));
-            auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.GRANTED, request, requestingUserId);
             return createJsonRpt(umaProviderSettings.getUmaTokenStore(), permissionTicket, authorisationApiToken);
         } else {
-            auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.DENIED, request, requestingUserId);
             throw new UmaException(400, UmaConstants.NOT_AUTHORISED_ERROR_CODE, "The client is not authorised to " +
                     "access the requested resource set");
         }
 
         //TODO not sure where "need_info" error fits in....
-    }
-
-    private String getResourceOwnerId(AccessToken authorisationApiToken, String resourceSetId) throws NotFoundException, UmaException {
-        OAuth2ProviderSettings providerSettings = oauth2ProviderSettingsFactory.get(requestFactory.create(getRequest()));
-        final String clientId = authorisationApiToken.getClientId();
-        ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, clientId,
-                providerSettings);
-        return resourceSetDescription.getResourceOwnerId();
     }
 
     private boolean hasExpired(PermissionTicket permissionTicket) {
@@ -231,16 +214,4 @@ public class AuthorizationRequestEndpoint extends ServerResource {
             throw new BadRequestException(e.getMessage());
         }
     }
-
-    private ResourceSetDescription getResourceSet(String resourceSetId, String clientId, OAuth2ProviderSettings providerSettings) throws UmaException {
-        try {
-            ResourceSetStore store = providerSettings.getResourceSetStore();
-            return store.read(resourceSetId, clientId);
-        } catch (NotFoundException e) {
-            throw new UmaException(400, "invalid_resource_set_id", e.getMessage());
-        } catch (ServerException e) {
-            throw new UmaException(400, "invalid_resource_set_id", e.getMessage());
-        }
-    }
-
 }

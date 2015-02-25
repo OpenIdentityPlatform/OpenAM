@@ -56,7 +56,6 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyStore;
-import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -78,9 +77,8 @@ public class UmaPolicyServiceImplTest {
         umaPolicyStore = mock(UmaPolicyStore.class);
         policyResourceDelegate = mock(PolicyResourceDelegate.class);
         ResourceSetStoreFactory resourceSetStoreFactory = mock(ResourceSetStoreFactory.class);
-        UmaAuditLogger auditLogger = mock(UmaAuditLogger.class);
-        policyService = new UmaPolicyServiceImpl(umaPolicyStore, policyResourceDelegate, resourceSetStoreFactory,
-                auditLogger);
+
+        policyService = new UmaPolicyServiceImpl(umaPolicyStore, policyResourceDelegate, resourceSetStoreFactory);
 
         ResourceSetStore resourceSetStore = mock(ResourceSetStore.class);
         resourceSet = new ResourceSetDescription("RESOURCE_SET_ID",

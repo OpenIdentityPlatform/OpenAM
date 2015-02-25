@@ -57,8 +57,6 @@ import org.forgerock.openam.uma.UmaPolicyComparator;
 import org.forgerock.openam.uma.UmaPolicyQueryFilterVisitor;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.uma.UmaPolicyStore;
-import org.forgerock.openam.uma.audit.UmaAuditLogger;
-import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.AsyncFunction;
 import org.forgerock.util.promise.Promise;
@@ -75,7 +73,6 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     private final UmaPolicyStore umaPolicyStore;
     private final PolicyResourceDelegate policyResourceDelegate;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
-    private final UmaAuditLogger auditLogger;
 
     /**
      * Creates an instance of the {@code UmaPolicyServiceImpl}.
@@ -86,11 +83,10 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      */
     @Inject
     public UmaPolicyServiceImpl(UmaPolicyStore umaPolicyStore, PolicyResourceDelegate policyResourceDelegate,
-            ResourceSetStoreFactory resourceSetStoreFactory, UmaAuditLogger auditLogger) {
+            ResourceSetStoreFactory resourceSetStoreFactory) {
         this.umaPolicyStore = umaPolicyStore;
         this.policyResourceDelegate = policyResourceDelegate;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
-        this.auditLogger = auditLogger;
     }
 
     /**
@@ -117,8 +113,6 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         try {
                             UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, value);
                             umaPolicyStore.addToUserCache(userId, getRealm(context), resourceSet.getId(), umaPolicy);
-                            auditLogger.log(resourceSet.getName(), userId, UmaAuditType.POLICY_CREATED,
-                                    userId);
                             return Promises.newSuccessfulPromise(umaPolicy);
                         } catch (ResourceException e) {
                             return Promises.newFailedPromise(e);
@@ -207,7 +201,6 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                     public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) throws ResourceException {
                         umaPolicyStore.addToUserCache(userId, getRealm(context), resourceSet.getId(),
                                 UmaPolicy.fromUnderlyingPolicies(resourceSet, value));
-                        auditLogger.log(resourceSet.getName(), userId, UmaAuditType.POLICY_UPDATED, userId);
                         return Promises.newSuccessfulPromise(umaPolicy);
                     }
                 }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {

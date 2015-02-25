@@ -31,7 +31,7 @@ import org.forgerock.util.Reject;
  * @see ConnectionType
  */
 public class ConnectionCount {
-    static final int MINIMUM_CONNECTIONS = 9;
+    static final int MINIMUM_CONNECTIONS = 7;
     private final Map<ConnectionType, LdapDataLayerConfiguration> dataLayerConfiguration;
 
     /**
@@ -64,7 +64,7 @@ public class ConnectionCount {
         switch (type) {
             case CTS_ASYNC:
                 if (dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
-                    max = (max - 1) / 4;
+                    max = (max - 1) / 3;
                 } else {
                     max = max - 2;
                 }
@@ -73,12 +73,7 @@ public class ConnectionCount {
                 return 1;
             case RESOURCE_SETS:
                 if (dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
-                    max = (max - 1) / 4;
-                }
-                return max;
-            case UMA_AUDIT_ENTRY:
-                if (dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
-                    max = (max - 1) / 4;
+                    max = (max - 1) / 3;
                 }
                 return max;
             case DATA_LAYER:
@@ -89,8 +84,7 @@ public class ConnectionCount {
                 int async = getSMSConnectionCount(max, ConnectionType.CTS_ASYNC);
                 int reaper = getSMSConnectionCount(max, ConnectionType.CTS_REAPER);
                 int resourceSets = getSMSConnectionCount(max, ConnectionType.RESOURCE_SETS);
-                int auditEntry = getSMSConnectionCount(max, ConnectionType.UMA_AUDIT_ENTRY);
-                return max - (async + reaper + resourceSets + auditEntry);
+                return max - (async + reaper + resourceSets);
             default:
                 throw new IllegalStateException();
         }
