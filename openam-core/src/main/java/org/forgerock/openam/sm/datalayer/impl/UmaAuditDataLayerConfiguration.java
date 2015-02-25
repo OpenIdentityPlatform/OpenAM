@@ -31,7 +31,7 @@ import com.iplanet.am.util.SystemProperties;
 
 /**
  * A data layer configuration for use with resource set tokens.
- * @see org.forgerock.openam.sm.datalayer.api.ConnectionType#RESOURCE_SETS
+ * @see org.forgerock.openam.sm.datalayer.api.ConnectionType#UMA_AUDIT
  */
 public class UmaAuditDataLayerConfiguration extends LdapDataLayerConfiguration {
 

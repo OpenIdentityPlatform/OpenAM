@@ -34,7 +34,7 @@ import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
-import org.forgerock.openam.uma.audit.UmaAuditEntry;
+import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;
 import org.restlet.Request;
 import org.restlet.Restlet;
 

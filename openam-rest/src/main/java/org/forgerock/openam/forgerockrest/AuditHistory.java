@@ -8,9 +8,12 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
@@ -18,8 +21,13 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.RouterContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.sm.datalayer.store.ServerException;
+import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
+
+import java.util.Set;
 
 public class AuditHistory implements CollectionResourceProvider {
 
@@ -33,7 +41,11 @@ public class AuditHistory implements CollectionResourceProvider {
     @Override
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
         AMIdentity identity = getIdentity(context);
-        handler.handleResult(new JsonValue(auditLogger.getHistory(identity, null)));
+        try {
+            handler.handleResult(new JsonValue(auditLogger.getHistory(identity, null)));
+        } catch (ServerException e) {
+            handler.handleError(new InternalServerErrorException(e));
+        }
     }
 
     @Override
@@ -58,17 +70,26 @@ public class AuditHistory implements CollectionResourceProvider {
 
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
-//        AMIdentity identity = getIdentity(context);
-//        List<UmaAuditEntry> history = auditLogger.getHistory(identity, request);
-//
-//        final QueryResultHandler resultHandler = new QueryResultHandlerBuilder(handler)
-//                .withPaging(request.getPageSize(), request.getPagedResultsOffset()).build();
+        AMIdentity identity = getIdentity(context);
+        try {
+            Set<UmaAuditEntry> history;
 
-        //TODO - finish this..
-//        for (UmaAuditEntry entry : history) {
-//            resultHandler.handleResource(new Resource(entry.getId(), null, new JsonValue()))
-//        }
+            if (request.getQueryFilter().toString().equals("true")) {
+                history = auditLogger.getEntireHistory(identity);
+            } else {
+                history = auditLogger.getHistory(identity, request);
+            }
+
+            final QueryResultHandler resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+
+            for (UmaAuditEntry entry : history) {
+                resultHandler.handleResource(new Resource(entry.getId(), null, entry.asJson()));
+            }
+
+            resultHandler.handleResult(new QueryResult());
+        } catch (ServerException e) {
+            handler.handleError(new InternalServerErrorException(e));
+        }
     }
 
     @Override

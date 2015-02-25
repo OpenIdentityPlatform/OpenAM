@@ -15,19 +15,16 @@
  */
 package org.forgerock.openam.sm.datalayer.api;
 
-import org.forgerock.openam.cts.impl.CTSConnectionModule;
-import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
+import com.iplanet.am.util.SystemProperties;
 import org.forgerock.openam.cts.impl.CTSAsyncConnectionModule;
+import org.forgerock.openam.cts.impl.CTSConnectionModule;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.reaper.CTSReaper;
 import org.forgerock.openam.entitlement.indextree.IndexTreeService;
 import org.forgerock.openam.sm.SMSConnectionModule;
-import org.forgerock.openam.sm.SMSDataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.impl.ResourceSetConnectionModule;
-import org.forgerock.openam.sm.datalayer.impl.ResourceSetDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.impl.UmaAuditConnectionModule;
 import org.forgerock.openam.utils.StringUtils;
-
-import com.iplanet.am.util.SystemProperties;
 
 /**
  * Defines the types of connections factories that should be used to provide connections
@@ -59,7 +56,11 @@ public enum ConnectionType {
     /**
      * @see org.forgerock.oauth2.resources.ResourceSetStore
      */
-    RESOURCE_SETS(ResourceSetConnectionModule.class);
+    RESOURCE_SETS(ResourceSetConnectionModule.class),
+    /**
+     * @see org.forgerock.openam.uma.audit.UmaAuditLogger
+     */
+    UMA_AUDIT_ENTRY(UmaAuditConnectionModule.class);
 
     private static final String CONFIGURATION_CLASS_PROPERTY_PREFIX = "org.forgerock.openam.sm.datalayer.module.";
     private final Class<? extends DataLayerConnectionModule> configurationClass;

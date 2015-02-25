@@ -1,20 +1,8 @@
 package org.forgerock.openam.uma;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.security.auth.Subject;
-
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Evaluator;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -26,11 +14,6 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
-import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
-import org.forgerock.openam.uma.audit.UmaAuditEntry;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,9 +24,19 @@ import org.restlet.ext.json.JsonRepresentation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.Evaluator;
+import javax.security.auth.Subject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 public class AuthorizationRequestEndpointTest {
 
@@ -98,15 +91,10 @@ public class AuthorizationRequestEndpointTest {
 
         oauth2TokenStore = mock(TokenStore.class);
         given(oauth2TokenStore.readAccessToken(Matchers.<OAuth2Request>anyObject(), anyString())).willReturn(accessToken);
+        given(accessToken.getClientId()).willReturn(RS_CLIENT_ID);
 
         subject = new Subject();
-        TaskExecutor taskDispatcher = mock(TaskExecutor.class);
-        TaskFactory taskFactory = mock(TaskFactory.class);
-        JavaBeanAdapter<UmaAuditEntry> umaAuditEntryAdapter = mock(JavaBeanAdapter.class);
-        Token token = mock(Token.class);
-        given(token.getTokenId()).willReturn("1");
-        given(umaAuditEntryAdapter.toToken(Matchers.<UmaAuditEntry>anyObject())).willReturn(token);
-        umaAuditLogger = new UmaAuditLogger(taskDispatcher, taskFactory, umaAuditEntryAdapter);
+        umaAuditLogger = mock(UmaAuditLogger.class);
 
         umaTokenStore = mock(UmaTokenStore.class);
         rpt = mock(RequestingPartyToken.class);

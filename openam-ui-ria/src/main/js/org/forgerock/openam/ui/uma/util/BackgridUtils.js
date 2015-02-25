@@ -89,8 +89,8 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
         render: function () {
             this.$el.empty();
             var rawValue = this.model.get(this.column.get("name")),
-            formattedValue = this.formatter.fromRaw(rawValue, this.model),
-            href = _.isFunction(this.column.get("href")) ? this.column.get('href')(rawValue, formattedValue, this.model) : this.column.get('href');
+                formattedValue = this.formatter.fromRaw(rawValue, this.model),
+                href = _.isFunction(this.column.get("href")) ? this.column.get('href')(rawValue, formattedValue, this.model) : this.column.get('href');
 
             this.$el.append($("<a>", {
                 href: href || rawValue,
@@ -126,7 +126,8 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
         var params = [];
         _.each(this.state.filters, function(filter){
             if (filter.query() !== '') {
-                params.push( filter.name + '+eq+' + encodeURIComponent('"*' + filter.query() + '*"') );
+                // FIXME: No server side support for 'co' ATM, this is effectively an 'eq'
+                params.push( filter.name + '+co+' + encodeURIComponent('"' +filter.query() + '"') );
             }
         });
         return params.length === 0 ? true : params.join('+AND+');
@@ -142,11 +143,15 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
         return (this.state.currentPage - 1) * this.state.pageSize;
     };
 
+    obj.sortKeys = function() {
+        return this.state.order === 1 ? '-' + this.state.sortKey : this.state.sortKey;
+    };
+
     obj.sync = function(method, model, options){
         var params = [];
 
         _.forIn(options.data, function(val, key){
-            if(!_.include(['page', 'total_pages', 'total_entries', 'order', 'per_page'], key)) {
+            if(!_.include(['page', 'total_pages', 'total_entries', 'order', 'per_page', 'sort_by'], key)) {
                 params.push(key + '=' + val);
             }
         });
@@ -170,7 +175,7 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
             _queryFilter: this.queryFilter,
             _pagedResultsOffset:  this.pagedResultsOffset
         };
-        
+
         if (data && typeof data === 'object') {
             _.extend(params,data);
         }

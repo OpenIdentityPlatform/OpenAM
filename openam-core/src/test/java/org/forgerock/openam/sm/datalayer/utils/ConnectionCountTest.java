@@ -26,6 +26,7 @@ import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
 import org.forgerock.openam.sm.datalayer.impl.ResourceSetDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.impl.UmaAuditDataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -38,12 +39,15 @@ public class ConnectionCountTest {
     public void setup() {
         LdapDataLayerConfiguration ctsConfiguration = mock(LdapDataLayerConfiguration.class);
         LdapDataLayerConfiguration resourceSetConfiguration = mock(LdapDataLayerConfiguration.class);
+        LdapDataLayerConfiguration umaAuditConfiguration = mock(UmaAuditDataLayerConfiguration.class);
         when(ctsConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         when(resourceSetConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
+        when(umaAuditConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         Map<ConnectionType, LdapDataLayerConfiguration> configMap = new HashMap<ConnectionType, LdapDataLayerConfiguration>();
         configMap.put(ConnectionType.CTS_ASYNC, ctsConfiguration);
         configMap.put(ConnectionType.CTS_REAPER, ctsConfiguration);
         configMap.put(ConnectionType.RESOURCE_SETS, resourceSetConfiguration);
+        configMap.put(ConnectionType.UMA_AUDIT_ENTRY, umaAuditConfiguration);
         count = new ConnectionCount(configMap);
     }
 
@@ -78,7 +82,8 @@ public class ConnectionCountTest {
         int total = count.getConnectionCount(max, ConnectionType.CTS_ASYNC) +
                 count.getConnectionCount(max, ConnectionType.CTS_REAPER) +
                 count.getConnectionCount(max, ConnectionType.RESOURCE_SETS) +
-                count.getConnectionCount(max, ConnectionType.DATA_LAYER);
+                count.getConnectionCount(max, ConnectionType.DATA_LAYER) +
+                count.getConnectionCount(max, ConnectionType.UMA_AUDIT_ENTRY);
         assertThat(total).isEqualTo(max);
     }
 
