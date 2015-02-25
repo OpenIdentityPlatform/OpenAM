@@ -714,13 +714,15 @@ define([
                     actionsList.render(entity, editResourceTypeView.data.actions, '#resTypeActions', function () {
                         var listItems = editResourceTypeView.$el.find('#resTypeActions ul li');
 
-                        QUnit.equal(listItems.length, 0, "No resource types are displayed");
+                        // first element is 'no item', second is 'add new' item
+                        QUnit.equal(listItems.length, 2, "Only default items are displayed");
                     });
 
                     patternList.render(entity, entity.patterns, '#resTypePatterns', function () {
                         var listItems = editResourceTypeView.$el.find('#resTypePatterns ul li');
 
-                        QUnit.equal(listItems.length, 0, "No patterns are displayed");
+                        // first element is 'no item', second is 'add new' item
+                        QUnit.equal(listItems.length, 2, "Only default items are displayed");
                     });
 
                     // Step 3
