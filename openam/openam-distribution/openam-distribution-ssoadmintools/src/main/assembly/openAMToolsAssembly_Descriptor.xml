@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+*
+* Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+*
+* The contents of this file are subject to the terms
+* of the Common Development and Distribution License
+* (the License). You may not use this file except in
+* compliance with the License.
+*
+* You can obtain a copy of the License at
+* http://forgerock.org/license/CDDLv1.0.html
+* See the License for the specific language governing
+* permission and limitations under the License.
+*
+* When distributing Covered Code, include this CDDL
+* Header Notice in each file and include the License file
+* at http://forgerock.org/license/CDDLv1.0.html
+* If applicable, add the following below the CDDL Header,
+* with the fields enclosed by brackets [] replaced by
+* your own identifying information:
+* "Portions Copyrighted [year] [name of copyright owner]"
+*
+-->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+    <id>openam-ssoAdminTools</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <!-- Library Dependency -->
+    <dependencySets>
+        <dependencySet>
+            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>org.forgerock.openam:openam-shared</include>
+                <include>org.forgerock.openam:openam-core</include>
+                <include>org.forgerock.openam:openam-cli-definitions</include>
+                <include>org.forgerock.openam:openam-cli-impl</include>
+                <include>org.forgerock.openam:openam-entitlements</include>
+                <include>org.forgerock.openam:openam-federation-library</include>
+                <include>org.forgerock.openam:OpenFM</include>
+                <include>org.forgerock.openam:openam-dtd-schema</include>
+                <include>org.forgerock.openam:openam-jaxrpc-schema</include>
+                <include>org.forgerock.openam:openam-idsvcs-schema</include>
+                <include>org.forgerock.openam:openam-liberty-schema</include>
+                <include>org.forgerock.openam:openam-saml2-schema</include>
+                <include>org.forgerock.openam:openam-xacml3-schema</include>
+                <include>org.forgerock.openam:openam-wsfederation-schema</include>
+                <include>org.forgerock.opendj:opendj-server</include>
+                <include>org.forgerock.commons:forgerock-util</include>
+                <include>org.forgerock.openam:openam-license-manager-cli</include>
+                <include>org.forgerock.commons:forgerock-guice-core</include>
+                <include>org.forgerock.openam:openam-license-core</include>
+                <include>org.forgerock.openam:openam-auth-scripted</include>
+                <include>org.forgerock.openam:openam-scripting</include>
+                <include>javax.inject:javax.inject</include>
+                <include>com.google.inject:guice:jar:no_aop</include>
+                <include>commons-lang:commons-lang</include>
+                <include>javax.xml:jaxrpc-api</include>
+                <include>external:jaxrpc-impl</include>
+                <include>com.sun.xml.rpc:jaxrpc-spi</include>
+                <include>org.json:json</include>
+                <include>org.codehaus.jackson:jackson-core-asl</include>
+                <include>org.codehaus.jackson:jackson-mapper-asl</include>
+                <include>external:jsr173_api</include>
+                <include>javax.mail:mail</include>
+                <include>relaxngDatatype:relaxngDatatype</include>
+                <include>external:webservices-api</include>
+                <include>external:webservices-rt</include>
+                <include>xalan:xalan</include>
+                <include>xerces-J:xml-serializer</include><!-- for metadata export -->
+                <include>xerces-J:xercesImpl</include>
+                <include>xerces-J:xml-apis</include>
+                <include>com.sun.msv.datatype.xsd:xsdlib</include>
+                <include>org.slf4j:slf4j-api</include>
+                <include>org.slf4j:slf4j-nop</include>
+                <include>org.apache.santuario:xmlsec</include>
+                <include>commons-logging:commons-logging-api</include>
+                <include>org.mozilla:rhino</include>
+                <include>org.codehaus.groovy:groovy-all</include>
+                <include>org.kohsuke:groovy-sandbox</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+            <scope>provided</scope>
+            <includes>
+                <include>javax.servlet:servlet-api</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
+
+    <!-- File Groupings -->
+    <fileSets>
+        <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.build.directory}/legal-notices</directory>
+            <includes>
+                <include>license.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.basedir}/../../license</directory>
+            <includes>
+                <include>**/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory></outputDirectory>
+            <directory>${project.basedir}/../src/main/amserver/scripts/tools</directory>
+            <includes>
+                <include>README.setup</include>
+                <include>setup</include>
+                <include>setup.bat</include>
+            </includes>
+            <fileMode>0755</fileMode>
+            <filtered>true</filtered>
+        </fileSet>
+        <!-- First, Pick up Files from our AntRun -->
+        <fileSet>
+            <outputDirectory>resources</outputDirectory>
+            <directory>${project.build.directory}/resources</directory>
+            <includes>
+                <include>*.properties</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <outputDirectory>resources</outputDirectory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF</directory>
+            <includes>
+                <include>*.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>resources</outputDirectory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/classes</directory>
+            <includes>
+                <include>*.properties</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <outputDirectory>resources</outputDirectory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/resources/config</directory>
+            <includes>
+                <include>*.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>resources</outputDirectory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/resources/console</directory>
+            <includes>
+                <include>*.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>resources</outputDirectory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/resources/tools</directory>
+            <includes>
+                <include>*.properties</include>
+            </includes>
+        </fileSet>
+        <!-- for create-agent command -->
+        <fileSet>
+            <outputDirectory>resources</outputDirectory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/resources/</directory>
+            <includes>
+                <include>agentlocaleprop.properties</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <outputDirectory>template/unix/bin</outputDirectory>
+            <includes>
+                <include></include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>/template/windows/bin</outputDirectory>
+            <includes>
+                <include></include>
+            </includes>
+        </fileSet>
+    </fileSets>
+
+    <!-- Single Files -->
+    <files>
+        <file>
+            <source>${project.basedir}/../../openam-federation/OpenFM/src/main/scripts/bin/ssoadm</source>
+            <outputDirectory>template/unix/bin</outputDirectory>
+            <destName>ssoadm.template</destName>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${project.basedir}/../../openam-federation/OpenFM/src/main/scripts/bin/ssoadm.bat</source>
+            <outputDirectory>template/windows/bin</outputDirectory>
+            <destName>ssoadm.bat.template</destName>
+            <filtered>true</filtered>
+        </file>
+
+        <file>
+            <source>${project.basedir}/../src/main/amserver/scripts/bin/ampassword</source>
+            <outputDirectory>template/unix/bin</outputDirectory>
+            <destName>ampassword.template</destName>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${project.basedir}/../src/main/amserver/scripts/bin/ampassword.bat</source>
+            <outputDirectory>template/windows/bin</outputDirectory>
+            <destName>ampassword.bat.template</destName>
+            <filtered>true</filtered>
+        </file>
+
+        <file>
+            <source>${project.basedir}/../src/main/amserver/scripts/log/amverifyarchive</source>
+            <outputDirectory>template/unix/bin</outputDirectory>
+            <destName>amverifyarchive.template</destName>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${project.basedir}/../src/main/amserver/scripts/log/amverifyarchive.bat</source>
+            <outputDirectory>template/windows/bin</outputDirectory>
+            <destName>amverifyarchive.bat.template</destName>
+            <filtered>true</filtered>
+        </file>
+    </files>
+</assembly>
+

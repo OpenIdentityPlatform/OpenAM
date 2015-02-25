@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+   !    
+-->
+<chapter xml:id='chap-upgrade-components'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+<title>Upgrading OpenAM Components</title>
+
+ <indexterm>
+  <primary>OpenAM</primary>
+  <secondary>components</secondary>
+  <tertiary>upgrading</tertiary>
+ </indexterm>
+
+ <para>This chapter is concerned with upgrades for policy agents, OpenAM tools,
+ and the OpenAM distributed authentication UI.</para>
+
+ <itemizedlist>
+  <listitem><para><xref linkend="upgrade-web-policy-agents" /></para></listitem>
+  <listitem><para><xref linkend="upgrade-java-ee-policy-agents" /></para></listitem>
+  <listitem><para><xref linkend="upgrade-tools" /></para></listitem>
+  <listitem><para><xref linkend="upgrade-das" /></para></listitem>
+ </itemizedlist>
+
+ <procedure xml:id="upgrade-web-policy-agents">
+  <title>To Upgrade Web Policy Agents</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>web policy agents</secondary>
+   <tertiary>upgrading</tertiary>
+  </indexterm>
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>upgrading</secondary>
+  </indexterm>
+
+  <step>
+   <para>Back up the policy agent installation and configuration directories.</para>
+
+   <para>Also back up the configuration if it is stored centrally in OpenAM.</para>
+  </step>
+
+  <step>
+   <para>Redirect client traffic away from the protected application.</para>
+  </step>
+
+  <step>
+   <para>Stop the web server where the policy agent is installed.</para>
+  </step>
+
+  <step>
+   <para>
+    Remove the old policy agent as described in the
+    <link
+     xlink:show="new"
+     xlink:href="${webPaDocBase}/web-users-guide/#web-users-guide"
+    ><citetitle>OpenAM Web Policy Agent User's Guide</citetitle></link>.
+   </para>
+
+   <para>
+    If the uninstallation process has changed, refer to the version of the
+    <citetitle>Web Policy Agent Installation Guide</citetitle> that corresponds
+    to your web policy agent.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Install the new policy agent using the existing configuration.
+   </para>
+  </step>
+
+  <step>
+   <para>Start the web server where the policy agent is installed.</para>
+
+   <para>For new features, the policy agent uses the default configuration
+   until you make changes.</para>
+  </step>
+
+  <step>
+   <para>Validate that the policy agent is performing as expected.</para>
+  </step>
+
+  <step>
+   <para>Allow client traffic to flow to the protected application.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="upgrade-java-ee-policy-agents">
+  <title>To Upgrade Java EE Policy Agents</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>Java EE policy agents</secondary>
+   <tertiary>upgrading</tertiary>
+  </indexterm>
+  <indexterm>
+   <primary>Java EE policy agents</primary>
+   <secondary>upgrading</secondary>
+  </indexterm>
+
+  <step>
+   <para>Back up the policy agent installation and configuration directories.</para>
+
+   <para>Also back up the configuration if it is stored centrally in OpenAM.</para>
+  </step>
+
+  <step>
+   <para>Redirect client traffic away from the protected application.</para>
+  </step>
+
+  <step>
+   <para>Uninstall the old policy agent.</para>
+  </step>
+
+  <step>
+   <para>Install the new policy agent.</para>
+
+   <para>For new features, the policy agent uses the default configuration
+   until you make changes.</para>
+  </step>
+
+  <step>
+   <para>Validate that the policy agent is performing as expected.</para>
+  </step>
+
+  <step>
+   <para>Allow client traffic to flow to the protected application.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="upgrade-tools">
+  <title>To Upgrade OpenAM Tools</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>tools</secondary>
+   <tertiary>upgrading</tertiary>
+  </indexterm>
+  <indexterm>
+   <primary>tools</primary>
+   <secondary>upgrading</secondary>
+  </indexterm>
+
+  <para>Since OpenAM 10.1, the session tools are no longer needed. Upgrading
+  other tools consists of installing new tools and customizing tools scripts
+  as necessary.</para>
+
+  <step>
+   <para>Install new versions of the tools.</para>
+  </step>
+
+  <step>
+   <para>Apply any customizations you made to the scripts, referring to the
+   old tools installation as necessary.</para>
+  </step>
+
+  <step>
+   <para>Once the new tools are working, you can delete the old tools.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="upgrade-das">
+  <title>To Upgrade OpenAM Distributed Authentication Server</title>
+
+  <indexterm>
+   <primary>OpenAM</primary>
+   <secondary>distributed authentication</secondary>
+   <tertiary>upgrading</tertiary>
+  </indexterm>
+  <indexterm>
+   <primary>distributed authentication</primary>
+   <secondary>upgrading</secondary>
+  </indexterm>
+
+  <para>If you deployed the distributed authentication server (DAS) .war file,
+  then you must upgrade the DAS when you upgrade other OpenAM servers.</para>
+
+  <step>
+   <para>Redirect client application traffic away from the server.</para>
+  </step>
+
+  <step>
+   <para>Stop the DAS or the container in which it runs.</para>
+  </step>
+
+  <step>
+   <para>Deploy the new DAS .war file.</para>
+
+   <para>When you deploy the new .war file, you might have to delete working
+   files left by the old installation.</para>
+  </step>
+
+  <step>
+   <para>Restart the DAS or the container in which it runs.</para>
+  </step>
+
+  <step>
+   <para>Validate that the DAS is working as expected.</para>
+  </step>
+
+  <step>
+   <para>Allow client application traffic to flow back to the server.</para>
+  </step>
+ </procedure>
+</chapter>

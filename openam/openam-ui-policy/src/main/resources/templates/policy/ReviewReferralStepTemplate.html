@@ -1,0 +1,59 @@
+<p>{{t "policy.summaryReview.referralDescription"}}</p>
+<p>{{#if advancedMode}}{{t "policy.summaryReview.advancedTrue"}}{{else}}{{t "policy.summaryReview.advancedFalse"}}{{/if}}</p>
+
+{{! The IDs are used for testing }}
+<div class="col2">
+
+    <div class="review-row clearfix{{#equals '' entity.name}} invalid{{/equals}}" tabindex="0" >
+        <h2>{{t "policy.common.name"}}</h2>
+        {{#unless advancedMode}}
+        {{#if entity.name}}
+        <span class="icon-arrow-down2"></span>
+        {{/if}} 
+        {{/unless}}
+        <div class="advanced-mode">
+            <p id="reviewName"{{#unless entity.name}} class="invalid"{{/unless}}>{{#if entity.name}}{{entity.name}}{{else}}{{t "policy.summaryReview.noName"}}{{/if}}</p>
+        </div>
+    </div>
+
+    <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resources}} invalid{{/unless}}" tabindex="0" >
+        <h2>{{t "policy.common.resources"}}</h2>
+        {{#unless advancedMode}}
+        {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if entity.resources}}
+            <ul id="reviewRes">
+                {{#each entity.resources}}
+                <li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>
+                {{/each}}
+            </ul>
+            {{else}}
+            <p class="invalid">{{t "policy.common.noResources"}}</p>
+            {{/if}}
+        </div>
+    </div>
+
+</div>
+
+<div class="col2">
+
+    <div class="review-row clearfix {{#unless entity.realms}} invalid{{/unless}}" tabindex="0" >
+        <h2>{{t "policy.common.realms"}}</h2>
+        {{#unless advancedMode}}
+        {{#if entity.realms}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if entity.realms}}
+            <ul id="reviewRealms">
+                {{#each entity.realms}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+            {{else}}
+            <p class="invalid">{{t "policy.common.noRealms"}}</p>
+            {{/if}}
+        </div>
+    </div>
+
+</div>

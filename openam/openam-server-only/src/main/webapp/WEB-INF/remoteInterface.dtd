@@ -1,0 +1,321 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: remoteInterface.dtd,v 1.3 2008/06/25 05:45:34 qcheng Exp $
+
+-->
+
+<!-- This DTD defines the XML interfaces that can be used to evaluate
+policies and to get policy decisions for users.
+
+Unique Declaration name for DOCTYPE tag:
+          "iPlanet Policy Remote Interface 1.0 DTD"
+-->
+
+<!-- PolicyService element is the root element for remote policy 
+     service. This XML will be typically used between the client 
+     and the server. The client uses the PolicyRequest element to 
+     request information from the server and the server would respond 
+     using the PolicyResponse element. The server would use 
+     PolicyNotification to send policy or subject change notification 
+     to the client.
+-->
+
+<!ELEMENT    PolicyService    ( PolicyRequest 
+                                | PolicyResponse 
+                                | PolicyNotification ) > 
+<!ATTLIST    PolicyService
+    version    CDATA    "1.0"
+    revisionNumber    CDATA    #IMPLIED
+>
+
+
+<!-- PolicyRequest element is used by the client to request the 
+     policy evaluation decisions or to add/remove a policy listener.
+     The attribute appSSOToken provides the SSO token of the client 
+     as its identity that can be used by the server to check if the 
+     client can receive the requested information.
+     The attribute requestId specifies the id of the request.
+ -->
+
+<!ELEMENT    PolicyRequest    ( GetResourceResults 
+                                | AddPolicyListener
+                                | RemovePolicyListener 
+                                | AdvicesHandleableByAMRequest ) >
+<!ATTLIST    PolicyRequest
+    appSSOToken    CDATA        #REQUIRED
+    requestId      CDATA        #REQUIRED
+>
+
+
+<!-- GetResourceResults element is used by the client to request
+     the policy evaluation decisions for a particular user regarding
+     a given service and a resource and possibly its sub resources.
+     The attribute userSSOToken provides the identity of the user. 
+     The attribute serviceName specifies the service name and 
+     resourceName specifies the name of the resource for which the 
+     policy is evaluated. 
+     The attribute resourceScope gives the scope of the resources in 
+     terms of the policy evaluation. The value of the attribute could
+     be "self", "strict-subtree", or "subtree". Value "self" means the 
+     resource node itself only; value "strict-subtree" means the strict
+     subtree of the root, no wildcard matching subtree included; value 
+     "subtree" means to get all the subtrees with the resource node being 
+     the root of one of the subtree, the other subtree roots are those that 
+     match the resourceName by wildcard.
+     The sub-element EnvParameters provides the environment 
+     information which may be useful during the policy evaluation.
+     The sub-element GetResponseDecisions requests for the values for
+     a set of user response attributes.
+-->
+
+<!ELEMENT    GetResourceResults   ( EnvParameters?, GetResponseDecisions? ) >
+<!ATTLIST    GetResourceResults
+    userSSOToken    CDATA        #REQUIRED
+    serviceName     NMTOKEN      #REQUIRED
+    resourceName    CDATA        #REQUIRED
+    resourceScope   (self | strict-subtree | subtree)  "strict-subtree" 
+>
+
+
+<!-- EnvParameters element provides the environment information which 
+     may be useful in the policy evaluation.
+     The sub-element AttributeValuePair provides the environment 
+     parameter name and its values.
+-->
+
+<!ELEMENT    EnvParameters    ( AttributeValuePair+ ) >
+
+
+<!-- AttributeValuePair defines generic attribute-values pair that 
+     can used to specify configuration information. The value for an attribute
+     can be empty.
+-->
+
+<!ELEMENT    AttributeValuePair    (Attribute, Value*) >
+
+
+<!-- Attribute defines the attribute name i.e., a configuration
+     parameter.
+-->
+
+<!ELEMENT    Attribute     EMPTY >
+<!ATTLIST    Attribute 
+      name    NMTOKEN    #REQUIRED 
+>
+
+
+<!-- Value element represents a value string.
+-->
+
+<!ELEMENT    Value    ( #PCDATA ) >
+
+
+<!-- GetResponseDecisions consists of a set of user attribute names.
+-->
+
+<!ELEMENT    GetResponseDecisions    ( Attribute+ ) >
+
+
+<!-- AddPolicyListener element adds a policy listener to the service
+     to receive the policy notification.
+     The attribute serviceName specifies the service name.
+     The attribute notificationURL provides the notification URL for 
+     the policy server to send the notification to.
+-->
+
+<!ELEMENT    AddPolicyListener    EMPTY >
+<!ATTLIST    AddPolicyListener
+    serviceName        NMTOKEN    #REQUIRED
+    notificationURL    CDATA      #REQUIRED
+>
+
+
+<!-- RemovePolicyListener element removes the policy listener from 
+     the service.
+     The attribute serviceName specifies the service name.
+     The attribute notificationURL provides the notification URL for 
+     which the corresponding policy listener needs to be removed.
+-->
+
+<!ELEMENT    RemovePolicyListener    EMPTY >
+<!ATTLIST    RemovePolicyListener
+    serviceName        NMTOKEN    #REQUIRED
+    notificationURL    CDATA      #REQUIRED
+>
+
+<!-- AdvicesHandleableByAMRequest element gets names of policy advices
+     that could be handled by AM if PEP redirects user agent to AM
+-->
+<!ELEMENT    AdvicesHandleableByAMRequest    EMPTY >
+
+<!-- PolicyResponse element is used by the server to return a
+     response to the client.
+     If the client request is a policy evaluation request, then the 
+     policy decision is sent back using ResourceResult.
+     If the client request is a policy listener addition, then an 
+     acknowledgement is sent back using AddPolicyListenerResponse.
+     If the client request is a policy listener removal, then an 
+     acknowledgement is sent back using RemovePolicyListenerResponse.
+     If anything wrong happens during the request processing, an
+     error message is sent back to the client using Exception.
+     The attribute requestId specifies the id of the request to
+     which this response is regarding.
+     The attribute issueInstant the time at which the response was issued.
+     This is the difference, measured in milliseconds, between the current 
+     time and midnight, January 1, 1970 UTC
+-->
+
+<!ELEMENT    PolicyResponse    ( ResourceResult+ 
+                                 | AddPolicyListenerResponse
+                                 | RemovePolicyListenerResponse
+                                 | AdvicesHandleableByAMResponse
+                                 | Exception ) >
+<!ATTLIST    PolicyResponse
+    requestId      CDATA        #REQUIRED
+    issueInstant   CDATA        #IMPLIED
+>
+
+
+<!-- ResourceResult element returns the policy evaluation decisions 
+     to the client. The attribute name specifies the resource name. 
+     If the GetResourceResults in the PolicyRequest doesn't provide 
+     a resource name with its resourceName attribute, the value of 
+     name will be an empty string. 
+     The sub-element PolicyDecision provides the policy evaluation 
+     decision for this resource.
+-->
+
+<!ELEMENT    ResourceResult    ( PolicyDecision, ResourceResult* ) >
+<!ATTLIST    ResourceResult
+    name    CDATA    #REQUIRED
+>
+
+
+<!-- PolicyDecision element returns the policy decision for the 
+     resource along with user attribute response if requested. A PolicyDecision
+     can be empty. If there are no applicable policies defined for a given 
+     PolicyRequest, the policy decision is empty.
+-->
+
+<!ELEMENT    PolicyDecision    ( ActionDecision*, ResponseDecisions?, ResponseAttributes? ) >
+
+
+<!-- ActionDecision element provides policy evaluation decision for 
+     the user in terms of the action specified in AttributeValuePair. 
+     The attribute timeToLive provides the time-to-live info of the 
+     policy decision in terms of the action.
+     The sub-element AttributeValuePair provides the action name and
+     its values.
+     The sub-element Advices provides some additional info which may 
+     help the client to better understand the policy evaluation 
+     decision.
+-->
+
+<!ELEMENT    ActionDecision    ( AttributeValuePair, Advices? ) >
+<!ATTLIST    ActionDecision
+    timeToLive    CDATA    #IMPLIED
+>
+
+
+<!-- Advices element provides some additional info which may help the 
+     client to better understand the policy evaluation decision. 
+-->
+
+<!ELEMENT    Advices   ( AttributeValuePair+ ) >
+
+
+<!-- ResponseDecisions consists the user attribute responses. The attribute
+whose values are returned are defined in the AMConfig.properties which 
+are applicable to all policies  and  resources defined in the policy serivce.
+-->
+
+<!ELEMENT    ResponseDecisions    ( AttributeValuePair+ ) >
+
+
+<!-- ResponseAttributes consists of the user responses attributes per policy
+ The attributes which are returned are an aggregation of those returned  by 
+the ResponseProvider(s) defined in the policy.
+-->
+
+<!ELEMENT    ResponseAttributes    ( AttributeValuePair+ ) >
+
+<!-- AddPolicyListenerResponse element is used by server to send 
+     back an acknowledgement of the success of adding a policy 
+     listener.
+-->
+
+<!ELEMENT    AddPolicyListenerResponse    EMPTY >
+
+
+<!-- RemovePolicyListenerResponse element is used by server to send 
+     back an acknowledgement of the success of removing a policy 
+     listener.
+-->
+
+<!ELEMENT    RemovePolicyListenerResponse    EMPTY >
+
+<!-- AdvicesHandleableByAMRsponse element has names of policy advices
+     that could be handled by AM if PEP redirects user agent to AM.
+     This element is sent in response to AdvicesHandleableByAMRequest
+-->
+<!ELEMENT    AdvicesHandleableByAMResponse    (AttributeValuePair) >
+
+<!-- Exception element is used by server to send back error message
+-->
+     
+<!ELEMENT    Exception    (#PCDATA) >
+
+
+<!-- PolicyNotification element specifies a policy notification.
+     The attribute notificationId is used for identifying the 
+     notification.
+-->
+
+<!ELEMENT    PolicyNotification    ( PolicyChangeNotification ) >
+<!ATTLIST    PolicyNotification
+    notificationId        CDATA       #REQUIRED 
+-->
+
+
+<!-- PolicyChangeNotification element sends a notification to the 
+     client if a policy regarding the service has been changed.
+     The attribute serviceName specifies the service name.
+     The attribute type specifies the policy change type.
+     The sub-element ResourceName specifies the name of the resource 
+     which is affected by the policy change.
+-->
+
+<!ELEMENT    PolicyChangeNotification    ( ResourceName* ) >
+<!ATTLIST    PolicyChangeNotification
+    serviceName    NMTOKEN    #REQUIRED
+    type           (added | modified | deleted)  "modified"
+>
+
+
+<!-- ResourceName element respresents a resource name
+-->
+
+<!ELEMENT    ResourceName    ( #PCDATA ) >
+

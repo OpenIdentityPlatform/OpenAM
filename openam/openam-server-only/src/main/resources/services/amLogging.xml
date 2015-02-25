@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: amLogging.xml,v 1.11 2008/10/10 22:14:25 bigfatrat Exp $
+
+    Portions Copyrighted 2011-2014 ForgeRock AS
+    Portions Copyrighted 2013 Cybernetica AS
+    Portions Copyrighted 2014 Nomura Research Institute, Ltd
+-->
+<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMLoggingService" version="1.0">
+        <Schema serviceHierarchy="/DSAMEConfig/iPlanetAMLoggingService"
+            i18nFileName="amLogging"
+            revisionNumber="50"
+            i18nKey="iplanet-am-logging-service-description">
+            <Global>
+                <AttributeSchema name="serviceObjectClasses"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>iplanet-am-logging-service</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-logging-file-rotation-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a101">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nNo">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-max-file-size"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a102">
+                    <DefaultValues>
+                        <Value>100000000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-num-hist-file"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a103">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-logging-file-prefix"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1031">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-logging-file-suffix"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1032">
+                    <DefaultValues>
+                        <Value>-MM.dd.yy-kk.mm</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-logging-file-rotation"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="-1" rangeEnd="2147483647"
+                    i18nKey="a1033">
+                    <DefaultValues>
+                        <Value>-1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-location"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a104">
+                    <DefaultValues>
+                        <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="logstatus"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a1041">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceACTIVE">ACTIVE</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceINACTIVE">INACTIVE</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>ACTIVE</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="resolveHostName"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a1042">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nNo">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-type"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a105">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceFile">File</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDB">DB</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceSyslog">Syslog</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>File</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+               <AttributeSchema name="iplanet-am-logging-secure-log-helper-class-name"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.secure.SecureLogHelperJCEImpl</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-secure-certificate-store"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1162">
+                    <DefaultValues>
+                        <Value>%BASE_DIR%/%SERVER_URI%/Logger.jks</Value>
+                    </DefaultValues>
+                </AttributeSchema>                 
+                <AttributeSchema name="iplanet-am-logging-db-user"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a107">
+                    <DefaultValues>
+                        <Value>dbuser</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-file-handler"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.handlers.FileHandler</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-jdbc-handler"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.handlers.DBHandler</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-secure-file-handler"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.handlers.SecureFileHandler</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-handler"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.log.handlers.syslog.SyslogHandler</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-secure-elf-formatter"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.handlers.SecureELFFormatter</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-remote-handler"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.handlers.RemoteHandler</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-remote-formatter"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.handlers.RemoteFormatter</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-elf-formatter"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.handlers.ELFFormatter</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-db-formatter"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.handlers.DBFormatter</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-formatter"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.log.handlers.syslog.SyslogFormatter</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-authz-class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.spi.ISAuthorizer</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-token-class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.spi.SSOTokenProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-archiver-class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.spi.Archiver</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-verifier-action-class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.spi.ISVerifierOutput</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-db-password"
+                    type="single"
+                    syntax="password"
+                    i18nKey="a108">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-db-driver"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a109">
+                    <DefaultValues>
+                        <Value>oracle.jdbc.driver.OracleDriver</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-log-list"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-allfields"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>Domain</Value>
+                        <Value>LoginID</Value>
+                        <Value>LogLevel</Value>
+                        <Value>IPAddr</Value>
+                        <Value>HostName</Value>
+                        <Value>LoggedBy</Value>
+                        <Value>ModuleName</Value>
+                        <Value>ContextID</Value>
+                        <Value>MessageID</Value>
+                        <Value>NameID</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- added new attribute schema on 3/4/2002 for DSAME52 Logging -->
+                <AttributeSchema name="iplanet-am-logging-logfields"
+                    type="multiple_choice"
+                    syntax="string"
+                    i18nKey="a111">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceDOM">Domain</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceLOGINID">LoginID</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceLOGLEVEL">LogLevel</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceIPADDR">IPAddr</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceHOSTNAME">HostName</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceLOGGEDBY">LoggedBy</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceMODULENAME">ModuleName</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceCONTEXTID">ContextID</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceMESSAGEID">MessageID</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceNAMEID">NameID</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>Domain</Value>
+                        <Value>LoginID</Value>
+                        <Value>LogLevel</Value>
+                        <Value>IPAddr</Value>
+                        <Value>HostName</Value>
+                        <Value>LoggedBy</Value>
+                        <Value>ModuleName</Value>
+                        <Value>ContextID</Value>
+                        <Value>MessageID</Value>
+                        <Value>NameID</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-verify-period-in-seconds"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a114">
+                    <DefaultValues>
+                        <Value>3600</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-signature-period-in-seconds"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a115">
+                    <DefaultValues>
+                        <Value>900</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-security-status"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a116">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceON">ON</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceOFF">OFF</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>OFF</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-secure-signing-algorithm"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a1161">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceMD2withRSA">MD2withRSA</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceMD5withRSA">MD5withRSA</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceSHA1withDSA">SHA1withDSA</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceSHA1withRSA">SHA1withRSA</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>SHA1withRSA</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-file-read-handler"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.handlers.LogReadFileHandler</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sun-am-logging-db-read-handler"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.handlers.LogReadDBHandler</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-max-records"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a117">
+                    <DefaultValues>
+                        <Value>500</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-buffer-size"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a119">
+                    <DefaultValues>
+                        <Value>25</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sun-am-logging-db-max-in-mem"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a1191">
+                    <DefaultValues>
+                        <Value>2</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-buffer-time-in-seconds"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a120">
+                    <DefaultValues>
+                        <Value>60</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-time-buffering-status"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a121">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceON">ON</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceOFF">OFF</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>ON</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-files-per-keystore"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a118">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-security-module-name"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>secmod.db</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-debug-class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.spi.ISDebug</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-secure-timestamp-generator"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.sun.identity.log.spi.SecureTimestampGenerator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sun-am-log-level"
+                    type="single_choice"
+                    listOrder="insertion"
+                    syntax="string"
+                    i18nKey="a130">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceLOGOFF">OFF</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceLOGSEVERE">SEVERE</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceLOGWARNING">WARNING</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceLOGINFO">INFO</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceLOGCONFIG">CONFIG</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceLOGFINE">FINE</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceLOGFINER">FINER</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceLOGFINEST">FINEST</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>INFO</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sun-am-logging-oradbdata-fieldtype"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>CLOB</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sun-am-logging-mysqldbdata-fieldtype"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>LONGTEXT</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sun-am-logging-ora-dbdate-format"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>YYYY-MM-DD HH24:MI:SS</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sun-am-logging-mysql-dbdate-format"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>%Y-%m-%d %H:%i:%s</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-host"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1101">
+                    <DefaultValues>
+                        <Value>localhost</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-port"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="65535"
+                    i18nKey="a1102">
+                    <DefaultValues>
+                        <Value>514</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-protocol"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a1103">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceUDP">UDP</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceTCP">TCP</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>UDP</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-facility"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a1104">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choicekern">kern</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceuser">user</ChoiceValue>
+                        <ChoiceValue i18nKey="choicemail">mail</ChoiceValue>
+                        <ChoiceValue i18nKey="choicedaemon">daemon</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceauth">auth</ChoiceValue>
+                        <ChoiceValue i18nKey="choicesyslog">syslog</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelpr">lpr</ChoiceValue>
+                        <ChoiceValue i18nKey="choicenews">news</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceuucp">uucp</ChoiceValue>
+                        <ChoiceValue i18nKey="choicecron">cron</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceauthpriv">authpriv</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceftp">ftp</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal0">local0</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal1">local1</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal2">local2</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal3">local3</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal4">local4</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal5">local5</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal6">local6</ChoiceValue>
+                        <ChoiceValue i18nKey="choicelocal7">local7</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>local5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-logging-syslog-connection-timeout"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="a1105">
+                    <DefaultValues>
+                        <Value>30</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
+

@@ -1,0 +1,86 @@
+------------------------------------------------------------------------------
+README file for Open Federation
+------------------------------------------------------------------------------
+DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+Copyright (c) 2007 Sun Microsystems, Inc. All Rights Reserved.
+  
+The contents of this file are subject to the terms
+of the Common Development and Distribution License
+(the License). You may not use this file except in
+compliance with the License.
+  
+You can obtain a copy of the License at
+https://opensso.dev.java.net/public/CDDLv1.0.html or
+opensso/legal/CDDLv1.0.txt
+See the License for the specific language governing
+permission and limitations under the License.
+  
+When distributing Covered Code, include this CDDL
+Header Notice in each file and include the License file
+at opensso/legal/CDDLv1.0.txt.
+If applicable, add the following below the CDDL Header,
+with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+  
+$Id: README,v 1.9 2008/07/23 17:40:34 veiming Exp $
+
+Portions Copyright 2013 ForgeRock AS
+
+
+%% Contents:
+    %% 1. Build requirements
+    %% 2. Library dependencies
+    %% 3. Building the workspace
+
+
+%% 1. Build requirements
+
+The OpenFederation Library workspace uses Apache Ant as the build tool. 
+The build scripts in this workspace use features not present in releases 
+of Ant prior to 1.6.  Thus, in order to build this workspace you must have 
+Ant version 1.6.5 or above installed and available in your system path.
+Set the ANT_HOME environment variable to the Ant root directory, and add 
+${ANT_HOME}/bin to your PATH environment variable.
+
+The sources in this workspace should be compiled using JDK 5.0 with the source
+and target levels set to "1.4". In order to allow this, you must ensure that
+JDK 5.0 is present in your system path and the JAVA_HOME environment variable
+is setup correctly pointing to its location.
+
+%% 2. Library dependencies
+
+%% 2.1 Follow section 2 of the README under the "opensso/products" directory to
+       resolve external library dependencies, and copy corresponding jars to 
+       the "opensso/products/extlib" directory of your workspace. 
+%% 2.2 Follow section 2 of the README under the 
+       "opensso/products/federation/library" directory to resolve 
+       library dependencies for Open Federation Library.
+%% 2.3 Open Federation depends on "opensso/products/amserver" branch of 
+       openSSO. You could
+       - check out the "opensso/products/amserver" branch source code 
+       or
+       - download opensso_server_samples.war, console.jar, amserver.jar, 
+         opensso-test.jar, amclientsdk.jar, amAdminTools.zip, 
+         openssosamples.zip, amclientsdk.jar, opensso-sharedlib.jar from
+         https://opensso.dev.java.net/public/use/index.html and copy them to 
+         the "opensso/products/federation/extlib" directory of your workspace.
+
+%% 3. Building the workspace
+
+The workspace build system offers many build targets. You can view the
+available targets by issuing the ant command from the root of the
+workspace. The default target that is executed is the usage target which
+displays a brief description about the other targets. Currently the main
+targets available in the workspace are:
+ 
+     - build           : compiles the sources
+     - unittest        : generates unit test zip file
+     - samples         : generates sample WARs
+     - war             : creates WAR for deployment
+     - clientsdk       : creates client SDK jar file
+     - doc             : creates javadocs
+     - clean           : deletes the generated files
+     - usage           : displays this usage message
+

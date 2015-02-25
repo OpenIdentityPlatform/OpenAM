@@ -1,0 +1,789 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions Copyrighted [year] [name of copyright owner]".
+
+  Copyright 2011-2014 ForgeRock AS. All rights reserved.
+-->
+
+<!--
+  Portions Copyrighted 2013 Syntegrity.
+  Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+-->
+
+<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"  "jar://com/sun/identity/sm/sms.dtd">
+<ServicesConfiguration>
+	<Service name="iPlanetAMAuthDevicePrintModuleService"
+		version="1.0">
+		<Schema
+			serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthDevicePrintModuleService"
+			i18nFileName="amAuthDevicePrintModule" revisionNumber="10"
+			i18nKey="device-print-service-description">
+			<Organization>
+
+				<AttributeSchema name="openam-auth-adaptive-auth-level"
+					cosQualifier="default" type="single" syntax="number" i18nKey="a000">
+					<DefaultValues>
+						<Value>0</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-profile-expiration-days"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+					i18nKey="a001">
+					<DefaultValues>
+						<Value>30</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-maximum-profiles-stored-quantity"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+					i18nKey="a002">
+					<DefaultValues>
+						<Value>5</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+                <AttributeSchema
+                        name="iplanet-am-auth-adaptive-device-print-max-tolerated-penalty-points"
+                        type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="a029">
+                    <DefaultValues>
+                        <Value>50</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-user-agent-penalty-points"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+					i18nKey="a009">
+					<DefaultValues>
+						<Value>35</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-installed-fonts-penalty-points"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+					i18nKey="a010">
+					<DefaultValues>
+						<Value>35</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-installed-plugins-penalty-points"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+					i18nKey="a011">
+					<DefaultValues>
+						<Value>35</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-screen-color-depth-penalty-points"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+					i18nKey="a012">
+					<DefaultValues>
+						<Value>35</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-screen-resolution-penalty-points"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+					i18nKey="a013">
+					<DefaultValues>
+						<Value>35</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-timezone-penalty-points"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+					i18nKey="a014">
+					<DefaultValues>
+						<Value>35</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+                <AttributeSchema
+                    name="iplanet-am-auth-adaptive-device-print-location-penalty-points"
+                    type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="a028">
+                    <DefaultValues>
+                        <Value>35</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-location-allowed-range"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+					i18nKey="a015">
+					<DefaultValues>
+						<Value>100</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-ignore-version-in-user-agent"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a016">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-fonts"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+					i18nKey="a017">
+					<DefaultValues>
+						<Value>0</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-installed-fonts"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="100"
+					i18nKey="a018">
+					<DefaultValues>
+						<Value>0</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-plugins"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+					i18nKey="a019">
+					<DefaultValues>
+						<Value>0</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-plugins"
+					type="single" syntax="number_range" rangeStart="0" rangeEnd="100"
+					i18nKey="a020">
+					<DefaultValues>
+						<Value>0</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<!-- Required Attributes Config START -->
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-user-agent-required"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a022">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>true</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-plugins-required"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a023">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-fonts-required"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a024">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-geolocation-required"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a025">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-screen-params-required"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a026">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-timezone-required"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a027">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
+				<AttributeSchema
+					name="iplanet-am-auth-adaptive-device-print-store-profiles-without-confirmation"
+					cosQualifier="default" type="single" syntax="boolean" i18nKey="a004">
+					<BooleanValues>
+						<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+						<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+					</BooleanValues>
+					<DefaultValues>
+						<Value>false</Value>
+					</DefaultValues>
+				</AttributeSchema>
+
+				<!-- Required Attributes Config END -->
+
+                <!-- HOTP Attributes START -->
+
+                <AttributeSchema name="sunAMAuthHOTPSMSGatewayImplClassName"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a501">
+                    <DefaultValues>
+                        <Value>com.sun.identity.authentication.modules.hotp.DefaultSMSGatewayImpl</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunAMAuthHOTPSMTPHostName"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a502">
+                    <DefaultValues>
+                        <Value>smtp.gmail.com</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunAMAuthHOTPSMTPHostPort"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="65535"
+                                 i18nKey="a503">
+                    <DefaultValues>
+                        <Value>465</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunAMAuthHOTPSMTPUserName"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a504">
+                    <DefaultValues>
+                        <Value>opensso.sun</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunAMAuthHOTPSMTPUserPassword"
+                                 type="single"
+                                 syntax="password"
+                                 i18nKey="a505">
+                    <DefaultValues>
+                        <Value>sunopensso</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunAMAuthHOTPSMTPSSLEnabled"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a506">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="ssl">SSL</ChoiceValue>
+                        <ChoiceValue i18nKey="nonssl">Non SSL</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>SSL</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunAMAuthHOTPSMTPFromAddress"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a5061">
+                    <DefaultValues>
+                        <Value>no-reply@openam.org</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="sunAMAuthHOTPPasswordValidityDuration"
+                                 type="single"
+                                 syntax="number_range" rangeStart="1" rangeEnd="30"
+                                 i18nKey="a507">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunAMAuthHOTPPasswordLength"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a508">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="6digits">6</ChoiceValue>
+                        <ChoiceValue i18nKey="8digits">8</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>8</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunAMAuthHOTPasswordDelivery"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a509">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="sms">SMS</ChoiceValue>
+                        <ChoiceValue i18nKey="email">E-mail</ChoiceValue>
+                        <ChoiceValue i18nKey="both">SMS and E-mail</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>SMS and E-mail</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                        name="sunAMAuthHOTPAutoClicking"
+                        cosQualifier="default" type="single"
+                        syntax="boolean" i18nKey="a520">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openamTelephoneAttribute"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a510">
+                    <DefaultValues>
+                        <Value>telephoneNumber</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openamSMSCarrierAttribute"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a511">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openamEmailAttribute"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a512">
+                    <DefaultValues>
+                        <Value>mail</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- HOTP Attributes END -->
+
+				<SubSchema name="serverconfig" inheritance="multiple">
+					<AttributeSchema name="openam-auth-adaptive-auth-level"
+						cosQualifier="default" type="single" syntax="number" i18nKey="a000">
+						<DefaultValues>
+							<Value>0</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-profile-expiration-days"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="a001">
+						<DefaultValues>
+							<Value>30</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-maximum-profiles-stored-quantity"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="a002">
+						<DefaultValues>
+							<Value>5</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+                    <AttributeSchema
+                            name="iplanet-am-auth-adaptive-device-print-max-tolerated-penalty-points"
+                            type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                            i18nKey="a029">
+                        <DefaultValues>
+                            <Value>50</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-user-agent-penalty-points"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="a009">
+						<DefaultValues>
+							<Value>35</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-installed-fonts-penalty-points"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="a010">
+						<DefaultValues>
+							<Value>35</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-installed-plugins-penalty-points"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="a011">
+						<DefaultValues>
+							<Value>35</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-screen-color-depth-penalty-points"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="a012">
+						<DefaultValues>
+							<Value>35</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-screen-resolution-penalty-points"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="a013">
+						<DefaultValues>
+							<Value>35</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-timezone-penalty-points"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="a014">
+						<DefaultValues>
+							<Value>35</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+                    <AttributeSchema
+                            name="iplanet-am-auth-adaptive-device-print-location-penalty-points"
+                            type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                            i18nKey="a028">
+                        <DefaultValues>
+                            <Value>35</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-location-allowed-range"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="a015">
+						<DefaultValues>
+							<Value>100</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-ignore-version-in-user-agent"
+						cosQualifier="default" type="single" syntax="boolean" i18nKey="a016">
+						<BooleanValues>
+							<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+							<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+						</BooleanValues>
+						<DefaultValues>
+							<Value>false</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-fonts"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="a017">
+						<DefaultValues>
+							<Value>0</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-installed-fonts"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="100"
+						i18nKey="a018">
+						<DefaultValues>
+							<Value>0</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-plugins"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+						i18nKey="a019">
+						<DefaultValues>
+							<Value>0</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-plugins"
+						type="single" syntax="number_range" rangeStart="0" rangeEnd="100"
+						i18nKey="a020">
+						<DefaultValues>
+							<Value>0</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<!-- Required Attributes Config START -->
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-user-agent-required"
+						cosQualifier="default" type="single" syntax="boolean" i18nKey="a022">
+						<BooleanValues>
+							<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+							<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+						</BooleanValues>
+						<DefaultValues>
+							<Value>true</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-plugins-required"
+						cosQualifier="default" type="single" syntax="boolean" i18nKey="a023">
+						<BooleanValues>
+							<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+							<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+						</BooleanValues>
+						<DefaultValues>
+							<Value>false</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-fonts-required"
+						cosQualifier="default" type="single" syntax="boolean" i18nKey="a024">
+						<BooleanValues>
+							<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+							<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+						</BooleanValues>
+						<DefaultValues>
+							<Value>false</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-geolocation-required"
+						cosQualifier="default" type="single" syntax="boolean" i18nKey="a025">
+						<BooleanValues>
+							<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+							<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+						</BooleanValues>
+						<DefaultValues>
+							<Value>false</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-screen-params-required"
+						cosQualifier="default" type="single" syntax="boolean" i18nKey="a026">
+						<BooleanValues>
+							<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+							<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+						</BooleanValues>
+						<DefaultValues>
+							<Value>false</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-timezone-required"
+						cosQualifier="default" type="single" syntax="boolean" i18nKey="a027">
+						<BooleanValues>
+							<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+							<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+						</BooleanValues>
+						<DefaultValues>
+							<Value>false</Value>
+						</DefaultValues>
+					</AttributeSchema>
+
+					<AttributeSchema
+						name="iplanet-am-auth-adaptive-device-print-store-profiles-without-confirmation"
+						cosQualifier="default" type="single" syntax="boolean" i18nKey="a004">
+						<BooleanValues>
+							<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+							<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+						</BooleanValues>
+						<DefaultValues>
+							<Value>false</Value>
+						</DefaultValues>
+					</AttributeSchema>
+					<!-- Required Attributes Config END -->
+
+                    <!-- HOTP Attributes START -->
+
+                    <AttributeSchema name="sunAMAuthHOTPSMSGatewayImplClassName"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a501">
+                        <DefaultValues>
+                            <Value>com.sun.identity.authentication.modules.hotp.DefaultSMSGatewayImpl</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPHostName"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a502">
+                        <DefaultValues>
+                            <Value>smtp.gmail.com</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPHostPort"
+                                     type="single"
+                                     syntax="number_range" rangeStart="0" rangeEnd="65535"
+                                     i18nKey="a503">
+                        <DefaultValues>
+                            <Value>465</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPUserName"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a504">
+                        <DefaultValues>
+                            <Value>opensso.sun</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPUserPassword"
+                                     type="single"
+                                     syntax="password"
+                                     i18nKey="a505">
+                        <DefaultValues>
+                            <Value>sunopensso</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPSSLEnabled"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a506">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="ssl">SSL</ChoiceValue>
+                            <ChoiceValue i18nKey="nonssl">Non SSL</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>SSL</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPSMTPFromAddress"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a5061">
+                        <DefaultValues>
+                            <Value>no-reply@openam.org</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPPasswordValidityDuration"
+                                     type="single"
+                                     syntax="number_range" rangeStart="1" rangeEnd="30"
+                                     i18nKey="a507">
+                        <DefaultValues>
+                            <Value>5</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPPasswordLength"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a508">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="6digits">6</ChoiceValue>
+                            <ChoiceValue i18nKey="8digits">8</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>8</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMAuthHOTPasswordDelivery"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a509">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="sms">SMS</ChoiceValue>
+                            <ChoiceValue i18nKey="email">E-mail</ChoiceValue>
+                            <ChoiceValue i18nKey="both">SMS and E-mail</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>SMS and E-mail</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="sunAMAuthHOTPAutoClicking"
+                            cosQualifier="default" type="single"
+                            syntax="boolean" i18nKey="a520">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openamTelephoneAttribute"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a510">
+                        <DefaultValues>
+                            <Value>telephoneNumber</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openamSMSCarrierAttribute"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a511">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openamEmailAttribute"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a512">
+                        <DefaultValues>
+                            <Value>mail</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <!-- HOTP Attributes END -->
+				</SubSchema>
+			</Organization>
+		</Schema>
+	</Service>
+</ServicesConfiguration>

@@ -1,0 +1,9 @@
+<p>Select a pattern from the list below</p>
+<div class="striped-list">
+    <h3>{{t "policy.common.availablePatterns"}}</h3>
+    <ul>
+    {{#each options.resourcePatterns}}
+        <li tabindex="0" class="addPattern"><span class="pattern">{{this}}</span><span class="icon-arrow-right float-right"></span></li>
+    {{/each}}
+    </ul>
+</div>

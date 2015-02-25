@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<section xml:id="data-store-requirements"
+          xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='http://docbook.org/ns/docbook
+                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ <title>Data Store Requirements</title>
+
+ <para>
+  The following table summarizes OpenAM data store support.
+ </para>
+
+ <table xml:id="table-data-store-requirements" pgwide="1">
+
+  <title>Supported Data Stores</title>
+
+  <tgroup cols="5">
+
+   <colspec colnum="1" colwidth="2*"/>
+   <colspec colnum="2" colwidth="1*"/>
+   <colspec colnum="3" colwidth="1*"/>
+   <colspec colnum="4" colwidth="2*"/>
+   <colspec colnum="5" colwidth="1*"/>
+
+   <thead>
+    <row>
+     <entry>Data Store</entry>
+     <entry>Versions</entry>
+     <entry>Core Token Service (CTS) Data Store</entry>
+     <entry>Configuration Data Store</entry>
+     <entry>User Data Store</entry>
+    </row>
+   </thead>
+
+   <tbody>
+    <row>
+     <entry>Embedded OpenDJ (included in OpenAM)</entry>
+     <entry>2.6.2</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+    </row>
+
+    <row>
+     <entry>External OpenDJ</entry>
+     <entry>2.6, 2.6.2</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+    </row>
+
+    <row>
+     <entry>IBM Tivoli Directory Server</entry>
+     <entry>6.3</entry>
+     <entry> </entry>
+     <entry> </entry>
+     <entry>Supported</entry>
+    </row>
+
+    <row>
+     <entry>Microsoft Active Directory</entry>
+     <entry>2008, 2008 R2, 2012, 2012 R2</entry>
+     <entry> </entry>
+     <entry> </entry>
+     <entry>Supported</entry>
+    </row>
+
+    <row>
+     <entry>Oracle Directory Server Enterprise Edition</entry>
+     <entry>11g</entry>
+     <entry><emphasis role="strong">NOT SUPPORTED</emphasis></entry>
+     <entry>
+      <para>
+       Supported
+      </para>
+
+      <para>
+       When using DSEE as a configuration store,
+       you must set up an external OpenDJ directory service
+       as a Core Token Service data store as well,
+       and you must configure OpenAM to use the external OpenDJ directory service
+       as the CTS data store.
+      </para>
+     </entry>
+     <entry>Supported</entry>
+    </row>
+
+    <row>
+     <entry>Oracle Unified Directory</entry>
+     <entry>11g</entry>
+     <entry> </entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+    </row>
+   </tbody>
+  </tgroup>
+
+ </table>
+</section>

@@ -1,0 +1,59 @@
+<!--
+    The contents of this file are subject to the terms of the Common Development and
+    Distribution License (the License). You may not use this file except in compliance with the
+    License.
+
+    You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+    specific language governing permission and limitations under the License.
+
+    When distributing Covered Software, include this CDDL Header Notice in each file and include
+    the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+    Header, with the fields enclosed by brackets [] replaced by your own identifying
+    information: "Portions copyright [year] [name of copyright owner]".
+
+    Copyright 2013-2014 ForgeRock AS.
+-->
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="common-section" defaultValue="amconfig.org.forgerock.services.cts.store.common.section">
+        <property required="true">
+            <cc name="cscorg-forgerock-services-cts-store-location" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+                <option label="amconfig.org.forgerock.services.cts.store.location.default" value="default" />
+                <option label="amconfig.org.forgerock.services.cts.store.location.external" value="external" />
+                <attribute name="onChange" value="toggleExternalConfig(this);" />
+            </cc>
+        </property>
+        <property required="true">
+            <label name="rootSuffixLabel" defaultValue="amconfig.org.forgerock.services.cts.store.root.suffix" labelFor="cscorg-forgerock-services-cts-store-root-suffix" />
+            <cc name="cscorg-forgerock-services-cts-store-root-suffix" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
+    </section>
+    <section name="external-section" defaultValue="amconfig.org.forgerock.services.cts.store.external.section">
+        <property required="true">
+            <label name="sslLabel" defaultValue="amconfig.org.forgerock.services.cts.store.ssl.enabled" labelFor="cscorg-forgerock-services-cts-store-ssl-enabled" />
+            <cc name="cscorg-forgerock-services-cts-store-ssl-enabled" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag"></cc>
+        </property>
+        <property required="true">
+            <label name="directoryNameLabel" defaultValue="amconfig.org.forgerock.services.cts.store.directory.name" labelFor="cscorg-forgerock-services-cts-store-directory-name" />
+            <cc name="cscorg-forgerock-services-cts-store-directory-name" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+            <fieldhelp name="helpcscorg-forgerock-services-cts-store-directory-name" defaultValue="amconfig.help.org.forgerock.services.cts.store.directory.name" />
+        </property>
+        <property required="true">
+            <label name="loginIdLabel" defaultValue="amconfig.org.forgerock.services.cts.store.loginid" labelFor="cscorg-forgerock-services-cts-store-loginid" />
+            <cc name="cscorg-forgerock-services-cts-store-loginid" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
+        <property required="true">
+            <label name="passwordLabel" defaultValue="amconfig.org.forgerock.services.cts.store.password" labelFor="cscorg-forgerock-services-cts-store-password" />
+            <cc name="cscorg-forgerock-services-cts-store-password" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag"></cc>
+        </property>
+        <property required="true">
+            <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.cts.store.max.connections" labelFor="cscorg-forgerock-services-cts-store-max-connections" />
+            <cc name="cscorg-forgerock-services-cts-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
+        <property required="true">
+            <label name="heartbeatLabel" defaultValue="amconfig.org.forgerock.services.cts.store.heartbeat" labelFor="cscorg-forgerock-services-cts-store-heartbeat" />
+            <cc name="cscorg-forgerock-services-cts-store-heartbeat" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
+    </section>
+</propertysheet>

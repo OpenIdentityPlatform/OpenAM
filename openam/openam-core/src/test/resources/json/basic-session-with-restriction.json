@@ -1,0 +1,29 @@
+{
+    "clientDomain": null,
+    "clientID": null,
+    "cookieMode": null,
+    "cookieStr": null,
+    "creationTime": 0,
+    "isISStored": false,
+    "latestAccessTime": 0,
+    "maxCachingTime": 0,
+    "maxIdleTime": 0,
+    "maxSessionTime": 0,
+    "reschedulePossible": false,
+    "restrictedTokensBySid": {
+        "AQIC5wM2LY4SfcyTLz6VjQ7nkFeDcEh8K5dXkIENpXlpg28.*AAJTSQACMDIAAlMxAAIwMQACU0sAEzc5ODIzMDM5MzQyNzU2MTg1NDQ.*": {
+            "@class": "com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction",
+            "addressList": [],
+            "asString": "Fzy2GsI/O1TsXhvlVuqjqIuTG2k=",
+            "dn": "id=myagent,ou=agent,dc=openam,dc=forgerock,dc=org"
+        }
+    },
+    "sessionEventURLs": {},
+    "sessionHandle": "shandle:weasel",
+    "sessionID": null,
+    "sessionProperties": null,
+    "sessionState": 0,
+    "sessionType": 0,
+    "timedOutAt": 0,
+    "willExpireFlag": false
+}

@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-troubleshooting'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Troubleshooting</title>
+ <indexterm><primary>Troubleshooting</primary></indexterm>
+ <para>This chapter covers how to get debugging information and troubleshoot
+ issues in OpenAM deployments.</para>
+ 
+ <qandaset xml:id="solutions-to-common-issues" defaultlabel="qanda">
+  <title>Solutions to Common Issues</title>
+  
+  <para>This section offers solutions to common problems when working with
+  OpenAM.</para>
+  
+  <qandadiv xml:id="troubleshooting-openam-installation">
+   <title>OpenAM Installation</title>
+   <qandaentry xml:id="cannot-write-to-config-directory">
+    <question>
+     <para>OpenAM configuration could not write to the configuration directory.
+     Where must I change permissions, and what permissions are required?</para>
+    </question>
+    <answer>
+     <para>If the user running the web container has a $HOME directory, then
+     the configuration directory is stored there, and you probably do not have
+     this problem. If you do not know the user running the web container, use
+     the <command>ps</command> command to check. In the following example, the
+     user is <literal>mark</literal>, the web container
+     <literal>tomcat</literal>.</para>
+
+     <screen>
+$ <userinput>ps -ef | grep tomcat</userinput>
+<computeroutput>mark      1739     1  0 14:47...</computeroutput>
+     </screen>
+
+     <para>For a container installed from native packages with a dedicated
+     user, $HOME may not be where you think it is. Look at the user's entry in
+     <filename>/etc/passwd</filename> to locate the home directory.
+     The user running the web container where you install OpenAM must
+     be able to read from and write in this directory.</para>
+     <para>If you cannot change the permissions to the user's home directory,
+     you can, as a workaround, unpack <filename><?eval ${coreWarFile}?></filename>, 
+     set the <literal>configuration.dir</literal> property in the
+     <filename>WEB-INF/classes/bootstrap.properties</filename> to a directory
+     with appropriate permissions, and repack <filename>openam.war</filename>
+     with the adjusted file before deploying that.</para>
+
+     <screen>
+$ <userinput>cd ~/Downloads/openam/${coreWarFile}</userinput>
+$ <userinput>mkdir unpacked ; cd unpacked</userinput>
+$ <userinput>jar xf ../${coreWarFile}</userinput>
+$ <userinput>vi WEB-INF/classes/bootstrap.properties</userinput>
+$ <userinput>grep ^config WEB-INF/classes/bootstrap.properties</userinput>
+<computeroutput>configuration.dir=/my/readwrite/config/dir</computeroutput>
+$ <userinput>jar cf ../openam.war *</userinput>
+     </screen>
+
+    </answer>
+   </qandaentry>
+   <qandaentry xml:id="deploy-failed-lack-of-memory">
+    <question>
+     <para>Deployment failed due to lack of memory. What do I do?</para>
+    </question>
+    <answer>
+     <para>OpenAM requires at least a maximum heap size of 1024 MB, with a 256
+     MB maximum permanent generation heap size. For the Sun JVM, ensure the
+     container starts with <literal>-Xmx1024m -XX:MaxPermSize=256m</literal>
+     for these settings.</para>
+     <para>If you do not know the settings used when the web container was
+     started, use the <command>ps</command> command to check. In the following
+     example, the web container is <literal>tomcat</literal>.</para>
+
+     <screen>
+$ <userinput>ps -ef | grep tomcat | grep Xm</userinput>
+<computeroutput>... -Xmx1024m -XX:MaxPermSize=256m ...</computeroutput>
+     </screen>
+
+     <para>Make sure you have at least 2 GB of RAM on the system where you
+     run OpenAM to avoid running out of memory.</para>
+
+     <para>If you make it through deployment and seem to be running out of
+     memory later, you can confirm memory errors in OpenAM by searching the
+     <filename><replaceable>config-dir</replaceable>/openam/debug/*</filename>
+     files for <literal>java.lang.OutOfMemoryError</literal>.</para>
+    </answer>
+   </qandaentry>
+   <qandaentry xml:id="deploy-failed-invalid-hostname">
+    <question>
+     <para>Deployment failed due to invalid hostname configuration. What do
+     I do?</para>
+    </question>
+    <answer>
+     <para>OpenAM requires that you use a fully qualified domain name (FQDN)
+     that the host can resolve.</para>
+
+     <screen>
+$ <userinput>ping openam-ter.example.com</userinput>
+<computeroutput>PING openam-ter (192.168.56.2) 56(84) bytes of data.
+64 bytes from openam (192.168.56.2): icmp_seq=1 ttl=64 time=0.025 ms
+64 bytes from openam (192.168.56.2): icmp_seq=2 ttl=64 time=0.032 ms
+64 bytes from openam (192.168.56.2): icmp_seq=3 ttl=64 time=0.030 ms</computeroutput>
+     </screen>
+
+     <para>For a test deployment (at home, on a laptop), you can use fake FQDNs
+     in <filename>/etc/hosts</filename> (<filename
+     >%SystemRoot%\system32\drivers\etc\hosts</filename> on Windows), depending
+     on how your network is configured.</para>
+
+     <screen>
+$ <userinput>cat /etc/hosts | grep openam</userinput>
+<computeroutput>192.168.56.2 openam openam.example.com
+192.168.56.3 openam-bis openam-bis.example.com
+192.168.56.5 openam-ter openam-ter.example.com</computeroutput>
+     </screen>
+    </answer>
+   </qandaentry>
+   <qandaentry xml:id="who-deleted-my-config">
+    <question>
+     <para>I configured OpenAM, and now am seeing the configuration screen
+     again. Who deleted my configuration?</para>
+    </question>
+    <answer>
+     <para>OpenAM uses a file in <filename>$HOME/.openamcfg/</filename> to
+     bootstrap and find its configuration. The file is named after the path
+     to OpenAM and contains the path to the configuration. The following
+     example shows what the file looks like for OpenAM deployed in Apache
+     Tomcat under <filename>/path/to/tomcat/webapps/openam</filename>, and
+     running as user <literal>amuser</literal> with <literal>$HOME</literal>
+     <filename>/home/amuser</filename>.</para>
+
+     <screen>
+$ <userinput>cat ~/.openamcfg/AMConfig_path_to_tomcat_webapps_openam_</userinput>
+<computeroutput>/home/amuser/openam</computeroutput>
+     </screen>
+
+     <para>If OpenAM cannot find its configuration, then it displays the
+     configuration screen.</para>
+    </answer>
+   </qandaentry>
+  </qandadiv>
+
+  <qandadiv xml:id="troubleshooting-openam-upgrades">
+   <title>OpenAM Upgrades</title>
+
+   <qandaentry xml:id="general-tools-upgrade">
+    <question>
+     <para>I have upgraded OpenAM, now my tools are not working properly. What
+     happened?</para>
+    </question>
+    <answer>
+     <para>Every OpenAM component must be upgraded, not just the main
+     OpenAM <filename>.war</filename> file. If you did not upgrade the tools
+     too, they may not work as intended.</para>
+    </answer>
+   </qandaentry>
+  </qandadiv>
+  
+  <qandadiv xml:id="troubleshooting-openam-administration">
+   <title>OpenAM Administration</title>
+   <qandaentry xml:id="cannot-use-ssoadm-jsp">
+    <question>
+     <para>I cannot use the browser-based equivalent of
+     <command>ssoadm</command>,
+     <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>. Why
+     not?</para>
+    </question>
+    <answer>
+     <para>For security reasons, <literal>ssoadm.jsp</literal> is not activated
+     by default. To activate it, browse to Configuration &gt; Servers and Sites
+     &gt; Servers &gt; <replaceable>ServerName</replaceable> &gt; Advanced,
+     and then add a property named <literal>ssoadm.disabled</literal> with
+     value <literal>false</literal>.</para>
+    </answer>
+   </qandaentry>
+
+   <qandaentry xml:id="ssoadm-slow-on-vm">
+    <question>
+     <para>The <command>ssoadm</command> command is very, very slow on my
+     virtual machine (VMWare, VirtualBox, etc.). How can I speed it up?</para>
+    </question>
+
+    <answer>
+     <para>Virtual machine random devices do not always produce enough random
+     data. The <command>ssoadm</command> command can hang while reading random
+     data from the virtual machine's random device, with the result that you
+     can wait a minute or more for a single command to finish.</para>
+
+     <para>To work around this limitation on virtual machines, make sure you
+     install something that generates enough random data, such as a <link
+     xlink:show="new" xlink:href="http://www.vanheusden.com/te/">timer entropy
+     daemon</link>.</para>
+    </answer>
+   </qandaentry>
+
+   <qandaentry xml:id="ssoadm-weblogic-1211-java6">
+    <question>
+     <para>
+      I have OpenAM deployed on WebLogic 12.1.1 and am running Java 6.
+      What can I do to fix the exceptions and strange results that I am seeing
+      when I use the <command>ssoadm</command> command?
+     </para>
+    </question>
+
+    <answer>
+     <para>
+      Edit the start up script for WebLogic as described in
+      the <citetitle>Installation Guide</citetitle> section,
+      <link xlink:href="install-guide#prepare-oracle-weblogic" xlink:show="new"
+      xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+      >Preparing Oracle WebLogic</citetitle></link>, and then restart WebLogic.
+     </para>
+    </answer>
+   </qandaentry>
+
+   <qandaentry xml:id="opendj-missing-schema">
+    <question>
+     <para>I added OpenDJ as a data store, and now I cannot add a user. OpenAM
+     gives me the following error.</para>
+     <literallayout>ERROR: LDAPv3Repo.create failed. errorCode=65 Entry
+     uid=test,ou=people,dc=example,dc=com violates the Directory Server
+     schema configuration because it includes attribute inetUserStatus which
+     is not allowed by any of the objectclasses defined in that
+     entry</literallayout>
+    </question>
+    <answer>
+     <para>When you set up a New Data Store to use OpenDJ as an identity
+     repository under Access Control &gt; <replaceable>Realm Name</replaceable>
+     &gt; Data Stores &gt; New..., you need to check the Load schema when
+     saved box if you want OpenAM to add the schema to OpenDJ. The box is
+     not selected by default.</para>
+     <para>The full version of OpenAM includes directory server schema in the
+     <filename>~/Downloads/openam/ldif/</filename> directory. To add the schema
+     to OpenDJ afterwards, you can try the following command.</para>
+
+     <screen>
+$ <userinput>/path/to/opendj/bin/ldapmodify \
+ --port 1389 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword password \
+ --filename ~/Downloads/openam/ldif/fam_sds_schema.ldif</userinput>
+<computeroutput>Processing MODIFY request for CN=schema
+MODIFY operation successful for DN CN=schema</computeroutput>
+     </screen>
+    </answer>
+   </qandaentry>
+
+   <qandaentry xml:id="websphere-smtp-ssl">
+    <question>
+     <para>
+      I have OpenAM installed in WebSphere application server with IBM Java.
+      I am doing REST-based user registration or forgotten password reset,
+      or setting up the HOTP authentication module,
+      sending mail to an SMTP server over SSL.
+     </para>
+
+     <para>
+      How come OpenAM cannot send mail over SSL?
+     </para>
+    </question>
+
+    <answer>
+     <para>
+      If you see in the OpenAM Authentication debug log
+      that the SSL handshake is failing when connecting to the mail server,
+      then it is likely that the SSL certificate presented by the mail server
+      is not trusted.
+     </para>
+
+     <para>
+      This is a WebSphere/IBM Java issue, rather than an OpenAM issue.
+     </para>
+
+     <para>
+      To work around the problem, follow these steps
+      to make sure that WebSphere trusts the mail server SSL certificate.
+     </para>
+
+     <orderedlist>
+      <listitem>
+       <para>Log in as administrator to WebSphere console.</para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Browse to Security
+        > SSL certificate and key management
+        > Manage endpoint security configurations,
+        and then click the link for the node where OpenAM runs.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        In the menu on the right, click SSL configuration.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Click NodeDefaultSSLSettings.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        In the menu on the right, click Key stores and certificates.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Click NodeDefaultTrustStore.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        In the menu on the right, click Signer certificates.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Click Retrieve from port.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Set Host, Port, and Alias, and then click Retrieve signer information.
+       </para>
+
+       <para>
+        The Host is the host name of the SMTP server.
+       </para>
+
+       <para>
+        The Port is the port number of the SMTP server, such as 465.
+       </para>
+
+       <para>
+        The certificate Alias can be set to the user name used
+        to authenticate to the mail server.
+       </para>
+
+       <para>
+        For example, if you are sending mail through Google mail as my.user,
+        then set Host to <literal>smtp.gmail.com</literal>,
+        set Port to <literal>465</literal>,
+        and set Alias to <literal>my.user</literal>.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        After the information is retrieved,
+        click Apply, save your work, and then restart WebSphere.
+       </para>
+      </listitem>
+     </orderedlist>
+
+     <para>
+      After WebSphere restarts, it should trust the mail server SSL certificate.
+      OpenAM therefore should be able to connect to the mail server over SSL.
+     </para>
+
+     <para>
+      For more information, see the
+      <link xlink:show="new"
+      xlink:href="http://infolib.lotus.com/resources/portal/8.0.0/doc/en_us/PT800ACD001/index.html"
+      >WebSphere documentation</link>.
+     </para>
+    </answer>
+   </qandaentry>
+
+   <qandaentry xml:id="turn-off-oauth2-logging">
+    <question>
+     <para>
+      My container log file is filling up with messages from OpenAM's
+      OAuth authorization service and OpenID Connect provider.
+     </para>
+
+     <para>
+      What can I do to prevent all these messages from being logged?
+     </para>
+    </question>
+
+    <answer>
+     <para>
+      This behavior is governed by the log settings for RESTlet,
+      which is used by OpenAM for OAuth 2.0 and OpenID Connect 1.0.
+     </para>
+
+     <para>
+      Use log configuration settings to turn off logging from RESTlet.
+     </para>
+
+     <para>
+      For example, if your container is Apache Tomcat, follow these steps.
+     </para>
+
+     <orderedlist>
+      <listitem>
+       <para>
+        Stop Tomcat.
+       </para>
+
+       <screen>
+$ <userinput>/path/to/tomcat/bin/shutdown.sh</userinput>
+       </screen>
+      </listitem>
+
+      <listitem>
+       <para>
+        Edit the Tomcat settings script,
+        <filename>catalina.sh</filename> or <filename>catalina.bat</filename>,
+        to use the logging configuration file.
+       </para>
+
+       <para>
+        For example, in <filename>/path/to/tomcat/bin/catalina.sh</filename>,
+        uncomment the following line, and then save your work:
+       </para>
+
+       <programlisting language="ini">
+LOGGING_CONFIG= \
+  "-Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"</programlisting>
+      </listitem>
+
+      <listitem>
+       <para>
+        In <filename>$CATALINA_BASE/conf/logging.properties</filename>,
+        add the following line, and then save your work:
+       </para>
+
+       <programlisting language="ini">
+org.restlet.level=OFF
+       </programlisting>
+      </listitem>
+
+      <listitem>
+       <para>
+        Start Tomcat.
+       </para>
+
+       <screen>
+$ <userinput>/path/to/tomcat/bin/startup.sh</userinput>
+       </screen>
+      </listitem>
+     </orderedlist>
+    </answer>
+   </qandaentry>
+
+   <qandaentry xml:id="openam-sfo-time-wait">
+    <question>
+     <para>I have session failover configured for an OpenAM site. I see many
+     connections in <literal>TIME_WAIT</literal> state, and the connections
+     seem to be used only for communication between OpenAM servers in that
+     site. What should I set to have fewer connections in
+     <literal>TIME_WAIT</literal>?</para>
+    </question>
+    <answer>
+     <para>When you have session failover configured for a site, OpenAM servers
+     run health checks against other servers in the same site. By default, the
+     health checks are run every second (1000 milliseconds) with a timeout of 1
+     second (1000 milliseconds).</para>
+
+     <para>If there is network latency between servers in a site, for example
+     if you are running your servers in virtual machines, the default settings
+     might not be right for your deployment. In that case, consider changing the
+     following advanced server properties.</para>
+     <itemizedlist>
+      <listitem>
+       <para>By lengthening
+       <literal>com.iplanet.am.session.failover.cluster.stateCheck.timeout</literal>
+       and
+       <literal>com.iplanet.am.session.failover.cluster.stateCheck.period</literal>
+       to something longer than the default, you can work around issues with
+       network latency.</para>
+      </listitem>
+      <listitem>
+       <para>By setting <literal>com.sun.identity.urlchecker.dorequest</literal>
+       to <literal>true</literal> or <literal>false</literal>, you can change
+       whether OpenAM performs an HTTP GET request or only checks the Socket
+       connection of <literal>com.sun.identity.urlchecker.targeturl</literal>
+       as a health check.</para>
+      </listitem>
+     </itemizedlist>
+
+     <para>To set advanced properties, either use the OpenAM console page under
+     Configuration &gt; Servers and Sites &gt; Default Server Settings &gt;
+     Advanced, or set the properties using the
+     <command>ssoadm update-server-cfg</command> command as in the following
+     example, which updates the default server configuration:</para>
+
+     <screen>
+$ <userinput>./ssoadm \
+ update-server-cfg \
+ --servername default \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --attributevalues com.iplanet.am.session.failover.cluster.stateCheck.timeout=2000</userinput>
+     </screen>
+
+    </answer>
+   </qandaentry>
+   <qandaentry xml:id="change-app-password">
+    <question>
+     <para>I want to change the password for the <literal>UrlAccessAgent</literal> that
+     was assigned during the OpenAM Installation process.</para>
+    </question>
+    <answer>
+     <para>To change the <literal>UrlAccessAgent</literal> password, you can use
+     the <command>ssoadm</command> that is installed with the OpenAM Administration tools,
+     as described in the <link xlink:href="install-guide#chap-install-tools" xlink:show="new"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing OpenAM Tools</citetitle>
+     Chapter of the Installation Guide.</link>
+     </para>
+     <para>You can then change the password for the <literal>UrlAccessAgent</literal> for
+     the root realm (/) with the following commands:</para>
+
+     <screen>
+$ <userinput>cd /path/to/SSOAdminTools/bin</userinput>
+$ <userinput>./ssoadm \
+ set-identity-attrs \
+ --realm / \
+ --idname amService-UrlAccessAgent \
+ --idtype user \
+ --adminid amadmin \
+ --password-file /tmp/passwd \
+ --attributevalues userpassword=changeit</userinput>
+
+<computeroutput>Attribute values of identity, amService-UrlAccessAgent of type, user
+ in realm, / was modified.</computeroutput>
+     </screen>
+
+     <para>The new password will take effect the next time you start OpenAM.</para>
+    </answer>
+   </qandaentry>
+  </qandadiv>
+ </qandaset>
+</chapter>

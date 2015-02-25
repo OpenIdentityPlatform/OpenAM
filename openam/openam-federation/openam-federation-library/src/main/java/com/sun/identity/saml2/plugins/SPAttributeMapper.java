@@ -1,0 +1,84 @@
+/**
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: SPAttributeMapper.java,v 1.3 2008/06/25 05:47:52 qcheng Exp $
+ *
+ */
+
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+package com.sun.identity.saml2.plugins;
+
+import com.sun.identity.saml2.assertion.Attribute;
+import com.sun.identity.saml2.common.SAML2Exception;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+
+/**
+ * This interface <code>SPAttributeMapper</code> is used to map the 
+ * SAML <code>Attribute</code>s  to the local user attributes.
+ * This mapper will be used by the Service Provider that will read
+ * the configured map for the corresponding SAML attributes and
+ * supply to the SAML framework.
+ * The locally mapped attributes returned by the implementation of
+ * this interface will be used by the SAML2 framework to expose
+ * through the single sign-on token to the application. 
+ * Also, the implementation of this mapper may need to consider the deployment
+ * of the SAML v2 plugin base platform for example <code>AccessManager</code>
+ * or the <code>FederationManager</code>.
+ * @see com.sun.identity.saml2.plugins.IDPAttributeMapper
+ *
+ * @supported.all.api
+ */
+
+public interface SPAttributeMapper {
+
+    /**
+     * Returns the map of user attribute values for the corresponding
+     * SAML <code>Attribute</code>s. This attribute value pair map will be
+     * expose by the <code>SAML</code> framework via the Single Sign On
+     * Token.
+     * @param attributes list of SAML <code>Attribute</code>s.
+     * @param userID universal identifier or the distinguished name (DN)
+     *        of the user.
+     * @param hostEntityID <code>EntityID</code> of the hosted provider.
+     * @param remoteEntityID <code>EntityID</code> of the remote provider.
+     * @param realm The realm where the hosted provider belongs to.
+     * @return map of <code>AttributeValuePair</code>s for the given
+     *        SAML <code>Attribute</code> list. 
+     * @exception SAML2Exception if any failure.
+     */
+    public Map<String, Set<String>> getAttributes(
+        List<Attribute> attributes,
+        String userID,
+        String hostEntityID,
+        String remoteEntityID,
+        String realm
+    ) throws SAML2Exception;
+
+
+}

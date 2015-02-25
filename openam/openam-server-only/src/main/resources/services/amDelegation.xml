@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amDelegation.xml,v 1.15 2009/12/21 22:02:42 veiming Exp $
+
+   Portions copyright 2014 ForgeRock AS.
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="sunAMDelegationService" version="1.0">
+        <Schema
+            i18nFileName="amDelegation"
+            revisionNumber="30"
+            i18nKey="">
+
+            <Global>
+                <AttributeSchema name="SubjectIdTypes"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>ROLE</Value>
+                        <Value>GROUP</Value>
+                        <Value>FILTEREDROLE</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <SubSchema name="Permissions">
+                    <SubSchema name="Permission" inheritance="multiple">
+                        <AttributeSchema name="resource" />
+                        <AttributeSchema name="actions" />
+                    </SubSchema>
+                </SubSchema>
+                <SubSchema name="Privileges">
+                    <SubSchema name="Privilege" inheritance="multiple">
+                        <AttributeSchema name="listOfPermissions" />
+                        <AttributeSchema name="defaultSubjectInLegacyMode" />
+                    </SubSchema>
+                </SubSchema>
+            </Global>
+
+            <Organization>
+                <SubSchema name="Permissions">
+                    <SubSchema name="Permission" inheritance="multiple">
+                        <AttributeSchema name="resource" />
+                        <AttributeSchema name="actions" />
+                    </SubSchema>
+                </SubSchema>
+                <SubSchema name="Privileges">
+                    <SubSchema name="Privilege" inheritance="multiple">
+                        <AttributeSchema name="listOfPermissions" />
+                        <AttributeSchema name="defaultSubjectInLegacyMode" />
+                    </SubSchema>
+                </SubSchema>
+            </Organization>
+
+            <Policy>
+                <AttributeSchema name="READ"
+                    type="single"
+                    syntax="boolean"
+                    uitype="radio"
+                    i18nKey="READ">
+                    <IsResourceNameAllowed/>
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>        
+                </AttributeSchema>
+                <AttributeSchema name="MODIFY"
+                    type="single"
+                    syntax="boolean"
+                    uitype="radio"
+                    i18nKey="MODIFY">
+                    <IsResourceNameAllowed/>
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
+                <AttributeSchema name="DELEGATE"
+                    type="single"
+                    syntax="boolean"
+                    uitype="radio"
+                    i18nKey="DELEGATE">
+                    <IsResourceNameAllowed/>
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>        
+                </AttributeSchema>
+            </Policy>
+
+            <PluginInterface
+                 name="DelegationInterface"
+                 interface= "com.sun.identity.delegation.interfaces.DelegationInterface" 
+                 i18nKey="sun-am-delegation-interface-name" />
+        </Schema>
+
+        <PluginSchema
+            name="DelegationPolicyImpl"
+            interfaceName= "DelegationInterface" 
+            className= "com.sun.identity.delegation.plugins.DelegationPolicyImpl" 
+            i18nKey="sun-am-delegation-policyimpl-name" />
+
+        <Configuration>
+            <GlobalConfiguration>
+                <SubConfiguration name="Permissions">
+                    <SubConfiguration name="RealmAdmin" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*REALM/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                            <Value>DELEGATE</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="PolicyAdmin" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*REALM/iPlanetAMPolicy*Service/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                            <Value>DELEGATE</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="RealmReadOnly" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*REALM/sunAMRealmService/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="DatastoresReadOnly" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*REALM/sunIdentityRepositoryService/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="LogWrite" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*@SM_CONFIG_ROOT_SUFFIX@/iPlanetAMLoggingService/1.0/application/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="LogRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*@SM_CONFIG_ROOT_SUFFIX@/iPlanetAMLoggingService/1.0/application/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="AgentsReadWrite" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*REALM/sunIdentityRepositoryService/1.0/application/agent*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                            <Value>DELEGATE</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SAML2Admin" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*REALM/sunFMSAML2MetadataService/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="IDFFAdmin" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*REALM/sunFMIDFFMetadataService/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="WSFederationAdmin" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*REALM/sunFMWSFederationMetadataService/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="COTAdmin" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*REALM/sunFMCOTConfigService/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+
+                    <SubConfiguration name="EntitlementAdmin" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>*REALM/sunEntitlementService/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                            <Value>DELEGATE</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="EntitlementRESTDecision" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/decision</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="EntitlementRESTDecisions" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/decisions</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="EntitlementRESTEntitlement" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/entitlement</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="EntitlementRESTEntitlements" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/entitlements</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="EntitlementRESTPrivilegeWrite" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/privilege*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="EntitlementRESTPrivilegeRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/privilege*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="RealmResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/realms/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="PolicyResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/policies/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="PolicyResourceModify" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/policies/modify</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="PolicyResourceEvaluate" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/policies/evaluate</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ReferralsResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/referrals/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ReferralsResourceModify" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/referrals/modify</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ApplicationResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/applications/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ApplicationResourceModify" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/applications/modify</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ApplicationTypesResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/applicationtypes/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ConditionTypesResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/conditiontypes/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SubjectTypesResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/subjecttypes/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SubjectAttributesResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/subjectattributes/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="DecisionCombinersResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/decisioncombiners/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
+
+
+                <SubConfiguration name="Privileges">
+                    <SubConfiguration name="RealmAdmin" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>RealmAdmin</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="defaultSubjectInLegacyMode" />
+                            <Value>id=Organization Admin Role,ou=role,REALM,amsdkdn=cn=Organization Admin Role,REALM</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="LogAdmin" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>LogWrite</Value>
+                            <Value>LogRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="LogRead" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>LogRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="LogWrite" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>LogWrite</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="AgentAdmin" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>RealmReadOnly</Value>
+                            <Value>AgentsReadWrite</Value>
+                            <Value>EntitlementRESTDecision</Value>
+                            <Value>EntitlementRESTDecisions</Value>
+                            <Value>EntitlementRESTEntitlement</Value>
+                            <Value>EntitlementRESTEntitlements</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="FederationAdmin" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>COTAdmin</Value>
+                            <Value>IDFFAdmin</Value>
+                            <Value>SAML2Admin</Value>
+                            <Value>WSFederationAdmin</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="RealmReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>RealmResourceRead</Value>
+                            <Value>RealmReadOnly</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                     <SubConfiguration name="PolicyAdmin" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>PolicyAdmin</Value>
+                            <Value>EntitlementAdmin</Value>
+                            <Value>RealmReadOnly</Value>
+                            <Value>RealmResourceRead</Value>
+                            <Value>DatastoresReadOnly</Value>
+                            <Value>PolicyResourceRead</Value>
+                            <Value>PolicyResourceModify</Value>
+                            <Value>ReferralsResourceRead</Value>
+                            <Value>ReferralsResourceModify</Value>
+                            <Value>ApplicationResourceRead</Value>
+                            <Value>ApplicationResourceModify</Value>
+                            <Value>ApplicationTypesResourceRead</Value>
+                            <Value>SubjectTypesResourceRead</Value>
+                            <Value>ConditionTypesResourceRead</Value>
+                            <Value>DecisionCombinersResourceRead</Value>
+                            <Value>SubjectAttributesResourceRead</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="defaultSubjectInLegacyMode" />
+                            <Value>id=Organization Policy Admin Role,ou=role,REALM,amsdkdn=cn=Organization Policy Admin Role,REALM</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="EntitlementRestAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>EntitlementRESTDecision</Value>
+                            <Value>EntitlementRESTDecisions</Value>
+                            <Value>EntitlementRESTEntitlement</Value>
+                            <Value>EntitlementRESTEntitlements</Value>
+                            <Value>PolicyResourceEvaluate</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="PrivilegeRestReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>EntitlementRESTPrivilegeRead</Value>
+                            <Value>PolicyResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="PrivilegeRestAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>EntitlementRESTPrivilegeWrite</Value>
+                            <Value>PolicyResourceModify</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ReferralsReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ReferralsResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ReferralsModifyAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ReferralsResourceModify</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ApplicationReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ApplicationResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ApplicationModifyAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ApplicationResourceModify</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ApplicationTypesReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ApplicationTypesResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ConditionTypesReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ConditionTypesResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SubjectTypesReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>SubjectTypesResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="DecisionCombinersReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>DecisionCombinersResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="SubjectAttributesReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>SubjectAttributesResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
+            </GlobalConfiguration>
+            <OrganizationConfiguration name="/">
+                <!-- Create empty organization configuration for
+                     management of delegation policies -->
+            </OrganizationConfiguration>
+        </Configuration>
+    </Service>
+</ServicesConfiguration>
+

@@ -1,0 +1,19 @@
+<div class="field-float-select data-obj day-field">
+    <label for="startDay" data-title="startDay">{{t "policy.conditionTypes.SimpleTime.props.startDay"}}</label>
+    <select id="startDay" class="" tabindex="0">
+        <option value="">{{t "policy.common.notApplicable"}}</option>
+        {{#each weekdays}}
+        <option {{#equals ../itemData.startDay this.value}}selected{{/equals}} value="{{this.value}}">{{this.title}}</option>
+        {{/each}}
+    </select>
+</div>
+
+<div class="field-float-select data-obj day-field">
+    <label for="endDay" data-title="endDay">{{t "policy.conditionTypes.SimpleTime.props.endDay"}}</label>
+    <select id="endDay" class="" tabindex="0">
+        <option value="">{{t "policy.common.notApplicable"}}</option>
+        {{#each weekdays}}
+        <option {{#equals ../itemData.endDay this.value}}selected{{/equals}} value="{{this.value}}">{{this.title}}</option>
+        {{/each}}
+    </select>
+</div>

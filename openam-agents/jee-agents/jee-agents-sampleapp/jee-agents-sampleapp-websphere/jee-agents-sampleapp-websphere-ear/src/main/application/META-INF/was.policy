@@ -1,0 +1,6 @@
+// policy file for OpenAM Policy Agent TestSuite enterprise application.
+
+grant codeBase "file:${application}" {
+    permission java.security.SecurityPermission "printIdentity";
+};
+

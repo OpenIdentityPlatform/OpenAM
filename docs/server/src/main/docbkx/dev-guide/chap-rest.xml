@@ -1,0 +1,1954 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-rest'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+
+ <title>RESTful Web Services</title>
+ <indexterm><primary>REST API</primary></indexterm>
+ <para>This chapter shows how to use the OpenAM RESTful interfaces for direct
+ integration between web client applications and OpenAM.</para>
+ 
+ <section xml:id="about-openam-rest-api">
+  <title>About the RESTful APIs</title>
+
+  <para>
+   <link
+    xlink:show="new"
+    xlink:href="http://en.wikipedia.org/wiki/Representational_state_transfer"
+   >Representational State Transfer</link>(REST) is an architectural style
+   that sets certain constraints for designing and building
+   large-scale distributed hypermedia systems.
+   As an architectural style, REST has very broad application.
+   The designs of both HTTP 1.1 and also URIs follow RESTful principles.
+   The World Wide Web is no doubt the largest and best known REST application.
+   Many other web services also follow the REST architectural style.
+   Examples include OAuth 2.0 and OpenID Connect 1.0.
+  </para>
+
+  <para>
+   ForgeRock Common REST (CREST) applies RESTful principles
+   to define common verbs for HTTP-based APIs that access web resources
+   and collections of web resources.
+  </para>
+
+  <para>
+   Native OpenAM REST APIs in version 11.0.0 and later use the CREST verbs.
+   (In contrast, OAuth 2.0 and OpenID Connect 1.0 APIs follow the standards.)
+   APIs covered in sections labelled (Legacy API) predate CREST,
+   and do not use the CREST verbs.
+  </para>
+
+  <para>
+   When using a CREST API, you use the common verbs as query string parameters
+   in resource and resource collection URIs.
+  </para>
+
+  <variablelist>
+   <para>
+    CREST APIs use these verbs.
+   </para>
+
+   <varlistentry>
+    <term>_create</term>
+    <listitem>
+     <para>
+      Add a new resource.
+     </para>
+
+     <para>
+      Create maps to HTTP PUT (or POST).
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_read</term>
+    <listitem>
+     <para>
+      Retrieve a single resource.
+     </para>
+
+     <para>
+      Read maps to HTTP GET.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_update</term>
+    <listitem>
+     <para>
+      Replace an existing resource.
+     </para>
+
+     <para>
+      Update maps to HTTP PUT.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_delete</term>
+    <listitem>
+     <para>
+      Remove an existing resource.
+     </para>
+
+     <para>
+      Delete maps to HTTP DELETE.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_patch</term>
+    <listitem>
+     <para>
+      Modify part of an existing resource
+     </para>
+
+     <para>
+      Patch maps to HTTP PATCH.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_action</term>
+    <listitem>
+     <para>
+      Perform a predefined action.
+     </para>
+
+     <para>
+      Action maps to HTTP POST.
+     </para>
+
+     <para>
+      The generic _action verb extends what the API can do
+      where none of the other standard CREST verbs fit,
+      as in <literal>_action=logout</literal>.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_query</term>
+    <listitem>
+     <para>
+      Search a collection of resources.
+     </para>
+
+     <para>
+      Query maps to HTTP GET.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>
+   <acronym>CRUDPAQ</acronym> is an acronym for the verbs.
+   Notice that reserved words in CREST, such as the verbs,
+   start with underscores (<literal>_</literal>).
+  </para>
+
+  <para>
+   In CREST, you can address resources in collections of resources
+   by their unique identifiers, their IDs.
+   IDs are exposed in the resource URIs
+   as in <literal>/users/<replaceable>id</replaceable></literal>
+   and <literal>/groups/<replaceable>id</replaceable></literal>.
+   The ID is also in the "_id" field of the resource.
+  </para>
+
+  <para>
+   In CREST, resources are versioned using revision numbers.
+   A revision is specified in the resource's "_rev" field.
+   Revisions make it possible to figure out whether to apply changes
+   without resource locking and without distributed transactions.
+  </para>
+
+  <para>
+   In CREST, you can explicitly request API versions.
+   This means that OpenAM can continue to support older API versions
+   as well as newer API versions as developers migrate their applications
+   to take advantage of capabilities provided by newer APIs.
+  </para>
+
+  <para>
+   Interface Stability:
+   <link
+    xlink:show="new"
+    xlink:href="admin-guide#interface-stability"
+    xlink:role="http://docbook.org/xlink/role/olink"
+   >Evolving</link>
+  </para>
+
+  <para>
+   OpenAM offers RESTful APIs for these access and identity management operations:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para><link linkend="rest-api-auth">Authentication</link> (login)</para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-auth">Logout</link></para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-cookie-info">Cookie information</link></para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-tokens">Token attribute retrieval</link></para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-tokens">Token validation</link></para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-logging">Logging</link></para>
+   </listitem>
+   <listitem>
+    <para>
+     <link
+      xlink:show="new"
+      xlink:href="dev-guide#chap-rest-authz-policy"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      >Authorization</link>
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <link
+      xlink:show="new"
+      xlink:href="dev-guide#chap-rest-oauth2-oidc"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      >OAuth 2.0 Authorization</link>
+    </para>
+   </listitem>
+   <listitem>
+    <para><link
+     xlink:show="new"
+     xlink:href="dev-guide#chap-rest-oauth2-oidc"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     >OpenID Connect 1.0</link></para>
+   </listitem>
+   <listitem>
+    <para>
+     <link
+      xlink:show="new"
+      xlink:href="dev-guide#chap-rest-user-services"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      >User Self-Registration</link></para>
+   </listitem>
+   <listitem>
+    <para><link
+     xlink:show="new"
+     xlink:href="dev-guide#chap-rest-user-services"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     >Resetting Forgotten Passwords</link></para>
+   </listitem>
+   <listitem>
+    <para><link
+     xlink:show="new"
+     xlink:href="dev-guide#chap-rest-user-services"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     >Dashboard Service</link></para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <link
+      xlink:show="new"
+      xlink:href="dev-guide#chap-rest-identity-realm-mgmt"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      >Identity Management
+      (creating, reading, updating, deleting identities)
+     </link>
+    </para>
+   </listitem>
+   <listitem>
+    <para><link
+     xlink:show="new"
+     xlink:href="dev-guide#chap-rest-identity-realm-mgmt"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     >Realm Management
+     (creating, reading, updating, deleting realms)
+    </link></para>
+   </listitem>
+   <listitem>
+    <para><link
+     xlink:show="new"
+     xlink:href="dev-guide#chap-rest-sts"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     >Secure Token Service (STS)
+    </link></para>
+   </listitem>
+  </itemizedlist>
+
+  <para>This chapter also includes a section on <link
+   linkend="rest-api-status-codes">REST Status Codes</link>.</para>
+
+  <para>In this chapter, long URLs are wrapped to fit the printed page, as some
+  of the output is formatted for easier reading.</para>
+ </section>
+
+ <section xml:id="rest-api-versioning">
+  <title>REST API Versioning</title>
+
+  <para>
+   In OpenAM 12.0.0 and later, REST API features are assigned version numbers.
+  </para>
+
+  <para>Providing version numbers in the REST API helps ensure compatibility
+   between OpenAM releases. The version number of a feature increases when OpenAM
+   introduces a non-backwards-compatible change that affects clients making use
+   of the feature.</para>
+
+  <variablelist>
+  <para>
+   OpenAM provides versions for the following aspects of the REST API.
+  </para>
+
+  <varlistentry>
+   <term><emphasis>resource</emphasis></term>
+   <listitem>
+    <para>
+     Any changes to the structure or syntax of a returned response will incur
+     a <emphasis>resource</emphasis> version change. For example changing
+     <literal>"errorMessage"</literal> to <literal>"message"</literal> in a
+     JSON response.
+    </para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term><emphasis>protocol</emphasis></term>
+   <listitem>
+    <para>
+     Any changes to the methods used to make REST API calls will incur
+     a <emphasis>protocol</emphasis> version change. For example changing <literal>_action</literal>
+     to <literal>$action</literal> in the required parameters of an API feature.
+    </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <section xml:id="rest-api-versioning-supported-versions">
+   <title>Supported REST API Versions</title>
+
+   <para>The REST API version numbers supported in OpenAM 12.0.0
+    are as follows:</para>
+
+  <variablelist>
+   <varlistentry>
+    <term><emphasis>Supported protocol versions</emphasis></term>
+    <listitem>
+     <para>The <emphasis>protocol</emphasis> versions supported in OpenAM 12.0.0
+      are:</para>
+      <simplelist>
+       <member><literal>1.0</literal></member>
+      </simplelist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><emphasis>Supported resource versions</emphasis></term>
+    <listitem>
+     <para>The <emphasis>resource</emphasis> versions supported in OpenAM 12.0.0
+      are shown in the following table.</para>
+     <table xml:id="rest-api-supported-resource-versions" pgwide="1">
+      <title>Supported <emphasis>resource</emphasis> Versions</title>
+      <tgroup cols="3">
+       <thead>
+        <row>
+         <entry>Base</entry>
+         <entry>End Point</entry>
+         <entry>Supported Versions</entry>
+        </row>
+       </thead>
+       <tbody>
+        <row>
+         <entry>/json</entry>
+         <entry>/authenticate</entry>
+         <entry>1.1, 2.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/users</entry>
+         <entry>1.1, 2.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/groups</entry>
+         <entry>1.1, 2.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/agents</entry>
+         <entry>1.1, 2.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/realms</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/dashboard</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/sessions</entry>
+         <entry>1.1</entry>
+        </row>
+        <!-- Not part of the public API at this time
+        <row>
+         <entry> </entry>
+         <entry>/tokens</entry>
+         <entry>1.0</entry>
+        </row>
+        -->
+        <row>
+         <entry> </entry>
+         <entry>/serverinfo/*</entry>
+         <entry>1.1</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/users/<emphasis>{user-id}</emphasis>/devices/trusted</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/applications</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/policies</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/applicationtypes</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/conditiontypes</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/subjecttypes</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/subjectattributes</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/decisioncombiners</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/subjectattributes</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry>/xacml</entry>
+         <entry>/policies</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry>/frrest</entry>
+         <entry>/token</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/client</entry>
+         <entry>1.0</entry>
+        </row>
+
+       </tbody>
+      </tgroup>
+     </table>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>The <citetitle>OpenAM Release Notes</citetitle> section,
+     <link
+      xlink:show="new"
+      xlink:href="release-notes#chap-compatibility"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      ><citetitle>OpenAM Changes &amp; Deprecated Functionality</citetitle></link>
+     describes the differences between API versions.</para>
+  </section>
+
+  <section xml:id="rest-api-explicit-version">
+   <title>Specifying an Explicit REST API Version</title>
+
+   <para>You can specify which version of the REST API to use by adding an
+    <literal>Accept-API-Version</literal> header to the request, as in the
+    following example, which is requesting <emphasis>resource</emphasis> version
+    2.0 and <emphasis>protocol</emphasis> version 1.0.</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Accept-API-Version: resource=2.0, protocol=1.0" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+</screen>
+
+   <para>You can configure the default behavior OpenAM will take when a REST
+    call does not specify explicit version information. For more
+    information, see <link
+     xlink:show="new"
+     xlink:href="admin-guide#chap-rest"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Configuring REST APIs</citetitle></link>
+    in the <citetitle>OpenAM Administration Guide</citetitle>.</para>
+
+  </section>
+
+ <section xml:id="rest-api-versioning-messages">
+  <title>REST API Versioning Messages</title>
+  <para>OpenAM provides REST API version messages in the JSON response to a
+   REST API call. You can also configure OpenAM to return version messages
+   in the response headers. See <link
+    xlink:show="new"
+    xlink:href="admin-guide#chap-rest"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Configuring REST APIs</citetitle></link>
+   in the <citetitle>OpenAM Administration Guide</citetitle></para>
+
+  <para>Messages include:</para>
+
+  <itemizedlist>
+   <listitem><para>Details of the REST API versions used to service a
+    REST API call.</para></listitem>
+   <listitem><para>Warning messages if REST API version information is not specified
+    or is incorrect in a REST API call.</para></listitem>
+  </itemizedlist>
+
+  <para>The <literal>resource</literal> and <literal>protocol</literal> version
+   used to service a REST API call are returned in the
+   <literal>Content-API-Version</literal> header, as shown below.</para>
+<screen>
+$ <userinput>curl \
+ -i \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Accept-API-Version: resource=2.0, protocol=1.0" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+
+<computeroutput>HTTP/1.1 200 OK
+Content-API-Version: protocol=1.0,resource=2.0
+Server: Restlet-Framework/2.1.7
+Content-Type: application/json;charset=UTF-8
+
+{
+ "tokenId":"AQIC5wM...TU3OQ*",
+ "successUrl":"/openam/console"
+}</computeroutput>
+</screen>
+
+  <para>If the default REST API version behavior is set to <literal>None</literal>,
+   and a REST API call does not include the <literal>Accept-API-Version</literal>
+   header, or does not specify a <literal>resource</literal> version, then a
+   <literal>400 Bad Request</literal> status code is returned,
+   as shown below.</para>
+
+<screen>
+$ <userinput>curl \
+ --header "Content-Type: application/json" \
+ --header "Accept-API-Version: protocol=1.0" \
+ https://openam.example.com:8443/openam/json/serverinfo/*</userinput>
+
+<computeroutput>{
+ "code":400,
+ "reason":"Bad Request",
+ "message":"No requested version specified and behavior set to NONE."
+}</computeroutput>
+</screen>
+
+  <para>If a REST API call does include the <literal>Accept-API-Version</literal>
+   header, but the specified <literal>resource</literal> or
+   <literal>protocol</literal> version does not exist in OpenAM, then a
+   <literal>404 Not Found</literal> status code is returned,
+   as shown below.</para>
+
+<screen>
+$ <userinput>curl \
+ --header "Content-Type: application/json" \
+ --header "Accept-API-Version: protocol=1.0, resource=999.0" \
+ https://openam.example.com:8443/openam/json/serverinfo/*</userinput>
+
+<computeroutput>{
+ "code":404,
+ "reason":"Not Found",
+ "message":"Accept-API-Version: Requested version \"999.0\" does not match any routes."
+}</computeroutput>
+</screen>
+
+   <tip><para>For more information on setting the default REST API
+   version behavior, see <link
+     xlink:show="new"
+     xlink:href="admin-guide#chap-rest"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Configuring REST APIs</citetitle></link>
+    in the <citetitle>OpenAM Administration Guide</citetitle>.</para></tip>
+  </section>
+ </section>
+
+ <section xml:id="c66-encoding">
+  <title>Token Encoding</title>
+
+  <para>Valid tokens in OpenAM requires configuration either in percent encoding or in <emphasis>C66Encode</emphasis>
+  format. C66Encode format is encouraged. It is the default token format for OpenAM, and is used in this chapter.
+  The following is an example token that has not been encoded:</para>
+
+  <literallayout class="monospaced">AQIC5wM2LY4SfczntBbXvEAOuECbqMY3J4NW3byH6xwgkGE=@AAJTSQACMDE=#</literallayout>
+
+  <para>This token includes reserved characters such as <literal>+</literal>, <literal>/</literal>,
+  and <literal>=</literal> (The <literal>@</literal>, <literal>#</literal>, and <literal>*</literal> are not
+  reserved characters per se, but substitutions are still required). To c66encode this token,
+  you would substitute certain characters for others, as follows:</para>
+
+  <simplelist>
+   <member><keycap>+</keycap> is replaced with <keycap>-</keycap></member>
+   <member><keycap>/</keycap> is replaced with <keycap>_</keycap></member>
+   <member><keycap>=</keycap> is replaced with <keycap>.</keycap></member>
+   <member><keycap>@</keycap> is replaced with <keycap>*</keycap></member>
+   <member><keycap>#</keycap> is replaced with <keycap>*</keycap></member>
+   <member><keycap>*</keycap> (first instance) is replaced with <keycap>@</keycap></member>
+   <member><keycap>*</keycap> (subsequent instances) is replaced with <keycap>#</keycap></member>
+  </simplelist>
+
+  <para>In this case, the translated token would appear as shown here:</para>
+
+  <literallayout class="monospaced">AQIC5wM2LY4SfczntBbXvEAOuECbqMY3J4NW3byH6xwgkGE.*AAJTSQACMDE.*</literallayout>
+
+ </section>
+ 
+ <section xml:id="rest-api-auth">
+  <title>Authentication &amp; Logout</title>
+  <indexterm>
+   <primary>Authentication</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Session tokens</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
+
+  <para>OpenAM provides REST APIs for authentication and for logout.</para>
+
+  <itemizedlist>
+   <listitem>
+    <para>Under <literal>/json/authenticate</literal> and
+    <literal>/json/sessions</literal>, you find the newer JSON-based APIs.</para>
+
+    <para>See <xref linkend="rest-api-auth-json" /> below.</para>
+   </listitem>
+
+   <listitem>
+    <para>Under <literal>/identity/authenticate</literal> and
+    <literal>/identity/logout</literal>, you find the backwards-compatible,
+    legacy API.</para>
+
+    <para>See <xref linkend="rest-api-auth-legacy" /> below.</para>
+   </listitem>
+  </itemizedlist>
+
+  <tip>
+   <para>
+    When authentication depends on the client IP address,
+    and OpenAM lies behind a load balancer or proxy layer,
+    configure the load balancer or proxy to send the address
+    by using the <literal>X-Forwarded-For</literal> header,
+    and configure OpenAM to consume and forward the header as necessary.
+    For details, see the <citetitle>Installation Guide</citetitle> section,
+    <link
+    xlink:show="new"
+    xlink:href="install-guide#handle-request-headers"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Handling HTTP Request Headers</citetitle></link>.
+   </para>
+  </tip>
+
+  <section xml:id="rest-api-auth-json">
+   <title>REST APIs for Authentication &amp; Logout</title>
+
+   <para>The simplest user name/password authentication returns a
+   <literal>tokenId</literal> that applications can present as a cookie
+   value for other operations that require authentication. In this case use
+   HTTP POST to prevent the web container from logging the credentials.
+   Pass the user name in an <literal>X-OpenAM-Username</literal> header, and
+   the password in an <literal>X-OpenAM-Password</literal> header.</para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Content-Type: application/json" \
+ --data "{}" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+<computeroutput>{ "tokenId": "AQIC5w...NTcy*", "successUrl": "/openam/console" }</computeroutput>
+   </screen>
+
+   <para>This "zero page login" mechanism works only for name/password
+   authentication. If you include a POST body with the request, it must
+   be an empty JSON string as shown in the example. Alternatively, you can
+   leave the POST body empty. Otherwise, OpenAM interprets the body as a
+   continuation of an existing authentication attempt, one that uses a
+   supported callback mechanism.</para>
+
+   <para>The authentication service at <literal>/json/authenticate</literal>
+   supports callback mechanisms that make it possible to perform other types of
+   authentication in addition to simple user name/password login.</para>
+
+   <para>Callbacks that are not completed based on the content of the client
+   HTTP request are returned in JSON as a response to the request. Each
+   callback has an array of output suitable for displaying to the end user,
+   and input which is what the client must complete and send back to
+   OpenAM. The default is still user name/password authentication.</para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+<computeroutput>
+{
+    "authId": "...jwt-value...",
+    "template": "",
+    "stage": "DataStore1",
+    "callbacks": [
+        {
+            "type": "NameCallback",
+            "output": [
+                {
+                    "name": "prompt",
+                    "value": " User Name: "
+                }
+            ],
+            "input": [
+                {
+                    "name": "IDToken1",
+                    "value": ""
+                }
+            ]
+        },
+        {
+            "type": "PasswordCallback",
+            "output": [
+                {
+                    "name": "prompt",
+                    "value": " Password: "
+                }
+            ],
+            "input": [
+                {
+                    "name": "IDToken2",
+                    "value": ""
+                }
+            ]
+        }
+    ]
+}</computeroutput>
+   </screen>
+
+   <para>The "authId" value is a JSON Web Token (JWT) that uniquely identifies
+   the authentication context to OpenAM, and so must also be sent back with the
+   requests.</para>
+
+   <para>To respond to the callback, send back the JSON object with the missing
+   values filled, as in this case where the user name is <literal>demo</literal>
+   and the password is <literal>changeit</literal>.</para>
+
+   <informalexample>
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1",
+   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt",
+   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
+   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
+   "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }' \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+<computeroutput>
+{ "tokenId": "AQIC5wM2...U3MTE4NA..*", "successUrl": "/openam/console" }</computeroutput>
+   </screen>
+   </informalexample>
+
+   <para>The response is a token ID holding the SSO Token value.</para>
+
+   <para>Alternatively, you can authenticate without requesting a session
+   using the <literal>noSession</literal> query string parameter.</para>
+
+   <informalexample>
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1",
+   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt",
+   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
+   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
+   "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }' \
+ https://openam.example.com:8443/openam/json/authenticate?noSession=true</userinput>
+<computeroutput>
+{ "message": "Authentication Successful", "successUrl": "/openam/console" }</computeroutput>
+   </screen>
+   </informalexample>
+
+   <para>OpenAM can be configured to return a failure URL value when
+   authentication fails. No failure URL is configured by default. The Default
+   Failure Login URL can be configured for the <link xlink:show="new"
+   xlink:href="admin-guide#core-module-conf-hints"
+   xlink:role="http://docbook.org/xlink/role/olink">Core</link> authentication
+   module. Alternatively, failure URLs can be configured per authentication
+   chain, which your client can specify using the <literal>service</literal>
+   parameter described below. On failure OpenAM then returns HTTP status
+   code 401 Unauthorized, and the JSON in the reply indicates the failure
+   URL.</para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: badpassword" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+<computeroutput>{
+  "code":401,
+  "reason":"Unauthorized",
+  "message":"Invalid Password!!",
+  "failureUrl": "http://www.example.com/401.html"
+}</computeroutput>
+   </screen>
+
+   <para>To specify a realm in your request, first make sure that the name of your realm does not match
+       an endpoint name to avoid any potential routing errors.
+       Then, specify the realm in one of two ways. For example, if you have a realm
+       titled "<literal>myRealm</literal>," you can use it in your request as follows:</para>
+    <itemizedlist>
+        <listitem>
+            <para>Using the realm in the URI to the endpoint (preferred method):</para>
+            <literallayout class="monospaced"
+            >https://openam.example.com:8443/openam/json/<literal>myRealm</literal>/authenticate</literallayout>
+        </listitem>
+        <listitem>
+            <para>Using the realm query string parameter:</para>
+            <literallayout class="monospaced"
+            >https://openam.example.com:8443/openam/json/authenticate?realm=<literal>myRealm</literal></literallayout>
+        </listitem>
+    </itemizedlist>
+
+   <variablelist>
+    <para>You can use the <literal>authIndexType</literal> and
+    <literal>authIndexValue</literal> query string parameters as a pair
+    to provide additional information about how you are authenticating.
+    The <literal>authIndexType</literal> can be one of the following
+    types:</para>
+
+    <varlistentry>
+     <term>composite</term>
+     <listitem>
+      <para>Set the value to a composite advice string.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>level</term>
+     <listitem>
+      <para>Set the value to the authentication level.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>module</term>
+     <listitem>
+      <para>Set the value to the name of an authentication module.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>resource</term>
+     <listitem>
+      <para>Set the value to a URL protected by an OpenAM policy.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>role</term>
+     <listitem>
+      <para>Set the value to an OpenAM role.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>service</term>
+     <listitem>
+      <para>Set the value to the name of an authentication chain.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>user</term>
+     <listitem>
+      <para>Set the value to an OpenAM user ID.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <para>
+    You can use the query string parameter,
+    <literal>sessionUpgradeSSOTokenId=<replaceable>tokenId</replaceable></literal>,
+    to request session upgrade.
+    For an explanation of session upgrade,
+    see the <citetitle>Administration Guide</citetitle> section on,
+    <link
+     xlink:show="new"
+     xlink:href="admin-guide#session-upgrade"
+     xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Authentication Levels &amp; Session Upgrade</citetitle></link>.
+   </para>
+
+   <itemizedlist>
+    <para>OpenAM uses the following callback types depending on the
+    authentication module in use.</para>
+
+    <listitem>
+     <para>
+      <literal>ChoiceCallback</literal>:
+      Used to display a list of choices and retrieve the selected choice
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>ConfirmationCallback</literal>:
+      Used to ask for a confirmation such as Yes, No, or Cancel and retrieve the selection
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>HiddenValueCallback</literal>:
+      Used to return form values that are not visually rendered to the end user
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>HttpCallback</literal>:
+      Used for HTTP handshake negotiations
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>LanguageCallback</literal>:
+      Used to retrieve the locale for localizing text presented to the end user
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>NameCallback</literal>:
+      Used to retrieve a name string
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>PasswordCallback</literal>:
+      Used to retrieve a password value
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>RedirectCallback</literal>:
+      Used to redirect the client user-agent
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>ScriptTextOutputCallback</literal>:
+      Used to insert a script into the page presented to the end user.
+      The script can, for example, collect data about the user's environment.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>TextInputCallback</literal>:
+      Used to retrieve text input from the end user
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>TextOutputCallback</literal>:
+      Used to display a message to the end user
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>X509CertificateCallback</literal>:
+      Used to retrieve the content of an x.509 certificate
+     </para>
+    </listitem>
+   </itemizedlist>
+
+   <para>Authenticated users can log out with the token cookie value and an HTTP
+   POST to <literal>/json/sessions/?_action=logout</literal>.</para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iplanetDirectoryPro: AQIC5wM2...U3MTE4NA..*" \
+ --header "Content-Type: application/json" \
+ "https://openam.example.com:8443/openam/json/sessions/?_action=logout"</userinput>
+<computeroutput>
+{"result":"Successfully logged out"}</computeroutput>
+   </screen>
+  </section>
+
+  <section xml:id="rest-api-auth-legacy">
+   <title>Authentication &amp; Logout (Legacy API)</title>
+
+    <para>Interface Stability: <link xlink:show="new"
+    xlink:href="admin-guide#interface-stability"
+    xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
+    <para>Simple authentication with a user name and password returns a
+    token.</para>
+
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "username=bjensen&amp;password=hifalutin" \
+ https://openam.example.com:8443/openam/identity/authenticate</userinput>
+<computeroutput>
+token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</computeroutput>
+    </screen>
+
+    <para>If you must specify parameters as when authenticating to
+    <literal>/UI/Login</literal>, you provide a percent encoded string of the
+    parameters as the value of the <literal>uri</literal> parameter. The
+    <literal>/UI/Login</literal> parameter deals with the <literal>realm</literal>,
+    <literal>module</literal>, and <literal>service</literal> parameters. Setting the
+    <literal>client</literal> parameter sets the user's IP address as part of the
+    token following successful authentication. The default for the <literal>client</literal>
+    parameter is the IP of the machine making the REST request.</para>
+
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "username=bjensen&amp;password=hifalutin&amp;uri=realm%3D%2F%26module%3DDataStore\
+&amp;client=192.168.1.1" \
+ https://openam.example.com:8443/openam/identity/authenticate</userinput>
+<computeroutput>
+token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</computeroutput>
+    </screen>
+
+    <para>You log out using the token to end the user session.</para>
+
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "subjectid=AQIC5w...*AAJTSQACMDE.*" \
+ https://openam.example.com:8443/openam/identity/logout</userinput>
+    </screen>
+  </section>
+ </section>
+
+ <section xml:id="rest-api-serverinfo">
+  <title>Server Information</title>
+
+  <para>You can retrieve OpenAM server information by using HTTP GET on
+   <literal>/json/serverinfo/*</literal>.</para>
+
+<screen>
+$ <userinput>curl https://openam.example.com:8443/openam/json/serverinfo/*</userinput>
+<computeroutput>{
+    "domains": [
+        ".example.com"
+    ],
+    "protectedUserAttributes": [],
+    "cookieName": "iPlanetDirectoryPro",
+    "forgotPassword": "false",
+    "selfRegistration": "false",
+    "lang": "en",
+    "successfulUserRegistrationDestination": "default",
+    "socialImplementations": [
+        {
+            "iconPath": "XUI/images/dashboard/facebook.png",
+            "authnChain": "FacebookSocialAuthenticationService",
+            "displayName": "Facebook",
+            "valid": true
+        }
+    ],
+    "referralsEnabled": "false",
+    "zeroPageLogin": {
+        "enabled": false,
+        "refererWhitelist": [
+            ""
+        ],
+        "allowedWithoutReferer": true
+    },
+    "FQDN": "openam.example.com"
+}</computeroutput>
+</screen>
+ </section>
+
+ <section xml:id="rest-api-cookie-info">
+  <title>Cookie Information</title>
+
+  <para>You can retrieve the cookie domains that OpenAM supports by HTTP GET on
+  <literal>/json/serverinfo/cookieDomains</literal>.</para>
+
+  <screen>
+$ <userinput>curl https://openam.example.com:8443/openam/json/serverinfo/cookieDomains</userinput>
+<computeroutput>{"domains":[".example.com"]}</computeroutput>
+  </screen>
+
+  <para>You can retrieve the name of the cookie used for storing the session
+  token. By default it is <literal>iPlanetDirectoryPro</literal>.</para>
+
+  <screen>
+$ <userinput>curl https://openam.example.com:8443/openam/identity/getCookieNameForToken</userinput>
+<computeroutput>string=iPlanetDirectoryPro</computeroutput>
+  </screen>
+
+  <para>You can also retrieve the name of the cookie used for storing the session
+  token and the names of the cookies to forward with requests.</para>
+
+  <screen>
+$ <userinput>curl https://openam.example.com:8443/openam/identity/getCookieNamesToForward</userinput>
+<computeroutput>string=iPlanetDirectoryPro
+string=amlbcookie</computeroutput>
+  </screen>
+ </section>
+
+ <section xml:id="rest-api-tokens">
+  <title>Token Validation and Session Information</title>
+
+  <indexterm>
+   <primary>Token validation</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
+
+  <indexterm>
+   <primary>Session information</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
+
+  <para>
+   OpenAM provides REST APIs for validating SSO tokens and getting information
+   about active sessions.
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Under <literal>/json/sessions</literal>
+     you find the newer JSON-based API.
+    </para>
+
+    <para>
+     See <xref linkend="rest-api-token-validation" />
+     and <xref linkend="rest-api-session-information" /> below.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Under <literal>/identity/isTokenValid</literal>
+     you find the backwards compatible, legacy APIs.
+    </para>
+
+    <para>
+     See <xref linkend="rest-api-tokens-legacy" /> below.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <section xml:id="rest-api-token-validation">
+   <title>Token Validation</title>
+
+   <para>
+    To check over REST whether a token is valid,
+    perform an HTTP POST
+    to the resource URL,
+    <literal>/json/sessions/<replaceable>tokenId</replaceable></literal>,
+    using the <literal>validate</literal> action
+    as shown in the following example:
+   </para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ http://openam.example.com:8080/openam/json/sessions/AQIC5...?_action=validate</userinput>
+<computeroutput>{"valid":true,"uid":"demo","realm":"/myRealm"}</computeroutput>
+   </screen>
+
+   <para>
+    An invalid token returns only information about the validity.
+   </para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ http://openam.example.com:8080/openam/json/sessions/AQIC5...?_action=validate</userinput>
+<computeroutput>{"valid":false}</computeroutput>
+   </screen>
+  </section>
+
+  <section xml:id="rest-api-session-information">
+   <title>Session Information</title>
+
+   <para>
+    You can use REST API calls to:
+
+    <itemizedlist>
+     <listitem>
+      <para>
+       Identify whether a session is active
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Check the maximum remaining amount of time a session has left before
+       the user is required to reauthenticate
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Determine the length of time a session has been idle
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Reset a session's idle time to 0
+      </para>
+     </listitem>
+    </itemizedlist>
+   </para>
+
+   <para>
+    For these REST endpoints, specify two SSO tokens. Provide the SSO token for the
+    current authenticated user as the value of a header whose name is the name
+    of the SSO token cookie, by default <literal>iPlanetDirectoryPro</literal>.
+    Specify the SSO token about which you want information as the
+    <literal>tokenId</literal> query string parameter of the REST URL.
+    In the examples in this section, <literal>AQIC5w...NTcy*</literal> is the SSO
+    token for the current authenticated user, while <literal>BXCCq...NX*1*</literal>
+    is the token being queried.
+   </para>
+
+   <para>
+    To determine whether a session is active,
+    perform an HTTP POST to the resource URL,
+    <literal>/json/sessions/</literal>,
+    using the <literal>isActive</literal> action
+    as shown in the following example:
+   </para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ http://openam.example.com:8080/openam/json/sessions/?_action=isActive&amp;tokenId=BXCCq...NX*1*
+  </userinput>
+<computeroutput>{"active":true}</computeroutput>
+</screen>
+
+   <para>
+    To check the maximum remaining time (in seconds) of a session,
+    perform an HTTP POST to the resource URL,
+    <literal>/json/sessions/</literal>,
+    using the <literal>getMaxTime</literal> action
+    as shown in the following example:
+   </para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ http://openam.example.com:8080/openam/json/sessions/?_action=getMaxTime&amp;tokenId=BXCCq...NX*1*
+  </userinput>
+<computeroutput>{"maxtime":7022}</computeroutput>
+</screen>
+
+   <para>
+    To check the amount of time (in seconds) that a session has been idle,
+    perform an HTTP POST to the resource URL,
+    <literal>/json/sessions/</literal>,
+    using the <literal>getIdle</literal> action
+    as shown in the following example:
+   </para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ http://openam.example.com:8080/openam/json/sessions/?_action=getIdle&amp;tokenId=BXCCq...NX*1*
+  </userinput>
+<computeroutput>{"idletime":355}</computeroutput>
+</screen>
+
+   <para>
+    To reset a session's idle time,
+    perform an HTTP POST to the resource URL,
+    <literal>/json/sessions/</literal>,
+    using the <literal>isActive</literal> action with the
+    <literal>refresh=true</literal>
+    option as shown in the following example:
+   </para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ http://openam.example.com:8080/openam/json/sessions/?_action=isActive&amp;refresh=true&amp;tokenId=BXCCq...NX*1*
+  </userinput>
+<computeroutput>{"active":true}</computeroutput>
+</screen>
+
+  </section>
+
+  <section xml:id="rest-api-tokens-legacy">
+   <title>Token Validation, Attribute Retrieval (Legacy API)</title>
+
+   <para>Interface Stability: <link xlink:show="new"
+   xlink:href="admin-guide#interface-stability"
+   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
+   <para>You check whether a token is valid as follows:</para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "tokenid=AQIC5w...*AAJTSQACMDE.*" \
+ https://openam.example.com:8443/openam/identity/isTokenValid</userinput>
+<computeroutput>boolean=true</computeroutput>
+   </screen>
+
+   <para>An invalid token returns <literal>boolean=false</literal>.</para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "tokenid=INVALID" \
+ https://openam.example.com:8443/openam/identity/isTokenValid</userinput>
+<computeroutput>boolean=false</computeroutput>
+   </screen>
+
+   <para>With a valid token, you can retrieve attributes about the subject.
+    OpenAM returns a series of <replaceable>name</replaceable>,
+    <replaceable>value</replaceable> pairs.</para>
+
+   <para>The newer API for retrieving user information is demonstrated in
+    <link xlink:show="new"
+          xlink:href="dev-guide#rest-api-read-identity"
+          xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Reading Identities</citetitle></link>. What follows describes the
+    legacy API.</para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "subjectid=AQIC5w...*AAJTSQACMDE.*" \
+ https://openam.example.com:8443/openam/identity/attributes</userinput>
+<computeroutput>userdetails.token.id=
+ AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
+userdetails.attribute.name=uid
+userdetails.attribute.value=bjensen
+userdetails.attribute.name=mail
+userdetails.attribute.value=bjensen@example.com
+userdetails.attribute.name=sn
+userdetails.attribute.value=Jensen
+userdetails.attribute.name=userpassword
+userdetails.attribute.value={SSHA}rhusOfYpkapDWEHcfT2Y7y83LMuC++F4Abqvig==
+userdetails.attribute.name=cn
+userdetails.attribute.value=Babs Jensen
+userdetails.attribute.value=Barbara Jensen
+userdetails.attribute.name=givenname
+userdetails.attribute.value=Barbara
+userdetails.attribute.name=dn
+userdetails.attribute.value=uid=bjensen,ou=people,dc=example,dc=com
+userdetails.attribute.name=telephonenumber
+userdetails.attribute.value=+1 408 555 1862
+userdetails.attribute.name=objectclass
+userdetails.attribute.value=organizationalPerson
+userdetails.attribute.value=person
+userdetails.attribute.value=posixAccount
+userdetails.attribute.value=inetOrgPerson
+userdetails.attribute.value=krbprincipalaux
+userdetails.attribute.value=krbTicketPolicyAux
+userdetails.attribute.value=top</computeroutput>
+   </screen>
+
+   <para>You can specify attributes to limit what you retrieve.</para>
+
+   <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/attributes?\
+subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*\
+&amp;attributenames=mail\
+&amp;attributenames=uid"</userinput>
+<computeroutput>userdetails.token.id=
+ AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
+userdetails.attribute.name=uid
+userdetails.attribute.value=bjensen
+userdetails.attribute.name=mail
+userdetails.attribute.value=bjensen@example.com</computeroutput>
+   </screen>
+
+   <para>When retrieving attributes, you can refresh the session thus setting
+    the idle time to 0, by adding the boolean parameter
+    <literal>refresh=true</literal> to the query string.</para>
+
+   <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/attributes?\
+subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*\
+&amp;attributenames=cn\
+&amp;refresh=true"</userinput>
+<computeroutput>userdetails.token.id=
+ AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
+userdetails.attribute.name=cn
+userdetails.attribute.value=Babs Jensen
+userdetails.attribute.value=Barbara Jensen</computeroutput>
+   </screen>
+
+   <para>
+    You can specify the following attributes to retrieve information
+    about the user's session time limits and current session:
+    <literal>maxsessiontime</literal> (maximum length of a session),
+    <literal>maxidletime</literal> (maximum idle time allowed during a session),
+    <literal>idletime</literal> (actual idle time during the current session),
+    <literal>timeleft</literal> (actual time left in session).
+    The unit for maximum times is minutes.
+    The unit for actual times is seconds.
+   </para>
+
+   <para>
+    Also use the parameter <literal>refresh=false</literal>
+    to avoid changing the <literal>idletime</literal> with your request.
+   </para>
+
+   <screen>
+$ <userinput>curl \
+--data "subjectid=AQIC5w....*AAJTSQACMDE.*\
+ &amp;attributenames=idletime\
+ &amp;attributenames=maxidletime\
+ &amp;attributenames=timeleft\
+ &amp;attributenames=maxsessiontime\
+ &amp;refresh=false" \
+ https://openam.example.com:8443/openam/identity/attributes</userinput>
+<computeroutput>
+userdetails.token.id=AQIC5w....*AAJTSQACMDE.*
+userdetails.attribute.name=maxsessiontime
+userdetails.attribute.value=120
+userdetails.attribute.name=maxidletime
+userdetails.attribute.value=30
+userdetails.attribute.name=idletime
+userdetails.attribute.value=664
+userdetails.attribute.name=timeleft
+userdetails.attribute.value=6319</computeroutput>
+  </screen>
+
+  </section>
+ </section>
+
+ <section xml:id="rest-api-logging">
+  <title>Logging</title>
+
+  <!-- Pending replacement
+  <para>Interface Stability: <link xlink:show="new"
+  xlink:href="admin-guide#interface-stability"
+  xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>-->
+
+  <para>
+   OpenAM supports access and audit logging for any request going to
+   a CREST endpoint and writes the data to two files:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para><emphasis role="bold">amRest.access</emphasis>. Records accesses to a
+     CREST endpoint, regardless of whether the request successfully reached the
+     endpoint through policy authorization.
+    </para>
+    <para>
+     An <literal>amRest.access</literal> example is as follows:
+    </para>
+    <screen>
+$ <userinput>cat openam/openam/log/amRest.access</userinput>
+
+<computeroutput>#Version: 1.0
+#Fields: time  Data  LoginID  ContextID  IPAddr  LogLevel  Domain  LoggedBy  MessageID  ModuleName
+NameID  HostName
+"2011-09-14 16:38:17"   /home/user/openam/openam/log/ "cn=dsameuser,ou=DSAME Users,o=openam"
+aa307b2dcb721d4201 "Not Available" INFO  o=openam   "cn=dsameuser,ou=DSAME Users,o=openam"
+LOG-1  amRest.access  "Not Available"  192.168.56.2
+"2011-09-14 16:38:17"  "Hello World"  id=bjensen,ou=user,o=openam 8a4025a2b3af291d01  "Not Available"
+INFO  o=openam id=amadmin,ou=user,o=openam "Not Available" amRest.access "Not Available"
+192.168.56.2</computeroutput>
+    </screen>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">amRest.authz</emphasis>. Records all CREST
+     authorization results regardless of success. If a request has an entry in the
+     <literal>amRest.access</literal> log, but no corresponding entry in
+     <literal>amRest.authz</literal>, then that
+     endpoint was not protected by an authorization filter and therefore the
+     request was granted access to the resource.
+    </para>
+    <para>
+     The <literal>amRest.authz</literal> file has a key field, the
+     <literal>Data</literal> field, which specifies the authorization decision,
+     resource, and type of action performed on that resource.
+     The <literal>Data</literal> field has the following syntax:
+    </para>
+    <programlisting>
+("GRANT"||"DENY") > "RESOURCE | ACTION"
+
+where
+  "GRANT > " is prepended to the entry if the request was allowed
+  "DENY  > " is prepended to the entry if the request was not allowed
+  "RESOURCE" is "ResourceLocation | ResourceParameter"
+     where
+       "ResourceLocation" is the endpoint location (e.g., subrealm/applicationtypes)
+       "ResourceParameter" is the ID of the resource being touched
+        (e.g., myApplicationType) if applicable. Otherwise, this field is empty
+        if touching the resource itself, such as in a query.
+
+  "ACTION" is "ActionType | ActionParameter"
+     where
+       "ActionType" is "CREATE||READ||UPDATE||DELETE||PATCH||ACTION||QUERY"
+       "ActionParameter" is one of the following depending on the ActionType:
+          For CREATE: the new resource ID
+          For READ: empty
+          For UPDATE: the revision of the resource to update
+          For DELETE: the revision of the resource to delete
+          For PATCH: the revision of the resource to patch
+          For ACTION: the actual action performed (e.g., "forgotPassword")
+          For QUERY: the query ID if any
+    </programlisting>
+    <screen>
+$ <userinput>cat openam/openam/log/amRest.authz</userinput>
+
+<computeroutput>#Version: 1.0
+#Fields: time   Data  ContextID  LoginID  IPAddr  LogLevel  Domain  MessageID  LoggedBy  NameID
+ModuleName    HostName
+"2014-09-16 14:17:28"   /var/root/openam/openam/log/   7d3af9e799b6393301
+"cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org" "Not Available" INFO
+dc=openam,dc=forgerock,dc=org  LOG-1  "cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org"
+"Not Available" amRest.authz    10.0.1.5
+"2014-09-16 15:56:12"  "GRANT > sessions|ACTION|logout|AdminOnlyFilter"  d3977a55a2ee18c201
+id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org "Not Available" INFO  dc=openam,dc=forgerock,dc=org
+OAuth2Provider-2  "cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org"  "Not Available"
+amRest.authz    127.0.0.1
+"2014-09-16 15:56:40"   "GRANT > sessions|ACTION|logout|AdminOnlyFilter"  eedbc205bf51780001
+id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org  "Not Available" INFO dc=openam,dc=forgerock,dc=org
+OAuth2Provider-2  "cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org"  "Not Available"
+amRest.authz    127.0.0.1</computeroutput>
+    </screen>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   OpenAM also provides additional information in its debug notifications for
+   accesses to any endpoint,
+   depending on the message type (error, warning or message) including realm,
+   user, and result of the operation.
+  </para>
+
+  <para>
+   You can also send OpenAM messages to log, specifying the message content
+   and the log file in which to write your message.
+   Logging takes a valid <literal>appid</literal> token for the subject
+   with access to log the message, and also a <literal>subjectid</literal> token
+   for the user whom the message concerns. If the tokens are valid and the
+   access rights correct, your message ends up in the log specified.
+  </para>
+
+  <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/log?\
+appid=AQIC5wM2LY4SfcwyCZkk-1JXzx6q1EzgagabHfBjMidb5jI.*AAJTSQACMDE.*\
+&amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*\
+&amp;logname=amRest.access\
+&amp;message=Hello%20World"</userinput>
+  </screen>
+
+ </section>
+
+ <section xml:id="rest-api-status-codes">
+   <title>REST Status Codes</title>
+
+   <para>OpenAM REST APIs respond to successful requests with HTTP status codes
+   in the 2xx range. OpenAM REST APIs respond to error conditions with HTTP
+   status codes in the 4xx and 5xx range. Status codes used are described in
+   the following list.</para>
+
+   <variablelist>
+    <varlistentry>
+     <term>200 OK</term>
+     <listitem>
+      <para>The request was successful and a resource returned, depending on the
+      request. For example, a successful HTTP GET on
+      <literal>/users/myUser</literal> returns a user profile and status code
+      200, whereas a successful HTTP DELETE returns
+      <literal>{"success","true"}</literal> and status code 200.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>201 Created</term>
+     <listitem>
+      <para>The request succeeded and the resource was created.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>400 Bad Request</term>
+     <listitem>
+      <para>The request was malformed. Either parameters required by the
+       action were missing, or as in the following example incorrect data was
+       sent in the payload for the action.</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{"bad":"data"}' \
+ https://openam.example.com:8443/openam/json/users?_action=forgotPassword
+</userinput>
+<computeroutput>{
+ "code":400,
+ "reason":"Bad Request",
+ "message":"Username or email not provided in request"
+}</computeroutput>
+</screen>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>401 Unauthorized</term>
+     <listitem>
+      <para>The request requires user authentication as in the following
+      example, which is missing an SSO Token value.</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ https://openam.example.com:8443/openam/json/sessions?_action=logout
+</userinput>
+<computeroutput>{
+ "code": 401,
+ "reason": "Unauthorized",
+ "message": "Access denied"
+}</computeroutput>
+</screen>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>403 Forbidden</term>
+     <listitem>
+      <para>Access was forbidden during an operation on a resource as in the
+      following example, which has a regular user trying to read the OpenAM
+      administrator profile.</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ https://openam.example.com:8443/openam/json/authenticate
+</userinput>
+<computeroutput>{ "tokenId": "AQIC5w...YyMA..*" }</computeroutput>
+
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...YyMA..*" \
+ https://openam.example.com:8443/openam/json/users/amadmin
+</userinput>
+<computeroutput>{
+ "code": 403,
+ "reason": "Forbidden",
+ "message": "Permission to perform the read operation denied to
+             id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
+}</computeroutput>
+</screen>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>404 Not Found</term>
+     <listitem>
+      <para>The specified resource could not be found as in the following
+      example, which is attempting to read a nonexistent user's profile.</para>
+
+<screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ https://openam.example.com:8443/openam/json/users/missing
+</userinput>
+<computeroutput>{
+ "code":404,
+ "reason":"Not Found",
+ "message":"Resource cannot be found."
+}</computeroutput>
+</screen>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>405 Method Not Allowed</term>
+     <listitem>
+      <para>The HTTP method is not allowed for the requested resource.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+    <term>406 Not Acceptable</term>
+    <listitem>
+    <para>The request contains parameters that are not acceptable as in
+     the following example, which specifies an API version parameter that
+     is not supported by OpenAM.</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Accept-API-Version: protocol=1.0, resource=999.0" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+
+<computeroutput>{
+ "code":406,
+ "reason":"Not Acceptable",
+ "message":"Accept-API-Version: Requested version \"999.0\" does not match any routes."
+}</computeroutput>
+</screen>
+
+    </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>409 Conflict</term>
+     <listitem>
+      <para>The request would have resulted in a conflict with the current
+      state of the resource. For example using the Forgot Password feature
+       and specifying the user's email address as in the following
+       example, where multiple users have the same email address.</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{"email":"demo@example.com"}' \
+ https://openam.example.com:8443/openam/json/users?_action=forgotPassword
+</userinput>
+<computeroutput>{
+ "code":409,
+ "reason":"Conflict",
+ "message":"Multiple users found"
+}</computeroutput>
+</screen>
+     </listitem>
+    </varlistentry>
+
+
+    <varlistentry>
+     <term>410 Gone</term>
+     <listitem>
+      <para>The requested resource is no longer available, and will not
+       become available again. The URI returned for resetting a password may
+       have expired as in the following example:</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{"username": "demo"}' \
+ https://openam.example.com:8443/openam/json/users/?_action=forgotPassword
+</userinput>
+<computeroutput>{
+ "code":410,
+ "reason":"Gone",
+ "message":"Token not found"
+}</computeroutput>
+</screen>
+     </listitem>
+    </varlistentry>
+
+    <!-- Object versioning does not seem to be used in OpenAM REST.
+    <varlistentry>
+     <term>412 Precondition Failed</term>
+     <listitem>
+      <para>The current version of the resource did not match the version
+      provided.</para>
+     </listitem>
+    </varlistentry>
+    -->
+
+    <varlistentry>
+     <term>415 Unsupported Media Type</term>
+     <listitem>
+      <para>The request is in a format not supported by the requested resource
+      for the requested method as in the following example, which is attempting
+      to pass basic authentication credentials as form-encoded data rather than
+      query string parameters.</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --data "username=demo&amp;password=changeit" \
+ https://openam.example.com:8443/openam/json/authenticate
+</userinput>
+<computeroutput>...
+HTTP Status 415
+...
+The server refused this request because the request entity is in a
+format not supported by the requested resource for the requested method
+...</computeroutput>
+</screen>
+     </listitem>
+    </varlistentry>
+
+    <!-- Object versioning does not seem to be used in OpenAM REST.
+    <varlistentry>
+     <term>428 Precondition Required</term>
+     <listitem>
+      <para>The resource requires a version, and no version was supplied with
+      the request.</para>
+     </listitem>
+    </varlistentry>
+    -->
+
+    <varlistentry>
+     <term>500 Internal Server Error</term>
+     <listitem>
+      <para>The server encountered an unexpected condition which prevented it
+      from fulfilling the request. This could be caused by an invalid
+       configuration in the Email Service, or as in the following example the
+       specified user account not  having an associated email address to send
+       the Forgot Password URI to.</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{"username": "demo"}' \
+ https://openam.example.com:8443/openam/json/users/?_action=forgotPassword
+</userinput>
+<computeroutput>{
+ "code":500,
+ "reason":"Internal Server Error",
+ "message":"No email provided in profile."
+}</computeroutput>
+</screen>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>501 Not Implemented</term>
+     <listitem>
+      <para>The resource does not support the functionality required to fulfill
+      the request as in the following example, which is attempting to delete
+      an entry as a delete action instead of using an HTTP DELETE request.</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ https://openam.example.com:8443/openam/json/users/demo?_action=delete
+</userinput>
+<computeroutput>{
+ "code": 501,
+ "reason": "Not Implemented",
+ "message": "Actions are not supported for resource instances"
+}</computeroutput>
+</screen>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>503 Service Unavailable</term>
+     <listitem>
+      <para>The requested resource was temporarily unavailable. The
+       service may have been disabled, as in the following example,
+       where the Forgot Password functionality has been disabled.</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{"username": "demo"}' \
+ https://openam.example.com:8443/openam/json/users/?_action=forgotPassword
+</userinput>
+<computeroutput>{
+ "code":503,
+ "reason":"Service Unavailable",
+ "message":"Forgot password is not accessible."
+}</computeroutput>
+</screen>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+</chapter>

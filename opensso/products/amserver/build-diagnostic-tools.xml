@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build-diagnostic-tools.xml,v 1.9 2009/08/19 05:40:29 veiming Exp $
+
+-->
+
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
+<project name="diagnostic" default="createZipFile" basedir=".">
+    <description>OpenWebSingle Sign-On: Diagnostic Tool</description>
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <fail message="*** diagnostic-tool build may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="amserver.warbase.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+    
+    <!-- build class path -->
+    <path id="build.class.path">
+        <pathelement location="${amserver.classes.dir}"/>
+        <pathelement location="${sharedlib.classes.dir}"/>
+        <fileset dir="${lockhart.dir}/lib">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${extlib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${jatolib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    
+    <property name="odt.path" value="/com/sun/identity/diagnostic"/>
+    <property name="odt.package.path" value="${amserver.src.dir}/${odt.path}"/>
+    <property name="odt.tools.dir" value="${amserver.built.dir}/diagnostic"/>
+    <property name="odt.cfg.dir" value="${odt.tools.dir}/config"/>
+    <property name="odt.classes.dir" value="${odt.tools.dir}/classes"/>
+    <property name="odt.res.dir" value="${odt.tools.dir}/resources"/>
+    <property name="odt.lib.dir" value="${odt.tools.dir}/lib"/>
+    <property name="odt.services.dir" value="${odt.tools.dir}/services"/>
+    <property name="services.lib.dir" value="${odt.services.dir}/lib"/>
+    <property name="services.res.dir" value="${odt.services.dir}/resources/locale"/>
+    <property name="odt.agent.dir" value="${odt.services.dir}/agent"/>
+    <property name="odt.connect.dir" value="${odt.services.dir}/connect"/>
+    <property name="odt.reports.dir" value="${odt.services.dir}/reports"/>
+    <property name="odt.server.dir" value="${odt.services.dir}/server"/>
+    <property name="odt.system.dir" value="${odt.services.dir}/system"/>
+    <property name="odt.tamper.dir" value="${odt.services.dir}/tamperdetection"/>
+    <property name="odt.webcontainer.dir" value="${odt.services.dir}/webcontainer"/>
+    <property name="odt.sample.dir" value="${odt.services.dir}/sample"/>
+    <property name="odt.base.src.path" value="${odt.package.path}/base/core"/>
+    <property name="odt.plugin.src.path" value="${odt.package.path}/plugin/services"/>
+    <property name="odt.plugin.res.path" value="${odt.plugin.src.path}/resources/locale"/>
+    <!-- server config files -->
+    <property name="odt.server.config" value="${odt.plugin.src.path}/server/config"/>
+    <!-- agent config files -->
+    <property name="odt.agent.config" value="${odt.plugin.src.path}/agent/config"/>
+    <!-- connect config files -->
+    <property name="odt.connect.config" value="${odt.plugin.src.path}/connect/config"/>
+    <!-- reports config files -->
+    <property name="odt.reports.config" value="${odt.plugin.src.path}/reports/config"/>
+    <!-- tamper config files -->
+    <property name="odt.tamper.config" value="${odt.plugin.src.path}/tamper/config"/>
+    <!-- webcontainer config files -->
+    <property name="odt.webcontainer.config" value="${odt.plugin.src.path}/webcontainer/config"/>
+    <!-- cli config files -->
+    <property name="odt.cli.config" value="${odt.base.src.path}/ui/cli"/>
+    <!-- image files -->
+    <property name="odt.image.src" value="${odt.base.src.path}/ui/gui/images"/>
+    
+    <target name="prepareBuild">
+        <mkdir dir="${odt.tools.dir}"/>
+        <mkdir dir="${odt.classes.dir}"/>
+        <mkdir dir="${odt.cfg.dir}"/>
+        <mkdir dir="${odt.lib.dir}"/>
+        <mkdir dir="${odt.res.dir}"/>
+        <mkdir dir="${odt.services.dir}"/>
+        <mkdir dir="${services.lib.dir}"/>
+        <mkdir dir="${services.res.dir}"/>
+        <mkdir dir="${odt.system.dir}"/>
+        <mkdir dir="${odt.agent.dir}/config"/>
+        <mkdir dir="${odt.connect.dir}/config"/>
+        <mkdir dir="${odt.reports.dir}/config"/>
+        <mkdir dir="${odt.server.dir}/config"/>
+        <mkdir dir="${odt.webcontainer.dir}/config"/>
+        <mkdir dir="${odt.tamper.dir}/config"/>
+        <mkdir dir="${odt.tamper.dir}/backup"/>
+        <mkdir dir="${odt.sample.dir}"/>
+    </target>
+    
+    <target name="copyConfigFiles">
+        <!-- copy server related file -->
+        <copy todir="${odt.server.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.server.config}"
+                     includes="*.xml"/>
+        </copy>
+        <copy todir="${odt.server.dir}/config"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.server.config}">
+                <include name="*" />
+                <exclude name="*.xml" />
+                <exclude name="*.properties" />
+            </fileset>
+        </copy>
+        <!-- copy agent related file -->
+        <copy todir="${odt.agent.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.agent.config}"
+                     includes="*.xml"/>
+        </copy>
+        <copy todir="${odt.agent.dir}/config"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.agent.config}">
+                <include name="*" />
+                <exclude name="*.xml" />
+                <exclude name="*.properties" />
+            </fileset>
+        </copy>
+        <!-- copy connect related file -->
+        <copy todir="${odt.connect.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.connect.config}"
+                     includes="*.xml"/>
+        </copy>
+        <copy todir="${odt.connect.dir}/config"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.connect.config}">
+                <include name="*" />
+                <exclude name="*.xml" />
+                <exclude name="*.properties" />
+            </fileset>
+        </copy>
+        <!-- copy reports related file -->
+        <copy todir="${odt.reports.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.reports.config}"
+                     includes="*.xml"/>
+        </copy>
+        <copy todir="${odt.reports.dir}/config"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.reports.config}">
+                <include name="*" />
+                <exclude name="*.xml" />
+                <exclude name="*.properties" />
+            </fileset>
+        </copy>
+        <!-- copy tamperdetection related file -->
+        <copy todir="${odt.tamper.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.tamper.config}"
+                     includes="*.xml"/>
+        </copy>
+        <copy todir="${odt.tamper.dir}/config"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.tamper.config}">
+                <include name="*" />
+                <exclude name="*.xml" />
+            </fileset>
+        </copy>
+        <!-- copy webcontainer related file -->
+        <copy todir="${odt.webcontainer.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.webcontainer.config}"
+                     includes="*.xml"/>
+        </copy>
+        <copy todir="${odt.webcontainer.dir}/config"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.webcontainer.config}">
+                <include name="*" />
+                <exclude name="*.xml" />
+            </fileset>
+        </copy>
+        <!-- copy system related file -->
+        <copy todir="${odt.system.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.package.path}/base/services/systeminfo/config"
+                     includes="*.xml"/>
+        </copy>
+        <copy todir="${odt.tools.dir}" overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${products.license.dir}" includes="*.txt"/>
+            <fileset dir="${amserver.basedir}/scripts/bin"
+                     includes="ssodtool.sh, ssodtool.bat"/>
+        </copy>
+        <copy todir="${odt.tools.dir}" overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${amserver.basedir}/scripts/bin"
+                     includes="README.ssodtool"/>
+            <mapper type="glob" from="README.ssodtool" to="README"/>
+        </copy>
+
+       <filter token="DATESTAMP" value="${war.time.stamp}"/>
+       <filter token="VERSION" value="${version.set}" />
+
+       <copy file="${amserver.warbase.dir}/xml/template/sms/serverdefaults.properties"
+           tofile="${services.res.dir}/serverdefaults.properties"
+       filtering="true"/>
+
+        <!-- copy properties file -->
+        <copy todir="${services.res.dir}" overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${amserver.built.res.dir}" includes="AgentConfiguration*.properties"/> 
+            <fileset dir="${amserver.built.res.dir}" includes="ServerConfig*.properties"/> 
+            <fileset dir="${amserver.built.res.dir}" includes="ServerConnection*.properties"/> 
+            <fileset dir="${amserver.built.res.dir}" includes="Tamper*.properties"/> 
+            <fileset dir="${amserver.built.res.dir}" includes="WebContainer*.properties"/> 
+            <fileset dir="${odt.res.dir}">
+                <include name ="validserverconfig.properties"/>
+            </fileset>
+        </copy>
+        <!-- copy sample related file -->
+        <copy todir="${odt.sample.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.plugin.src.path}/sample"
+                     includes="*"/>
+        </copy>
+        
+    </target>
+    
+    <target name="makeLocaleJar">
+        <copy todir="${odt.res.dir}"
+              overwrite="yes" encoding="UTF-8">
+            <fileset dir="${amserver.built.res.dir}" includes="*.properties"
+                     excludes="AMConfig.properties" />
+        </copy>
+        <jar destfile="${odt.lib.dir}/locale.jar"
+             basedir="${odt.res.dir}">
+        </jar>
+    </target>        
+    
+    <target name="compileCore">
+        <antcall target="xsd.services" />
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+               destdir="${odt.classes.dir}"
+               source="${target.jdk.set}" target="${target.jdk.set}"
+               debug="${build.debug}" debuglevel="${build.debuglevel}"
+               srcdir="${odt.package.path}/base"
+               excludes="${odt.package.path}/plugin">
+            <classpath refid="build.class.path"/>
+        </javac>
+    </target>
+    
+    <target name="xsd.services">
+        <property name="xsd.services.dir" value="${odt.package.path}/base/config"/>
+        <property name="xsd.services.files" value="${xsd.services.dir}/service.xsd"/>
+        <java classname="com.sun.tools.xjc.Driver"
+              maxmemory="128m" failonerror="true" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg line="-b &quot;${xsd.services.dir}/binding.xjb&quot; -d &quot;${amserver.src.dir}&quot; &quot;${xsd.services.files}&quot;"/>
+        </java>
+    </target>
+    
+    <target name="makeBaseJar" depends="compileCore">
+        <mkdir dir="${odt.classes.dir}${odt.path}/base/core/ui/gui/images"/>
+        <copy todir="${odt.classes.dir}${odt.path}/base/core/ui/gui/images"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.image.src}"
+                     includes="*"/>
+        </copy>
+        <copy todir="${odt.classes.dir}${odt.path}/base/resources/locale"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${amserver.built.res.dir}"
+                includes="DiagnosticTool*.properties"/>
+            <fileset dir="${amserver.built.res.dir}"
+                includes="SystemInfo*.properties"/>
+        </copy>
+        <copy todir="${odt.classes.dir}${odt.path}/base/core/ui/cli"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.base.src.path}/ui/cli"
+                     includes="*.properties"/>
+        </copy>
+        <copy todir="${odt.classes.dir}${odt.path}/base/services/systeminfo/config"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.package.path}/base/services/systeminfo/config"
+                     includes="*.properties"/>
+        </copy>
+        <copy todir="${odt.classes.dir}${odt.path}/base/core/jaxbgen">
+            <fileset dir="${odt.base.src.path}/jaxbgen">
+                <include name="**/jaxb.properties" />
+                <include name="**/bgm.ser" />
+                <include name="**/package.html" />
+            </fileset>
+        </copy>
+        <jar destfile="${odt.lib.dir}/toolbase.jar"
+             basedir="${odt.classes.dir}">
+            <exclude name="**/com/sun/identity/diagnostic/plugin/**/*"/>
+            <manifest>
+                <attribute name="Main-Class"
+                    value="com.sun.identity.diagnostic.base.core.DiagnosticToolMain"/>
+            </manifest>
+        </jar> 
+        <!--
+            <delete dir="${odt.classes.dir}"/>
+            -->
+    </target>        
+    
+    <target name="compileServices" depends="makeBaseJar">
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+               destdir="${odt.classes.dir}"
+               source="${target.jdk.set}" target="${target.jdk.set}"
+               debug="${build.debug}" debuglevel="${build.debuglevel}"
+               srcdir="${odt.package.path}/plugin">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${odt.lib.dir}/toolbase.jar"/>
+            </classpath>
+        </javac>
+    </target>
+    <target name="makeServicesJar" depends="compileServices, copyConfigFiles">
+        <copy todir="${services.lib.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${extlib.dir}"
+                     includes="imq.jar, jms.jar"/>
+        </copy>
+        <jar destfile="${services.lib.dir}/toolservices.jar"
+             basedir="${odt.classes.dir}">
+            <exclude name="**/com/sun/identity/diagnostic/base/**/*"/>
+        </jar>
+    </target>        
+    
+    <target name="copyNeededFiles" depends="prepareBuild, makeLocaleJar, makeServicesJar">
+        <copy todir="${odt.lib.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${extlib.dir}"
+                     includes="xsdlib.jar, jaxb-api.jar, jaxb-impl.jar, webservices-rt.jar, OpenDJ.jar"/>
+            <fileset dir="${sharedlib.dist.dir}"
+                     includes="opensso-sharedlib.jar"/>
+            <fileset dir="${amserver.dist.dir}"
+                     includes="amserver.jar"/>
+        </copy>
+        <copy todir="${odt.cfg.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${odt.package.path}/base/core"
+                     includes="*.properties"/>
+        </copy>
+        <delete dir="${odt.res.dir}"/>
+        <delete dir="${odt.classes.dir}"/>
+    </target>
+    
+    <target name="createZipFile" depends="clean, copyNeededFiles">
+        <zip destfile="${amserver.dist.dir}/ssoDiagnosticTools.zip"
+             whenempty="create">
+            <zipfileset dir="${odt.tools.dir}" filemode="755">
+                <include name="ssodtool.sh"/>
+                <include name="ssodtool.bat"/>
+                <include name="*.txt"/>
+                <include name="README"/>
+                <include name="config/**/*"/>
+                <include name="services/**/*"/>
+                <include name="lib/**/*"/>
+            </zipfileset>
+        </zip>
+        <checksum file="${amserver.dist.dir}/ssoDiagnosticTools.zip"
+                  algorithm="SHA" fileext=".sha" />
+    </target>
+    
+    
+    <target name="clean">
+        <delete dir="${odt.tools.dir}"/>
+    </target>
+    
+</project>

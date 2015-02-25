@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * Copyright 2013-2015 ForgeRock AS.
+ *
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.forgerock.openam.agents</groupId>
+        <artifactId>jee-agents-sampleapp</artifactId>
+        <version>3.5.0</version>
+    </parent>
+
+    <name>OpenAM JavaEE Policy Agents SampleApp Jetty</name>
+    <description>OpenAM JavaEE Policy Agents SampleApp Jetty</description>
+    <artifactId>jee-agents-sampleapp-jetty</artifactId>
+
+    <packaging>war</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <targetPath>images</targetPath>
+                            <directory>${project.basedir}/../src/main/assembly/docroot/images</directory>
+                        </resource>
+                        <resource>
+                            <targetPath>jsp</targetPath>
+                            <directory>${project.basedir}/../src/main/assembly/docroot/servlet/jsp</directory>
+                        </resource>
+                        <resource>
+                            <targetPath>public</targetPath>
+                            <directory>${project.basedir}/../src/main/assembly/docroot/servlet/public</directory>
+                        </resource>
+                        <resource>
+                            <targetPath>authentication</targetPath>
+                            <directory>${project.basedir}/../src/main/assembly/docroot/shared/authentication</directory>
+                        </resource>
+                        <resource>
+                            <targetPath>jsp</targetPath>
+                            <directory>${project.basedir}/../src/main/assembly/docroot/shared/jsp</directory>
+                        </resource>
+                        <resource>
+                            <targetPath>public</targetPath>
+                            <directory>${project.basedir}/../src/main/assembly/docroot/shared/public</directory>
+                        </resource>
+                        <resource>
+                            <targetPath></targetPath>
+                            <directory>${project.basedir}/../src/main/assembly/docroot/shared</directory>
+                            <includes>
+                                <include>*.html</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.forgerock.openam.agents</groupId>
+            <artifactId>jee-agents-sampleapp-webservlet</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<chapter xml:id='chap-lb'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ <title>Configuring Web Policy Agents Behind Load Balancers</title>
+
+ <indexterm>
+  <primary>load balancers</primary>
+ </indexterm>
+
+ <para>
+  This chapter addresses the question of configuring policy agents
+  on protected servers that operate behind network load balancers.
+ </para>
+
+ <section xml:id="lb-scenarios">
+  <title>The Role of the Load Balancing Layer</title>
+
+  <indexterm>
+   <primary>load balancers</primary>
+   <secondary>role of</secondary>
+  </indexterm>
+
+  <para>
+   A load balancing layer that stands between clients and protected servers
+   can distribute the client load,
+   and fail client traffic over when a protected server goes offline.
+   In the simplest case, the load balancing layer passes requests
+   from the clients to servers and responses from servers to clients,
+   managing the traffic so the client experience
+   is as smooth as possible.
+  </para>
+
+  <figure xml:id="figure-lb-agents">
+   <title>Load Balancing With Same Protocol and Port</title>
+
+   <mediaobject>
+    <alt>Diagram showing matching protocols and port numbers</alt>
+
+    <imageobject>
+     <imagedata fileref="images/lb-agents.png" />
+    </imageobject>
+
+    <textobject>
+     <para>
+      In some deployments, the protocol scheme and port number
+      on the load balancer matches the protocol and port on the servers.
+     </para>
+    </textobject>
+   </mediaobject>
+  </figure>
+
+  <para>
+   If your deployment has protocols and port numbers on the load balancer
+   that match those of the protected servers,
+   see <xref linkend="lb-same-protocol-and-port" />.
+  </para>
+
+  <para>
+   A load balancing layer can also offload processor-intensive
+   public-key encryption algorithms involved in SSL transactions
+   to a hardware accelerator, reducing the load on the protected servers.
+   The client connects to the load balancer over HTTPS,
+   but the load balancer connects to the servers over HTTP.
+  </para>
+
+  <figure xml:id="figure-lb-agents-ssl-offload">
+   <title>Load Balancing With SSL Offloading</title>
+
+   <mediaobject>
+    <alt>Diagram showing SSL offloading</alt>
+
+    <imageobject>
+     <imagedata fileref="images/lb-agents-ssl-offload.png" />
+    </imageobject>
+
+    <textobject>
+     <para>
+      In some deployments, the protocol scheme and port number
+      on the load balancer differ from the protocol and port on the servers.
+     </para>
+    </textobject>
+   </mediaobject>
+  </figure>
+
+  <para>
+   If your deployment uses SSL offloading,
+   see <xref linkend="lb-different-protocol-and-port" />.
+  </para>
+ </section>
+
+ <section xml:id="lb-same-protocol-and-port">
+  <title>When Protocols &amp; Port Number Match</title>
+
+  <indexterm>
+   <primary>load balancers</primary>
+   <secondary>when protocols and port number match</secondary>
+  </indexterm>
+
+  <para>
+   When the protocol on the load balancer, such as HTTP or HTTPS,
+   matches the protocol on the protected web server,
+   and the port number the load balancer listens on, such as 80 or 443,
+   matches the port number the protected web server listens on,
+   then the main difference between URLs is in the host names.
+   Map the agent host name to the host name for the load balancer.
+  </para>
+
+  <procedure xml:id="lb-fqdn-mapping">
+   <title>To Map the Agent Host Name to the Load Balancer Host Name</title>
+
+   <indexterm>
+    <primary>load balancers</primary>
+    <secondary>mapping agent host name</secondary>
+   </indexterm>
+
+   <para>
+    When protocols and port numbers match,
+    configure fully qualified domain name (FQDN) mapping.
+   </para>
+
+   <para>
+    This procedure explains how to do so
+    for a centralized web policy agent profile configured in OpenAM Console.
+    The steps also mention the properties for
+    web agent profiles that rely on local, file-based configurations.
+   </para>
+
+   <step>
+    <para>
+     Login to OpenAM Console as an administrative user
+     with rights to modify the policy agent profile.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Browse to Access Control > <replaceable>Realm Name</replaceable>
+     > Agents > Web > <replaceable>Agent Name</replaceable>
+     to open the web agent profile for editing.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Global tab page section Fully Qualified Domain Name Checking,
+     make sure FQDN checking is selected (the default).
+    </para>
+
+    <para>
+     The equivalent property setting is
+     <literal>com.sun.identity.agents.config.fqdn.check.enable=true</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Set FQDN Default to the fully qualified domain name of the load balancer,
+     such as <literal>lb.example.com</literal>,
+     rather than the protected server FQDN where the policy agent is installed.
+    </para>
+
+    <para>
+     The equivalent property setting is
+     <literal>com.sun.identity.agents.config.fqdn.default=lb.example.com</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Set FQDN Virtual Host Map to map the protected server FQDN
+     to the load balancer FQDN, for example where
+     the key <literal>agent.example.com</literal> (protected server)
+     has value <literal>lb.example.com</literal> (load balancer).
+    </para>
+
+    <para>
+     The equivalent property setting is
+     <literal>com.sun.identity.agents.config.fqdn.mapping[agent.example.com]=lb.example.com</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Save your work, and then restart the protected server.
+    </para>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="lb-different-protocol-and-port">
+  <title>When Protocols &amp; Port Number Differ</title>
+
+  <indexterm>
+   <primary>load balancers</primary>
+   <secondary>when protocols and port number differ</secondary>
+  </indexterm>
+
+  <para>
+   When the load balancer protocol and port, such as HTTPS and 443,
+   differ from the protocol on the protected web server, such as HTTP and 80,
+   then you must override these in the policy agent configuration.
+  </para>
+
+  <procedure>
+   <title>To Override Protocol, Host, &amp; Port</title>
+
+   <para>
+    Use the Agent Deployment URI Prefix setting to override the agent
+    protocol, host, and port with that of the load balancer.
+   </para>
+
+   <important>
+    <para>
+     The web policy agent configuration for SSL offloading
+     has the side effect of preventing FQDN checking and mapping.
+     As a result, URL rewriting and redirection does not work correctly
+     when the policy agent is accessed directly and not through the load balancer.
+     This should not be a problem for client traffic,
+     but potentially could be an issue for applications
+     accessing the protected server directly, from behind the load balancer.
+    </para>
+   </important>
+
+   <para>
+    This procedure explains how to do so
+    for a centralized web policy agent profile configured in OpenAM Console.
+    The steps also mention the properties for
+    web agent profiles that rely on local, file-based configurations.
+   </para>
+
+   <step>
+    <para>
+     Login to OpenAM Console as an administrative user
+     with rights to modify the policy agent profile.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Browse to Access Control > <replaceable>Realm Name</replaceable>
+     > Agents > Web > <replaceable>Agent Name</replaceable>
+     to open the web agent profile for editing.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Global tab page Profile section,
+     set the Agent Deployment URI Prefix to that of the load balancer.
+    </para>
+
+    <para>
+     The value you set here is used when overriding protocol, host, and port
+     on the protected server with the web policy agent.
+    </para>
+
+    <para>
+     The property to set is
+     <literal>com.sun.identity.agents.config.agenturi.prefix</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Advanced tab page Load Balancer section,
+     enable Load Balancer Setup.
+    </para>
+
+    <para>
+     The equivalent property setting is
+     <literal>com.sun.identity.agents.config.load.balancer.enable=true</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Enable Override Request URL Protocol.
+    </para>
+
+    <para>
+     The equivalent property setting is
+     <literal>com.sun.identity.agents.config.override.protocol=true</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Enable Override Request URL Host.
+    </para>
+
+    <para>
+     The equivalent property setting is
+     <literal>com.sun.identity.agents.config.override.host=true</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Enable Override Request URL Port.
+    </para>
+
+    <para>
+     The equivalent property setting is
+     <literal>com.sun.identity.agents.config.override.port=true</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Enable Notification URL when the web policy agent
+     gets notifications about configuration changes.
+    </para>
+
+    <para>
+     The equivalent property setting is
+     <literal>com.sun.identity.agents.config.override.notification.url=true</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Save your work, and then restart the protected server.
+    </para>
+   </step>
+  </procedure>
+ </section>
+</chapter>

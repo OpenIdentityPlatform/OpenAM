@@ -1,0 +1,18 @@
+##############################################################################
+###
+### SERVER_URL is the URL of the web container on which OpenAM Server is
+### deployed.
+###
+### DEPLOYMENT_URI is the OpenAM Server deployment URI.
+###
+### ACCEPT_LICENSES is an optional boolean value, which can be set to always
+### skip displaying the license to the user. Use of this variable will
+### take presidence over the --acceptLicense flag which can be passed in
+### to the application. The value true will auto-accept the license, any other
+### value will be assumed to equal false, resulting in presentation of the
+### license.
+###
+#############################################################################
+SERVER_URL=http://server1.example.com:8080
+DEPLOYMENT_URI=/opensso
+ACCEPT_LICENSES=false

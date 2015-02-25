@@ -1,0 +1,22 @@
+<p>Add static attributes.</p>
+<div class="striped-list created-items" data-attr-type="{{attrType.STATIC}}" id="attrTypeStatic">
+    <h3>{{t "policy.common.staticAttributes"}}</h3>
+    <ul>
+        {{#if staticAttributes}}
+        {{#each staticAttributes}}
+        <li data-attr-key="{{propertyName}}" data-attr-val="{{propertyValues}}" {{#equals this ../../options.justAdded}}class="highlight-good"{{/equals}}>
+            <span class="key">{{propertyName}}:</span>{{propertyValues}}
+            <span tabindex="0" class="icon-close float-right"></span>
+        </li>
+        {{/each}}
+        {{else}}
+        <li class="disabled">{{t "policy.common.noStaticAttributes"}}</li>
+        {{/if}}
+
+        <li class="editing clearfix">
+            <input type="text" placeholder="{{t 'policy.common.key'}}" data-attr-add-key />
+            <input type="text" placeholder="{{t 'policy.common.value'}}" data-attr-add-val />
+            <span tabindex="0" class="icon-plus float-right"></span>
+        </li>
+    </ul>
+</div>

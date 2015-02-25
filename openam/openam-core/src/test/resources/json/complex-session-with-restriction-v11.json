@@ -1,0 +1,135 @@
+{
+    "clientDomain": "dc=openam,dc=forgerock,dc=org",
+    "clientID": "id=demo,ou=user,dc=openam,dc=forgerock,dc=org",
+    "cookieMode": null,
+    "cookieStr": null,
+    "creationTime": 1396296561,
+    "isISStored": true,
+    "maxCachingTime": 3,
+    "maxIdleTime": 30,
+    "maxSessionTime": 120,
+    "reschedulePossible": false,
+    "restrictedTokensByRestriction": {
+        "Fzy2GsI/O1TsXhvlVuqjqIuTG2k=": {
+            "comingFromAuth": false,
+            "cookieMode": null,
+            "encryptedString": "AQIC5wM2LY4SfcyTLz6VjQ7nkFeDcEh8K5dXkIENpXlpg28.*AAJTSQACMDIAAlMxAAIwMQACU0sAEzc5ODIzMDM5MzQyNzU2MTg1NDQ.*",
+            "extensionPart": null,
+            "extensions": {},
+            "isParsed": false,
+            "sessionDomain": "",
+            "sessionServer": "",
+            "sessionServerID": "",
+            "sessionServerPort": "",
+            "sessionServerProtocol": "",
+            "sessionServerURI": "",
+            "tail": null
+        }
+    },
+    "restrictedTokensBySid": {
+        "AQIC5wM2LY4SfcyTLz6VjQ7nkFeDcEh8K5dXkIENpXlpg28.*AAJTSQACMDIAAlMxAAIwMQACU0sAEzc5ODIzMDM5MzQyNzU2MTg1NDQ.*": {
+            "addressList": [],
+            "asString": "Fzy2GsI/O1TsXhvlVuqjqIuTG2k=",
+            "dn": "id=myagent,ou=agent,dc=openam,dc=forgerock,dc=org"
+        }
+    },
+    "sessionEventURLs": {
+        "http://app.example.com:48080/agentapp/notification": [{
+                "comingFromAuth": false,
+                "cookieMode": null,
+                "encryptedString": "AQIC5wM2LY4SfcyTLz6VjQ7nkFeDcEh8K5dXkIENpXlpg28.*AAJTSQACMDIAAlMxAAIwMQACU0sAEzc5ODIzMDM5MzQyNzU2MTg1NDQ.*",
+                "extensionPart": "AAJTSQACMDIAAlMxAAIwMQACU0sAEzc5ODIzMDM5MzQyNzU2MTg1NDQ=",
+                "extensions": {
+                    "SI": "02",
+                    "SK": "7982303934275618544",
+                    "S1": "01"
+                },
+                "isParsed": true,
+                "sessionDomain": "",
+                "sessionServer": "lb.example.com",
+                "sessionServerID": "02",
+                "sessionServerPort": "8080",
+                "sessionServerProtocol": "http",
+                "sessionServerURI": "/openam",
+                "tail": ""
+            }],
+        "http://openam.example.com:8080/openam/notificationservice": [{
+                "comingFromAuth": false,
+                "cookieMode": null,
+                "encryptedString": "AQIC5wM2LY4SfcyTLz6VjQ7nkFeDcEh8K5dXkIENpXlpg28.*AAJTSQACMDIAAlMxAAIwMQACU0sAEzc5ODIzMDM5MzQyNzU2MTg1NDQ.*",
+                "extensionPart": null,
+                "extensions": {},
+                "isParsed": false,
+                "sessionDomain": "",
+                "sessionServer": "",
+                "sessionServerID": "",
+                "sessionServerPort": "",
+                "sessionServerProtocol": "",
+                "sessionServerURI": "",
+                "tail": null
+            }, {
+                "comingFromAuth": false,
+                "cookieMode": null,
+                "encryptedString": "AQIC5wM2LY4SfczP_8x74sOXqIX5N5SloYYSYRAOGk1kPP0.*AAJTSQACMDIAAlNLABM3OTgyMzAzOTM0Mjc1NjE4NTQ0AAJTMQACMDE.*",
+                "extensionPart": null,
+                "extensions": {},
+                "isParsed": false,
+                "sessionDomain": "",
+                "sessionServer": "",
+                "sessionServerID": "",
+                "sessionServerPort": "",
+                "sessionServerProtocol": "",
+                "sessionServerURI": "",
+                "tail": null
+            }]
+    },
+    "sessionHandle": "shandle:AQIC5wM2LY4SfcyzzDfznoJJM1rmCsiStqTPvTQ5Sowv4aA.*AAJTSQACMDIAAlMxAAIwMQACU0sAEzc5ODIzMDM5MzQyNzU2MTg1NDQ.*",
+    "sessionID": {
+        "comingFromAuth": false,
+        "cookieMode": null,
+        "encryptedString": "AQIC5wM2LY4SfczP_8x74sOXqIX5N5SloYYSYRAOGk1kPP0.*AAJTSQACMDIAAlNLABM3OTgyMzAzOTM0Mjc1NjE4NTQ0AAJTMQACMDE.*",
+        "extensionPart": "AAJTSQACMDIAAlNLABM3OTgyMzAzOTM0Mjc1NjE4NTQ0AAJTMQACMDE=",
+        "extensions": {
+            "SI": "02",
+            "S1": "01",
+            "SK": "7982303934275618544"
+        },
+        "isParsed": true,
+        "sessionDomain": "dc=openam,dc=forgerock,dc=org",
+        "sessionServer": "lb.example.com",
+        "sessionServerID": "02",
+        "sessionServerPort": "8080",
+        "sessionServerProtocol": "http",
+        "sessionServerURI": "/openam",
+        "tail": ""
+    },
+    "sessionProperties": {
+        "CharSet": "UTF-8",
+        "UserId": "demo",
+        "FullLoginURL": "/openam/UI/Login",
+        "successURL": "/openam/console",
+        "cookieSupport": "true",
+        "AuthLevel": "0",
+        "SessionHandle": "shandle:AQIC5wM2LY4Sfcx8PbXKiXaDlSYzLw6ohwft40pDSc-kbZw.*AAJTSQACMDIAAlMxAAIwMQACU0sAEzg2MjYxNDg5MTc5NTU5NTU5MzM.*",
+        "UserToken": "demo",
+        "loginURL": "/openam/UI/Login",
+        "Principals": "demo",
+        "Service": "ldapService",
+        "sun.am.UniversalIdentifier": "id=demo,ou=user,dc=openam,dc=forgerock,dc=org",
+        "amlbcookie": "01",
+        "Organization": "dc=openam,dc=forgerock,dc=org",
+        "Locale": "en",
+        "HostName": "127.0.0.1",
+        "AuthType": "DataStore",
+        "Host": "127.0.0.1",
+        "UserProfile": "Required",
+        "clientType": "genericHTML",
+        "AMCtxId": "982c2a6ccd3cc5fd01",
+        "authInstant": "2014-03-31T20:09:21Z",
+        "Principal": "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
+    },
+    "sessionState": 1,
+    "sessionType": 0,
+    "timedOutAt": 0,
+    "willExpireFlag": true
+}

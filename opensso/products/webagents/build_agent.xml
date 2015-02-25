@@ -1,0 +1,221 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build_agent.xml,v 1.18 2009/11/04 22:13:29 leiming Exp $
+
+-->
+
+<!--
+Portions Copyrighted 2010-2014 ForgeRock AS
+-->
+
+<project name="open-source-web-agents" default="usage">
+                
+    <description>Open Web Single Sign-On Web Agents</description>
+    <property name="webagents.install.dir" 
+              location="${webagents.basedir}/install"/>
+    <property name="webagents.am.src.dir" 
+              location="${webagents.basedir}/am/source"/>
+    <property name="webagents.sjsws.src.dir" 
+              location="${webagents.basedir}/agents/source/sjsws"/>
+    <property name="webagents.apache22.src.dir" 
+              location="${webagents.basedir}/agents/source/apache22"/>
+    <property name="webagents.apache24.src.dir" 
+              location="${webagents.basedir}/agents/source/apache24"/>
+
+    <!-- top level directory structure -->
+    <property name="webagents.container.extlib.dir" 
+              location="${webagents.basedir}/extlib"/>
+   
+    <!-- container agent directory structure -->
+    <property name="webagents.container.built.dir" 
+              location="${webagents.built.dir}/${containername}"/>   
+    <property name="webagents.container.classes.dir" 
+              location="${webagents.container.built.dir}/classes"/>   
+    <property name="webagents.container.lib.dir" 
+              location="${webagents.container.built.dir}/lib"/> 
+    <property name="webagents.container.archive.dir" 
+              location="${webagents.container.built.dir}/archive"/>   
+    <property name="webagents.container.scratch.dir" 
+              location="${webagents.container.built.dir}/scratch"/>   
+    <property name="container.web_agents.dir" 
+              location="${webagents.container.scratch.dir}/web_agents"/>   
+    <property name="container.web_agent.dir" 
+              location="${container.web_agents.dir}/${containername}_agent"/>   
+    <property name="container.web_agent.bin.dir" 
+              location="${container.web_agent.dir}/bin"/>   
+    <property name="container.web_agent.config.dir" 
+              location="${container.web_agent.dir}/config"/>   
+    <property name="container.web_agent.data.dir" 
+              location="${container.web_agent.dir}/data"/>   
+    <property name="container.web_agent.etc.dir" 
+              location="${container.web_agent.dir}/etc"/>   
+    <property name="container.web_agent.lib.dir" 
+              location="${container.web_agent.dir}/lib"/>   
+    <property name="container.web_agent.locale.dir" 
+              location="${container.web_agent.dir}/locale"/>   
+    <property name="container.web_agent.logs.dir" 
+              location="${container.web_agent.dir}/installer-logs"/>
+    <property name="container.web_agent.legal.notices.dir" 
+              location="${container.web_agent.dir}/legal-notices"/>   
+
+    <!-- build class path for container -->
+    <path id="build.class.path">
+        <pathelement location="${webagents.container.classes.dir}"/>
+        <fileset dir="${webagents.container.extlib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <pathelement location="../installtools/built/classes"/>
+    </path>
+
+    <target name="preparebuild">
+        <mkdir dir="${webagents.built.dir}"/>
+        <mkdir dir="${webagents.container.built.dir}"/>
+        <mkdir dir="${webagents.container.classes.dir}"/>
+        <mkdir dir="${webagents.container.lib.dir}"/>
+        <mkdir dir="${webagents.container.archive.dir}"/>
+        <mkdir dir="${webagents.container.scratch.dir}"/>
+        <mkdir dir="${container.web_agents.dir}"/>
+        <mkdir dir="${container.web_agent.dir}"/>
+        <mkdir dir="${container.web_agent.bin.dir}"/>
+        <mkdir dir="${container.web_agent.config.dir}"/>
+        <mkdir dir="${container.web_agent.data.dir}"/>
+        <mkdir dir="${container.web_agent.etc.dir}"/>
+        <mkdir dir="${container.web_agent.lib.dir}"/>
+        <mkdir dir="${container.web_agent.locale.dir}"/>
+        <mkdir dir="${container.web_agent.logs.dir}"/>
+        <mkdir dir="${container.web_agent.legal.notices.dir}"/>
+    </target>
+
+    <target name="scratch">
+        <!-- Copy license file -->
+        <copy todir="${container.web_agent.legal.notices.dir}">
+            <fileset dir="${webagents.basedir}/legal">
+                <include name="license.txt"/>
+            </fileset>
+        </copy>
+
+        <!-- Update and copy README file -->
+        <copy file="${webagents.basedir}/README" tofile="${container.web_agent.dir}/README" overwrite="true"/>
+        <replaceregexp file="${container.web_agent.dir}/README"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
+
+        <!-- Copy and update OpenSSOAgentBootstrap.template file -->
+        <copy todir="${container.web_agent.config.dir}">
+            <fileset dir="${webagents.basedir}/conf">
+                <include name="OpenSSOAgentBootstrap.template"/>
+            </fileset>
+        </copy>
+        <replaceregexp file="${container.web_agent.config.dir}/OpenSSOAgentBootstrap.template"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
+
+        <!-- Copy and update OpenSSOAgentConfiguration.template file -->
+        <copy todir="${container.web_agent.config.dir}">
+            <fileset dir="${webagents.basedir}/conf">
+                <include name="OpenSSOAgentConfiguration.template"/>
+            </fileset>
+        </copy>
+        <replaceregexp file="${container.web_agent.config.dir}/OpenSSOAgentConfiguration.template"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
+
+        <!-- Copy OpenSSOAgentMigration.template file -->
+        <copy todir="${container.web_agent.config.dir}">
+            <fileset dir="${webagents.basedir}/conf">
+                <include name="OpenSSOAgentMigration.properties"/>
+            </fileset>
+        </copy>
+
+        <!-- Copy RELEASE_NOTES file -->
+        <available file="${webagents.basedir}/.copyReleaseNotes" property="copy.release.notes"/>
+        <antcall target="copyreleasenotes"/>
+
+    </target>
+
+    <target name="copyreleasenotes" if="copy.release.notes">
+        <!-- Copy RELEASE_NOTES file -->
+        <copy todir="${container.web_agent.dir}">
+            <fileset dir="${webagents.basedir}">
+                <include name="RELEASE_NOTES"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean">
+        <delete dir="${container.web_agent.bin.dir}"/>
+        <delete dir="${container.web_agent.config.dir}"/>
+        <delete dir="${container.web_agent.data.dir}"/>
+        <delete dir="${container.web_agent.etc.dir}"/>
+        <delete dir="${container.web_agent.lib.dir}"/>
+        <delete dir="${container.web_agent.locale.dir}"/>
+        <delete dir="${container.web_agent.logs.dir}"/>
+        <delete dir="${container.web_agent.legal.notices.dir}"/>
+        <delete dir="${container.web_agent.sampleapp.dir}"/>
+        <delete dir="${container.web_agent.dir}"/>
+        <delete dir="${container.web_agents.dir}"/>
+        <delete dir="${webagents.container.scratch.dir}"/>
+        <delete dir="${webagents.container.archive.dir}"/>
+        <delete dir="${webagents.container.lib.dir}"/>
+        <delete dir="${webagents.container.classes.dir}"/>
+        <delete dir="${webagents.container.built.dir}"/>
+        <delete>
+            <fileset dir="${webagents.basedir}/install/varnish/source/" includes="**/*.o"/>
+            <fileset dir="${webagents.basedir}/install/varnish/include/" includes="version.h"/>
+            <fileset dir="${webagents.basedir}/install/varnish/" includes="agentadmin"/>
+        </delete>
+    </target>
+
+    <target name="all" depends="preparebuild, scratch">
+        <echo message="Dispatch to container specific directory"/>
+        <ant antfile="${webagents.install.dir}/build.xml" inheritRefs="true"/>
+    </target>
+    
+    <target name="varnish" depends="preparebuild, scratch">
+        <zip file="${webagents.dist.dir}/${containername}_v30_${build.os}${build.type.suffix}_agent_${agentversion}.zip" whenempty="create">  
+            <zipfileset filemode="755" prefix="web_agents/varnish/bin" dir="${webagents.basedir}/install/varnish/" includes="agentadmin"/>
+            <zipfileset prefix="web_agents/varnish/instances" includes="**" dir="${container.web_agent.logs.dir}"/>
+            <zipfileset prefix="web_agents/varnish/logs" includes="**" dir="${container.web_agent.logs.dir}" />
+            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/agents/source/varnish/" includes="libvmod_am.so"/>
+            <zipfileset dir="${webagents.basedir}/extlib/${build.os.ext}/legal-notices/" includes="license.txt" fullpath="web_agents/varnish/legal-notices/license.txt"/>
+            <zipfileset dir="${container.web_agent.config.dir}/" includes="OpenSSOAgentBootstrap.template" fullpath="web_agents/varnish/conf/OpenSSOAgentBootstrap.template"/>
+            <zipfileset dir="${container.web_agent.config.dir}/" includes="OpenSSOAgentConfiguration.template" fullpath="web_agents/varnish/conf/OpenSSOAgentConfiguration.template"/>
+        </zip>
+        <checksum file="${webagents.dist.dir}/${containername}_v30_${build.os}${build.type.suffix}_agent_${agentversion}.zip"
+                  algorithm="SHA" fileext=".sha" />  
+    </target>
+    
+    <target name="varnish302" depends="preparebuild, scratch">
+        <zip file="${webagents.dist.dir}/${containername}_${build.os}${build.type.suffix}_agent_${agentversion}.zip" whenempty="create">  
+            <zipfileset filemode="755" prefix="web_agents/varnish/bin" dir="${webagents.basedir}/install/varnish/" includes="agentadmin"/>
+            <zipfileset prefix="web_agents/varnish/instances" includes="**" dir="${container.web_agent.logs.dir}"/>
+            <zipfileset prefix="web_agents/varnish/logs" includes="**" dir="${container.web_agent.logs.dir}" />
+            <zipfileset filemode="755" prefix="web_agents/varnish/lib" dir="${webagents.basedir}/agents/source/varnish/" includes="libvmod_am.so"/>
+            <zipfileset dir="${webagents.basedir}/extlib/${build.os.ext}/legal-notices/" includes="license.txt" fullpath="web_agents/varnish/legal-notices/license.txt"/>
+            <zipfileset dir="${container.web_agent.config.dir}/" includes="OpenSSOAgentBootstrap.template" fullpath="web_agents/varnish/conf/OpenSSOAgentBootstrap.template"/>
+            <zipfileset dir="${container.web_agent.config.dir}/" includes="OpenSSOAgentConfiguration.template" fullpath="web_agents/varnish/conf/OpenSSOAgentConfiguration.template"/>
+        </zip>
+        <checksum file="${webagents.dist.dir}/${containername}_${build.os}${build.type.suffix}_agent_${agentversion}.zip"
+                  algorithm="SHA" fileext=".sha" />  
+    </target>
+
+</project>

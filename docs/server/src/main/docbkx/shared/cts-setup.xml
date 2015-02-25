@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2013-2014 ForgeRock AS
+  !
+-->
+<programlisting
+ xml:id="configure-agent-auth"
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+#!/bin/sh
+
+#
+# copyright (C) 2014 ForgeRock AS
+#
+# cts-setup.sh: This script installs and configures an external CTS data store.
+# It assumes that you have downloaded the OpenDJ zip file to a local
+# folder.
+
+# Reset the tmp folder
+T=/tmp/ldif
+rm -rf $T
+mkdir $T
+
+# Define variables used in this script. Make them specific to your deployment.
+
+TOMCAT_OPENAM_WEBAPP=/usr/local/tomcat/webapps/openam/WEB-INF/template/ldif/sfha
+USER="cn=Directory Manager"
+PASS="pwd"
+PORT=4444
+CTS_DN="dc=cts,dc=example,dc=com"
+
+# Make sure to download the OpenDJ Zip file and place it in the same folder as
+# this script
+DS="OpenDJ-2.6.2.zip"
+
+# Sanity Check
+[ ! -d "$TOMCAT_OPENAM_WEBAPP" ] &amp;&amp; echo "TOMCAT OPENAM WEBAPP folder inaccessible" \
+ &amp;&amp; exit 1
+[ ! -f "$DS" ] &amp;&amp; echo "$DS is not present" &amp;&amp; exit 1
+
+# Create a properties file for the OpenDJ install
+printf '#\n' >> $T/setup.props
+printf '# Sample properties file to set up the OpenDJ directory server\n' >> \
+ $T/setup.props
+printf '#\n' >> $T/setup.props
+printf 'hostname                      = opendj.example.com\n' >> $T/setup.props
+printf 'ldapPort                      = 1389\n' >> $T/setup.props
+printf 'generateSelfSignedCertificate = true\n' >> $T/setup.props
+printf 'enableStartTLS                = true\n' >> $T/setup.props
+printf 'ldapsPort                     = 1636\n' >> $T/setup.props
+printf 'jmxPort                       = 1689\n' >> $T/setup.props
+printf "adminConnectorPort            = $PORT\n" >> $T/setup.props
+printf "rootUserDN                    = $USER\n" >> $T/setup.props
+printf 'rootUserPassword              = pwd\n' >> $T/setup.props
+#printf '#baseDN                      = dc=example,dc=com\n' >> $T/setup.props
+#printf '#ldifFile                    = /path/to/Example.ldif\n' >> $T/setup.props
+#printf '#sampleData                  = \n' >> $T/setup.props
+
+# Create the CTS base dn and ACIs entries and write them to a file
+# Linefeeds have been added for publication purposes.
+printf '#\n' >> $T/add-cts-entries.ldif
+printf '# add-cts-entries.ldif: base DN and ACIs\n' >> $T/add-cts-entries.ldif
+printf '#\n' >> $T/add-cts-entries.ldif
+printf "dn: $CTS_DN\n" >> $T/add-cts-entries.ldif
+printf 'objectclass: top\n' >> $T/add-cts-entries.ldif
+printf 'objectclass: domain\n' >> $T/add-cts-entries.ldif
+printf 'dc: cts\n' >> $T/add-cts-entries.ldif
+printf "aci: (targetattr=\"*\")(version 3.0;acl \"Allow entry search\"; \
+ allow (search, read)(userdn = \
+ "ldap:///uid=openam,ou=admins,$CTS_DN\");)\n" >> $T/add-cts-entries.ldif
+printf "aci: (targetattr=\"*\")(version 3.0;acl \"Modify config entry\"; \
+ allow (write)(userdn = \
+ "ldap:///uid=openam,ou=admins,$CTS_DN\");)\n" >> $T/add-cts-entries.ldif
+printf "aci: (targetcontrol=\"2.16.840.1.113730.3.4.3\") \
+ (version 3.0;acl \"Allow persistent search\"; \
+ allow (search, read)(userdn = \
+ "ldap:///uid=openam,ou=admins,$CTS_DN\");)\n" >> $T/add-cts-entries.ldif
+printf "aci: (version 3.0;acl \"Add config entry\"; allow (add)(userdn = \
+ "ldap:///uid=openam,ou=admins,$CTS_DN\");)\n" >> $T/add-cts-entries.ldif
+printf "aci: (version 3.0;acl \"Delete config entry\"; allow (delete)(userdn = \
+ "ldap:///uid=openam,ou=admins,$CTS_DN\");)\n" >> $T/add-cts-entries.ldif
+printf '\n' >>$T/add-cts-entries.ldif
+printf "dn: ou=admins,$CTS_DN\n" >> $T/add-cts-entries.ldif
+printf 'objectclass: top\n' >> $T/add-cts-entries.ldif
+printf 'objectclass: organizationalUnit\n' >> $T/add-cts-entries.ldif
+printf 'ou: admins\n' >> $T/add-cts-entries.ldif
+printf '\n' >>$T/add-cts-entries.ldif
+printf "dn: uid=openam,ou=admins,$CTS_DN\n" >> $T/add-cts-entries.ldif
+printf 'objectclass: top\n' >> $T/add-cts-entries.ldif
+printf 'objectclass: person\n' >> $T/add-cts-entries.ldif
+printf 'objectclass: organizationalPerson\n' >> $T/add-cts-entries.ldif
+printf 'objectclass: inetOrgPerson\n' >> $T/add-cts-entries.ldif
+printf 'cn: openam\n' >> $T/add-cts-entries.ldif
+printf 'sn: openam\n' >> $T/add-cts-entries.ldif
+printf 'uid: openam\n' >> $T/add-cts-entries.ldif
+printf 'userPassword: secret12\n' >> $T/add-cts-entries.ldif
+printf 'ds-privilege-name: subentry-write\n' >> $T/add-cts-entries.ldif
+printf 'ds-privilege-name: update-schema\n' >> $T/add-cts-entries.ldif
+
+# Unzip and install OpenDJ using the properties file
+echo ""
+echo "... Unpacking OpenDJ and installing ..."
+unzip "$DS" &amp;&amp; cd opendj
+./setup --cli --propertiesFilePath $T/setup.props --acceptLicense --no-prompt
+
+# Create the CTS Backend
+echo ""
+echo "... Creating backend ..."
+echo ""
+bin/dsconfig create-backend \
+--backend-name cts-store \
+--set base-dn:"$CTS_DN" \
+--set enabled:true \
+--type local-db \
+--port $PORT \
+--bindDN "$USER" \
+--bindPassword $PASS \
+--trustAll \
+--no-prompt
+echo "Backend created"
+
+# Verify Backend
+#bin/dsconfig list-backends \
+#--port $PORT \
+#--bindDN "$USER" \
+#--bindPassword $PASS \
+#--trustAll \
+#--no-prompt
+
+# Add the Base DN and ACIs
+echo ""
+echo "...Adding Base DN and ACIs..."
+echo ""
+bin/ldapmodify \
+--port $PORT \
+--bindDN "$USER" \
+--bindPassword $PASS \
+--defaultAdd \
+--filename $T/add-cts-entries.ldif \
+--useSSL \
+--trustAll 
+echo "BaseDN and ACIs added."
+
+# Verify BaseDN and ACIs
+#bin/ldapsearch --port $PORT --bindDN "$USER" --bindPassword $PASS \
+ --baseDN "$CTS_DN" --searchscope sub --useSSL --trustAll  "(objectclass=*)"
+
+# Add the Admin Global ACI
+echo ""
+echo "...Adding Admin Global ACIs..."
+echo ""
+bin/dsconfig set-access-control-handler-prop \
+--add global-aci:'(target = "ldap:///cn=schema")(targetattr = "attributeTypes || \
+ objectClasses")(version 3.0; acl "Modify schema"; allow (write) userdn = \
+ "ldap:///uid=openam,ou=admins,dc=cts,dc=example,dc=com";)' \
+--port $PORT \
+--bindDN "$USER" \
+--bindPassword $PASS \
+--trustAll \
+--no-prompt
+echo "Global ACI added."
+
+# Verify Global ACI
+#bin/dsconfig get-access-control-handler-prop --property global-aci --port $PORT \
+ --bindDN "$USER" --bindPassword $PASS -X -n
+
+# Copy the Schema, Indexes, and Container files for CTS
+echo ""
+echo "... Begin copying schema, indexes, and container ..."
+cp $TOMCAT_OPENAM_WEBAPP/cts-add-schema.ldif $T/cts-add-schema.ldif
+cat $TOMCAT_OPENAM_WEBAPP/cts-indices.ldif | sed -e 's/@DB_NAME@/cts-store/' > \
+ $T/cts-indices.ldif
+cat $TOMCAT_OPENAM_WEBAPP/cts-container.ldif | sed -e \
+ "s/@SM_CONFIG_ROOT_SUFFIX@/$CTS_DN/" > $T/cts-container.ldif
+echo "Schema, index, and container files copied."
+
+# Add the Schema Files
+echo ""
+echo "... Adding CTS Schema ..."
+bin/ldapmodify --port $PORT --bindDN "$USER" --bindPassword $PASS \
+ --fileName $T/cts-add-schema.ldif --useSSL --trustAll
+
+# Add the CTS Indexes
+echo ""
+echo "... Adding CTS Indexes ..."
+bin/ldapmodify --port $PORT --bindDN "$USER" --bindPassword $PASS --defaultAdd \
+ --fileName $T/cts-indices.ldif --useSSL --trustAll
+
+# Add the CTS Container Files
+echo ""
+echo "... Adding CTS Container ..."
+bin/ldapmodify --port $PORT --bindDN "$USER" --bindPassword "$PASS" --defaultAdd \
+ --fileName $T/cts-container.ldif --useSSL --trustAll
+
+# Rebuild the Indexes
+echo ""
+echo "... Rebuilding Index ..."
+bin/rebuild-index --port $PORT --bindDN "$USER" --bindPassword "$PASS" \
+ --baseDN "$CTS_DN" --rebuildALL --start 0 --trustAll
+
+# Verify the Indexes
+echo ""
+echo "... Verifying Index ..."
+bin/verify-index --baseDN "$CTS_DN"
+
+echo ""
+echo "Your CTS External Store has been successfully installed and configured."
+exit 0
+</programlisting>

@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2012-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-securing'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Securing OpenAM</title>
+ <indexterm>
+  <primary>Securing OpenAM</primary>
+ </indexterm>
+
+ <para>This chapter identifies best practices for securing your OpenAM
+ deployment.</para>
+
+ <section xml:id="avoid-obvious-defaults">
+  <title>Avoiding Obvious Defaults</title>
+
+  <itemizedlist>
+   <para>OpenAM includes default settings to make it easier for you to
+   evaluate the software. Avoid these default settings in production
+   deployments.</para>
+
+   <listitem>
+    <para>When connecting to LDAP, bind with a specific administrative account
+    rather than a root DN account if possible.</para>
+   </listitem>
+
+   <listitem>
+    <para>Change the default <literal>iPlanetDirectoryPro</literal> cookie name
+    both in OpenAM (<literal>com.iplanet.am.cookie.name</literal>) and in your
+    policy agent profiles (<literal
+    >com.sun.identity.agents.config.cookie.name</literal>).</para>
+   </listitem>
+
+   <listitem>
+    <para>When installing OpenAM, do not use <literal>/openam</literal> or
+    <literal>/opensso</literal> as the deployment URI.</para>
+   </listitem>
+
+   <listitem>
+    <para>Set valid goto URL domains for OpenAM in the core authentication
+    module configuration. The parameter is described in the section providing
+    <link xlink:show="new" xlink:href="admin-guide#core-module-conf-hints"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For the
+    Core Authentication Module</citetitle></link> (<literal
+    >iplanet-am-auth-valid-goto-domains</literal>).</para>
+   </listitem>
+
+   <listitem>
+    <para>Create an administrator in the top-level realm with a different ID
+    than the default <literal>amadmin</literal>.</para>
+   </listitem>
+
+   <listitem>
+    <para>Create specific administrator users to track better who makes
+    configuration changes.</para>
+   </listitem>
+
+   <listitem>
+    <para>Set the OpenAM advanced property
+    <literal>openam.auth.soap.rest.generic.authentication.exception</literal>
+    to <literal>true</literal>. This causes OpenAM to return the same exception
+    both when the user does not exist, and also when the password is not
+    valid.</para>
+   </listitem>
+
+   <listitem>
+    <para>Remove the demo user account. For example, if you configure the embedded
+     OpenDJ directory server as a configuration and CTS store, the default demo user
+     account gets created during the installation process. You should
+     remove the user using the OpenAM console under Access Control &gt; / (Top Realm)
+     &gt; Subjects &gt; User.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>Set the list of Valid <literal>goto</literal> URL Resources.
+     By default, OpenAM redirects the user to the URL specified in the
+     <literal>goto</literal> and <literal>gotoOnFail</literal> query string parameters
+     supplied to the authentication interface in the login URL.
+    </para>
+    <para>
+     To increase security against possible phishing attacks through open redirect,
+     you can specify a list of valid URL resources against which OpenAM
+     validates these URLs.
+     OpenAM only redirects a user if the <literal>goto</literal> and
+     <literal>gotoOnFail</literal> URL matches any of the resources specified in
+     this setting.
+     If no setting is present, it is assumed that the <literal>goto</literal> or
+     <literal>gotoOnFail</literal> URL is valid.
+    </para>
+    <para>To set the Valid <literal>goto</literal> URL Resources, use the OpenAM
+     console, and navigate to Access Control &gt; <replaceable>Realm Name </replaceable>
+     &gt; Services. Click Add, select Validation Service, and then add one or more
+     valid <literal>goto</literal> URLs.
+    </para>
+
+     <para>
+      When setting valid <literal>goto</literal> URLs,
+      you can use the "*" wildcard,
+      where "*" matches all characters except "?".
+      For more specific patterns,
+      use resource names with wildcards as described in the procedure,
+       <link
+        xlink:href="admin-guide#configure-valid-goto-url-resources"
+        xlink:role="http://docbook.org/xlink/role/olink"
+        xlink:show="new"
+        ><citetitle>Configuring Valid goto URL Resources</citetitle></link>.
+     </para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="protect-network-access">
+  <title>Protecting Network Access</title>
+
+   <para>Anytime users interact with a web service, there are risks. With OpenAM, you can
+   reduce those risks by deploying different parts of OpenAM in appropriate parts of an
+   enterprise network.</para>
+
+    <para>To minimize risks, deploy only the core OpenAM server on systems directly connected
+        through a firewall. As a start, deploy only the core server (and the protected web application)
+        on Internet-facing servers. For instructions, see the following section from the
+        OpenAM Installation Guide, <link xlink:href="install-guide#which-war-to-deploy"
+        xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Determine Which
+        War File to Deploy</citetitle></link>.</para>
+
+    <para>You can further limit what is exposed through the firewall by using one of two strategies:</para>
+
+    <itemizedlist>
+        <listitem>
+            <para>Set up a distributed authentication user interface (UI) in a DMZ between firewalls.</para>
+            <para>The distributed authentication UI is essentially a small subset of the OpenAM server with
+            just enough login logic to receive user authentication requests. Those requests are forwarded
+            to the core OpenAM servers.</para>
+            <para>See <link xlink:href="install-guide#chap-install-das"
+                  xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing
+                    OpenAM Distributed Authentication</citetitle></link> for installation
+                instructions. The following figure shows the recommended architecture.</para>
+            <mediaobject xml:id="figure-securing-openam-daui">
+                <alt>Exposing only the Distributed Authentication UI to the Internet</alt>
+                <imageobject>
+                    <imagedata fileref="images/securing-openam-daui.png" format="PNG" />
+                </imageobject>
+                <textobject><para>The OpenAM Distributed Authentication UI can hide many
+                    OpenAM administrative capabilities from the Internet. Notice that OpenAM
+                    installed with the console is inside your infrastructure as well.</para></textobject>
+            </mediaobject>
+        </listitem>
+
+        <listitem>
+            <para>Alternatively, use a reverse proxy in front of OpenAM to allow
+             access only to the necessary URLs.
+             The distributed authentication user interface
+             only exposes the authentication UI, while a reverse proxy can expose
+             those endpoints needed for an application. For example, if you
+             need to expose the OAuth2/OpenID Connect endpoints and REST interface
+             in addition to the authentication UI,
+             then you should implement a reverse proxy. If you only need to expose
+             a login page, then use the DAUI.
+            </para>
+            <para>
+             Also note that the DAUI does not support SAML 2.0, so in applications
+             that require access to SAML 2.0 endpoints, you must implement
+             a reverse proxy.
+            </para>
+
+
+            <para>
+            The following figure shows the recommended architecture with a
+            reverse proxy.</para>
+
+            <mediaobject xml:id="figure-securing-openam-rp">
+                <alt>Exposing only a reverse proxy to the Internet</alt>
+                <imageobject>
+                    <imagedata fileref="images/securing-openam-rp.png" format="PNG" />
+                </imageobject>
+                <textobject><para>By placing a reverse proxy between OpenAM and the
+                    Internet, you expose only the necessary endpoints outside your
+                    infrastructure. Notice that OpenAM installed with the console is inside
+                    your infrastructure as well.</para></textobject>
+            </mediaobject>
+            <para>For access to the console, deploy the full OpenAM application<footnote
+                    ><para>Console only deployment is no longer supported.</para></footnote> on
+                a separate system that is reachable only from internal systems. Do not
+                include the full OpenAM server in the load-balanced pool of OpenAM servers
+                serving applications.</para>
+        </listitem>
+        <listitem>
+            <para>Leave <literal>ssoadm.jsp</literal> disabled in production. (Advanced
+                property: <literal>ssoadm.disabled=true</literal>)</para>
+        </listitem>
+        <listitem>
+            <para>If possible in your deployment, control access to OpenAM console by
+                network address, such that administrators can only connect from well-known
+                systems and networks.</para>
+        </listitem>
+        <listitem>
+            <para>Restrict access to URIs that you do not use, and prevent internal
+                endpoints such as <literal>/sessionservice</literal> from being reachable
+                over the Internet.</para>
+            <para>For a full list of endpoints, see the <citetitle>Reference</citetitle>
+            chapter on <link xlink:show="new" xlink:href="reference#chap-endpoints"
+            xlink:role="http://docbook.org/xlink/role/olink">
+            <citetitle>Service Endpoints</citetitle></link>.</para>
+        </listitem>
+    </itemizedlist>
+ </section>
+
+ <section xml:id="secure-openam-administration">
+  <title>Securing OpenAM Administration</title>
+
+  <itemizedlist>
+   <para>Keep administration of access management services separate from
+   management of the services themselves.</para>
+
+   <listitem>
+    <para>Create realms for your organization(s) and separate administrative
+    users from end users. For instructions, see <link
+    xlink:href="admin-guide#chap-realms" xlink:show="new"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+    Realms</citetitle></link>. You must then either:</para>
+    <itemizedlist>
+     <listitem>
+      <para>Use the <literal>realm=<replaceable>realm-name</replaceable></literal>
+      query string parameter when redirecting users to OpenAM, which gives you
+      a way to isolate the URLs used by an application.</para>
+     </listitem>
+     <listitem>
+      <para>Create fully qualified domain name realm/DNS aliases, and use
+      them to control access to the realms.</para>
+     </listitem>
+    </itemizedlist>
+   </listitem>
+
+   <listitem>
+    <para>When customizing <filename>config/auth/default*/Login.jsp</filename>,
+    make sure that you do not introduce any security vulnerabilities such as
+    cross-site scripting due to unvalidated input.</para>
+   </listitem>
+
+   <listitem>
+    <para>Create a policy agent profile for each policy agent. See <link
+    xlink:href="admin-guide#chap-agents" xlink:show="new"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+    Policy Agent Profiles</citetitle></link> for instructions.</para>
+   </listitem>
+
+  </itemizedlist>
+ </section>
+
+ <section xml:id="secure-communications">
+  <title>Securing Communications</title>
+
+  <itemizedlist>
+   <para>Keep communications secure by using encryption, properly configured
+   cookies, and request and response signatures.</para>
+
+   <listitem>
+    <para>Protect network traffic by using HTTPS and LDAPS where
+    possible.</para>
+   </listitem>
+
+   <listitem>
+    <para>
+     When using HTTPS, use secure cookies,
+     which are transmitted only over secured connections.
+    </para>
+
+    <para>
+     You can configure OpenAM server to use secure cookies
+     by browsing in OpenAM console to
+     Configuration &gt; Servers and Sites &gt; Default Server Settings &gt; Security &gt; Cookie,
+     selecting Yes in the Secure Cookie field,
+     and then clicking Save to keep your work.
+    </para>
+
+    <para>
+     HttpOnly cookies are meant to be transmitted only over HTTP and HTTPS,
+     and not through non-HTTP methods such as JavaScript functions.
+    </para>
+
+    <para>
+     You can configure OpenAM server to use HttpOnly cookies
+     by browsing in OpenAM console to
+     Configuration > Servers and Sites > Default Server Settings > Advanced,
+     adding the advanced property
+     with name <literal>com.sun.identity.cookie.httponly</literal>
+     and value <literal>true</literal>,
+     and then clicking Save to keep your work.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>Where possible, use subdomain cookies, and control subdomains in
+    a specific DNS master.</para>
+   </listitem>
+   <listitem>
+    <para>Use cookie hijacking protection with restricted tokens, where each
+    policy agent uses different SSO tokens for the same user. See <link
+    xlink:show="new" xlink:href="admin-guide#enable-cdsso-cookie-hijacking-protection"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Protect
+    Against CDSSO Cookie Hijacking</citetitle></link> for instructions.</para>
+   </listitem>
+
+   <listitem>
+    <para>When using SAML 2.0:</para>
+    <itemizedlist>
+     <listitem>
+      <para>Sign authentication requests, authentication responses, and single
+      logout requests.</para>
+     </listitem>
+     <listitem>
+      <para>If the other entities in your circle of trust can handle encryption,
+      then use encryption as well.</para>
+     </listitem>
+     <listitem>
+      <para>Use your own key, not the <literal>test</literal> key provided with
+      OpenAM.</para>
+     </listitem>
+    </itemizedlist>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="amadmin-changes">
+        <title>Administering the amadmin Account</title>
+
+        <para>You can make changes to the password and user name for the main OpenAM administrative account.</para>
+        <para>You can change the user name of the <literal>amadmin</literal> administrative account
+            to something more obscure, such as superroot. However, the capabilities of that alternative administrative
+            account would not be complete, due to some hard-coding of <literal>amadmin</literal> in the source files.
+            When changing the password for the main OpenAM administrative account, you must make a corresponding change
+            to the authentication datastore. That datastore could be OpenDJ. The steps you would take to change
+            the OpenAM top-level administrative password and account name are shown in the following sections.</para>
+
+        <procedure xml:id="change-amadmin-password">
+            <title>To Change the Password for the Top-Level Administrator (normally <literal>amadmin</literal>)</title>
+
+            <step>
+                <para>Login to the OpenAM console as the administrator, normally
+                    <literal>amadmin</literal>.</para>
+            </step>
+            <step>
+                <para>Under Access Control &gt; / (Top Level Realm) &gt; Subjects &gt; User, select the name of the
+                    current top-level administrative user.</para>
+            </step>
+            <step>
+                <para>In the page that appears, navigate to the Password row and click Edit.</para>
+            </step>
+            <step>
+                <para>In the window that appears, enter the desired new password in the New Password and
+                    Re-Enter Password text boxes.</para>
+            </step>
+            <step>
+                <para>Click OK to implement the change. If you want to cancel, click Close or just close the window.</para>
+            </step>
+            <step>
+                <para>You'll also need to change the password for the administrator on the directory server. If you are
+                    using OpenDJ, refer to the <link xlink:show="new"
+                    xlink:href="${opendjDocBase}/admin-guide/#troubleshoot-reset-admin-passwords"
+                    ><citetitle>OpenDJ Administration Guide</citetitle> section on Resetting Administrator
+                    Passwords</link>. If you are using a different directory server, you will have to refer to the
+                documentation for that server.</para>
+            </step>
+        </procedure>
+
+        <para>In the following steps, you will identify the new administrative user by assigning it to the <literal>
+            com.sun.identity.authentication.super.user</literal> directive. You may also need to create an
+            OpenAM account for the new administrative user. Don't forget to make sure that new administrative
+            account is configured in the corresponding directory server such as OpenDJ.
+        </para>
+
+        <procedure xml:id="change-amadmin-uid">
+            <title>To Change the Account Name for the Top-Level Administrator (normally <literal>amadmin</literal>)</title>
+
+            <step>
+                <para>Login to the OpenAM console as the administrator, normally
+                    <literal>amadmin</literal>.</para>
+            </step>
+            <step>
+                <para>Navigate to the page where you can set the properties for different classes. Select
+                    Configuration &gt; Servers and Sites &gt; <replaceable>Server Name</replaceable> &gt; Advanced.</para>
+            </step>
+            <step>
+                <para>In the Advanced Properties window that appears, click Add.</para>
+            </step>
+            <step>
+                <para>You'll see blank entries in the end of the list of Property Names and Property Values. In the
+                    empty Property Name text box, enter <literal>com.sun.identity.authentication.super.user</literal>.</para>
+            </step>
+            <step>
+                <para>In the corresponding Property Values test box, enter appropriate values for the new administrative
+                    user in LDAP Data Interchange Format (LDIF). For example, the following entry would set up an
+                    administrative user named <literal>superroot</literal>, in the organizational unit named <literal>
+                        people</literal>people, associated with the example.com domain:
+                    <literal>uid=superroot,ou=people,dc=example,dc=com</literal>.</para>
+            </step>
+            <step>
+                <para>Click Save to save the changes that you've made. </para>
+            </step>
+            <step>
+                <para>If the account doesn't already exist in OpenAM or on a connected directory server, you'll need to
+               create it. To do so, select Access Control &gt; / (Top Level Realm) &gt; Subject &gt; User &gt; New.
+               In the New User window that appears, create the new user. Make sure to enter an appropriate password
+               and make that user Active. The ID for that new user is the user name.</para>
+            </step>
+            <step>
+                <para>As noted earlier, you'll also need to make sure that the corresponding account on the directory server
+                has at least CN=Directory Manager  privileges. If you're using OpenDJ, refer to the chapter on
+                    <citetitle>Configuring Privileges &amp; Access Control</citetitle> in the
+                    <link xlink:show="new"
+                    xlink:href="${opendjDocBase}/admin-guide/#chap-privileges-acis">
+                    <citetitle>OpenDJ Administration Guide</citetitle></link>.</para>
+            </step>
+        </procedure>
+
+        <para>If you do change the account name of the top-level administrative account, you should be aware that the
+        original <literal>amadmin</literal> account is "hard-coded" in the source code of several files.
+            The code in these files may affect the functionality of a top-level administrative user
+            with a name other than <literal>amadmin</literal>.</para>
+
+        <para>One of the improvements that we plan to make to OpenAM is to eliminate these instances of hard-coding.
+        Until we make such improvements, the amadmin user would retain privileges related to the LoginState and some
+        IDM-related classes.</para>
+
+    </section>
+
+</chapter>

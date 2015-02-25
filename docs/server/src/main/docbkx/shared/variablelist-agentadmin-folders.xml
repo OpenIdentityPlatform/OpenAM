@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<variablelist xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+        xmlns:xlink='http://www.w3.org/1999/xlink'
+        xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <varlistentry >
+  <term><filename>bin</filename></term>
+  <listitem>
+   <para>The installation and configuration program
+    <command>agentadmin</command> and a password hashing tool
+    <command>crypt_util</command>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+ <term><filename>config</filename></term>
+ <listitem>
+  <para>Configuration templates used by the <command>agentadmin</command>
+   command during installation</para>
+ </listitem>
+</varlistentry>
+<varlistentry>
+ <term><filename>data</filename></term>
+ <listitem>
+  <para>Not used</para>
+ </listitem>
+</varlistentry>
+<varlistentry>
+ <term><filename>etc</filename></term>
+ <listitem>
+  <para>Configuration templates used during installation</para>
+ </listitem>
+</varlistentry>
+<varlistentry>
+ <term><filename>installer-logs</filename></term>
+ <listitem>
+  <para>Location for log files written during installation</para>
+ </listitem>
+</varlistentry>
+<varlistentry>
+ <term><filename>legal-notices</filename></term>
+ <listitem>
+  <para>Contains licensing information including third-party licenses</para>
+ </listitem>
+</varlistentry>
+<varlistentry>
+ <term><filename>lib</filename></term>
+ <listitem>
+  <para>Shared libraries used by the Java EE policy agent</para>
+ </listitem>
+</varlistentry>
+<varlistentry>
+ <term><filename>locale</filename></term>
+ <listitem>
+  <para>Property files used by the installation program</para>
+ </listitem>
+</varlistentry>
+<varlistentry>
+ <term><filename>README</filename></term>
+ <listitem>
+  <para>README file containing platform and install information for the agent</para>
+ </listitem>
+</varlistentry>
+<!--varlistentry>
+ <term><filename>sampleapp</filename></term>
+ <listitem>
+  <para>Sample application that demonstrates key features of the policy
+   agent. Wait until you have installed the agent to deploy this.</para>
+ </listitem>
+</varlistentry-->
+</variablelist>

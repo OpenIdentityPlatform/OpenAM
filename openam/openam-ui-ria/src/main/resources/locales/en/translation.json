@@ -1,0 +1,449 @@
+{
+    "config" : {
+        "dates" : {
+            "monthNames" : "January, February, March, April, May, June, July, August, September, October, November, December",
+            "monthNamesShort" : "Jan., Feb., Mar., Apr., May., Jun., Jul., Aug., Sep., Oct., Nov., Dec.",
+            "dayNames" : "Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday",
+            "dayNamesShort" : "Sun. , Mon., Tue., Wed., Thu., Fri., Sat."
+        },
+        "messages" : {
+            "CommonMessages" : {
+                "authenticationFailed" : "Login/password combination is invalid.",
+                "loginFailureLockout" : "Your password has expired. Please contact service desk to reset your password",
+                "maxSessionsLimitOrSessionQuota": "Maximum sessions limit reached or session quota has exhausted.",
+                "invalidRealm" : "The realm doesn't exist",
+                "serviceUnavailable" : "Service unavailable",
+                "unknown" : "Unknown error. Please contact your Administrator",
+                "loggedIn" : "You have been successfully logged in.",
+                "errorFetchingData" : "Error fetching user data",
+                "loggedOut" : "You have been logged out.",
+                "loginTimeout" : "Login processed timed out. Restarting...",
+                "unauthorized" : "Unauthorized access or session timeout",
+                "internalError" : "Internal server error",
+                "forbiddenError" : "Forbidden request error.",
+                "notFoundError" : "Not found error.",
+                "badRequestError" : "Bad request error.",
+                "conflictError" : "Detected conflict in request.",
+                "incorrectRevisionError" : "Cannot update the record because the version is not the latest.",
+                "tokenNotFound" : "Token not found.",
+                "securityDataChanged" : "Password was changed"
+            },
+            "UserMessages" : {
+                "invalidOldPassword" : "Old password is invalid.",
+                "usernameNotFound" : "Username not found",
+                "noEmailProvided" : "No email provided in profile",
+                "emailNotSent" : "Email not sent",
+                "unableToRegister" : "Unable to register at this time. Please contact your Administrator",
+                "changedPassword" : "Password has been changed",
+                "profileUpdateFailed" : "Problem during profile update",
+                "profileUpdateSuccessful" : "Profile has been updated",
+                "userNameUpdated" : "Username has been modified successfully.",
+                "afterRegistration" : "Your account has been registered successfully",
+                "siteIdentificationChanged" : "Site identification image has been changed",
+                "userAlreadyExists" : "User already exists",
+                "errorDeletingNotification" : "Error deleting notification.",
+                "errorFetchingNotifications" : "Error Fetching notifications.",
+                "identityNoSpace" : "Identity names may not have a space <br> character at the beginning or end.",
+                "selfRegistrationDisabled"  : "Self Registration is disabled."
+                
+            },
+            "AdminMessages" : {
+                "cannotDeleteYourself" : "You can't delete yourself",
+                "userDeleted" : "User has been deleted",
+                "userDeleteError" : "Error when deleting user",
+                "userApplicationsUpdate" : "Application settings have been changed.",
+                "completedTask" : "Task has been completed.",
+                "claimedTask" : "Task has been claimed.",
+                "unclaimedTask" : "Task has been unclaimed.",
+                "startedProcess" : "Process has been started"
+            }
+        },
+        "AppConfiguration" : {
+            "Navigation" : {
+                "links" : {
+                    "dashboard" : "Dashboard",
+                    "users" : "Users",
+                    "apps" : "Applications",
+                    "allApps" : "All applications",
+                    "addMore" : "Add more apps",
+                    "groups" : "Groups",
+                    "tasksMenu" : "Tasks",
+                    "allTasks" : "Tasks that are in my group's queue",
+                    "myTasks" : "My tasks",
+                    "startProcess" : "Start process",
+                    "oauthtokens" : "OAuth 2 Token Manager"
+                }
+            }
+        }
+    },
+    "templates" : {
+        "user" : {
+            "LoginDialog" : {
+                "refreshOnLogin" : "Should refresh on login" 
+            },
+            "LoginTemplate" : {
+                "loginRemember" : "Remember my username",
+                "noAccountQuestion" : "Don't have an account?",
+                "registerAccount" : "Register your account",
+                "problemLoggingQuestion" : "Having trouble logging in?",
+                "resetPassword" : "Reset your password",
+                "siteIdentificationHeader": "Site Identification",
+                "siteIdentificationExplanation": "Please enter your login name.<br />Your site image and pass phrase will be displayed here."
+            },
+            "404" : {
+                "pageNotFound" : "Page not found",
+                "requestedPageCouldNotBeFound" : "The requested page could not be found."
+            },
+            "DefaultBaseTemplate" : {
+                "orPhone" : ", or phone"
+            },
+            "ChangeSecurityDataDialogTemplate" : {
+                "securityDataChange" : "Security data change",
+                "enterNewPasswordToChange" : "Please enter new password in the fields below to change your password.",
+                "selectQuestionAndAnserIfYouWant" : "Please select question and enter your answer if you want to set up a one.",
+                "securityQuestionAndAnserExplanation" : "The Security Question selected and corresponding Answer provided by you will be used to help identify you in the event that you forget your password."
+            },
+            "ConfirmPasswordDialogTemplate" : {
+                "title" : "Current Password",
+                "explanation1" : "Changing the following attributes requires re-authentication: ",
+                "explanation2" : "Please confirm your current password to continue."
+            },
+            "ChangeSiteIdentificationDialogTemplate" : {
+                "siteImageAndPhaseExplanation" : "The Site Image and Phrase selected will be shown to you upon login to confirm that you are logging in to the genuine site"
+            },
+            "EnterOldPasswordDialog" : {
+                "passwordAndSecurityQuestionChange" : "Password and security question change",
+                "enterYourOldPassword" : "Please enter your old password"
+            },
+            "ForgottenPasswordTemplate" : {
+                "forgottenPasswordQuestion" : "Forgotten password?",
+                "enterLogin" : "Please enter your username, we will send you an email containing instructions on how to reset your password.",
+                "changeForgottenPassword" : "Change forgotten password",
+                "emailSubject" : "OpenAM: You have requested a password reset",
+                "emailMessage" : "Hello from OpenAM, \n\nYou have requested to have your ForgeRock account's password reset.\n\nIf you want to reset your password then follow the link below.\n\n**Note: If you encounter an error message when you click on this link, please copy the url and paste it into your browser instead.\n\n",
+                "emailSent" : "We have sent you an e-mail, please follow the link in the e-mail to complete your password reset process.",
+                "proceedToLogin" : "proceed to login"
+            },
+            "TermsOfUseTemplate" : {
+                "termsOfUse" : "Terms of use",
+                "termsOfUseContent" : "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p>"
+            },
+            "UserProfileTemplate" : {
+                "changeEmailAddress" : "Change Email Address",
+                "changeSecurityData" : "Change Password",
+                "changeSiteIdentification" : "Change Site Identification"
+            },
+            "UserRegistrationTemplate" : {
+                "registerYourAccount" : "Register your account",
+                "logIn" : "Log in",
+                "haveAccoutQuestion" : "Already have an account?",
+                "agreeToTerms" : "I agree to the %sterms of use%s",
+                "emailSubject" : "OpenAM Registration",
+                "emailMessage" : "Please goto the link below to continue the registration process:",
+                "emailSent" : "We have sent you an e-mail, please follow the link in the e-mail to complete the registration process.",
+                "registrationComplete" : "Registration complete"
+            },
+            "RestLogoutTemplate" : {
+                "loggedOut" : "You have been logged out.",
+                "returnToLogin" : "Return to Login page"
+            }
+        },
+        "admin" : {
+            "tasks" : {
+                "ShowUserProfile" : {
+                    "requestInitiator" : "Request initiated by"
+                },
+                "TasksDashboardTemplate" : {
+                    "tasksFromGroupsQueue" : "Tasks that are in my group's queue"
+                },
+                "ProcessUserTaskTableTemplate" : {
+                    "requestCount" : "__count__  request",
+                    "requestCount_plural" : "__count__  requests"
+                }
+            },
+            "ChangeUserPasswordDialogTemplate" : {
+                "securityDataChange" : "Security data change",
+                "enterNewPasswordToChange" : "Please enter new password in the fields below to change user's password."
+            },
+            "UsersTemplate" : {
+                "remainingUsers" : "remaining users"
+            }
+        },
+        "oauth": {
+            "clientID" : "Client ID",
+            "tokenList" : "Authorized Apps",
+            "remainingTokens" : "remaining tokens",
+            "tokenID" : "Token ID",
+            "expireDate" : "Expire Date",
+            "scope" : "Scope",
+            "tokenType" : "Token Type",
+            "parent" : "Parent",
+            "username" : "Username",
+            "redirecturi" : "Redirect URI",
+            "refreshToken" : "Refresh Token",
+            "issued" : "Issued",
+            "realm" : "Realm",
+            "tokenInfo": "TokenInfo"
+        }
+    },
+    "common" : {
+         "form" : {
+            "yes" : "Yes",
+            "no" : "No",
+            "true" : "True",
+            "false" : "False",
+            "update" : "Update",
+            "save" : "Save",
+            "create" : "Create",
+            "cancel" : "Cancel",
+            "reset" : "Reset",
+            "close" : "Close",
+            "logout" : "Log out",
+            "register" : "Register",
+            "home" : "Home",
+            "start" : "Start",
+            "continue" : "Continue",
+            "back" : "Back",
+            "delete" : "Delete",
+            "details" : "Details",
+            "pleaseSelect" : "Please Select",
+            "addUser" : "Add user",
+            "decision" : "Decision",
+            "accept" : "Accept",
+            "reject" : "Reject",
+            "createdAt" : "Created at",
+            "search" : "Search",
+            "submit" : "Submit",
+            "actions" : "Actions",
+            "complete" : "Complete",
+            "copyright" : "Copyright &copy; 2010-14 ForgeRock AS, all rights reserved.",
+            "sessionExpired" : "Session Expired",
+            "enableCookies" : "Cookies must be enabled to login",
+            "deleteSelected" : "Delete Selected",
+            "validation" : {
+                "VALID_PHONE_FORMAT": "Contains invalid characters",
+                "VALID_NAME_FORMAT": "Contains invalid characters",
+                "VALID_EMAIL_ADDRESS_FORMAT": "Not a valid email address",
+                "AT_LEAST_X_CAPITAL_LETTERS" : "At least __numCaps__ capital letters",
+                "AT_LEAST_X_NUMBERS" : "At least __numNums__ numbers",
+                "CANNOT_CONTAIN_OTHERS" : "Cannot contain values from: __disallowedFields__",
+                "MIN_LENGTH" : "At least __minLength__ characters",
+                "REQUIRED" : "Cannot be blank",
+                "UNIQUE" : "Already exists",
+                "REAUTH_REQUIRED" : "",
+                "formContainsErrors" : "Form contains validation errors",
+                "atLeastOneCapitalLetter" : "At least one capital letter",
+                "atLeastOneNumber" : "At least one number",
+                "atLeast8Characters" : "At least 8 characters",
+                "cannotMatchLogin" : "Cannot match login",
+                "confirmationMatchesPassword" : "Confirmation matches password",
+                "usernameExists" : "Username already exists",
+                "emailAddressAlreadyExists" : "Email address already exists",
+                "onlyAlphabeticCharacters" : "Only alphabetic characters",
+                "onlyNumbersAndSpecialCharacters" : "Only numbers and special characters",
+                "cannotMatchOldPassword" : "Cannot match old password",
+                "minimum4Characters" : "Minimum 4 characters",
+                "acceptanceRequiredForRegistration" : "Acceptance required for registration",
+                "incorrectPassword" : "Incorrect password",
+                "incorrectSecurityAnswer" : "Incorrect answer",
+                "required" : "Required",
+                "emailNotValid" : "Not a valid email address.",
+                "emailExists" : "Email address already exists.",
+                "shouldBeLong" : "Should be long value",
+                "wrongDateFormat" : "Wrong format"
+            }
+         },
+         "user" : {
+            "user" : "User",
+            "login" : "Log in",
+            "loginConfirm" : "You have already logged in. Do you want to log out and then login to a different organization?",
+            "profile" : "Profile",
+            "myProfile" : "My Profile",
+            "userProfile" : "User profile",
+            "username" : "Username",
+            "emailAddress" : "Email address",
+            "givenName" : "First Name",
+            "familyName" : "Last Name",
+            "changePassword" : "Change password",
+            "forgotPassword" : "Forgot password",
+            "accountStatus" : "Account status",
+            "active" : "Active",
+            "inactive" : "Inactive",
+            "address" : "Address",
+            "address1" : "Address 1",
+            "address2" : "Address 2",
+            "country" : "Country",
+            "city" : "City",
+            "role" : "Admin Role",
+            "stateProvince" : "State/Province",
+            "phoneNumber" : "Phone number",
+            "postalCode" : "Postal Code",
+            "lastPasswordSet" : "Last password set",
+            "siteImage" : "Site Image",
+            "sitePhrase" : "Site Phrase",
+            "securityQuestion" : "Security question",
+            "securityAnswer" : "Security answer",
+            "adaptiveAuthMethod" : "Adaptive auth method",
+            "SMS" : "SMS",
+            "OAuth" : "OAuth",
+            "createNewAccount" : "Create new account",
+            "password" : "Password",
+            "confirmPassword" : "Confirm Password",
+            "newPassword" : "New password",
+            "oldPassword" : "Old password",
+            "currentPassword" : "Current Password",
+            "confirmNewPassword" : "Confirm new password",
+            "usersList" : "Users list",
+            "addUsers" : "Add users",
+            "name" : "Name",
+            "status" : "Status",
+            "email" : "Email",
+            "system" : "System",
+            "changePhoto" : "Change photo",
+            "SKYPE" : "SKYPE",
+            "googlePlus" : "Google+"
+         }, 
+         "task" : {
+            "unassigned" : "Unassigned",
+            "assignToMe" : "Assign to me",
+            "claim" : "Claim",
+            "unclaim" : "Unclaim",
+            "approve" : "Approve",
+            "deny" : "Deny",
+            "requeue" : "Requeue",
+            "taskName" : "Task Name",
+            "processName" : "Process Name",
+            "startProcess" : "Start Process",
+            "assignee" : "Assignee",
+            "taskDetails" : "Task Details",
+            "myTasks" : "My tasks",
+            "tasksList" : "Tasks list",
+            "processes" : "Processes"
+         },
+         "application" : {
+            "applicationName" : "Application Name",
+            "requestedBy" : "Requested by",
+            "yourFrequentlyUsedApplications" : "Your frequently used apps",
+            "applicationsYouHaveAdded" : "Apps you've added",
+            "defaultApplications" : "Default apps",
+            "addMoreApplications" : "Add more apps",
+            "allAvailableApps" : "All available apps",
+            "dropApplicationsHere" : "drop apps here"
+         },
+         "notification" : {
+            "notifications" : "Notifications",
+            "deleteThisMessage" : "Delete this message",
+            "type" : "Notification type",
+            "message" : "Message",
+            "types" : {
+                "info" : "Info",
+                "warning" : "Warning",
+                "error" : "Error"
+            }
+         }
+    },
+    "openam" : {
+        "apps" : {
+            "header" : "My Applications",
+            "noneFound": "You have no applications assigned to you"
+        },
+        "trusted" : {
+            "devices" : {
+                "header" : "Trusted Devices",
+                "deviceName" : "Name",
+                "lastUsed" : "Last Used",
+                "deleteDevice" : "Delete Device"
+            }
+        },
+        "oAuth2" : {
+            "tokens" : {
+                "appName" : "Application",
+                "scope" : "Scope",
+                "expiryDate" : "Expiry Date",
+                "deleteToken" : "Revoke Access"
+            }
+        },
+        "authentication": {
+            "input": {
+                "name": "Username",
+                "password": "Password"
+            },
+            "unavailable": "Unable to login to OpenAM"
+            
+        }
+    },    
+    "openidm" : {
+        "ui" : {
+            "common" : {
+                "components" : {
+                    "LineTableView" : {
+                        "seeMoreItems" : "see more",
+                        "noItems" : "No items"
+                    }
+                }
+            },
+            "admin" : {
+                "tasks" : {
+                    "TasksMenuView" : {
+                        "noTasksAssigned" : "You do not have any tasks assigned to you right now.",
+                        "noTasksInGroupQueue" : "You do not have any tasks in your's group's queue now.",
+                        "denyDefaultReason" : "Enter a reason for denying this request",
+                        "acceptanceForm" : {
+                            "for" : "For",
+                            "application" : "Application",
+                            "requested" : "Requested",
+                            "actions" : "Actions"                            
+                        },
+                        "headers" : {
+                            "initiator" : "Initiator",
+                            "key" : "Key",
+                            "requested" : "Requested",
+                            "inQueue" : "In queue",
+                            "actions" : "Actions"    
+                        }   
+                    },
+                    "TasksWithMenuView" : {
+                        "chooseTask" : "Choose a task"
+                    },
+                    "StartProcessDashboardView" : {
+                        "chooseProcess" : "Please choose a process to start",
+                        "noProcesses": "No processes",
+                        "noDataRequired": "No data required"
+                    }
+                },
+                "users" : {
+                    "UsersView" : {
+                        "display" : "Display",
+                        "perPage" : "per page"
+                    },
+                    "AdminUserProfileView" : {
+                        "profileOwnership" : "%s' profile",
+                        "profileWillBeDeleted" : "%s account will be deleted."
+                    },
+                    "ChangeUserPasswordDialog" : {
+                        "securityDataChangeForWhom" : "Security data change for %s" 
+                    }
+                }
+            },
+            "apps" : {
+                "dashboard" : {
+                    "NotificationsView" : {
+                        "noNotifications" : "You have no notifications right now.",
+                        "seeMoreNotifications" : "see more notifications"
+                    }
+                }, 
+                "BaseApplicationsView" : {
+                    "noApplicationsHere" : "Your have no apps here",
+                    "noDefaultApplications" : "Your have no default apps",
+                    "noFrequentlyUsedApplications" : "Your have no frequently used apps"
+                },
+                "UsersApplicationsView" : {
+                    "noApplications" : "You have no applications"
+                },
+                "FrequentlyUsedApplicationsView" : {
+                    "clickHereToAdd" : "Click %shere%s to add."
+                }
+            }
+        }
+    }
+}

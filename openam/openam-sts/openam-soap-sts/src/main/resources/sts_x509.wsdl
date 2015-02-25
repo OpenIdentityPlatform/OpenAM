@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+-->
+<wsdl:definitions
+        targetNamespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        xmlns:tns="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        xmlns:wstrust="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy"
+        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+
+    <wsdl:import location="ws-trust-1.4-service.wsdl"	namespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"/>
+
+    <wsdl:binding name="certificate_token_symmetric_endorsing_policy" type="wstrust:STS">
+        <wsp:PolicyReference URI="#certificate_token_symmetric_endorsing_policy" />
+        <soap:binding style="document"
+                      transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="Issue">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue" />
+            <wsdl:input>
+                <wsp:PolicyReference
+                        URI="#signed_body_input_policy" />
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <wsp:PolicyReference
+                        URI="#signed_body_output_policy" />
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Validate">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Validate" />
+            <wsdl:input>
+                <wsp:PolicyReference
+                        URI="#signed_body_input_policy" />
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <wsp:PolicyReference
+                        URI="#signed_body_output_policy" />
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Cancel">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Cancel" />
+            <wsdl:input>
+                <wsp:PolicyReference
+                        URI="#signed_body_input_policy" />
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <wsp:PolicyReference
+                        URI="#signed_body_output_policy" />
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Renew">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Renew" />
+            <wsdl:input>
+                <wsp:PolicyReference
+                        URI="#signed_body_input_policy" />
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <wsp:PolicyReference
+                        URI="#signed_body_output_policy" />
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="KeyExchangeToken">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/KeyExchangeToken" />
+            <wsdl:input>
+                <wsp:PolicyReference
+                        URI="#signed_body_input_policy" />
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <wsp:PolicyReference
+                        URI="#signed_body_output_policy" />
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="RequestCollection">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/RequestCollection" />
+            <wsdl:input>
+                <wsp:PolicyReference
+                        URI="#signed_body_input_policy" />
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <wsp:PolicyReference
+                        URI="#signed_body_output_policy" />
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <!-- 2.2.4 (WSS1.1) Mutual Authentication with X.509 Certificates, Sign, Encrypt -->
+    <wsp:Policy wsu:Id="certificate_token_symmetric_endorsing_policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding>
+                    <wsp:Policy>
+                        <sp:ProtectionToken>
+                            <wsp:Policy>
+                                <sp:X509Token
+                                        sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                                    <wsp:Policy>
+                                        <sp:RequireDerivedKeys/>
+                                        <sp:RequireThumbprintReference />
+                                        <sp:WssX509V3Token11/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:ProtectionToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Strict/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                    </wsp:Policy>
+                </sp:SymmetricBinding>
+                <sp:EndorsingSupportingTokens>
+                    <wsp:Policy>
+                        <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                                <sp:RequireThumbprintReference/>
+                                <sp:WssX509V3Token11/>
+                            </wsp:Policy>
+                        </sp:X509Token>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
+                <sp:Wss11>
+                    <wsp:Policy>
+                        <sp:MustSupportRefKeyIdentifier/>
+                        <sp:MustSupportRefIssuerSerial/>
+                        <sp:MustSupportRefThumbprint/>
+                        <sp:MustSupportRefEncryptedKey/>
+                        <sp:RequireSignatureConfirmation/>
+                    </wsp:Policy>
+                </sp:Wss11>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+
+    <wsp:Policy wsu:Id="signed_body_input_policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SignedParts>
+                    <sp:Body/>
+                </sp:SignedParts>
+                <!--    <sp:EncryptedParts>
+                        <sp:Body/>
+                    </sp:EncryptedParts> -->
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+
+    <wsp:Policy wsu:Id="signed_body_output_policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SignedParts>
+                    <sp:Body/>
+                </sp:SignedParts>
+                <!--    <sp:EncryptedParts>
+                        <sp:Body/>
+                    </sp:EncryptedParts> -->
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+
+    <wsdl:service name="symmetric_endorsing_cert_sts_service">
+        <wsdl:port name="symmetric_endorsing_cert_sts_service_port" binding="tns:certificate_token_symmetric_endorsing_policy">
+            <soap:address location=""/>
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>
+

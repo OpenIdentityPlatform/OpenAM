@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-post-auth'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Creating a Post Authentication Plugin</title>
+ <indexterm>
+  <primary>Authentication</primary>
+  <secondary>Post authentication plugins</secondary>
+ </indexterm>
+
+ <para>Post authentication plugins (PAP) let you include custom processing at
+ the end of the authentication process, immediately before the subject is
+ authenticated. Common uses of post authentication plugins include setting
+ cookies and session variables. Post authentication plugins are often used in
+ conjunction with policy agents. The post authentication plugin sets custom
+ session properties, and then the policy agent injects the custom properties
+ into the request header to the protected application.</para>
+ 
+ <para>This chapter explains how to create a post authentication plugin.</para>
+ 
+ <!-- Taken from Steve's wiki article,
+ https://wikis.forgerock.org/confluence/display/openam/Write+a+Post+Authentication+Plug-in -->
+
+ <section xml:id="design-post-authentication-plugin">
+  <title>Designing Your Post Authentication Plugin</title>
+  
+  <para>Your post authentication plugin class implements the
+  <literal>AMPostAuthProcessInterface</literal> interface, and in particular
+  the following three methods.</para>
+  
+  <programlisting language="java">public void onLoginSuccess(
+  Map requestParamsMap, 
+  HttpServletRequest request,
+  HttpServletResponse response,
+  SSOToken token
+) throws AuthenticationException
+
+public void onLoginFailure(
+  Map requestParamsMap, 
+  HttpServletRequest request,
+  HttpServletResponse response
+) throws AuthenticationException
+
+public void onLogout(
+  HttpServletRequest request, 
+  HttpServletResponse response,
+  SSOToken token
+) throws AuthenticationException</programlisting>
+  
+  <para>OpenAM calls the <literal>onLoginSuccess()</literal> and
+  <literal>onLoginFailure()</literal> methods immediately before informing the
+  user of login success or failure, respectively. OpenAM calls the
+  <literal>onLogout()</literal> method only when the user actively logs out,
+  not when a user's session times out.</para>
+  
+  <para>See the <link xlink:href="${javadocBase}" xlink:show="new"
+  ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for
+  reference.</para>
+
+  <para>These methods can perform whatever processing you require. Yet, know
+  that OpenAM calls your methods synchronously as part of the authentication
+  process. Therefore, if your methods take a long time to complete, you will
+  keep users waiting. Minimize the processing done in your post authentication
+  methods.</para>
+ </section>
+
+ <section xml:id="build-post-authentication-plugin">
+  <title>Building Your Sample Post Authentication Plugin</title>
+  
+  <para>The following example post authentication plugin sets a session
+  property during successful login, writing to its debug log if the operation
+  fails.</para>
+  
+  <programlisting language="java">package com.forgerock.openam.examples;
+
+import java.util.Map;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+
+import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
+import com.sun.identity.authentication.spi.AuthenticationException;
+import com.sun.identity.shared.debug.Debug;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class SamplePAP implements AMPostAuthProcessInterface {
+    private final static String PROP_NAME = "MyProperty";
+    private final static String PROP_VALUE = "MyValue";
+    private final static String DEBUG_FILE = "SamplePAP";
+
+    protected Debug debug = Debug.getInstance(DEBUG_FILE);
+
+    public void onLoginSuccess(
+            Map requestParamsMap,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            SSOToken token
+    ) throws AuthenticationException {
+        try {
+            token.setProperty(PROP_NAME, PROP_VALUE);
+        } catch (SSOException e) {
+            debug.error("Unable to set property");
+        }
+    }
+
+    public void onLoginFailure(
+            Map requestParamsMap,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws AuthenticationException {
+        // Not used
+    }
+
+    public void onLogout(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            SSOToken token
+    ) throws AuthenticationException {
+        // Not used
+    }
+}
+</programlisting>
+  
+  <para>
+   The <link xlink:href="https://github.com/markcraig/openam-post-auth-sample"
+   xlink:show="new">sample post authentication plugin source</link>
+   is available online.
+   Get a local clone so that you can try the sample on your system.
+   In the sources you find the following files.
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term><filename>pom.xml</filename></term>
+    <listitem>
+     <para>
+      Apache Maven project file for the module
+     </para>
+
+     <para>
+      This file specifies how to build the sample post authentication plugin,
+      and also specifies its dependencies on OpenAM components
+      and on the Servlet API.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>src/main/java/com/forgerock/openam/examples/SamplePAP.java</filename></term>
+    <listitem>
+     <para>
+      Core class for the sample post authentication plugin
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>
+   Build the module using Apache Maven.
+  </para>
+
+  <screen>
+$ <userinput>cd /path/to/openam-post-auth-sample</userinput>
+$ <userinput>mvn install</userinput>
+<computeroutput>[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building openam-post-auth-sample 1.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+
+...
+
+[INFO]
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ openam-post-auth-sample --
+[INFO] Building jar: .../target/openam-post-auth-sample-1.0.0-SNAPSHOT.jar
+
+...
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 6.727s
+[INFO] Finished at: Mon Nov 25 17:07:23 CET 2013
+[INFO] Final Memory: 20M/227M
+[INFO] ------------------------------------------------------------------------</computeroutput>
+  </screen>
+  
+  <para>
+   Copy the .jar to the <filename>WEB-INF/lib</filename> directory
+   where you deployed OpenAM.
+  </para>
+  
+  <screen>
+$ <userinput>cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</userinput>
+  </screen>
+  
+  <para>
+   Restart OpenAM or the container in which it runs.
+  </para>
+ </section>
+
+ <section xml:id="configure-post-authentication-plugin">
+  <title>Configuring Your Post Authentication Plugin</title>
+  
+  <para>
+   You can configure the post authentication plugin for a realm,
+   for a service (authentication chain), or for a role.
+   Where you configure the plugin depends on the scope
+   to which the plugin should apply.
+   Configuring the plugin at the realm level as shown here, for example,
+   ensures that OpenAM calls your plugin for all authentications to the realm.
+  </para>
+  
+  <para>
+   In OpenAM Console, browse to Access Control &gt; <replaceable>Realm
+   Name</replaceable> &gt; Authentication &gt; All Core Settings.
+   In the Authentication Post Processing Classes list,
+   add the sample plugin class,
+   <literal>com.forgerock.openam.examples.SamplePAP</literal>,
+   and then click Save.
+  </para>
+  
+  <para>
+   Alternatively, you can configure sample plugin for the realm
+   by using the <command>ssoadm</command> command.
+  </para>
+  
+  <screen>
+$ <userinput>ssoadm
+ set-svc-attrs
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --servicename iPlanetAMAuthService
+ --realm /myRealm
+ --attributevalues iplanet-am-auth-post-login-process-class=
+ com.forgerock.openam.examples.SamplePAP</userinput>
+
+<computeroutput>iPlanetAMAuthService under /myRealm was
+ modified.</computeroutput>
+  </screen>
+ </section>
+
+ <section xml:id="test-post-authentication-plugin">
+  <title>Testing Your Post Authentication Plugin</title>
+  
+  <para>
+   To test the sample post authentication plugin,
+   login successfully to OpenAM in the scope where the plugin is configured.
+   For example, if you configured your plugin for the realm,
+   <literal>/myRealm</literal>, specify the realm in the login URL.
+  </para>
+  
+  <literallayout class="monospaced">http://openam.example.com:8080/openam/UI/Login?realm=myRealm</literallayout>
+  
+  <para>
+   Although as a user you do not notice anywhere in the user interface
+   that OpenAM calls your plugin,
+   a policy agent or custom client code could retrieve the session property
+   that your plugin added to the user session.
+  </para>
+ </section>
+</chapter>

@@ -1,0 +1,903 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in 
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: entitlement.xml,v 1.9 2010/01/07 00:19:12 veiming Exp $
+
+   Portions copyright 2011-2014 ForgeRock AS.
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="sunEntitlementService" version="1.0">
+        <Schema i18nFileName="" revisionNumber="20">
+            <Global>
+                <AttributeSchema name="usenewconsole"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="migratedtoentitlementservice"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="xacml-privilege-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="evalThreadSize"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="200"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="searchThreadSize"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="200"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="policyCacheSize"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>100000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="indexCacheSize"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>100000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- entitlement notification, Connection timeout in millisec,
+                     max 5 mins -->
+                <AttributeSchema name="entitlement-notifier-conn-timeout"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="300000"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>1000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="entitlement-notifier-retries"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="50"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>3</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <!-- duration between retries in millisec, max 5 mins -->
+                <AttributeSchema name="entitlement-notifier-duration-between-retries"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="300000"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>1000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <!-- Privilege change notification
+                     Connection timeout in millisec, max 5 mins -->
+                <AttributeSchema name="privilege-notifier-conn-timeout"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="300000"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>1000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="privilege-notifier-retries"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="50"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>3</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <!-- duration between retries in millisec, max 5 mins -->
+                <AttributeSchema name="privilege-notifier-duration-between-retries"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="300000"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>3000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="privilege-notifier-threadpool-size"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="20"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="network-monitor-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+
+                <AttributeSchema name="listeners"
+                    type="list"
+                    syntax="string"
+                    i18nKey="" />
+                <SubSchema name="applicationTypes" inheritance="multiple">
+                    <SubSchema name="applicationType" inheritance="multiple">
+                        <AttributeSchema name="applicationClassName"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="actions"
+                            type="list"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="searchIndexImpl"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="saveIndexImpl"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="resourceComparator"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="nonBooleanActionValues"
+                            type="list"
+                            syntax="string"
+                            i18nKey="" />
+                    </SubSchema>
+                </SubSchema>
+            </Global>
+            <Organization>
+                <SubSchema name="applications" inheritance="multiple">
+                    <SubSchema name="application" inheritance="multiple">
+                        <AttributeSchema name="applicationType"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="description"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="actions"
+                            type="list"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="resources"
+                            type="list"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="subjects"
+                            type="list"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="conditions"
+                            type="list"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="entitlementCombiner"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="searchIndexImpl"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="saveIndexImpl"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="resourceComparator"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="subjectAttributeNames"
+                            type="list"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="meta"
+                            type="list"
+                            syntax="string"
+                            i18nKey="" />
+                    </SubSchema>
+                </SubSchema>
+                <SubSchema name="subjectAttributesCollectors" inheritance="multiple">
+                    <SubSchema name="OpenSSOSubjectAttributesCollector" inheritance="multiple">
+                        <AttributeSchema name="class"
+                            type="single"
+                            syntax="string"
+                            i18nKey="" />
+                        <AttributeSchema name="groupMembershipSearchIndexEnabled"
+                            type="single"
+                            syntax="boolean"
+                            i18nKey="" />
+                    </SubSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+        <Configuration>
+            <GlobalConfiguration>
+                <SubConfiguration name="applicationTypes" id="applicationTypes">
+                    <SubConfiguration name="iPlanetAMWebAgentService"
+                        id="applicationType">
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>GET=true</Value>
+                            <Value>POST=true</Value>
+                            <Value>PUT=true</Value>
+                            <Value>DELETE=true</Value>
+                            <Value>HEAD=true</Value>
+                            <Value>OPTIONS=true</Value>
+                            <Value>PATCH=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="searchIndexImpl" />
+                            <Value>org.forgerock.openam.entitlement.indextree.TreeSearchIndex</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="saveIndexImpl" />
+                            <Value>org.forgerock.openam.entitlement.indextree.TreeSaveIndex</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resourceComparator" />
+                            <Value>com.sun.identity.entitlement.URLResourceName</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="crestPolicyService" id="applicationType">
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>CREATE=true</Value>
+                            <Value>READ=true</Value>
+                            <Value>UPDATE=true</Value>
+                            <Value>DELETE=true</Value>
+                            <Value>PATCH=true</Value>
+                            <Value>ACTION=true</Value>
+                            <Value>QUERY=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="searchIndexImpl" />
+                            <Value>org.forgerock.openam.entitlement.indextree.TreeSearchIndex</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="saveIndexImpl" />
+                            <Value>org.forgerock.openam.entitlement.indextree.TreeSaveIndex</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resourceComparator" />
+                            <Value>com.sun.identity.entitlement.URLResourceName</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="sunIdentityServerDiscoveryService"
+                        id="applicationType">
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>LOOKUP=true</Value>
+                            <Value>UPDATE=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="searchIndexImpl" />
+                            <Value>com.sun.identity.entitlement.util.ResourceNameSplitter</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="saveIndexImpl" />
+                            <Value>com.sun.identity.entitlement.util.ResourceNameIndexGenerator</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resourceComparator" />
+                            <Value>com.sun.identity.entitlement.PrefixResourceName</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="sunIdentityServerLibertyPPService"
+                        id="applicationType">
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>QUERY_allow=true</Value>
+                            <Value>QUERY_deny=false</Value>
+                            <Value>QUERY_interactForValue=false</Value>
+                            <Value>QUERY_interactForConsent=false</Value>
+                            <Value>MODIFY_allow=true</Value>
+                            <Value>MODIFY_deny=false</Value>
+                            <Value>MODIFY_interactForValue=false</Value>
+                            <Value>MODIFY_interactForConsent=false</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="nonBooleanActionValues" />
+                            <Value>QUERY=deny,allow,interactForValue,interactForConsent</Value>
+                            <Value>MODIFY=deny,allow,interactForValue,interactForConsent</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="searchIndexImpl" />
+                            <Value>com.sun.identity.entitlement.util.ResourceNameSplitter</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="saveIndexImpl" />
+                            <Value>com.sun.identity.entitlement.util.ResourceNameIndexGenerator</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resourceComparator" />
+                            <Value>com.sun.identity.entitlement.PrefixResourceName</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="sunAMDelegationService"
+                        id="applicationType">
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ=true</Value>
+                            <Value>MODIFY=true</Value>
+                            <Value>DELEGATE=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="searchIndexImpl" />
+                            <Value>com.sun.identity.entitlement.opensso.DelegationResourceNameSplitter</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="saveIndexImpl" />
+                            <Value>com.sun.identity.entitlement.opensso.DelegationResourceNameIndexGenerator</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resourceComparator" />
+                            <Value>com.sun.identity.entitlement.RegExResourceName</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="openProvisioning"
+                        id="applicationType">
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>CREATE=true</Value>
+                            <Value>READ=true</Value>
+                            <Value>UPDATE=true</Value>
+                            <Value>DELETE=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="searchIndexImpl" />
+                            <Value>com.sun.identity.entitlement.util.ResourceNameSplitter</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="saveIndexImpl" />
+                            <Value>com.sun.identity.entitlement.util.ResourceNameIndexGenerator</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resourceComparator" />
+                            <Value>com.sun.identity.entitlement.PrefixResourceName</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="banking"
+                        id="applicationType">
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>TRANSFER=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="searchIndexImpl" />
+                            <Value>com.sun.identity.entitlement.util.ResourceNameSplitter</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="saveIndexImpl" />
+                            <Value>com.sun.identity.entitlement.util.ResourceNameIndexGenerator</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resourceComparator" />
+                            <Value>com.sun.identity.entitlement.ExactMatchResourceName</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="webservices"
+                        id="applicationType">
+                        <AttributeValuePair>
+                            <Attribute name="applicationClassName" />
+                            <Value>com.sun.identity.entitlement.WebServiceApplication</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="searchIndexImpl" />
+                            <Value>com.sun.identity.entitlement.util.ResourceNameSplitter</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="saveIndexImpl" />
+                            <Value>com.sun.identity.entitlement.util.ResourceNameIndexGenerator</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resourceComparator" />
+                            <Value>com.sun.identity.entitlement.URLResourceName</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
+            </GlobalConfiguration>
+            <OrganizationConfiguration name="/">
+                <SubConfiguration name="registeredApplications"
+                    id="applications">
+                    <SubConfiguration name="iPlanetAMWebAgentService"
+                        id="application">
+                        <AttributeValuePair>
+                            <Attribute name="description" />
+                            <Value>The built-in Application used by OpenAM Policy Agents.</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="applicationType" />
+                            <Value>iPlanetAMWebAgentService</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources" />
+                            <Value>*://*:*/*</Value>
+                            <Value>*://*:*/*?*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="subjects" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
+                            <Value>NONE</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="conditions" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner" />
+                           <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="crestPolicyService" id="application">
+                        <AttributeValuePair>
+                            <Attribute name="applicationType" />
+                            <Value>crestPolicyService</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources" />
+                            <Value>http://*</Value>
+                            <Value>https://*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="subjects" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="conditions" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner" />
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="sunIdentityServerDiscoveryService"
+                        id="application">
+                        <AttributeValuePair>
+                            <Attribute name="applicationType" />
+                            <Value>sunIdentityServerDiscoveryService</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources" />
+                            <Value>http://*</Value>
+                            <Value>https://*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="subjects" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="conditions" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner" />
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="sunIdentityServerLibertyPPService"
+                        id="application">
+                        <AttributeValuePair>
+                            <Attribute name="applicationType" />
+                            <Value>sunIdentityServerLibertyPPService</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources" />
+                            <Value>*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="subjects" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="conditions" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner" />
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="sunAMDelegationService"
+                        id="application">
+                        <AttributeValuePair>
+                            <Attribute name="applicationType" />
+                            <Value>sunAMDelegationService</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources" />
+                            <Value>sms://*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="subjects" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner" />
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="openProvisioning"
+                        id="application">
+                        <AttributeValuePair>
+                            <Attribute name="applicationType" />
+                            <Value>openProvisioning</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources" />
+                            <Value>/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner" />
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="paycheck"
+                        id="application">
+                        <AttributeValuePair>
+                            <Attribute name="applicationType" />
+                            <Value>iPlanetAMWebAgentService</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources" />
+                            <Value>http://paycheck.sun.com:8081/*</Value>
+                            <Value>http://paycheck.sun.com:8081/*/private</Value>
+                            <Value>http://paycheck.sun.com:8081/*/users/*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="subjects" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="conditions" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner" />
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="calendar"
+                        id="application">
+                        <AttributeValuePair>
+                            <Attribute name="applicationType" />
+                            <Value>iPlanetAMWebAgentService</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources" />
+                            <Value>http://calendar.sun.com/*</Value>
+                            <Value>http://calendar.sun.com/my/*</Value>
+                            <Value>http://calendar.sun.com/admin</Value>
+                            <Value>http://calendar.sun.com/*/calendars?calId=*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="subjects" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="conditions" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner" />
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="im"
+                        id="application">
+                        <AttributeValuePair>
+                            <Attribute name="applicationType" />
+                            <Value>iPlanetAMWebAgentService</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources" />
+                            <Value>http://im.sun.com/register</Value>
+                            <Value>http://im.sun.com/im.jnlp</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="subjects" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="conditions" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner" />
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="sunBank"
+                        id="application">
+                        <AttributeValuePair>
+                            <Attribute name="applicationType" />
+                            <Value>banking</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources" />
+                            <Value>*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="subjects" />
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AuthenticatedUsers</Value>
+                            <Value>Identity</Value>
+                            <Value>JwtClaim</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="conditions" />
+                            <Value>NumericAttribute</Value>
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <Value>AMIdentityMembership</Value>
+                            <Value>AuthLevel</Value>
+                            <Value>AuthLevelLE</Value>
+                            <Value>AuthScheme</Value>
+                            <Value>AuthenticateToRealm</Value>
+                            <Value>AuthenticateToService</Value>
+                            <Value>IPv4</Value>
+                            <Value>IPv6</Value>
+                            <Value>LDAPFilter</Value>
+                            <Value>OAuth2Scope</Value>
+                            <Value>ResourceEnvIP</Value>
+                            <Value>Session</Value>
+                            <Value>SessionProperty</Value>
+                            <Value>SimpleTime</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner" />
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
+                <SubConfiguration name="subjectAttributesCollectors"
+                    id="subjectAttributesCollectors">
+                    <SubConfiguration name="OpenSSO"
+                        id="OpenSSOSubjectAttributesCollector">
+                        <AttributeValuePair>
+                            <Attribute name="class" />
+                            <Value>com.sun.identity.entitlement.opensso.OpenSSOSubjectAttributesCollector</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="groupMembershipSearchIndexEnabled" />
+                            <Value>false</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
+            </OrganizationConfiguration>
+        </Configuration>
+    </Service>
+</ServicesConfiguration>
+

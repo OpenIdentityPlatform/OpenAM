@@ -1,0 +1,464 @@
+/**
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: README,v 1.14 2009/12/03 18:57:52 mrudul_uchil Exp $
+ *
+ * Portions Copyright 2013 ForgeRock AS
+ *
+ */
+
+ %% Contents:
+    %% 1. General Description and Assumption
+    %% 2. Environment requirements
+    %% 3. Building and Deploying the un-secured samples
+    %% 4. Building and Deploying the secured samples
+    %% 5. OpenAM Server Configuration
+    %% 6. Testing the samples
+    %% 7. Explanation of changes for Tomcat and Sun Web Server
+    %% 8. Deployment changes for WebSphere Application Server (WAS)
+    
+
+%% 1. General Description and Assumption
+
+General Description :
+   The samples provided here are JAX-WS based Web Service and a Web Services
+   Client.
+
+   The sample demonstrates a simple stock quote service where given
+   a stock ticker symbol it obtains stock data. The secure communication
+   between stock quote web services client is achieved using
+   OpenAM web services security agents.
+
+   The following diagram depicts a simple deployment scenario where the
+   profiles of WSC and WSP are all hosted on a single OpenAM instance.
+
+     JAX-WS Compliant Container 1       JAX-WS Compliant Container 2
+           _______________                   ________________
+          |              |                  |               |
+          |              |                  |               |
+          |     WSC      |<---------------->|     WSP       |
+          |(Stock Client)|                  |(Stock Service)|
+          |              |<---------------->|               |
+          |______________|    |      |      |_______________|
+                              |      |
+               Machine 1      |      |           Machine 2
+                            __V______V_
+                            |          |
+                            |          | Machine 3
+                            | OpenAM  |
+                            |(WSC,WSP  |
+                            | Profiles)|
+                            |__________|
+
+Assumption :
+   1) You have installed and configured OpenAM server.
+   2) OpenAM server runs in the same domain (example, ".sun.com") as the domain
+      of the server in which WSC application is running. This is required for
+      SSO between OpenAM server and WSC application, when end user
+      authentication happens in showcasing Web Service Security between WSC and
+      WSP.
+
+%% 2. Environment requirements
+
+   2.1 Ant (version "1.7" or higher)
+       The OpenAM Web Services Security Agents workspace uses Apache Ant as the
+       build tool. The build scripts in this workspace use features not present
+       in releases of Ant prior to 1.7.  Thus, in order to build this workspace
+       you must have Ant version 1.7 or above installed and available in your
+       system path.
+       Set the ANT_HOME environment variable to the Ant root directory, and add
+       ${ANT_HOME}/bin to your PATH environment variable.
+
+   2.2 JDK 1.6 (version "1.6.0_12" or higher)
+       The sources in this workspace should be compiled using JDK "1.6.0_12" or 
+       higher with the source and target levels set to "1.6.0_12" or higher.
+       In order to allow this, you must ensure that JDK "1.6.0_12" or higher is
+       present in your system path and the JAVA_HOME environment variable is
+       setup correctly pointing to its location.
+       All the deployment containers should be also running with JDK "1.6.0_12" 
+       or higher so that the runtime JDK version would be same as the compile
+       time JDK version.
+
+   2.3 JAX-WS Library
+       Download the latest stable version of JAXWS Reference Implementation from
+       http://jax-ws.dev.java.net. 
+       Execute the downloaded jar with the command : java -jar <filename>.jar
+       After the files have been extracted, note the location of the lib folder
+       found within the extracted folder and use this value for the
+       "jaxws.lib" property within the
+       <wssagents_unzip_location>/wssagent/samples/jaxws.properties
+       file for the Web Service Client and Web Service Provider.
+
+       For example, the value of "jaxws.lib" property would be:
+       jaxws.lib=<jaxws_install_location>/lib
+
+   2.4 [Only for deployment on Tomcat container]
+
+       To make Tomcat 6.x JAX-WS aware, edit the <TOMCAT_HOME>/conf/
+       catalina.properties file and set the shared.loader property as shown:
+
+       shared.loader=<jaxws_install_location>/lib/*.jar
+
+       If you are running multiple instances of Tomcat, then edit
+       <CATALINA_BASE>/conf/catalina.properties for that particular instance.
+
+   2.5 [Only for deployment on Sun Web Server container]
+
+       To make Sun Web Server 7.x JAX-WS aware, edit
+       <webserver_install_dir>/admin-server/config/server.xml file and
+       <webserver_install_dir>/<https-servername>/config/server.xml file
+       to add JAX-WS lib to the existing JVM server class path as shown:
+
+       <jvm>
+       ....
+       <server-class-path><jaxws_install_location>/lib:....</server-class-path>
+       ....
+       </jvm>
+
+   2.6 [Only for deployment on JBoss container]
+
+       2.5.1 To make JBoss 5.x JAX-WS aware, download JBossWS, the JBoss Web
+             Services stack (Metro/Apache CXF version 3.1.1.GA).
+             The version of JBossWS needed depends on the version of JBoss
+             Application Server that you are running.
+             Note : Please do not download/use JBossWS native package as it runs
+             into some conflict issues with native Web Services stack when used
+             with these OpenAM WSS agents.
+       2.5.2 To install the stack downloaded in the previous step, unzip the
+             downloaded file and modify the file ant.properties.example by
+             providing the JBOSS_HOME value based on the version of JBoss you
+             are using. All the other values can be left to default. Save the
+             file as ant.properties in the same location.
+       2.5.3 Run the ant target deploy-jbossxxx where xxx is the version of
+             JBoss.
+             For example, if you are using JBoss 5.0.0.GA, the command would be:
+             ant deploy-jboss500
+             Refer to the JBoss website for detailed installation instructions.
+   
+%% 3. [Optional] If Building and Deploying the Un-Secured Samples,
+      then follow this section, else go to section 4.
+
+   3.1 cd <wssagents_unzip_location>/wssagent/samples/StockService
+       If you plan to deploy on Tomcat or Sun Web Server, then run
+       "ant tomcat-war" Else run "ant war".
+       This will generate StockService.war under "dist" directory, deploy this
+       war on any JAX-WS compliant container running with JDK "1.6.0_12" or
+       higher.
+
+   3.2 cd <wssagents_unzip_location>/wssagent/samples
+       The protocol, host and port number of the container where the
+       StockService is deployed, will need to be changed for "wsdlLocation" in,
+       etc/Tomcat/StockClient/unsecure/GetQuote.java for Tomcat or
+       Sun Web Server deployment
+       OR
+       etc/config/StockClient/GetQuote.java for rest of the containers.
+
+   3.3 cd <wssagents_unzip_location>/wssagent/samples/StockClient
+       If your deployment container is Tomcat or Sun Web Server, then run
+       "ant tomcat-war" Else run "ant war".
+       This will generate StockClient.war under "dist" directory, deploy this
+       war on any JAX-WS compliant container running with JDK "1.6.0_12" or
+       higher.
+
+   The WARs generated above can be deployed on GlassFish v2.x, WebLogic 10.x,
+   JBoss 5.x, Tomcat 6.x, Sun Web Server 7.x & WebSphere 7.x, all running with
+   JDK "1.6.0_12" or higher.
+   For deployment changes required on WebSphere 7.x, go to section 8.
+
+%% 4. Building and Deploying the Secured Samples
+
+   You can use ONE of the following options (A or B) for deployment on any
+   JAX-WS compliant container running with JDK "1.6.0_12" or higher.
+
+   A) Using configurator script / utility
+
+     4.1 To generate secured StockService.war
+
+       4.1.1 cd <wssagents_unzip_location>/wssagent/samples/StockService
+           If you plan to deploy on Tomcat or Sun Web Server, then run
+           "ant tomcat-build" Else run "ant build".
+
+       4.1.2 Run "<wssagents_unzip_location>/wssagent/ant config" to generate
+           secured StockService.war by entering appropriate input as follows :
+           
+        [input] Enter OpenAM Server URL :
+        <server_protocol>://<server_host.server_domain>:<server_port>/<server_deploy_uri>
+
+        [input] Enter type of application (WSC/ WSP) : (WSC, WSP)
+        WSP
+
+        [input] Enter location of un-secured WAR file OR
+                location of un-secured application's staging area :
+        <wssagents_unzip_location>/wssagent/samples/StockService/web
+
+        [input] Enter the name of secured war file to be generated (e.g. mySecuredApp.war) :
+        StockService.war
+
+        [input] Enter the package structure of application class file (e.g. com/sun/stockquote) :
+        com/sun/stockquote
+
+           This will generate secured StockService.war under
+           <wssagents_unzip_location>/wssagent/secured_war directory, deploy this
+           war on any JAX-WS compliant container running with JDK "1.6.0_12" or
+           higher.
+
+     4.2 To generate secured StockClient.war
+
+       4.2.1 cd <wssagents_unzip_location>/wssagent/samples
+           The protocol, host and port number of the container where the
+           StockService is deployed, will need to be changed for "wsdlLocation" in,
+           etc/Tomcat/StockClient/secure/GetQuote.java for Tomcat or Sun Web Server
+           deployment
+           OR
+           etc/config/StockClient/GetQuote.java for rest of the containers.
+
+       4.2.2 cd <wssagents_unzip_location>/wssagent/samples/StockClient
+           If your deployment container is Tomcat or Sun Web Server, then run
+           "ant tomcat-secure-build" Else run "ant build".
+
+       4.2.3 Run "<wssagents_unzip_location>/wssagent/ant config" to generate
+           secured StockClient.war by entering appropriate input as follows :
+
+        [input] Enter OpenAM Server URL :
+        <server_protocol>://<server_host.server_domain>:<server_port>/<server_deploy_uri>
+
+        [input] Enter type of application (WSC/ WSP) : (WSC, WSP)
+        WSC
+
+        [input] Enter location of un-secured WAR file OR
+                location of un-secured application's staging area :
+        <wssagents_unzip_location>/wssagent/samples/StockClient/web
+
+        [input] Enter the name of secured war file to be generated (e.g. mySecuredApp.war) :
+        StockClient.war
+
+        [input] Enter the package structure of application class file (e.g. com/sun/stockquote) :
+        com/sun/stockquote
+
+           This will generate secured StockClient.war under
+           <wssagents_unzip_location>/wssagent/secured_war directory, deploy this
+           war on any JAX-WS compliant container running with JDK "1.6.0_12" or
+           higher.
+
+   B) Using manual configuration steps
+
+       4.1 Follow <wssagents_unzip_location>/wssagent/README file
+           (if you have not done already)
+           a) To add the keystore related files to the local file system,
+           by copying <wssagents_unzip_location>/wssagent/resources/keystore.jks,
+           <wssagents_unzip_location>/wssagent/resources/.keypass and
+           <wssagents_unzip_location>/wssagent/resources/.storepass files to some
+           directory that can be later referred in
+           <wssagents_unzip_location>/wssagent/config/AMConfig.properties file and
+           b) To modify the <wssagents_unzip_location>/wssagent/config/AMConfig.properties
+           file, in order to update properties that are at the top of the file, under
+           heading "Following properties need to be updated for OpenAM WSS Agents".
+
+       4.2 cd <wssagents_unzip_location>/wssagent/samples/StockService
+           If you plan to deploy on Tomcat or Sun Web Server, then run
+           "ant tomcat-secure-war" Else run "ant secure-war".
+           This will generate StockService.war under "dist" directory, deploy this
+           war on any JAX-WS compliant container running with JDK "1.6.0_12" or
+           higher.
+
+       4.3 cd <wssagents_unzip_location>/wssagent/samples
+           The protocol, host and port number of the container where the
+           StockService is deployed, will need to be changed for "wsdlLocation" in,
+           etc/Tomcat/StockClient/secure/GetQuote.java for Tomcat or Sun Web Server
+           deployment
+           OR
+           etc/config/StockClient/GetQuote.java for rest of the containers.
+
+       4.4 cd <wssagents_unzip_location>/wssagent/samples/StockClient
+           If your deployment container is Tomcat or Sun Web Server, then run
+           "ant tomcat-secure-war" Else run "ant secure-war".
+           This will generate StockClient.war under "dist" directory, deploy this
+           war on any JAX-WS compliant container running with JDK "1.6.0_12" or
+           higher.
+
+   The WARs generated above can be deployed on GlassFish v2.x, WebLogic 10.x,
+   JBoss 5.x, Tomcat 6.x, Sun Web Server 7.x & WebSphere 7.x, all running with
+   JDK "1.6.0_12" or higher.
+   For deployment changes required on WebSphere 7.x, go to section 8.
+   
+%% 5. OpenAM Server Configuration
+
+   Login into the OpenAM Console with user amadmin and <amadmin password>,
+   invoking following URL
+
+   openamserver_protocol://openamserver_host:openamserver_port/
+                                                        openamserver_deploy_uri
+
+   Note: If you have logged in as any other user, click Logout on the console
+         page and Login again and make sure that you access the OpenAM Console.
+
+   5.1 Configuring cookie encode property (If you have not done already)
+
+       5.1.1 Go to Configuration -> Servers and Sites -> Default Server Settings ->
+       5.1.2 Click on "Advanced" tab and set property value for
+             "com.iplanet.am.cookie.c66Encode" property to be "true".
+       5.1.3 Save changes.
+
+   5.2 Enabling STS Security for WSC profile in OpenAM
+
+       By default, this sample will use the default WSC and WSP profiles that
+       OpenAM ships with (named as "wsc" and "wsp" respectively).
+
+       5.2.1 Go to Access Control -> Default realm -> Agents ->
+       5.2.2 Select Web Service Client -> click on "wsc" profile to edit ->
+       5.2.3 Select required Security Mechanism as "STSSecurity"
+       5.2.4 Select STS Configuration as "SecurityTokenService"
+       5.2.5 Save changes.
+    
+   Logout of OpenAM and Restart the container.
+
+%% 6. Testing the Samples
+
+   6.1 From your web browser, access <protocol>://<host>:<port>/StockClient
+
+   6.2 With unsecure Samples, you should be directed to the page with a simple
+       form to enter the Stock Symbol of your choice. Click Get Quote button.
+       The StockService should return the stock results. On this page,
+       click on the links named Request and Response in the image illustrating
+       the communication. You should see the SOAP request and response without
+       any security token in the SOAP request/response headers.
+
+   6.3 With the secure Samples, you will be redirected to OpenAM's Authentication
+       service for end user login. Enter any existing OpenAM user with the
+       password. Upon successful end user authentication, you will be redirected 
+       back to <protocol>://<host>:<port>/StockClient/ page. Click Get Quote for
+       a symbol of your choice and by clicking on the Request/Response links on
+       the stock quote results page, you can see the Web Service communication
+       is secured with WS-Security token in the SOAP request/response headers.
+
+   Notes :
+       1) With the secure Samples, you will be always redirected to OpenAM's
+          Authentication service for end user login first. If you want this end
+          user authentication redirection to be done based on WSC's profile /
+          configuration by reading "User Authentication Required" flag setting, 
+          then the property "com.sun.identity.wss.wsc.providername" needs to be
+          set in the StockClient side AMConfig.properties file and its value
+          should be the WSC provider name. Also If you have multiple WSC talking
+          to same service (WSP), then you can identify each WSC's profile
+          uniquely by specifying this com.sun.identity.wss.wsc.providername
+          property value in the WSC side AMConfig.properties file.
+          For WSC profile name, com.sun.identity.wss.wsc.providername property
+          takes precedence over the WSDL service name. If both are absent, then
+          default name as "wsc" (this is created out of box) is used.
+
+          For this sample, you can use and set this property as shown below :
+          com.sun.identity.wss.wsc.providername=wsc
+
+          Make sure to re-war the StockClient web application (war file) and
+          redeploy on the required JAX-WS compliant container running with
+          JDK "1.6.0_12" or higher.
+
+       2) Even after successfully retrieving stock quote results page, if the
+          request / response links on the StockClient web page do not show any
+          data or have exception showing data, then create "openam" directory
+          under your "user.home" directory on the machine where StockClient and
+          StockService web applications are running.
+
+%% 7. Explanation of changes for Tomcat or Sun Web Server
+
+   7.1 StockService WAR
+
+       7.1.1 Because Tomcat or Sun Web Server is a Web Container (not a Java EE
+             container) and does not support JSR 109 service endpoint, the
+             JAX-WS service WAR deployed in Tomcat or Sun Web Server needs a
+             special deployment descriptor which defines a set of "endpoints".
+             This descriptor is the XML file - <wssagents_unzip_location>/wssagent/
+             samples/etc/Tomcat/StockService/sun-jaxws.xml. This file describes
+             the JAX-WS service endpoint which represents a web particular
+             published web service (StockService), and is copied to
+             <wssagents_unzip_location>/wssagent/samples/StockService/web/WEB-INF/
+             folder.
+       7.1.2 The Web Service servlet in the web.xml file needs to be configured
+             to the com.sun.xml.ws.transport.http.servlet.WSServlet class from
+             JAX-WS Reference implementation that comes with JAX-WS libraries
+             after download and install of JAX-WS RI. Hence
+             <wssagents_unzip_location>/wssagent/samples/StockService/web/
+             WEB-INF/web.xml file is replaced with
+             <wssagents_unzip_location>/wssagent/samples/etc/Tomcat/
+             StockService/web.xml file.
+
+   7.2 StockClient WAR
+
+       7.2.1 The @WebServiceRef and @HandlerChain annotations are not supported
+             by Tomcat or Sun Web Server and hence, the web service reference
+             and jax-ws handler chain needs to be invoked programmatically by
+             making the required changes to the implementation class.
+             Due to this, <wssagents_unzip_location>/wssagent/samples/StockClient
+             /src/com/sun/stockquote/GetQuote.java is replaced with
+             <wssagents_unzip_location>/wssagent/samples/etc/Tomcat/StockClient/
+             unsecure/GetQuote.java for Unsecure applicaton WAR OR it is
+             replaced with <wssagents_unzip_location>/wssagent/samples/etc/Tomcat/
+             StockClient/secure/GetQuote.java for Secure applicaton WAR.
+
+             The ..secure/GetQuote.java has following additional line over
+             ..unsecure/GetQuote.java.
+
+             handlerChain.add(new com.sun.identity.wssagents.jaxws.client.ClientHandler());
+
+             This line is required by Client application in order to invoke the
+             WSS Client Handler for securing outgoing Web Service requests.
+
+%% 8. Deployment changes for WebSphere Application Server (WAS)
+
+   8.1 Upgrade to JDK "1.6.0_12" or higher.
+
+       WAS 7.0 is bundling with java version "1.6.0", hence you need to
+       upgrade WAS 7.0 to 7.0.0.5 and upgrade its JDK to IBM JDK 1.6.0 SR5,
+       equivalent to SUN JDK 1.6.0.13.
+
+   8.2 Create shared libraries.
+
+       8.2.1 Create a directory for shared libraries e.g. shared_libs.
+       8.2.2 Copy <wssagents_unzip_location>/wssagent/lib/xmlsec.jar and
+             <wssagents_unzip_location>/wssagent/lib/openssoclientsdk.jar to
+             shared_libs.
+       8.2.3 Get xalan.jar and xercesImpl.jar from openam external libraries
+             at http://download.java.net/general/opensso/extlib/latest/opensso-sun-extlib.zip
+             and copy them to shared_libs.
+       8.2.4 On WAS console, load these four jars under shared_libs as
+             shared libraries.
+       8.2.5 Restart WAS.
+
+   8.3 StockService and StockClient Applications modifications.
+
+       8.3.1 Unwar StockService and StockClient applications (war files),
+             delete WEB-INF/lib/xmlsec.jar and WEB-INF/lib/openssoclientsdk.jar
+             from these applications and re-war back these applications.
+       8.3.2 Deploy StockService and StockClient applications (war files),
+             and change both applications to reference the above shared
+             libraries (created in step 8.2.4).
+       8.3.3 From WAS console, change StockService and StockClient applications'
+             classloader behaviors to:
+             "Class loader order" - Classes loaded with local class loader first (parent last)
+             "WAR class loader policy" - Single class loader for application
+       8.3.4 Add the following JVM options to genericJVMArguments in server.xml
+             and save the file:
+             -DamCryptoDescriptor.provider=IBMJCE -DamKeyGenDescriptor.provider=IBMJCE
+       8.3.5 Restart WAS.
+

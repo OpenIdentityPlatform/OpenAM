@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: application-create.xhtml,v 1.8 2009/08/12 04:35:53 farble1670 Exp $
+
+-->
+
+<ui:composition
+    template="template/page.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ui:define name="panel-title">
+        <ice:outputText value="#{resources['application-create.panelTitle']}" />
+    </ui:define>
+    <ui:define name="panel-details">
+        <ice:outputText value="#{resources['application-create.panelDetails']}" />
+    </ui:define>
+    <ui:define name="panel-body">
+        <o:wizard
+            steps="7"
+            wizardHandler="#{applicationCreateWizardHandler}"
+            wizardBean="#{applicationCreateWizardBean}">
+            <ui:define name="wizard-steps">
+                <o:wstep
+                    step="0"
+                    label="#{applicationCreateWizardBean.namePanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/application-name.xhtml">
+                            <ui:param
+                                name="applicationNameBean"
+                                value="#{applicationCreateWizardBean}"/>
+                            <ui:param
+                                name="applicationNameHandler"
+                                value="#{applicationCreateWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="1"
+                    label="#{applicationCreateWizardBean.resourcesPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include
+                            src="#{applicationCreateWizardBean.viewApplication.viewApplicationType.applicationResourceTemplate}">
+                            <ui:param
+                                name="resourcesBean"
+                                value="#{applicationCreateWizardBean}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="2"
+                    label="#{applicationCreateWizardBean.subjectsPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include
+                            src="/admin/facelet/template/application-subjects.xhtml">
+                            <ui:param
+                                name="subjectsBean"
+                                value="#{applicationCreateWizardBean}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="3"
+                    label="#{applicationCreateWizardBean.actionsPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include
+                            src="/admin/facelet/template/actions.xhtml">
+                            <ui:param
+                                name="booleanActionsBean"
+                                value="#{applicationCreateWizardBean.viewApplication.booleanActionsBean}"/>
+                            <ui:param
+                                name="booleanActionsHandler"
+                                value="#{applicationCreateWizardBean.viewApplication.booleanActionsHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="4"
+                    label="#{applicationCreateWizardBean.conditionsPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include
+                            src="/admin/facelet/template/application-conditions.xhtml">
+                            <ui:param
+                                name="conditionsBean"
+                                value="#{applicationCreateWizardBean}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="5"
+                    label="#{applicationCreateWizardBean.overridePanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include
+                            src="/admin/facelet/template/application-override.xhtml">
+                            <ui:param
+                                name="overrideBean"
+                                value="#{applicationCreateWizardBean}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="6"
+                    label="#{applicationCreateWizardBean.summaryPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include
+                            src="/admin/facelet/template/application-summary.xhtml">
+                            <ui:param
+                                name="summaryBean"
+                                value="#{applicationCreateWizardBean}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+            </ui:define>
+        </o:wizard>
+    </ui:define>
+</ui:composition>

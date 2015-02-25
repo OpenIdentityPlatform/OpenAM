@@ -1,0 +1,115 @@
+------------------------------------------------------------------------------
+README file for OpenAM Policy Agents AGENT_VER
+------------------------------------------------------------------------------
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+# 
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+#
+#
+# Portions Copyright 2011-2014 ForgeRock AS
+
+%% Contents:
+    %% 1. Platforms
+    %% 1.1 Solaris Sparc
+    %% 1.2 Solaris x86
+    %% 1.3 Red Hat Enterprise Linux
+    %% 1.4 Windows 2003 Enterprise Edition
+    %% 1.5 Windows Server 2008 Enterprise 
+
+%% 1. Platforms
+
+Web Agent dependent external library retrieving location, build and install 
+instructions are platform specific. The following files for each of the 
+platforms cover this aspect in detail.
+
+%% 1.1 Solaris Sparc
+
+Apache Agent Build instructions: 
+opensso/products/webagents/docs/SunOS/apache/README.txt
+
+Apache Agent Install instructions:
+opensso/products/webagents/docs/SunOS/apache/INSTALL.txt
+
+Sun Java System Web Server Agent Build instructions: 
+opensso/products/webagents/docs/SunOS/sjsws/README.txt
+
+Sun Java System Web Server Agent Install instructions:
+opensso/products/webagents/docs/SunOS/sjsws/INSTALL.txt
+
+%% 1.2 Solaris x86
+
+External library location and Build instructions: 
+opensso/products/webagents/docs/SunOS_i86pc/apache/README.txt
+
+Apache Agent Install instructions:
+opensso/products/webagents/docs/SunOS_i86pc/apache/INSTALL.txt
+
+Sun Java System Web Server Agent Build instructions: 
+opensso/products/webagents/docs/SunOS_i86pc/sjsws/README.txt
+
+Sun Java System Web Server Agent Install instructions:
+opensso/products/webagents/docs/SunOS_i86pc/sjsws/INSTALL.txt
+
+%% 1.3 Red Hat Enterprise Linux
+
+External library location and Build instructions: 
+opensso/products/webagents/docs/Linux/apache/README.txt
+
+Apache Agent Install instructions:
+opensso/products/webagents/docs/Linux/apache/INSTALL.txt
+
+Sun Java System Web Server Agent Build instructions: 
+opensso/products/webagents/docs/Linux/sjsws/README.txt
+
+Sun Java System Web Server Agent Install instructions:
+opensso/products/webagents/docs/Linux/sjsws/INSTALL.txt
+
+%% 1.4 Windows 2003 Enterprise Edition
+
+External library location and Build instructions: 
+opensso/products/webagents/docs/WINNT/apache/README.txt
+
+Apache Agent Install instructions:
+opensso/products/webagents/docs/WINNT/apache/INSTALL.txt
+
+Sun Java System Web Server Agent Build instructions: 
+opensso/products/webagents/docs/WINNT/sjsws/README.txt
+
+Sun Java System Web Server Agent Install instructions:
+opensso/products/webagents/docs/WINNT/sjsws/INSTALL.txt
+
+Microsoft Internet Information Services 6 Agent Build instructions: 
+opensso/products/webagents/docs/WINNT/iis/README.txt
+
+Microsoft Internet Information Services 6 Agent Install instructions:
+opensso/products/webagents/docs/WINNT/iis/INSTALL.txt
+
+%% 1.5 Windows Server 2008 Enterprise 
+
+Microsoft Internet Information Services 7 Agent Build instructions: 
+opensso/products/webagents/docs/WINNT/iis7/README.txt
+
+Microsoft Internet Information Services 7 Agent Install instructions:
+opensso/products/webagents/docs/WINNT/iis7/INSTALL.txt
+

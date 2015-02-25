@@ -1,0 +1,239 @@
+SUNW_1.0 {
+	global:
+		am_agent_init;
+		am_cleanup;
+		am_shutdown_nss;
+                am_agent_cleanup;
+
+		am_http_cookie_encode;
+		am_http_cookie_decode;
+
+		am_log_add_module;
+		am_log_init;
+		am_log_is_level_enabled;
+		am_log_log;
+		am_log_set_levels_from_string;
+		am_log_set_log_file;
+		am_log_set_logger;
+		am_log_set_module_level;
+		am_log_set_remote_info;
+		am_log_vlog;
+
+		am_log_record_create;
+                am_log_record_destroy;
+                am_log_record_populate;
+                am_log_record_add_loginfo;
+                am_log_record_set_loginfo_props;
+                am_log_record_set_log_level;
+                am_log_record_set_log_message;
+                am_log_log_record;
+                am_log_flush_remote_log;
+                am_log_set_debug_file_rotate;
+                am_log_set_debug_file_size;
+
+		am_map_clear;
+		am_map_size;
+		am_map_copy;
+		am_map_create;
+		am_map_destroy;
+		am_map_erase;
+		am_map_find;
+		am_map_find_first_value;
+		am_map_for_each;
+		am_map_get_entries;
+		am_map_insert;
+
+		am_map_entry_iter_destroy;
+		am_map_entry_iter_get_first_value;
+		am_map_entry_iter_get_key;
+		am_map_entry_iter_get_values;
+		am_map_entry_iter_is_entry_valid;
+		am_map_entry_iter_next;
+
+		am_map_value_iter_destroy;
+		am_map_value_iter_get;
+		am_map_value_iter_is_value_valid;
+		am_map_value_iter_next;
+
+
+		am_policy_destroy;
+		am_policy_result_destroy;
+		am_policy_evaluate;
+		am_policy_init;
+		am_policy_is_notification_enabled;
+		am_policy_notify;
+		am_policy_compare_urls;
+		am_policy_get_url_resource_root;
+		am_policy_resource_canonicalize;
+		am_policy_resource_has_patterns;
+		am_policy_service_init;
+
+		am_properties_copy;
+		am_properties_create;
+		am_properties_destroy;
+		am_properties_get;
+		am_properties_get_boolean_with_default;
+		am_properties_get_signed;
+		am_properties_get_signed_with_default;
+		am_properties_get_unsigned;
+		am_properties_get_unsigned_with_default;
+		am_properties_get_with_default;
+		am_properties_load;
+		am_properties_set;
+		am_properties_store;
+
+
+		am_status_to_string;
+		am_status_to_name;
+
+
+		am_web_cleanup;
+		am_web_free_memory;
+		am_web_get_cookie_name;
+		am_web_get_cookie_name_len;
+		am_web_get_redirect_url;
+		am_web_do_result_attr_map_set;
+		am_web_handle_notification;
+		am_web_get_notification_url;
+		am_web_http_decode;
+		am_web_init;
+		am_web_is_access_allowed;
+		am_web_is_debug_on;
+		am_web_is_in_not_enforced_list;
+		am_web_is_in_not_enforced_ip_list;
+		am_web_is_max_debug_on;
+		am_web_is_notification;
+		am_web_log_always;
+		am_web_log_auth;
+		am_web_log_debug;
+		am_web_log_error;
+		am_web_log_info;
+		am_web_log_max_debug;
+		am_web_log_warning;
+		am_web_postcache_insert;
+		am_web_postcache_lookup;
+		am_web_postcache_remove;
+		am_web_create_post_preserve_urls;
+		am_web_is_postpreserve_enabled;
+		am_web_clean_post_urls;
+		am_web_create_post_page;
+		am_web_postcache_data_cleanup;
+		am_web_do_cookies_reset;
+		am_web_get_agent_server_host;
+		am_web_get_agent_server_port;
+		am_web_do_cookie_domain_set;
+		am_web_get_token_from_assertion;
+		am_web_remove_parameter_from_query;
+		am_web_get_parameter_value;
+		am_web_is_cdsso_enabled;
+		am_web_clear_attributes_map;
+		am_web_get_client_ip_header_name;
+		am_web_get_client_hostname_header_name;
+		am_web_get_client_ip_host;
+		am_web_set_host_ip_in_env_map;
+
+		am_auth_init;
+		am_auth_create_auth_context;
+		am_auth_destroy_auth_context;
+		am_auth_login;
+		am_auth_logout;
+		am_auth_abort;
+		am_auth_has_more_requirements;
+		am_auth_num_callbacks;
+		am_auth_get_organization_name;
+		am_auth_get_sso_token_id;
+		am_auth_get_callback;
+		am_auth_submit_requirements;
+		am_auth_submit_requirements_and_update_authctx;
+		am_auth_get_status;
+		am_auth_get_module_instance_names;
+
+		am_sso_init;
+		am_sso_set_initializeLog;
+		am_sso_create_sso_token_handle;
+		am_sso_destroy_sso_token_handle;
+		am_sso_get_auth_level;
+		am_sso_get_auth_type;
+		am_sso_get_host;
+		am_sso_get_max_idle_time;
+		am_sso_get_max_session_time;
+		am_sso_get_property;
+		am_sso_get_sso_token_id;
+		am_sso_get_principal;
+		am_sso_get_principal_set;
+		am_sso_get_time_left;
+		am_sso_get_idle_time;
+		am_sso_is_valid_token;
+		am_sso_validate_token;
+		am_sso_refresh_token;
+		am_sso_invalidate_token;
+		am_sso_set_property;
+                am_sso_add_sso_token_listener;
+                am_sso_remove_sso_token_listener;
+		am_sso_add_listener;
+		am_sso_remove_listener;
+
+                am_notify;
+
+		am_string_set_allocate;
+		am_string_set_destroy;
+
+                am_web_is_cache_control_enabled;
+                am_web_is_iis_logonuser_enabled;
+                am_web_is_password_header_enabled;
+                am_web_get_password_encryption_key;
+                am_web_is_remoteuser_header_disabled;
+                am_web_validate_url;
+                am_agent_version;
+
+	local:
+		*;
+};
+
+SUNW_2.1.1 {
+	global:
+		am_web_is_valid_fqdn_url;
+		am_web_is_cookie_present;
+		am_web_result_attr_map_set;
+		am_web_check_cookie_in_query;
+		am_web_check_cookie_in_post;
+		am_web_get_url_to_redirect;
+        am_web_is_logout_url;
+        am_web_is_agent_logout_url;
+        am_web_logout_cookies_reset;
+        am_web_remove_authnrequest;
+
+	local:
+		*;
+};
+
+SUNW_2.1.2 {
+	global:
+		am_web_process_request;
+		am_web_method_num_to_str;
+		am_web_method_str_to_num;
+		am_web_result_num_to_str;
+		am_web_set_cookie;
+
+	local:
+		*;
+};
+
+SUNW_2.2 {
+	global:
+		am_web_build_advice_response;
+                am_web_build_advice_redirect_url;
+		am_web_use_redirect_for_advice;
+		am_web_get_request_url;
+		am_web_get_all_request_urls;
+		am_web_get_agent_configuration;
+		am_web_delete_agent_configuration;
+		am_web_is_url_enforced;
+		am_web_get_postdata_preserve_lbcookie;
+		am_web_get_postdata_preserve_URL_parameter;
+
+
+	local:
+		*;
+};
+

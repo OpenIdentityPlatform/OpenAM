@@ -1,0 +1,18 @@
+-------------------------------------------------------------
+  OpenAM Policy Agents 
+-------------------------------------------------------------
+
+The following web agents have been developed as part of the OpenAM project's
+web agents:
+
+- Sun Java System Web Server 7.0 agent
+- Apache Web Server 2.2.x
+- Apache Web Server 2.4.x
+- Varnish Cache Server 3.0.x
+- Microsoft IIS 6.0
+- Microsoft IIS 7.0
+
+More information on these unique features and all product documentation can 
+be accessed at the following URL:
+
+https://wikis.forgerock.org/confluence/display/openam/Home

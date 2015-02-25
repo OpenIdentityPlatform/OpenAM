@@ -1,0 +1,43 @@
+<!--
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+-->
+
+Agent C-SDK libraries
+
+The following libraries are included:
+
+agent-csdk-solaris-sparc-32.tar.gz -- Agent C-SDK for Solaris Sparc (9,10) 
+				      32-bit platform
+agent-csdk-solaris-sparc-64.tar.gz -- Agent C-SDK for Solaris Sparc (9,10) 
+				      64-bit platform
+agent-csdk-solaris-x86-32.tar.gz --   Agent C-SDK for Solaris x86 (9,10) 
+				      32-bit platform
+agent-csdk-solaris-x86-64.tar.gz --   Agent C-SDK for Solaris x86 (9,10) 
+				      64-bit platform
+agent-csdk-linux-32.tar.gz       --   Agent C-SDK for RHEL AS 4.0 and 5.0
+				      32-bit platform
+agent-csdk-linux-64.tar.gz       --   Agent C-SDK for RHEL AS 4.0 and 5.0
+				      64-bit platform
+agent-csdk-windows-32.zip        --   Agent C-SDK for Windows 2003
+				      32-bit platform
+agent-csdk-windows-64.zip        --   Agent C-SDK for Windows 2003
+				      64-bit platform

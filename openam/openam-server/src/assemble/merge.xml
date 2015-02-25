@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<uberwar>
+  <wars>
+    <war>org.forgerock.openam:openam-server-only</war>
+    <war>org.forgerock.openam:openam-console</war>
+  </wars>
+  <merges>
+    <merge>
+      <type>web.xml</type>
+      <parameters>
+        <default>
+          <tag name="display-name">
+            <strategy name="Overwrite"/>
+          </tag>
+        </default>
+      </parameters>
+    </merge>
+  </merges>
+</uberwar>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<section xml:id="policy-agent-properties"
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+ <title>About Policy Agent Properties</title>
+
+ <indexterm>
+  <primary>properties</primary>
+ </indexterm>
+
+ <para>All policy agent configuration settings are stored centrally by default
+  in the OpenAM configuration store, which allows you
+  to configure your policy agents on the OpenAM console for easier management and
+  convenience.
+  Any property change made
+  in OpenAM using the console or the <command>ssoadm</command> command-line tool is
+  immediately communicated to the agent via a notification.
+  Many policy agent properties are hot-swap enabled, allowing the change
+  to take effect immediately without a server restart.
+ </para>
+ <para>Policy agent configuration settings can also be stored locally in a
+  Java properties flat-file, such as
+  <filename>Agent_001/config/${agentsConfigurationFile}</filename>,
+  which is created when you install the agent.
+  If you implement a local properties file, you must make all
+  configuration changes by modifying property values in the file.
+ </para>
+ <para>While the majority of agent properties are hot swap-enabled, there are
+  a number that are not. These non-hot swappable properties are indicated in the
+  OpenAM console or local properties file as such. Any changes to these non-hot swappable
+  properties require a container restart. To avoid any configuration errors that
+  could take effect immediately, you can lock the properties by setting the
+  <literal>com.sun.identity.agents.config.lock.enable</literal> to <literal>true</literal>
+  in the OpenAM bootstrap file, <filename>${agentsBootstrapFile}</filename>,
+  and then re-start the container.
+ </para>
+</section>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<refentry xml:id='man-upgrade-jar'
+          xmlns='http://docbook.org/ns/docbook'
+          version='5.0' xml:lang='en'
+          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+          xmlns:xlink='http://www.w3.org/1999/xlink'
+          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+    <info><copyright><year>2011-2014</year><holder>ForgeRock AS</holder></copyright></info>
+    <refmeta>
+        <refentrytitle>upgrade.jar</refentrytitle><manvolnum>1</manvolnum>
+        <refmiscinfo class="software">OpenAM</refmiscinfo>
+        <refmiscinfo class="version"><?eval ${serverDocTargetVersion}?></refmiscinfo>
+    </refmeta>
+    <refnamediv>
+        <refname>upgrade.jar</refname>
+        <refpurpose>upgrade OpenAM using a configuration file</refpurpose>
+    </refnamediv>
+    <refsynopsisdiv>
+        <cmdsynopsis>
+            <command>upgrade.jar</command>
+            <arg choice="req">options</arg>
+        </cmdsynopsis>
+    </refsynopsisdiv>
+    <refsect1>
+        <title>Description</title>
+        <para>This executable jar file, ${ssoconfigUpgradeJarFile}, lets you
+            perform a silent upgrade on a deployed OpenAM server by applying
+            settings from a configuration file or using arguments. This capability allows you to
+            include the <literal>upgrade.jar</literal> from a command line or in an upgrade script.</para>
+    </refsect1>
+    <refsect1>
+     <title>Options</title>
+     <para>The following options are supported.</para>
+      <variablelist>
+       <varlistentry>
+        <term><option>-f | --file <replaceable>configuration-file</replaceable></option></term>
+        <listitem>
+         <para>Upgrade a deployed OpenAM web application archive using the
+          specified configuration file. Upgrade configuration
+          files are described in the sections below.
+          Also, you can specify the system properties on the command line,
+          instead of using the configuration file.
+          See Example 2 below.</para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term><option>--acceptLicense</option></term>
+         <listitem>
+          <para>Auto-accept the software license agreement and suppress the display
+           of the licence acceptance screen to the user. If the configuration file
+           contains the <literal>ACCEPT_LICENSES</literal> property,
+           it will have precedence over the command-line option.</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term><option>-? | --help</option></term>
+          <listitem>
+           <para>Display the usage message.</para>
+          </listitem>
+        </varlistentry>
+       </variablelist>
+    </refsect1>
+    <refsect1>
+        <title>Upgrade Configuration File</title>
+        <para>Base your configuration on the <filename>sampleupgrade</filename>
+         file delivered with OpenAM, and using the hints in this section, or the
+         comments included in the file.</para>
+        <variablelist>
+         <title>Upgrade Properties</title>
+         <varlistentry>
+          <term>SERVER_URL</term>
+           <listitem>
+            <para>URL to the web container where OpenAM runs, such as
+             <literal>http://openam.example.com:8080</literal>.</para>
+           </listitem>
+           </varlistentry>
+           <varlistentry>
+            <term>DEPLOYMENT_URI</term>
+             <listitem>
+              <para>URI where OpenAM is deployed on the web container, such as
+               <literal>/openam</literal>.</para>
+             </listitem>
+           </varlistentry>
+           <varlistentry>
+            <term>ACCEPT_LICENSES</term>
+            <listitem>
+             <para>Optional boolean property that can be set to always auto-accept
+              the software license agreement and suppress displaying the
+              license acceptance screen to the user.
+              A value of <literal>true</literal> auto-accepts the license;
+              any other value will be assumed to equal <literal>false</literal>,
+              resulting in the presentation of the license.
+              Default value is <literal>false</literal>.
+              This property takes precedence over the <literal>--acceptLicense</literal>
+              option, which can also be passed in to the application with the
+              ${ssoconfigUpgradeJarFile} file.
+             </para>
+            </listitem>
+           </varlistentry>
+         </variablelist>
+    </refsect1>
+    <refsect1>
+        <title>Examples</title>
+        <para>The following example shows a configuration file and the commands to upgrade a server
+        using the <literal>upgrade.jar</literal>.
+        The configuration file is saved as <literal>/tmp/upgrade.txt</literal>.</para>
+        <programlisting>SERVER_URL=http://openam.example.com:8080
+DEPLOYMENT_URI=/openam
+ACCEPT_LICENSES=true</programlisting>
+        <literallayout class="monospaced">$JAVA_HOME/bin/java -jar ~/openam/tools/${ssoconfigUpgradeJarFile} \
+ -f /tmp/upgrade.txt</literallayout>
+
+        <para>The following example shows how to specify system properties with the <literal>upgrade.jar</literal>.</para>
+        <programlisting>SERVER_URL=http://openam.example.com:8080
+DEPLOYMENT_URI=/openam
+ACCEPT_LICENSES=true</programlisting>
+        <literallayout class="monospaced">$JAVA_HOME/bin/java -jar ~/openam/tools/${ssoconfigUpgradeJarFile} \
+ -DSERVER_URL=http://openam.example.com:8080 -DDEPLOYMENT_URI=/openam</literallayout>
+
+        <para>The following example shows the use of the <literal>--acceptLicense</literal>
+         option with the <literal>upgrade.jar</literal>.</para>
+        <programlisting>SERVER_URL=http://openam.example.com:8080
+DEPLOYMENT_URI=/openam</programlisting>
+        <literallayout class="monospaced">$JAVA_HOME/bin/java -jar ~/openam/tools/${ssoconfigUpgradeJarFile} \
+ -DSERVER_URL=http://openam.example.com:8080 -DDEPLOYMENT_URI=/openam \
+ --acceptLicense</literallayout>
+    </refsect1>
+</refentry>

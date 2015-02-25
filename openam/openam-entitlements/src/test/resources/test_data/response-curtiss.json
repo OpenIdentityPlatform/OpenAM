@@ -1,0 +1,38 @@
+{
+"Response": 
+ {
+ 
+ "Result": 
+  {
+   "Decision": "Permit"
+  },
+  
+  "Status": 
+  {  
+   "StatusCode": 
+   {
+    "Value": "urn:oasis:names:tc:xacml:1.0:status:ok"
+   }
+  },
+
+  "Obligations": 
+  {
+  "ObligationOrAdvice": [
+   {
+    "Id": "urn:oasis:names:tc:xacml:3.0:ipc:obligation:encrypt"    
+   },
+   
+   {
+    "Id": "urn:oasis:names:tc:xacml:3.0:ipc:obligation:marking",
+     "AttributeAssignment": [
+     {
+     "AttributeId": "urn:oasis:names:tc:xacml:3.0:example:attribute:text",
+      "Value": "Curtiss Proprietary Information: Limited Distribution",
+      "DataType": "string"
+     }
+    ]
+   }
+   ]
+  }
+ }
+}

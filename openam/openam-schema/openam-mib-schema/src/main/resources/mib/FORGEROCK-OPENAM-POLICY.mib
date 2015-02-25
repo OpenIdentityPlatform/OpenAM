@@ -1,0 +1,173 @@
+--
+--  Copyright 2014 ForgeRock AS.
+--  The contents of this file are subject to the terms of the Common Development and
+--  Distribution License (the License). You may not use this file except in compliance with the
+--  License.
+--
+--  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+--  specific language governing permission and limitations under the License.
+--
+--  When distributing Covered Software, include this CDDL Header Notice in each file and include
+--  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+--  Header, with the fields enclosed by brackets [] replaced by your own identifying
+--  information: "Portions copyright [year] [name of copyright owner]".
+--
+
+--
+-- MIB for Policy Monitoring
+-- Copyright (c) 2014, ForgeRock AS, All Rights Reserved.
+--
+
+FORGEROCK-OPENAM-POLICY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, enterprises,
+    Integer32
+        FROM SNMPv2-SMI
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+--
+-- ForgeRock
+--
+
+forgerock OBJECT IDENTIFIER ::= {enterprises 36733}
+
+--
+-- SNMP
+--
+
+snmp OBJECT IDENTIFIER ::= { forgerock 1 }
+
+--
+-- openAM
+--
+
+openam OBJECT IDENTIFIER ::= { snmp 2 }
+
+--
+-- SSO Policy Monitoring
+--
+
+policyMonitoring OBJECT IDENTIFIER ::= { openam 2 }
+
+--
+-- policyEvaluationMonitoring
+--
+
+policyEvaluationMonitoring OBJECT IDENTIFIER ::= { policyMonitoring 1 }
+
+selfEvaluation OBJECT IDENTIFIER ::= { policyEvaluationMonitoring 1 }
+
+selfEvaluationsCumulative  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative number of self evaluations"
+    DEFVAL    		{ 0 }
+    ::= { selfEvaluation 1 }
+
+selfEvaluationsAverage  OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average rate of self evaluations"
+    DEFVAL    		{ 0 }
+    ::= { selfEvaluation 2 }
+
+selfEvaluationsMinimum  OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum rate of self evaluations"
+    DEFVAL    		{ 0 }
+    ::= { selfEvaluation 3 }
+
+selfEvaluationsMaximum  OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum rate of self evaluations"
+    DEFVAL    		{ 0 }
+    ::= { selfEvaluation 4 }
+
+subtreeEvaluation OBJECT IDENTIFIER ::= { policyEvaluationMonitoring 2 }
+
+subtreeEvaluationsCumulative  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative number of subtree evaluations"
+    DEFVAL    		{ 0 }
+    ::= { subtreeEvaluation 1 }
+
+subtreeEvaluationsAverage  OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average rate of subtree evaluations"
+    DEFVAL    		{ 0 }
+    ::= { subtreeEvaluation 2 }
+
+subtreeEvaluationsMinimum  OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum rate of subtree evaluations"
+    DEFVAL    		{ 0 }
+    ::= { subtreeEvaluation 3 }
+
+subtreeEvaluationsMaximum  OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum rate of subtree evaluations"
+    DEFVAL    		{ 0 }
+    ::= { subtreeEvaluation 4 }
+
+policyTiming OBJECT IDENTIFIER ::= { policyMonitoring 2 }
+
+selfTiming OBJECT IDENTIFIER ::= { policyTiming 1 }
+
+selfTimingAverage OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average length of time a self policy takes to evaluate"
+    DEFVAL      { 0 }
+    ::= { selfTiming 1 }
+
+selfSlowestEvaluationTime OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Slowest self policy evaluations"
+    ::= { selfTiming 2 }
+
+subtreeTiming OBJECT IDENTIFIER ::= { policyTiming 2 }
+
+subtreeTimingAverage OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average length of time a subtree policy takes to evaluate"
+    DEFVAL      { 0 }
+    ::= { subtreeTiming 1 }
+
+subtreeSlowestEvaluationTime OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Slowest subtree policy evaluation"
+    ::= { subtreeTiming 2 }
+
+policyEvaluation OBJECT IDENTIFIER ::= { policyMonitoring 3 }
+
+slowestPolicyEvaluationTime OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Slowest individual policy evaluation"
+    ::= { policyEvaluation 1 }
+
+END

@@ -1,0 +1,22 @@
+<p>{{t "policy.addResources.resourceDescription"}}</p>
+<div class="striped-list created-items" id="createdResources">
+    <h3>{{t "policy.common.resources"}}</h3>
+    <ul>
+    {{#if entity.resources}}
+        {{#each entity.resources}}
+        <li data-resource="{{this}}" {{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}{{#equals this ../../options.justAdded}}class="highlight-good"{{/equals}} >{{this}}<span tabindex="0" class="icon-close float-right"></span></li>
+        {{/each}}
+    {{else}}
+        <li class="invalid">{{t "policy.common.noResources"}}</li>
+    {{/if}}
+
+    {{#if options.newPattern}}
+    <li class="editing clearfix" data-resource="{{options.newPattern}}">{{policyEditorResourceHelper}}<span tabindex="0" class="icon-plus float-right"></span></li>
+    {{/if}}
+
+    </ul>
+    
+</div>
+
+
+

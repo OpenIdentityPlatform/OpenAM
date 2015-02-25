@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3D7FF238-2339-4046-A5D7-92A5F526DEF2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sun.Identity</RootNamespace>
+    <AssemblyName>Fedlet</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>fedlet.pfx</AssemblyOriginatorKeyFile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Fedlet.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Fedlet.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="source\Common\FedletCertificateFactory.cs" />
+    <Compile Include="source\Common\FedletLogger.cs" />
+    <Compile Include="source\Common\FedletEncryptedXml.cs" />
+    <Compile Include="source\Saml2\Artifact.cs" />
+    <Compile Include="source\Saml2\ArtifactResolve.cs" />
+    <Compile Include="source\Saml2\ArtifactResponse.cs" />
+    <Compile Include="source\Saml2\AttributeQueryResponse.cs" />
+    <Compile Include="source\Saml2\Exceptions\SoapException.cs" />
+    <Compile Include="source\Saml2\SamlAttribute.cs" />
+    <Compile Include="source\Saml2\AttributeQueryRequest.cs" />
+    <Compile Include="source\Saml2\AuthnRequest.cs" />
+    <Compile Include="source\Saml2\AuthnRequestCache.cs" />
+    <Compile Include="source\Saml2\LogoutRequestCache.cs" />
+    <Compile Include="source\Saml2\LogoutResponse.cs" />
+    <Compile Include="source\Saml2\LogoutRequest.cs" />
+    <Compile Include="source\Saml2\RequestedAuthnContext.cs" />
+    <Compile Include="source\Saml2\Exceptions\CircleOfTrustException.cs" />
+    <Compile Include="source\Saml2\CircleOfTrust.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="source\Saml2\AuthnResponse.cs" />
+    <Compile Include="source\Saml2\Exceptions\IdentityProviderException.cs" />
+    <Compile Include="source\Saml2\Exceptions\Saml2Exception.cs" />
+    <Compile Include="source\Saml2\Exceptions\ServiceProviderException.cs" />
+    <Compile Include="source\Saml2\Exceptions\ServiceProviderUtilityException.cs" />
+    <Compile Include="source\Saml2\IdentityProvider.cs" />
+    <Compile Include="source\Saml2\IdentityProviderDiscoveryUtils.cs" />
+    <Compile Include="source\Saml2\Saml2Constants.cs" />
+    <Compile Include="source\Saml2\Saml2Utils.cs" />
+    <Compile Include="source\Saml2\Scoping.cs" />
+    <Compile Include="source\Saml2\ServiceProvider.cs" />
+    <Compile Include="source\Saml2\ServiceProviderUtility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="conf\fedlet.cot-template" />
+    <None Include="conf\idp-extended.xml-template" />
+    <None Include="conf\sp-extended.xml-template" />
+    <None Include="conf\sp.xml-template" />
+    <None Include="fedlet.pfx" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,0 +1,25 @@
+<div id="trustedDevices">
+    {{#if devices}}
+    <h2 class="header">{{t "openam.trusted.devices.header"}}</h2>
+    <div class="content-bg">
+        
+        <table id="trustedDevicesTable">
+
+            <tr>
+                <th id="trustedDevicesDeviceName" scope="col">{{t "openam.trusted.devices.deviceName"}}</th>
+                <th id="trustedDevicesLastUsed" scope="col">{{t "openam.trusted.devices.lastUsed"}}</th>
+                <th id="trustedDevicesDeleteBtn" scope="col"> </th>
+            </tr>
+
+            {{#each devices}}
+            <tr id="trustedDevice_{{@index}}">
+                <td>{{this.name}}</td>
+                <td>{{this.lastSelectedDate}}</td>
+                <td><a class="deleteDevice" href="#" id="{{this.uuid}}">{{t "openam.trusted.devices.deleteDevice"}}</a></td>
+            </tr>
+            {{/each}}
+
+        </table>
+    </div>
+    {{/if}}
+</div>

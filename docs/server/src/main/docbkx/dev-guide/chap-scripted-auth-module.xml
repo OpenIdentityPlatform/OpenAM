@@ -1,0 +1,1780 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<chapter xml:id='chap-scripted-auth-module'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Scripted Authentication</title>
+
+ <para>
+  This chapter demonstrates how to develop scripts
+  for a scripted authentication module.
+ </para>
+
+ <indexterm>
+  <primary>Authentication</primary>
+  <secondary>Scripted modules</secondary>
+ </indexterm>
+
+ <para>
+  A scripted authentication module allows you to develop
+  a custom authentication module by adding Groovy or JavaScript
+  to the module configuration.
+  Scripted authentication modules are an alternative to developing
+  custom authentication modules in Java as described in
+  <link
+   xlink:href="dev-guide#chap-auth-spi"
+   xlink:role="http://docbook.org/xlink/role/olink"
+   xlink:show="new"
+  ><citetitle>Customizing Authentication Modules</citetitle></link>.
+ </para>
+
+ <section xml:id="scripted-auth-module-about">
+  <title>About Authentication Module Scripts</title>
+
+  <para>
+   This section explains how client-side and server-side scripts
+   cooperate to perform authentication.
+  </para>
+
+  <para>
+   A scripted authentication module runs scripts to authenticate a user.
+   The configuration for the module can hold two scripts,
+   one to include in the web page run on the client user-agent,
+   another to run in OpenAM on the server side.
+  </para>
+
+  <para>
+   The client-side script is intended to retrieve data from the user-agent.
+   This must be in a language the the user-agent, such as JavaScript,
+   even if the server-side script is written in Groovy.
+  </para>
+
+  <para>
+   The client-side script data is returned to OpenAM by self-submitting form.
+   This makes the client-side data available to the server-side script.
+   The client-side script does this by adding data to a String object,
+   <literal>clientScriptOutputData</literal>.
+  </para>
+
+  <para>
+   The server-side script is intended to handle authentication.
+  </para>
+
+  <para>
+   The server-side script runs after the client-side script has completed.
+   The server-side script has access both
+   to information added by the client-side script to
+   <literal>clientScriptOutputData</literal>,
+   and also to several objects from OpenAM
+   described in <xref linkend="scripted-auth-module-api" />,
+   allowing it to make an authentication decision.
+   The server-side script thus must at minimum set the authentication state
+   to success or failure.
+  </para>
+ </section>
+
+ <section xml:id="scripted-auth-module-api">
+  <title>Authentication Script API</title>
+
+  <para>
+   Client-side scripts have access only to the user-agent API.
+   That API of course depends on the user agent.
+  </para>
+
+  <itemizedlist>
+   <para>
+    Server-side scripts have access to objects from OpenAM
+    for the following uses.
+   </para>
+
+   <listitem>
+    <para>
+     <xref linkend="scripted-auth-module-auth-state" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="scripted-auth-module-client-data" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="scripted-auth-module-http-client" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="scripted-auth-module-id-repo" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="scripted-auth-module-logger" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="scripted-auth-module-request-data" />
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <section xml:id="scripted-auth-module-auth-state">
+   <title>Accessing Authentication State</title>
+
+   <para>
+    OpenAM passes <literal>authState</literal> and <literal>sharedState</literal>
+    to server-side scripts in order for the scripts
+    to access authentication state.
+   </para>
+
+   <para>
+    Server-side scripts can access the current authentication state
+    through the <literal>authState</literal> object.
+   </para>
+
+   <para>
+    The <literal>authState</literal> value is <literal>SUCCESS</literal>
+    if the authentication is currently successful,
+    or <literal>FAILED</literal> if authentication has failed.
+    Server-side scripts must set a value for <literal>authState</literal>
+    before completing.
+   </para>
+
+   <para>
+    If an earlier authentication module in the authentication chain
+    has set the login name of the user,
+    server-side scripts can access the login name
+    through <literal>username</literal>.
+    This is shared by
+    Anonymous,
+    Certificate,
+    Data Store,
+    Federation,
+    HTTP Basic,
+    JDBC,
+    LDAP,
+    Membership,
+    RADIUS,
+    <xinclude:include href="../shared/securid/phrase-scripted-auth-module.xml${skipSecurID}">
+     <xinclude:fallback>
+      <!-- Module not present in nightly builds -->
+     </xinclude:fallback>
+    </xinclude:include>
+    Windows Desktop SSO,
+    &amp; Windows NT
+    authentication modules.
+   </para>
+
+   <!-- Not getting this to work at all...
+   <para>
+    Server-side scripts can access the shared state
+    of the current authentication chain
+    through the <literal>sharedState</literal> object.
+   </para>
+
+   <para>
+    The <literal>sharedState</literal> object is a key-value map.
+    The following table lists the <literal>sharedState</literal> map content.
+   </para>
+
+   <table xml:id="scripted-auth-module-shared-state-map-content" pgwide="1">
+    <title>Shared State Map Content</title>
+    <tgroup cols="4">
+     <colspec colnum="1" colwidth="2*"/>
+     <colspec colnum="2" colwidth="3*"/>
+     <colspec colnum="3" colwidth="3*"/>
+     <thead>
+      <row>
+       <entry>Key</entry>
+       <entry>Value Description</entry>
+       <entry>Shared By</entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>
+        <para>
+         <literal>CompositeAdviceXML</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         XML composite advice for the authentication request
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Any login module
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>javax.security.auth.login.name</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         User's login name
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Anonymous,
+         Certificate,
+         Data Store,
+         Federation,
+         HTTP Basic,
+         JDBC,
+         LDAP,
+         Membership,
+         RADIUS,
+         <xinclude:include href="../shared/securid/phrase-scripted-auth-module${skipSecurID}.xml">
+          <xinclude:fallback>
+           <!- - Module not present in nightly builds - ->
+          </xinclude:fallback>
+         </xinclude:include>
+         Windows Desktop SSO,
+         &amp; Windows NT
+         authentication modules
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>javax.security.auth.login.password</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         User's password
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Data Store,
+         HTTP Basic,
+         JDBC,
+         LDAP,
+         Membership,
+         RADIUS,
+         <xinclude:include href="../shared/securid/phrase-scripted-auth-module${skipSecurID}.xml">
+          <xinclude:fallback>
+           <!- - Module not present in nightly builds - ->
+          </xinclude:fallback>
+         </xinclude:include>
+         &amp; Windows NT
+         authentication modules
+        </para>
+       </entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+   -->
+  </section>
+
+  <section xml:id="scripted-auth-module-client-data">
+   <title>Access Client-Side Script Output Data</title>
+
+   <para>
+    Client-side scripts add data they gather into a String object
+    named <literal>clientScriptOutputData</literal>.
+    Client-side scripts then cause the user-agent automatically
+    to return the data to OpenAM by HTTP POST of a self-submitting form.
+   </para>
+
+  </section>
+
+  <section xml:id="scripted-auth-module-http-client">
+   <title>Accessing HTTP Services</title>
+
+   <para>
+    OpenAM passes an HTTP client object, <literal>httpClient</literal>,
+    to server-side scripts.
+    Server-side scripts can call HTTP services
+    with the <literal>httpClient.get</literal>
+    and <literal>httpClient.post</literal> methods.
+    The methods return an <literal>HttpClientResponse</literal>.
+   </para>
+
+   <table xml:id="scripted-auth-module-http-client-methods" pgwide="1">
+    <title>HTTP Client Methods</title>
+    <tgroup cols="4">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="2*"/>
+     <colspec colnum="3" colwidth="2*"/>
+     <colspec colnum="4" colwidth="3*"/>
+     <thead>
+      <row>
+       <entry>Method</entry>
+       <entry>Parameters</entry>
+       <entry>Return Type</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>
+        <para>
+         <literal>get</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>uri</replaceable></literal> (type: <literal>String</literal>),
+         <literal><replaceable>requestData</replaceable></literal> (type:
+         <literal>Map</literal>)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>HttpClientResponse</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Perform an HTTP GET on the specified URI
+         with the specified request data,
+         and return the response retrieved.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>post</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>uri</replaceable></literal> (type: <literal>String</literal>),
+         <literal><replaceable>body</replaceable></literal> (type: <literal>String</literal>),
+         <literal><replaceable>requestData</replaceable></literal> (type:
+         <literal>Map</literal>)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>HttpClientResponse</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Perform an HTTP POST to the specified URI
+         with the specified body and request data,
+         and return the response retrieved.
+        </para>
+       </entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+
+   <para>
+    The <literal>requestData</literal> object is a map where the keys are
+    <literal>cookies</literal> and <literal>headers</literal>. OpenAM ignores other keys.
+   </para>
+   <para>
+    The <literal>cookies</literal> value, specifying the cookie headers in the
+    request, is a list of Maps where the keys are <literal>domain</literal>,
+    <literal>field</literal>, and <literal>value</literal>.
+   </para>
+   <para>
+    The <literal>headers</literal> value, specifying the headers in the request,
+    is a list of Maps where the keys are <literal>field</literal>, and
+    <literal>value</literal>.
+   </para>
+   <para>An example <literal>requestData</literal> JavaScript object using GET
+    would be as follows:</para>
+   <programlisting language="javascript">
+var response = httpClient.get("http://example.com:8080/openam/json/users" + username,
+ {
+   cookies:[
+    {
+       "domain": ".example.com",
+       "field": "iPlanetDirectoryPro,
+       "value": "E8cDkvlad83kdKDodkIEIxqJ938DKSDLIE31djkiefjekda.*DLEDLKJKD09dkleuhDK3kEJKj"
+    }
+   ],
+   headers:[
+    {
+       "field": "Content-type",
+       "value": "application/json"
+    }
+   ]
+ });
+   </programlisting>
+
+   <para>An example <literal>requestData</literal> JavaScript object using POST
+    would be as follows:</para>
+
+   <programlisting language="javascript">
+var response = httpClient.post("http://example.com:8080/openam/json/authenticate","{
+  "authId": "eyAiYWxnIjogIkhTMjU2IiwgInR5cCI6ICJqd3QiIH0.eyAib3RrIjogIm03ODVzN2x
+   sbnR1bjZvbGZ1MHZhOGVtYTQxIiwgInNlc3Npb25JZCI6ICJBUUlDNXdNMkxZNFNmY3lEeDY3QnB
+   PdzJtRU9rUzNpLWhfNDdRWlMwNHBEN1ppdy4qQUFKVFNRQUNNREVBQWxOTEFCUXROak15TURjNU1
+   UZzROVFUwTXpnNE5qRTNNQS4uKiIsICJyZWFsbSI6ICJkYz1vcGVuYW0sZGM9Zm9yZ2Vyb2NrLGR
+   jPW9yZyIgfQ.VDRqaekQuXBm2lNI29hfwVADLxjepezuO0241VNDsIM",
+  "template": "",
+  "stage": "DataStore1",
+  "callbacks": [
+    {
+      "type": "NameCallback",
+      "output": [
+        {
+          "name": "prompt",
+          "value": "User Name:"
+        }
+       ],
+      "input": [
+        {
+          "name": "IDToken1",
+          "value": "demo"
+        }
+       ]
+    },
+    {
+      "type": "PasswordCallback",
+      "output": [
+        {
+          "name": "prompt",
+          "value": "Password:"
+        }
+       ],
+      "input": [
+        {
+          "name": "IDToken2",
+          "value": "changeit"
+        }
+      ]
+    }
+  ]
+ }",
+ {
+   cookies:[
+   ],
+   headers:[
+    {
+      "field": "Content-Type",
+      "value": "application/json"
+    }
+   ]
+ });
+</programlisting>
+
+   <note><para>To get the form data, you can access the <literal>sharedState</literal>
+    object to get the data that previous modules in the chain have obtained.
+    For example, if you have a DataStore module in your chain, you can get the
+    username and password from the <literal>sharedState</literal> object in the
+    script.
+   </para></note>
+
+   <para>
+    HTTP client requests are synchronous, blocking until they return.
+    You can, however, set a global timeout for server-side scripts.
+    For details, see the <citetitle>Administration Guide</citetitle> section,
+    <link
+     xlink:href="admin-guide#scripted-module-conf-hints"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>Hints For Scripted Authentication Modules</citetitle></link>.
+   </para>
+
+   <!-- HttpClientRequest seems to have disappeared in the refactoring.
+   <para>
+    Server-side scripts can construct requests by using the methods
+    listed in the table below.
+   </para>
+
+   <table xml:id="scripted-auth-module-http-client-request-methods" pgwide="1">
+    <title>HTTP Client Request Methods</title>
+    <tgroup cols="4">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="1*"/>
+     <colspec colnum="3" colwidth="1*"/>
+     <colspec colnum="4" colwidth="3*"/>
+     <thead>
+      <row>
+       <entry>Method</entry>
+       <entry>Parameters</entry>
+       <entry>Return Type</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>
+        <para>
+         <literal>addCookie</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>domain</replaceable></literal> (type: <literal>String</literal>),
+         <literal><replaceable>field</replaceable></literal> (type: <literal>String</literal>),
+         <literal><replaceable>value</replaceable></literal> (type: <literal>String</literal>)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Add a cookie to the request.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>addHeader</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>field</replaceable></literal> (type: <literal>String</literal>),
+         <literal><replaceable>value</replaceable></literal> (type: <literal>String</literal>)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Add a header to the request.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>addQueryParameter</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>field</replaceable></literal> (type: <literal>String</literal>),
+         <literal><replaceable>value</replaceable></literal> (type: <literal>String</literal>)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Add a query parameter to the request.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getCookies</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Set&lt;HttpClientRequestCookie></literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Get the cookies set on the request.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getEntity</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Get the entity set on the request.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getHeaders</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Map&lt;String, String></literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Get the headers set on the request.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getMethod</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Get the method to be performed on the resource identified by the request.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getQueryParameters</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Map&lt;String, String></literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Get the query parameters set on the request.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getUri</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Get the URI of the resource identified by the request.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>setEntity</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>entity</replaceable></literal> (type: <literal>String</literal>)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Add an entity to the request.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>setMethod</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>method</replaceable></literal> (type: <literal>String</literal>)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Set the method to be performed on the resource identified by the request.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>setUri</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>uri</replaceable></literal> (type: <literal>String</literal>)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Set the URI of the resource identified by the request.
+        </para>
+       </entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+   -->
+
+   <para>
+    Server-side scripts can access response data by using the methods
+    listed in the table below.
+   </para>
+
+   <table xml:id="scripted-auth-module-http-client-response-methods" pgwide="1">
+    <title>HTTP Client Response Methods</title>
+    <tgroup cols="4">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="1*"/>
+     <colspec colnum="3" colwidth="1*"/>
+     <colspec colnum="4" colwidth="2*"/>
+     <thead>
+      <row>
+       <entry>Method</entry>
+       <entry>Parameters</entry>
+       <entry>Return Type</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>
+        <para>
+         <literal>getCookies</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Map&lt;String, String></literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Get the cookies for the returned response, if any exist.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getEntity</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Get the entity of the returned response.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getHeaders</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Map&lt;String, String></literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Get the headers for the returned response, if any exist.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getReasonPhrase</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Get the reason phrase of the returned response.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getStatusCode</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Integer</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Get the status code of the returned response.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>hasCookies</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>boolean</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Indicates whether the returned response had any cookies.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>hasHeaders</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>boolean</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Indicates whether the returned response had any headers.
+        </para>
+       </entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+  </section>
+
+  <section xml:id="scripted-auth-module-id-repo">
+   <title>Accessing Profile Data</title>
+
+   <para>
+    Server-side scripts can access profile data through
+    the methods of the <literal>idRepository</literal> object.
+   </para>
+
+   <table xml:id="scripted-auth-module-id-repo-methods" pgwide="1">
+    <title>Profile Data Methods</title>
+    <tgroup cols="4">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="1*"/>
+     <colspec colnum="3" colwidth="1*"/>
+     <colspec colnum="4" colwidth="2*"/>
+     <thead>
+      <row>
+       <entry>Method</entry>
+       <entry>Parameters</entry>
+       <entry>Return Type</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>
+        <para>
+         <literal>getAttribute</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>userName</replaceable></literal> (type: String),
+         <literal><replaceable>attributeName</replaceable></literal> (type: String)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Set
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Return the values of the named attribute for the named user.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>setAttribute</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>userName</replaceable></literal> (type: String),
+         <literal><replaceable>attributeName</replaceable></literal> (type: String),
+         <literal><replaceable>attributeValue</replaceable></literal> (type: String)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Set the named attribute to the specified value for the named user,
+         and persist the result in the user's profile.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>addAttribute</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>userName</replaceable></literal> (type: String),
+         <literal><replaceable>attributeName</replaceable></literal> (type: String),
+         <literal><replaceable>attributeValue</replaceable></literal> (type: String)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Adds an attribute value to the list of attribute values associated with the
+         attribute name for a particular user.
+        </para>
+       </entry>
+      </row>
+
+     </tbody>
+    </tgroup>
+   </table>
+  </section>
+
+  <section xml:id="scripted-auth-module-logger">
+   <title>Logging</title>
+
+   <para>
+    Server-side scripts can log messages to OpenAM debug logs
+    by using the methods of the <literal>logger</literal> object.
+   </para>
+
+   <para>
+    By default, OpenAM does not log debug messages from scripts.
+    You can configure OpenAM to log such messages
+    by setting the debug log level for the <literal>amScript</literal> service.
+    For details, see the <citetitle>Administration Guide</citetitle> section,
+    <link
+     xlink:href="admin-guide#log-debug-selective-capture"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>Debug Logging by Service</citetitle></link>.
+   </para>
+
+   <para>
+    The following table lists the <literal>logger</literal> methods.
+   </para>
+
+   <table xml:id="scripted-auth-module-logger-methods" pgwide="1">
+    <title>Logger Methods</title>
+    <tgroup cols="4">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="1*"/>
+     <colspec colnum="3" colwidth="1*"/>
+     <colspec colnum="4" colwidth="2*"/>
+     <thead>
+      <row>
+       <entry>Method</entry>
+       <entry>Parameters</entry>
+       <entry>Return Type</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>
+        <para>
+         <literal>error</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String <replaceable>message</replaceable></literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Logs <replaceable>message</replaceable> to OpenAM debug logs
+         if ERROR level logging is enabled.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>errorEnabled</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>boolean</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>true</literal> when ERROR level debug messages are enabled.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>message</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String <replaceable>message</replaceable></literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Logs <replaceable>message</replaceable> to OpenAM debug logs
+         if MESSAGE level logging is enabled.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>messageEnabled</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>boolean</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>true</literal> when MESSAGE level debug messages are enabled.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>warning</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String <replaceable>message</replaceable></literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Logs <replaceable>message</replaceable> to OpenAM debug logs
+         if WARNING level logging is enabled.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>warningEnabled</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>boolean</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>true</literal> when WARNING level debug messages are enabled.
+        </para>
+       </entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+  </section>
+
+  <section xml:id="scripted-auth-module-request-data">
+   <title>Accessing Request Data</title>
+
+   <para>
+    Server-side scripts can get access to the login request
+    by using the methods of the <literal>requestData</literal> object.
+   </para>
+
+   <para>
+    The following table lists the methods
+    of the <literal>requestData</literal> object. Note that this object differs
+    from the client-side <literal>requestData</literal> object (see
+     <xref linkend="scripted-auth-module-http-client-methods" />)
+    and contains information about the original authentication request made by the user.
+   </para>
+
+   <table xml:id="scripted-auth-module-request-data-methods" pgwide="1">
+    <title>Request Data Methods</title>
+    <tgroup cols="4">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="1*"/>
+     <colspec colnum="3" colwidth="1*"/>
+     <colspec colnum="4" colwidth="2*"/>
+     <thead>
+      <row>
+       <entry>Method</entry>
+       <entry>Parameters</entry>
+       <entry>Return Type</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>
+        <para>
+         <literal>getHeader</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>name</replaceable></literal> (type: String)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Return the String value of the named request header,
+         or <literal>null</literal> if parameter is not set.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getHeaders</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>name</replaceable></literal> (type: String)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String[]</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Return the array of String values of the named request header,
+         or <literal>null</literal> if parameter is not set.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getParameter</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>name</replaceable></literal> (type: String)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Return the String value of the named request parameter,
+         or <literal>null</literal> if parameter is not set.
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>getParameters</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>name</replaceable></literal> (type: String)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>String[]</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Return the array of String values of the named request parameter,
+         or <literal>null</literal> if parameter is not set.
+        </para>
+       </entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+  </section>
+ </section>
+
+ <section xml:id="scripted-auth-module-javascript-example">
+  <title>Example JavaScript Authentication Module</title>
+
+  <para>
+   This section demonstrates an authentication module
+   with server-side JavaScript.
+  </para>
+
+  <para>
+   Before you start, make sure OpenAM is installed and configured,
+   and create a new Scripted Module authentication module configuration
+   in the realm / (Top Level Realm), called <literal>JavaScript</literal>.
+  </para>
+
+  <para>
+   To create the module configuration, browse in OpenAM Console
+   to Access Control > / (Top Level Realm) > Authentication > Module Instances,
+   and then click New.
+   The name of your new module should be <literal>JavaScript</literal>,
+   and the type should be <literal>Scripted Module</literal>.
+  </para>
+
+  <para>
+   Next, browse to the new authentication module configuration in OpenAM console
+   under Module Instances > JavaScript.
+  </para>
+
+  <para>
+   You notice that an example server-side script already exists.
+   Replace that script with the following program listing.
+  </para>
+
+  <programlisting language="javascript">
+var START_TIME = 9;  // 9am
+var END_TIME   = 17; // 5pm
+
+logger.message("Starting server-side JavaScript");
+logger.message("User: " + username);
+
+var now = new Date();
+logger.message("Current time: " + now.getHours());
+
+if (now.getHours() &lt; START_TIME || now.getHours() > END_TIME) {
+    logger.error("Login forbidden outside work hours!");
+    authState = FAILED;
+} else {
+    logger.message("Authentication allowed!");
+    authState = SUCCESS;
+}
+  </programlisting>
+
+  <para>
+   This server-side script simply allows users to authenticate successfully
+   if they login between 9 AM and 5 PM (according to the server time zone).
+   It demonstrates logging messages to OpenAM debug logs.
+  </para>
+
+  <para>
+   If you are trying this script outside "work hours",
+   then edit the <literal>START_TIME</literal> or <literal>END_TIME</literal>.
+  </para>
+
+  <para>
+   In addition, debug logging for server-side scripts is not enabled by default.
+   Configure message-level debug logging for scripted authentication modules
+   by setting the debug log level for the <literal>amScript</literal> service.
+   For details, see the <citetitle>Administration Guide</citetitle> section,
+   <link
+    xlink:href="admin-guide#log-debug-selective-capture"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    xlink:show="new"
+   ><citetitle>Debug Logging by Service</citetitle></link>.
+  </para>
+
+  <para>
+   At this point, the authentication module is ready for use.
+   You can either add an example Groovy scripted authentication module as well
+   as described in <xref linkend="scripted-auth-module-groovy-example" />,
+   or use the current module alone
+   as described in <xref linkend="scripted-auth-module-try-it-out" />.
+  </para>
+ </section>
+
+ <section xml:id="scripted-auth-module-groovy-example">
+  <title>Example Groovy Authentication Module</title>
+
+  <para>
+   This section demonstrates an authentication module
+   with a server-side Groovy script.
+  </para>
+
+  <para>
+   Create a new Scripted Module authentication module
+   for a server-side Groovy script as described for the JavaScript module
+   in <xref linkend="scripted-auth-module-javascript-example" />.
+   The name of your new module should be <literal>Groovy</literal>,
+   and the type should be <literal>Scripted Module</literal>.
+  </para>
+
+  <para>
+   Next, browse to the new authentication module configuration in OpenAM console
+   under Module Instances > Groovy.
+  </para>
+
+  <para>
+   Set the Server-Side Script Language to Groovy.
+  </para>
+
+  <para>
+   Also notice that an example server-side script already exists.
+   Replace that script with the following program listing.
+  </para>
+
+  <programlisting language="java">
+START_TIME = 9   // 9am
+END_TIME   = 17  // 5pm
+
+logger.message("Starting server-side Groovy script")
+logger.message("User: " + username)
+
+now = new Date()
+logger.message("Current time: " + now.getHours())
+
+if (now.getHours() &lt; START_TIME || now.getHours() > END_TIME) {
+    logger.error("Login forbidden outside work hours!")
+    authState = FAILED
+} else {
+    logger.message("Authentication allowed!")
+    authState = SUCCESS
+}
+  </programlisting>
+
+  <para>
+   This server-side script simply allows users to authenticate successfully
+   if they login between 9 AM and 5 PM (according to the server time zone).
+   It demonstrates logging messages to OpenAM debug logs.
+  </para>
+
+  <para>
+   If you are trying this script outside "work hours",
+   then edit the <literal>START_TIME</literal> or <literal>END_TIME</literal>.
+  </para>
+
+  <para>
+   In addition, debug logging for server-side scripts is not enabled by default.
+   If you have not already done so,
+   configure message-level debug logging for scripted authentication modules
+   by setting the debug log level for the <literal>amScript</literal> service.
+   For details, see the <citetitle>Administration Guide</citetitle> section,
+   <link
+    xlink:href="admin-guide#log-debug-selective-capture"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    xlink:show="new"
+   ><citetitle>Debug Logging by Service</citetitle></link>.
+  </para>
+
+  <para>
+   At this point, the authentication module is ready for use.
+   You can use the module as described in
+   <xref linkend="scripted-auth-module-try-it-out" />.
+  </para>
+ </section>
+
+ <section xml:id="scripted-auth-module-try-it-out">
+  <title>Trying It Out</title>
+
+  <para>
+   You can put the example scripted authentication modules
+   into an authentication chain, and then try them out.
+  </para>
+
+  <para>
+   First create a new authentication chain.
+   In OpenAM console under
+   Access Control > / (Top Level Realm) > Authentication > Authentication Chaining
+   click New, and then name your new chain <literal>scripted</literal>.
+  </para>
+
+  <para>
+   After creating the chain, click Authentication Chaining > scripted
+   to edit the configuration for the chain.
+  </para>
+
+  <para>
+   Add a DataStore module as REQUIRED to the chain first.
+   The DataStore module checks the user credentials,
+   whereas the scripted authentication modules do not check credentials,
+   but instead only check that the authentication request
+   is processed during working hours.
+   Without the DataStore module, therefore, the <literal>username</literal>
+   in the scripted authentication modules could not be determined.
+  </para>
+
+  <para>
+   After the DataStore module, add as REQUIRED either or both
+   of the example scripted authentication modules you configured to the chain.
+   For example, if you add both the JavaScript and Groovy modules,
+   then your <literal>scripted</literal> chain would have three REQUIRED modules,
+   first the DataStore module, and then JavaScript and Groovy modules.
+   Make sure you save the chain configuration.
+  </para>
+
+  <para>
+   To try the new authentication chain, first log out of OpenAM.
+   Next, browse to the login URI for the chain
+   <literal>/XUI/#login/&amp;service=scripted</literal>,
+   where the full URL depends on your deployment,
+   and is something like
+   <literal>http://openam.example.com:8080/openam/XUI/#login/&amp;service=scripted</literal>.
+  </para>
+
+  <para>
+   Login as the sample user having
+   username <literal>demo</literal> and password <literal>changeit</literal>.
+  </para>
+
+  <para>
+   When you complete the login process successfully, you should see
+   the sample user profile page.
+   You should also see messages such as the following
+   in the <filename>debug/Authentication</filename> log file.
+  </para>
+
+  <programlisting language="none">
+amScript:07/08/2014 11:31:21:835 AM CEST: Thread[pool-19-thread-5,5,main]
+Starting server-side JavaScript
+amScript:07/08/2014 11:31:21:837 AM CEST: Thread[pool-19-thread-5,5,main]
+User: demo
+amScript:07/08/2014 11:31:21:837 AM CEST: Thread[pool-19-thread-5,5,main]
+Current time: 11
+amScript:07/08/2014 11:31:21:837 AM CEST: Thread[pool-19-thread-5,5,main]
+Authentication allowed!
+amScript:07/08/2014 11:31:22:567 AM CEST: Thread[pool-19-thread-6,5,main]
+Starting server-side Groovy script
+amScript:07/08/2014 11:31:22:567 AM CEST: Thread[pool-19-thread-6,5,main]
+User: demo
+amScript:07/08/2014 11:31:22:568 AM CEST: Thread[pool-19-thread-6,5,main]
+Current time: 11
+amScript:07/08/2014 11:31:22:568 AM CEST: Thread[pool-19-thread-6,5,main]
+Authentication allowed!
+  </programlisting>
+
+  <para>
+   If the login process fails due to errors in your scripts,
+   then see the same log file for information about the errors.
+  </para>
+ </section>
+
+ <section xml:id="scripted-auth-module-sandbox">
+  <title>Scripted Authentication Sandbox</title>
+  <para>The OpenAM console provides a sandboxing feature to test your Javascript
+   or Groovy scripted authentication modules, ensuring that malicious Java classes
+   are not directly called.
+
+   The sandbox validates the script by checking that all directly-called Java
+   classes match those in a whitelist of classes that are allowed to be invoked.
+  </para>
+  <para>You can configure the sandbox in the console by navigating to Configuration &gt;
+   Authentication &gt; Scripted Module.
+  </para>
+  <para>The sandbox supports the following features:</para>
+  <itemizedlist>
+   <listitem>
+    <para><emphasis role="bold">Java Class Whitelist</emphasis>. Specifies the list
+     of class-name patterns allowed to be invoked by the script. Every class
+     accessed by the script must match at least one of these patterns. You can
+     specify the classes as is or use "*" wildcards. The default whitelist values
+     are stored in the <literal>amAuthScripted.xml</literal> file.
+    </para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Java Class Blacklist</emphasis>. Specifies the list
+     of class-name patterns that are NOT allowed to be invoked by the script.
+     The blacklist is applied AFTER the whitelist to exclude those classes.
+
+     You can specify the classes to exclude as is or use "*" wildcards.
+     The default blacklist values are stored in the <literal>amAuthScripted.xml</literal> file.
+    </para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Using System SecurityManager</emphasis>. If enabled,
+     the sandbox will make an additional call to
+     <literal>System.getSecurityManager().checkPackageAccess(...)</literal>
+     for each class that is accessed. The method throws a SecurityException
+     if the calling thread is not allowed to access the package.
+     This feature only takes effect if the security manager is enabled for the JVM.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <variablelist>
+   <title>Points about the Scripted Authentication Sandbox</title>
+
+   <varlistentry>
+    <term>Sandbox only validates directly accessible classes.</term>
+    <listitem>
+     <para>The sandbox only applies to classes that the script <emphasis>directly</emphasis>
+      accesses. If the script calls <literal>Foo.a()</literal> and then that method
+      calls Bar.b(), then the sandbox will allow it. You must consider the whole
+      chain of accessible classes from each white-listed class.
+     </para>
+     <note><para>"Access" means importing/loading a class,
+      accessing any instance of that class (for example, passed as a parameter
+      to the script), calling a static method on that class, calling a method on
+      an instance of that class, accessing a method or field that returns an
+      instance of that class, etc.
+     </para></note>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>All Java reflection classes are blacklisted by default.</term>
+    <listitem>
+     <para>All Java reflection classes (<literal>java.lang.Class, java.lang.reflect.*</literal>)
+      are blacklisted by default to avoid bypassing the sandbox.
+      Do not enable these reflection classes.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>java.security.AccessController</literal> is blacklisted by default.</term>
+    <listitem>
+     <para>The <literal>java.security.AccessController</literal> is blacklisted by default
+      to prevent access to the <literal>doPrivileged()</literal> methods.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>No knowledge about inheritance.</term>
+    <listitem>
+     <para>The whitelist patterns apply only to the exact class or package names
+      involved. The sandbox does not know anything about inheritance, so it is
+      best to white list known, specific classes.
+     </para>
+    </listitem>
+   </varlistentry>
+
+  </variablelist>
+ </section>
+
+
+
+</chapter>

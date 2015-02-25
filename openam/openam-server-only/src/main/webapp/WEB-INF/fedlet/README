@@ -1,0 +1,581 @@
+------------------------------------------------------------------------------
+README file for Open Federation Library
+------------------------------------------------------------------------------
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+The contents of this file are subject to the terms
+of the Common Development and Distribution License
+(the License). You may not use this file except in
+compliance with the License.
+
+You can obtain a copy of the License at
+https://opensso.dev.java.net/public/CDDLv1.0.html or
+opensso/legal/CDDLv1.0.txt
+See the License for the specific language governing
+permission and limitations under the License.
+
+When distributing Covered Code, include this CDDL
+Header Notice in each file and include the License file
+at opensso/legal/CDDLv1.0.txt.
+If applicable, add the following below the CDDL Header,
+with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+Portions Copyright 2012-2013 ForgeRock AS
+
+
+
+
+%% Contents:
+    %% 1. Contents of this directory 
+    %% 2. How to use fedlet.war for demo.
+    %% 3. How to embed Fedlet into existing application
+    %% 4. How to integrate with existing application after Single Sign-on 
+    %% 5. How to enable Fedlet to support multiple Identity Providers  
+    %% 6. How to enable Identity Provider Discovery service in Fedlet
+    %% 7. How to perform Fedlet Attribute Query
+    %% 8. How to perform Fedlet XACML Query
+
+
+%% 1. Contents of this directory 
+   This README file provides information on Fedlet ZIP file with pre-configured
+   IDP and Fedlet (SP) metadata.
+ 
+   Fedlet.zip 
+     |
+     |- fedlet.war        Fedlet WAR file. This is a ready-to-deploy WAR 
+     |                    to show the Fedlet features.
+     |
+     |- README            This README file. The file shows how to use Fedlet.
+
+
+%% 2. How to use fedlet.war for demo 
+     The fedlet.war contains all necessay bits for Fedlet to acting as a 
+     light-weighted SAMLv2 Service provider. It also provides convenient ways 
+     to setup and validate Fedlet deployment. 
+
+     After deploying fedlet.war into your web container, try access the 
+     Fedlet(SP) index.jsp page to start Fedlet setup, e.g.
+         <SP_PROTOCOL>://<SP_HOST>:<SP_PORT>/<SP_DEPLOY_URI>/index.jsp
+
+     If this is the first time the page is accessed, it will show that the 
+     Fedlet home directory is not configured yet, and a link will be provided 
+     for you to create the configuration automatically. After done, you will 
+     be shown links to start Fedlet(SP) and IDP initiated Single Sign-on. 
+     Click the link, you will be redirected to IDP for login, then Single 
+     Sign-on to Fedlet(SP). Upon successful completion, a Fedlet(SP) side JSP 
+     will be presented to show the SSO Response, Assertion and 
+     AttributeStatement if any.
+
+     
+%% 3. How to embed Fedlet into your existing application WAR
+  a) Extract the fedlet.war into a temporal directory. 
+  b) Copy files inside "conf" directory to a sub directory named "fedlet" 
+     under your web container running user's home directory (pointed by
+     JVM property "user.home"). For example, assume running user's home 
+     directory is "/home/webservd":
+         % mkdir /home/webservd/fedlet 
+         % cd conf
+         % cp * /home/webservd/fedlet 
+     The "fedlet" subdirectory under the web container running user's home 
+     is the default location for Fedlet to read its metadata, COT and 
+     configuration properties. To change this default directory, set the 
+     value of a JVM run-time property "com.sun.identity.fedlet.home" to the 
+     desired location.  For example:  
+         -Dcom.sun.identity.fedlet.home=/export/fedlet/conf 
+     this will tell Fedlet to read metadata/COT/configuration files from 
+     "/export/fedlet/conf" directory instead.
+  c) Copy all other files to your application WAR staging directory, overlay 
+     them with your existing application WAR structure.
+     Optionally you could remove index.jsp, fedletEncode.jsp and "conf" 
+     directory from the temporal directory created in step a) before copying. 
+  d) Create the application WAR and redeploy in your web container. 
+
+
+%% 4. How to integrate with existing application after Single Sign-on
+     There is a sample Fedlet application, fedletSampleApp.jsp, bundled 
+     with fedlet.war. The fedletSampleApp.jsp first invokes a util method 
+     to complete SAMLv2 protocol processing. A map containing various data, 
+     including Response/Assertion/Attributes, is returned to caller for further
+     processing. The fedletSampleApp.jsp also provides some sample code on 
+     how to retrieve data from the returned map. 
+     You could either modify fedletSampleApp.jsp to add your application
+     specific logic or replace fedletSampleApp.jsp with your own servlet/jsp.
+     To replace fedletSampleApp.jsp with new servlet/JSP:
+     1. Modify web.xml to set servlet and servlet-mapping for your new servlet
+        or JSP. You must map your new servlet/JSP to the url-pattern 
+        "/fedletapplication" since it is the URI set in the Fedlet metadata 
+        (the assertion consumer URL). For example:
+            <servlet>
+                <servlet-name>yourapplication</servlet-name>
+                <jsp-file>/Your-Application.jsp</jsp-file>
+            </servlet>
+            <servlet-mapping>
+                <servlet-name>yourapplication</servlet-name>
+                <url-pattern>/fedletapplication</url-pattern>
+            </servlet-mapping> 
+     2. Copy following code from fedletSampleApp.jsp to your
+        application processing code with proper import statement:
+Map map;
+try {
+    // invoke the Fedlet processing logic. this will do all the
+    // necessary processing conforming to SAMLv2 specifications,
+    // such as XML signature validation, Audience and Recipient
+    // validation etc.
+    map = SPACSUtils.processResponseForFedlet(request, response);
+} catch (SAML2Exception sme) {
+    response.sendError(response.SC_INTERNAL_SERVER_ERROR, sme.getMessage());
+    return;
+} catch (IOException ioe) {
+    response.sendError(response.SC_INTERNAL_SERVER_ERROR, ioe.getMessage());
+    return;
+} catch (SessionException se) {
+    response.sendError(response.SC_INTERNAL_SERVER_ERROR, se.getMessage());
+    return;
+} catch (ServletException se) {
+    response.sendError(response.SC_BAD_REQUEST, se.getMessage());
+    return;
+}
+        After obtaining the returned "map" object, you could follow the sample
+        code to retrieve data needed for your business logics.
+
+
+%% 5. How to enable Fedlet to support multiple Identity Providers  
+    To configure second Identity Provider with this Fedlet:
+    a) Get the standard metadata XML file for the new Identity Provider, name 
+       the XML file as "idp2.xml" and copy it to the Fedlet home directory.
+    b) Decide on the circle-of-trust (COT) the new Identity Provider would 
+       belong. This IDP could be added to an existing COT (e.g. "saml2cot") or
+       a brand new COT. 
+       ** To add the Identity Provider to an existing COT, edit the 
+          corresponding COT file (e.g. "fedlet.cot") under your Fedlet home 
+          directory, and append the new IDP entity ID (pointed by the 
+          "entityID" attribute in the "idp2.xml" metadata file) to the 
+          value of "sun-fm-trusted-providers" attribute using "," as separator.
+       ** To add to a new circle-of-trust:
+          -- create a new file named "fedlet2.cot" and put it under the Fedlet 
+             home directory. Use the existing fedlet.cot as a template, but
+             change the value of attribute "cot-name" to the actual name of 
+             the new COT (e.g. "cot2"), and include both the new IDP entity ID 
+             and the Fedlet entity ID as value for "sun-fm-trusted-providers"
+             attribute (two entity IDs separated by ",").
+          -- edit the sp-extended.xml file, add the new COT name to the value
+             of "cotlist" attribute, e.g.
+             <Attribute name="cotlist">
+                 <Value>saml2cot</Value>
+                 <Value>cot2</Value>
+             </Attribute>
+    c) Create a new "idp2-extended.xml" file as the extended metadata for the
+       new Identity Provider. Use the existing idp-extended.xml as a template
+       but change the "entityID" to the new IDP entity ID, change the value for
+       "cotlist" attribute to the COT name if a new COT is created for the IDP.
+       Note : make sure the second IDP is a remote IDP by setting the "hosted" 
+       attribute in the EntityConfig element to "false".
+    d) Send the Fedlet metadata XML file (i.e. "sp.xml" under your Fedlet home)
+       to the second IDP, import the metadata in the remote IDP and add it to 
+       the same circle-of-trust as the IDP. 
+    Repeat the same steps for the third, fourth, ... and [x]th IDP, use 
+    idpx.xml/idpx-extended.xml/fedletx.cot as standard meta/extended meta/COT
+    name for the new IDP. Restart your Fedlet web container to make the change
+    effective.
+    Now accessing the index.jsp again, it will prompt you with a list of IDPs
+    the Fedlet trusted. You could choose any of the IDP and perform Single
+    sign-on.
+
+%% 6. How to enable Identity Provider Discovery service in Fedlet
+    When Fedlet is setup with multiple Identity Providers in a COT, it could be 
+    configured to use IDP Discovery service to find out the preferred IDP.
+
+    You need to have the Identity Provider Discovery service set up before
+    performing following steps. If you installed the OpenAM WAR, the
+    IDP discovery service is bundled in the products already. Or you could
+    follow the document to create a separate WAR for the IDP discovery 
+    service  using the OpenAM WAR. Please refer to the OpenAM
+    document set on how to setup and use the Identity Provider
+    Discovery service. After set up the IDP discovery service, have the
+    reader service URL (URL to find out preferred IDP) and writer service
+    URL (URL to write the preferred IDP) ready, they are needed in step
+    a) and c) below. If you are using OpenAM server instance
+    or the IDP discovery only WAR instance, the reader service URL is:
+    <protocol>://<host>:<port>/<deploy_uri>/saml2reader  
+    (e.g :  http://discovery.common.com/openam/saml2reader)
+    the writer service URL is :
+    <protocol>://<host>:<port>/<deploy_uri>/saml2writer
+    (e.g :  http://discovery.common.com/openam/saml2writer)
+
+    To setup IDP discovery in the Fedlet:
+    a) edit the COT file (e.g. "fedlet.cot"), and set the value for attribute 
+       "sun-fm-saml2-readerservice-url" to the SAML2 reader service URL 
+       (e.g. http://discovery.common.com/openam/saml2reader), set the value
+       for attribute "sun-fm-saml2-writerservice-url" to the SAML2 writer 
+       service URL (e.g. http://discovery.common.com/openam/saml2writer).
+    b) Restart your Fedlet web container to make the change to be effective. 
+    c) Setup IDP discovery on each of your IDPs. If your IDP is an OpenAM
+       server instance, need to goto console, find the COT for
+       the IDP and Fedlet, and specify the SAML2 reader service URL and
+       SAML2 writer service URL. 
+    d) Access the Fedlet index.jsp page, you will be presented with IDP 
+       selection page. Don't click the "use IDP discovery service ..."
+       link yet, as your preferred IDP has not been set yet. Choose one
+       of the IDPs, and complete the Single Sign-on process. The preferred IDP
+       is set right now by the IDP discovery service.
+    c) Access the Fedlet index.jsp page again, and choose the
+       "use IDP discovery service to find out preferred IDP" link.
+       You will be redirected to the IDP discovery service to find out
+       the preferred IDP and send back to Fedlet side with the chosen
+       IDP to start the Fedlet initiated single sign-on.
+
+%% 7. How to perform Fedlet Attribute Query:
+
+      I.  Signing
+      II. Signing and Encryption
+     III. Testing
+
+I. Signing
+==========
+
+      Step 1)
+      Following steps need to be performed on hosted IDP:
+
+      a) When creating the IDP entity metadata, make sure that you specify that
+         particular entity with Attribute Authority role. Also the reponse from
+         Attribute Authority needs to be signed. Enable signing for Attribute
+         Authority role.
+      b) Specify the list of attributes to be fetched in the Attribute Map
+	 IDP Entity -> Assertion Processing -> Attribute Map
+	 ex : CommonName=cn
+	      GivenName=sn
+	      UserStatus=inetUserStatus
+      c) Create the Fedlet.
+
+      Step 2)
+      Following steps need to be performed on Fedlet side:
+
+      a) Deploy fedlet.war and configure the fedlet
+
+      b) The Attribute Query needs to be signed. Please follow the links
+         below on creating a key store and using the certificate.
+         http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
+         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
+	 
+	 Add the certificate to the "RoleDescriptor" element as shown below
+	 inside "sp.xml".
+
+         <RoleDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	  xmlns:query="urn:oasis:names:tc:SAML:metadata:ext:query" 
+	  xsi:type="query:AttributeQueryDescriptorType" 
+	  protocolSupportEnumeration= "urn:oasis:names:tc:SAML:2.0:protocol">
+	      <KeyDescriptor use="signing">
+	      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+	      <ds:X509Data>
+	      <ds:X509Certificate>
+		--certificate--
+              </ds:X509Certificate>
+              </ds:X509Data>
+              </ds:KeyInfo>
+              </KeyDescriptor>
+         </RoleDescriptor>
+
+      c) In the "sp-extended.xml", specify the correct value for
+         "signingCertAlias" inside the AttributeQueryConfig element as follows:
+             <Attribute name="signingCertAlias">
+                 <Value>test</Value>
+             </Attribute>
+
+      d) Goto Step (1) i.e to Hosted IDP side
+
+      e) Delete existing fedlet metadata and obtain the standard metadata 
+	 from Fedlet(i.e sp.xml) and import the same.
+
+II. Signing and Encryption
+==========================
+
+     Step 1)
+      Following steps need to be performed on hosted IDP:
+
+      a) When creating the IDP entity metadata, make sure that you specify that
+         particular entity with Attribute Authority role. Also the response from
+         Attribute Authority needs to be signed. Enable signing for Attribute 
+         Authority role. Enable encryption for the IDP Attribute Authority 
+         entity.
+      b) Specify the list of attributes to be fetched in the Attribute Map
+	 IDP Entity -> Assertion Processing -> Attribute Map
+	 ex : CommonName=cn
+	      GivenName=sn
+	      UserStatus=inetUserStatus
+      c) Specify the Attribute Authority Mapper.
+	  IDP Entity -> Attribute Authority -> Subject Data Store 
+          Specify the Attribute name which contains X.509 Subject DN.
+      d) Create the Fedlet.
+
+
+     Step 2)
+     Following steps need to be performed on hosted SP:
+
+      a) Deploy fedlet.war and configure the fedlet
+
+      b) For signing and encryption, please follow the links
+         below on creating a key store and using the certificate.
+         http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
+         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
+
+	 Add the certificate to the "RoleDescriptor" element as shown below
+	 inside "sp.xml".
+
+         <RoleDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	  xmlns:query="urn:oasis:names:tc:SAML:metadata:ext:query" 
+	  xsi:type="query:AttributeQueryDescriptorType" 
+	  protocolSupportEnumeration= "urn:oasis:names:tc:SAML:2.0:protocol">
+	      <KeyDescriptor use="signing">
+	        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+	          <ds:X509Data>
+	             <ds:X509Certificate>
+		        --certificate--
+                     </ds:X509Certificate>
+                   </ds:X509Data>
+                </ds:KeyInfo>
+              </KeyDescriptor>
+	      <KeyDescriptor use="encryption">
+		<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+		   <ds:X509Data>
+		      <ds:X509Certificate>
+			 --certificate--
+		      </ds:X509Certificate>
+		   </ds:X509Data>
+		</ds:KeyInfo>
+		<EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc">
+		    <xenc:KeySize xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">128</xenc:KeySize>
+                </EncryptionMethod>
+              </KeyDescriptor>
+         </RoleDescriptor>
+     
+      c) In the "sp-extended.xml", specify the correct value for
+         "encryptionCertAlias". If you want Assertion to be encrypted by IDP, 
+         the NameID from Fedlet needs to be encrypted. Please specify the 
+         value of "true" to the attribute "wantNameIDEncrypted" in 
+         AttributeQueryConfig element as follows:
+             <Attribute name="encryptionCertAlias">
+                 <Value>test</Value>
+             </Attribute>
+             <Attribute name="wantNameIDEncrypted">
+                 <Value>true</Value>
+             </Attribute>
+
+      d) Goto Step (1) i.e to Hosted IDP side
+
+      e) Delete existing fedlet metadata and obtain the standard metadata 
+	 from Fedlet(i.e sp.xml) and import the same.
+
+III. Testing:
+===========
+Two JSP files are bundled along inside fedlet.war. fedletAttrQuery.jsp and
+fedletAttrResp.jsp
+a) fedletAttrQuery.jsp:
+   Gets the list of attributes from the form whose values needs to be 
+   fetched from IDP. Please make sure you define the correct mapping in the IDP.
+
+b) fedletAttrResp.jsp
+   Retrieves the attribute names from the previous jsp and invokes the 
+   below method to get the attribute values and display the same. 
+   
+       Map attrMap = AttributeQueryUtil.getAttributeMapForFedlet(
+                                                      spEntityID, 
+                                                      idpEntityID, 
+                                                      newNameIDValue, 
+                                                      attrsList,
+                                                      attrQueryProfile ,
+                                                      subjectDN);
+c) Select either the "Default" or "X.509" profile. If "X.509" profile is
+   selected, specify the right value for the "X.509 Subject DN".
+
+%% 8. How to perform Fedlet XACML Query
+
+      I.  General Information
+      II.  Signing
+      III. Encryption
+      IV. Testing
+
+I.  General Information
+======================
+Following steps are common for all the scenarios (including Signing and 
+Encryption). Unlike Fedlet Attribute Query which required query signing 
+to be done on the Fedlet side, no such requirement is there for Fedlet 
+XACML Query. Signing and Encryption are optional.
+
+      Step 1)
+        Following steps need to be performed on hosted IDP:
+
+          a) When creating the IDP entity metadata, make sure that you specify that
+             particular entity with XACML PDP role. 
+          b) Specify the Request Handler for SAMLv2 SOAP Binding. Log into 
+	     the OpenAM console.
+	       Configuration tab -> Global -> SAMLv2 SOAP Binding -> New
+               Key = /pdp (This should be the same metaAlias specified while 
+                         creating the IDP)
+               class = com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler
+               Click the "Save" button.
+          c) Create the Fedlet.
+          d) Specify the right URL policies for the resources for which the Fedlet 
+	     is issuing a XACML query. Right URL policies with right actions 
+	     (GET or POST) should be specified for the XACML query to get the 
+	     policy decisions for the resoruce.
+	       Access Control -> Realm Name -> Policies -> New Policy
+
+      Step 2)
+         Following steps need to be performed on Fedlet side:
+
+           a) Deploy fedlet.war and configure the fedlet
+           b) If Signing or Encryption is enabled, please make sure when you
+              create PDP on IDP, signing cert or encryption cert should have a
+	      valid value. Also the updated Fedlet metadata is loaded on IDP
+	      side.
+           c) If Signing and Encryption are not enabled, skip to Step IV.
+
+II. Signing
+==========
+      Please follow the links below on creating a key store and using the
+      certificate.
+      http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
+      http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
+	 
+         Add the certificate to the "XACMLAuthzDecisionQueryDescriptor" 
+         element as shown below inside "sp.xml".
+
+         <XACMLAuthzDecisionQueryDescriptor WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+	   <KeyDescriptor use="signing">
+	      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+	        <ds:X509Data>
+	           <ds:X509Certificate>
+		      --certificate--
+                   </ds:X509Certificate>
+                 </ds:X509Data>
+                </ds:KeyInfo>
+            </KeyDescriptor>
+         </XACMLAuthzDecisionQueryDescriptor>
+
+
+   a) In the "sp-extended.xml", specify the correct value for
+         "signingCertAlias" inside the XACMLAuthzDecisionQueryConfig element as 
+         follows:
+             <Attribute name="signingCertAlias">
+                 <Value>test</Value>
+             </Attribute>
+
+    b) If Fedlet wants have the Authorization Decision Response signed, it 
+       will specify the following.
+       
+       1) On the Fedlet side, specify the value for 
+          "wantXACMLAuthzDecisionResponseSigned" inside the 
+          XACMLAuthzDecisionQueryConfig as shown below:
+
+             <Attribute name="wantXACMLAuthzDecisionResponseSigned">
+                 <Value>true</Value>
+             </Attribute>
+
+    c) Goto to Hosted IDP side
+
+    d) If IDP wants the XACML Query signed, it will enable the below
+      property on the XACML PDP tab for the IDP Entity
+	  Authorization Decision Query Signed
+
+    e) Specify the below value for the attribute 
+       "wantXACMLAuthzDecisionQuerySigned" in "idp-extended.xml" on the Fedlet
+       side for this change to happen.
+             <Attribute name="wantXACMLAuthzDecisionQuerySigned">
+                 <Value>true</Value>
+             </Attribute>
+
+    f) Delete existing fedlet metadata and obtain the standard metadata 
+	 from Fedlet(i.e sp.xml) and import the same.
+
+    g) If Authorization Decision Response Signed is required (Step b), click 
+       on the XACML PEP entity that was added. Enable the attribute 
+       "Authorization Decision Response Signed".
+
+III. Encryption
+===============
+
+      In addition to above section, the Fedlet might want to get the Assertion
+      from IDP to be encrypted. It will do the following.
+      
+      a) Enable the following in "sp-extended.xml" inside 
+         XACMLAuthzDecisionQueryConfig element.
+           <Attribute name="wantAssertionEncrypted">
+		<Value>true</Value>
+           </Attribute>
+
+      b) For signing and encryption, please follow the links
+         below on creating a key store and using the certificate.
+         http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
+         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
+
+         Add the certificate to the "XACMLAuthzDecisionQueryDescriptor" 
+         element as shown below inside "sp.xml".
+
+         <XACMLAuthzDecisionQueryDescriptor WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+	   <KeyDescriptor use="signing">
+	      <KeyDescriptor use="signing">
+	        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+	          <ds:X509Data>
+	             <ds:X509Certificate>
+		        --certificate--
+                     </ds:X509Certificate>
+                   </ds:X509Data>
+                </ds:KeyInfo>
+              </KeyDescriptor>
+	      <KeyDescriptor use="encryption">
+		<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+		   <ds:X509Data>
+		      <ds:X509Certificate>
+			 --certificate--
+		      </ds:X509Certificate>
+		   </ds:X509Data>
+		</ds:KeyInfo>
+		<EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc">
+		    <xenc:KeySize xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">128</xenc:KeySize>
+                </EncryptionMethod>
+              </KeyDescriptor>
+         </XACMLAuthzDecisionQueryDescriptor>
+     
+      c) In the "sp-extended.xml", specify the correct value for
+         "encryptionCertAlias". 
+             <Attribute name="encryptionCertAlias">
+                 <Value>test</Value>
+             </Attribute>
+
+      d) Goto to Hosted IDP side
+
+      e) Delete existing fedlet metadata and obtain the standard metadata 
+	 from Fedlet(i.e sp.xml) and import the same.
+
+      f) Click on the XACML PEP entity that was added. Enable the attribute 
+         "Assertion Encrypted".
+
+IV. Testing:
+===========
+Two JSP files are bundled along inside fedlet.war. fedletXACMLQuery.jsp and
+fedletXACMLResp.jsp
+
+a) fedletXACMLQuery.jsp:
+   Prompts the user to enter the Resource URL, Action (GET or POST).  Fedlet 
+   then passes this information along with other parameters (pepEntityID, 
+   pdpEntityID, NameID) to fedletXACMLResp.jsp
+
+b) fedletXACMLResp.jsp
+   Retrieves the Resource URL from the previous jsp and invokes the 
+   below method to get the policy decision for the Resource URL and display the 
+   same. The decision can be either "Permit" (if the right policy decision is 
+   provided", else "Deny" (if no policy is found) or "Indeterminate" 
+   (if the user session has expired).
+   
+       String policy_decision = XACMLQueryUtil.getPolicyDecisionForFedlet(
+						      request,
+                                                      pepEntityID, 
+                                                      pdpEntityID, 
+                                                      nameIDValue, 
+                                                      serviceName, 
+                                                      resource,
+                                                      action);

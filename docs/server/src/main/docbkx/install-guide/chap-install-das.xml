@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-install-das'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Installing OpenAM Distributed Authentication</title>
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Behind the firewall</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>distributed authentication</primary>
+  <secondary>installing</secondary>
+ </indexterm>
+
+ <para>OpenAM provides a login interface called the <emphasis>distributed authentication
+  service (DAS)</emphasis>, deployed within network demilitarized zones
+  to limit OpenAM's exposure to the Internet.
+  Login requests through the DAS are forwarded through the internal firewall to
+  the OpenAM core server.
+ </para>
+
+ <para>
+  For more information see
+  the OpenAM Administration Guide section on <link xlink:show="new"
+  xlink:href="admin-guide#protect-network-access"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Protecting Network
+  Access</citetitle></link>.
+ </para>
+
+ <para>To deploy the DAS securely, select a system in your DMZ. Then take the following
+  general steps:</para>
+ <orderedlist>
+  <listitem>
+   <para>Make sure the cookie domain for the DAS is configured in OpenAM under
+    Configuration &gt; System &gt; Platform.</para>
+  </listitem>
+  <listitem>
+   <para>Make sure the realms used have a Realm/DNS alias for the DAS
+    configured in OpenAM under Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; General.</para>
+  </listitem>
+  <listitem>
+   <para>
+    Create a 2.2 Agent profile in OpenAM for the DAS to connect to the server.
+   </para>
+
+   <para>
+    You can create the profile in OpenAM Console under
+    Access Control > <replaceable>Realm Name</replaceable> > Agents > 2.2 Agents.
+    See the <citetitle>Administration Guide</citetitle> section on
+    <link xlink:show="new" xlink:href="admin-guide#configure-22-policy-agent"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+    >Configuring Version 2.2 Policy Agents</citetitle></link> for details.
+   </para>
+  </listitem>
+  <listitem>
+   <para>Deploy the <?eval ${distauthWarFile}?> file into your web application
+    container.</para>
+   <para>How you deploy the DAS .war file depends on your web application
+     container. The procedure in this section shows how to deploy on
+     Apache Tomcat.</para>
+  </listitem>
+  <listitem>
+   <para>Configure the DAS UI to access OpenAM core services.</para>
+  </listitem>
+  <listitem>
+   <para>Configure your firewall to allow end user access to the DAS.</para>
+   <para>Firewall configuration is not described here.</para>
+  </listitem>
+ </orderedlist>
+
+  <important><!-- Pending fix for OPENAM-2808 -->
+   <para>The DAS relies on the classic OpenAM UI. If you customize the end
+    user pages, follow the procedures for the classic UI described in
+    <link xlink:show="new" xlink:href="install-guide#chap-custom-ui"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Customizing the
+    OpenAM End User Pages</citetitle></link>.</para>
+  </important>
+
+ <procedure xml:id="deploy-distributed-auth-on-tomcat">
+  <title>To Deploy the DAS on Tomcat</title>
+
+  <indexterm>
+   <primary>distributed authentication</primary>
+   <secondary>deploying on Tomcat</secondary>
+  </indexterm>
+
+  <step>
+   <para>Copy the <filename><?eval ${distauthWarFile}?></filename> file into the 
+   <filename>webapps/</filename> directory.</para>
+
+   <screen>
+$ <userinput>cp ~/Downloads/openam/${distauthWarFile} \
+ /path/to/tomcat/webapps</userinput>
+   </screen>
+
+  </step>
+  <step>
+   <para>Check that you see the initial DAS configuration screen
+   in your browser.</para>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="configure-distributed-auth">
+  <title>To Configure the DAS</title>
+
+  <indexterm>
+   <primary>distributed authentication</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+
+  <step>
+   <para>
+    Configure the DAS using the agent profile to connect to OpenAM. The DAS agent
+    profile can only be configured in the top level realm ("/").
+    If working with sub-realms, you may then define the Realm/DNS alias for the
+    DAS under Access Control &gt; <replaceable>Realm Name</replaceable> &gt; General.
+   </para>
+
+   <mediaobject xml:id="figure-das-complete-config">
+    <alt>Completed DAS configuration screen</alt>
+    <imageobject>
+     <imagedata fileref="images/das-complete-config.png" format="PNG" />
+    </imageobject>
+    <textobject><para>Configure access to OpenAM.</para></textobject>
+   </mediaobject>
+
+   <para>Most DAS configuration choices require no clarification. Hints for
+   equivocal parameters follow.</para>
+   <variablelist>
+    <varlistentry>
+     <term>Debug Level</term>
+     <listitem>
+      <para>Default is <literal>error</literal>. Other options include
+      <literal>error</literal>, <literal>warning</literal>,
+      <literal>message</literal>, and <literal>off</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Encryption Key</term>
+     <listitem>
+      <para>Do not change the password encryption key.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Application User Name</term>
+     <listitem>
+      <para>
+       The DAS uses this 2.2 Agent identity to authenticate to OpenAM.
+      </para>
+
+      <para>
+       You can find the 2.2 Agent profile in OpenAM Console under
+       Access Control > <replaceable>Realm Name</replaceable> > Agents > 2.2 Agents
+       as described above.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Application User Password</term>
+     <listitem>
+      <para>The DAS uses this password to authenticate to OpenAM.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </step>
+  <step>
+   <para>Login through the DAS to access OpenAM services.</para>
+   <para>For testing, you can login as user <literal>demo</literal>,
+   password <literal>changeit</literal>.</para>
+   <mediaobject xml:id="figure-das-login-success">
+    <alt>Successfully logged in through the DAS</alt>
+    <imageobject>
+     <imagedata fileref="images/das-login-success.png" format="PNG" />
+    </imageobject>
+    <textobject><para>The DAS UI redirects the user to the URL
+    configured for the realm.</para></textobject>
+   </mediaobject>
+   <para>When the <literal>/openam/idm/EndUser</literal> page is inside the
+   firewall, and therefore not visible to users outside, redirect the
+   browser after successful login to a page that exists. One way to do this
+   is to use the <literal>goto</literal> parameter in the URL.</para>
+   <literallayout class="monospaced">https://das.example.com/das/UI/Login?goto=<replaceable>absolute-successful-redirect-URL</replaceable></literallayout>
+   <!-- Tips from Peter follow. See
+   http://blogs.forgerock.org/petermajor/2011/09/how-to-set-up-multiple-daui-instances/ -->
+   <para>On successful login, your browser stores an
+   <literal>AMDistAuthConfig</literal> cookie that identifies the DAS.</para>
+  </step>
+
+  <step xml:id="das-configuration-file">
+   <para>
+    Restrict permissions to the configuration for the DAS
+    under the <filename>$HOME/FAMDistAuth</filename> directory of the user
+    who runs the web container where you deployed the service.
+   </para>
+
+   <para>
+    Configuration file names depend on the path where the DAS is deployed,
+    and end in <filename>AMDistAuthConfig.properties</filename>.
+    For example,
+    if the DAS is deployed under <filename>/path/to/tomcat/webapps/das/</filename>
+    then the configuration file name is
+    <filename>$HOME/FAMDistAuth/_path_to_tomcat_webapps_das_AMDistAuthConfig.properties</filename>.
+   </para>
+  </step>
+
+  <step>
+   <para>If you deploy multiple DAS servers, you can configure them to forward
+   requests to each other based on the <literal>AMDistAuthConfig</literal>
+   cookie by setting the <literal>com.sun.identity.distauth.cluster</literal>
+   property in this file. The following example lines are wrapped to fit on the
+   page, but you put the entire property on a single line in the configuration
+   file.</para>
+   <programlisting language="ini">com.sun.identity.distauth.cluster=
+ http://das.example.com:8080/das/UI/Login,
+ http://das2.example.com:8080/das/UI/Login</programlisting>
+  </step>
+
+  <step>
+   <para>
+    If your deployment includes multiple OpenAM servers,
+    then edit the DAS configuration file
+    mentioned in <xref linkend="das-configuration-file" />
+    to include <literal>X-Forwarded-For</literal> in the list of
+    <link
+     xlink:show="new"
+     xlink:href="reference#openam-retained-http-request-headers"
+     xlink:role="http://docbook.org/xlink/role/olink"><literal
+    >openam.retained.http.request.headers</literal></link>.
+   </para>
+
+   <para>
+    Example:
+    <literal>openam.retained.http.request.headers=X-DSAMEVersion,X-Forwarded-For</literal>
+   </para>
+
+   <para>This ensures the authoritative OpenAM authentication server gets
+   the client IP address in this header of the forwarded HTTP request. You can
+   also add the header to the list for the
+   <literal>openam.retained.http.headers</literal> property to have OpenAM copy
+   the header to the response.</para>
+  </step>
+
+  <step>
+   <para>Some application servers such as JBoss 7 mount the content of the
+   deployed .war file in a temporary location that can change on restart. To
+   make sure that the DAS can find its bootstrap configuration in this case,
+   specify the path to the bootstrap configuration file as a Java runtime option
+   for the DAS, as in the following example. The property to set is
+   <literal>openam.das.bootstrap.file</literal>.</para>
+
+   <programlisting language="ini"
+   >-Dopenam.das.bootstrap.file=/home/openam/FAMDistAuth/AMDistAuthConfig.properties</programlisting>
+
+   <para>You must make sure that the value of the option corresponds to the path
+   to the correct <filename>AMDistAuthConfig.properties</filename> file.</para>
+  </step>
+
+  <step>
+   <para>
+    If your deployment uses a custom login URI,
+    then edit the DAS configuration file
+    mentioned in <xref linkend="das-configuration-file" />
+    to add the custom login URI to the whitelist specified
+    by the <literal>org.forgerock.openam.cdc.validLoginURIs</literal> property.
+   </para>
+
+   <para>
+    Example:
+    <literal>org.forgerock.openam.cdc.validLoginURIs=/UI/Login,/customLoginURI</literal>
+   </para>
+
+   <para>
+    For more information about this property,
+    see the <citetitle>Reference</citetitle> section on advanced properties,
+    <link
+     xlink:show="new"
+     xlink:href="reference#servers-advanced-configuration"
+     xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Servers &gt; Advanced</citetitle></link>.
+   </para>
+  </step>
+ </procedure>
+
+ <section xml:id="configure-valid-goto-url-resources">
+  <title>Configuring Valid goto URL Resources</title>
+
+  <indexterm>
+   <primary>valid goto URL resources</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+
+  <para>By default, OpenAM redirects the user to the URL specified in the
+   <literal>goto</literal> and <literal>gotoOnFail</literal> query string parameters
+   supplied to the authentication interface in the login URL.
+  </para>
+  <para>
+   You can increase security against possible phishing attacks through open redirect
+   by specifying a list of valid URL resources against which OpenAM
+   validates these URLs.
+
+   OpenAM only redirects a user if the <literal>goto</literal> and
+   <literal>gotoOnFail</literal> URL matches any of the resources specified in
+   this setting.
+   If no setting is present, it is assumed that the <literal>goto</literal> or
+   <literal>gotoOnFail</literal> URL is valid.
+  </para>
+
+  <itemizedlist>
+   <para>
+    When setting valid <literal>goto</literal> URLs,
+    you can use the "*" wildcard,
+    where "*" matches all characters except "?".
+    The following rules apply:
+   </para>
+
+   <listitem>
+    <para>
+     To allow only a single host name to be used
+     when redirecting the user after authentication,
+     specify the host name.
+    </para>
+
+    <para>
+     For example, if you specify
+     <literal>http*://secure.example.com</literal>,
+     then you can redirect only to
+     URLs on <literal>secure.example.com</literal>,
+     not URLs on <literal>www.example.com</literal>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Start the domain name with <literal>*.</literal>
+     to allow all host names in the domain to be used
+     when redirecting the user after authentication.
+    </para>
+
+    <para>
+     For example, to allow redirects to URLs on any hosts in the domain
+     <literal>secure.example.com</literal>,
+     use <literal>http*://*.secure.example.com</literal>.
+    </para>
+
+    <para>
+     Note that <literal>http*://*.secure.example.com</literal>
+     matches URLs on <literal>www.secure.example.com</literal>,
+     and also URLs on <literal>www.subdomain.secure.example.com</literal>.
+    </para>
+
+    <para>
+     Also note that the <literal>*</literal> wildcard in the protocol,
+     <literal>http*://</literal>, matches URLs starting with
+     either <literal>http://</literal> or <literal>https://</literal>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     To match URLs using secure connections
+     to <literal>www.example.com</literal> on any port,
+     but no URLs with query string parameters,
+     use <literal>https://www.example.com:*/*</literal>.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+ <procedure xml:id="configure-valid-goto-url-resource">
+  <title>To Configure Valid goto URL Resources</title>
+
+  <para>
+   You can increase security against possible phishing attacks through open redirect
+   by specifying a list of valid URL resources using the Valid
+   <literal>goto</literal> URL Resource service.
+  </para>
+  <para>
+   OpenAM only redirects a user if the <literal>goto</literal> and
+   <literal>gotoOnFail</literal> URL matches any of the resources specified in
+   this setting.
+   If no setting is present, it is assumed that the <literal>goto</literal> or
+   <literal>gotoOnFail</literal> URL is valid.
+  </para>
+  <para>
+   When setting valid <literal>goto</literal> URLs,
+   you can use the "*" wildcard,
+   where "*" matches all characters except "?".
+   For more specific patterns,
+   use resource names with wildcards as described in the procedure,
+   <link
+    xlink:href="admin-guide#configure-valid-goto-url-resources"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    xlink:show="new"
+    ><citetitle>Configuring Valid goto URL Resources</citetitle></link>.
+  </para>
+  <step>
+   <para>Open the OpenAM console. Click Access Control &gt;
+    <replaceable>Realm Name</replaceable> &gt; Services, and
+    then click Add.</para>
+  </step>
+  <step>
+   <para>Select Validation Service.</para>
+  </step>
+  <step>
+   <para>In the New Value box, enter a valid <literal>goto</literal> URL, and
+   then click Add. You can repeat this step to enter additional URLs.</para>
+  </step>
+ </procedure>
+ </section>
+
+</chapter>

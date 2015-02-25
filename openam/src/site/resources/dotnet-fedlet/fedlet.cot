@@ -1,0 +1,5 @@
+cot-name=cot
+sun-fm-cot-status=Active
+sun-fm-trusted-providers=http://openam.example.com:8080/openam, http://openam.example.com/fedlet
+sun-fm-saml2-readerservice-url=
+sun-fm-saml2-writerservice-url=

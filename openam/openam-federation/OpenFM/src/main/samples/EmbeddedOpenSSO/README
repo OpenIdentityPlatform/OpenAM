@@ -1,0 +1,109 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README,v 1.2 2009/05/12 05:38:47 kevinserwin Exp $
+
+-->
+
+Embedded OpenSSO sample
+
+This directory contains the sample code for Embedded OpenSSO.
+The contents of opensso.war are included, as well as Embedded OpenSSO specific
+classes.
+
+Contents of this directory:
+  <>            (root directory where opensso.zip is extracted)
+     |- README                (this README file)
+     |- build.sh              (script to build the Hello sample)
+     |- run.sh                (script to execute the Hello sample)
+     |- login.jsp             (login script for deployed version of sample)
+     |- config                (contents from opensso.war)
+     |- source                (sample source code directory)
+       |- Hello.java          (sample code for Embedded OpenSSO)
+     |- WEB-INF               (contents from opensso.war)
+       |- classes             (contains opensso.war classes plus Hello.class)
+       |- classes/configparam.properties  (contains configuration parameters
+                                           for embedded opensso. 
+                                           NOTE: This file must be modified to
+                                           use the deployed version)
+
+Steps to run Embedded OpenSSO:
+
+Standalone
+==========
+
+1. Extract the opensso-embedded.war file:
+   % mkdir <staging area>
+   % cd <staging area>
+   % jar xvf <war-file-location>/opensso-embedded.war
+
+2. Fix permissions on the run.sh script
+   % chmod 755 run.sh
+
+3. Execute the run.sh script:
+   % run.sh
+
+4. Modify source/Hello.java and then rebuild to test your modifications.
+   % build.sh
+   % run.sh
+
+Deployed
+==========
+
+1. Extract the opensso-embedded.war file:
+   % mkdir <staging area>
+   % cd <staging area>
+   % jar xvf <war-file-location>/opensso-embedded.war
+
+2. Modify the configuration parameters for your environment:
+   % vi WEB-INF/classes/configparam.properties
+
+     SERVER_URL=http://<your host>:<deployed port>
+     locale=en_US
+     PLATFORM_LOCALE=en_US
+     AM_ENC_KEY=abcdefghijklm
+     ADMIN_PWD=11111111
+     ADMIN_CONFIRM_PWD=11111111
+     AMLDAPUSERPASSWD=00000000
+     AMLDAPUSERPASSWD_CONFIRM=00000000
+     COOKIE_DOMAIN=
+     DATA_STORE=embedded
+     DIRECTORY_SSL=SIMPLE
+     DIRECTORY_SERVER=localhost
+     DIRECTORY_PORT=50389
+     ROOT_SUFFIX=dc=openam,dc=forgerock.dc=org
+     DS_DIRMGRDN=cn=Directory Manager
+     DS_DIRMGRPASSWD=11111111
+
+3. Jar the modified contents:
+   % jar cvf hello.war *
+
+4. Deploy the war file on your favorite container
+
+5. Goto the Embedded OpenSSO URL in your browser:
+   http://myhost:8080/hello/login.jsp
+
+
+
+

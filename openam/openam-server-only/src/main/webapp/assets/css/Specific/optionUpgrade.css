@@ -1,0 +1,110 @@
+/* CSS Document */
+#options div {
+    width: 290px;
+    float: left;
+    height:200px;
+
+}
+
+.borderRight {
+    padding-right: 10px
+}
+
+h4 {
+    background: #eeea07;
+    border: 1px solid;
+    border-color: #eeea07;
+    font-size: 14px;
+    color: #333333;
+    font-weight: bold;
+    padding: 5px;
+    margin-left: -5px;
+    margin-bottom: 5px;
+}
+p {
+    text-align:justify;
+}
+
+span.yellowBlock {
+    background: #eeea07;
+    border: 1px solid;
+    border-color: #eeea07;
+    font-size: 14px;
+    color: #333333;
+    font-weight: bold;
+    padding: 5px;
+    margin-left: -5px;
+    margin-bottom: 5px;
+    width:100%;
+    display:block;
+    line-height: 17px;
+}
+
+span.currentVersion{
+    font-weight: normal;
+}
+
+
+/*licensing*/
+.inner-summary{
+    margin: 20px; 
+}
+
+.inner-license{
+    background: url(../../../images/loading.gif) no-repeat 50% 50% transparent; 
+}
+
+.license-loaded .inner-license{
+    background: transparent;    
+}
+
+.inner-license{
+    overflow: hidden;
+    overflow-y: scroll;
+    margin:0;
+    height: 546px;
+    padding: 10px 80px;
+    font-size: 12px;
+}
+
+.summary{
+    display:none;
+}
+
+.license-accepted .summary{
+    display:block;
+}
+
+.license-accepted .license{
+    display:none;
+}
+
+.accept-check-container{
+    background-color: #e5e9ed;
+    margin: 15px 0 5px;
+    display:none;
+}
+
+.license-loaded .accept-check-container{
+    display: block;
+}
+
+.accept-check-container label{
+    padding: 5px 5px 5px 8px;
+}
+.accept-check-container input{
+    margin: 6px 0 0 0;
+}
+
+a.disabled,a.disabled:hover{
+    cursor: initial;
+    color:#DDD;
+}
+
+#upgradeFooter{
+    border-top: 1px solid #DDD;
+}
+.license-accepted #upgradeFooter{
+    border: none;
+}
+

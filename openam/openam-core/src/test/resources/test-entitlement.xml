@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  
+   The contents of this file are subject to the terms of the Common Development and
+   Distribution License (the License). You may not use this file except in compliance with the
+   License.
+
+   You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+   specific language governing permission and limitations under the License.
+  
+   When distributing Covered Software, include this CDDL Header Notice in each file and include
+   the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+   Header, with the fields enclosed by brackets [] replaced by your own identifying
+   information: "Portions copyright [year] [name of copyright owner]".
+  
+   Copyright 2014 ForgeRock AS.
+  
+-->
+
+<ServicesConfiguration>
+    <Service name="sunEntitlementService" version="1.0">
+        <Configuration>
+            <GlobalConfiguration>
+                <SubConfiguration name="applicationTypes" id="applicationTypes">
+                    <SubConfiguration name="type4" id="applicationType">
+                        <AttributeValuePair>
+                            <Attribute name="actions"/>
+                            <Value>CREATE=true</Value>
+                            <Value>READ=true</Value>
+                            <Value>UPDATE=true</Value>
+                            <Value>DELETE=true</Value>
+                            <Value>PATCH=true</Value>
+                            <Value>ACTION=true</Value>
+                            <Value>QUERY=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="searchIndexImpl"/>
+                            <Value>
+                                org.forgerock.openam.upgrade.steps.UpgradeEntitlementSubConfigsStepTest$DumbSearchIndex
+                            </Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="saveIndexImpl"/>
+                            <Value>
+                                org.forgerock.openam.upgrade.steps.UpgradeEntitlementSubConfigsStepTest$DumbSaveIndex
+                            </Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resourceComparator"/>
+                            <Value>
+                                org.forgerock.openam.upgrade.steps.UpgradeEntitlementSubConfigsStepTest$DumbResourceName
+                            </Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
+            </GlobalConfiguration>
+            <OrganizationConfiguration name="/">
+                <SubConfiguration name="registeredApplications" id="applications">
+                    <SubConfiguration name="application4" id="application">
+                        <AttributeValuePair>
+                            <Attribute name="applicationType"/>
+                            <Value>type1</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources"/>
+                            <Value>http://*</Value>
+                            <Value>https://*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="subjects"/>
+                            <Value>subject.entry.1</Value>
+                            <Value>subject.entry.2</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="conditions"/>
+                            <Value>condition.entry.1</Value>
+                            <Value>condition.entry.2</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner"/>
+                            <Value>
+                                DenyOverride
+                            </Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
+            </OrganizationConfiguration>
+        </Configuration>
+    </Service>
+</ServicesConfiguration>
+

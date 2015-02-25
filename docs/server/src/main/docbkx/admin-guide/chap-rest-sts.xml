@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<chapter xml:id='chap-rest-sts'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+         http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+
+ <title>The RESTful Security Token Service</title>
+
+  <para>
+    This chapter specifies the configuration requirements associated with the
+    RESTful Security Token Service (REST-STS). Like previous implementations of
+    STS, this implementation secures identity tokens and messages.
+  </para>
+
+  <para>
+   The REST-STS is inspired by the WS-Trust STS. The REST-STS supports one
+   basic operation: token transformation. This chapter describes how you can
+   configure REST-STS token transformations through the OpenAM UI.
+  </para>
+
+  <para>
+   Different Identity Relationship Management (IRM) services require different
+   token types. Given the variety of token types in use today, it can be
+   helpful to have a service that you can configure to transform tokens.
+  </para>
+
+   <section xml:id="sts-about">
+    <title>About the REST-STS</title>
+
+     <note>
+      <para>
+       Do not use the WSP and WSC agent UI tools described in <link xlink:show="new"
+       xlink:role="http://docbook.org/roles/xlink/role/olink"
+       xlink:href="admin-guide#chap-agents"><citetitle>Configuring Policy Agent
+       Profiles</citetitle>.</link>
+      </para>
+     </note>
+
+     <para>
+      The OpenAM implementation of REST-STS supports a variety of
+      token transformations, as well as different attributes from SAML2
+      assertions, along with different encryption contexts.
+     </para>
+
+     <para>
+      The REST-STS UI currently includes transformations from three types of
+      tokens:
+     </para>
+
+     <itemizedlist>
+      <listitem>
+       <para>
+        <literal>UNT</literal>: Username Token. May be associated with
+        usernames and/or associated passwords.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <literal>OpenID Connect</literal>: OpenID Connect token.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <literal>OpenAM</literal>: OpenAM session token.
+       </para>
+      </listitem>
+     </itemizedlist>
+
+     <para>
+      At this time, the ForgeRock REST-STS supports conversions from these
+      types of tokens to a SAML2 token. For the conversion, you can
+      configure OpenAM to invalidate the interim OpenAM session.
+     </para>
+
+   </section>
+
+   <section xml:id="sts-configure">
+    <title>Configuring the Security Token Service</title>
+
+    <para>
+     To access the REST-STS configuration menu for your realm, navigate to
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; STS. When
+     you see the <replaceable>Realm Name</replaceable> - REST STS Instances
+     menu, click Add. You should see an excerpt of the REST Security Token
+     Service menu in the following screen shot.
+    </para>
+
+    <mediaobject xml:id="rest-sts-access-menu">
+     <alt>The REST Security Token Service UI</alt>
+     <imageobject>
+      <imagedata fileref="images/rest-sts-access-menu.png" format="PNG"/>
+     </imageobject>
+     <textobject>
+      <para>You can configure the REST STS from this realm-based menu</para>
+     </textobject>
+    </mediaobject>
+
+    <para>
+     The REST STS configuration menu is subdivided into four sections:
+    </para>
+
+    <section xml:id="rest-sts-general">
+     <title>REST STS General Configuration</title>
+
+     <para>
+      At the top of the REST STS configuration menu, you can set up the
+      General Configuration for the system.
+     </para>
+
+     <para>
+      You will first add a name for the REST-STS token issuer. You can pick any
+      name; the REST-STS includes that name with the <literal>issuer</literal>
+      label for each token.
+     </para>
+
+     <para>
+      You can then select from one of the noted types of token transformations.
+      Be aware, you should not select both "invalidate" and "don't invalidate"
+      options for the same token transformation.
+     </para>
+
+    </section>
+
+    <section xml:id="rest-sts-deployment">
+     <title>REST STS Deployment Configuration</title>
+
+     <para>
+      In the Deployment Configuration section, you can assign a specific
+      endpoint for the REST STS, and set up the mapping for each token
+      transformation.
+     </para>
+
+     <para>
+      OpenAM includes what you enter in the
+      <literal>Deployment Url Element</literal> text box in the REST-STS
+      endpoint, as well as the name of the REST-STS instance. As an example,
+      assume that you've set the <literal>Deployment Url Element</literal> to
+      <literal>instance1</literal>, on a realm named <literal>NewRealm</literal>.
+     </para>
+
+     <para>
+      In that case, the STS Endpoint URI would be
+      <literal>rest-sts/NewRealm/instance1</literal>, and the REST STS Instance
+      would be <literal>NewRealm/instance1</literal>.
+     </para>
+
+     <para>
+      Under Authentication Target Mappings, you can configure two or three
+      pieces of information related to each input token. The default options
+      shown in this field are known as a <literal>tuple</literal>, an ordered
+      list of elements. Each element is separated with a pipe character:
+      "<literal>|</literal>".
+     </para>
+     <variablelist>
+      <varlistentry>
+       <term>Authentication target type</term>
+       <listitem>
+        <para>
+         Whether the target is a module or service
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Name of the authentication module or service</term>
+       <listitem>
+        <para>
+         Two default options are included: the <literal>ldapService</literal>
+         service for usernames, and <literal>OPENIDCONNECT</literal> module to
+         identify elements of the OpenAM RESTful authentication context that
+         should be consumed to validate that OpenID Connect token.
+        </para>
+        <para>
+         The <literal>OPENIDCONNECT</literal> module supports the transformation
+         of a token from OpenID Connect to SAML2.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Authentication context information (optional)</term>
+       <listitem>
+        <para>
+         Defines STS authentication context information about the token to be
+         consumed. In the case shown in the default, the name of the token to
+         be consumed is <literal>oidc_id_token</literal>.
+        </para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </section>
+
+    <section xml:id="rest-sts-keystore">
+     <title>REST STS Keystore Configuration</title>
+
+     <para>
+      The REST STS can use the same keystore as is used for OpenAM. While the
+      version of Java that you use includes its own version of the
+      <command>keytool</command> command, the location where you set up the
+      keystore file may vary.
+     </para>
+
+     <para>
+      For example, you may use the procedure <link xlink:show="new"
+      xlink:href="http://docbook.org/roles/xlink/role/olink
+      xlink:href=admin-guide#openam-with-https-on-tomcat"><citetitle>To Set Up
+      OpenAM With HTTPS on Tomcat</citetitle></link>, if you use Tomcat as
+      the container for OpenAM.
+     </para>
+
+     <para>
+      The following describes the purpose of each entry under 
+      <literal>Keystore Configuration</literal>:
+     </para>
+     
+     <variablelist>
+      <varlistentry>
+       <term>Keystore Path</term>
+       <listitem>
+        <para>
+         You can set this to the location of the keystore file of your choice.
+         For reference, the default OpenAM keystore file is
+         <filename>keystore.jks</filename>, and you can find it in the OpenAM
+         configuration directory, as described in the following installation
+         procedure: <link xlink:show="new"
+               xlink:role="http://docbook.org/roles/xlink/role/olink"
+               xlink:href="install-guide#deploy-openam"><citetitle>
+          To Deploy OpenAM</citetitle></link>
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Keystore Password</term>
+       <listitem>
+        <para>
+         Enter the password for the keystore file, normally
+         <filename>keystore.jks</filename>. The default password for that file
+         packaged with OpenAM is <literal>changeit</literal>.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Encryption Key Alias</term>
+       <listitem>
+        <para>
+         Alias used for the encryption key; you may use that alias with the
+         <command>keytool</command> command.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Encryption Key Password</term>
+       <listitem>
+        <para>
+         Enter the password for the encryption key.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Signature Key Alias</term>
+       <listitem>
+        <para>
+         The REST-STS uses a signature key to verify X.509 tokens. Enter the 
+         desired alias for that signature key.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Signature Key Password</term>
+       <listitem>
+        <para>
+         Enter the password for the signature key.
+        </para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+
+    </section>
+
+    <section xml:id="rest-sts-saml2">
+     <title>REST STS SAML2 Token Configuration</title>
+
+     <para>
+      This REST-STS configuration UI supports token transformations from
+      username, Open ID Connect, and OpenAM tokens to SAML2 format. Configure
+      the options shown in this part of the REST-STS UI menu to customize
+      how OpenAM will create those SAML2 tokens.
+     </para>
+
+     <para>
+      Several options require you to include the specific classes, either in a
+      custom <literal>.jar</literal> file or classes configured in files in the
+      <literal>WEB-INF/classes</literal> directory.
+     </para>
+
+     <variablelist>
+      <varlistentry>
+
+       <!-- TODO question: are we supporting SAML 1 name-id formats? It's among
+        the options  in the drop down text box. Dirk suggests that he'll
+         clarify at a later date. -->
+
+       <term>NameIdFormat</term>
+       <listitem>
+        <para>
+         Specify the name identifier format for the SAML2 token that you want
+         REST-STS to generate.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Token Lifetime (Seconds)</term>
+       <listitem>
+        <para>
+         Enter the desired lifetime for the SAML2 token that you want REST-STS
+         to generate. The default is 10 minutes.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Custom Conditions Provider Class Name (optional)</term>
+       <listitem>
+        <para>
+         If you need to customize the conditions for the issued SAML2 token,
+         specify the class name of the implementation in the associated text
+         box.
+        </para>
+        <para>
+         Implement the specified class name with the<literal>
+         org.forgerock.openam.sts.tokengeneration.saml2.statements.ConditionsProvider
+        </literal>interface.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Custom Subject Provider Class Name (optional)</term>
+       <listitem>
+        <para>
+         If you need to define a custom provider for the SAML2 token, enter
+         the class name of the provider here.
+        </para>
+        <para>
+         Implement the specified class name with the<literal>
+         org.forgerock.openam.sts.tokengeneration.saml2.statements.SubjectProvider
+         </literal>interface.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Custom Authentication Statements Class Name (optional)</term>
+       <listitem>
+        <para>
+         If you need to create a custom authentication statement for the SAML2
+         token, enter the class name of the statement here.
+        </para>
+        <para>
+         Implement the specified class name with the<literal>
+         org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthenticationStatementsProvider
+         </literal>interface.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Custom Attribute Statements Class Name (optional)</term>
+       <listitem>
+        <para>
+         If you need to define a custom attribute statement for the SAML2
+         token, enter the class name of the statement here.
+        </para>
+        <para>
+         Implement the specified class name with the<literal>
+         org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeStatementsProvider
+        </literal>interface.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Custom Authorization Decision Statements Class Name (optional)</term>
+       <listitem>
+        <para>
+         If you need to set up a custom authorization decision statement for
+         the SAML2 token, enter the class name of the statement here.
+        </para>
+        <para>
+         Implement the specified class name with the<literal>
+         org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthzDecisionStatementsProvider
+        </literal>interface.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Custom Attribute Mapper Class Name (optional)</term>
+       <listitem>
+        <para>
+         If you need to define a custom attribute mapper for the SAML2 token,
+         enter the class name of the mapper here.
+        </para>
+        <para>
+         Implement the specified class name with the<literal>
+         org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeMapper
+        </literal>interface.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Custom Authentication Context Class Name (optional)</term>
+       <listitem>
+        <para>
+         If you need to note a custom AuthContext mapper for the SAML2 token,
+         enter the class name of the context here.
+        </para>
+        <para>
+         If you need to include an <literal>AuthnContext</literal> mapping,
+         implemented by the<literal>
+         org.forgerock.openam.sts.token.provider.AuthnContextMapperImpl
+         </literal> class, enter the class name of the following
+         interface:<literal>
+          org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthnContextMapper
+        </literal>.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Canonicalization Algorithm</term>
+       <listitem>
+        <para>
+         For more information on the two options shown see the W3C
+         Recommendation document entitled: <link xlink:show="new"
+         xlink:href="http://www.w3.org/TR/2002/REC-xml-exc-c14n-20020718/">
+         <citetitle>Exclusive XML Canonicalization</citetitle>.
+         </link>
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Sign Assertion</term>
+       <listitem>
+        <para>
+         If checked, this implementation of the REST-STS will sign the
+         assertion of the associated token.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Assertion audiences</term>
+       <listitem>
+        <para>
+         If you need to restrict the audience for the newly created SAML2
+         tokens, enter appropriate assertion audiences here. Values so entered
+         will be used to populate the <literal>Audience</literal> based on the
+         <literal>AudienceRestriction</literal> element, as defined in section
+         4.1.4.2 of the OASIS document entitled: <link xlink:show="new"
+         xlink:href="http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf">
+         <citetitle>Profiles for the OASIS Security Assertion Markup Language
+         (SAML) v2.0</citetitle>.
+         </link>
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Attribute Mappings</term>
+       <listitem>
+        <para>
+         You should configure mappings between SAML2 attribute names (Map keys)
+         and local OpenAM attributes (Map values).
+        </para>
+        <para>
+         The <literal>DefaultAttributeMapper</literal> looks at profile
+         attributes in configured data stores, or in session properties.
+        </para>
+        <para>
+         The map keys will define the names of the attributes included in
+         <literal>Assertion Attribute</literal> statements.
+        </para>
+        <para>
+         The data pulled from the subject's directory entry or session state
+         corresponding to the map value will define the value corresponding
+         to the name of the attribute.
+        </para>
+        <para>
+         Map keys can be set up in the following format:
+         <literal>[NameFormatURI]|SAML_ATTRIBUTE_NAME</literal>.
+        </para>
+        <para>
+         If the attribute value is enclosed in quotes, that quoted value will
+         be included in the attribute without mapping. Binary attributes should
+         be followed by <literal>';binary'</literal>
+        </para>
+        <para>
+         Beyond that, examples for appropriate mappings include:
+        </para>
+        <screen>EmailAddress=mail</screen>
+        <screen>Address=postaladdress</screen>
+        <screen>urn:oasis:names:tc:SAML:2.0:attrname-format:uri|urn:mace:dir:attribute-def:cn=cn</screen>
+        <screen>partnerID="staticPartnerIDValue"</screen>
+        <screen>urn:oasis:names:tc:SAML:2.0:attrname-format:uri|nameID="staticNameIDValue"</screen>
+        <screen>photo=photo;binary</screen>
+        <screen>urn:oasis:names:tc:SAML:2.0:attrname-format:uri|photo=photo;binary</screen>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+
+    </section>
+
+   </section>
+
+ </chapter>

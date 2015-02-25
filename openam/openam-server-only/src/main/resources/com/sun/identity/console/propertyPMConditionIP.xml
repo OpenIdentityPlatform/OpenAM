@@ -1,0 +1,151 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyPMConditionIP.xml,v 1.2 2008/06/25 05:45:12 qcheng Exp $
+
+-->
+
+<!--
+Portions Copyrighted [2013] [ForgeRock AS]
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="dummy" defaultValue="blank.header" >
+        <property required="true">
+            <label name="lblName" defaultValue="policy.condition.attribute.label.name" labelFor="tfConditionName" />
+            <cc name="tfConditionName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="50" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <cc name="conditionTypeName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+            <cc name="tfConditionTypeName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+            <cc name="tfRealmName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+        </property>
+    </section>
+
+    <section name="ip" defaultValue="policy.condition.section.ip">
+        <property>
+            <label name="lblIpVersion" defaultValue="policy.condition.attribute.label.ipAddressVersion" labelFor="IpVersion" />
+            <cc name="IpVersion" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+                <option label="policy.condition.attribute.option.ipv4" value="IPv4" />
+                <option label="policy.condition.attribute.option.ipv6" value="IPv6" />
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblStartIp" defaultValue="policy.condition.attribute.label.startIP" labelFor="StartIp1" />
+            <cc name="StartIp1" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="size" value="3" />
+                <attribute name="maxLength" value="3" />
+            </cc>
+            <cc name="dot" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue" value="." />
+            </cc>
+            <cc name="StartIp2" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="size" value="3" />
+                <attribute name="maxLength" value="3" />
+            </cc>
+            <cc name="dot" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue" value="." />
+            </cc>
+            <cc name="StartIp3" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="size" value="3" />
+                <attribute name="maxLength" value="3" />
+            </cc>
+            <cc name="dot" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue" value="." />
+            </cc>
+            <cc name="StartIp4" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="size" value="3" />
+                <attribute name="maxLength" value="3" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblEndIp" defaultValue="policy.condition.attribute.label.endIP" labelFor="EndIp1" />
+            <cc name="EndIp1" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="3" />
+                <attribute name="maxLength" value="3" />
+                <attribute name="autoSubmit" value="false" />
+            </cc>
+            <cc name="dot" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue" value="." />
+            </cc>
+            <cc name="EndIp2" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="size" value="3" />
+                <attribute name="maxLength" value="3" />
+            </cc>
+            <cc name="dot" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue" value="." />
+            </cc>
+            <cc name="EndIp3" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="size" value="3" />
+                <attribute name="maxLength" value="3" />
+            </cc>
+            <cc name="dot" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue" value="." />
+            </cc>
+            <cc name="EndIp4" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="size" value="3" />
+                <attribute name="maxLength" value="3" />
+            </cc>
+        </property>
+        <!-- IPv6 -->
+        <property>
+            <label name="lblStartIp" defaultValue="policy.condition.attribute.label.startIP" labelFor="StartIp" />
+            <cc name="StartIp" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="size" value="45" />
+                <attribute name="maxLength" value="45" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblEndIp" defaultValue="policy.condition.attribute.label.endIP" labelFor="EndIp" />
+            <cc name="EndIp" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="size" value="45" />
+                <attribute name="maxLength" value="45" />
+            </cc>
+        </property>
+    </section>
+    <section name="dnsName" defaultValue="policy.condition.section.dnsName">
+        <property>
+            <label name="lblDnsName" defaultValue="policy.condition.attribute.label.dnsName" labelFor="DnsName" />
+            <cc name="DnsName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+                <attribute name="size" value="50" />
+            </cc>
+        </property>
+    </section>
+</propertysheet>

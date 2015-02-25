@@ -1,0 +1,1 @@
+The source for all OpenAM JavaEE Policy agents can now be found in ../../../openam-agents/jee-agents as part of the work to Maven-enable the building of the agents.

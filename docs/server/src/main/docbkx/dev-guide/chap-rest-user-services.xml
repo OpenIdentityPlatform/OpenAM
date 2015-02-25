@@ -1,0 +1,625 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-rest-user-services'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+
+  <title>RESTful User Self-Service</title>
+
+  <indexterm><primary>REST API</primary></indexterm>
+
+  <para>This chapter shows how to use the OpenAM RESTful interfaces for user
+   self-service functionality: user self-registration and forgotten password reset.
+  </para>
+
+  <para>In this chapter, long URLs are wrapped to fit the printed page, as some
+   of the output is formatted for easier reading.</para>
+
+ <section xml:id="rest-api-self-registration">
+  <title>User Self-Registration</title>
+
+  <indexterm><primary>Self-registration</primary></indexterm>
+
+  <para>
+   The OpenAM REST API for users provides an action for self-registration.
+   The feature works by sending an email to the user in response to RESTful
+   HTTP POST requesting registration with an email address. When the user clicks
+   the link received by mail, an application intercepts the HTTP GET,
+   transforms the query string values into an HTTP POST to confirm the operation.
+   OpenAM responds to the application with a JSON object that the application
+   can further use to request creation of the user account to complete the
+   transaction.
+  </para>
+
+  <procedure xml:id="setup-user-self-registration">
+   <title>To Set Up User Self-Registration</title>
+
+   <step>
+    <para>Configure the Email Service.</para>
+
+    <para>You must configure the Email Service to send mail
+     notifications to users who self-register. You can configure these globally
+     in OpenAM console at Configuration &gt; Global &gt; Email Service.
+    </para>
+
+    <para>Alternatively, you can configure them for an individual realm under
+    Access Control > <replaceable>Realm Name</replaceable> > Services.</para>
+   </step>
+
+   <step>
+    <para>Configure User Self Service.</para>
+
+    <para>
+     You must enable self-registration in the User Self Service
+     service. You can configure these globally in OpenAM console at
+     Configure &gt; Global &gt; User Self Service. On the User Self Service page, click
+     the <literal>Enabled</literal> checkbox next to Self-Registration for Users,
+     and then click Save.
+    </para>
+    <para>
+     At this point users can self-register.
+     The starting screen for self-registration is
+     at <literal>/XUI/#register/</literal>
+     under the base URL where OpenAM is installed.
+     The default confirmation URI is <literal>/XUI/confirm.html</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>Perform an HTTP POST on <literal>/json/users?_action=register</literal>
+    with the new user's mail.</para>
+
+    <para>
+     To use a subject and message other than those configured in the Email Service,
+     you can optionally set the mail subject and message content
+     by including "subject" and "message" strings in the JSON data.
+
+     For example, the following POST results in a mail with
+     subject <literal>Confirm registration with OpenAM</literal>
+     and content <literal>Follow this link to confirm your registration</literal>
+     in addition to the confirmation link.
+    </para>
+
+    <para>
+     Notice that authentication is not required.
+    </para>
+
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data \
+ '{
+   "email": "newuser@example.com",
+   "subject": "Confirm registration with OpenAM",
+   "message": "Follow this link to confirm your registration"
+ }' \
+ https://openam.example.com:8443/openam/json/users?_action=register</userinput>
+<computeroutput>{}</computeroutput>
+    </screen>
+
+    <para>On success, the response is an empty JSON object <literal>{}</literal>
+    as shown in the example.</para>
+   </step>
+
+   <step>
+    <para>
+     The user receives an email message that includes a URL
+     similar to the following example, but all on one line.
+     The user has self-registered in the root realm:
+    </para>
+
+    <literallayout class="monospaced"
+    >https://openam.example.com:8443/openam/XUI/confirm.html?
+     confirmationId=f4x0Dh6iZCXtX8nhiSb3xahNxrg=
+     &amp;email=newuser@example.com
+     &amp;tokenId=yA26LZ6SxFEgNuF86/SIXfimGlg=
+     &amp;realm=/</literallayout>
+   </step>
+   <step>
+    <para>Intercept the HTTP GET request to this URL when the user clicks the
+    link.</para>
+
+    <para>Your application must use the confirmation link to construct an HTTP
+    POST to <literal>/json/users?_action=confirm</literal> from the query string
+    parameters as shown in the following example:</para>
+
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data \
+ '{
+   "email": "newuser@example.com",
+   "tokenId": "yA26LZ6SxFEgNuF86/SIXfimGlg=",
+   "confirmationId": "f4x0Dh6iZCXtX8nhiSb3xahNxrg="
+ }' \
+ https://openam.example.com:8443/openam/json/users?_action=confirm</userinput>
+<computeroutput>{
+    "email": "newuser@example.com",
+    "tokenId": "yA26LZ6SxFEgNuF86/SIXfimGlg=",
+    "confirmationId": "f4x0Dh6iZCXtX8nhiSb3xahNxrg="
+}</computeroutput>
+    </screen>
+
+    <para>The response is a further confirmation that the account can be
+    created.</para>
+   </step>
+
+   <step>
+    <para>Using the confirmation, your application must make an authenticated
+    HTTP POST to <literal>/json/users?_action=anonymousCreate</literal> to
+    create the user as shown in the following example:</para>
+
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data \
+ '{
+   "email": "newuser@example.com",
+   "tokenId": "yA26LZ6SxFEgNuF86/SIXfimGlg=",
+   "confirmationId": "f4x0Dh6iZCXtX8nhiSb3xahNxrg=",
+   "username": "newuser",
+   "userpassword": "password"
+ }' \
+ https://openam.example.com:8443/openam/json/users?_action=anonymousCreate</userinput>
+<computeroutput>{
+    "username": "newuser",
+    "realm": "/",
+    "uid": [
+        "newuser"
+    ],
+    "mail": [
+        "newuser@example.com"
+    ],
+    "sn": [
+        "newuser"
+    ],
+    "userPassword": [
+        "{SSHA}dAiONYMxqFiNilXeLXUQoDpHlePYtiJcjYw8Dw=="
+    ],
+    "cn": [
+        "newuser"
+    ],
+    "inetUserStatus": [
+        "Active"
+    ],
+    "dn": [
+        "uid=newuser,ou=people,dc=openam,dc=forgerock,dc=org"
+    ],
+    "objectClass": [
+        "devicePrintProfilesContainer",
+        "person",
+        "sunIdentityServerLibertyPPService",
+        "inetorgperson",
+        "sunFederationManagerDataStore",
+        "iPlanetPreferences",
+        "iplanet-am-auth-configuration-service",
+        "organizationalperson",
+        "sunFMSAML2NameIdentifier",
+        "inetuser",
+        "forgerock-am-dashboard-service",
+        "iplanet-am-managed-person",
+        "iplanet-am-user-service",
+        "sunAMAuthAccountLockout",
+        "top"
+    ],
+    "universalid": [
+        "id=newuser,ou=user,dc=openam,dc=forgerock,dc=org"
+    ]
+}</computeroutput>
+    </screen>
+    <para>At this point, the user is registered, active, and can authenticate
+     with OpenAM.</para>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="rest-api-password-reset">
+  <title>Resetting Forgotten Passwords</title>
+  <indexterm>
+   <primary>Passwords</primary>
+   <secondary>Reset</secondary>
+  </indexterm>
+
+  <para>
+   The OpenAM REST API provides an action
+   for handling forgotten passwords
+   as long as the user has a valid email address in their profile.
+   This is an alternative to the password reset capability described in
+   the <citetitle>Administration Guide</citetitle> chapter,
+   <link xlink:show="new" xlink:href="admin-guide#chap-pwd-reset"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+   >Configuring Password Reset</citetitle></link>.
+  </para>
+
+  <tip><para>If the current password is known, use the
+   <link xlink:show="new"
+         xlink:href="dev-guide#rest-api-change-password"
+         xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Change Password</citetitle></link>
+   feature to change a password.</para></tip>
+
+  <para>The option is disabled by default. You can enable it in the OpenAM Console
+  globally by using Configuration > Global > User Self Service.</para>
+
+  <para>Alternatively, you can enable it for an individual realm under
+  Access Control > <replaceable>Realm Name</replaceable> > Services > Add >
+  User Self Service.</para>
+
+  <orderedlist>
+   <para>An example follows, showing the steps in more detail.</para>
+
+   <listitem>
+    <para>Configure the Email Service.</para>
+
+    <para>In particular, you must configure the Email Service to send mail
+    allowing the user to reset the forgotten password.</para>
+
+    <para>You can configure the service globally in the OpenAM Console via
+    Configuration > Global > Email Service.</para>
+
+    <para>Alternatively, you can configure it for an individual realm under
+    Access Control > <replaceable>Realm Name</replaceable> > Services.</para>
+
+    <para>
+     At this point users with mail addresses can reset their forgotten passwords.
+     The starting screen for forgotten password reset is
+     at <literal>/XUI/#forgotPassword/</literal>
+     under the base URL where OpenAM is installed.
+     The default confirmation URI is <literal>/XUI/confirm.html</literal>.
+    </para>
+
+    <para>
+     The steps that follow show how to use the REST API directly.
+    </para>
+
+   </listitem>
+
+   <listitem>
+    <para>
+     Perform an HTTP POST on <literal>/json/users?_action=forgotPassword</literal>
+     with the user's ID.
+    </para>
+
+    <para>
+     To use a subject and message other than those configured in the Email Service,
+     you can optionally set the mail subject and message content
+     by including "subject" and "message" strings in the JSON data.
+
+     For example, the following POST results in a mail with
+     subject <literal>Reset your forgotten password with OpenAM</literal>
+     and content <literal>Follow this link to reset your password</literal>
+     in addition to the confirmation link.
+    </para>
+
+    <para>
+     Notice that authentication is not required.
+    </para>
+
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{
+   "username": "demo",
+   "subject": "Reset your forgotten password with OpenAM",
+   "message": "Follow this link to reset your password"
+ }' \
+ https://openam.example.com:8443/openam/json/users/?_action=forgotPassword</userinput>
+<computeroutput>{}</computeroutput>
+    </screen>
+
+    <para>Note that you can also use the <literal>email</literal> attribute
+     to locate the user. If both <literal>username</literal> and <literal>mail</literal>
+     attributes are used, then a request error is issued. If more
+     than one account has been registered with the same email address,
+     the password reset process does not start.</para>
+
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{
+   "email": "demo@example.com",
+   "subject": "Reset your forgotten password with OpenAM",
+   "message": "Follow this link to reset your password"
+ }' \
+ https://openam.example.com:8443/openam/json/users/?_action=forgotPassword</userinput>
+<computeroutput>{}</computeroutput>
+    </screen>
+
+    <para>On success, the response is an empty JSON object <literal>{}</literal>
+    as shown in the example.</para>
+   </listitem>
+
+   <listitem>
+    <para>OpenAM looks up the email address in the user profile, and sends an
+    email message that includes a URL as in the following example,
+    but all on one line.</para>
+
+    <literallayout class="monospaced"
+    >https://openam.example.com:8443/openam/json/XUI/confirm.html
+     ?confirmationId=sdfsfeM+URcWVQ7vvCDnx4N5Vut7SBIY=
+     &amp;tokenId=vkm+5v58cTs1yQcQl5HCQGOsuQk=
+     &amp;username=demo&amp;realm=/</literallayout>
+   </listitem>
+
+   <listitem>
+    <para>Intercept the HTTP GET request to this URL when the user clicks the
+     link.</para>
+
+    <para>Your application must use the confirmation link to construct an HTTP
+     POST to <literal>/json/users?_action=confirm</literal> from the query string
+     parameters as shown in the following example:</para>
+
+    <screen>
+     $ <userinput>curl \
+     --request POST \
+     --header "Content-Type: application/json" \
+     --data \
+     '{
+     "username":"demo",
+     "tokenId":"vkm+5v58cTs1yQcQl5HCQGOsuQk=",
+     "confirmationId":"sdfsfeM+URcWVQ7vvCDnx4N5Vut7SBIY="
+     }' \
+     https://openam.example.com:8443/openam/json/users?_action=confirm</userinput>
+     <computeroutput>{
+      "username": "demo",
+      "tokenId": "vkm+5v58cTs1yQcQl5HCQGOsuQk=",
+      "confirmationId": "sdfsfeM+URcWVQ7vvCDnx4N5Vut7SBIY="
+      }</computeroutput>
+    </screen>
+
+    <para>The response is a further confirmation that the request is
+     valid, has not expired, and the password can be reset.</para>
+   </listitem>
+
+
+   <listitem>
+    <para>Using the confirmation, your application must construct an HTTP
+    POST to <literal>/json/users?_action=forgotPasswordReset</literal> to
+     reset the password as shown in the following example.</para>
+
+    <para>Your POST includes the new password as the value of the "userpassword"
+     field in the JSON payload. You can also use the <literal>email</literal>
+     attribute instead of <literal>username</literal>.
+    </para>
+
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{
+ "username":"demo",
+ "userpassword":"password",
+ "tokenId":"vkm+5v58cTs1yQcQl5HCQGOsuQk=",
+ "confirmationId":"sdfsfeM+URcWVQ7vvCDnx4N5Vut7SBIY="
+ }' \
+ https://openam.example.com:8443/openam/json/users?_action=forgotPasswordReset</userinput>
+<computeroutput>{}</computeroutput>
+    </screen>
+
+    <para>On success or failure, the REST call returns an empty message, so that
+     information is not leaked.
+    </para>
+   </listitem>
+  </orderedlist>
+
+  <para>At this point the user can authenticate with the new password.</para>
+ </section>
+
+ <section xml:id="rest-dashboard">
+  <title>Displaying Dashboard Applications</title>
+  <indexterm><primary>Dashboard services</primary></indexterm>
+  
+    <para>OpenAm lets administrators configure online applications to display
+    applications on user Dashboards. You can used exposed REST API to display
+    information about the online applications.</para>
+    
+    <variablelist>
+     <varlistentry>
+      <term><literal>/dashboard/assigned</literal></term>
+      <listitem>
+       <para>This endpoint retrieves the list of applications assigned to the 
+       authenticated user.</para>
+
+      <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/dashboard/assigned</userinput>
+<computeroutput>{
+  "google": {
+      "dashboardIcon": [
+          "Google.gif"
+      ],
+      "dashboardName": [
+          "Google"
+      ],
+      "dashboardLogin": [
+          "http://www.google.com"
+      ],
+      "ICFIdentifier": [
+          ""
+      ],
+      "dashboardDisplayName": [
+          "Google"
+      ],
+      "dashboardClassName": [
+          "SAML2ApplicationClass"
+      ]
+   }
+}</computeroutput>
+      </screen>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>/dashboard/available</literal></term>
+      <listitem>
+       <para>This endpoint retrieves the list of applications available in the
+       authenticated user's realm. The example is based on two of the default 
+       Dashboard applications: Google and Salesforce.</para>
+
+      <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/dashboard/available</userinput>
+<computeroutput>{
+  "google": {
+      "dashboardIcon": [
+          "Google.gif"
+      ],
+      "dashboardName": [
+          "Google"
+      ],
+      "dashboardLogin": [
+          "http://www.google.com"
+      ],
+      "ICFIdentifier": [
+          ""
+      ],
+      "dashboardDisplayName": [
+          "Google"
+      ],
+      "dashboardClassName": [
+          "SAML2ApplicationClass"
+      ]
+  }
+  "salesforce": {
+      "dashboardIcon": [
+          "salesforce.gif"
+      ],
+      "dashboardName": [
+          "Salesforce"
+      ],
+      "dashboardLogin": [
+          "http://salesforce.com"
+      ],
+      "ICFIdentifier": [
+          ""
+      ],
+      "dashboardDisplayName": [
+          "Salesforce"
+      ],
+      "dashboardClassName": [
+          "SAML2ApplicationClass"
+      ]
+  }
+}</computeroutput>
+      </screen>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>/dashboard/defined</literal></term>
+      <listitem>
+       <para>This endpoint retrieves the list of all applications available defined
+       for the OpenAM Dashboard service. The example is based on the three default 
+       Dashboard applications: Google, Salesforce, and Zendesk.</para>
+
+      <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/dashboard/defined</userinput>
+<computeroutput>{
+    "google": {
+        "dashboardIcon": [
+            "Google.gif"
+        ],
+        "dashboardName": [
+            "Google"
+        ],
+        "dashboardLogin": [
+            "http://www.google.com"
+        ],
+        "ICFIdentifier": [
+            "idm magic 34"
+        ],
+        "dashboardDisplayName": [
+            "Google"
+        ],
+        "dashboardClassName": [
+            "SAML2ApplicationClass"
+        ]
+    },
+    "salesforce": {
+        "dashboardIcon": [
+            "salesforce.gif"
+        ],
+        "dashboardName": [
+            "SalesForce"
+        ],
+        "dashboardLogin": [
+            "http://www.salesforce.com"
+        ],
+        "ICFIdentifier": [
+            "idm magic 12"
+        ],
+        "dashboardDisplayName": [
+            "Salesforce"
+        ],
+        "dashboardClassName": [
+            "SAML2ApplicationClass"
+        ]
+    },
+    "zendesk": {
+        "dashboardIcon": [
+            "ZenDesk.gif"
+        ],
+        "dashboardName": [
+            "ZenDesk"
+        ],
+        "dashboardLogin": [
+            "http://www.ZenDesk.com"
+        ],
+        "ICFIdentifier": [
+            "idm magic 56"
+        ],
+        "dashboardDisplayName": [
+            "ZenDesk"
+        ],
+        "dashboardClassName": [
+            "SAML2ApplicationClass"
+        ]
+    }
+}</computeroutput>
+      </screen>
+      </listitem>
+     </varlistentry>
+
+    </variablelist>
+    
+    <para>If your application runs in a user-agent such as a browser, you can
+    rely on OpenAM to handle authentication.</para>
+   
+  </section>
+
+</chapter>

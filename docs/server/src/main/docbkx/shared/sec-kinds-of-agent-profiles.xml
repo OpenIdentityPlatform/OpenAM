@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<section xml:id="kinds-of-agent-profiles"
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+ <title>Kinds of Agent Profiles</title>
+
+ <indexterm>
+  <primary>policy agent profiles</primary>
+  <secondary>kinds of</secondary>
+ </indexterm>
+
+ <para>When you open the OpenAM console to configure agents for the top level
+  realm, you can choose from a number of different types of agents. Web and J2EE policy
+  agents are the most common, requiring the least integration effort.</para>
+ <indexterm>
+  <primary>Policy agents</primary>
+  <secondary>Profiles</secondary>
+ </indexterm>
+ <variablelist>
+  <varlistentry>
+   <term>Web</term>
+   <listitem>
+    <para>You install web agents in web servers to protect web sites.</para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>J2EE</term>
+   <listitem>
+    <para>You install J2EE agents in web application containers to protect
+     web applications.</para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Web Service Provider</term>
+   <listitem>
+    <para>WSP agents are for use with Web Services Security.</para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Web Service Client</term>
+   <listitem>
+    <para>WSC agents are for use with Web Services Security.</para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>STS Client</term>
+   <listitem>
+    <para>The Security Token Service client agent is for securing
+     requests to the Security Token Service.</para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>2.2 Agents</term>
+   <listitem>
+    <para>Version 2.2 web and Java EE policy agents hold their configuration
+     locally, connecting to OpenAM with a user name, password combination.
+     This kind of agent is provided for backwards compatibility.</para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>OAuth 2.0 Client Agent</term>
+   <listitem>
+    <para>OAuth 2.0 clients are registered using this type of policy agent
+     profile.</para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Agent Authenticator</term>
+   <listitem>
+    <para>The agent authenticator can read agent profiles by connecting
+     to OpenAM with a user name, password combination, but unlike the
+     agent profile administrator, cannot change agent configuration.</para>
+   </listitem>
+  </varlistentry>
+
+ </variablelist>
+</section>

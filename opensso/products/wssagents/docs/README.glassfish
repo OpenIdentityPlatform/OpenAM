@@ -1,0 +1,152 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README.glassfish,v 1.17 2009/06/12 22:11:19 huacui Exp $
+
+   Portions Copyright 2013 ForgeRock AS
+
+-->
+
+=================
+README.glassfish
+=================
+
+This README contains instructions on how to secure web services using 
+OpenAM WSS providers on SUN Application Server 9.1 (Glassfish V2).
+
+This document assumes that users have already done the following:
+
+1. Installed the SUN Application Server 9.1 that host the web services client (WSC) 
+   and web services provider (WSP). 
+2. Required Web services client and Web services provider applications are 
+   implemented.
+3. Installed and configured the OpenAM server.
+
+Follow the steps below to secure the web services using OpenAM WSS
+providers.
+
+I. Install WSS Agent
+Repeat the following steps on the machines where WSC and WSP are deployed:
+1. Unzip openamwssproviders.zip to a desired directory,
+   say <unzip_dir_of_openamwssproviders.zip>
+
+2. Run the installer to install the WSS Agent.
+ A. Stop the Application Server instance that the agent is to be
+    installed on.
+
+ B. On Unix/Linux machine,
+      change directory to <unzip_dir_of_openamwssproviders.zip>/bin
+      and chmod 755 wssagentadmin
+    On Windows machine,
+      change directory to <unzip_dir_of_openamwssproviders.zip>\bin
+
+ C. On Unix/Linux machine, run
+      ./wssagentadmin --install or ./wssagentadmin --custom-install
+    On Windows machine, run
+      wssagentadmin.bat --install or wssagentadmin.bat --custom-install
+   (both --install and --custom-install options install the agent,
+    however the --custom-install allows you to specify the application
+    server instance name that you want the agent to install on; the
+    --install assumes that the application server name is "server")
+
+ C. If this is the first run of the installer wssagentadmin, then it
+    asks you to read and agree the license information.
+
+ D. Installer prompts for "Application Server Config Directory Path",
+    enter the absolute path of the application server domain
+    configuration directory.
+
+ E. (only for --custom-install) Installer prompts for "name of the
+    Application Server instance", enter the application server instance
+    name.  In the case of Sun Application Server Enterprise Edition, a
+    domain can have more than one application server instances. Enter
+    the name of the application server instance that you want the agent
+    to be installed on. The default server instance name is "server".
+
+ F. Installer prompts for "URL where the OpenAM server is running",
+    enter the OpenAM deployemnt URL in the format of
+    protocol://host:port/deployURI.
+    The protocol is either http or https; the host is the FQDN of the
+    machine where OpenAM server is running; the deployURI is the OpenAM
+    deployment URI. e.g. http://openam.sample.com:58080/openam
+ G. Installer prompts for "Enter the Agent profile name", enter the 
+    agent profile name. This agent user needs to have the permission to
+    read the WSC and/or WSP profiles. Out of box, there is such an agent
+    user named "agentAuth". It has permission to read the default 
+    profiles "wsc", "wsp", and "SecurityTokenService".
+ H. Installer prompts for "Enter the path to the password file", create
+    a text file that contains the password of the agent profile user in
+    clear text. By default the password for agentAuth is "changeit".
+ I. This should conclude the user input process. The installer displays
+    the summary of your responses, and you can choose
+    "Continue with Installation" to start the agent installation.
+ J. Restart the Application Server instance after the installation
+    completes successfully.
+
+
+II. Add Java security permissions 
+
+On the Application Servers that host OpenAM server (OpenAM server),
+Web Service Client application and Web Service Provider application :
+
+If the Security Manager is "on", append the Java security permissions in
+<unzip_dir_of_openamwssproviders.zip>/config/OpenSSOJavaPermissions.txt
+to the server.policy file of the Application Server domain.
+
+Each Application Server domain has its own standard J2SE policy file 
+named server.policy. It is located in the 
+/ApplicationServer-install/domains/<domain-name>/config directory. 
+More information can be found in The server.policy File in Sun Java 
+System Application Server 9 .1 Developer's Guide.
+
+
+III. Configure the web services client and the web services provider for Web services security.
+
+1.  Login into the OpenAM Console with user amadmin and <amadmin password>
+
+    openamserver_protocol://openamserver_host:openamserver_port/openamserver_deploy_uri
+
+    Note: If you have logged in as any other user, click Logout on the console page and Login again and make sure
+    that you access the OpenAM Console.
+
+    Create agent profiles for WSC and WSP (if not created out of box) :
+
+      Go to Access Control -> Default realm -> Agents ->
+
+        a) Create "WSC" profile
+        Select Web Service Client -> under Agent, click "new" -> enter name as "wsc" and other required fields -> Save.
+        Click on above saved profile to edit -> Select required Security Mechanism and "Is Request Signed" as true
+        (checked).
+        Save changes.
+        Note : If the required or selected Security Mechanism is "STSSecurity", then 
+        select STS Configuration as "SecurityTokenService" and Web Service End Point as "default".
+
+        b) Create "WSP" profile
+        Select Web Service Provider -> under Agent, click "new" -> enter name as "wsp" and other required fields -> Save.
+        Click on above saved profile to edit -> Select all Security Mechanisms.
+        Select Web Service End Point as "default" and "Is Request Signature Verified" as true (checked).
+        Save changes.
+
+2.  Logout of OpenAM Administration console.
+

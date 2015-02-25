@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-authz-policy'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+ <title>Defining Authorization Policies</title>
+
+ <para>
+  <firstterm>Authorization</firstterm> is determining
+  whether to grant or to deny a user access to a resource.
+  <firstterm>Policies</firstterm> define how to determine
+  whether to grant or deny access.
+  This chapter describes how to configure authorization policies in OpenAM.
+ </para>
+ 
+ <section xml:id="what-is-authz">
+  <title>About Authorization in OpenAM</title>
+  <indexterm>
+   <primary>Authorization</primary>
+  </indexterm>
+
+  <para>
+   Applications rely on OpenAM for access management,
+   which breaks down into authentication,
+   or determining who is trying to access a resource,
+   and authorization,
+   or determining whether to grant or deny access.
+   This is because whether access is granted generally depends on
+   what the policies about access are,
+   who is trying to gain access,
+   and perhaps some other conditions,
+   such as whether the access itself needs to happen over a secure channel
+   or what time of day it is.
+  </para>
+
+  <para>
+   To return to the international airport example
+   from the discussion on authentication
+   the policy might be that passengers with valid passports and visas
+   presenting valid plane tickets
+   are allowed through to the gate where the plane is waiting to take off,
+   but only under the condition that the plane is going to leave soon.
+   (You cannot expect to get to the gate today
+   with a scheduled departure for three months from now.)
+  </para>
+
+  <section xml:id="what-is-authz-policies">
+   <title>OpenAM Policies and Applications</title>
+   <indexterm>
+    <primary>Policy</primary>
+   </indexterm>
+
+   <variablelist>
+    <para>
+     To allow OpenAM to determine whether to grant access,
+     you define authorization <firstterm>policies</firstterm>.
+     A policy defines the following.
+    </para>
+
+    <varlistentry>
+     <term><firstterm>resources</firstterm></term>
+     <listitem>
+      <para>
+       The resource definitions constrain which resources,
+       such as web pages or access to the boarding area,
+       the policy applies to.
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><firstterm>actions</firstterm></term>
+     <listitem>
+      <para>
+       The actions are verbs that describe
+       what the policy allows users to do to the resources,
+       such as read a web page, submit a web form, or access the boarding area.
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><firstterm>subject conditions</firstterm></term>
+     <listitem>
+      <para>
+       The subject conditions constrain who the policy applies to,
+       such as all authenticated users, only administrators,
+       or only passengers with valid tickets for planes leaving soon.
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><firstterm>environment conditions</firstterm></term>
+     <listitem>
+      <para>
+       The environment conditions set
+       the circumstances under which the policy applies,
+       such as only during work hours,
+       only when accessing from a specific IP address,
+       or only when the flight is scheduled to leave within the next four hours.
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><firstterm>response attributes</firstterm></term>
+     <listitem>
+      <para>
+       The response attributes define information
+       that OpenAM attaches to a response following a policy decision,
+       such as a name, email address, or frequent flyer status.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <para>
+    When queried about whether to let a user through to a protected resource,
+    OpenAM decides to authorize access or not based on applicable policies
+    as described below in <xref linkend="what-is-authz-decision" />.
+    OpenAM communicates its decision to the application
+    using OpenAM for access management.
+    In the common case, this is a policy agent
+    installed on the server where the application runs.
+    The agent then enforces the authorization decision from OpenAM.
+   </para>
+
+   <mediaobject xml:id="figure-realm-app-policy-overview">
+    <alt>Shows the relationship between Realms, Applications and
+     Policies, and how a policy agent requests authorization decisions from
+     OpenAM.</alt>
+    <imageobject>
+     <imagedata
+      fileref="images/realm-app-policy-overview.png"
+      format="PNG" />
+    </imageobject>
+    <textobject><para>Shows the relationship between Realms, Applications and
+     Policies, and how a policy agent requests authorization decisions from
+     OpenAM.</para></textobject>
+   </mediaobject>
+
+   <para>
+    To act as a template for the policies,
+    OpenAM uses <firstterm>applications</firstterm>.
+    An application can constrain the resources that its policies apply to.
+    For example, an application for Example.com's HR service
+    might constrain all policies to apply to resources under
+    <literal>http*://example.com/hr*</literal> and
+    <literal>http*://example.com/hr*?*</literal>.
+    The list of applications is the first thing that you see
+    when editing policies through OpenAM console.
+    You create or select an application,
+    and then configure the policies for that application.
+   </para>
+
+   <para>
+    Applications have associated types.
+    The default application type that represents web resources
+    is <literal>iPlanetAMWebAgentService</literal>,
+    which defines resources as URL patterns and actions as HTTP methods.
+    OpenAM policy agents use a default application type based on this type,
+    which is called <literal>iPlanetAMWebAgentService</literal>.
+    This is the application type for policies
+    that you edit through OpenAM console.
+    OpenAM supports other application types as well
+    that you can manage over the policy REST APIs.
+   </para>
+
+   <para>
+    For applications that are not of type <literal>iPlanetAmWebAgentService</literal>,
+    such as CREST applications, you must manage these applications over REST.
+    OpenAM policy agents work with applications of type
+    <literal>iPlanetAmWebAgentService</literal>, so your policy evaluation points (PEPs)
+    should use the REST endpoints for policy decision requests.
+   </para>
+
+   <tip>
+    <para>
+     When you configure a policy agent,
+     if the application for its policies is not named
+     <literal>iPlanetAMWebAgentService</literal>,
+     then you must edit the policy agent configuration,
+     setting the application name to match your application.
+    </para>
+
+    <para>
+     The application you specify must exist in the evaluation realm
+     that you specify for the policy agent.
+    </para>
+   </tip>
+
+   <para>
+    When policies for an application are administered in multiple realms,
+    you set up a <firstterm>referral</firstterm> between applications.
+    When finding all policies that apply for a given request,
+    OpenAM follows the referrals
+    to locate the application's policies in other realms.
+    This is useful, for example,
+    when the same policy agents protect multiple applications.
+    The OpenAM policy editor does allow you to manage referrals as well,
+    though the referral editor is not enabled by default.
+   </para>
+   <!-- TODO: link to section explaining how to do this. -->
+  </section>
+
+  <section xml:id="what-is-authz-decision">
+   <title>OpenAM Policy Decisions</title>
+
+   <para>
+    OpenAM relies on policies to reach authorization decisions,
+    such as whether to grant or to deny access to a resource.
+    OpenAM acts as the <firstterm>policy decision point</firstterm> (PDP),
+    whereas OpenAM policy agents act as
+    <firstterm>policy enforcement points</firstterm> (PEP).
+    In other words, a policy agent or other PEP takes responsibility only
+    for enforcing a policy decision rendered by OpenAM.
+    When you configured applications and their policies in OpenAM,
+    you used OpenAM as a
+    <firstterm>policy administration point</firstterm> (PAP).
+<!-- Not useful yet:
+    For information used to reach policy decisions,
+    OpenAM could act as or rely on a
+    <firstterm>policy information point</firstterm> (PIP) as well.
+-->
+   </para>
+
+   <para>
+    Concretely speaking, when a PEP requests a policy decision from OpenAM
+    it specifies the target resource(s),
+    the application (default: <literal>iPlanetAMWebAgentService</literal>),
+    and information about the subject and the environment.
+    OpenAM as the PDP retrieves policies within the specified application
+    that apply to the target resource(s).
+    OpenAM then evaluates those policies to make a decision
+    based on the conditions matching those of the subject and environment.
+    When multiple policies apply for a particular resource,
+    the default logic for combining decisions is that
+    the first evaluation resulting in a decision to deny access
+    takes precedence over all other evaluations.
+    OpenAM only allows access if all applicable policies evaluate
+    to a decision to allow access.
+   </para>
+
+   <para>
+    OpenAM communicates the policy decision to the PEP.
+    The concrete decision,
+    applying policy for a subject under the specified conditions,
+    is called an <firstterm>entitlement</firstterm>.
+   </para>
+
+   <para>
+    The entitlement indicates the resource(s) it applies to,
+    the actions permitted and denied for each resource,
+    and optionally response attributes and <firstterm>advice</firstterm>.
+   </para>
+
+   <para>
+    When OpenAM denies a request due to a failed condition,
+    OpenAM can send advice to the PEP,
+    and the PEP can then take remedial action.
+    For instance, suppose a user comes to a web site
+    having authenticated with an email address and password,
+    which is configured as authentication level 0.
+    Had the user authenticated using a one-time password,
+    the user would have had authentication level 1 in their session.
+    Yet, because they have authentication level 0,
+    they currently cannot access the desired page,
+    as the policy governing access requires authentication level 1.
+    OpenAM sends advice, prompting the PEP
+    to have the user re-authenticate using a one-time password module,
+    gaining authentication level 1,
+    and thus having OpenAM grant access to the protected page.
+   </para>
+  </section>
+
+  <section xml:id="what-is-authz-example">
+   <title>Example Authorization</title>
+
+   <para>
+    Consider the case where OpenAM protects a user profile web page.
+    An OpenAM policy agent installed in the web server
+    intercepts client requests to enforce policy.
+    The policy says that only authenticated users
+    can access the page to view and to update their profiles.
+   </para>
+
+   <para>
+    When a user browses to the profile page,
+    the OpenAM policy agent intercepts the request.
+    The policy agent notices that the request is to access a protected resource,
+    but the request is coming from a user who has not yet logged in
+    and consequently has no authorization to visit the page.
+    The policy agent therefore redirects the user's browser
+    to OpenAM to authenticate.
+   </para>
+
+   <para>
+    OpenAM receives the redirected user,
+    serving a login page that collects the user's email and password.
+    With the email and password credentials,
+    OpenAM authenticates the user, and creates a session for the user.
+    OpenAM then redirects the user to the policy agent,
+    which gets the policy decision from OpenAM for the page to access,
+    and grants access to the page.
+   </para>
+
+   <para>
+    OpenAM and the policy agent use cookies set in the user's browser
+    to share an opaque reference to the session with OpenAM.
+    While the user has a valid session with OpenAM,
+    the user can go away to another page in the browser,
+    come back to the profile page,
+    and gain access without having to enter their email and password again.
+   </para>
+
+   <para>
+    Notice how OpenAM and the policy agent handle the access in the example.
+    The web site developer can offer a profile page,
+    but the web site developer never has to manage login,
+    or handle who can access a page.
+    As OpenAM administrator, you can change
+    authentication and authorization independently of updates to the web site.
+    You might need to agree with web site developers
+    on how OpenAM identifies users
+    so web developers can identify users by their own names when they log in.
+    By using OpenAM and policy agents for authentication and authorization,
+    your organization no longer needs to update web applications
+    when you want to add external access to your Intranet for roaming users,
+    open some of your sites to partners,
+    only let managers access certain pages of your HR web site,
+    or allow users already logged in to their desktops to visit protected sites
+    without having to type their credentials again.
+   </para>
+  </section>
+ </section>
+ 
+ <section xml:id="policy-resolution">
+  <title>How OpenAM Reaches Policy Decisions</title>
+  
+  <para>OpenAM has to match policies to resources to take policy decisions.
+  For a policy to match, the resource has to match one of the resource patterns
+   defined in the policy. The user making the request has to match a subject.
+   Furthermore, at least one condition for each condition type has to be
+   satisfied.</para>
+  
+  <para>If more than one policy matches, OpenAM has to reconcile differences.
+  When multiple policies match, the order in which OpenAM uses them to make a
+  policy decision is not deterministic. However, a deny decision overrides an
+  allow decision, and so by default once OpenAM reaches a deny decision it
+  stops checking further policies. (If you want OpenAM to continue checking
+  despite the deny, see Configuration &gt; Global &gt; Policy Configuration
+  &gt; Continue Evaluation on Deny Decision.)</para>
+ </section>
+
+ <section xml:id="configure-authz-apps">
+  <title>Configuring Applications, Policies, and Referrals</title>
+
+  <para>You can configure applications, policies and referrals by using the
+   policy editor in the OpenAM console, by using the REST interface,
+   or by using the <command>ssoadm</command> command.</para>
+  <para>This section explains how to use the OpenAM console to configure
+   applications, policies and referrals to protect a web site or web
+   application.</para>
+  <para>To configure applications and policies to protect
+   other types of resource, you must use the REST API or
+   the <command>ssoadm</command> command. For more information on the REST API,
+   see the <citetitle>Developer's Guide</citetitle> chapters
+   <link xlink:href="dev-guide#rest-api-authz-applications"
+         xlink:role="http://docbook.org/xlink/role/olink">
+    <citetitle>Defining Applications</citetitle></link> and
+   <link xlink:href="dev-guide#rest-api-authz-policies"
+         xlink:role="http://docbook.org/xlink/role/olink">
+    <citetitle>Managing Policies</citetitle></link>. For more
+   information on the <command>ssoadm</command> command,
+   see the <citetitle>OpenAM Reference Guide</citetitle> chapter
+   <link xlink:href="reference#ssoadm-1"
+         xlink:role="http://docbook.org/xlink/role/olink">
+    <citetitle>ssoadm</citetitle></link>.</para>
+
+  <xinclude:include href="sec-configure-apps-with-console.xml">
+   <xinclude:fallback>
+    <para>
+     Configuring Applications with the OpenAM Console missing:
+     /sections/sec-configure-apps-with-console.xml
+    </para>
+   </xinclude:fallback>
+  </xinclude:include>
+
+  <xinclude:include href="sec-configure-policies-with-console.xml">
+   <xinclude:fallback>
+    <para>
+     Configuring Policies with the OpenAM Console missing:
+     /sections/sec-configure-apps-with-console.xml
+    </para>
+   </xinclude:fallback>
+  </xinclude:include>
+
+  <xinclude:include href="sec-configure-referrals-with-console.xml">
+   <xinclude:fallback>
+    <para>
+     Configuring Referrals with the OpenAM Console missing:
+     /sections/sec-configure-referrals-with-console.xml
+    </para>
+   </xinclude:fallback>
+  </xinclude:include>
+
+  <section xml:id="policy-patterns-wildcards">
+   <title>Specifying Resource Patterns with Wildcards</title>
+   <xinclude:include href="../shared/itemizedlist-wildcard-syntax.xml">
+    <xinclude:fallback>
+     <para>
+      wildcard syntax missing shared/itemizedlist-wildcard-syntax.xml
+     </para>
+    </xinclude:fallback>
+   </xinclude:include>
+  </section>
+
+  <xinclude:include href="sec-import-export-policies.xml">
+   <xinclude:fallback>
+    <para>
+     Importing and Exporting Policies missing:
+     /sections/sec-import-export-policies.xml
+    </para>
+   </xinclude:fallback>
+  </xinclude:include>
+
+ </section>
+
+ <section xml:id="delegate-policy">
+  <title>Delegating Policy Management</title>
+
+  <indexterm>
+   <primary>Policy</primary>
+   <secondary>Delegating management</secondary>
+  </indexterm>
+
+  <para>
+   To delegate policy management and other administrative tasks, use privileges.
+   You set privileges in OpenAM console on the Privileges page for a realm.
+  </para>
+
+  <para>
+   For details see the procedure,
+   <link
+    xlink:href="admin-guide#chap-realms"
+    xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>To Delegate Administration</citetitle></link>.</para>
+ </section>
+</chapter>

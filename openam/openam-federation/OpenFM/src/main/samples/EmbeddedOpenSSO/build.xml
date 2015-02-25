@@ -1,0 +1,59 @@
+<project name="embedded-opensso" default="all">
+                
+    <description>embedded-opensso</description>
+    <import file="../../../../products.xml" />
+    <import file="../../openfm.xml" />
+    <import file="embeddedOpenSSO.xml" />
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <path id="build.class.path">
+        <fileset dir="${embedded.extlib.dir}">
+            <include name="j2ee.jar"/>
+        </fileset>
+        <fileset dir="${openfm.built.war.dir}/package/WEB-INF/lib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="all" depends="preparebuild,compile,war">
+
+    </target>
+
+    <target name="compile" depends="preparebuild">
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+            destdir="${embedded.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="on" debuglevel="lines,vars,source">
+            <src path="${embedded.src.dir}"/>
+            <classpath refid="build.class.path"/>
+        </javac>
+    </target>
+
+    <target name="war" depends="compile">
+        <war destfile="${prd.nightly.dist.dir}/openfm/opensso-embedded.war"
+            webxml="${embedded.base.dir}/www/web.xml">
+            <zipfileset dir="${openfm.built.war.dir}/package/WEB-INF" prefix="WEB-INF" excludes="web.xml" />
+            <zipfileset file="${embedded.extlib.dir}/j2ee.jar" prefix="WEB-INF/lib" />            
+            <zipfileset dir="${openfm.built.war.dir}/package/config" prefix="config" />
+            <zipfileset dir="${embedded.base.dir}/www" excludes="web.xml" />            
+            <zipfileset file="${embedded.base.dir}/source/Hello.java" prefix="source" />
+            <zipfileset dir="${embedded.classes.dir}" prefix="WEB-INF/classes" />
+            <zipfileset dir="${embedded.resources.dir}" prefix="WEB-INF/classes" />
+            <zipfileset file="${embedded.base.dir}/README" />
+        </war>
+    </target>
+    
+    <target name="preparebuild">
+        <mkdir dir="${embedded.classes.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${embedded.built.dir}"/>
+        <delete file="${prd.nightly.dist.dir}/openfm/opensso-embedded.war"/>
+    </target>
+</project>

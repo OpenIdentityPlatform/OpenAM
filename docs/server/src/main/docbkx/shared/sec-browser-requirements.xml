@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<section xml:id="browser-requirements"
+          xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='http://docbook.org/ns/docbook
+                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ <title>Browser Requirements</title>
+
+ <para>
+  The following table summarizes browser support.
+ </para>
+
+ <table pgwide="1">
+
+  <title>Supported Platforms &amp; Browsers</title>
+
+  <tgroup cols="5">
+
+   <colspec colnum="1" colwidth="1*"/>
+   <colspec colnum="2" colwidth="1*"/>
+   <colspec colnum="3" colwidth="1*"/>
+   <colspec colnum="4" colwidth="1*"/>
+   <colspec colnum="5" colwidth="1*"/>
+
+   <thead>
+    <row>
+     <entry>Client Platform</entry>
+     <entry>Chrome 16 or later</entry>
+     <entry>Internet Explorer 9 or later</entry>
+     <entry>Firefox 3.6 or later</entry>
+     <entry>Safari 5 or later</entry>
+    </row>
+   </thead>
+
+   <tbody>
+    <row>
+     <entry>Apple iOS 7 or later</entry>
+     <entry>Supported</entry>
+     <entry> </entry>
+     <entry> </entry>
+     <entry>Supported</entry>
+    </row>
+
+    <row>
+     <entry>Apple Mac OS X 10.8 or later</entry>
+     <entry>Supported</entry>
+     <entry> </entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+    </row>
+
+    <row>
+     <entry>Google Android 4.3 or later</entry>
+     <entry>Supported</entry>
+     <entry> </entry>
+     <entry> </entry>
+     <entry> </entry>
+    </row>
+
+    <row>
+     <entry>Microsoft Windows 7 or later</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+     <entry>Supported</entry>
+    </row>
+
+    <row>
+     <entry>Ubuntu Linux 12.04 LTS or later</entry>
+     <entry>Supported</entry>
+     <entry> </entry>
+     <entry>Supported</entry>
+     <entry> </entry>
+    </row>
+   </tbody>
+  </tgroup>
+
+ </table>
+</section>

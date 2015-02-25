@@ -1,0 +1,42 @@
+<h1>{{t "templates.user.ChangeSecurityDataDialogTemplate.securityDataChange"}}</h1>
+<form id="passwordChange" action="" class="form" method="post" onsubmit="return false" autocomplete="off">
+    <fieldset>
+
+        <div class="group-field-row">
+            <label for="currentPassword">{{t "common.user.oldPassword"}}</label> 
+            <input  id="currentPassword"  type="password" name="currentPassword" value="" data-validator="required" pattern=".{8,}" data-validator-event="keyup change" required autofocus />
+            <span class="error">x</span>
+        </div>
+
+        <p>{{t "templates.user.ChangeSecurityDataDialogTemplate.enterNewPasswordToChange"}}</p>
+
+        <div class="float-left">
+
+            <div class="group-field-row float-left">
+                <label for="password">{{t "common.user.newPassword"}}</label>
+                <input type="password" id="password" name="password" value="" data-validation-dependents="passwordConfirm" data-validator="minLength" minLength="8" pattern=".{8,}" data-validator-event="keyup change" data-validation-status="error" required />
+            </div> 
+            
+             <div class="group-field-row float-left">
+                <label for="confirm">{{t "common.user.confirmPassword"}}</label> 
+                <input  id="confirm" type="password" name="passwordConfirm" value="" data-validator="passwordConfirm" data-validator-event="keyup change" required/>
+            </div>   
+
+        </div>  
+
+        <div class="group-field-errors float-right validationRules" data-for-validator="password passwordConfirm">
+
+            <div class="field-rule">
+                <span class="error">x</span> 
+                <span data-for-validator="minLength">{{t "common.form.validation.atLeast8Characters"}}</span>
+            </div> 
+
+            <div class="field-rule">
+                <span class="error">x</span> 
+                <span data-for-validator="passwordConfirm">{{t "common.form.validation.confirmationMatchesPassword"}}</span>
+            </div> 
+
+        </div>
+
+    </fieldset>
+</form>      

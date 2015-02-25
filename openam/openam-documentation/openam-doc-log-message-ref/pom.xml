@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+ <modelVersion>4.0.0</modelVersion>
+
+ <parent>
+  <groupId>org.forgerock.openam</groupId>
+  <artifactId>openam-documentation</artifactId>
+  <version>13.0.0-SNAPSHOT</version>
+ </parent>
+
+ <name>OpenAM Log Message Reference</name>
+ <artifactId>openam-doc-log-message-ref</artifactId>
+ <packaging>jar</packaging>
+
+ <build>
+  <plugins>
+
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-javadoc-plugin</artifactId>
+    <configuration>
+     <skip>true</skip>
+    </configuration>
+   </plugin>
+
+   <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>xml-maven-plugin</artifactId>
+    <executions>
+     <execution>
+      <phase>compile</phase>
+      <goals>
+        <goal>transform</goal>
+      </goals>
+      <configuration>
+       <transformationSets>
+        <transformationSet>
+         <dir>../..</dir>
+         <includes>
+          <!-- AM -->
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/AuthenticationLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/CLILogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/ConsoleLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/CoreTokenLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/EntitlementLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/LoggingLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/OAuth2ProviderLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/PolicyLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/RestLogMessageIDs.xml</include>
+          <include>openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/SessionLogMessageIDs.xml</include>
+
+          <!-- FM -->
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/COTLogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/IDFFLogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/LibertyLogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/SAML2LogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/SAMLLogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/WebServicesSecurityLogMessageIDs.xml</include>
+          <include>openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/WSFederationLogMessageIDs.xml</include>
+         </includes>
+         <stylesheet>src/main/xslt/logs.xsl</stylesheet>
+         <outputProperties>
+          <outputProperty>
+           <name>omit-xml-declaration</name>
+           <value>yes</value>
+          </outputProperty>
+         </outputProperties>
+         <validating>false</validating>
+        </transformationSet>
+       </transformationSets>
+       <catalogs>
+        <catalog>src/main/xslt/catalog.xml</catalog>
+       </catalogs>
+      </configuration>
+     </execution>
+    </executions>
+    <dependencies>
+     <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.7.1</version>
+     </dependency>
+    </dependencies>
+   </plugin>
+
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-antrun-plugin</artifactId>
+    <executions>
+     <execution>
+      <id>generate-log-message-ref</id>
+      <phase>compile</phase>
+      <inherited>false</inherited>
+      <goals>
+       <goal>run</goal>
+      </goals>
+      <configuration>
+       <target>
+        <concat
+         destfile="target/generated-resources/chap-log-messages.xml">
+         <header
+          file="src/main/resources/log-messages-preface.header"/>
+
+         <fileset
+          dir="target/generated-resources/xml/xslt"
+          includes="**/*.xml" />
+
+         <footer
+          file="src/main/resources/log-messages-preface.footer"/>
+        </concat>
+       </target>
+      </configuration>
+     </execution>
+    </executions>
+   </plugin>
+
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-assembly-plugin</artifactId>
+    <executions>
+     <execution>
+      <id>assemble-log-message-reference</id>
+      <phase>package</phase>
+      <goals>
+       <goal>single</goal>
+      </goals>
+      <configuration>
+       <descriptors>
+        <descriptor>src/main/assembly.xml</descriptor>
+       </descriptors>
+      </configuration>
+     </execution>
+    </executions>
+   </plugin>
+
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-site-plugin</artifactId>
+    <configuration>
+      <skip>true</skip>
+      <skipDeploy>true</skipDeploy>
+    </configuration>
+   </plugin>
+  </plugins>
+ </build>
+</project>

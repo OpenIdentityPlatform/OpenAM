@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2012-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-javaee-agents'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Java EE Policy Agents ${agentsDocTargetVersion}</title>
+
+ <para>This chapter concerns OpenAM Java EE policy agents. Java EE policy
+ agents run in web application containers and protect Java EE
+ applications.</para>
+
+ <section xml:id="what-new-javaee-agents">
+  <title>New in JavaEE Policy Agents ${agentsDocTargetVersion}</title>
+
+  <itemizedlist>
+   <listitem>
+    <para><emphasis role="bold">Click-Through Licensing</emphasis>. The
+     <command>agentadmin --install</command>command now displays a
+     software license acceptance prompt prior to installing a J2EE agent. You can
+     scroll through the license by pressing &lt;Enter&gt;.
+     At the prompt, enter <literal>yes</literal> to accept the license and
+     continue the installation.</para>
+
+    <screen>
+$ <userinput>bin/agentadmin --install</userinput>
+<computeroutput>
+Please read the following License Agreement carefully:
+
+[Press &lt;Enter> to continue...] or [Enter n To Finish]
+
+Do you completely agree with all the terms and conditions of this License
+Agreement (yes/no): [no]:</computeroutput>
+    </screen>
+
+    <para>For scripted or silent installs, you can include the
+     <option>--acceptLicense</option> option on the command line to suppress the
+     license acceptance prompt. Using the option indicates that you have read and
+     accepted the terms stated in the license.</para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">JBoss 7 Support</emphasis>. A new Java EE policy agent for JBoss 7 has been added. The new agent
+    simplifies integration with JBoss AS 7 (EAP 6) application servers by
+    leveraging the module system introduced in JBoss 7 (<link xlink:show="new"
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1806"
+    >OPENAM-1806</link>, <link xlink:show="new"
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1735"
+    >OPENAM-1735</link>).</para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Java 7 Support</emphasis>. Java EE policy agents now fully support Java 7 environments.</para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Modifiable goto URL</emphasis>. The Java EE agent goto URL can now be modified (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1299"
+    xlink:show="new">OPENAM-1299</link>).</para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Tomcat 7 Support</emphasis>. The Apache Tomcat policy agent now supports Tomcat 7 as well (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1273"
+    xlink:show="new">OPENAM-1273</link>, <link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-591"
+    xlink:show="new">OPENAM-591</link>).</para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Conditional Redirect</emphasis>. Java EE policy agents can now conditionally redirect users based on
+    the incoming request URL (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1265"
+    xlink:show="new">OPENAM-1265</link>).</para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Auto-Submitting Form Parses Valid XML</emphasis>. The auto-submitting form in <filename>FormLoginContent.txt</filename>
+    now parses as valid XML (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-674"
+    xlink:show="new">OPENAM-674</link>).</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="before-you-start-javaee-agents">
+ <title>Before You Install OpenAM Java EE Policy Agents</title>
+
+  <para>
+   This section covers software and hardware prerequisites
+   for installing and running OpenAM Java EE Policy Agents.
+  </para>
+
+  <xinclude:include href="../shared/para-requirements-support.xml">
+   <xinclude:fallback>
+    <para>
+     Error: failed to include file
+    </para>
+   </xinclude:fallback>
+  </xinclude:include>
+
+  <para>TODO: Update for release</para>
+
+  <section xml:id="java-requirements-javaee-agents">
+   <title>Java EE Agents Java Requirements</title>
+
+   <para>
+    Java EE policy agents run in a Java EE Web container,
+    and require a Java Development Kit.
+   </para>
+
+   <xinclude:include href="../shared/itemizedlist-java-requirements.xml">
+    <xinclude:fallback>
+     <para>
+      Error: failed to include file
+     </para>
+    </xinclude:fallback>
+   </xinclude:include>
+  </section>
+
+  <xinclude:include href="../shared/sec-browser-requirements.xml">
+   <xinclude:fallback>
+    <!-- Error: failed to include file -->
+   </xinclude:fallback>
+  </xinclude:include>
+
+  <xinclude:include href="../shared/sec-native-application-platforms.xml">
+   <xinclude:fallback>
+    <!-- Error: failed to include file -->
+   </xinclude:fallback>
+  </xinclude:include>
+
+
+  <xinclude:include href="../shared/sec-jee-pa-platform-requirements.xml">
+   <xinclude:fallback>
+    <!-- Error: failed to include file -->
+   </xinclude:fallback>
+  </xinclude:include>
+
+
+  <xinclude:include href="../shared/sec-special-requests.xml">
+   <xinclude:fallback>
+    <!-- Error: failed to include file -->
+   </xinclude:fallback>
+  </xinclude:include>
+ </section>
+
+ <section xml:id="javaee-agent-compatibility">
+  <title>Java EE Policy Agent Compatibility</title>
+
+  <para>
+   This section concerns OpenAM Java EE Policy Agents ${agentsDocTargetVersion}.
+  </para>
+
+  <section xml:id="javaee-agent-major-changes">
+   <title>Important Changes to Java EE Policy Agent Functionality</title>
+
+   <para>The default policy evaluation mode for new policy agent profiles is
+   now self rather than subtree, in order to better scale for large numbers of
+   policy rules.</para>
+
+   <para>Upgrade does not change existing policy agent profile configurations,
+   however. If you want to adopt the new default setting for existing policy
+   agents, you must change the setting manually.</para>
+
+   <para>To do so for Java EE policy agents, set
+   <literal>com.sun.identity.policy.client.cacheMode=self</literal>.</para>
+  </section>
+
+  <section xml:id="javaee-agent-deprecated">
+   <title>Deprecated Functionality</title>
+
+   <para>Support for Oracle WebLogic 10g is deprecated and is likely to be
+   removed in a future release.</para>
+  </section>
+
+  <section xml:id="javaee-agent-removed">
+   <title>Removed Functionality</title>
+
+   <para>No functionality has been removed in this release.</para>
+  </section>
+ </section>
+
+ <section xml:id="javaee-agent-issues">
+  <title>Java EE Policy Agents Fixes, Limitations, &amp; Known Issues</title>
+
+  <para>OpenAM Java EE policy agent issues are tracked at <link xlink:show="new"
+  xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
+  >https://bugster.forgerock.org/jira/browse/OPENAM</link>.</para>
+
+  <section xml:id="javaee-agent-fixes">
+   <title>Key Fixes</title>
+
+    <para>
+     The following bugs were fixed in release ${agentsDocTargetVersion}.
+     For details, see the
+     <link
+      xlink:show="new"
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
+     >OpenAM issue tracker</link>.
+    </para>
+
+   <para>TODO</para>
+  </section>
+
+  <section xml:id="javaee-agent-limitations">
+   <title>Limitations</title>
+
+   <para>
+    No particular limitations are identified for this release.
+   </para>
+  </section>
+
+  <section xml:id="javaee-agent-known-issues">
+   <title>Known Issues</title>
+
+   <para>
+    The following important known issues
+    remained open at the time release ${agentsDocTargetVersion} became available.
+    For details and information on other issues, see the
+    <link
+     xlink:show="new"
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
+     >OpenAM issue tracker</link>.
+   </para>
+
+   <para>TODO</para>
+  </section>
+ </section>
+</chapter>

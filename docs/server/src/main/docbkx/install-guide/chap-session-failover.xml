@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-session-failover'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Setting Up OpenAM Session Failover</title>
+
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Session failover</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>session failover</primary>
+ </indexterm>
+
+ <para>
+  This chapter covers setting up session failover (SFO).
+  Session failover allows another OpenAM server to manage a session
+  when the server that initially authenticated the user is down.
+  This means the user does not need to log in again,
+  even though the server that authenticated them is down.
+ </para>
+
+ <para>
+  Session failover (high availability for sessions) builds
+  on OpenAM service availability.
+  Before configuring session failover,
+  you must therefore first make the overall OpenAM service highly available.
+  This is done by setting up OpenAM in a site configuration.
+  You can find instructions for setting up a site configuration in the chapter,
+  <link
+   xlink:show="new"
+   xlink:href="install-guide#chap-install-multiple"
+   xlink:role="http://docbook.org/xlink/role/olink"
+  ><citetitle>Installing Multiple Servers</citetitle></link>.
+ </para>
+ 
+ <para>
+  Session failover also relies on a shared Core Token Service (CTS)
+  to store user session data.
+  The service is shared with other OpenAM servers in the same OpenAM Site.
+  When an OpenAM server goes down, other servers in the Site
+  can read user session information from the CTS,
+  so the user with a valid session does not have to log in again.
+  When the original OpenAM server becomes available again,
+  it can also read session information from the CTS,
+  and can carry on serving users with active sessions.
+  By default the Core Token Service uses the embedded OpenDJ directory server.
+  For more information on configuring the Core Token Service, see the chapter,
+  <link
+   xlink:show="new"
+   xlink:href="install-guide#chap-cts"
+   xlink:role="http://docbook.org/xlink/role/olink"
+  ><citetitle>Configuring the Core Token Service (CTS)</citetitle></link>.
+ </para>
+
+ <para>
+  In deployments with multiple OpenAM Sites,
+  session failover can function across Sites.
+  In order for this to work, all Sites must use
+  the same, global, underlying Core Token Service,
+  which is replicated across all Sites.
+  Then when an entire Site fails or becomes unavailable,
+  OpenAM servers in another Site detect the failure of the Site's load balancer
+  and attempt to recover the user session from the global Core Token Service.
+ </para>
+
+ <para>
+  In the event of a failure,
+  client applications can connect to an OpenAM server in an active data center
+  as shown in <xref linkend="figure-global-cts" />.
+ </para>
+
+ <figure xml:id="figure-global-cts">
+  <title>Core Token Service For Global Session Failover</title>
+
+  <mediaobject>
+   <alt>Global CTS</alt>
+   <imageobject>
+       <imagedata fileref="images/global-cts.png" format="PNG" />
+   </imageobject>
+   <textobject>
+       <para>
+        Shows a globally replicated Core Token Service with two data centers
+       </para>
+   </textobject>
+  </mediaobject>
+ </figure>
+
+ <para>
+  For more information on how this is done with OpenDJ directory server,
+  see the OpenDJ documentation on
+  <link
+   xlink:show="new"
+   xlink:href="${opendjDocBase}/admin-guide/#chap-replication"
+  ><citetitle>Managing Data Replication</citetitle></link>.
+ </para>
+
+ <procedure xml:id="enable-session-failover">
+  <title>To Configure Session Failover After Installation</title>
+
+  <indexterm>
+   <primary>session failover</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+
+  <para>
+   Session failover requires an OpenAM Site configuration
+   with a Core Token Service.
+  </para>
+
+  <para>
+   If you did not configure session persistence and availability during
+   initial configuration,
+   first complete the steps in the procedure,
+   <link
+    xlink:show="new"
+    xlink:href="install-guide#configure-site-load-balancing"
+    xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>To Configure Site Load Balancing</citetitle></link>,
+   and then follow these steps.
+  </para>
+
+  <step>
+   <para>
+    In the OpenAM console for one of the servers in the Site,
+    under Configuration > Global, click Session.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Under Secondary Configuration Instance, click New.
+   </para>
+
+   <para>
+    If the server is not part of a Site,
+    or if the configuration server does not support the Core Token Service,
+    the New button is grayed out.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    In the Add Sub Configuration page,
+    check that the Name is set to the name of the site.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    To activate the Session Persistence and High Availability Failover option,
+    check the Enabled box.
+   </para>
+  </step>
+
+  <step>
+   <para>To ensure that local OpenAM instances resolve sessions from the Core
+    Token Service session store rather than by using crosstalk, check the Reduce
+    Crosstalk Enabled box. For more information about crosstalk, see the section,
+    <link
+     xlink:show="new"
+     xlink:href="install-guide#chap-install-multiple"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>To Configure Site Load Balancing</citetitle></link>.
+   </para>
+
+   <para>Do not disable reduced crosstalk unless advised to do so by ForgeRock
+    Technical Support.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Set reduced crosstalk options.
+   </para>
+   <para>
+    Session logout/destroy broadcasting enables
+    notification to all servers in an OpenAM site when a user logs out or
+    her session is destroyed by the OpenAM server. The broadcast notifications
+    are in addition to normal session logout/destroy notifications sent to
+    interested clients and servers.
+   </para>
+   <para>
+    Without session logout/destroy broadcasting,
+    it is possible for a user to log out
+    from one OpenAM server and then access her session on another server during
+    the brief window between the logout and session store replication.
+    Enabling session
+    logout/destroy broadcasting ensures that logged out and destroyed sessions
+    have the correct state on all OpenAM servers.
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      Select Disabled if you do not want the OpenAM server to broadcast session
+      logout/destroy messages. Session logout/destroy broadcasting is disabled
+      by default. Disabling broadcasting is suitable when you do not need the
+      highest level of security. Disable broadcasting when you do not expect
+      users to maliciously attempt to access logged out or destroyed sessions.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Specify one of the two broadcast options to achieve a higher level of
+      security, at a cost of incurring additional network I/O. Select
+      "Broadcast only to local site servers" if your session store
+      supports a single OpenAM site. Select
+      "Broadcast to servers in all sites" if your session store
+      supports multiple OpenAM sites.
+     </para>
+    </listitem>
+   </itemizedlist>
+
+   <para>
+    The Reduced Crosstalk Purge
+    Delay option specifies the amount of time (in minutes) before
+    sessions are purged from OpenAM servers after the server receives
+    session logout/destroy broadcast notification. The delay ensures that
+    sessions are in memory during the time between
+    session logout/destruction and session store replication.
+   </para>
+   <para>
+    The default purge delay is 1 minute, which should be adequate unless
+    session store replication is abnormally slow on your network.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Click Add to save your work.
+   </para>
+  </step>
+  <step>
+   <para>
+    Restart all the OpenAM servers in the site.
+   </para>
+  </step>
+ </procedure>
+</chapter>

@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amSession.xml,v 1.6 2009/02/19 05:51:10 bhavnab Exp $
+  
+-->
+
+<!--
+  Portions Copyrighted 2011-2014 ForgeRock AS
+-->
+
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMSessionService" version="1.0">
+        <Schema
+                serviceHierarchy="/DSAMEConfig/iPlanetAMSessionService"
+                i18nFileName="amSession"
+                revisionNumber="40"
+                i18nKey="iplanet-am-session-service-description">
+            <Global>
+                <AttributeSchema name="serviceObjectClasses"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="">
+                    <DefaultValues>
+                        <Value>iplanet-am-session-service</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-enable-session-trimming"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a122">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceNO">NO</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>NO</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-max-session-list-size"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="1" rangeEnd="2147483647"
+                                 i18nKey="a105">
+                    <DefaultValues>
+                        <Value>120</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-session-list-retrieval-timeout"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="1" rangeEnd="2147483647"
+                                 i18nKey="a106">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-property-change-notification"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a116">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceON">ON</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceOFF">OFF</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>OFF</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-deny-login-if-db-is-down"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a119c">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceNO">NO</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>NO</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-notification-property-list"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a120">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-enable-session-constraint"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a117">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceON">ON</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceOFF">OFF</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>OFF</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-constraint-resulting-behavior"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a119b">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceDenyAccess">DENY_ACCESS</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDestroyOldSession">DESTROY_OLD_SESSION</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>DESTROY_OLD_SESSION</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-constraint-handler"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a119b">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceDenyAccess">org.forgerock.openam.session.service.DenyAccessAction
+                        </ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDestroyNextExpiring">
+                            org.forgerock.openam.session.service.DestroyNextExpiringAction
+                        </ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDestroyOldSession">
+                            org.forgerock.openam.session.service.DestroyOldestAction
+                        </ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDestroyAll">org.forgerock.openam.session.service.DestroyAllAction
+                        </ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.session.service.DestroyNextExpiringAction</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-constraint-max-wait-time"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="0" rangeEnd="2147483647"
+                                 i18nKey="a119">
+                    <DefaultValues>
+                        <Value>6000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-dnrestrictiononly"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a121b">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-timeout-handler-list"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a123">
+                </AttributeSchema>
+                <SubSchema name="Site" inheritance="multiple" i18nKey="site">
+                    <AttributeSchema name="iplanet-am-session-sfo-enabled"
+                                     type="single"
+                                     syntax="boolean"
+                                     i18nKey="a121">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-session-reduced-crosstalk-enabled"
+                                     type="single"
+                                     syntax="boolean"
+                                     i18nKey="a121c.session.reduced.crosstalk.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-session-logout-destroy-broadcast"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a121d.session.destroy.logout.broadcast">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="choiceBroadcastOff">OFF</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceBroadcastToLocalSite">LOCAL_SITE</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceBroadcastToAllSites">ALL_SITES</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>OFF</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-session-reduced-crosstalk-purge-delay"
+                                     type="single"
+                                     syntax="number_range"
+                                     rangeStart="1" rangeEnd="2147483647"
+                                     i18nKey="a121e.session.reduced.crosstalk.purge.delay">
+                        <DefaultValues>
+                            <Value>1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
+                    <!-- Was i18Key a127 -->
+                    <AttributeSchema name="iplanet-am-session-store-username"
+                                     type="single"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>guest</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
+                    <!-- Was i18Key a128 -->
+                    <AttributeSchema name="iplanet-am-session-store-password"
+                                     type="single"
+                                     syntax="password">
+                        <DefaultValues>
+                            <Value>guest</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
+                    <!-- Was i18Key a129 -->
+                    <AttributeSchema name="iplanet-am-session-min-pool-size"
+                                     type="single"
+                                     syntax="number_range"
+                                     rangeStart="1" rangeEnd="100">
+                        <DefaultValues>
+                            <Value>8</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
+                    <!-- Was i18Key a130 -->
+                    <AttributeSchema name="iplanet-am-session-max-pool-size"
+                                     type="single"
+                                     syntax="number_range"
+                                     rangeStart="1" rangeEnd="100">
+                        <DefaultValues>
+                            <Value>32</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
+                    <!-- Was i18Key a131 -->
+                    <AttributeSchema name="iplanet-am-session-store-cpl-max-wait-time"
+                                     type="single"
+                                     syntax="number_range"
+                                     rangeStart="0" rangeEnd="2147483647">
+                        <DefaultValues>
+                            <Value>5000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
+                    <AttributeSchema name="iplanet-am-session-JDBC-driver-Impl-classname"
+                                     type="single"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>com.iplanet.dpro.session.jdbc.HADBConnectionImpl</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- Was i18Key a113 -->
+                    <!-- This property is deprecated as of 10.1.0 -->
+                    <AttributeSchema name="iplanet-am-session-jdbc-url"
+                                     type="single"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+            </Global>
+            <Dynamic>
+                <AttributeSchema name="iplanet-am-session-max-session-time"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="1" rangeEnd="2147483647"
+                                 i18nKey="a101">
+                    <DefaultValues>
+                        <Value>120</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-max-idle-time"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="1" rangeEnd="2147483647"
+                                 i18nKey="a102">
+                    <DefaultValues>
+                        <Value>30</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-max-caching-time"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="0" rangeEnd="2147483647"
+                                 i18nKey="a103">
+                    <DefaultValues>
+                        <Value>3</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-quota-limit"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="1" rangeEnd="2147483647"
+                                 i18nKey="a118">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-service-status"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceActive">Active</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceInactive">Inactive</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceDeleted">Deleted</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>Active</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-get-valid-sessions"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-destroy-sessions"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-add-session-listener-on-all-sessions"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Dynamic>
+            <User>
+                <AttributeSchema name="iplanet-am-session-max-session-time"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="1" rangeEnd="2147483647"
+                                 i18nKey="a101">
+                    <DefaultValues>
+                        <Value>120</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-max-idle-time"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="1" rangeEnd="2147483647"
+                                 i18nKey="a102">
+                    <DefaultValues>
+                        <Value>30</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-max-caching-time"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="0" rangeEnd="2147483647"
+                                 i18nKey="a103">
+                    <DefaultValues>
+                        <Value>3</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-session-quota-limit"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="1" rangeEnd="2147483647"
+                                 i18nKey="a118">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </User>
+        </Schema>
+        <Configuration>
+            <GlobalConfiguration>
+            </GlobalConfiguration>
+        </Configuration>
+    </Service>
+</ServicesConfiguration>
+  

@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: setAgentEnv.sh.template,v 1.2 2008/11/28 12:26:58 saueree Exp $
+
+# Portions Copyrighted 2013 ForgeRock AS.
+#
+# *************************************************************************
+# This script is used to set up your environment for OpenAM
+# Tomcat 6.0 policy agent. 
+# *************************************************************************
+
+# Append AGENT_CLASSPATH to the Tomcat system classpath
+
+CLASSPATH="$CLASSPATH":"@AGENT_LOCALE_DIR@":"@AGENT_CONFIG_DIR@":"@AGENT_LIB_DIR@"/agent.jar:"@AGENT_LIB_DIR@"/openssoclientsdk.jar
+CLASSPATH="$CLASSPATH":"@TOMCAT_SERVER_LIB@"/catalina.jar:"@TOMCAT_SERVER_LIB@"/catalina-ha.jar:"@TOMCAT_SERVER_LIB@"/annotations-api.jar:"@TOMCAT_SERVER_LIB@"/catalina-tribes.jar:"@TOMCAT_SERVER_LIB@"/catalina-ant.jar:"@TOMCAT_SERVER_LIB@"/tomcat-coyote.jar:"@TOMCAT_SERVER_LIB@"/tomcat-dbcp.jar:"@TOMCAT_SERVER_LIB@"/tomcat-i18n-es.jar:"@TOMCAT_SERVER_LIB@"/tomcat-i18n-fr.jar:"@TOMCAT_SERVER_LIB@"/tomcat-i18n-ja.jar
+CLASSPATH="$CLASSPATH":"@TOMCAT_COMMON_LIB@"/naming-factory.jar:"@TOMCAT_COMMON_LIB@"/jsp-api.jar:"@TOMCAT_COMMON_LIB@"/servlet-api.jar:"@TOMCAT_COMMON_LIB@"/jasper.jar:"@TOMCAT_COMMON_LIB@"/jasper-el.jar:"@TOMCAT_COMMON_LIB@"/jasper-jdt.jar:"@TOMCAT_COMMON_LIB@"/el-api.jar
+
+OS_TYPE=`uname -s | tr '[a-z]' '[A-Z]'`
+if [ "$OS_TYPE" = "AIX" ]; then
+    JAVA_OPTS="-DamKeyGenDescriptor.provider=IBMJCE -DamCryptoDescriptor.provider=IBMJCE"
+fi

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<section xml:id="configure-22-policy-agent"
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+ <title>Configuring Version 2.2 Policy Agents</title>
+ <indexterm>
+  <primary>Policy agents</primary>
+  <secondary>Configuring</secondary>
+ </indexterm>
+ <para>This section covers version 2.2 agent properties. Version 2.2 agents
+  store their configurations locally, with a user name, password combination
+  used to connect to OpenAM.</para>
+
+ <warning>
+  <para>ForgeRock no longer supports 2.2 agents. Documentation exists only for
+   legacy systems. Do not use 2.2 policy agents for new deployments.
+  </para>
+ </warning>
+
+ <para>After creating the agent profile, you access agent properties in the
+  OpenAM console under Access Control &gt; <replaceable>Realm Name</replaceable>
+  &gt; Agents &gt; 2.2 Agents &gt; <replaceable>Agent Name</replaceable>.</para>
+
+ <variablelist>
+  <varlistentry>
+   <term>Password</term>
+   <listitem>
+    <para>Specifies the password the agent uses to connect to OpenAM.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Status</term>
+   <listitem>
+    <para>Specifies whether the agent profile is active, and so can be
+     used.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Description</term>
+   <listitem>
+    <para>Specifies a short description for the agent.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Agent Key Value(s)</term>
+   <listitem>
+    <para>Additional key-value pairs that OpenAM uses to receive agent
+     requests concerning credential assertions.</para>
+    <para>OpenAM currently supports one property,
+     <literal>agentRootURL=<replaceable>protocol</replaceable>://<replaceable>host</replaceable>:<replaceable>port</replaceable>/</literal>
+     where the key is case-sensitive.</para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+</section>

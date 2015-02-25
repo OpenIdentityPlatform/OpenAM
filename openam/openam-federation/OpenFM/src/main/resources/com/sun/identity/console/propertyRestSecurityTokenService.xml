@@ -1,0 +1,356 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+    Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+
+    The contents of this file are subject to the terms of the Common Development and
+    Distribution License (the License). You may not use this file except in compliance with the
+    License.
+
+    You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+    specific language governing permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL Header Notice in each file and include
+    the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+    Header, with the fields enclosed by brackets [] replaced by your own identifying
+    information: "Portions Copyrighted [year] [name of copyright owner]"
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+<propertysheet>
+    <section name="General" defaultValue="rest.sts.general.section.title">
+        <property>
+            <label name="lblIssuerName"
+                   defaultValue="rest.sts.issuerName"
+                   labelFor="issuer-name"/>
+            <cc name="issuer-name"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblTokenTransforms"
+                   defaultValue="rest.sts.tokentransforms"
+                   labelFor="supported-token-transforms"/>
+            <cc name="supported-token-transforms"
+                tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
+                <option label="rest.sts.transform.unt.saml2.true" value="USERNAME|SAML2|true"/>
+                <option label="rest.sts.transform.unt.saml2.false" value="USERNAME|SAML2|false"/>
+                <option label="rest.sts.transform.oidc.saml2.true" value="OPENIDCONNECT|SAML2|true"/>
+                <option label="rest.sts.transform.oidc.saml2.false" value="OPENIDCONNECT|SAML2|false"/>
+                <option label="rest.sts.transform.openam.saml2.true" value="OPENAM|SAML2|true"/>
+                <option label="rest.sts.transform.openam.saml2.false" value="OPENAM|SAML2|false"/>
+                <option label="rest.sts.transform.x509.saml2.true" value="X509|SAML2|true"/>
+                <option label="rest.sts.transform.x509.saml2.false" value="X509|SAML2|false"/>
+                <attribute name="multiple" value="true" />
+            </cc>
+            <fieldhelp name="helpTokenTransforms" defaultValue="rest.sts.tokentransforms.help" />
+        </property>
+    </section>
+
+    <section name="Deployment" defaultValue="rest.sts.deployment.section.title">
+        <property>
+            <label name="lblDeploymentUrlElement"
+                   defaultValue="rest.sts.deployment.UrlElement"
+                   labelFor="deployment-url-element"/>
+            <cc name="deployment-url-element"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpDeploymentUrlElement" defaultValue="rest.sts.deployment.UrlElement.help" />
+        </property>
+
+        <property>
+            <label name="lblAuthTargetMappings"
+                   defaultValue="rest.sts.deployment.AuthTargetMappings"
+                   labelFor="deployment-auth-target-mappings"/>
+            <cc name="deployment-auth-target-mappings"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpAuthTargetMappings" defaultValue="rest.sts.deployment.AuthTargetMappings.help" />
+        </property>
+
+        <property>
+            <label name="lblDeploymentTwoWayTLSHeaderKey"
+                   defaultValue="rest.sts.deployment.TwoWayTLSHeaderKey"
+                   labelFor="deployment-offloaded-two-way-tls-header-key"/>
+            <cc name="deployment-offloaded-two-way-tls-header-key"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpDeploymentTwoWayTLSHeaderKey" defaultValue="rest.sts.deployment.TwoWayTLSHeaderKey.help" />
+        </property>
+
+        <property>
+            <label name="lblDeploymentTLSOffloadEngineHosts"
+                   defaultValue="rest.sts.deployment.TLSOffloadEngineHosts"
+                   labelFor="deployment-tls-offload-engine-hosts"/>
+            <cc name="deployment-tls-offload-engine-hosts"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpDeploymentTLSOffloadEngineHosts" defaultValue="rest.sts.deployment.TLSOffloadEngineHosts.help" />
+        </property>
+    </section>
+    <section name="SAML2" defaultValue="rest.sts.saml2.section.title">
+        <property>
+            <label name="lblSAML2ServiceProviderEntityId"
+                   defaultValue="rest.sts.saml2.ServiceProviderEntityId"
+                   labelFor="saml2-sp-entity-id"/>
+            <cc name="saml2-sp-entity-id"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2ServiceProviderEntityId"
+                       defaultValue="rest.sts.saml2.ServiceProviderEntityId.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2ServiceProviderAssertionConsumerServiceUrl"
+                   defaultValue="rest.sts.saml2.ServiceProviderAssertionConsumerServiceUrl"
+                   labelFor="saml2-sp-acs-url"/>
+            <cc name="saml2-sp-acs-url"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2ServiceProviderAssertionConsumerServiceUrl"
+                       defaultValue="rest.sts.saml2.ServiceProviderAssertionConsumerServiceUrl.help" />
+        </property>
+        <property>
+            <label name="lblSAML2NameIdFormat"
+                   defaultValue="rest.sts.saml2.NameIdFormat"
+                   labelFor="saml2-name-id-format"/>
+            <cc name="saml2-name-id-format"
+                tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+                <option label="rest.sts.saml2.nameidformat.unspecified" value="urn:oasis:names:tc:SAML:1.0:nameid-format:unspecified"/>
+                <option label="rest.sts.saml2.nameidformat.entity" value="urn:oasis:names:tc:SAML:2.0:nameid-format:entity"/>
+                <option label="rest.sts.saml2.nameidformat.email" value="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
+                <option label="rest.sts.saml2.nameidformat.encrypted" value="urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted"/>
+                <option label="rest.sts.saml2.nameidformat.persistent" value="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"/>
+                <option label="rest.sts.saml2.nameidformat.transient" value="urn:oasis:names:tc:SAML:2.0:nameid-format:transient"/>
+                <option label="rest.sts.saml2.nameidformat.x509" value="urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName"/>
+                <option label="rest.sts.saml2.nameidformat.windowsdomain" value="urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName"/>
+                <option label="rest.sts.saml2.nameidformat.kerberos" value="urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos"/>
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblSAML2TokenLifetime"
+                   defaultValue="rest.sts.saml2.TokenLifetime"
+                   labelFor="saml2-token-lifetime-seconds"/>
+            <cc name="saml2-token-lifetime-seconds"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblSAML2CustomConditionsProviderClassName"
+                   defaultValue="rest.sts.saml2.CustomConditionsProviderClassName"
+                   labelFor="saml2-custom-conditions-provider-class-name"/>
+            <cc name="saml2-custom-conditions-provider-class-name"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2CustomConditionsProviderClassName" defaultValue="rest.sts.saml2.CustomConditionsProviderClassName.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2CustomSubjectProviderClassName"
+                   defaultValue="rest.sts.saml2.CustomSubjectProviderClassName"
+                   labelFor="saml2-custom-subject-provider-class-name"/>
+            <cc name="saml2-custom-subject-provider-class-name"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2CustomSubjectProviderClassName" defaultValue="rest.sts.saml2.CustomSubjectProviderClassName.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2CustomAuthenticationStatementsClassName"
+                   defaultValue="rest.sts.saml2.CustomAuthenticationStatementsClassName"
+                   labelFor="saml2-custom-authentication-statements-provider-class-name"/>
+            <cc name="saml2-custom-authentication-statements-provider-class-name"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2CustomAuthenticationStatementsClassName" defaultValue="rest.sts.saml2.CustomAuthenticationStatementsClassName.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2CustomAttributeStatementsClassName"
+                   defaultValue="rest.sts.saml2.CustomAttributeStatementsClassName"
+                   labelFor="saml2-custom-attribute-statements-provider-class-name"/>
+            <cc name="saml2-custom-attribute-statements-provider-class-name"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2CustomAttributeStatementsClassName" defaultValue="rest.sts.saml2.CustomAttributeStatementsClassName.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2CustomAuthorizationDecisionStatementsClassName"
+                   defaultValue="rest.sts.saml2.CustomAuthorizationDecisionStatementsClassName"
+                   labelFor="saml2-custom-authz-decision-statements-provider-class-name"/>
+            <cc name="saml2-custom-authz-decision-statements-provider-class-name"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2CustomAuthorizationDecisionStatementsClassName" defaultValue="rest.sts.saml2.CustomAuthorizationDecisionStatementsClassName.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2CustomAttributeMapperClassName"
+                   defaultValue="rest.sts.saml2.CustomAttributeMapperClassName"
+                   labelFor="saml2-custom-attribute-mapper-class-name"/>
+            <cc name="saml2-custom-attribute-mapper-class-name"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2CustomAttributeMapperClassName" defaultValue="rest.sts.saml2.CustomAttributeMapperClassName.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2CustomAuthenticationContextMapperClassName"
+                   defaultValue="rest.sts.saml2.CustomAuthenticationContextMapperClassName"
+                   labelFor="saml2-custom-authn-context-mapper-class-name"/>
+            <cc name="saml2-custom-authn-context-mapper-class-name"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2CustomAuthenticationContextMapperClassName" defaultValue="rest.sts.saml2.CustomAuthenticationContextMapperClassName.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2AttributeMap"
+                   defaultValue="rest.sts.saml2.AttributeMap"
+                   labelFor="saml2-attribute-map"/>
+            <cc name="saml2-attribute-map"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpSAML2AttributeMap" defaultValue="rest.sts.saml2.AttributeMap.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2SignAssertion"
+                   defaultValue="rest.sts.saml2.SignAssertion"
+                   labelFor="saml2-sign-assertion"/>
+            <cc name="saml2-sign-assertion"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblSAML2EncryptAssertion"
+                   defaultValue="rest.sts.saml2.EncryptAssertion"
+                   labelFor="saml2-encrypt-assertion"/>
+            <cc name="saml2-encrypt-assertion"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            </cc>
+            <fieldhelp name="helpSAML2EncryptAssertion" defaultValue="rest.sts.saml2.EncryptAssertion.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2EncryptAttributes"
+                   defaultValue="rest.sts.saml2.EncryptAttributes"
+                   labelFor="saml2-encrypt-attributes"/>
+            <cc name="saml2-encrypt-attributes"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            </cc>
+            <fieldhelp name="helpSAML2EncryptAttributes" defaultValue="rest.sts.saml2.EncryptAttributes.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2EncryptNameID"
+                   defaultValue="rest.sts.saml2.EncryptNameID"
+                   labelFor="saml2-encrypt-nameid"/>
+            <cc name="saml2-encrypt-nameid"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            </cc>
+            <fieldhelp name="helpSAML2EncryptNameID" defaultValue="rest.sts.saml2.EncryptNameID.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2EncryptionAlgorithm"
+                   defaultValue="rest.sts.saml2.EncryptionAlgorithm"
+                   labelFor="saml2-encryption-algorithm"/>
+            <cc name="saml2-encryption-algorithm"
+                tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
+                <option label="http://www.w3.org/2001/04/xmlenc#aes128-cbc" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+                <option label="http://www.w3.org/2001/04/xmlenc#aes192-cbc" value="http://www.w3.org/2001/04/xmlenc#aes192-cbc"/>
+                <option label="http://www.w3.org/2001/04/xmlenc#aes256-cbc" value="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
+                <attribute name="multiple" value="false" />
+            </cc>
+            <fieldhelp name="helpSAML2EncryptionAlgorithm" defaultValue="rest.sts.saml2.EncryptionAlgorithm.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2KeystoreFilename"
+                   defaultValue="rest.sts.saml2.keystore.filename"
+                   labelFor="saml2-keystore-filename"/>
+            <cc name="saml2-keystore-filename"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2KeystoreFilename" defaultValue="rest.sts.saml2.keystore.filename.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2KeystorePassword"
+                   defaultValue="rest.sts.saml2.keystore.password"
+                   labelFor="saml2-keystore-password"/>
+            <cc name="saml2-keystore-password"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+        <!--
+            note that the name of the password confirmation field must be the name of the password field + _confirm.
+            See AMPropertySheet.getAttributeValues for details.
+        -->
+        <property>
+            <label name="lblSAML2KeystorePasswordConfirm"
+                   defaultValue="rest.sts.saml2.keystore.password.confirm"
+                   labelFor="saml2-keystore-password_confirm"/>
+            <cc name="saml2-keystore-password_confirm"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblSAML2KeystoreEncryptionKeyAlias"
+                   defaultValue="rest.sts.saml2.keystore.EncryptionKeyAlias"
+                   labelFor="saml2-encryption-key-alias"/>
+            <cc name="saml2-encryption-key-alias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2KeystoreEncryptionKeyAlias" defaultValue="rest.sts.saml2.keystore.EncryptionKeyAlias.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2KeystoreSignatureKeyAlias"
+                   defaultValue="rest.sts.saml2.keystore.SignatureKeyAlias"
+                   labelFor="saml2-signature-key-alias"/>
+            <cc name="saml2-signature-key-alias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2KeystoreSignatureKeyAlias" defaultValue="rest.sts.saml2.keystore.SignatureKeyAlias.help" />
+        </property>
+
+        <property>
+            <label name="lblKeystoreSignatureKeyPassword"
+                   defaultValue="rest.sts.saml2.keystore.SignatureKeyPassword"
+                   labelFor="saml2-signature-key-password"/>
+            <cc name="saml2-signature-key-password"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+
+        <!--
+            note that the name of the password confirmation field must be the name of the password field + _confirm.
+            See AMPropertySheet.getAttributeValues for details.
+        -->
+        <property>
+            <label name="lblKeystoreSignatureKeyPasswordConfirm"
+                   defaultValue="rest.sts.saml2.keystore.SignatureKeyPassword.confirm"
+                   labelFor="saml2-signature-key-password_confirm"/>
+            <cc name="saml2-signature-key-password_confirm"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+    </section>
+</propertysheet>

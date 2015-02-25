@@ -1,0 +1,1524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock Inc
+  !    
+-->
+<chapter xml:id='chap-agents'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+ <title>Configuring Policy Agent Profiles</title>
+
+ <indexterm>
+  <primary>Policy agents</primary>
+  <secondary>profiles</secondary>
+ </indexterm>
+
+ <!-- The following two paras are used in the admin guide, j2ee pa users and web pa users guides -->
+ <para> You install policy agents in web servers and web application containers
+  to enforce access policies OpenAM applies to protected web sites and web
+  applications. Policy agents depend on OpenAM for all authentication and
+  authorization decisions. Their primary responsibility consists in enforcing
+  what OpenAM decides in a way that is unobtrusive to the user. In organizations
+  with many servers, you might well install many policy agents.</para>
+
+ <para>Policy agents can have local configurations where they are installed,
+  but usually you store all policy agent configuration information in the
+  OpenAM configuration store, defining policy agent profiles for each, and then
+  you let the policy agents access their profiles through OpenAM such that you
+  manage all agent configuration changes centrally. This chapter describes how
+  to set up policy agent profiles in OpenAM for centralized configuration.</para>
+
+
+ <!-- The following sections are being reused in multiple docs -->
+ <xinclude:include href="../shared/sec-gateway-or-policy-agent.xml" />
+
+ <xinclude:include href="../shared/sec-kinds-of-agent-profiles.xml" />
+
+ <xinclude:include href="../shared/sec-create-agent-profiles.xml" />
+
+ <xinclude:include href="../shared/sec-delegate-agent-profile-creation.xml" />
+
+ <!-- The following section will be reused in the web policy agent users guide  -->
+ <xinclude:include href="../shared/sec-configuring-web-policy-agents.xml" />
+
+ <!-- The following section is reused in the j2ee policy agent users guide  -->
+ <xinclude:include href="../shared/sec-configuring-j2ee-policy-agents.xml" />
+
+ <!-- TODO: Web Service Provider, Client, and STS Agent sections subject to
+ change / deletion  -->
+
+ <section xml:id="configure-wsp-policy-agent">
+  <title>Configuring Web Service Provider Policy Agents</title>
+
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>web service provider</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+
+  <para>This section covers Web Service Provider (WSP) properties. WSPs
+  both validate incoming web service requests from Web Service Clients (WSC),
+  and also secure outgoing responses sent back to WSCs.</para>
+
+  <xinclude:include href="../shared/note-old-sts.xml" />
+
+  <para>After creating a WSP profile, you access WSP properties in the
+  OpenAM console under Access Control &gt; <replaceable>Realm Name</replaceable>
+  &gt; Agents &gt; Web Service Provider &gt; <replaceable>Agent
+  Name</replaceable>.</para>
+  
+  <variablelist xml:id="wsp-general-properties">
+   <title>General properties</title>
+   <varlistentry>
+    <term>Group</term>
+    <listitem>
+     <para>For assigning the agent to a previously configured agent group in
+     order to inherit selected properties from the group.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Password</term>
+    <listitem>
+     <para>Agent password used when creating the password file and when
+     installing the agent.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Status</term>
+    <listitem>
+     <para>Status of the agent configuration.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Universal Identifier</term>
+    <listitem>
+     <para>OpenAM identifier for the agent configuration.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsp-security-properties">
+   <title>Security properties</title>
+   <varlistentry>
+    <term>Security Mechanism</term>
+    <listitem>
+     <para>Specifies the mechanisms allowed to validate the web service
+     request.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Authentication Chain</term>
+    <listitem>
+     <para>Specifies which OpenAM authentication chain consumes the credentials
+     from the web service request to authenticate the WSC.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Token Conversion Type</term>
+    <listitem>
+     <para>Specifies how to covert the incoming token before issuing requests
+     to other WSPs.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Preserve Security Headers in Message</term>
+    <listitem>
+     <para>Yes means the agent preserves SOAP security headers from the request
+     for subsequent processing.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Detect Message Replay</term>
+    <listitem>
+     <para>Yes means the agent checks whether the request is a replay of
+     an earlier request, and if so, rejects the request.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Detect User Token Replay</term>
+    <listitem>
+     <para>Yes means the agent checks whether the user token is a replay
+     from an earlier requests, and if so, rejects the request.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Private Key Type</term>
+    <listitem>
+     <para>Specifies the type of key, such as <literal>PublicKey</literal>,
+     used to verify the request signature.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Liberty Service Type URN</term>
+    <listitem>
+     <para>Specifies the Universal Resource Name for the Liberty service type
+     used for lookups.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DNS Claim</term>
+    <listitem>
+     <para>Specifies a Uniform Resource Identifier shared by the WSP and
+     WSC.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Credential for User Token</term>
+    <listitem>
+     <para>Specifies the user name and password credentials compared with
+     the user name security token in a request.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsp-saml-conf-properties">
+   <title>SAML Configuration properties</title>
+   <varlistentry>
+    <term>SAML Attribute Mapping</term>
+    <listitem>
+     <para>Maps SAML attribute names from the incoming request to attribute
+     names as retrieved from the SSOToken or the identity repository, used to
+     have the Security Token Service generate an appropriate SAML
+     assertion.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>SAML NameID Mapper Plugin</term>
+    <listitem>
+     <para>Specifies the class name of a plugin used to perform SAML account
+     mapping.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>SAML Attributes Namespace</term>
+    <listitem>
+     <para>Identifies the attribute name space used when generating SAML
+     assertions.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Include Memberships</term>
+    <listitem>
+     <para>Yes means the agent includes the principal's membership as a
+     SAML attribute.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsp-signing-and-encryption-properties">
+   <title>Signing and Encryption properties</title>
+   <varlistentry>
+    <term>Is Request Signature Verified</term>
+    <listitem>
+     <para>Yes means verify signatures in requests.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Is Response Signed Enabled</term>
+    <listitem>
+     <para>Yes means the agent signs the specified parts of the response with
+     its x509 certificate.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Signing Reference Type</term>
+    <listitem>
+     <para>Specifies how the x509 certificate used to sign responses is
+     referenced in the response.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Is Request Decrypted</term>
+    <listitem>
+     <para>Yes means do decrypt the specified parts of incoming requests.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Is Response Encrypted</term>
+    <listitem>
+     <para>Yes means do encrypt the outgoing response.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Encryption Algorithm</term>
+    <listitem>
+     <para>Specifies whether to use Advanced Encryption Standard, corresponding
+     to an Encryption Strength of 128, 192, or 256, or to use Triple DES with
+     a key length of 0, 112, or 168.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Encryption Strength</term>
+    <listitem>
+     <para>Specifies the key length used for encryption.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsp-keystore-properties">
+   <title>Key Store properties</title>
+   <varlistentry>
+    <term>Public Key Alias of Web Service Client</term>
+    <listitem>
+     <para>Specifies the alias of the certificate in the key store used to
+     verify request signatures and encrypt responses.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Private Key Alias</term>
+    <listitem>
+     <para>Specifies the alias of the certificate in the key store used to
+     sign responses and decrypt requests.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Key Store Usage</term>
+    <listitem>
+     <para>If you use your own, custom key store, specify how to access it
+     here.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsp-end-points-properties">
+   <title>End Points properties</title>
+   <varlistentry>
+    <term>Web Service Security Proxy End Point</term>
+    <listitem>
+     <para>If the WSC sends requests through a web service proxy, specify that
+     as the end point here.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Web Service End Point</term>
+    <listitem>
+     <para>Specifies the end point to which the WSC sends requests.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsp-kerberos-properties">
+   <title>Kerberos Configuration properties</title>
+   <varlistentry>
+    <term>Kerberos Domain Server</term>
+    <listitem>
+     <para>Specifies the fully qualified domain name of the Kerberos
+     Distribution Center service.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Kerberos Domain</term>
+    <listitem>
+     <para>Specifies the Kerberos Distribution Center domain name. For
+     Windows environments this is the domain controller domain name.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Kerberos Service Principal</term>
+    <listitem>
+     <para>Specifies the Kerberos principal used by OpenAM, using the form
+     <literal>HTTP/<replaceable>openam-fqdn</replaceable>@<replaceable>krb-domain</replaceable></literal>,
+     where <replaceable>openam-fqdn</replaceable> is the fully qualified domain
+     name for OpenAM, and <replaceable>krb-domain</replaceable> is the
+     Kerberos Domain.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Kerberos Key Tab File</term>
+    <listitem>
+     <para>Specifies the Kerberos keytab file using the form
+     <literal><replaceable>openam-host</replaceable>.HTTP.keytab</literal>,
+     where <replaceable>openam-host</replaceable> is the host name for
+     OpenAM.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Verify Kerberos Signature</term>
+    <listitem>
+     <para>Yes means the agent signs the Kerberos token.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+ 
+ <section xml:id="configure-wsc-policy-agent">
+  <title>Configuring Web Service Client Policy Agents</title>
+
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>web service client</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+
+  <para>This section covers Web Service Client (WSC) properties. WSCs
+  both secure outgoing requests sent to Web Service Providers (WSP),
+  and also validate incoming from WSPs.</para>
+
+  <xinclude:include href="../shared/note-old-sts.xml" />
+
+  <para>After creating a WSC profile, you access WSC properties in the
+  OpenAM console under Access Control &gt; <replaceable>Realm Name</replaceable>
+  &gt; Agents &gt; Web Service Client &gt; <replaceable>Agent
+  Name</replaceable>.</para>
+  
+  <variablelist xml:id="wsc-general-properties">
+   <title>General properties</title>
+   <varlistentry>
+    <term>Group</term>
+    <listitem>
+     <para>For assigning the agent to a previously configured agent group in
+     order to inherit selected properties from the group.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Password</term>
+    <listitem>
+     <para>Agent password used when creating the password file and when
+     installing the agent.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Status</term>
+    <listitem>
+     <para>Status of the agent configuration.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Universal Identifier</term>
+    <listitem>
+     <para>OpenAM identifier for the agent configuration.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsc-security-properties">
+   <title>Security properties</title>
+   <varlistentry>
+    <term>Security Mechanism</term>
+    <listitem>
+     <para>Specifies the mechanism used to secure web service requests.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>STS Configuration</term>
+    <listitem>
+     <para>Specifies the agent used to secure requests to the Security Token
+     Service. Associated with the STSSecurity Security Mechanism.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Discovery Configuration</term>
+    <listitem>
+     <para>Specifies the agent used to secure requests to the Discovery
+     Service. Associated with the LibertyDiscoverySecurity Security Mechanism.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>User Authentication Required</term>
+    <listitem>
+     <para>Yes means users must authenticate to access the WSC's protected
+     page.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Preserve Security Headers in Message</term>
+    <listitem>
+     <para>Yes means the agent preserves SOAP security headers in the request
+     for subsequent processing.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>User Pass Through Security Token</term>
+    <listitem>
+     <para>Yes means the agent passes along the Security Token from the Subject,
+     rather than generating a token or requesting it from the Security Token
+     Service.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Liberty Service Type URN</term>
+    <listitem>
+     <para>Specifies the Universal Resource Name for the Liberty service type
+     used for lookups.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Credential for User Token</term>
+    <listitem>
+     <para>Specifies the user name and password credentials shared with the
+     WSP and used to generate a Username Security Token.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DNS Claim</term>
+    <listitem>
+     <para>Specifies a Uniform Resource Identifier shared by the WSP and
+     WSC.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsc-saml-conf-properties">
+   <title>SAML Configuration properties</title>
+   <varlistentry>
+    <term>SAML Attribute Mapping</term>
+    <listitem>
+     <para>Maps SAML attribute names from the outgoing request to attribute
+     names as retrieved from the SSOToken or the identity repository.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>SAML NameID Mapper Plugin</term>
+    <listitem>
+     <para>Specifies the class name of a plugin used to perform SAML account
+     mapping.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>SAML Attributes Namespace</term>
+    <listitem>
+     <para>Identifies the attribute name space used when generating SAML
+     assertions.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Include Memberships</term>
+    <listitem>
+     <para>Yes means the agent includes the principal's membership as a
+     SAML attribute.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsc-signing-and-encryption-properties">
+   <title>Signing and Encryption properties</title>
+   <varlistentry>
+    <term>Is Request Signed Enabled</term>
+    <listitem>
+     <para>Yes means the agent signs the specified parts of the request with
+     its x509 certificate.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Signing Reference Type</term>
+    <listitem>
+     <para>Specifies how the x509 certificate used to sign requests is
+     referenced in the request.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Is Response Signature Verified</term>
+    <listitem>
+     <para>Yes means verify signatures in responses.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Is Request Encryption Enabled</term>
+    <listitem>
+     <para>Yes means do encrypt the specified parts of outgoing requests.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Encryption Algorithm</term>
+    <listitem>
+     <para>Specifies whether to use Advanced Encryption Standard, corresponding
+     to an Encryption Strength of 128, 192, or 256, or to use Triple DES with
+     a key length of 0, 112, or 168.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Encryption Strength</term>
+    <listitem>
+     <para>Specifies the key length used for encryption.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Is Response Decrypted</term>
+    <listitem>
+     <para>Yes means do decrypt the incoming response.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsc-keystore-properties">
+   <title>Key Store properties</title>
+   <varlistentry>
+    <term>Public Key Alias of Web Service Provider</term>
+    <listitem>
+     <para>Specifies the alias of the certificate in the key store used to
+     sign requests and decrypt responses.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Private Key Alias</term>
+    <listitem>
+     <para>Specifies the alias of the certificate in the key store used to
+     verify response signatures and encrypt requests.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Key Store Usage</term>
+    <listitem>
+     <para>If you use your own, custom key store, specify how to access it
+     here.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsc-end-points-properties">
+   <title>End Points properties</title>
+   <varlistentry>
+    <term>Web Service Security Proxy End Point</term>
+    <listitem>
+     <para>If the WSC sends requests through a web service proxy, specify that
+     as the end point here.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Web Service End Point</term>
+    <listitem>
+     <para>Specifies the end point to which the WSC sends requests.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="wsc-kerberos-properties">
+   <title>Kerberos Configuration properties</title>
+   <varlistentry>
+    <term>Kerberos Domain Server</term>
+    <listitem>
+     <para>Specifies the fully qualified domain name of the Kerberos
+     Distribution Center service.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Kerberos Domain</term>
+    <listitem>
+     <para>Specifies the Kerberos Distribution Center domain name. For
+     Windows environments this is the domain controller domain name.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Kerberos Service Principal</term>
+    <listitem>
+     <para>Specifies the Kerberos principal used by OpenAM, using the form
+     <literal>HTTP/<replaceable>openam-fqdn</replaceable>@<replaceable>krb-domain</replaceable></literal>,
+     where <replaceable>openam-fqdn</replaceable> is the fully qualified domain
+     name for OpenAM, and <replaceable>krb-domain</replaceable> is the
+     Kerberos Domain.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Kerberos Ticket Cache Directory</term>
+    <listitem>
+     <para>Specifies the directory in which Kerberos Ticket Granting Tickets
+     (TGT) are cached. The <command>kinit</command> command stores the TGT from
+     the KDC here.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="configure-sts-policy-agent">
+  <title>Configuring Security Token Service Client Policy Agents</title>
+
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>security token service client</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+
+  <para>This section covers Security Token Service (STS) Client properties. STS
+  clients both secure outgoing requests to trust authorities, and also validate
+  incoming requests from trust authorities. You can configure STS clients to
+  work with OpenAM's Security Token Service and with its Discovery
+  Service.</para>
+
+  <xinclude:include href="../shared/note-old-sts.xml" />
+
+  <para>After creating an STS Client profile, you access STS Client properties
+  in the OpenAM console under Access Control &gt; <replaceable>Realm
+  Name</replaceable> &gt; Agents &gt; STS Client &gt; <replaceable>Agent
+  Name</replaceable>.</para>
+  
+  <variablelist xml:id="sts-agent-general-properties">
+   <title>General properties</title>
+   <varlistentry>
+    <term>Group</term>
+    <listitem>
+     <para>For assigning the agent to a previously configured agent group in
+     order to inherit selected properties from the group.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Password</term>
+    <listitem>
+     <para>Agent password used when creating the password file and when
+     installing the agent.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Status</term>
+    <listitem>
+     <para>Status of the agent configuration.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>WS-Trust Version</term>
+    <listitem>
+     <para>Specifies whether to use WS-Trust 1.3 or 1.0.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Universal Identifier</term>
+    <listitem>
+     <para>OpenAM identifier for the agent configuration.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="sts-agent-security-properties">
+   <title>Security properties</title>
+   <varlistentry>
+    <term>Security Mechanism</term>
+    <listitem>
+     <para>Specifies the mechanism used to secure the STS request.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>STS Configuration</term>
+    <listitem>
+     <para>Specifies the STS Client agent profile to use if the security
+     mechanism is STS Security.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Preserve Security Headers in Message</term>
+    <listitem>
+     <para>Yes means the agent preserves SOAP security headers for subsequent
+     processing.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Credential for User Token</term>
+    <listitem>
+     <para>Specifies the user name and password credentials the agent uses
+     to generate a Username security token.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Requested Key Type</term>
+    <listitem>
+     <para>Specifies the type of key, such as <literal>PublicKey</literal>,
+     used to encrypt responses.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Requested Claims</term>
+    <listitem>
+     <para>Specifies the Uniform Resource Identifiers for the claims to
+     be represented in the Security Token.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DNS Claim</term>
+    <listitem>
+     <para>Specifies a Uniform Resource Identifier shared by the agent and the
+     WSC.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="sts-agent-saml-conf-properties">
+   <title>SAML Configuration properties</title>
+   <varlistentry>
+    <term>SAML Attribute Mapping</term>
+    <listitem>
+     <para>Maps SAML attribute names from the incoming request to attribute
+     names as retrieved from the SSOToken or the identity repository, used to
+     have the Security Token Service generate an appropriate SAML
+     assertion.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>SAML NameID Mapper Plugin</term>
+    <listitem>
+     <para>Specifies the class name of a plugin used to perform SAML account
+     mapping.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>SAML Attributes Namespace</term>
+    <listitem>
+     <para>Identifies the attribute name space used when generating SAML
+     assertions.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Include Memberships</term>
+    <listitem>
+     <para>Yes means the agent includes the principal's membership as a
+     SAML attribute.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="sts-agent-signing-and-encryption-properties">
+   <title>Signing and Encryption properties</title>
+   <varlistentry>
+    <term>Is Response Signature Verified</term>
+    <listitem>
+     <para>Yes means verify signatures in responses.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Is Request Signed Enabled</term>
+    <listitem>
+     <para>Yes means the agent signs the specified parts of the request with
+     its x509 certificate.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Signing Reference Type</term>
+    <listitem>
+     <para>Specifies how the x509 certificate used to sign requests is
+     referenced in the request.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Is Request Encryption Enabled</term>
+    <listitem>
+     <para>Yes means do encrypt the specified parts of requests.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Is Response Decrypted</term>
+    <listitem>
+     <para>Yes means do decrypt the response.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Encryption Algorithm</term>
+    <listitem>
+     <para>Specifies whether to use Advanced Encryption Standard, corresponding
+     to an Encryption Strength of 128, 192, or 256, or to use Triple DES with
+     a key length of 0, 112, or 168.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Encryption Strength</term>
+    <listitem>
+     <para>Specifies the key length used for encryption.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="sts-agent-keystore-properties">
+   <title>Key Store properties</title>
+   <varlistentry>
+    <term>Public Key Alias of Web Service Provider</term>
+    <listitem>
+     <para>Specifies the alias of the certificate in the key store used to
+     verify response signatures and encrypt requests.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Private Key Alias</term>
+    <listitem>
+     <para>Specifies the alias of the certificate in the key store used to
+     sign requests and decrypt responses.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Key Store Usage</term>
+    <listitem>
+     <para>If you use your own, custom key store, specify how to access it
+     here.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="sts-agent-end-points-properties">
+   <title>End Points properties</title>
+   <varlistentry>
+    <term>Security Token Service End Point</term>
+    <listitem>
+     <para>Specifies the URL to the Security Token Service end point.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Security Token Service MEX End Point</term>
+    <listitem>
+     <para>Specifies the URL to the Security Token Service message exchange
+     end point.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="sts-agent-kerberos-properties">
+   <title>Kerberos Configuration properties</title>
+   <varlistentry>
+    <term>Kerberos Domain Server</term>
+    <listitem>
+     <para>Specifies the fully qualified domain name of the Kerberos
+     Distribution Center service.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Kerberos Domain</term>
+    <listitem>
+     <para>Specifies the Kerberos Distribution Center domain name. For
+     Windows environments this is the domain controller domain name.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Kerberos Service Principal</term>
+    <listitem>
+     <para>Specifies the Kerberos principal used by OpenAM, using the form
+     <literal>HTTP/<replaceable>openam-fqdn</replaceable>@<replaceable>krb-domain</replaceable></literal>,
+     where <replaceable>openam-fqdn</replaceable> is the fully qualified domain
+     name for OpenAM, and <replaceable>krb-domain</replaceable> is the
+     Kerberos Domain.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Kerberos Ticket Cache Directory</term>
+    <listitem>
+     <para>Specifies the directory in which Kerberos Ticket Granting Tickets
+     (TGT) are cached. The <command>kinit</command> command stores the TGT from
+     the KDC here.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <xinclude:include href="../shared/sec-configure-22-policy-agent.xml" />
+
+ <section xml:id="configure-oauth2-client">
+  <title>Configuring OAuth 2.0 &amp; OpenID Connect 1.0 Clients</title>
+
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>OAuth 2.0 clients</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+  <indexterm>
+   <primary>OAuth 2.0 clients</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>OpenID Connect 1.0</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+
+  <para>When you want to register an OAuth 2.0 client with OpenAM as the
+  OAuth 2.0 authorization server, or register an OpenID Connect 1.0 client
+  through OpenAM console, then create an OAuth 2.0 Client agent profile.
+  After creating the agent profile, you can further configure the properties
+  in the OpenAM console under Access Control &gt; <replaceable>Realm
+  Name</replaceable> &gt; Agents &gt; OAuth 2.0 Client &gt; <replaceable>Client
+  Name</replaceable>.</para>
+
+  <itemizedlist>
+   <para>The topmost configuration fields are for both OAuth 2.0 and OpenID
+   Connect 1.0, whereas others are specifically for OpenID Connect 1.0.</para>
+
+   <listitem>
+    <para><xref linkend="configure-oauth2-client-common" /></para>
+   </listitem>
+
+   <listitem>
+    <para><xref linkend="configure-oauth2-client-openid-connect" /></para>
+   </listitem>
+  </itemizedlist>
+
+  <variablelist xml:id="configure-oauth2-client-common">
+   <title>Common Client Configuration</title>
+
+   <para>The following configuration fields are common to OAuth 2.0 and OpenID
+   Connect 1.0 clients.</para>
+
+   <varlistentry>
+    <term>Group</term>
+    <listitem>
+     <para>Set this if you have configured an OAuth 2.0 Client agent
+     group.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Status</term>
+    <listitem>
+     <para>Whether the client profile is active for use.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Client password</term>
+    <listitem>
+     <para>The client password as described by RFC 6749 in the section,
+     <link xlink:href="http://tools.ietf.org/html/rfc6749#section-2.3.1"
+     xlink:show="new">Client Password</link>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Client type</term>
+    <listitem>
+     <para>Confidential clients can maintain confidentiality of their
+     credentials. Public clients cannot.</para>
+     <para>A web application running on a server where its credentials are
+     protected is an example of a confidential client.</para>
+     <para>A JavaScript client running in a browser is an example of a public
+     client.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Redirection URIs</term>
+    <listitem>
+     <para>Specify client redirection endpoint URIs as described by RFC 6749
+     in the section, <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/rfc6749#section-3.1.2">Redirection
+     Endpoint</link>. OpenAM's OAuth 2.0 authorization service redirects the
+     the resource owner's user-agent back to this endpoint during the
+     authorization code grant process. If your client has more than one
+     redirection URI, then it must specify the redirection URI to use in
+     the authorization request.</para>
+
+     <para>Redirection URIs are required for OpenID Connect 1.0 clients.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Scopes</term>
+    <listitem>
+     <para>Specify scopes in <literal><replaceable>scope</replaceable></literal>
+     or <literal><replaceable>scope</replaceable>|<replaceable
+     >locale</replaceable>|<replaceable>localized
+     description</replaceable></literal> format. These scopes are to be
+     presented to the resource owner when the resource owner is asked to
+     authorize client access to protected resources.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Display name</term>
+    <listitem>
+     <para>Specify a client name to display to the resource owner
+     when the resource owner is asked to authorize client access to protected
+     resources. Valid formats include <literal><replaceable
+     >name</replaceable></literal> or <literal><replaceable
+     >locale</replaceable>|<replaceable>localized
+     name</replaceable></literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Display description</term>
+    <listitem>
+     <para>Specify a client description to display to the resource owner
+     when the resource owner is asked to authorize client access to protected
+     resources. Valid formats include <literal><replaceable
+     >description</replaceable></literal> or <literal><replaceable
+     >locale</replaceable>|<replaceable>localized
+     description</replaceable></literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Default Scope(s)</term>
+    <listitem>
+     <para>Specify scopes in <literal><replaceable>scope</replaceable></literal>
+     or <literal><replaceable>scope</replaceable>|<replaceable
+     >locale</replaceable>|<replaceable>localized
+     description</replaceable></literal> format. These scopes are set
+     automatically when tokens are issued.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Response Types</term>
+    <listitem>
+     <para>
+      Specify response type lists that the client uses.
+     </para>
+
+     <itemizedlist>
+      <para>
+       The default lists are the following.
+      </para>
+
+      <listitem>
+       <para>
+        <literal>code</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>token</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>id_token</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>code token</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>token id_token</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>code id_token</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>code token id_token</literal>
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Contacts</term>
+    <listitem>
+     <para>
+      Specify email address of users who administer the client.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Client Name</term>
+    <listitem>
+     <para>
+      Specify a human-readable name for the client.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Client JWT Bearer Public Key Certificate</term>
+    <listitem>
+     <para>
+      Specify the public key certificate of the client's key pair
+      that is used to sign JWTs issued by the client
+      and used for client authentication or to request access tokens.
+     </para>
+
+     <para>
+      This is the base64-encoded X509 certificate containing the public key
+      in PEM format, as in the following example.
+     </para>
+
+     <programlisting language="none">
+-----BEGIN CERTIFICATE-----
+MIIDETCCAfmgAwIBAgIEU8SXLjANBgkqhkiG9w0BAQsFADA5MRswGQYDVQQKExJvcGVuYW0uZXhh
+bXBsZS5jb20xGjAYBgNVBAMTEWp3dC1iZWFyZXItY2xpZW50MB4XDTE0MTAyNzExNTY1NloXDTI0
+MTAyNDExNTY1NlowOTEbMBkGA1UEChMSb3BlbmFtLmV4YW1wbGUuY29tMRowGAYDVQQDExFqd3Qt
+YmVhcmVyLWNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAID4ZZ/DIGEBr4QC
+2uz0GYFOCUlAPanxX21aYHSvELsWyMa7DJlD+mnjaF8cPRRMkhYZFXDJo/AVcjyblyT3ntqL+2Js
+3D7TmS6BSjkxZWsJHyhJIYEoUwwloc0kizgSm15MwBMcbnksQVN5VWiOe4y4JMbi30t6k38lM62K
+KtaSPP6jvnW1LTmL9uiqLWz54AM6hU3NlCI3J6Rfh8waBIPAEjmHZNquOl2uGgWumzubYDFJbomL
+SQqO58RuKVaSVMwDbmENtMYWXIKQL2xTt5XAbwEQEgJ/zskwpA2aQt1HE6de3UymOhONhRiu4rk3
+AIEnEVbxrvy4Ik+wXg7LZVsCAwEAAaMhMB8wHQYDVR0OBBYEFIuI7ejuZTg5tJsh1XyRopGOMBcs
+MA0GCSqGSIb3DQEBCwUAA4IBAQBM/+/tYYVIS6LvPl3mfE8V7x+VPXqj/uK6UecAbfmRTrPk1ph+
+jjI6nmLX9ncomYALWL/JFiSXcVsZt3/412fOqjakFVS0PmK1vEPxDlav1drnVA33icy1wORRRu5/
+qA6mwDYPAZSbm5cDVvCR7Lt6VqJ+D0V8GABFxUw9IaX6ajTqkWhldY77usvNeTD0Xc4R7OqSBrnA
+SNCaUlJogWyzhbFlmE9Ne28j4RVpbz/EZn0oc/cHTJ6Lryzsivf4uDO1m3M3kM/MUyXc1Zv3rqBj
+TeGSgcqEAd6XlGXY1+M/yIeouUTi0F1bk1rNlqJvd57Xb4CEq17tVbGBm0hkECM8
+-----END CERTIFICATE-----
+     </programlisting>
+
+     <para>
+      You can generate a key pair and export the certificate
+      by using the Java <command>keytool</command> command.
+     </para>
+
+     <screen>
+$ <userinput>keytool \
+ -genkeypair \
+ -keysize 2048 \
+ -alias self-signed \
+ -keyalg rsa \
+ -dname "CN=jwt-bearer-client,O=openam.example.com" \
+ -keystore keystore.jks \
+ -keypass changeit \
+ -storepass changeit \
+ -validity 3650 \
+ -v</userinput>
+<computeroutput>Generating 2,048 bit RSA key pair and self-signed certificate (SHA256withRSA)
+ with a validity of 3,650 days
+    for: CN=jwt-bearer-client, O=openam.example.com
+[Storing keystore.jks]</computeroutput>
+
+$ <userinput>keytool \
+ -list \
+ -alias self-signed \
+ -rfc \
+ -keystore keystore.jks \
+ -keypass changeit \
+ -storepass changeit</userinput>
+<computeroutput>Alias name: self-signed
+Creation date: Oct 27, 2014
+Entry type: PrivateKeyEntry
+Certificate chain length: 1
+Certificate[1]:
+-----BEGIN CERTIFICATE-----
+MIIDETCCAfmgAwIBAgIEU8SXLjANBgkqhkiG9w0BAQsFADA5MRswGQYDVQQKExJvcGVuYW0uZXhh
+bXBsZS5jb20xGjAYBgNVBAMTEWp3dC1iZWFyZXItY2xpZW50MB4XDTE0MTAyNzExNTY1NloXDTI0
+MTAyNDExNTY1NlowOTEbMBkGA1UEChMSb3BlbmFtLmV4YW1wbGUuY29tMRowGAYDVQQDExFqd3Qt
+YmVhcmVyLWNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAID4ZZ/DIGEBr4QC
+2uz0GYFOCUlAPanxX21aYHSvELsWyMa7DJlD+mnjaF8cPRRMkhYZFXDJo/AVcjyblyT3ntqL+2Js
+3D7TmS6BSjkxZWsJHyhJIYEoUwwloc0kizgSm15MwBMcbnksQVN5VWiOe4y4JMbi30t6k38lM62K
+KtaSPP6jvnW1LTmL9uiqLWz54AM6hU3NlCI3J6Rfh8waBIPAEjmHZNquOl2uGgWumzubYDFJbomL
+SQqO58RuKVaSVMwDbmENtMYWXIKQL2xTt5XAbwEQEgJ/zskwpA2aQt1HE6de3UymOhONhRiu4rk3
+AIEnEVbxrvy4Ik+wXg7LZVsCAwEAAaMhMB8wHQYDVR0OBBYEFIuI7ejuZTg5tJsh1XyRopGOMBcs
+MA0GCSqGSIb3DQEBCwUAA4IBAQBM/+/tYYVIS6LvPl3mfE8V7x+VPXqj/uK6UecAbfmRTrPk1ph+
+jjI6nmLX9ncomYALWL/JFiSXcVsZt3/412fOqjakFVS0PmK1vEPxDlav1drnVA33icy1wORRRu5/
+qA6mwDYPAZSbm5cDVvCR7Lt6VqJ+D0V8GABFxUw9IaX6ajTqkWhldY77usvNeTD0Xc4R7OqSBrnA
+SNCaUlJogWyzhbFlmE9Ne28j4RVpbz/EZn0oc/cHTJ6Lryzsivf4uDO1m3M3kM/MUyXc1Zv3rqBj
+TeGSgcqEAd6XlGXY1+M/yIeouUTi0F1bk1rNlqJvd57Xb4CEq17tVbGBm0hkECM8
+-----END CERTIFICATE-----</computeroutput>
+     </screen>
+
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="configure-oauth2-client-openid-connect">
+   <title>OpenID Connect 1.0 Client Configuration</title>
+
+   <para>The following optional configuration fields are for OpenID Connect 1.0
+   clients.</para>
+
+   <!--
+   <varlistentry>
+    <term>Grant Types</term>
+    <listitem>
+     <para>Grant types this client supports and uses. Default:
+     <literal>authorization_code</literal>, <literal>implicit</literal>,
+     <literal>refresh_token</literal>,
+     <literal>urn:ietf:params:oauth:grant-type:jwt-bearer</literal></para>
+
+     <para>The grant types are described in <citetitle>OpenID Connect Dynamic
+     Client Registration 1.0</citetitle>: <link xlink:show="new"
+     xlink:href="http://openid.net/specs/openid-connect-registration-1_0.html#client-metadata"
+     ><citetitle>Client Metadata</citetitle></link>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Response Types</term>
+    <listitem>
+     <para>Response types this client supports and uses. Default:
+     <literal>code</literal>, <literal>token</literal>,
+     <literal>id_token</literal></para>
+
+     <para>The response types are described in <citetitle>OpenID Connect Dynamic
+     Client Registration 1.0</citetitle>: <link xlink:show="new"
+     xlink:href="http://openid.net/specs/openid-connect-registration-1_0.html#client-metadata"
+     ><citetitle>Client Metadata</citetitle></link>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Contacts</term>
+    <listitem>
+     <para>Email addresses for the users who administer this client</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Logo URI</term>
+    <listitem>
+     <para>URI to the logo of this client</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Token Endpoint Authentication Method</term>
+    <listitem>
+     <para>Authentication method that the token endpoint should use with this
+     client. One of <literal>client_secret_basic</literal> (default),
+     <literal>client_secret_jwt</literal>, <literal>client_secret_post</literal>,
+     <literal>private_key_jwt</literal></para>
+
+     <para>These methods are described in <citetitle>OpenID Connect Messages
+     1.0</citetitle>: <link xlink:show="new"
+     xlink:href="http://openid.net/specs/openid-connect-messages-1_0.html#client_authentication"
+     ><citetitle>Client Authentication</citetitle></link>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Policy URI</term>
+    <listitem>
+     <para>URI to the policy for this client, which explains to the end user
+     how the user's profile data is used</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Terms of Service URI</term>
+    <listitem>
+     <para>URI to the terms of service for this client, which describes the
+     client's terms of service to the end user</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Json Web Key URI</term>
+    <listitem>
+     <para>URI to the client's public keys as a JSON Web Key Set document,
+     corresponding to keys used when signing requests to OpenAM</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Sector Identifier URI</term>
+    <listitem>
+     <para>URI to a JSON array of Redirect URIs registered for the client. This
+     URI is used by OpenAM to calculate Pseudonymous Identifiers.</para>
+    </listitem>
+   </varlistentry>
+   -->
+
+   <!--
+   <varlistentry>
+    <term>Subject Type</term>
+    <listitem>
+     <para>Subject type added to responses for this client. One of: Pairwise
+     (default), Public</para>
+
+     <para>Pairwise means each client gets different values for the
+     <literal>sub</literal> (subject), preventing correlation of the user's
+     activities without the user's consent. When this option subject type is
+     selected, the client should provide a sector identifier URI.</para>
+
+     <para>Public means all clients get the same values for
+     <literal>sub</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Request Object Signing Algorithm</term>
+    <listitem>
+     <para>Algorithm that request objects for this client must be signed with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-3.1"
+     ><citetitle>"alg" (Algorithm) Header Parameter Values for JWS</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Userinfo Signed Response Algorithm</term>
+    <listitem>
+     <para>Algorithm that responses from the UserInfo endpoint should be signed with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-3.1"
+     ><citetitle>"alg" (Algorithm) Header Parameter Values for JWS</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Userinfo Encrypted Response Algorithm</term>
+    <listitem>
+     <para>Algorithm that responses from the UserInfo endpoint should be encrypted with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-4.1"
+     ><citetitle>"alg" (Algorithm) Header Parameter Values for JWE</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Userinfo Encrypted Response Encryption Algorithm</term>
+    <listitem>
+     <para>Algorithm that responses from the UserInfo endpoint should be
+     encrypted and signed with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-4.2"
+     ><citetitle>"enc" (Encryption Method) Header Parameter Values for JWE</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+   -->
+
+   <varlistentry>
+    <term>ID Token Signed Response Algorithm</term>
+    <listitem>
+     <para>Algorithm that the ID Token for this client must be signed with</para>
+
+     <para>
+      Default: <literal>RS256</literal>
+      (RSA with SHA256, where the RSA key comes from the OpenAM keystore)
+     </para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-3.1"
+     ><citetitle>"alg" (Algorithm) Header Parameter Values for JWS</citetitle></link>.
+     OpenAM supports <literal>HmacSHA256</literal>,
+     <literal>HmacSHA384</literal>, and <literal>HmacSHA512</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <!--
+   <varlistentry>
+    <term>ID Token Encrypted Response Algorithm</term>
+    <listitem>
+     <para>Algorithm that the ID Token for this client must be encrypted with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-4.1"
+     ><citetitle>"alg" (Algorithm) Header Parameter Values for JWE</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>ID Token Encrypted Response Encryption Algorithm</term>
+    <listitem>
+     <para>Algorithm that the ID Token for this client must be signed and encrypted with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-4.2"
+     ><citetitle>"enc" (Encryption Method) Header Parameter Values for JWE</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Default Max Age</term>
+    <listitem>
+     <para>Maximum time in seconds that a user can be authenticated. If the user
+     was last authenticated earlier than this value, then the user must be
+     authenticated again. If specified, the request parameter
+     <literal>max_age</literal> overrides this setting.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Require Auth Time</term>
+    <listitem>
+     <para>Whether to include auth time in the ID Token. Default: not enabled</para>
+
+     <para>The request parameter <literal>auth_time</literal> overrides this
+     setting.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Default ACR Values</term>
+    <listitem>
+     <para>Default Authentication Context Class Reference values that the
+     Authorization Server must used when processing requests from this client</para>
+
+     <para>The discovery element <literal>acr_values_supported</literal> lists
+     the values supported by OpenAM.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Initiate Login URI</term>
+    <listitem>
+     <para>URI to initiate login for this client</para>
+
+     <para>This URI must accept both HTTP GET and HTTP POST, and the client
+     must understand the <literal>login_hint</literal> and <literal>iss</literal>
+     parameters.</para>
+    </listitem>
+   </varlistentry>
+   -->
+
+   <varlistentry>
+    <term>Post Logout Redirect URI</term>
+    <listitem>
+     <para>URI to which to redirect the user-agent after the client logout
+      process</para>
+    </listitem>
+   </varlistentry>
+
+   <!--
+   <varlistentry>
+    <term>Request URIs</term>
+    <listitem>
+     <para>List of request URIs registered for this client, used for passing
+     a (pre-registered) request by reference rather than by value</para>
+    </listitem>
+   </varlistentry>
+   -->
+
+   <varlistentry>
+    <term>Access Token</term>
+    <listitem>
+     <para>The <literal>registration_access_token</literal> value that you
+     provide when registering the client, and then subsequently when reading
+     or updating the client profile.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Client Session URI</term>
+    <listitem>
+     <para>The relying party (client) URI to which the OpenID Connect Provider
+     sends session changed notification messages using the HTML 5 postMessage
+     API.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <xinclude:include href="../shared/sec-configure-agent-authenticators.xml" />
+</chapter>

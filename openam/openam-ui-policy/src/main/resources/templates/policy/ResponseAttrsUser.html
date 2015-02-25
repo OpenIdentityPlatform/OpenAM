@@ -1,0 +1,20 @@
+<p>{{t "policy.responseAttributes.subjectAttributesDescription"}}</p>
+<div class="striped-list created-items" data-attr-type="{{attrType.USER}}" >
+    <h3>{{t "policy.common.subjectAttributes"}}</h3>
+    <ul>
+        <li>
+            {{#if allUserAttributes}}
+            <select multiple id="avaliableUserAttributes" class="selectize">
+                <option disabled selected value="">{{t "policy.responseAttributes.subjectAttributesPlaceholder"}}</option>
+                {{#each allUserAttributes}}
+                <option {{#if selected}}selected{{/if}} value="{{propertyName}}">{{propertyName}}</option> 
+                {{/each}}  
+            </select>
+            {{else}}
+            {{t "policy.common.noSubjectAttributes"}}
+            {{/if}} 
+        </li>
+    </ul> 
+</div>
+
+

@@ -1,0 +1,12 @@
+<div class="container-shadow hidden" id="deviceMatch-container">
+    <form action="" method="post" class="form clearfix" autocomplete="off">
+        <fieldset>
+            {{#each reqs.callbacks}}
+            <div class="field {{#if isSubmit}}field-submit{{/if}}">
+                {{callbackRender}}
+            </div>
+            {{/each}}
+        </fieldset>
+    </form>
+</div>
+      

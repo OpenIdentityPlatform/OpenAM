@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*
+ * ident "@(#)descriptor.dtd 1.3 04/03/23 SMI"
+ *
+ * Copyright 2003 Sun Microsystems, Inc. All rights reserved.
+ * Use is subject to license terms.
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+-->
+
+<!-- This is the descriptor for a common component tag.
+
+The cc element can nest other cc elements. This is useful if, for example, the
+cc is an href, which has a nested static text field. 
+
+If the cc element is, say, a drop down menu, the menu options can be specified
+with the option elements. The attribute element is used to set attributes of the
+cc element. For example setting the size of a text box, or the display text of a
+button, etc.
+
+name: The name of the child view associate with this tag.
+tagclass: The tag class to use for this tag.
+option: The option associated with a menu, radiobutton, etc.
+optionGroup: The option group associated with a menu, radiobutton, etc.
+optionSeparator: The option list separator.
+-->
+<!ELEMENT cc (#PCDATA | attribute | cc | value-option |
+	option | optionGroup | optionSeparator)*>
+<!ATTLIST cc
+    name CDATA #IMPLIED
+    tagclass CDATA #REQUIRED
+>
+
+<!-- This is the descriptor for a tag attribute.
+
+The attribute element is used to set attributes on child components.
+
+name: The tag attribute name associated with the value.
+value: The value associated with the tag attribute.
+-->
+<!ELEMENT attribute EMPTY>
+<!ATTLIST attribute
+    name CDATA #REQUIRED
+    value CDATA #REQUIRED
+>
+
+<!-- This is the descriptor for a tag option.
+
+The option element is used to specify menu options for components such as drop
+down menus. This is useful if the options are static and can be specified
+statically. All label data are used as keys for I18N translations.
+
+label: The option label.
+value: The option value.
+title: The option title (tooltip) used for enabled state.
+titleDisabled: The option title (tooltip) used for disabled state.
+disabled: The disabled state "true" or "false".
+-->
+<!ELEMENT option EMPTY>
+<!ATTLIST option
+    label CDATA #REQUIRED
+    value CDATA #REQUIRED
+    title CDATA #IMPLIED
+    titleDisabled CDATA #IMPLIED
+    disabled CDATA #IMPLIED
+>
+
+<!-- This is the descriptor for a tag value-option.
+
+The option element is used to specify menu options for components such as maps where
+the value is limited to a drop down.. This is useful if the options are static and
+can be specified statically.
+
+label: The option label.
+value: The option value.
+-->
+<!ELEMENT value-option EMPTY>
+<!ATTLIST value-option
+    label CDATA #REQUIRED
+    value CDATA #REQUIRED
+>
+
+<!-- This is the descriptor for a tag option group.
+
+label: The option group label.
+title: The option group title (tooltip).
+-->
+<!ELEMENT optionGroup (option)+>
+<!ATTLIST optionGroup
+    label CDATA #REQUIRED
+    title CDATA #IMPLIED
+>
+
+<!-- This is the descriptor for a tag option separator.
+label: The HTML character used to create option label.
+value: The option value.
+maxHtmlChars: The max HTML characters.
+-->
+<!ELEMENT optionSeparator EMPTY>
+<!ATTLIST optionSeparator
+    label CDATA #IMPLIED
+    value CDATA #IMPLIED
+    maxHtmlChars CDATA #IMPLIED
+>

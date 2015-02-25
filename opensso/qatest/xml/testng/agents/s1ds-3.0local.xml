@@ -1,0 +1,15 @@
+   <test name="Header Attribute Tests for 3.0 Agent with local configuration">
+            <parameter name="policyIdx" value="0"/>
+            <parameter name="evaluationIdx" value="0"/>
+            <parameter name="resourceIdx" value="21"/>
+            <parameter name="agentType" value="3.0"/>
+            <groups>
+                <run>
+                    <include name="@mode@"/>
+                </run>
+            </groups>
+            <classes>
+                <class name="com.sun.identity.qatest.agents.AgentTests3_0_Local"/>
+            </classes>
+    </test>
+

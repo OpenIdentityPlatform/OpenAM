@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ! CCPL HEADER START
+ !
+ ! This work is licensed under the Creative Commons
+ ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+ ! To view a copy of this license, visit
+ ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+ ! or send a letter to Creative Commons, 444 Castro Street,
+ ! Suite 900, Mountain View, California, 94041, USA.
+ !
+ ! You can also obtain a copy of the license at
+ ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+ ! See the License for the specific language governing permissions
+ ! and limitations under the License.
+ !
+ ! If applicable, add the following below this CCPL HEADER, with the fields
+ ! enclosed by brackets "[]" replaced with your own identifying information:
+ !      Portions Copyright [yyyy] [name of copyright owner]
+ !
+ ! CCPL HEADER END
+ !
+ !      Copyright 2011-2014 ForgeRock AS
+ !
+-->
+<procedure xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+           xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+           xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+           xmlns:xlink='http://www.w3.org/1999/xlink'
+           xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+    <title>To Create the Agent Profile</title>
+
+    <para>Regardless of whether you store configurations centrally in OpenAM
+        or locally with your agents, the agent requires a profile so that it can
+        connect to and communicate with OpenAM.</para>
+    <step>
+        <para>In the OpenAM console, browse to Access Control &gt;
+            <replaceable>Realm Name</replaceable> &gt; Agents &gt; J2EE,
+            and then click the New... button in the Agent table.</para>
+    </step>
+    <step>
+        <para>Complete the web form using the following hints.</para>
+        <variablelist>
+            <varlistentry>
+                <term>Name</term>
+                <listitem>
+                    <para>The name for the agent profile used when you install the
+                        agent</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Password</term>
+                <listitem>
+                    <para>Password the agent uses to authenticate to OpenAM</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Configuration</term>
+                <listitem>
+                    <para>Centralized configurations are stored in the OpenAM configuration
+                        store. You can manage the centralized configuration through the OpenAM
+                        console. Local configurations are stored in a file alongside the
+                        agent.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Server URL</term>
+                <listitem>
+                    <para>The full URL to an OpenAM instance, or if OpenAM is deployed in
+                        a site configuration (behind a load balancer) then the site URL</para>
+                    <para>In centralized configuration mode, the Server URL is used to
+                        populate the agent profile for services such as Login, Logout, Naming,
+                        and Cross Domain SSO.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Agent URL</term>
+                <listitem>
+                    <para>The URL to the J2EE agent application, such as
+                        <literal>http://www.example.com:8080/agentapp</literal></para>
+                    <para>In centralized configuration mode, the Agent URL is used to
+                        populate the Agent Profile for services such as notifications.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </step>
+</procedure>

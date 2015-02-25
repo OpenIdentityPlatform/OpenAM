@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+
+<ModuleProperties moduleName="SecurID" version="1.0" >
+    <Callbacks length="2" order="1" timeout="120" header="이 서버는 SecurID 인증을 사용합니다." >
+        <NameCallback>
+            <Prompt>사용자 아이디 입력</Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt>Passcode 입력</Prompt>
+        </PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="2" timeout="120" header="새 PIN 모드" >
+	<!-- TextInputCallback not implemented in UI -->
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>새 PIN 메시지 입력</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="3" timeout="120" header="다음 PASSCODE" >
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>토큰의 코드가 변경될 때까지 기다린 후 다음 PASSCODE 입력:</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="4" timeout="120" header="새 PIN 생성" >
+	<!-- TextInputCallback not implemented in UI -->
+	<NameCallback>
+	    <Prompt>항상 교체</Prompt>
+	</NameCallback>
+    </Callbacks>
+    <Callbacks length="1" order="5" timeout="120" header="다음 PASSCODE" >
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>토큰이 메시지를 변경할 때까지 대기</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+</ModuleProperties>
+

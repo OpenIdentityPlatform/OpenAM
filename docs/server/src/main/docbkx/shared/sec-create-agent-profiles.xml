@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<section xml:id="create-agent-profiles"
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+         
+ <title>Creating Agent Profiles</title>
+
+ <indexterm>
+  <primary>policy agent profiles</primary>
+  <secondary>creating</secondary>
+ </indexterm>
+
+ <para>This section concerns creating agent profiles, and creating groups
+  that let agents inherit settings when you have many agents with nearly
+  the same profile settings.</para>
+
+ <procedure xml:id="create-agent-profile">
+  <title>To Create an Agent Profile</title>
+  <para>To create a new Java EE policy agent profile, you need a name and
+   password for the agent, and the URLs to OpenAM and the application to
+   protect.</para>
+  <step>
+   <para>On the Access Control tab page of the OpenAM console, click the link
+    for the realm in which you manage agents.</para>
+  </step>
+  <step>
+   <para>Click the Agents tab, click the tab page for the kind of agent you
+    want to create, and then click the New... button in the Agent table.</para>
+  </step>
+  <step>
+   <para>Provide a name for the agent, and also the URLs to OpenAM and to
+    the application to protect, then click Create. <!--Note that for web agents,
+    an example URL would look like: <uri>http://www.example.com:80</uri>;-->
+    Note that for Java EE policy agents, an example URL must include
+    the <literal>agentapp</literal> context:
+    <uri>http://www.example.com:8080/agentapp</uri>.
+   </para>
+
+   <mediaobject xml:id="figure-create-agent">
+    <alt>Creating a new agent profile</alt>
+    <imageobject>
+     <imagedata fileref="images/create-agent.png" format="PNG" />
+    </imageobject>
+    <textobject><para>At first, you provide only minimal configuration
+     for your new agent.</para></textobject>
+   </mediaobject>
+
+  </step>
+  <step>
+   <para>After creating the agent profile, you can click the link to the
+    new profile to adjust and export the configuration.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="create-agent-group">
+  <title>To Create an Agent Profile Group &amp; Inherit Settings</title>
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Group inheritance</secondary>
+  </indexterm>
+  <para>Agent profile groups let you set up multiple agents to inherit
+   settings from the group. To create a new Java EE agent profile group,
+   you need a name and the URL to the OpenAM server in which you store the
+   profile.</para>
+  <step>
+   <para>On the Access Control tab page of the OpenAM console, click the link
+    for the realm in which you manage agents.</para>
+  </step>
+  <step>
+   <para>Click the Agents tab, click the tab page for the kind of agent you
+    want to create, and then click the New... button in the Group table.</para>
+   <para>After creating the group profile, you can click the link to the new
+    group profile to fine-tune or export the configuration.</para>
+  </step>
+  <step>
+   <para>Inherit group settings by selecting your agent profile, and then
+    selecting the group name in the Group drop-down list near the top of
+    the profile page.</para>
+   <para>You can then adjust inheritance by clicking Inheritance Settings
+    on the agent profile page.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="create-agent-profile-cli">
+  <title>To Create an Agent Profile Using the Command Line</title>
+
+  <para>You can create a policy agent profile in OpenAM using the
+   <command>ssoadm</command> command-line tool. You do so by specifying
+   the agent properties either as a list of attributes, or by using an
+   agent properties file as shown below. Export an existing policy
+   agent configuration before you start to see what properties you
+   want to set when creating the agent profile.</para>
+
+  <para>The following procedure demonstrates creating a policy agent
+   profile using the <command>ssoadm</command> command.</para>
+
+  <step>
+   <para>Make sure the <command>ssoadm</command> command is installed as
+    described in the <citetitle>Installation Guide</citetitle> procedure,
+    <link xlink:show="new" xlink:href="install-guide#install-openam-admin-tools"
+          xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
+     Administration Tools</citetitle></link>.</para>
+  </step>
+
+  <step>
+   <para>Determine the list of properties to set in the agent profile.</para>
+
+   <para>The following properties file shows a minimal configuration for a
+    policy agent profile.</para>
+
+    <screen>
+$ <userinput>cat myAgent.properties</userinput>
+com.sun.identity.agents.config.agenturi.prefix=http://www.example.com:80/amagent
+com.sun.identity.agents.config.cdsso.cdcservlet.url[0]=https://openam.example.com:8443/
+  openam/cdcservlet
+com.sun.identity.agents.config.fqdn.default=www.example.com
+com.sun.identity.agents.config.login.url[0]=http://openam.example.com:8443/
+  openam/UI/Login
+com.sun.identity.agents.config.logout.url[0]=http://openam.example.com:8443/
+  openam/UI/Logout
+com.sun.identity.agents.config.remote.logfile=amAgent_www_example_com_80.log
+com.sun.identity.agents.config.repository.location=centralized
+com.sun.identity.client.notification.url=http://www.example.com:80/
+  UpdateAgentCacheServlet?shortcircuit=false
+com.sun.identity.client.notification.url=http://www.example.com:80/
+  UpdateAgentCacheServlet?shortcircuit=false
+sunIdentityServerDeviceKeyValue[0]=agentRootURL=http://www.example.com:80/
+sunIdentityServerDeviceStatus=Active
+userpassword=password
+    </screen>
+  </step>
+  <!-- Consider moving this: ssoadm pwd should be part of the ssoadm install procedure-->
+  <step>
+   <para>Set up a password file used when authenticating to OpenAM.
+    The password file must be read-only for the user who creates the policy
+    agent profile, and must not be accessible to other users.
+   </para>
+
+   <screen>
+    $ <userinput>echo password > /tmp/pwd.txt</userinput>
+    $ <userinput>chmod 400 /tmp/pwd.txt</userinput>
+   </screen>
+  </step>
+
+  <step>
+   <para>Create the profile in OpenAM.</para>
+
+   <screen>
+    $ <userinput>ssoadm \
+    create-agent \
+    --realm / \
+    --agentname myAgent \
+    --agenttype J2EE \
+    --adminid amadmin
+    --password-file /tmp/pwd.txt \
+    --datafile myAgent.properties</userinput>
+
+    <computeroutput>Agent configuration was created.</computeroutput>
+   </screen>
+
+   <para>At this point you can view the profile in OpenAM Console under
+    Access Control > <replaceable>Realm Name</replaceable> > Agents to make
+    sure the configuration is what you expect.</para>
+  </step>
+ </procedure>
+</section>

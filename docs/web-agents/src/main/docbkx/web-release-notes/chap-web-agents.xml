@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2012-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-web-agents'
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Web Policy Agents ${agentsDocTargetVersion}</title>
+
+ <para>This chapter concerns OpenAM web policy agents. Web policy agents
+ run in web servers and protect access to web pages.</para>
+
+ <section xml:id="what-new-web-agents">
+  <title>New in Web Policy Agents ${agentsDocTargetVersion}</title>
+
+  <itemizedlist>
+   <listitem>
+    <para><emphasis role="bold">Click-Through Licensing</emphasis>. The
+     <command>agentadmin --install</command>command now displays a
+     software license acceptance prompt prior to installing a J2EE agent. You can
+     scroll through the license by pressing &lt;Enter&gt;.
+     At the prompt, enter <literal>yes</literal> to accept the license and
+     continue the installation.</para>
+
+     <screen>
+$ <userinput>bin/agentadmin --install</userinput>
+<computeroutput>
+Please read the following License Agreement carefully:
+
+[Press &lt;Enter> to continue...] or [Enter n To Finish]
+
+Do you completely agree with all the terms and conditions of this License
+Agreement (yes/no): [no]:</computeroutput>
+     </screen>
+
+     <para>For scripted or silent installs, you can include the
+      <option>--acceptLicense</option> option on the command line to suppress the
+      license acceptance prompt. Using the option indicates that you have read and
+      accepted the terms stated in the license.</para>
+    </listitem>
+   <listitem>
+    <para><emphasis role="bold">IPv4 &amp; IPv6</emphasis>. All of the web policy
+     agents have been updated to include support for
+     Internet Protocol version 6 (IPv6) support, in addition to support for
+     IPv4.</para>
+   </listitem>
+
+   <listitem>
+    <para><emphasis role="bold">Certdb Password Encryption</emphasis>Web policy
+        agents now encrypt the value of the
+    <literal>com.sun.identity.agents.config.certdb.password</literal> property
+    (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2479"
+    xlink:show="new">OPENAM-2479</link>).</para>
+   </listitem>
+
+   <listitem>
+    <para><emphasis role="bold">Debug Logs Show Bootstrap REST URLs</emphasis>.
+     Web policy agents debug logs now show the full REST URL accessed
+     during the bootstrap process (<link xlink:show="new"
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2397"
+     >OPENAM-2397</link>).</para>
+   </listitem>
+
+   <listitem>
+    <variablelist>
+     <para>Web policy agents can perform naming URL validation during the
+     bootstrap phase, and can fail over from one OpenAM service to another
+     (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1258"
+     xlink:show="new">OPENAM-1258</link>, <link xlink:show="new"
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1270"
+     >OPENAM-1270</link>). Configure these capabilities by
+     using the following bootstrap properties.</para>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.default.url.set</literal></term>
+      <listitem>
+       <para>Indicates order of service URLs for failover</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.level</literal></term>
+      <listitem>
+       <para>Controls the extent of naming URL validation</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.ping.interval</literal></term>
+      <listitem>
+       <para>Sets seconds between validation requests against the naming URL</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.ping.miss.count</literal></term>
+      <listitem>
+       <para>Sets threshold of validation failures after which to fail over</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.ping.ok.count</literal></term>
+      <listitem>
+       <para>Sets threshold of validation successes after which to fail back to
+       the first URL in the <literal>default.url.set</literal> list</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+
+    <para>See <link xlink:show="new"
+    xlink:href="web-users-guide#web-bootstrap-configuration-properties"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Bootstrap
+    Configuration Properties</citetitle></link> for details.</para>
+   </listitem>
+
+   <listitem>
+    <para>Web policy agents now allow you to configure the naming of the URL
+    validation net-connect timeout (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1257"
+    xlink:show="new">OPENAM-1257</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents now support IPv6 for notenforced IP addresses
+    (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1256"
+    xlink:show="new">OPENAM-1256</link>).</para>
+   </listitem>
+   <listitem>
+    <para>A web policy agent is now available for Apache HTTPD Server 2.4 (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1195"
+    xlink:show="new">OPENAM-1195</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents now let you enable and disable Cache-Control
+    headers for unauthenticated sessions (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1087"
+    xlink:show="new">OPENAM-1087</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents now let you preserve POST data when working with
+    URI-based load balancing (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-980"
+    xlink:show="new">OPENAM-980</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents now let you configure whether to do an HTTP 302
+    redirect after processing the LARES POST (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-936"
+    xlink:show="new">OPENAM-936</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents now let you configure whether to URL encode the
+    session cookie sent with the LARES POST using the boolean property
+    <literal>com.forgerock.agents.cdsso.cookie.urlencode</literal> (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-915"
+    xlink:show="new">OPENAM-915</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents can now conditionally redirect users based on the
+    incoming request URL (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-849"
+    xlink:show="new">OPENAM-849</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents now support the Expires attribute on cookies (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-815"
+    xlink:show="new">OPENAM-815</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents can now mark persistent cookies as HTTPOnly, to
+    prevent scripts and third-party programs from accessing the cookies
+    (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-804"
+    xlink:show="new">OPENAM-804</link>).</para>
+   </listitem>
+   <listitem>
+    <para>The IIS 7 web policy agents now has support for HTTP Basic
+    authentication and password replay, thereby better supporting Microsoft
+    OWA and SharePoint (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-773"
+     xlink:show="new">OPENAM-773</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents now allow use of regular expressions in Not
+    Enforced URLs (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-772"
+    xlink:show="new">OPENAM-772</link>). In addition, regular expressions are
+    supported for logout URLs and for rejecting access to invalid URLs.</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents can now forward injected attributes to Not
+    Enforced URLs (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-770"
+    xlink:show="new">OPENAM-770</link>). Set
+    <literal>com.sun.identity.agents.config.notenforced.url.attributes.enable=true</literal>
+    in the web policy agent profile as described in <link xlink:show="new"
+    xlink:href="web-reference#appendix-web-config-properties"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Agent
+    Configuration Properties</citetitle></link>.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="before-you-start-web-agents">
+  <title>Before You Install OpenAM Web Policy Agents</title>
+
+  <para>
+   This section covers software and hardware prerequisites
+   for installing and running OpenAM web policy agents.
+  </para>
+
+  <xinclude:include href="../shared/para-requirements-support.xml">
+   <xinclude:fallback>
+    <para>
+     Error: failed to include file
+    </para>
+   </xinclude:fallback>
+  </xinclude:include>
+
+  <para>TODO: Update for release</para>
+
+  <section xml:id="java-requirements-web-agents">
+   <title>Web Agents Java Requirements</title>
+
+   <para>
+    All web policy agents except those associated with Microsoft IIS
+    require a Java runtime environment for installation.
+   </para>
+
+   <xinclude:include href="../shared/itemizedlist-java-requirements.xml">
+    <xinclude:fallback>
+     <para>
+      Error: failed to include file
+     </para>
+    </xinclude:fallback>
+   </xinclude:include>
+  </section>
+
+  <xinclude:include href="../shared/sec-browser-requirements.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
+
+  <xinclude:include href="../shared/sec-native-application-platforms.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
+
+  <xinclude:include href="../shared/sec-web-pa-platform-requirements.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
+
+  <xinclude:include href="../shared/sec-special-requests.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
+ </section>
+
+  <section xml:id="web-agent-compatibility">
+   <title>Web Policy Agent Compatibility</title>
+
+   <para>
+    This section concerns OpenAM Web Policy Agents ${agentsDocTargetVersion}.
+   </para>
+
+   <section xml:id="web-agent-major-changes">
+    <title>Important Changes to Web Policy Agent Functionality</title>
+
+    <itemizedlist>
+     <listitem>
+      <para>
+       Apache policy agents no longer require APR 1.3.x or later.
+
+       The implementation that previously relied on APR 1.3.x or later
+       now uses POSIX on UNIX and Linux and native calls on Windows.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       On Linux, library requirements have changed.
+       Make sure the system can run <command>gcc</command> 4.4.7.
+       <literal>libc.so.6</literal> must be available
+       and it must support the GLIBC_2.3 ABI.
+       You can check this by running the following command:
+       <command>strings libc.so.6 | grep GLIBC_2</command>.
+       Also, <literal>libstdc++.so.6</literal> must be available
+       and it must support GLIBCXX_3.4 and CXXABI_1.3.
+       You can check this by running the following commands:
+       <command>strings libstdc++.so.6 | grep GLIBCXX_3</command>
+       and <command>strings libstdc++.so.6 | grep CXXABI_1</command>.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>IIS web policy agents no longer rely on the Windows registry to
+      determine where to find configuration settings. Instead, IIS agents
+      determine the relative location of their configuration properties files
+      based on the location of the web policy agent DLL, and on the Site ID set
+      by IIS at runtime.</para>
+
+      <para>The cleanest upgrade path is to uninstall the previous version of
+      the IIS agent, and then install the new version of the IIS agent.</para>
+     </listitem>
+
+     <listitem>
+         <para>The IIS web policy agents no longer depend on third-party libraries.
+         They are now built and shipped as single Dynamic-Link Libraries (DLLs). </para>
+     </listitem>
+
+     <listitem>
+         <para>The IIS 6 agent, installed on older versions (pre R2) of Windows 2003,
+         may require the installation of Microsoft Core XML Services (MSXML) 6.0 and
+         any applicable service packs and updates. The IIS7 agent also requires
+         MSXML 6.0 or above. For installation instructions, see the <link xlink:show="new"
+         xlink:href="http://www.microsoft.com/en-us/download/details.aspx?id=3988"
+         ><citetitle>Microsoft Download Center page for MSXML 6.0</citetitle></link>.</para>
+     </listitem>
+
+     <listitem>
+         <para>When SSL is used, the Linux/Solaris agents no longer include independent
+         NSS/NSPR libraries. They rely on the libraries included in the OS native
+         <filename>libxml2</filename> and <filename>openssl</filename> packages.
+         The package names may vary slightly, depending on release / distribution.</para>
+     </listitem>
+
+     <listitem>
+      <para>Naming URL validation was introduced after release 3.0.4. The initial
+      implementation of naming URL validation for web policy agents enabled
+      validation by default. Naming URL validation is now fully disabled by
+      default. You can adjust this setting by using the bootstrap configuration
+      property,
+      <literal>com.forgerock.agents.ext.url.validation.level</literal>.</para>
+     </listitem>
+
+     <listitem>
+      <para>The default policy evaluation mode for new policy agent profiles is
+      now self rather than subtree, in order to better scale for large numbers of
+      policy rules.</para>
+
+      <para>Upgrade does not change existing policy agent profile configurations,
+      however. If you want to adopt the new default setting for existing policy
+      agents, you must change the setting manually.</para>
+
+      <para>For web policy agents, set
+      <literal>com.sun.identity.agents.config.fetch.from.root.resource=false</literal>.</para>
+     </listitem>
+    </itemizedlist>
+   </section>
+
+   <section xml:id="web-agent-deprecated">
+    <title>Deprecated Functionality</title>
+
+    <para>Support for Microsoft IIS 6 is deprecated, and likely to be removed in
+    a future release.</para>
+   </section>
+
+   <section xml:id="web-agent-removed">
+    <title>Removed Functionality</title>
+
+    <itemizedlist>
+     <listitem>
+      <para>The web policy agent bootstrap property
+      <literal>com.forgerock.agents.ext.url.validation.disable</literal>
+      introduced in release 3.1.0 has been superseded by the bootstrap property
+      <literal>com.forgerock.agents.ext.url.validation.level</literal>.</para>
+     </listitem>
+
+     <listitem>
+      <para>Web policy agent support for Apache HTTP Server 2.0 is no longer
+      provided in this release.</para>
+     </listitem>
+
+     <listitem>
+      <para>Web policy agent support for Oracle iPlanet Web Proxy Server
+      (formerly Sun Java System Web Sun Proxy Server) is no longer provided
+      in this release.</para>
+     </listitem>
+    </itemizedlist>
+
+   </section>
+  </section>
+
+  <section xml:id="web-agent-issues">
+   <title>Web Policy Agents Fixes, Limitations, &amp; Known Issues</title>
+
+   <para>OpenAM web policy agent issues are tracked at <link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
+   >https://bugster.forgerock.org/jira/browse/OPENAM</link>.</para>
+
+   <section xml:id="web-agent-fixes">
+    <title>Key Fixes</title>
+
+    <para>
+     The following bugs were fixed in release ${agentsDocTargetVersion}.
+     For details, see the
+     <link
+      xlink:show="new"
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
+     >OpenAM issue tracker</link>.
+    </para>
+
+   <para>TODO</para>
+  </section>
+
+  <section xml:id="web-agent-limitations">
+      <title>Limitations</title>
+
+   <itemizedlist>
+
+    <listitem>
+      <para>Web policy agents for IIS do not support Web gardens nor
+      multi-process mode.</para>
+    </listitem>
+
+    <listitem>
+      <para>If you are running an Apache Web agent on RHEL 6 (CentOS 6), and
+      are also running SELinux in enforcing mode, Apache may fail to restart
+      with a 'Permission denied' message, with a pointer to a file in the
+      <filename>/path/to/web_agents/apache2x_agent/lib</filename> directory.
+      SELinux expects most library files to be configured with a
+      <literal>lib_t</literal> label; you can set that up with the
+      <command>chcon -t lib_t /path/to/web_agents/apache2x_agent/lib/*.so</command>
+      and <command>semanage fcontext -a -t lib_t /path/to/web_agents/apache2x_agent/lib/*.so</command>
+      commands.</para>
+    </listitem>
+   </itemizedlist>
+  </section>
+
+  <section xml:id="web-agent-known-issues">
+   <title>Known Issues</title>
+
+   <para>
+    The following important known issues remained open
+    at the time release ${agentsDocTargetVersion} became available.
+    For details and information on other issues, see the
+    <link
+     xlink:show="new"
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
+     >OpenAM issue tracker</link>.
+   </para>
+
+   <para>TODO</para>
+  </section>
+ </section>
+</chapter>

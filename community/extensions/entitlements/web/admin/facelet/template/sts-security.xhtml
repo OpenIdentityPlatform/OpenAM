@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: sts-security.xhtml,v 1.2 2009/08/03 22:25:31 ggennaro Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['sts-security.section-title']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['sts-security.section-details']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+
+            <ice:panelGroup>
+                <ice:panelGrid
+                    columns="2"
+                    columnClasses="label-column,input-column" >
+
+                    <ice:outputLabel
+                        for="securityMechanism"
+                        style="float: right;"
+                        value="#{resources['sts-security.securityMechanismLabel']}" />
+                    <ice:selectOneMenu 
+                        id="securityMechanism"
+                        value="#{wizardBean.securityMechanism}"
+                        valueChangeListener="#{wizardHandler.selectedSecurityMechanismListener}" >
+                        <f:selectItems
+                            value="#{wizardBean.securityMechanismList}"/>
+                    </ice:selectOneMenu>
+
+                    <ice:outputText value="" />
+                    <ice:panelStack
+                        selectedPanel="#{wizardHandler.selectedSecurityPanel}">
+
+                        <ice:panelGroup id="noSettingsPanel" />
+
+                        <ice:panelGroup id="x509TokenSettingsPanel">
+                            <ice:panelGrid columns="1">
+                                <ice:outputLabel 
+                                    for="x509TokenSigningReferenceType"
+                                    value="#{resources['sts-security.x509TokenSigningReferenceTypeLabel']}" />
+                                <ice:selectOneMenu
+                                    id="x509TokenSigningReferenceType"
+                                    value="#{wizardBean.x509TokenSigningReferenceType}">
+                                    <f:selectItems
+                                        value="#{wizardBean.x509SigningReferenceTypeList}" />
+                                </ice:selectOneMenu>
+                            </ice:panelGrid>
+                        </ice:panelGroup>
+
+                        <ice:panelGroup id="userNameTokenSettingsPanel">
+                            <ice:outputText
+                                value="#{resources['sts-security.userNameTokenSettingsLabel']}" />
+                            <ice:panelGrid columns="2">
+                                <ice:outputLabel
+                                    for="userNameTokenUserName"
+                                    style="float: right;"
+                                    value="#{resources['sts-security.userNameTokenUserNameLabel']}" />
+                                <ice:inputText
+                                    id="userNameTokenUserName"
+                                    size="50"
+                                    maxlength="50"
+                                    value="#{wizardBean.userNameTokenUserName}" />
+                                <ice:outputLabel
+                                    for="userNameTokenPassword"
+                                    style="float: right;"
+                                    value="#{resources['sts-security.userNameTokenPasswordLabel']}" />
+                                <ice:inputSecret 
+                                    id="userNameTokenPassword"
+                                    size="50"
+                                    maxlength="50"
+                                    redisplay="true"
+                                    value="#{wizardBean.userNameTokenPassword}" />
+                            </ice:panelGrid>
+                        </ice:panelGroup>
+
+                        <ice:panelGroup id="kerberosSettingsPanel">
+                            <ice:outputText
+                                value="#{resources['sts-security.kerberosSettingsLabel']}" />
+                            <ice:panelGrid columns="2">
+                                <ice:outputLabel
+                                    for="kerberosDomainServer"
+                                    style="float: right;"
+                                    value="#{resources['sts-security.kerberosDomainServerLabel']}" />
+                                <ice:inputText
+                                    id="kerberosDomainServer"
+                                    size="50"
+                                    maxlength="255"
+                                    value="#{wizardBean.kerberosDomainServer}" />
+                                <ice:outputLabel
+                                    for="kerberosDomain"
+                                    style="float: right;"
+                                    value="#{resources['sts-security.kerberosDomainLabel']}" />
+                                <ice:inputText
+                                    id="kerberosDomain"
+                                    size="50"
+                                    maxlength="255"
+                                    value="#{wizardBean.kerberosDomain}" />
+                                <ice:outputLabel
+                                    for="kerberosServicePrincipal"
+                                    style="float: right;"
+                                    value="#{resources['sts-security.kerberosServicePrincipalLabel']}" />
+                                <ice:inputText
+                                    id="kerberosServicePrincipal"
+                                    size="50"
+                                    maxlength="255"
+                                    value="#{wizardBean.kerberosServicePrincipal}" />
+                                <ice:outputLabel
+                                    for="kerberosTicketCache"
+                                    style="float: right;"
+                                    value="#{resources['sts-security.kerberosTicketCacheLabel']}" />
+                                <ice:inputText
+                                    id="kerberosTicketCache"
+                                    size="50"
+                                    maxlength="255"
+                                    value="#{wizardBean.kerberosTicketCache}" />
+                            </ice:panelGrid>
+                        </ice:panelGroup>
+
+                        <ice:panelGroup id="stsConfigSettingsPanel">
+                            <ice:panelGrid 
+                                columns="1"
+                                rendered="#{o:size(wizardBean.stsConfigurationNameList) > 1 }">
+                                <ice:outputLabel 
+                                    for="stsConfigurationName"
+                                    value="#{resources['sts-security.stsConfigurationNameLabel']}" />
+                                <ice:selectOneMenu
+                                    id="stsConfigurationName"
+                                    value="#{wizardBean.stsConfigurationName}" >
+                                    <f:selectItems
+                                        value="#{wizardBean.stsConfigurationNameList}"/>
+                                </ice:selectOneMenu>
+                                <ice:outputText
+                                        style="font-style: italic;"
+                                        value="#{resources['sts-security.stsHostedStsInlineHelp']}" />
+                            </ice:panelGrid>
+                        </ice:panelGroup>
+
+                    </ice:panelStack>
+
+                </ice:panelGrid>
+            </ice:panelGroup>
+
+        </ui:define>
+    </o:section>
+
+</span>

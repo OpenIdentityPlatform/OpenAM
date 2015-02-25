@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: Membership.xml,v 1.10 2009/07/16 04:12:02 cbasha Exp $
+
+-->
+
+<!--
+Portions Copyrighted 2011-2013 ForgeRock AS
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+        "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="Membership" version="1.0" >
+
+    <Callbacks length="3" order="1" timeout="120" header="自己登録モジュール" template="membership.jsp" >
+        <NameCallback>
+            <Prompt>ユーザー名:</Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt>パスワード:</Prompt>    
+        </PasswordCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>ログイン</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>新規ユーザー</Value>
+                </OptionValue>
+             </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="0" order="2" timeout="120" template="disclaimerDeclined.jsp" error="true" />
+    
+    <Callbacks length="0" order="3" timeout="120" template="profileError.jsp" error="true" />
+   
+    <Callbacks length="8" order="4" timeout="300" header="自己登録" template="register.jsp" >
+        <NameCallback isRequired="true" attribute="uid" >
+            <Prompt>ユーザー名:</Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" isRequired="true" attribute="userPassword" >
+            <Prompt>パスワード:</Prompt>    
+        </PasswordCallback>
+        <PasswordCallback echoPassword="false" isRequired="true" >
+            <Prompt>パスワードの確認:</Prompt>    
+        </PasswordCallback>
+        <NameCallback isRequired="true" attribute="givenname" >
+            <Prompt>名:</Prompt>
+        </NameCallback>
+        <NameCallback isRequired="true" attribute="sn" >
+            <Prompt>姓:</Prompt>
+        </NameCallback>
+        <NameCallback isRequired="true" attribute="cn" >
+            <Prompt>フルネーム:</Prompt>
+        </NameCallback>
+        <NameCallback attribute="mail" >
+            <Prompt>電子メールアドレス:</Prompt>
+        </NameCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>登録</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>取消し</Value>
+                </OptionValue>
+             </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="2" order="5" timeout="120" header="自己登録" >
+        <ChoiceCallback attribute="uid" >
+            <Prompt>入力したユーザー名の&lt;BR&gt;ユーザーがすでに存在します。&lt;BR&gt;次のユーザー名の&lt;BR&gt;いずれかを選択するか、&lt;BR&gt;独自に作成してください。</Prompt>
+            <ChoiceValues>
+              <ChoiceValue>
+                  <Value>自分独自のものを作成</Value>
+              </ChoiceValue>
+            </ChoiceValues>
+        </ChoiceCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>送信</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="1" order="6" timeout="120" template="disclaimer.jsp" >
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>同意する</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>同意しない</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+</ModuleProperties>

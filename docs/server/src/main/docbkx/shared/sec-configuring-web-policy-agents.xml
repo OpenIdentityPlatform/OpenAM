@@ -1,0 +1,1578 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<section xml:id="configure-web-policy-agent"
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+ <title>Configuring Web Policy Agents</title>
+
+ <indexterm>
+  <primary>policy agent profiles</primary>
+  <secondary>web policy agents</secondary>
+  <tertiary>creating</tertiary>
+ </indexterm>
+
+ <para>When you create a web policy agent profile and install the agent,
+  you can choose to store the agent configuration centrally and configure
+  the agent through OpenAM console. Alternatively, you can choose to store
+  the agent configuration locally and configure the agent by changing
+  values in the properties file. This section covers centralized configuration,
+  indicating the corresponding properties for use in a local configuration
+  file where applicable.
+
+  <footnote><para>The configuration file syntax is that
+   of a standard Java properties file. See <link
+    xlink:href="http://download.oracle.com/javase/6/docs/api/java/util/Properties.html#load%28java.io.Reader%29"
+    >java.util.Properties.load</link> for a description of the format. The value
+   of a property specified multiple times is not defined.</para></footnote>
+ </para>
+
+ <tip>
+  <para>To show the agent properties in configuration file format that
+   correspond to what you see in the console, click Export Configuration
+   after editing agent properties.</para>
+
+  <para>This corresponds to the local Java properties configuration file
+   that is set up when you install an agent, for example in
+   <filename>Agent_001/config/<?eval ${agentsConfigurationFile}?></filename>.</para>
+ </tip>
+
+ <para>After changing properties specified as "Hot swap: no" you must
+  restart the agent's container for the changes to take effect.</para>
+
+ <section xml:id="configure-web-pa-global-props">
+  <title>Configuring Web Policy Agent Global Properties</title>
+
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>global properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+
+  <para>This section covers global web agent properties. After creating the
+   agent profile, you access these properties in the OpenAM console under
+   Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+   Web &gt; <replaceable>Agent Name</replaceable> &gt; Global.</para>
+
+  <variablelist xml:id="web-agent-profile-properties">
+   <title>Profile properties</title>
+   <varlistentry>
+    <term>Group</term>
+    <listitem>
+     <para>For assigning the agent to a previously configured web agent group
+      in order to inherit selected properties from the group.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Password</term>
+    <listitem>
+     <para>Agent password used when creating the password file and when
+      installing the agent.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Status</term>
+    <listitem>
+     <para>Status of the agent configuration.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Location of Agent Configuration Repository</term>
+    <listitem>
+     <para>Indicates agent's configuration located either on agent's host or
+      centrally on OpenAM server.</para>
+     <para>If you change this to a local configuration, you can no longer
+      manage the policy agent configuration through OpenAM console.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.repository.location</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Agent Configuration Change Notification</term>
+    <listitem>
+     <para>Enable agent to receive notification messages from OpenAM server for
+      configuration changes.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.change.notification.enable</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Enable Notifications</term>
+    <listitem>
+     <para>If enabled, the agent receives policy updates from the OpenAM
+      notification mechanism to maintain its internal cache. If disabled, the
+      agent must poll OpenAM for changes.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.notification.enable</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Agent Notification URL</term>
+    <listitem>
+     <para>URL used by agent to register notification listeners.</para>
+     <para>Property: <literal>com.sun.identity.client.notification.url</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Agent Deployment URI Prefix</term>
+    <listitem>
+     <para>The default value is
+      <literal><replaceable>agent-root-URL</replaceable>/amagent</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.agenturi.prefix</literal></para>
+     <para>Hot swap: yes</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Configuration Reload Interval</term>
+    <listitem>
+     <para>Interval in minutes to fetch agent configuration from OpenAM. Used
+      if notifications are disabled. Default: 60.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.polling.interval</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Configuration Cleanup Interval</term>
+    <listitem>
+     <para>Interval in minutes to cleanup old agent configuration entries
+      unless they are referenced by current requests. Default: 30.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.cleanup.interval</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Agent Root URL for CDSSO</term>
+    <listitem>
+     <para>The agent root URL for CDSSO. The valid value is in the format
+      <literal><replaceable>protocol</replaceable>://<replaceable>hostname</replaceable>:<replaceable>port</replaceable>/</literal>
+      where <replaceable>protocol</replaceable> represents the protocol used,
+      such as <literal>http</literal> or <literal>https</literal>,
+      <replaceable>hostname</replaceable> represents the host name of the
+      system where the agent resides, and <replaceable>port</replaceable>
+      represents the port number on which the agent is installed.
+      The slash following the port number is required.</para>
+
+     <para>If your agent system also has virtual host names, add URLs with
+      the virtual host names to this list as well. OpenAM checks that the
+      <literal>goto</literal> URLs match one of the agent root URLs for
+      CDSSO.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-general-properties">
+   <title>General properties</title>
+
+   <indexterm>
+    <primary>web policy agents</primary>
+    <secondary>general properties</secondary>
+   </indexterm>
+
+   <varlistentry>
+    <term>SSO Only Mode</term>
+    <listitem>
+     <para>When enabled, the agent enforces authentication, so that upon verification
+      of the user's identity, the user receives a session token.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.sso.only</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Resources Access Denied URL</term>
+    <listitem>
+     <para>The URL of the customized access denied page. If no value is
+      specified (default), then the agent returns an HTTP status of 403
+      (Forbidden).</para>
+     <para>Property: <literal>com.sun.identity.agents.config.access.denied.url</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Agent Debug Level</term>
+    <listitem>
+     <para>Default is <literal>Error</literal>. Increase to
+      <literal>Message</literal> or even <literal>All</literal> for
+      fine-grained detail.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.debug.level</literal></para>
+     <para>You can set the level in the configuration file by module using
+      the format
+      <literal><replaceable>module</replaceable>[:<replaceable>level</replaceable>][,<replaceable>module</replaceable>[:<replaceable>level</replaceable>]]*</literal>,
+      where <replaceable>module</replaceable> is one of
+      <literal>AuthService</literal>, <literal>NamingService</literal>,
+      <literal>PolicyService</literal>, <literal>SessionService</literal>,
+      <literal>PolicyEngine</literal>, <literal>ServiceEngine</literal>,
+      <literal>Notification</literal>, <literal>PolicyAgent</literal>,
+      <literal>RemoteLog</literal>, or <literal>all</literal>,
+      and <replaceable>level</replaceable> is one of the following.</para>
+     <itemizedlist>
+      <listitem>
+       <para><literal>0</literal>: Disable logging from specified module</para>
+       <para>At this level the agent nevertheless logs messages having the
+        level value <literal>always</literal>.</para>
+      </listitem>
+      <listitem>
+       <para><literal>1</literal>: Log error messages</para>
+      </listitem>
+      <listitem>
+       <para><literal>2</literal>: Log warning and error messages</para>
+      </listitem>
+      <listitem>
+       <para><literal>3</literal>: Log info, warning, and error messages</para>
+      </listitem>
+      <listitem>
+       <para><literal>4</literal>: Log debug, info, warning, and error messages</para>
+      </listitem>
+      <listitem>
+       <para><literal>5</literal>: Like level 4, but with even more debugging messages</para>
+      </listitem>
+     </itemizedlist>
+     <para>When you omit <replaceable>level</replaceable>, the agent uses the
+      default level, which is the level associated with the
+      <literal>all</literal> module.</para>
+     <para>The following example used in the local configuration sets the
+      log overall level to debug for all messages.</para>
+     <literallayout class="monospaced"
+      >com.sun.identity.agents.config.debug.level=all:5</literallayout>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Agent Debug File Rotation</term>
+    <listitem>
+     <para>When enabled, rotate the debug file when specified file size is
+      reached.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.debug.file.rotate</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Agent Debug File Size</term>
+    <listitem>
+     <para>Debug file size in bytes beyond which the log file is rotated. The
+      minimum is 1048576 bytes (1 MB), and lower values are reset to 1 MB.
+      OpenAM console sets a default of 10 MB.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.debug.file.size</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-audit-properties">
+   <title>Audit properties</title>
+   <varlistentry>
+    <term>Audit Access Types</term>
+    <listitem>
+     <para>Types of messages to log based on user URL access attempts.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.audit.accesstype</literal></para>
+     <para>Valid values for the configuration file property include
+      <literal>LOG_NONE</literal>, <literal>LOG_ALLOW</literal>,
+      <literal>LOG_DENY</literal>, and <literal>LOG_BOTH</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Audit Log Location</term>
+    <listitem>
+     <para>Specifies where audit messages are logged. By default, audit
+      messages are logged remotely.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.log.disposition</literal></para>
+     <para>Valid values for the configuration file property include
+      <literal>REMOTE</literal>, <literal>LOCAL</literal>, and
+      <literal>ALL</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Remote Log Filename</term>
+    <listitem>
+     <para>Name of file stored on OpenAM server that contains agent audit
+      messages if log location is remote or all.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.remote.logfile</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Remote Audit Log Interval</term>
+    <listitem>
+     <para>Periodic interval in minutes in which audit log messages are sent
+      to the remote log file.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.remote.log.interval</literal></para>
+     <para>Default: 5</para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Rotate Local Audit Log</term>
+    <listitem>
+     <para>When enabled, audit log files are rotated when reaching the
+      specified size.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.local.log.rotate</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Local Audit Log Rotation Size</term>
+    <listitem>
+     <para>Beyond this size limit in bytes the agent rotates the local audit
+      log file if rotation is enabled.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.local.log.size</literal></para>
+     <para>Default: 50 MB</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-fqdn-properties">
+   <title>Fully Qualified Domain Name Checking properties</title>
+   <varlistentry>
+    <term>FQDN Check</term>
+    <listitem>
+     <para>Enables checking of FQDN default value and FQDN map values.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.fqdn.check.enable</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>FQDN Default</term>
+    <listitem>
+     <para>Fully qualified domain name that the users should use in order to
+      access resources. Without this value, the web server can fail to
+      start, thus you set the property on agent installation, and only change
+      it when absolutely necessary.</para>
+     <para>This property ensures that when users access protected resources
+      on the web server without specifying the FQDN, the agent can redirect
+      the users to URLs containing the correct FQDN.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.fqdn.default</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>FQDN Virtual Host Map</term>
+    <listitem>
+     <para>Enables virtual hosts, partial hostname and IP address to access
+      protected resources. Maps invalid or virtual name keys to valid FQDN
+      values so the agent can properly redirect users and the agents receive
+      cookies belonging to the domain.</para>
+     <para>To map <literal>myserver</literal> to
+      <literal>myserver.mydomain.example</literal>, enter
+      <literal>myserver</literal> in the Map Key field, and enter
+      <literal>myserver.mydomain.example</literal> in the Corresponding Map Value
+      field. This corresponds to
+      <literal>com.sun.identity.agents.config.fqdn.mapping[myserver]= myserver.mydomain.example</literal>.</para>
+     <para>Invalid FQDN values can cause the web server to become unusable
+      or render resources inaccessible.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.fqdn.mapping</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="configure-web-pa-application-props">
+  <title>Configuring Web Policy Agent Application Properties</title>
+
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>application properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+
+  <para>This section covers application web agent properties. After creating
+   the agent profile, you access these properties in the OpenAM console under
+   Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+   Web &gt; <replaceable>Agent Name</replaceable> &gt; Application.</para>
+
+  <variablelist xml:id="web-agent-not-enforced-url-properties">
+   <title>Not Enforced URL Processing properties</title>
+   <varlistentry>
+    <term>Ignore Path Info for Not Enforced URLs</term>
+    <listitem>
+     <para>When enabled, the path info and query are stripped from the
+      request URL before being compared with the URLs of the not enforced list
+      for those URLs containing a wildcard character. This prevents a user
+      from accessing <literal>http://host/index.html</literal> by requesting
+      <literal>http://host/index.html/hack.gif</literal> when the not enforced
+      list includes <literal>http://host/*.gif</literal>.</para>
+
+     <!--<note><para>This setting is not supported by the Varnish Cache agent.</para></note>-->
+
+     <para>For a more generally applicable setting, see
+      <xref linkend="web-agent-ignore-path-info-properties" />.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.ignore.path.info.for.not.enforced.list</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Enable Regular Expressions for Not Enforced URLs (Not yet in OpenAM console)</term>
+    <listitem>
+     <para>Enable use of <link xlink:href="http://www.pcre.org/pcre.txt"
+                               xlink:show="new">Perl-compatible regular expressions</link> in
+      Not Enforced URL settings by using the following property under Advanced
+      &gt; Custom Properties in the agent profile.</para>
+
+     <literallayout class="monospaced"
+      >com.forgerock.agents.notenforced.url.regex.enable=true</literallayout>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Not Enforced URLs</term>
+    <listitem>
+     <para>List of URLs for which no authentication is required. You can use
+      wildcards to define a pattern for a URL.</para>
+     <para>The <literal>*</literal> wildcard matches all characters except
+      question mark (<literal>?</literal>), cannot be escaped, and spans
+      multiple levels in a URL. Multiple forward slashes do not match a
+      single forward slash, so <literal>*</literal> matches
+      <literal>mult/iple/dirs</literal>, yet <literal>mult/*/dirs</literal>
+      does not match <literal>mult/dirs</literal>.</para>
+     <para>The <literal>-*-</literal> wildcard matches all characters except
+      forward slash (<literal>/</literal>) or question mark
+      (<literal>?</literal>), and cannot be escaped. As it does not match
+      <literal>/</literal>, <literal>-*-</literal> does not span multiple
+      levels in a URL.</para>
+     <para>OpenAM does not let you mix <literal>*</literal> and
+      <literal>-*-</literal> in the same URL.</para>
+     <para>Examples include
+      <literal>http://www.example.com/logout.html</literal>,
+      <literal>http://www.example.com/images/*</literal>,
+      <literal>http://www.example.com/css/-*-</literal>, and
+      <literal>http://www.example.com/*.jsp?locale=*</literal>.</para>
+     <para>Trailing forward slashes are not recognized as part of a resource
+      name. Therefore <literal>http://www.example.com/images//</literal> and
+      <literal>http://www.example.com/images</literal> are equivalent.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.notenforced.url</literal></para>
+
+     <para>If you enabled use of <link xlink:href="http://www.pcre.org/pcre.txt"
+                                       xlink:show="new">Perl-compatible regular expressions</link> to match
+      Not Enforced URLs, then all your settings must be done using regular
+      expressions. (Do not mix settings; use either the mechanism
+      described above or Perl-compatible regular expressions, but not both.)</para>
+
+     <para>The following example shows settings where no authentication is
+      required for URLs whose path ends <literal>/publicA</literal> or
+      <literal>/publicB</literal> (with or without query string parameters),
+      and no authentication is required to access .png, .jpg, .gif, .js, or .css
+      files under URLs that do not contain <literal>/protectedA/</literal>
+      or <literal>/protectedB/</literal>.</para>
+
+     <literallayout class="monospaced">.*/(PublicServletA|PublicServletB)(\?.*|$)
+      ^(?!.*(/protectedA/|/protectedB/)).*\.(png|jpg|gif|js|css)(\?.*|$)</literallayout>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Invert Not Enforced URLs</term>
+    <listitem>
+     <para>Only enforce not enforced list of URLs. In other words, enforce
+      policy only for those URLs and patterns specified in the list.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.notenforced.url.invert</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Fetch Attributes for Not Enforced URLs</term>
+    <listitem>
+     <para>When enabled, the agent fetches profile, response, and session
+      attributes that are mapped by doing policy evaluation, and forwards
+      these attributes to not enforced URLs.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.notenforced.url.attributes.enable</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-not-enforced-ip-properties">
+   <title>Not Enforced IP Processing Properties</title>
+   <varlistentry>
+    <term>Not Enforced Client IP List</term>
+    <listitem>
+     <para>No authentication and authorization are required for the requests
+      coming from these client IP addresses.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.notenforced.ip</literal></para>
+     <note>
+      <para>
+       Loopback addresses are not considered valid IPs on the Not Enforced IP list.
+       If specified, the policy agent ignores the loopback address.
+      </para>
+     </note>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <!-- Fix for OPENAM-717: Document com.forgerock.agents.config.notenforced.ip.handler enhancement -->
+    <term>CIDR Client IP Specification (Not yet in OpenAM console)</term>
+    <listitem>
+     <para>As of version 3.0.4, web policy agents with this property set to
+      <literal>cidr</literal> can use IPv4 netmasks and IP ranges instead of
+      wildcards as values for Not Enforced Client IP addresses. Version 3.0.5
+      adds support for IPv6, including the IPv6 loopback address,
+      <literal>::1</literal>.</para>
+     <para>When the parameter is defined, wildcards are ignored in Not
+      Enforced Client IP settings. Instead, you can use settings such as
+      those shown in the following examples.</para>
+     <variablelist>
+      <varlistentry>
+       <term>Netmask Example</term>
+       <listitem>
+        <para>To disable policy agent enforcement for addresses in
+         192.168.1.1 to 192.168.1.255, use the following setting.</para>
+        <literallayout class="monospaced"
+         >com.sun.identity.agents.config.notenforced.ip = 192.168.1.1/24</literallayout>
+        <para>The following example shows an IPv6 address with a corresponding network mask.</para>
+        <literallayout class="monospaced"
+         >com.sun.identity.agents.config.notenforced.ip = 2001:5c0:9168:0:0:0:0:2/128</literallayout>
+        <para>Currently the policy agent stops evaluating properties after
+         reaching an invalid netmask in the list.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>IP Range Example</term>
+       <listitem>
+        <para>To disable policy agent enforcement for addresses between
+         192.168.1.1 to 192.168.4.3 inclusive, use the following setting.</para>
+        <literallayout class="monospaced"
+         >com.sun.identity.agents.config.notenforced.ip = 192.168.1.1-192.168.4.3</literallayout>
+        <para>The following example shows a range of IPv6 addresses. The example
+         is displayed over two lines for formatting purposes.
+        </para>
+        <literallayout class="monospaced"
+         >com.sun.identity.agents.config.notenforced.ip = \
+    2001:5c0:9168:0:0:0:0:1-2001:5c0:9168:0:0:0:0:2</literallayout>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+     <para>Property: <literal>com.forgerock.agents.config.notenforced.ip.handler</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Client IP Validation</term>
+    <listitem>
+     <para>When enabled, validate that the subsequent browser requests come
+      from the same IP address that the SSO token is initially issued
+      against.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.client.ip.validation.enable</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-profile-attributes-processing-properties">
+   <title>Profile Attributes Processing properties</title>
+   <varlistentry>
+    <term>Profile Attribute Fetch Mode</term>
+    <listitem>
+     <para>When set to <literal>HTTP_COOKIE</literal> or
+      <literal>HTTP_HEADER</literal>, profile attributes are introduced into
+      the cookie or the headers, respectively.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.profile.attribute.fetch.mode</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Profile Attribute Map</term>
+    <listitem>
+     <para>Maps the profile attributes to HTTP headers for the currently
+      authenticated user. Map Keys are LDAP attribute names, and Map Values
+      are HTTP header names.</para>
+     <para>To populate the value of profile attribute CN under
+      <literal>CUSTOM-Common-Name</literal>: enter CN in the Map Key field,
+      and enter <literal>CUSTOM-Common-Name</literal> in the Corresponding
+      Map Value field. This corresponds to
+      <literal>com.sun.identity.agents.config.profile.attribute.mapping[cn]=CUSTOM-Common-Name</literal>.</para>
+     <para>In most cases, in a destination application where an HTTP header
+      name shows up as a request header, it is prefixed by
+      <literal>HTTP_</literal>, lower case letters become upper case, and
+      hyphens (<literal>-</literal>) become underscores (<literal>_</literal>).
+      For example, <literal>common-name</literal> becomes
+      <literal>HTTP_COMMON_NAME</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.profile.attribute.mapping</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-response-attributes-processing-properties">
+   <title>Response Attributes Processing properties</title>
+   <varlistentry>
+    <term>Response Attribute Fetch Mode</term>
+    <listitem>
+     <para>When set to <literal>HTTP_COOKIE</literal> or
+      <literal>HTTP_HEADER</literal>, response attributes are introduced into
+      the cookie or the headers, respectively.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.response.attribute.fetch.mode</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Response Attribute Map</term>
+    <listitem>
+     <para>Maps the policy response attributes to HTTP headers for the
+      currently authenticated user. The response attribute is
+      the attribute in the policy response to be fetched.</para>
+     <para>To populate the value of response attribute <literal>uid</literal>
+      under <literal>CUSTOM-User-Name</literal>: enter <literal>uid</literal>
+      in the Map Key field, and enter <literal>CUSTOM-User-Name</literal> in
+      the Corresponding Map Value field. This corresponds to
+      <literal>com.sun.identity.agents.config.response.attribute.mapping[uid]=Custom-User-Name</literal>.</para>
+     <para>In most cases, in a destination application where an HTTP header
+      name shows up as a request header, it is prefixed by
+      <literal>HTTP_</literal>, lower case letters become upper case, and
+      hyphens (<literal>-</literal>) become underscores (<literal>_</literal>).
+      For example, <literal>response-attr-one</literal> becomes
+      <literal>HTTP_RESPONSE_ATTR_ONE</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.response.attribute.mapping</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-session-attributes-processing-properties">
+   <title>Session Attributes Processing properties</title>
+   <varlistentry>
+    <term>Session Attribute Fetch Mode</term>
+    <listitem>
+     <para>When set to <literal>HTTP_COOKIE</literal> or
+      <literal>HTTP_HEADER</literal>, session attributes are introduced into the
+      cookie or the headers, respectively.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.session.attribute.fetch.mode</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Session Attribute Map</term>
+    <listitem>
+     <para>Maps session attributes to HTTP headers for the currently
+      authenticated user. The session attribute is the attribute in the session
+      to be fetched.</para>
+     <para>To populate the value of session attribute
+      <literal>UserToken</literal> under <literal>CUSTOM-userid</literal>:
+      enter <literal>UserToken</literal> in the Map Key field, and enter
+      <literal>CUSTOM-userid</literal> in
+      the Corresponding Map Value field. This corresponds to
+      <literal>com.sun.identity.agents.config.session.attribute.mapping[UserToken] =CUSTOM-userid</literal>.</para>
+     <para>In most cases, in a destination application where an HTTP header
+      name shows up as a request header, it is prefixed by
+      <literal>HTTP_</literal>, lower case letters become upper case, and
+      hyphens (<literal>-</literal>) become underscores (<literal>_</literal>).
+      For example, <literal>success-url</literal> becomes
+      <literal>HTTP_SUCCESS_URL</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.session.attribute.mapping</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-attributes-fetching-properties">
+   <title>Common Attributes Fetching Processing properties</title>
+   <varlistentry>
+    <term>Attribute Multi Value Separator</term>
+    <listitem>
+     <para>Specifies separator for multiple values. Applies to all types of
+      attributes such as profile, session and response attributes. Default:
+      <literal>|</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.attribute.multi.value.separator</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="configure-web-pa-sso-props">
+  <title>Configuring Web Policy Agent SSO Properties</title>
+
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>SSO properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+
+  <para>This section covers SSO web agent properties. After creating the
+   agent profile, you access these properties in the OpenAM console under
+   Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+   Web &gt; <replaceable>Agent Name</replaceable> &gt; SSO</para>
+
+  <variablelist xml:id="web-agent-cookie-properties">
+   <title>Cookie properties</title>
+   <varlistentry>
+    <term>Cookie Name</term>
+    <listitem>
+     <para>Name of the SSO Token cookie used between the OpenAM server and
+      the agent. Default: <literal>iPlanetDirectoryPro</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.cookie.name</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Cookie Security</term>
+    <listitem>
+     <para>When enabled, the agent marks cookies secure, sending them only
+      if the communication channel is secure.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.cookie.secure</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <!-- OPENAM-804: Add ability to set HttpOnly flag for cookies -->
+    <term>HTTPOnly Cookies (Not yet in OpenAM console)</term>
+    <listitem>
+     <para>As of version 3.0.5, web policy agents with this property set to
+      <literal>true</literal> mark cookies as HTTPOnly, to prevent scripts
+      and third-party programs from accessing the cookies.</para>
+     <para>Property: <literal>com.sun.identity.cookie.httponly</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-cdsso-properties">
+   <title>Cross Domain SSO properties</title>
+   <varlistentry>
+    <term>Cross Domain SSO</term>
+    <listitem>
+     <para>Enables Cross Domain Single Sign On.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.cdsso.enable</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>CDSSO Servlet URL</term>
+    <listitem>
+     <para>List of URLs of the available CDSSO controllers that the agent can
+      use for CDSSO processing. For example,
+      <literal>http://openam.example.com:8080/openam/cdcservlet</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.cdsso.cdcservlet.url</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Cookies Domain List</term>
+    <listitem>
+     <para>List of domains, such as <literal>.example.com</literal>, in which
+      cookies have to be set in CDSSO. If this property is left blank, then
+      the fully qualified domain name of the cookie for the agent server
+      is used to set the cookie domain, meaning that a host cookie rather than
+      a domain cookie is set.</para>
+     <para>To set the list to <literal>.example.com</literal>, and
+      <literal>.example.net</literal> using the configuration file property,
+      include the following.</para>
+     <literallayout class="monospaced">com.sun.identity.agents.config.cdsso.cookie.domain[0]=.example.com
+      com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayout>
+     <para>Property: <literal>com.sun.identity.agents.config.cdsso.cookie.domain</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-cookie-reset-properties">
+   <title>Cookie Reset properties</title>
+   <varlistentry>
+    <term>Cookie Reset</term>
+    <listitem>
+     <para>When enabled, agent resets cookies in the response before
+      redirecting to authentication.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.cookie.reset.enable</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Cookie Reset Name List</term>
+    <listitem>
+     <para>List of cookies in the format
+      <literal><replaceable>name</replaceable>[=<replaceable>value</replaceable>][;Domain=<replaceable>value</replaceable>]</literal>.</para>
+     <para>Concrete examples include the following with two list items
+      configured.</para>
+     <itemizedlist>
+      <listitem>
+       <para><literal>LtpaToken</literal>, corresponding to
+        <literal>com.sun.identity.agents.config.cookie.reset[0]=LtpaToken</literal>.
+        The default domain is taken from FQDN Default.</para>
+      </listitem>
+      <listitem>
+       <para><literal>token=value;Domain=subdomain.domain.com</literal>,
+        corresponding to
+        <literal>com.sun.identity.agents.config.cookie.reset[1]= token=value;Domain=subdomain.domain.com</literal></para>
+      </listitem>
+     </itemizedlist>
+     <para>Property: <literal>com.sun.identity.agents.config.cookie.reset</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="configure-web-pa-services-props">
+  <title>Configuring Web Policy Agent OpenAM Services Properties</title>
+
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>OpenAM services properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+
+  <para>This section covers OpenAM services web agent properties. After
+   creating the agent profile, you access these properties in the OpenAM console
+   under Access Control &gt; <replaceable>Realm Name</replaceable> &gt;
+   Agents &gt; Web &gt; <replaceable>Agent Name</replaceable> &gt; OpenAM
+   Services.</para>
+
+  <variablelist xml:id="web-agent-login-url-properties">
+   <title>Login URL properties</title>
+   <varlistentry>
+    <term>OpenAM Login URL</term>
+    <listitem>
+     <para>OpenAM login page URL, such as
+      <literal>http://openam.example.com:8080/openam/UI/Login</literal>, to
+      which the agent redirects incoming users without sufficient credentials
+      so that they can authenticate.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.login.url</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <!-- OPENAM-849: Policy Agent needs conditional redirect to a login URL
+    based on incoming request URL -->
+    <term>OpenAM Conditional Login URL (Not yet in OpenAM console)</term>
+
+    <xinclude:include href="../shared/listitem-conditional-login-url-web.xml" />
+
+   </varlistentry>
+   <varlistentry>
+    <term>Agent Connection Timeout</term>
+    <listitem>
+     <para>Timeout period in seconds for an agent connection with OpenAM auth
+      server.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.auth.connection.timeout</literal></para>
+     <para>Default: 2</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Polling Period for Primary Server</term>
+    <listitem>
+     <para>Interval in minutes, agent polls to check the primary server is up
+      and running. Default: 5.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.poll.primary.server</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-logout-url-properties">
+   <title>Logout URL properties</title>
+   <varlistentry>
+    <term>OpenAM Logout URL</term>
+    <listitem>
+     <para>OpenAM logout page URL, such as
+      <literal>http://openam.example.com:8080/openam/UI/Logout</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.logout.url</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Enable Logout URL Redirect (Not yet in OpenAM console)</term>
+    <listitem>
+     <para>Logout URL redirect is enabled by default.</para>
+
+     <para>When this is disabled, instead of redirecting the user-agent, the
+      policy agent performs session logout in the background and then continues
+      processing access to the current URL. Disable this using Advanced &gt;
+      Custom Properties in the agent profile.</para>
+
+     <literallayout class="monospaced"
+      >com.forgerock.agents.config.logout.redirect.disable=true</literallayout>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-agent-logout-url-properties">
+   <title>Agent Logout URL properties</title>
+   <varlistentry>
+    <term>Logout URL List</term>
+    <listitem>
+     <para>List of application logout URLs, such as
+      <literal>http://www.example.com/logout.html</literal>.
+      The user is logged out of the OpenAM session when these URLs are accessed.
+      When using this property, specify a value for the Logout Redirect URL
+      property.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.agent.logout.url</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Agent Logout URL Regular Expression (Not yet in OpenAM console)</term>
+    <listitem>
+     <para><link xlink:href="http://www.pcre.org/pcre.txt" xlink:show="new"
+      >Perl-compatible regular expression</link> that matches logout URLs.
+      Set this using Advanced &gt; Custom Properties in the agent profile.</para>
+
+     <para>For example, to match URLs with <literal>protectedA</literal> or
+      <literal>protectedB</literal> in the path and <literal>op=logout</literal>
+      in the query string, use the following setting.</para>
+
+     <programlisting language="ini">com.forgerock.agents.agent.logout.url.regex= \
+      .*(/protectedA\?|/protectedB\?/).*(\&amp;op=logout\&amp;)(.*|$)</programlisting>
+
+     <para>When you use this property, the agent ignores the settings for
+      Logout URL List.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Logout Cookies List for Reset</term>
+    <listitem>
+     <para>Cookies to be reset upon logout in the same format as the cookie
+      reset list.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.logout.cookie.reset</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Logout Redirect URL</term>
+    <listitem>
+     <para>User gets redirected to this URL after logout. Specify this
+      property alongside a Logout URL List.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.logout.redirect.url</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-policy-client-service-properties">
+   <title>Policy Client Service properties</title>
+   <varlistentry>
+    <term>Policy Cache Polling Period</term>
+    <listitem>
+     <para>Polling interval in minutes during which an entry remains valid
+      after being added to the agent's cache.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.policy.cache.polling.interval</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>SSO Cache Polling Period</term>
+    <listitem>
+     <para>Polling interval in minutes during which an SSO entry remains valid
+      after being added to the agent's cache.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.sso.cache.polling.interval</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>User ID Parameter</term>
+    <listitem>
+     <para>Agent sets this value for User Id passed in the session from
+      OpenAM to the REMOTE_USER server variable. Default: UserToken.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.userid.param</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>User ID Parameter Type</term>
+    <listitem>
+     <para>User ID can be fetched from either SESSION or LDAP attributes.
+      Default: <literal>SESSION</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.userid.param.type</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Fetch Policies from Root Resource</term>
+    <listitem>
+     <para>When enabled, the agent caches the policy decision of the
+      resource and all resources from the root of the resource down. For
+      example, if the resource is <literal>http://host/a/b/c</literal>, then
+      the root of the resource is <literal>http://host/</literal>. This setting
+      can be useful when a client is expect to access multiple resources on the
+      same path. Yet, caching can be expensive if very many policies are
+      defined for the root resource.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.fetch.from.root.resource</literal></para>
+     <para>Default: false</para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Retrieve Client Hostname</term>
+    <listitem>
+     <para>When enabled, get the client hostname through DNS reverse lookup
+      for use in policy evaluation. This setting can impact performance.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.get.client.host.name</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Policy Clock Skew</term>
+    <listitem>
+     <para>Time in seconds used adjust time difference between agent system
+      and OpenAM. Clock skew in seconds = AgentTime - OpenAMServerTime.</para>
+     <para>Use this property to adjust for small time differences encountered
+      despite use of a time synchronization service. When this property is
+      not set and agent time is greater than OpenAM server time, the agent
+      can make policy calls to the OpenAM server before the policy subject
+      cache has expired, or you can see infinite redirection occur.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.policy.clock.skew</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Realm</term>
+    <listitem>
+     <para>
+      Realm where OpenAM starts policy evaluation for this policy agent.
+     </para>
+
+     <para>
+      Default: / (top level realm)
+     </para>
+
+     <para>
+      Edit this property when OpenAM should start policy evaluation
+      in a realm other than the top level realm, <literal>/</literal>,
+      when handling policy decision requests from this policy agent.
+     </para>
+
+     <para>
+      This property is recognized by OpenAM, not the policy agent.
+     </para>
+
+     <para>
+      Property: <literal>org.forgerock.openam.agents.config.policy.evaluation.realm</literal>
+     </para>
+
+     <para>
+      Hot swap: yes
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Application</term>
+    <listitem>
+     <para>
+      Application where OpenAM looks for policies to evaluate
+      for this policy agent.
+     </para>
+
+     <para>
+      Default: <literal>iPlanetAMWebAgentService</literal>
+     </para>
+
+     <para>
+      Edit this property when OpenAM should look for policies
+      that belong to an application other than
+      <literal>iPlanetAMWebAgentService</literal>
+      when handling policy decision requests from this policy agent.
+     </para>
+
+     <para>
+      This property is recognized by OpenAM, not the policy agent.
+     </para>
+
+     <para>
+      Property: <literal>org.forgerock.openam.agents.config.policy.evaluation.application</literal>
+     </para>
+
+     <para>
+      Hot swap: yes
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="configure-web-pa-misc-props">
+  <title>Configuring Web Policy Agent Miscellaneous Properties</title>
+
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>miscellaneous properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+
+  <para>This section covers miscellaneous web agent properties. After creating
+   the agent profile, you access these properties in the OpenAM console under
+   Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+   Web &gt; <replaceable>Agent Name</replaceable> &gt; Miscellaneous.</para>
+
+  <variablelist xml:id="web-agent-advice-handling-properties">
+   <!-- OPENAM-754: Option to send composite advice in the query instead of sending it through a POST request -->
+   <title>Advice Handling properties</title>
+   <varlistentry>
+    <term>Composite Advice Handling (Not yet in OpenAM console)</term>
+    <listitem>
+     <para>As of version 3.0.4, when set to <literal>true</literal>, the agent
+      sends composite advice in the query (GET request) instead of sending it
+      through a POST request.</para>
+     <para>Property: <literal>com.sun.am.use_redirect_for_advice</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-locale-properties">
+   <title>Locale properties</title>
+   <varlistentry>
+    <term>Agent Locale</term>
+    <listitem>
+     <para>The default locale for the agent.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.locale</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-anonymous-user-properties">
+   <title>Anonymous user properties</title>
+   <varlistentry>
+    <term>Anonymous User</term>
+    <listitem>
+     <para>Enable or disable REMOTE_USER processing for anonymous users.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.anonymous.user.enable</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-cookie-processing-properties">
+   <title>Cookie Processing properties</title>
+   <varlistentry>
+    <term>Encode special characters in Cookies</term>
+    <listitem>
+     <para>When enabled, use URL encoding for special characters in cookies.
+      This is useful when profile, session, and response attributes contain
+      special characters, and the attributes fetch mode is set to
+      <literal>HTTP_COOKIE</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.encode.cookie.special.chars.enable</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Profile Attributes Cookie Prefix</term>
+    <listitem>
+     <para>Sets cookie prefix in the attributes headers. Default:
+      <literal>HTTP_</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.profile.attribute.cookie.prefix</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Profile Attributes Cookie Maxage</term>
+    <listitem>
+     <para>Maximum age in seconds of custom cookie headers. Default:
+      300.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.profile.attribute.cookie.maxage</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-url-handling-properties">
+   <title>URL Handling properties</title>
+   <varlistentry>
+    <term>URL Comparison Case Sensitivity Check</term>
+    <listitem>
+     <para>When enabled, enforces case insensitivity in both policy and
+      not enforced URL evaluation.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.url.comparison.case.ignore</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Encode URL's Special Characters</term>
+    <listitem>
+     <para>When enabled, encodes the URL which has special characters before
+      doing policy evaluation.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.encode.url.special.chars.enable</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-ignore-naming-url-properties">
+   <title>Ignore Naming URL properties</title>
+   <varlistentry>
+    <term>Ignore Preferred Naming URL in Naming Request</term>
+    <listitem>
+     <para>When enabled, do not send a preferred naming URL in the naming request.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.ignore.preferred.naming.url</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-invalid-url-properties">
+   <title>Invalid URL properties (Not yet in OpenAM console)</title>
+   <varlistentry>
+    <term>Invalid URL Regular Expression</term>
+    <listitem>
+     <para>Use a <link xlink:href="http://www.pcre.org/" xlink:show="new"
+      >Perl-compatible regular expression</link> to filter out invalid
+      request URLs. The policy agent reject requests to invalid URLs
+      with HTTP 403 Forbidden status without further processing. Use Advanced
+      &gt; Custom Properties to set this in the agent profile.</para>
+
+     <para>For example, to filter out URLs containing the symbols in the list
+      ./, /., /, ., ,\, %00-%1f, %7f-%ff, %25, %2B, %2C, %7E, .info, use the
+      following setting.</para>
+
+     <programlisting language="ini">com.forgerock.agents.agent.invalid.url.regex= \
+     ^((?!(|/\.|\./||*|\.info|%25|%2B|%2C|%[0-1][0-9a-fA-F]|%[7-9a-fA-F][0-9a-fA-F])).)$</programlisting>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-ignore-server-check-properties">
+   <title>Ignore Server Check properties</title>
+   <varlistentry>
+    <term>Ignore Server Check</term>
+    <listitem>
+     <para>When enabled, do not check whether OpenAM is up before doing a
+      302 redirect.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.ignore.server.check</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-ignore-path-info-properties">
+   <title>Ignore Path Info properties</title>
+   <varlistentry>
+    <term>Ignore Path Info in Request URL</term>
+    <listitem>
+     <para>When enabled, strip path info from the request URL while doing the
+      Not Enforced List check, and URL policy evaluation. This is designed
+      to prevent a user from accessing a URI by appending the matching pattern
+      in the policy or not enforced list.</para>
+
+     <!--<note><para>This setting is not supported by the Varnish Cache agent.</para></note>-->
+
+     <para>For example, if the not enforced list includes
+      <literal>http://host/*.gif</literal>, then stripping path info from the
+      request URI prevents access to <literal>http://host/index.html</literal>
+      by using <literal>http://host/index.html?hack.gif</literal>.</para>
+     <para>However, when a web server is configured as a reverse proxy for a
+      J2EE application server, the path info is interpreted to map a resource
+      on the proxy server rather than the application server. This prevents the
+      not enforced list or the policy from being applied to the part of the URI
+      below the application server path if a wildcard character is used.</para>
+     <para>For example, if the not enforced list includes
+      <literal>http://host/webapp/servcontext/*</literal> and the request URL is
+      <literal>http://host/webapp/servcontext/example.jsp</literal>, the path
+      info is <literal>/servcontext/example.jsp</literal> and the resulting
+      request URL with path info stripped is
+      <literal>http://host/webapp/</literal>, which does not match the
+      not enforced list. Thus when this property is enabled, path info is
+      not stripped from the request URL even if there is a wildcard in the not
+      enforced list or policy.</para>
+     <para>Make sure therefore when this property is enabled that there is
+      nothing following the wildcard in the not enforced list or policy.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.ignore.path.info</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-multi-byte-properties">
+   <title>Multi-byte Enable properties</title>
+   <varlistentry>
+    <term>Native Encoding of Profile Attributes</term>
+    <listitem>
+     <para>When enabled, the agent encodes the LDAP header values in the
+      default encoding of operating system locale. When disabled, the agent
+      uses UTF-8.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.convert.mbyte.enable</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-goto-parameter-name-properties">
+   <title>Goto Parameter Name properties</title>
+   <varlistentry>
+    <term>Goto Parameter Name</term>
+    <listitem>
+     <para>Property used only when CDSSO is enabled. Only change the default
+      value, <literal>goto</literal> when the login URL has a landing page
+      specified such as,
+      <literal>com.sun.identity.agents.config.cdsso.cdcservlet.url
+       = http://openam.example.com:8080/openam/cdcservlet?goto=
+       http://www.example.com/landing.jsp</literal>.
+      The agent uses this parameter to append the original request URL
+      to this cdcservlet URL. The landing page consumes this parameter to
+      redirect to the original URL.</para>
+     <para>As an example, if you set this value to <literal>goto2</literal>,
+      then the complete URL sent for authentication is
+      <literal>http://openam.example.com:8080/openam/cdcservlet?goto=
+       http://www.example.com/landing.jsp?goto2=http://www.example.com/original.jsp</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.redirect.param</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-deprecated-properties">
+   <title>Deprecated Agent properties</title>
+   <varlistentry>
+    <term>Anonymous User Default Value</term>
+    <listitem>
+     <para>User ID of unauthenticated users. Default:
+      <literal>anonymous</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.anonymous.user.id</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="configure-web-pa-advanced-props">
+  <title>Configuring Web Policy Agent Advanced Properties</title>
+
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>advanced properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+
+  <para>This section covers advanced web agent properties. After creating the
+   agent profile, you access these properties in the OpenAM console under
+   Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+   Web &gt; <replaceable>Agent Name</replaceable> &gt; Advanced.</para>
+
+  <variablelist xml:id="web-agent-client-identification-properties">
+   <title>Client Identification properties</title>
+   <para>If the agent is behind a proxy or load balancer, then the agent can
+    get client IP and host name values from the proxy or load balancer. For
+    proxies and load balancer that support providing the client IP and host
+    name in HTTP headers, you can use the following properties.</para>
+
+   <para>When multiple proxies or load balancers sit in the request path,
+    the header values can include a comma-separated list of values with the
+    first value representing the client, as in
+    <literal>client,next-proxy,first-proxy</literal>.</para>
+   <varlistentry>
+    <term>Client IP Address Header</term>
+    <listitem>
+     <para>HTTP header name that holds the IP address of the client.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.client.ip.header</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Client Hostname Header</term>
+    <listitem>
+     <para>HTTP header name that holds the hostname of the client.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.client.hostname.header</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-lb-properties">
+   <title>Load Balancer properties</title>
+   <varlistentry>
+    <term>Load Balancer Setup</term>
+    <listitem>
+     <para>Enable if a load balancer is used for OpenAM services.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.load.balancer.enable</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Override Request URL Protocol</term>
+    <listitem>
+     <para>Enable if the agent is sitting behind a SSL/TLS off-loader,
+      load balancer, or proxy such that the protocol users use is different
+      from the protocol the agent uses. When enabled, the protocol is overridden
+      with the value from the Agent Deployment URI Prefix (property:
+      <literal>com.sun.identity.agents.config.agenturi.prefix</literal>).</para>
+     <para>Property: <literal>com.sun.identity.agents.config.override.protocol</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Override Request URL Host</term>
+    <listitem>
+     <para>Enable if the agent is sitting behind a SSL/TLS off-loader,
+      load balancer, or proxy such that the host name users use is different
+      from the host name the agent uses. When enabled, the host is overridden
+      with the value from the Agent Deployment URI Prefix (property:
+      <literal>com.sun.identity.agents.config.agenturi.prefix</literal>).</para>
+     <para>Property: <literal>com.sun.identity.agents.config.override.host</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Override Request URL Port</term>
+    <listitem>
+     <para>Enable if the agent is sitting behind a SSL/TLS off-loader,
+      load balancer, or proxy such that the port users use is different
+      from the port the agent uses. When enabled, the port is overridden
+      with the value from the Agent Deployment URI Prefix (property:
+      <literal>com.sun.identity.agents.config.agenturi.prefix</literal>).</para>
+     <para>Property: <literal>com.sun.identity.agents.config.override.port</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Override Notification URL</term>
+    <listitem>
+     <para>Enable if the agent is sitting behind a SSL/TLS off-loader,
+      load balancer, or proxy such that the URL users use is different
+      from the URL the agent uses. When enabled, the URL is overridden
+      with the value from the Agent Deployment URI Prefix (property:
+      <literal>com.sun.identity.agents.config.agenturi.prefix</literal>).</para>
+     <para>Property: <literal>com.sun.identity.agents.config.override.notification.url</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-post-data-preservation-properties">
+   <title>Post Data Preservation properties</title>
+   <varlistentry>
+    <term>POST Data Preservation</term>
+    <listitem>
+     <para>Enables HTTP POST data preservation. This feature is available in
+      the Apache 2.2, Microsoft IIS 6, Microsoft IIS 7, and Sun Java System
+      Web Server web policy agents as of version 3.0.3.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.postdata.preserve.enable</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>POST Data Entries Cache Period</term>
+    <listitem>
+     <para>POST cache entry lifetime in minutes. Default: 10.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.postcache.entry.lifetime</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>POST Data Preservation Cookie Name (Not yet in OpenAM Console)</term>
+    <listitem>
+     <para>When HTTP POST data preservation is enabled, override properties
+      are set to true, and the agent is behind a load balancer, then this
+      property sets the name and value of the sticky cookie to use.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.postdata.preserve.lbcookie</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Post Data Preservation URI Prefix (Not yet in OpenAM Console)</term>
+    <listitem>
+     <para>If you run multiple web servers with policy agents behind a load
+      balancer that directs traffic based on the request URI, and you need to
+      preserve POST data, then set this property.</para>
+
+     <para>By default, policy agents use a dummy URL for POST data preservation,
+      <literal>http://<replaceable>agent.host</replaceable>:<replaceable
+       >port</replaceable>/dummypost/sunpostpreserve</literal>,
+      to handle POST data across redirects to and from OpenAM. When you set this
+      property, the policy agent prefixes the property value to the dummy URL
+      path. In other words, when you set
+      <literal>com.forgerock.agents.config.pdpuri.prefix = app1</literal>,
+      the policy agent uses the dummy URL,
+      <literal>http://<replaceable>agent.host</replaceable>:<replaceable
+       >port</replaceable>/app1/dummypost/sunpostpreserve</literal>.</para>
+
+     <para>Next, use the prefix you set when you define load balancer URI
+      rules. This ensures that clients end up being redirected to the policy
+      agent that preserved the POST data.</para>
+
+     <para>Property: <literal>com.forgerock.agents.config.pdpuri.prefix</literal></para>
+    </listitem>
+   </varlistentry>
+
+  </variablelist>
+
+  <variablelist xml:id="web-agent-sjsws-properties">
+   <title>Sun Java System Proxy Server properties</title>
+   <varlistentry>
+    <term>Override Proxy Server's Host and Port</term>
+    <listitem>
+     <para>When enabled ignore the host and port settings.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.proxy.override.host.port</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-iis-properties">
+   <title>Microsoft IIS Server properties</title>
+   <varlistentry>
+    <term>Authentication Type</term>
+    <listitem>
+     <para>The agent should normally perform authentication, so this is not
+      required. If necessary, set to <literal>none</literal>.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.iis.auth.type</literal></para>
+     <para>Hot swap: no</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Replay Password Key</term>
+    <listitem>
+     <para>DES key for decrypting the basic authentication password in the
+      session.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.replaypasswd.key</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Filter Priority</term>
+    <listitem>
+     <para>The loading priority of filter, DEFAULT, HIGH, LOW, or MEDIUM.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.iis.filter.priority</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Filter configured with OWA</term>
+    <listitem>
+     <para>Enable if the IIS agent filter is configured for OWA.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.iis.owa.enable</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Change URL Protocol to https</term>
+    <listitem>
+     <para>Enable to avoid IE6 security pop-ups.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.iis.owa.enable.change.protocol</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Idle Session Timeout Page URL</term>
+    <listitem>
+     <para>URL of the local idle session timeout page.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.iis.owa.enable.session.timeout.url</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-domino-properties">
+   <title>IBM Lotus Domino Server properties</title>
+   <varlistentry>
+    <term>Check User in Domino Database</term>
+    <listitem>
+     <para>When enabled, the agent checks whether the user exists in the
+      Domino name database.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.domino.check.name.database</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Use LTPA token</term>
+    <listitem>
+     <para>Enable if the agent needs to use LTPA Token.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.domino.ltpa.enable</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>LTPA Token Cookie Name</term>
+    <listitem>
+     <para>The name of the cookie that contains the LTPA token.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.domino.ltpa.cookie.name</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>LTPA Token Configuration Name</term>
+    <listitem>
+     <para>The configuration name that the agent uses in order to employ the
+      LTPA token mechanism.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.domino.ltpa.config.name</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>LTPA Token Organization Name</term>
+    <listitem>
+     <para>The organization name to which the LTPA token belongs.</para>
+     <para>Property: <literal>com.sun.identity.agents.config.domino.ltpa.org.name</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="web-agent-custom-properties">
+   <title>Custom properties</title>
+   <varlistentry>
+    <term>Custom Properties</term>
+    <listitem>
+     <para>Additional properties to augment the set of properties supported
+      by agent. Such properties take the following forms.</para>
+     <itemizedlist>
+      <listitem><para><literal>customproperty=custom-value1</literal></para></listitem>
+      <listitem><para><literal>customlist[0]=customlist-value-0</literal></para></listitem>
+      <listitem><para><literal>customlist[1]=customlist-value-1</literal></para></listitem>
+      <listitem><para><literal>custommap[key1]=custommap-value-1</literal></para></listitem>
+      <listitem><para><literal>custommap[key2]=custommap-value-2</literal></para></listitem>
+     </itemizedlist>
+     <para>Property: <literal>com.sun.identity.agents.config.freeformproperties</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+</section>

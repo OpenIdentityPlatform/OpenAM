@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+<!--
+      DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright 2013-2015 ForgeRock AS.
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   http://forgerock.org/license/CDDLv1.0.html
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at http://forgerock.org/license/CDDLv1.0.html
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions copyright [year] [name of copyright owner]"
+-->
+
+<ServicesConfiguration>
+    <Service name="RestSecurity" version="1.0">
+        <Schema
+                serviceHierarchy="/DSAMEConfig/ForgeRockRestSecurityService"
+                i18nFileName="RestSecurity"
+                revisionNumber="1"
+                i18nKey="forgerock-restSecurity-service-description">
+
+            <Organization>
+                <AttributeSchema name="forgerockRESTSecurityTwoFactorAuthEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a100">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityTwoFactorAuthMandatory"
+                                 type="single"
+                                 syntax="boolean"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a100a">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecuritySelfRegistrationEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a101">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecuritySelfRegTokenTTL"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a102">
+                    <DefaultValues>
+                        <Value>900</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecuritySelfRegConfirmationUrl"
+                                 type="single"
+                                 syntax="url"
+                                 i18nKey="a103">
+                    <DefaultValues>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/confirm.html</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPasswordEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a104">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassTokenTTL"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a105">
+                    <DefaultValues>
+                        <Value>900</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassConfirmationUrl"
+                                 type="single"
+                                 syntax="url"
+                                 i18nKey="a106">
+                    <DefaultValues>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/confirm.html</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecuritySuccessfulUserRegistrationDestination"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a107">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a107a">default</ChoiceValue>
+                        <ChoiceValue i18nKey="a107b">login</ChoiceValue>
+                        <ChoiceValue i18nKey="a107c">autologin</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>default</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityProtectedUserAttributes" 
+                                type="list" 
+                                syntax="string" 
+                                i18nKey="a108"> 
+                </AttributeSchema> 
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

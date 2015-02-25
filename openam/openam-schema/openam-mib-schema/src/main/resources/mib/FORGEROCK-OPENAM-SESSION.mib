@@ -1,0 +1,184 @@
+--
+--  Copyright 2014 ForgeRock AS.
+--  The contents of this file are subject to the terms of the Common Development and
+--  Distribution License (the License). You may not use this file except in compliance with the
+--  License.
+--
+--  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+--  specific language governing permission and limitations under the License.
+--
+--  When distributing Covered Software, include this CDDL Header Notice in each file and include
+--  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+--  Header, with the fields enclosed by brackets [] replaced by your own identifying
+--  information: "Portions copyright [year] [name of copyright owner]".
+--
+
+--
+-- MIB for Policy Monitoring
+-- Copyright (c) 2014, ForgeRock AS, All Rights Reserved.
+--
+
+FORGEROCK-OPENAM-SESSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, enterprises,
+    Integer32
+        FROM SNMPv2-SMI
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+--
+-- ForgeRock
+--
+
+forgerock OBJECT IDENTIFIER ::= {enterprises 36733}
+
+--
+-- SNMP
+--
+
+snmp OBJECT IDENTIFIER ::= { forgerock 1 }
+
+--
+-- openAM
+--
+
+openam OBJECT IDENTIFIER ::= { snmp 2 }
+
+--
+-- SSO Session Monitoring
+--
+
+sessionMonitoring OBJECT IDENTIFIER ::= { openam 1 }
+
+--
+-- internalSessions
+--
+
+internalSessions OBJECT IDENTIFIER ::= { sessionMonitoring 1 }
+
+sumInternalSessions  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Total number of current internal sessions"
+    DEFVAL    		{ 0 }
+    ::= { internalSessions 1 }
+
+averageInternalRefreshTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to refresh an internal session"
+    DEFVAL    		{ 0 }
+    ::= { internalSessions 2 }
+
+averageInternalLogoutTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to logout an internal session"
+    DEFVAL    		{ 0 }
+    ::= { internalSessions 3 }
+
+averageInternalDestroyTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to destroy an internal session"
+    DEFVAL    		{ 0 }
+    ::= { internalSessions 4 }
+
+averageInternalSetPropertyTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to set a property on an internal session"
+    DEFVAL    		{ 0 }
+    ::= { internalSessions 5 }
+
+remoteSessions OBJECT IDENTIFIER ::= { sessionMonitoring 2 }
+
+sumRemoteSessions  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Total number of current remote sessions"
+    DEFVAL    		{ 0 }
+    ::= { remoteSessions 1 }
+
+averageRemoteRefreshTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to refresh a remote session"
+    DEFVAL    		{ 0 }
+    ::= { remoteSessions 2 }
+
+averageRemoteLogoutTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to logout a remote session"
+    DEFVAL    		{ 0 }
+    ::= { remoteSessions 3 }
+
+averageRemoteDestroyTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to destroy a remote session"
+    DEFVAL    		{ 0 }
+    ::= { remoteSessions 4 }
+
+averageRemoteSetPropertyTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to set a property on a remote session"
+    DEFVAL    		{ 0 }
+    ::= { remoteSessions 5 }
+
+ctsSessions OBJECT IDENTIFIER ::= { sessionMonitoring 3 }
+
+sumCTSSessions  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Total number of sessions currently in the CTS"
+    DEFVAL    		{ 0 }
+    ::= { ctsSessions 1 }
+
+averageCTSRefreshTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to refresh a CTS session"
+    DEFVAL    		{ 0 }
+    ::= { ctsSessions 2 }
+
+averageCTSLogoutTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to logout a CTS session"
+    DEFVAL    		{ 0 }
+    ::= { ctsSessions 3 }
+
+averageCTSDestroyTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to destroy a CTS session"
+    DEFVAL    		{ 0 }
+    ::= { ctsSessions 4 }
+
+averageCTSSetPropertyTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to set a property on a CTS session"
+    DEFVAL    		{ 0 }
+    ::= { ctsSessions 5 }
+
+END

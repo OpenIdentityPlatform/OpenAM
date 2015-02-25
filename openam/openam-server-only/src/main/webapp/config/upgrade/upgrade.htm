@@ -1,0 +1,108 @@
+<!--
+  ~ Copyright 2014 ForgeRock, AS.
+  ~
+  ~ The contents of this file are subject to the terms of the Common Development and
+  ~ Distribution License (the License). You may not use this file except in compliance with the
+  ~ License.
+  ~
+  ~ You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  ~ specific language governing permission and limitations under the License.
+  ~
+  ~ When distributing Covered Software, include this CDDL Header Notice in each file and include
+  ~ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
+  ~ information: "Portions copyright [year] [name of copyright owner]".
+  -->
+
+<script type="text/javascript">
+    YAHOO.namespace("sun.identity.config.options.upgrade");
+
+    //convenient alias:
+    var $ = YAHOO.util.Dom.get;
+    
+    function cancelUpgrade() {
+        YAHOO.sun.identity.config.options.upgrade.hide();
+    }
+
+    function saveReport() {
+        window.open("$context$path?actionLink=saveReport", "Download");
+    }
+
+    function writeUpgradeAsync() {
+        ie7fix++;
+        var licenseAccepted = document.getElementById("upgrade-accept-check").checked ? "true" : "false";
+
+        AjaxUtils.call("$context$path?actionLink=doUpgrade&ie7fix=" + ie7fix + "&acceptLicense=" + licenseAccepted, writeConfigResponse);
+    }
+
+    function doUpgrade() {
+        document.getElementById("returnToConfig").style.display = "none";
+        document.getElementById("setupMessage").innerHTML = "";
+        YAHOO.sun.identity.config.options.inProgress.show();
+
+        var fr1 = window.frames['progressIframe'];
+        if (fr1) {
+            fr1.location = "$context/upgrade/setUpgradeProgress";
+        }
+        setTimeout('writeUpgradeAsync()', 2000);
+    }
+
+    function upgradeAcceptChecked(){
+        document.getElementById("upgrade-accept-license-button").disabled = document.getElementById("upgrade-accept-check").checked ? false : true;
+    }
+
+    function upgradeAcceptLicense() {
+       YAHOO.util.Dom.addClass('upgrade', 'license-accepted'); 
+    }
+</script>
+<div id="upgrade" style="width: 810px; background-color: #FFFFFF" class="clearfix">
+    <div class="header">$page.getLocalizedString("upgrade.main.title")</div>
+    #if ($error)
+    <div id="content" class="tabContent">
+        <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
+            <p class="blueSmall">$page.getLocalizedString("upgrade.init.error")</p>
+            <button id="cancelButton" type="button" onclick="cancelUpgrade();">$page.getLocalizedString("cancel.button")</button>
+        </div>
+    </div>
+    #else
+    <div class="license inner-license">
+        <pre id="upgrade-license-message"> </pre> 
+        <div class="accept-check-container clearfix">
+            <input type="checkbox" onchange="upgradeAcceptChecked();" name="upgrade-accept-check"  id="upgrade-accept-check" tabindex=1/>
+            <label for="upgrade-accept-check" >I accept the license agreement</label>
+        </div>
+    </div>
+    <div id="content" class="tabContent summary">
+        <div style="margin: 10px 23px">
+            $page.getLocalizedString("upgrade.current.version") $currentVersion <br/>
+            $page.getLocalizedString("upgrade.new.version") $newVersion
+        </div>
+        <div style="overflow: auto; border: solid 1px; height: 180px; width: 90%; margin: 0 auto;">
+            $changelist
+        </div>
+    </div>
+    <div id="upgradeFooter" style="padding-bottom: 10px" class="clearfix">
+        
+        <div class="col1">&nbsp;</div>
+
+        <div align="left" style="float:left; margin-left: 23px" class="license">
+            <button id="upgrade-accept-license-button" type="button" onclick="upgradeAcceptLicense();" class="buttonblue license" disabled tabindex=2>Continue</button>
+        </div>   
+        <div class="summary" style="float:left; margin-left: 23px" >
+            <div style="float: left;" >
+                <button id="upgradeButton" type="button" onclick="doUpgrade()" tabindex=3>$page.getLocalizedString("upgrade.button")</button>
+            </div>
+
+            <div style="float:left; margin-left: 23px">
+                <button id="saveReportButton" type="button" onclick="saveReport();" class="buttonblue" tabindex=4>$page.getLocalizedString("save.report.button")</button>
+            </div>
+            
+         </div>
+
+        <div style="float: right; margin-right: 23px">
+             <button id="cancelButton" type="button" onclick="cancelUpgrade();" tabindex=5>$page.getLocalizedString("cancel.button")</button>
+        </div>
+    </div>
+
+    #end
+</div>

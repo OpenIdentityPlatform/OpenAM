@@ -1,0 +1,207 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+    Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+
+    The contents of this file are subject to the terms of the Common Development and
+    Distribution License (the License). You may not use this file except in compliance with the
+    License.
+
+    You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+    specific language governing permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL Header Notice in each file and include
+    the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+    Header, with the fields enclosed by brackets [] replaced by your own identifying
+    information: "Portions Copyrighted [year] [name of copyright owner]"
+-->
+<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAuthOpenIdConnectService" version="1.0">
+        <Schema
+                serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthOpenIdConnectService"
+                i18nFileName="amAuthOpenIdConnect" revisionNumber="10"
+                i18nKey="openidconnect-service-description">
+
+            <Organization>
+                <AttributeSchema name="RequiredValueValidator"
+                                 type="validator"
+                                 syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-header-name"
+                                 type="single" syntax="string" i18nKey="header_name"
+                                 validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>oidc_id_token</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-issuer-name"
+                                 type="single" syntax="string" i18nKey="issuer_name"
+                                 validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>accounts.google.com</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
+                                 type="single_choice" syntax="string" i18nKey="crypto_context_type"
+                                 validator="RequiredValueValidator">
+                    <ChoiceValues>
+                        <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
+                        <ChoiceValue>jwk_url</ChoiceValue>
+                        <ChoiceValue>client_secret</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>.well-known/openid-configuration_url</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
+                                 type="single" syntax="string" i18nKey="crypto_context_value"
+                                 validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
+                                 type="single" syntax="string" i18nKey="account_provider_class"
+                                 validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
+                                 type="single" syntax="string" i18nKey="princial_mapper_class"
+                                 validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.authentication.modules.oidc.JwtAttributeMapper</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="openam-auth-openidconnect-local-to-jwt-attribute-mappings"
+                                 type="list"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="local_to_jwt_attr_mappings">
+                    <DefaultValues>
+                        <Value>uid=sub</Value>
+                        <Value>mail=email</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="openam-auth-openidconnect-audience-name"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="listed_audience_name">
+                    <DefaultValues>
+                        <Value>example</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="openam-auth-openidconnect-accepted-authorized-parties"
+                                 type="list"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="listed_authorized_parties">
+                    <DefaultValues>
+                        <Value>AuthorizedPartyExample</Value>
+                        <Value>http://www.example.com/authorized/party</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="RequiredValueValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-header-name"
+                                     type="single" syntax="string" i18nKey="header_name"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>oidc_id_token</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-issuer-name"
+                                     type="single" syntax="string" i18nKey="issuer_name"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>accounts.google.com</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
+                                     type="single_choice" syntax="string" i18nKey="crypto_context_type"
+                                     validator="RequiredValueValidator">
+                        <ChoiceValues>
+                            <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
+                            <ChoiceValue>jwk_url</ChoiceValue>
+                            <ChoiceValue>client_secret</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>.well-known/openid-configuration_url</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
+                                     type="single" syntax="string" i18nKey="crypto_context_value"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
+                                     type="single" syntax="string" i18nKey="principal_provider_class"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
+                                     type="single" syntax="string" i18nKey="principal_mapper_class"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.authentication.modules.oidc.JwtAttributeMapper</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="openam-auth-openidconnect-local-to-jwt-attribute-mappings"
+                                     type="list"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="local_to_jwt_attr_mappings">
+                        <DefaultValues>
+                            <Value>uid=sub</Value>
+                            <Value>mail=email</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="openam-auth-openidconnect-audience-name"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="listed_audience_name">
+                        <DefaultValues>
+                            <Value>example</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="openam-auth-openidconnect-accepted-authorized-parties"
+                                     type="list"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="listed_authorized_parties">
+                        <DefaultValues>
+                            <Value>AuthorizedPartyExample</Value>
+                            <Value>http://www.example.com/authorized/party</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

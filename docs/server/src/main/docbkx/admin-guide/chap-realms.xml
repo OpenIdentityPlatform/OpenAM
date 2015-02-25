@@ -1,0 +1,691 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-realms'
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Configuring Realms</title>
+ 
+ <indexterm>
+  <primary>Realms</primary>
+ </indexterm>
+
+ <para>
+  This chapter shows how to configure OpenAM <firstterm>realms</firstterm>,
+  which are used to group configuration and identities together.
+  For example, you might have one realm for OpenAM administrators and agents,
+  and another realm for users.
+  In this two-realm setup, the OpenAM administrator can login
+  to the administrative realm to manage the services,
+  but cannot authenticate as OpenAM administrator to the realm
+  that protects web sites with HR and financial information.
+ </para>
+ 
+ <para>
+  OpenAM associates a realm with at least one identity repository
+  and authentication chain.
+  OpenAM also associates the realm with
+  authorization applications and their policies,
+  and with privileges for administrators.
+  Each realm can have its own configuration for the services it provides.
+ </para>
+ 
+ <para>
+  When you first configure OpenAM,
+  OpenAM sets up the default <literal>/ (Top Level Realm)</literal>,
+  containing OpenAM configuration data,
+  and allowing authentication using the identity repository
+  that you choose during initial configuration.
+  The top level realm might hold the overall configuration
+  for Example.com for instance.
+ </para>
+ 
+ <para>
+  You create new realms to subdivide authentication and authorization,
+  and to delegate management of subrealms.
+  For example, your organization might require separate realms for payroll,
+  human resources, and IT management domains and their applications.
+ </para>
+
+ <para>
+  By default a new realm inherits configuration from its parent's configuration.
+  The default identity repository is the one you choose
+  when you deploy and configure OpenAM.
+  The default authentication mechanism corresponds
+  to that identity repository as well.
+  You can, however, constrain authentication to rely on different data stores,
+  and set policy for agents to define authorization in the realm.
+ </para>
+
+ <section xml:id="manage-realms">
+  <title>Managing Realms</title>
+
+  <para>
+   You create and configure realms through the console,
+   starting from the Access Control tab > Realms table.
+   You delegate administration for a realm by setting privileges in the realm.
+  </para>
+
+  <itemizedlist>
+   <listitem><para><xref linkend="create-new-realm" /></para></listitem>
+   <listitem><para><xref linkend="delegate-realm-administration" /></para></listitem>
+  </itemizedlist>
+
+  <procedure xml:id="create-new-realm">
+   <title>To Create a New Realm</title>
+
+   <indexterm>
+    <primary>Realms</primary>
+    <secondary>Creating</secondary>
+   </indexterm>
+
+   <para>
+    You can create a new realm through the OpenAM console as described below,
+    or by using the <command>ssoadm create-realm</command> command.
+   </para>
+
+   <step>
+    <para>
+     Login to the OpenAM console as OpenAM Administrator, <literal>amadmin</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     On the Access Control tab > Realms table,
+     click New to open the New Realm page, where you configure the realm.
+    </para>
+
+    <note><para>Do not use the names of OpenAM REST endpoints as the name of a realm.
+     The OpenAM REST endpoint names that should not be used includes: "users",
+     "groups", "realms", "policies" and "applications".</para></note>
+
+    <para>
+     If you configure the realm to be inactive,
+     then users cannot use it to authenticate
+     or be granted access to protected resources.
+    </para>
+
+    <para>
+     Realm/DNS aliases must follow standard FQDN conventions,
+     such as <literal>hr.example.com</literal>
+     or <literal>pay.example.com</literal>.<footnote>
+     <para>
+      The Realm/DNS Alias option refers to an FQDN
+      that can be used to represent the realm.
+      It is not related to the CNAME record used in DNS database zones.
+      In other words, the Realm/DNS Alias option shown in the console
+      does not conform to the definition of DNS Aliases described in
+      <link
+       xlink:href="http://tools.ietf.org/html/rfc2219"
+       xlink:show="new"
+      >RFC 2219</link>.
+     </para></footnote>
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Save your work after defining the configuration for the new realm.
+    </para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="delegate-realm-administration">
+   <title>To Delegate Administration</title>
+
+   <indexterm>
+    <primary>Delegating administration</primary>
+   </indexterm>
+
+   <para>
+    You can delegate administration in a realm.
+    OpenAM grants administrative capabilities
+    to members of groups having administrative privileges.
+   </para>
+
+   <para>
+    You can grant privileges through the OpenAM console as described below,
+    or by using the <command>ssoadm add-privileges</command> command.
+   </para>
+
+   <step>
+    <para>
+     On the Access Control tab > Realms table,
+     click the realm for which you want to delegate administration
+     to view the realm configuration.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     On the Privileges tab, click the name of the group
+     to whom you intend to grant access.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Select the administrative privileges to delegate for the realm. See
+     <xref linkend="realm-privileges" /> for information about OpenAM
+     privileges.
+    </para>
+    <para>
+     Unless your delegation model requires a high degree of granularity, assign
+     realm administrators the <literal>RealmAdmin</literal> privilege, and assign
+     policy administrators the <literal>PolicyAdmin</literal> privilege.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Save your work.
+    </para>
+   </step>
+
+  </procedure>
+
+  <para>
+   The following table describes privileges that you can assign
+   in the OpenAM console or by using the
+   <command>ssoadm add-privileges</command>
+   command:
+  </para>
+
+  <table xml:id="realm-privileges" pgwide="1">
+   <title>OpenAM Privileges</title>
+   <tgroup cols="3">
+    <colspec colnum="1" colwidth="2*"/>
+    <colspec colnum="2" colwidth="3*"/>
+    <colspec colnum="3" colwidth="3*"/>
+    <thead>
+     <row>
+      <entry>Privilege</entry>
+      <entry>
+       Privilege Name to Use With the <command>ssoadm add-privileges</command>
+       Command
+      </entry>
+      <entry>Notes</entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>Read and write access to all realm and policy properties</entry>
+      <entry><literal>RealmAdmin</literal></entry>
+      <entry>
+       Assign this privilege to administrators
+       in order to let them modify or read any part of an OpenAM realm.
+       Use this privilege when you do not require
+       granularity in your delegation model. All other OpenAM
+       privileges are included with this privilege.
+      </entry>
+     </row>
+     <row>
+      <entry>Read and write access to all log files</entry>
+      <entry><literal>LogAdmin</literal></entry>
+      <entry>Subset of the <literal>RealmAdmin</literal> privilege.</entry>
+     </row>
+     <row>
+      <entry>Read access to all log files</entry>
+      <entry><literal>LogRead</literal></entry>
+      <entry>Subset of the <literal>RealmAdmin</literal> privilege.</entry>
+     </row>
+     <row>
+      <entry>Write access to all log files</entry>
+      <entry><literal>LogWrite</literal></entry>
+      <entry>Subset of the <literal>RealmAdmin</literal> privilege.</entry>
+     </row>
+     <row>
+      <entry>Read and write access to all configured agents</entry>
+      <entry><literal>AgentAdmin</literal></entry>
+      <entry>
+       Provides access to centralized agent configuration;
+       subset of the <literal>RealmAdmin</literal> privilege.
+      </entry>
+     </row>
+     <row>
+      <entry>Read and write access to all federation metadata configurations</entry>
+      <entry><literal>FederationAdmin</literal></entry>
+      <entry>Subset of the <literal>RealmAdmin</literal> privilege.</entry>
+     </row>
+     <row>
+      <entry>REST calls for reading realms</entry>
+      <entry><literal>RealmReadAccess</literal></entry>
+      <entry>Subset of the <literal>RealmAdmin</literal> privilege.</entry>
+     </row>
+     <row>
+      <entry>Read and write access only for policy properties, including REST calls</entry>
+      <entry><literal>PolicyAdmin</literal></entry>
+      <entry>
+       Assign this privilege to policy administrators
+       in order to let them modify or read any part of the OpenAM
+       policy configuration. This privilege lets an
+       administrator modify or read all policy components:
+       policies, applications, referrals, subject types,
+       condition types, subject attributes, and decision combiners.
+       All other OpenAM privileges that affect policy components
+       are included with this privilege. Subset of the
+       <literal>RealmAdmin</literal> privilege.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for policy evaluation</entry>
+      <entry><literal>EntitlementRestAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading policies</entry>
+      <entry><literal>PrivilegeRestReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for managing policies</entry>
+      <entry><literal>PrivilegeRestAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading policy referrals</entry>
+      <entry><literal>ReferralsReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for modifying policy referrals</entry>
+      <entry><literal>ReferralsModifyAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading policy applications</entry>
+      <entry><literal>ApplicationReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for modifying policy applications</entry>
+      <entry><literal>ApplicationModifyAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading policy application types</entry>
+      <entry><literal>ApplicationTypesReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading environment conditions</entry>
+      <entry><literal>ConditionTypesReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading subject conditions</entry>
+      <entry><literal>SubjectTypesReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading decision combiners</entry>
+      <entry><literal>DecisionCombinersReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+     <row>
+      <entry>REST calls for reading subject attributes</entry>
+      <entry><literal>SubjectAttributesReadAccess</literal></entry>
+      <entry>
+       Subset of the <literal>RealmAdmin</literal> and
+       <literal>PolicyAdmin</literal> privileges.
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+
+ </section>
+
+ <section xml:id="realms-agents">
+  <title>Working With Realms and Policy Agents</title>
+
+  <para>
+   You can configure a policy agent
+   to be directed to a realm and application when requesting policy decisions,
+   or to log users into a different realm than the policy agent's realm.
+  </para>
+
+  <itemizedlist>
+   <listitem><para><xref linkend="agent-realm-application-for-policy-decisions" /></para></listitem>
+   <listitem><para><xref linkend="agent-redirect-login-to-realm" /></para></listitem>
+  </itemizedlist>
+
+  <procedure xml:id="agent-realm-application-for-policy-decisions">
+   <title>To Specify the Realm and Application for Policy Decisions</title>
+
+   <para>
+    By default, policy agents request policy decisions
+    in the top level realm (/)
+    and for the default policy agent application,
+    <literal>iPlanetAMWebAgentService</literal>.
+    When the realm and application differ for your policy agent,
+    you can specify the realm and application in the policy agent profile.
+    OpenAM then directs requests from the policy agent
+    to the specified realm and application,
+    so this is backwards compatible with existing policy agents.
+   </para>
+
+   <step>
+    <para>
+     In the OpenAM console, browse to
+     Access Control > <replaceable>Realm Name</replaceable> > Agents >
+     <replaceable>Web or Java EE Agent Type</replaceable> >
+     <replaceable>Agent Name</replaceable> > OpenAM Services >
+     Policy Client Service.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Set the Realm and Application.
+    </para>
+
+    <itemizedlist>
+
+     <para>
+      For example,
+      if the realm is <literal>/hr</literal>
+      and the application is <literal>myHRApp</literal>:</para>
+
+     <listitem>
+      <para>
+       Realm: <literal>/hr</literal>
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       Application: <literal>myHRApp</literal>
+      </para>
+     </listitem>
+    </itemizedlist>
+   </step>
+
+   <step>
+    <para>
+     Save your work.
+    </para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="agent-redirect-login-to-realm">
+   <title>To Configure a Web or J2EE Agent for Login to a Realm</title>
+
+   <para>
+    You might choose to configure your agent in one realm,
+    yet have your real users authenticate through another realm.
+    In this case, you want your policy agents
+    to redirect users to authenticate to their realm, rather than the agent realm.
+   </para>
+
+   <step>
+    <para>
+     In the OpenAM console, browse to
+     Access Control > <replaceable>Realm Name</replaceable> > Agents >
+     <replaceable>Web or Java EE Agent Type</replaceable> >
+     <replaceable>Agent Name</replaceable> > OpenAM Services.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Add login and logout URLs, including the realm in the query string.
+    </para>
+
+    <itemizedlist>
+
+     <para>
+      For example,
+      if your <replaceable>Realm Name</replaceable> is <literal>hr</literal>,
+      and you access OpenAM at
+      <literal>http://openam.example.com:8080/openam</literal>:</para>
+
+     <listitem>
+      <para>
+       Login URL:
+       <literal>http://openam.example.com:8080/openam/UI/Login?realm=hr</literal>
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       Logout URL:
+       <literal>http://openam.example.com:8080/openam/UI/Logout?realm=hr</literal>
+      </para>
+     </listitem>
+    </itemizedlist>
+   </step>
+
+   <step>
+    <para>
+     Save your work.
+    </para>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="config-data-store">
+  <title>Configuring Data Stores</title>
+
+  <para>
+   When you first set up a realm,
+   the new realm inherits the data store from the parent realm.
+   Yet, if your administrators are in one realm and your users in another,
+   your new child realm might retrieve users from a different data store.
+  </para>
+
+  <procedure xml:id="realm-data-store">
+   <title>To Configure a Data Store</title>
+
+   <step>
+    <para>
+     In OpenAM console, browse to
+     Access Control > <replaceable>Realm Name</replaceable> > Data Stores.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Click New in the Data Stores table to create a data store profile,
+     and to provide the information needed to connect to the data store.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the first screen, name the data store and select the type of data store.
+    </para>
+
+    <para>
+     Most data stores are directory services, though the Database Repository
+     lets you connect to an SQL database through JDBC.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the second screen, provide information on
+     how to connect to your data store,
+     and then click Finish to save your work.
+    </para>
+
+    <itemizedlist>
+     <para>
+      See the following sections for hints depending on the type of data store.
+     </para>
+
+     <listitem>
+      <para>
+       <link
+        xlink:href="admin-guide#sec-data-stores-active-directory"
+        xlink:role="http://docbook.org/xlink/role/olink"
+        xlink:show="new"
+       ><citetitle>Hints for Configuring Active Directory Data Stores</citetitle></link>
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link
+        xlink:href="admin-guide#sec-data-stores-adam"
+        xlink:role="http://docbook.org/xlink/role/olink"
+        xlink:show="new"
+       ><citetitle>Hints for Configuring Active Directory Application Mode (ADAM) Data Stores</citetitle></link>
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link
+        xlink:href="admin-guide#sec-data-stores-db"
+        xlink:role="http://docbook.org/xlink/role/olink"
+        xlink:show="new"
+       ><citetitle>Hints for Configuring Database Repository (Early Access) Data Stores</citetitle></link>
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link
+        xlink:href="admin-guide#sec-data-stores-generic-ldapv3"
+        xlink:role="http://docbook.org/xlink/role/olink"
+        xlink:show="new"
+       ><citetitle>Hints for Configuring Generic LDAPv3 Data Stores</citetitle></link>
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link
+        xlink:href="admin-guide#sec-data-stores-opendj"
+        xlink:role="http://docbook.org/xlink/role/olink"
+        xlink:show="new"
+       ><citetitle>Hints for Configuring OpenDJ Data Stores</citetitle></link>
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link
+        xlink:href="admin-guide#sec-data-stores-dsee"
+        xlink:role="http://docbook.org/xlink/role/olink"
+        xlink:show="new"
+       ><citetitle>Hints for Configuring Sun/Oracle DSEE Data Stores</citetitle></link>
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link
+        xlink:href="admin-guide#sec-data-stores-tivoli"
+        xlink:role="http://docbook.org/xlink/role/olink"
+        xlink:show="new"
+        ><citetitle>Hints for Configuring Tivoli Directory Server Data Stores</citetitle></link>
+      </para>
+     </listitem>
+    </itemizedlist>
+   </step>
+
+   <step>
+    <para>
+     Click the Subjects tab,
+     and make sure the connection to your new data store is working,
+     by searching for a known identity.
+    </para>
+
+    <para>
+     By default the Subjects list only retrieves 100 entries
+     from the data store.
+     Narrow your search if you do not see the identity you are looking for.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     If you no longer need the connection to the inherited data store
+     <emphasis>in this realm</emphasis>,
+     then you can delete its entry in the Data Stores table.
+    </para>
+
+    <para>
+     Also, once you change the data store for a realm,
+     you might opt to change the
+     <link
+      xlink:href="admin-guide#configure-authn-modules"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     >authentication module configuration</link>
+     as described in the chapter on authentication
+     to use your realm data store, rather than the inherited settings.
+    </para>
+   </step>
+  </procedure>
+
+  <xinclude:include href="../shared/sec-data-stores-active-directory.xml" />
+  <xinclude:include href="../shared/sec-data-stores-adam.xml" />
+  <xinclude:include href="../shared/sec-data-stores-db.xml" />
+  <xinclude:include href="../shared/sec-data-stores-generic-ldapv3.xml" />
+  <xinclude:include href="../shared/sec-data-stores-opendj.xml" />
+  <xinclude:include href="../shared/sec-data-stores-dsee.xml" />
+  <xinclude:include href="../shared/sec-data-stores-tivoli.xml" />
+ </section>
+</chapter>

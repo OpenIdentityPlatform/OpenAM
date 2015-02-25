@@ -1,0 +1,138 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2013 ForgeRock Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms of the Common Development and
+    Distribution License (the License). You may not use this file except in compliance with the
+    License.
+
+    You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+    specific language governing permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL Header Notice in each file and include
+    the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+    Header, with the fields enclosed by brackets [] replaced by your own identifying
+    information: "Portions Copyrighted [year] [name of copyright owner]"
+-->
+<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAuthPersistentCookieService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthPersistentCookieService"
+            i18nFileName="amAuthPersistentCookie" revisionNumber="10"
+            i18nKey="persistent-cookie-service-description">
+
+            <Organization>
+                <AttributeSchema
+                        name="openam-auth-persistent-cookie-idle-time"
+                        type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="a001">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                        name="openam-auth-persistent-cookie-max-life"
+                        type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="a002">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                        name="openam-auth-persistent-cookie-enforce-ip"
+                        cosQualifier="default" type="single"
+                        syntax="boolean" i18nKey="a003">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                        name="openam-auth-persistent-cookie-secure-cookie"
+                        cosQualifier="default" type="single"
+                        syntax="boolean" i18nKey="a004">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                        name="openam-auth-persistent-cookie-http-only-cookie"
+                        cosQualifier="default" type="single"
+                        syntax="boolean" i18nKey="a005">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema
+                            name="openam-auth-persistent-cookie-idle-time"
+                            type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                            i18nKey="a001">
+                        <DefaultValues>
+                            <Value>5</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="openam-auth-persistent-cookie-max-life"
+                            type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                            i18nKey="a002">
+                        <DefaultValues>
+                            <Value>5</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="openam-auth-persistent-cookie-enforce-ip"
+                            cosQualifier="default" type="single"
+                            syntax="boolean" i18nKey="a003">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="openam-auth-persistent-cookie-secure-cookie"
+                            cosQualifier="default" type="single"
+                            syntax="boolean" i18nKey="a004">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="openam-auth-persistent-cookie-http-only-cookie"
+                            cosQualifier="default" type="single"
+                            syntax="boolean" i18nKey="a005">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

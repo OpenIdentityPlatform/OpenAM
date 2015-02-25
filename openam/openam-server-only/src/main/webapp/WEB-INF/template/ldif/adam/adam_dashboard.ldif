@@ -1,0 +1,80 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2013 ForgeRock AS. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# http://forgerock.org/license/CDDLv1.0.html
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at http://forgerock.org/license/CDDLv1.0.html
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+dn: CN=assignedDashboard,CN=Schema,CN=Configuration,CN=@INSTANCE_GUID@
+changetype: add
+adminDisplayName: assignedDashboard
+adminDescription: Assigned Dashboards are stored within this attribute
+attributeID: 1.3.6.1.4.1.36733.2.2.1.3.1
+attributeSyntax: 2.5.5.3
+cn: assignedDashboard
+instanceType: 4
+isSingleValued: FALSE
+lDAPDisplayName: assignedDashboard
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,CN=@INSTANCE_GUID@
+objectClass: attributeSchema
+schemaIDGUID:: Ex8e44hhhECVQDvQK+9fSQ==
+oMSyntax: 27
+searchFlags: 1
+systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=forgerock-am-dashboard-service,CN=Schema,CN=Configuration,CN=@INSTANCE_GUID@
+changetype: add
+adminDisplayName: forgerock-am-dashboard-service
+adminDescription: Class containing dashboard service related attributes
+cn: forgerock-am-dashboard-service
+governsID: 1.3.6.1.4.1.36733.2.2.2.3.1
+instanceType: 4
+lDAPDisplayName: forgerock-am-dashboard-service
+mayContain: assignedDashboard
+objectCategory: CN=Class-Schema,CN=Schema,CN=Configuration,CN=@INSTANCE_GUID@
+objectClass: classSchema
+objectClassCategory: 3
+rDNAttID: cn
+subClassOf: top
+schemaIDGUID:: u+sX6782FkylVhNmsZPeaw==
+systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,CN=@INSTANCE_GUID@
+changetype: modify
+add: auxiliaryClass
+auxiliaryClass: forgerock-am-dashboard-service
+-
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-

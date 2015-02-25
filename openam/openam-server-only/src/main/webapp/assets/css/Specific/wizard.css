@@ -1,0 +1,181 @@
+/* CSS Document */
+.wizard h1{
+	font-size:14px;
+	font-weight:bold;
+	color:#000000;
+}
+.wizard{
+	font-size:11px;
+	font-family:Arial, Helvetica, sans-serif;
+}
+.tabList {
+	margin-left: 5px;
+	margin-bottom: 1em;
+	padding-bottom: 1em;
+}
+
+.tablist ol {
+	margin: 0;
+	padding-left:1.2em;
+}
+
+.tabList li {
+	/*display: inline;*/
+	/*float: left;*/        
+	padding: 0.5em;		
+	font-size: 108%;
+	margin-left:20px;
+	/*border-bottom: 1px solid #999999;*/
+}
+
+.LastTab {
+	color: #5e887f;
+	font-weight: bold;
+	font-size: 123.1%;			
+}
+.currentTab {
+	/*color: #ec9c2b;*/
+	font-weight: bold;
+	font-size: 123.1%;		
+	list-style-image:url(../../images/wizard/wiz-arrow.gif);		
+	/*background:url($context/assets/images/wizard/wiz-arrow.gif) no-repeat left;*/		
+}
+
+#wizardFooter {
+	height: 30px;
+	background: #d4deec;
+	padding: 10px;
+	vertical-align: middle;
+}
+
+.tabContents {
+	padding: 0em 1em 0em 0em;				
+}
+
+#tab1RequiredInfoPanel li {
+	color: black;
+	padding: 0;
+}
+
+.tabContent {
+	height: 535px;
+	border-left:1px solid #999999;
+	margin-left:170px;		
+}
+
+.tabContent h1 {
+	margin: 0 0 .5em 0;
+}
+
+.panel h1 {
+	padding: 0 1em 0.2em 1em;
+}
+
+#title{
+	background-color: #80b7ab;
+	color:#FFFFFF;
+	font-size:1.2em;
+	font-weight:bold;
+	line-height:2;
+	padding:0pt 10px;
+	height:41px;
+}
+.col1{
+	float:left;
+	width:170px;
+	padding-left:10px;
+}
+#wizardFooter{
+	background:#e5e9ed;
+	border-top:1px solid #a9a9ab;
+}
+.buttonblue{
+	background:url(../../images/wizard/nextbg.png);
+}
+
+/*Step 3*/
+#configStoreFieldset label {
+	width: 12em;		
+}
+#userStoreFieldset label {
+	width: 12em;
+}
+.beginChunk {
+	padding-top: 0.625em;
+}
+.endChunk {
+	border-bottom: 1px solid #4993dd;
+	padding-bottom: 0.625em;
+}
+.singleChunk {
+	padding-top: 0.625em;
+	padding-bottom: 0.625em;
+	border-bottom: 1px solid #4993dd;
+}
+#allfields{
+	 text-align:right;
+}
+
+/*Step 4*/
+#userStoreFieldset label {
+	width: 12em;
+}
+.beginChunk {
+	padding-top: 0.6em;
+}
+
+.endChunk {
+	border-bottom: 1px solid #4993dd;
+	padding-bottom: 0.6em;
+}
+#allfields{
+	text-align:right;
+}
+/*Step 5*/
+#loadBalancerFieldset label {
+	width: 12em;
+}
+
+/*Step 6*/
+.summaryPanel {
+	float: left;
+	margin-right: 7px;
+}
+
+.summaryPanel .bodyBox {
+	height: 100px;
+}
+
+.summaryPanel ol {
+	padding: 0;
+	margin: 0;
+	font-size: smaller;
+}
+
+.summaryPanel li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.summaryPanel label {
+	float: left;
+	margin-right: 0.5em;
+	width: 55px;
+}
+#loadBalancingSummary label {
+	width: 25px;    
+}
+
+#userStoreCustomTypes td {
+    padding-top: 0;
+    padding-bottom: 5px;
+}
+
+#userStoreCustomTypes tr:last-child td {
+    padding-bottom: 0;
+}
+
+#wizardStep4 td {
+    padding-right: 5px;
+}

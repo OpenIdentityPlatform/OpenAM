@@ -1,0 +1,1031 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<section xml:id="sec-data-stores-opendj"
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ <title>Hints for Configuring OpenDJ Data Stores</title>
+
+ <para>
+  Use these hints when configuring OpenDJ Data Stores.
+ </para>
+
+ <indexterm>
+  <primary>Data stores</primary>
+  <secondary>OpenDJ</secondary>
+ </indexterm>
+
+ <para>
+  <command>ssoadm</command> service name:
+  <literal>sunIdentityRepositoryService</literal>
+ </para>
+
+ <variablelist>
+  <varlistentry>
+   <term>Name</term>
+   <listitem>
+    <para>
+     Name for the data store configuration
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Load schema when finished</term>
+   <listitem>
+    <para>
+     Add appropriate LDAP schema to the directory server
+     when saving the configuration.
+     The LDAP Bind DN user must have access to perform this operation.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>idRepoLoadSchema</literal>
+    </para>
+
+    <para>
+     Default:
+     false
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Server</term>
+   <listitem>
+    <para>
+     <literal><replaceable>host</replaceable>:<replaceable>port</replaceable></literal>
+     to contact the directory server, with optional
+     <literal>|<replaceable>server_ID</replaceable>|<replaceable>site_ID</replaceable></literal>
+     for deployments with multiple servers and sites
+    </para>
+
+    <orderedlist>
+     <para>
+      OpenAM uses the optional settings to determine
+      which directory server to contact first.
+      OpenAM tries to contact directory servers
+      in the following priority order, with highest priority first.
+     </para>
+
+     <listitem>
+      <para>
+       The first directory server in the list
+       whose <replaceable>server_ID</replaceable>
+       matches the current OpenAM server
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       The first directory server in the list
+       whose <replaceable>site_ID</replaceable>
+       matches the current OpenAM server
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       The first directory server in the remaining list
+      </para>
+     </listitem>
+    </orderedlist>
+
+    <para>
+     If the directory server is not available,
+     OpenAM proceeds to the next directory server in the list.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-ldap-server</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal><replaceable>host</replaceable>:<replaceable>port</replaceable></literal>
+     of the initial directory server configured for this OpenAM server
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Bind DN</term>
+   <listitem>
+    <para>
+     Bind DN for connecting to the directory server.
+     Some OpenAM capabilities require write access to directory entries.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-authid</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Bind Password</term>
+   <listitem>
+    <para>
+     Bind password for connecting to the directory server
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-authpw</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Organization DN</term>
+   <listitem>
+    <para>
+     The base DN under which to find user and group profiles
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-organization_name</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal><replaceable>base-dn</replaceable></literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP SSL/TLS Enabled</term>
+   <listitem>
+    <para>
+     Whether to use LDAPS or StartTLS to connect to the directory server.
+     If you enable SSL/TLS, OpenAM must be able to trust server certificates,
+     either because the server certificates were signed by a CA
+     whose certificate is already included in the trust store
+     used by the container where OpenAM runs,
+     or because you imported the certificates into the trust store.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-ssl-enabled</literal>
+    </para>
+
+    <para>
+     Default:
+     false
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Connection Pool Maximum Size</term>
+   <listitem>
+    <para>
+     Maximum number of connections to the directory server.
+     Make sure the directory service can cope
+     with the maximum number of client connections across all servers.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-connection_pool_max_size</literal>
+    </para>
+
+    <para>
+     Default:
+     10
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Connection Heartbeat Interval</term>
+   <listitem>
+    <para>
+     How often to send a heartbeat request to the directory server
+     to ensure that the connection does not remain idle.
+     Some network administrators configure firewalls
+     and load balancers to drop connections that are idle for too long.
+     You can turn this off by setting the value to 0 or to a negative number.
+     To set the units for the interval use LDAP Connection Heartbeat Time Unit.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>openam-idrepo-ldapv3-heartbeat-interval</literal>
+    </para>
+
+    <para>
+     Default:
+     10
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Connection Heartbeat Time Unit</term>
+   <listitem>
+    <para>
+     Time unit for the LDAP Connection Heartbeat Interval setting
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>openam-idrepo-ldapv3-heartbeat-timeunit</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>second</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Maximum Results Returned from Search</term>
+   <listitem>
+    <para>
+     A cap for the number of search results to request.
+     For example when using the Subjects tab to view profiles,
+     even if you set
+     Configuration > Console > Administration > Maximum Results Returned from Search
+     to a larger number, OpenAM does not exceed this setting.
+     Rather than raise this number,
+     consider narrowing your search to match fewer directory entries.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-max-result</literal>
+    </para>
+
+    <para>
+     Default:
+     1000
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Search Timeout</term>
+   <listitem>
+    <para>
+     Maximum time to wait for search results in seconds.
+     Does not apply to persistent searches.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-time-limit</literal>
+    </para>
+
+    <para>
+     Default:
+     10
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAPv3 Plug-in Search Scope</term>
+   <listitem>
+    <para>
+     LDAP searches can apply to a single entry (SCOPE_BASE),
+     entries directly below the search DN (SCOPE_ONE),
+     or all entries below the search DN (SEARCH_SUB)
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-search-scope</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>SCOPE_SUB</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAPv3 Repository Plug-in Class Name</term>
+   <listitem>
+    <para>
+     OpenAM identity repository implementation
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sunIdRepoClass</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Attribute Name Mapping</term>
+   <listitem>
+    <para>
+     Map of OpenAM profile attribute names to directory server attribute names
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sunIdRepoAttributeMapping</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAPv3 Plug-in Supported Types and Operations</term>
+   <listitem>
+    <para>
+     Map of OpenAM operations that can be performed in the specified OpenAM contexts
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sunIdRepoSupportedOperations</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>realm=read,create,edit,delete,service</literal>,
+     <literal>user=read,create,edit,delete</literal>,
+     <literal>group=read,create,edit,delete</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Users Search Attribute</term>
+   <listitem>
+    <para>
+     When searching for a user by name, match values against this attribute
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-users-search-attribute</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>uid</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Users Search Filter</term>
+   <listitem>
+    <para>
+     When searching for users, apply this LDAP search filter as well
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-users-search-filter</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>(objectclass=inetorgperson)</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP People Container Naming Attribute</term>
+   <listitem>
+    <para>
+     RDN attribute of the LDAP base DN which contains user profiles
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-people-container-name</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>ou</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP People Container Value</term>
+   <listitem>
+    <para>
+     RDN attribute value of the LDAP base DN which contains user profiles
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-people-container-value</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>people</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP User Object Class</term>
+   <listitem>
+    <para>
+     User profiles have these LDAP object classes
+    </para>
+
+    <para>
+     OpenAM handles only those attributes listed in this setting.
+     OpenAM discards any unlisted attributes from requests
+     and the request proceeds without the attribute.
+    </para>
+
+    <para>
+     For example, with default settings
+     if you request that OpenAM execute a search that asks for
+     the <literal>mailAlternateAddress</literal> attribute,
+     OpenAM does the search, but does not request
+     <literal>mailAlternateAddress</literal>.
+     In the same way, OpenAM does perform an update operation
+     with a request to set the value of an unlisted attribute
+     like <literal>mailAlternateAddress</literal>,
+     but it drops the unlisted attribute from the update request.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-user-objectclass</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>devicePrintProfilesContainer</literal>,
+     <literal>forgerock-am-dashboard-service</literal>,
+     <literal>inetorgperson</literal>,
+     <literal>inetuser</literal>,
+     <literal>iplanet-am-auth-configuration-service</literal>,
+     <literal>iplanet-am-managed-person</literal>,
+     <literal>iplanet-am-user-service</literal>,
+     <literal>iPlanetPreferences</literal>,
+     <literal>organizationalperson</literal>,
+     <literal>person</literal>,
+     <literal>sunAMAuthAccountLockout</literal>,
+     <literal>sunFederationManagerDataStore</literal>,
+     <literal>sunFMSAML2NameIdentifier</literal>,
+     <literal>sunIdentityServerLibertyPPService</literal>,
+     <literal>top</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP User Attributes</term>
+   <listitem>
+    <para>
+     User profiles have these LDAP attributes
+    </para>
+
+    <para>
+     OpenAM handles only those attributes listed in this setting.
+     OpenAM discards any unlisted attributes from requests
+     and the request proceeds without the attribute.
+    </para>
+
+    <para>
+     For example, with default settings
+     if you request that OpenAM execute a search that asks for
+     the <literal>mailAlternateAddress</literal> attribute,
+     OpenAM does the search, but does not request
+     <literal>mailAlternateAddress</literal>.
+     In the same way, OpenAM does perform an update operation
+     with a request to set the value of an unlisted attribute
+     like <literal>mailAlternateAddress</literal>,
+     but it drops the unlisted attribute from the update request.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-user-attributes</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>sunIdentityServerPPDemographicsBirthDay</literal>,
+     <literal>uid</literal>,
+     <literal>sunIdentityServerPPLegalIdentityLegalName</literal>,
+     <literal>manager</literal>,
+     <literal>assignedDashboard</literal>,
+     <literal>sunIdentityServerPPCommonNameSN</literal>,
+     <literal>userPassword</literal>,
+     <literal>iplanet-am-session-get-valid-sessions</literal>,
+     <literal>sunIdentityServerPPEmploymentIdentityJobTitle</literal>,
+     <literal>iplanet-am-user-password-reset-question-answer</literal>,
+     <literal>sunIdentityServerPPLegalIdentityDOB</literal>,
+     <literal>sunIdentityServerPPEmergencyContact</literal>,
+     <literal>sunIdentityServerPPCommonNameCN</literal>,
+     <literal>iplanet-am-user-success-url</literal>,
+     <literal>iplanet-am-user-admin-start-dn</literal>,
+     <literal>iplanet-am-user-federation-info</literal>,
+     <literal>userCertificate</literal>,
+     <literal>sunIdentityServerPPFacadeGreetSound</literal>,
+     <literal>sunAMAuthInvalidAttemptsData</literal>,
+     <literal>sunIdentityServerPPFacadeNamePronounced</literal>,
+     <literal>distinguishedName</literal>,
+     <literal>sunIdentityServerPPDemographicsTimeZone</literal>,
+     <literal>sunIdentityMSISDNNumber</literal>,
+     <literal>iplanet-am-session-max-caching-time</literal>,
+     <literal>sn</literal>,
+     <literal>iplanet-am-session-quota-limit</literal>,
+     <literal>iplanet-am-session-max-session-time</literal>,
+     <literal>adminRole</literal>,
+     <literal>sunIdentityServerPPEmploymentIdentityAltO</literal>,
+     <literal>objectClass</literal>,
+     <literal>sun-fm-saml2-nameid-info</literal>,
+     <literal>sunIdentityServerPPLegalIdentityMaritalStatus</literal>,
+     <literal>iplanet-am-user-login-status</literal>,
+     <literal>sunIdentityServerPPLegalIdentityAltIdType</literal>,
+     <literal>devicePrintProfiles</literal>,
+     <literal>iplanet-am-session-max-idle-time</literal>,
+     <literal>sunIdentityServerPPFacadegreetmesound</literal>,
+     <literal>cn</literal>,
+     <literal>iplanet-am-user-password-reset-options</literal>,
+     <literal>telephoneNumber</literal>,
+     <literal>preferredlanguage</literal>,
+     <literal>iplanet-am-user-federation-info-key</literal>,
+     <literal>sunIdentityServerPPMsgContact</literal>,
+     <literal>sunIdentityServerPPLegalIdentityGender</literal>,
+     <literal>iplanet-am-user-alias-list</literal>,
+     <literal>sunIdentityServerPPCommonNameFN</literal>,
+     <literal>caCertificate</literal>,
+     <literal>inetUserStatus</literal>,
+     <literal>sunIdentityServerPPCommonNameMN</literal>,
+     <literal>sunIdentityServerPPEncryPTKey</literal>,
+     <literal>givenName</literal>,
+     <literal>memberOf</literal>,
+     <literal>sunIdentityServerPPLegalIdentityVATIdValue</literal>,
+     <literal>preferredLocale</literal>,
+     <literal>iplanet-am-session-service-status</literal>,
+     <literal>sun-fm-saml2-nameid-infokey</literal>,
+     <literal>sunIdentityServerPPDemographicsAge</literal>,
+     <literal>sunIdentityServerDiscoEntries</literal>,
+     <literal>sunIdentityServerPPLegalIdentityVATIdType</literal>,
+     <literal>iplanet-am-user-auth-config</literal>,
+     <literal>iplanet-am-user-failure-url</literal>,
+     <literal>sunIdentityServerPPAddressCard</literal>,
+     <literal>sunIdentityServerPPCommonNamePT</literal>,
+     <literal>dn</literal>,
+     <literal>iplanet-am-session-add-session-listener-on-all-sessions</literal>,
+     <literal>mail</literal>,
+     <literal>authorityRevocationList</literal>,
+     <literal>iplanet-am-user-password-reset-force-reset</literal>,
+     <literal>inetUserHttpURL</literal>,
+     <literal>sunIdentityServerPPLegalIdentityAltIdValue</literal>,
+     <literal>sunIdentityServerPPCommonNameAltCN</literal>,
+     <literal>preferredtimezone</literal>,
+     <literal>sunIdentityServerPPInformalName</literal>,
+     <literal>sunIdentityServerPPSignKey</literal>,
+     <literal>sunIdentityServerPPEmploymentIdentityOrg</literal>,
+     <literal>iplanet-am-session-destroy-sessions</literal>,
+     <literal>sunIdentityServerPPFacadeMugShot</literal>,
+     <literal>sunIdentityServerPPFacadeWebSite</literal>,
+     <literal>sunIdentityServerPPDemographicsDisplayLanguage</literal>,
+     <literal>postalAddress</literal>,
+     <literal>iplanet-am-auth-configuration</literal>,
+     <literal>employeeNumber</literal>,
+     <literal>iplanet-am-user-account-life</literal>,
+     <literal>iplanet-am-user-auth-modules</literal>,
+     <literal>sunIdentityServerPPDemographicsLanguage</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Create User Attribute Mapping</term>
+   <listitem>
+    <para>
+     When creating a user profile,
+     apply this map of OpenAM profile attribute names
+     to directory server attribute names.
+    </para>
+
+    <para>
+     Attributes not mapped to another attribute
+     (for example, <literal>cn</literal>)
+     and attributes mapped to themselves
+     (for example, <literal>cn=cn</literal>)
+     take the value of the username
+     unless the attribute values are provided when creating the profile.
+     The object classes for user profile LDAP entries
+     generally require Common Name (cn) and Surname (sn) attributes,
+     so this prevents an LDAP constraint violation
+     when performing the add operation.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-createuser-attr-mapping</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>cn</literal>, <literal>sn</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Attribute Name of User Status</term>
+   <listitem>
+    <para>
+     Attribute to check/set user status
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-isactive</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>inetuserstatus</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>User Status Active Value</term>
+   <listitem>
+    <para>
+     Active users have the user status attribute set to this value.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-active</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>Active</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>User Status Inactive Value</term>
+   <listitem>
+    <para>
+     Inactive users have the user status attribute set to this value.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-inactive</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>Inactive</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Authentication Naming Attribute</term>
+   <listitem>
+    <para>
+     RDN attribute for building the bind DN when given a username and password
+     to authenticate a user against the directory server
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-auth-naming-attr</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>uid</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Groups Search Attribute</term>
+   <listitem>
+    <para>
+     When searching for a group by name, match values against this attribute
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-groups-search-attribute</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>cn</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Groups Search Filter</term>
+   <listitem>
+    <para>
+     When searching for groups, apply this LDAP search filter as well
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-groups-search-filter</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>(objectclass=groupOfUniqueNames)</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Groups Container Naming Attribute</term>
+   <listitem>
+    <para>
+     RDN attribute of the LDAP base DN which contains group profiles
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-group-container-name</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>ou</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Groups Container Value</term>
+   <listitem>
+    <para>
+     RDN attribute value of the LDAP base DN which contains group profiles
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-group-container-value</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>groups</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Groups Object Class</term>
+   <listitem>
+    <para>
+     Group profiles have these LDAP object classes
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-group-objectclass</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>groupofuniquenames</literal>,
+     <literal>top</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>LDAP Groups Attributes</term>
+   <listitem>
+    <para>
+     Group profiles have these LDAP attributes
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-group-attributes</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>cn</literal>,
+     <literal>dn</literal>,
+     <literal>objectclass</literal>,
+     <literal>uniqueMember</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Attribute Name for Group Membership</term>
+   <listitem>
+    <para>
+     LDAP attribute in the member's LDAP entry
+     whose values are the groups to which a member belongs
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-memberof</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Attribute Name of Unique Member</term>
+   <listitem>
+    <para>
+     Attribute in the group's LDAP entry
+     whose values are the members of the group
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-uniquemember</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>uniqueMember</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Persistent Search Base DN</term>
+   <listitem>
+    <para>
+     Base DN for LDAP persistent searches used
+     to receive notification of changes in directory server data
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-psearchbase</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal><replaceable>base-dn</replaceable></literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Persistent Search Filter</term>
+   <listitem>
+    <para>
+     LDAP filter to apply when performing persistent searches
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-psearch-filter</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>(objectclass=*)</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Persistent Search Scope</term>
+   <listitem>
+    <para>
+     LDAP searches can apply to a single entry (SCOPE_BASE),
+     entries directly below the search DN (SCOPE_ONE),
+     or all entries below the search DN (SEARCH_SUB)
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-config-psearch-scope</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>SCOPE_SUB</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>The Delay Time Between Retries</term>
+   <listitem>
+    <para>
+     How long to wait after receiving an error result
+     that indicates OpenAM should try the LDAP operation again
+    </para>
+
+    <para>
+     The OpenDJ data store uses this setting only for persistent searches.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>com.iplanet.am.ldap.connection.delay.between.retries</literal>
+    </para>
+
+    <para>
+     Default:
+     1000 milliseconds
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>DN Cache Enabled</term>
+   <listitem>
+    <para>
+     Whether to enable the DN cache, which is used to cache DN lookups
+     that can happen in bursts during authentication.
+     As the cache can become stale when a user is moved or renamed,
+     enable DN caching when the directory service allows move/rename operations (Mod DN),
+     and when OpenAM uses persistent searches to obtain notification of such updates.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-dncache-enabled</literal>
+    </para>
+
+    <para>
+     Default:
+     true
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>DN Cache Size</term>
+   <listitem>
+    <para>
+     Maximum number of DNs cached when caching is enabled
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-idrepo-ldapv3-dncache-size</literal>
+    </para>
+
+    <para>
+     Default:
+     1500 items
+    </para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+</section>

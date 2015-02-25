@@ -1,0 +1,73 @@
+{
+        "themes": [
+            {
+                "name": "default",
+                "path": "",
+                "realms": [".*"],
+                "regex": true,
+                "icon": "favicon.ico",
+                "settings": {
+                    "logo": {
+                        "src": "images/logo.png",
+                        "title": "ForgeRock",
+                        "alt": "ForgeRock",
+                        "height": "80px",
+                        "width": "120px"
+                    },
+                    "lessVars": {
+                        "background-color": "#eee",
+                        "background-image": "url('../images/box-bg.png')",
+                        "background-repeat": "no-repeat",
+                        "background-position": "950px -100px",
+                        "footer-background-color": "rgba(238, 238, 238, 0.7)",
+                        "background-font-color": "#5a646d",
+                        "column-padding": "111px",
+                  
+                        "login-container-label-align": "right",
+
+                        "login-container-width": "472px",
+                        "medium-container-width": "592px",
+                        "site-width": "960px",
+            
+                        "message-background-color": "#fff",
+                        "content-background": "#f9f9f9",
+                        "font-color": "#5a646d",
+                        "font-size": "14px",
+                        "font-family": "Arial, Helvetica, sans-serif",
+                        "line-height": "18px",
+            
+                        "color-active": "#80b7ab",
+                        "color-inactive": "#626d75",
+            
+                        "active-menu-color": "#80b7ab",
+                        "active-menu-font-color": "#f9f9f9",
+                        "inactive-menu-color": "#5d6871",
+                        "inactive-menu-font-color": "#f9f9f9",
+                        "button-hover-lightness": "4%",   
+            
+                        "href-color": "#80b7ab",
+                        "href-color-hover": "#5e887f",
+                        "color-error": "#d97986",
+                        "color-warning": "yellow",
+                        "color-success": "#71bd71",
+                        "color-info": "blue",
+                        "color-inactive": "gray",
+
+
+                        "input-background-color": "#fff",
+                        "input-background-invalid-color": "#fff",
+                        "input-border-invalid-color": "#f8b9b3",
+                        "input-border-basic": "#DBDBDB",
+                        "header-border-color": "#5D5D5D",
+            
+            
+                        "footer-height": "126px"
+                    },
+                    "footer": {
+                        "mailto": "info@forgerock.com",
+                        "phone": ""
+                    }
+                }
+            }
+        ]
+}

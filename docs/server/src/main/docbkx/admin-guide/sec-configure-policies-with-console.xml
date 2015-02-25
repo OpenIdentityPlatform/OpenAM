@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+
+<section xml:id="configure-policies-with-console"
+          xmlns='http://docbook.org/ns/docbook'
+          version='5.0' xml:lang='en'
+          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+          xmlns:xlink='http://www.w3.org/1999/xlink'
+          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+    <title>Configuring Policies by Using the OpenAM Console</title>
+
+    <para>This section describes the process of configuring policies to
+     protect a web site or web application by using the OpenAM console.</para>
+
+ <procedure xml:id="create-policy-xui">
+  <title>To Configure a Policy by Using the OpenAM Console</title>
+  <indexterm>
+   <primary>Authorization</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Policy</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+
+  <step>
+   <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; Policies, and then click the name of the
+    application to configure a policy in.</para>
+  <substeps>
+   <step><para>To create a new policy, click Add New Policy.</para></step>
+   <step><para>To modify an existing policy, click the name of the
+    policy.</para></step>
+   <step><para>To discard any changes and return to the previous page,
+    click Cancel.</para></step>
+  </substeps>
+  </step>
+
+  <step>
+   <para>Provide a name for the policy, and optionally a
+    description, and then click Next.
+   </para>
+   <para>
+    Do not use special characters within policy, application or referral names
+    (for example, "my+referral") using the Policy Editor or REST endpoints as
+    OpenAM returns a 400 Bad Request error.
+    The special characters are: double quotes ("), plus sign (+), comma (,),
+    less than (&lt;), equals (=), greater than (&gt;), backslash (\), and
+    null (\u0000).
+   </para>
+  </step>
+
+  <step>
+   <para>To define resources that the policy applies to,
+    follow the steps below:</para>
+   <substeps>
+    <step>
+     <para>In the Available patterns section, click the
+      row containing the pattern to use as the template for a resource pattern
+      to move it to the Create your resources section.</para>
+     <mediaobject xml:id="figure-resource-patterns-policies-step1">
+      <alt>Modify the resource patterns to specify the resources the
+       policy applies to.</alt>
+      <imageobject>
+       <imagedata
+        fileref="images/resource-pattern-step1.png"
+        format="PNG" />
+      </imageobject>
+      <textobject><para>Select a resource pattern.</para></textobject>
+     </mediaobject>
+    </step>
+
+    <step performance="optional">
+     <para>Optionally, in the Create your resources
+      section, replace the asterisks with values to define the resources
+      that the policy applies to.</para>
+
+     <mediaobject xml:id="figure-resource-patterns-policies-step2">
+      <alt>Edit the resource pattern if required.</alt>
+      <imageobject>
+       <imagedata
+        fileref="images/resource-pattern-step2.png"
+        format="PNG" />
+      </imageobject>
+      <textobject><para>Optionally, edit the resource pattern.</para></textobject>
+     </mediaobject>
+
+     <para>For information on specifying patterns for matching resources, see
+      <link xlink:href="admin-guide#policy-patterns-wildcards"
+            xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink">
+    <citetitle>Specifying Resource Patterns with Wildcards</citetitle></link>.</para>
+  </step>
+
+    <step>
+     <para>Click the Add icon to move the resource into
+      the Resources section.</para>
+     <mediaobject xml:id="figure-resource-patterns-policies-step3">
+      <alt>Add the completed resource to the Resources section
+       by clicking the Add icon.</alt>
+      <imageobject>
+       <imagedata
+        fileref="images/resource-pattern-step3.png"
+        format="PNG" />
+      </imageobject>
+      <textobject><para>Add the resource to the Resources section.</para></textobject>
+     </mediaobject>
+    </step>
+   </substeps>
+   <tip><para>To remove a resource pattern,
+    click the Delete icon.</para></tip>
+   <para>Repeat these steps to add all the resources your
+    policy applies to,  and then click Next.</para>
+  </step>
+
+  <step>
+   <para>
+    Select the HTTP 1.1 methods that the policy applies to, and whether to
+    <literal>Allow</literal> or <literal>Deny</literal> those methods on the
+    resources specified earlier, and then click Next.</para>
+   <para>For more information on HTTP 1.1 methods, see <link
+    xlink:show="new"
+    xlink:href="https://tools.ietf.org/html/rfc2616#section-9"
+    ><citetitle>Method Definitions</citetitle></link> and <link
+    xlink:show="new"
+    xlink:href="https://tools.ietf.org/html/rfc5789"
+    ><citetitle>PATCH Method for HTTP</citetitle></link>.</para>
+   </step>
+
+    <step>
+     <para>Define conditions in the OpenAM console
+      by combining logical operators with blocks of configured
+      parameters to create a rule set that the policy uses to filter
+      requests for resources. You can nest logical operators at multiple
+      levels to create complex rule sets.</para>
+     <para>To define the subjects that the policy applies to,
+      complete the following steps:</para>
+     <substeps>
+      <step>
+       <para>To add a subject condition, click the Subject
+        Condition button, choose the type from
+        the drop-down menu, specify any required
+        Subject Values, and then drag the block into a
+        drop-point in a logical block above.</para>
+
+       <tip><para>Valid drop-points in which to drop a block are displayed with
+        a striped horizontal bar.</para>
+
+        <mediaobject xml:id="policy-editor-valid-drop-points">
+         <alt>Valid drop-points to drop a block are shown with a striped
+          horizontal band.</alt>
+         <imageobject>
+          <imagedata
+           fileref="images/policy-editor-valid-drop-points.png"
+           format="PNG" />
+         </imageobject>
+         <textobject><para>Drop blocks into drop-points that contain a
+          striped horizontal band.</para></textobject>
+        </mediaobject>
+
+       </tip>
+
+       <para>The available Subject Condition Types are:</para>
+       <variablelist>
+        <varlistentry>
+         <term>Authenticated Users</term>
+         <listitem>
+          <para>Any user that has successfully authenticated with OpenAM.</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Users &amp; Groups</term>
+         <listitem>
+          <para>A user or group as defined in the Subjects tab of the
+           realm the policy is created in.</para>
+          <para>Select one or more users or groups from the
+           Subject Values drop-down menu, which displays
+           the subjects available within the realm.</para>
+          <para>To remove an entry, click the value,
+           and then press <keycap>Delete</keycap> (Windows/GNU/Linux)
+           or <keycap>Backspace</keycap> (Mac OS X).</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Jwt Claim</term>
+         <listitem>
+          <para>Validate a claim within a JSON Web Token (JWT).</para>
+          <para>Type the name of the claim to validate in
+           Claim Name, for example <literal>sub</literal>,
+           and the required value in Claim Value,
+           for example <literal>UserA</literal>.</para>
+          <note><para>This condition type only supports string
+           equality comparisons, and is case-sensitive.</para></note>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Never Match</term>
+         <listitem>
+          <para>
+           Never match any subject, with the result not that access is denied,
+           but instead that the policy itself does not match
+           and therefore cannot be evaluated in order to allow access.
+          </para>
+
+          <para>
+           If you do not set a subject condition, "Never Match" is the default.
+           In other words,
+           you must set a subject condition for the policy to apply.
+          </para>
+
+          <para>
+           To match regardless of the subject, configure a subject condition
+           that is <literal>NOT</literal> "Never Match".
+          </para>
+         </listitem>
+        </varlistentry>
+       </variablelist>
+      </step>
+      <step><para>To add a logical operator, click the Logical
+       button, choose between <literal>AND</literal>, <literal>NOT</literal>,
+       and <literal>OR</literal> from the drop-down menu,
+       and then drag the block into a valid drop point in the rule set
+       above.</para></step>
+      <step><para>Continue combining logical operators and subject
+       conditions, and then click Next.</para></step>
+     </substeps>
+    </step>
+
+
+  <step>
+  <para>To configure environment conditions in the policy,
+   complete the following steps:</para>
+   <substeps>
+    <step>
+      <para>To add an environment condition, click the Environment Condition
+        button, choose the type from the drop-down menu,
+        specify any required parameters, and then drag the block into a
+        drop-point in a logical block above.</para>
+       <tip><para>Valid drop-points in which to drop a block are displayed with
+        a striped horizontal bar.</para>
+        <mediaobject xml:id="policy-editor-valid-drop-points-environment">
+         <alt>Valid drop-points to drop a block are shown with a striped
+          horizontal band.</alt>
+         <imageobject>
+          <imagedata
+           fileref="images/policy-editor-valid-drop-points.png"
+           format="PNG" />
+         </imageobject>
+         <textobject><para>Drop blocks into drop-points that contain a
+          striped horizontal band.</para></textobject>
+        </mediaobject>
+       </tip>
+       <para>The available environment condition types are:</para>
+       <variablelist>
+        <varlistentry>
+         <term>Active Session Time</term>
+         <listitem>
+          <para>Make the policy depend on how long the user's session has been
+           active, as specified in Max Session Time. To
+           terminate the session if it has been active for longer than the
+           specified time, set Terminate Sessions to
+           <literal>True</literal>. The user will need to re-authenticate.</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Authentication by Module Chain</term>
+         <listitem>
+          <para>Make the policy depend on the service that was used to
+           authenticate the user.</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Authentication by Module Instance</term>
+         <listitem>
+          <para>Make the policy depend on the authentication
+           module used to authenticate, specified in Authentication
+            Scheme. Specify a timeout for
+           application authentication in Application Idle
+            Timeout Scheme and the name of the application in
+           Application Name.</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Authentication Level (greater than or equal to)</term>
+         <listitem>
+          <para>Make the policy depend on the minimum acceptable authentication
+           level specified in Authentication Level.</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Authentication to a Realm</term>
+         <listitem>
+          <para>Make the policy depend on the realm to which the user
+           authenticated.</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Current Session Properties</term>
+         <listitem>
+          <para>Make the policy depend on properties set in the user's session.</para>
+          <para>Type the value to search for in Properties,
+           and set Ignore Value Case to <literal>True</literal>
+           to make the search case-insensitive.</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Identity Membership</term>
+         <listitem>
+          <para>Make the policy apply if the UUID of the invocator is a member
+           of at least one of the AMIdentity objects specified in AM
+            Identity Name.</para>
+          <para>Often used to filter requests on the identity of a
+           Web Service Client (WSC).</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>IPv4 Address/DNS Name</term>
+         <listitem>
+          <para>Make the policy depend on the IP version 4 address that
+           the request originated from.</para>
+          <note><para>The IP address is taken from the
+           <literal>requestIp</literal> value of policy decision requests. If
+           this is not provided, the IP address stored in the SSO token is
+           used instead.</para></note>
+          <para>
+          Specify a range of addresses to test against by
+           entering four sets of up to three digits, separated by full stops
+           (<keycap>.</keycap>) in both Start IP and
+           End IP.</para>
+          <note><para>If only one of these values is provided, it is used as a
+           single IP address to match.</para></note>
+          <para>Optionally, specify a DNS name in DNS Name to filter requests to
+           that domain.</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>IPv6 Address/DNS Name</term>
+         <listitem>
+          <para>Make the policy depend on the IP version 6 address that
+           the request originated from.</para>
+          <note><para>The IP address is taken from the
+           <literal>requestIp</literal> value of policy decision requests. If
+           this is not provided, the IP address stored in the SSO token is
+           used instead.</para></note>
+          <para>Specify a range of addresses to test against by entering eight
+           sets of four hexadecimal characters, separated by a colon
+           (<keycap>:</keycap>) in both Start IP and
+           End IP.</para>
+          <note><para>If only one of these values is provided, it is used as a
+           single IP address to match.</para></note>
+          <para>Optionally, specify a DNS name in
+          DNS Name to filter requests to those coming
+           from the specified domain.</para>
+          <tip><para>Use an asterisk (<keycap>*</keycap>) in the DNS
+           name to match multiple subdomains. For example
+           <literal>*.example.com</literal> applies to requests coming from
+           <literal>www.example.com</literal>, <literal>secure.example.com</literal>,
+           or any other subdomain of <literal>example.com</literal>.</para></tip>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>LDAP Filter Condition</term>
+         <listitem>
+          <para>Make the policy depend on whether
+           the user's entry can be found using the LDAP search filter you specify
+           in the directory configured for the policy service, which by default
+           is the identity repository. See Configuration &gt; Global &gt; Policy
+           Configuration &gt; Realm Attributes &gt; Primary LDAP Server.</para>
+          <para>Alternatively you can set this for the realm under Access Control
+           &gt; <replaceable>Realm Name</replaceable> &gt; Services &gt; Policy
+           Configuration.</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>OAuth2 Scope</term>
+         <listitem>
+          <para>
+           Make the policy depend on whether an authorization request
+           includes all of the specified OAuth 2.0 scopes.
+          </para>
+
+          <para>
+           Scope names must follow OAuth 2.0 scope syntax described in RFC 6749,
+           <link
+            xlink:show="new"
+            xlink:href="https://tools.ietf.org/html/rfc6749#section-3.3"
+            ><citetitle>Access Token Scope</citetitle></link>.
+           As described in that section,
+           separate multiple scope strings with spaces,
+           such as <literal>openid profile</literal>.
+          </para>
+
+          <para>
+           The scope strings match regardless of order in which they occur,
+           so <literal>openid profile</literal>
+           is equivalent to <literal>profile openid</literal>.
+          </para>
+
+          <para>
+           The condition is also met when additional scope strings are provided
+           beyond those required to match the specified list.
+           For example,
+           if the condition specifies <literal>openid profile</literal>,
+           then <literal>openid profile email</literal> also matches.
+          </para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Resource/Environment/IP Address</term>
+         <listitem>
+          <para>Make the policy apply to a complex condition such as whether the
+           user is making a request from the localhost and has also authenticated
+           with the LDAP authentication module.</para>
+          <para>Entries must take the form of an
+           <literal>IF...ELSE</literal> statement. The <literal>IF</literal> statement can specify either
+           <literal>IP</literal> to match the user's IP address, or
+           <literal>dnsName</literal> to match their DNS name.</para>
+          <para>If the <literal>IF</literal> statement is true,
+           the <literal>THEN</literal> statement must also be true for the
+           condition to be fulfilled. If not, relevant advice is returned in the
+           policy evaluation request.</para>
+          <para>The available parameters for the
+           <literal>THEN</literal> statement are as follows:</para>
+           <variablelist>
+            <varlistentry>
+             <term><literal>module</literal></term>
+             <listitem>
+              <para>The module that was used to authenticate the user, for
+               example <literal>DataStore</literal>.</para>
+             </listitem>
+            </varlistentry>
+            <varlistentry>
+             <term><literal>service</literal></term>
+             <listitem>
+              <para>The service that was used to authenticate the user.</para>
+             </listitem>
+            </varlistentry>
+            <varlistentry>
+             <term><literal>authlevel</literal></term>
+             <listitem>
+              <para>The minimum required authentication level.</para>
+             </listitem>
+            </varlistentry>
+            <varlistentry>
+             <term><literal>role</literal></term>
+             <listitem>
+              <para>The role of the authenticated user.</para>
+             </listitem>
+            </varlistentry>
+            <varlistentry>
+             <term><literal>user</literal></term>
+             <listitem>
+              <para>The name of the authenticated user.</para>
+             </listitem>
+            </varlistentry>
+            <varlistentry>
+             <term><literal>redirectURL</literal></term>
+             <listitem>
+              <para>The URL the user was redirected from.</para>
+             </listitem>
+            </varlistentry>
+            <varlistentry>
+             <term><literal>realm</literal></term>
+             <listitem>
+              <para>The realm that was used to authenticate the user.</para>
+             </listitem>
+            </varlistentry>
+           </variablelist>
+          <para>The IP address can be IPv4, IPv6, or a hybrid of the two.</para>
+          <para>Example:
+           <literal>IF IP=[127.0.0.1] THEN role=admins</literal>.</para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Time (day, date, time, and timezone)</term>
+         <listitem>
+          <para>Make the policy depend on when the policy is evaluated.</para>
+          <para>The values for day, date and time must be set in pairs,
+           a start and an end. Incomplete pairings are highlighted
+           in red.</para>
+          <mediaobject xml:id="policy-editor-mismatched-time-pairs">
+           <alt>Missing values are highlighted in red.</alt>
+           <imageobject>
+            <imagedata
+             fileref="images/policy-editor-mismatched-time-pairs.png"
+             format="PNG" />
+           </imageobject>
+           <textobject><para>Day, date and time conditions in policies must
+            consist of a start and an end value. Missing values are
+            highlighted in red.</para></textobject>
+          </mediaobject>
+         </listitem>
+        </varlistentry>
+       </variablelist>
+     </step>
+
+   <step><para>To add a logical operator, click the Logical
+    button, choose between <literal>AND</literal>, <literal>NOT</literal>,
+    and <literal>OR</literal> from the drop-down menu,
+    and then drag the block into a valid drop point in the rule set
+    above.</para>
+   </step>
+    <step><para>Continue combining logical operators and environment
+     conditions, and when finished, click Next.</para></step>
+ </substeps>
+</step>
+  <step performance="optional">
+   <para>Add policy response attributes, retrieved from the user entry in the
+    identity repository, into the headers of the request at policy decision time.
+    The policy agent for the protected resources/applications or the protected resources/applications themselves
+    retrieve the policy response attributes to customize or personalize the application.
+    Policy response attributes come in two formats: subject
+    attributes and static attributes.
+   </para>
+   <substeps>
+    <step>
+     <para>To add subject attributes, click an empty space in the Subject
+      attributes field, and select the subject attribute to add to the
+      response.</para>
+     <para>To remove an entry, click the value,
+      and then press <keycap>Delete</keycap> (Windows/GNU/Linux) or
+      <keycap>Backspace</keycap> (Mac OS X)</para>
+     </step>
+    <step>
+     <para>To add a static attribute, type in a Key and a Value in the fields,
+      and then click the Add icon.
+     </para>
+     <para>To remove an entry, click the Delete icon in
+      the row containing the Key: Value pair.</para>
+    </step>
+    <step>
+     <para>Continue adding subject and static attributes,
+      and when finished, click Next.</para>
+    </step>
+   </substeps>
+  </step>
+  <step>
+   <para>Review your configuration.</para>
+
+   <tip><para>If the configuration is not visible, click the maximized
+    link to switch to maximized view.</para></tip>
+
+   <para>To make changes to the configuration, either click the relevant step,
+    or click the item to jump to the relevant step and make amendments to
+    the configuration.</para>
+
+   <para>When the configuration is completed, click Finish.</para>
+  </step>
+ </procedure>
+</section>

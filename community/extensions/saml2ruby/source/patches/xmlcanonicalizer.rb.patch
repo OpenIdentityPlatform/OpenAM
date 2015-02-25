@@ -1,0 +1,19 @@
+*** lib/xml/util/xmlcanonicalizer.rb.orig	2007-10-09 18:14:11.000000000 +0900
+--- lib/xml/util/xmlcanonicalizer.rb	2007-10-09 18:09:58.000000000 +0900
+***************
+*** 133,139 ****
+            @inclusive_namespaces = add_inclusive_namespaces(@prefix_list, element, @inclusive_namespaces) if (@prefix_list)
+            @preserve_document = element.document()
+            tmp_parent = element.parent()
+!           body_string = remove_whitespace(element.to_s().gsub("\n","").gsub("\t","").gsub("\r",""))
+            document = Document.new(body_string)
+            tmp_parent.delete_element(element)
+            element = tmp_parent.add_element(document.root())
+--- 133,139 ----
+            @inclusive_namespaces = add_inclusive_namespaces(@prefix_list, element, @inclusive_namespaces) if (@prefix_list)
+            @preserve_document = element.document()
+            tmp_parent = element.parent()
+!           body_string = remove_whitespace(element.to_s().gsub(/\n+/,"\n").gsub("\t","").gsub("\r",""))
+            document = Document.new(body_string)
+            tmp_parent.delete_element(element)
+            element = tmp_parent.add_element(document.root())

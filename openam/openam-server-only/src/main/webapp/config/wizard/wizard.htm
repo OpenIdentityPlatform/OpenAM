@@ -1,0 +1,435 @@
+        <script type="text/javascript">
+
+            YAHOO.namespace("sun.identity.config.options.wizard");
+
+            //convenient alias:
+            var $ = YAHOO.util.Dom.get;
+
+            var startingTab = $startingTab; //determined by Click Wizard.java control based on user cookie
+
+            var currentTab = startingTab;
+            var previousTab = 1;
+            var nextTab = currentTab + 1;
+            var firstFAMInstance = true;
+
+            var usingCustomConfigStore = false;
+            var configStoreNameValid = false;
+            var configStoreHostValid = false;
+            var configStoreBaseDNValid = false;
+            var configStoreSessionDNValid = false;
+            var configStoreLoginIdValid = false;
+
+            var usingCustomUserStore = false;
+            var userStoreNameValid = false;
+            //var userStoreHostValid = false;
+            var userStoreBaseDNValid = false;
+           // var userStoreLoginIdValid = false;
+
+            // generic validation code used by all pages. This will automatically
+            // set the status response, plus set boolean flags for each field
+            // which can be evaluated on each page as needed. The value for field
+            // will be set in each calling page.
+            var field = "";
+
+            function validate() {
+                var callUrl = "$context$path?actionLink=validateInput";
+                var key = "&key=" + field;
+                var value = "&value=" + encodeURIComponent($(field).value);
+                ie7fix++;
+                callUrl = callUrl + "&ie7fix=" + ie7fix;
+                AjaxUtils.call(callUrl+key+value, fieldValidated);
+            }
+
+            function validatePost() {
+                var callUrl = "$context$path?actionLink=validateInput";
+                var key = "key=" + field;
+                var value = "&value=" + encodeURIComponent($(field).value);
+                ie7fix++;
+                callUrl = callUrl + "&ie7fix=" + ie7fix;
+                AjaxUtils.doPost(null, callUrl, key+value, fieldValidated,
+                    null, null);
+            }
+
+            function fieldValidated(response) {
+                if (response.responseText == "true") { 
+                    eval(field + "Valid = true;" );
+                    $(field + 'Status').innerHTML = okString;
+                } else {
+                    eval(field + "Valid = false;" );
+                    $(field + 'Status').innerHTML = errorImage +
+                        '<small>' + response.responseText + '</small>';
+                }                
+                field = "";
+            }
+
+            function adjustTabButtons() {
+                if ( currentTab == 1 ) {
+                    $('previousTabButton').disabled = true;
+                    $('nextTabButton').style.display = "";
+                    $('writeConfigButton').style.display = "none";
+                } else if ( currentTab == 7 ) {
+                    $('previousTabButton').disabled = false;
+                    $('nextTabButton').style.display = "none";
+                    $('writeConfigButton').style.display = "";
+                } else {
+                    $('previousTabButton').disabled = false;
+                    $('nextTabButton').style.display = "";
+                    $('writeConfigButton').style.display = "none";
+                }
+            }
+
+            function rangeCheck( tabNum ) {
+                if ( tabNum < 1 ) {
+                    return 1;
+                } else if ( tabNum > 7 ) {
+                    return 7;
+                } else {
+                    return tabNum;
+                }
+            }
+
+            // helper function - do not call directly.
+            // change the references from tab6 to tab5 if skipping agent 
+            function _tabLoaded( tabNum ) {
+                $('wizardStep' + currentTab).style.display = "none";
+                $('wizardStep' + tabNum).style.display = "";
+                $('tab' + currentTab).className = "LastTab";
+                $('tab' + tabNum).className = "currentTab";
+                currentTab = tabNum;
+                $('nextTabButton').disabled = false;
+                if ( !firstFAMInstance && currentTab == 5 ) {
+                    nextTab = 7;
+                } else if (!firstFAMInstance && (currentTab == 3)) {
+                    nextTab = 5;
+                } else {
+                    nextTab = rangeCheck(currentTab + 1);
+                }
+                if ( !firstFAMInstance && currentTab == 7 ) {
+                    previousTab = 5;
+                } else if (!firstFAMInstance && (currentTab == 5)) {
+                    previousTab = 3;
+                } else {
+                    previousTab = rangeCheck(currentTab - 1);
+                }
+                adjustTabButtons();
+            }
+            function showTab( tabNum ) {
+                tabNum = rangeCheck(tabNum);
+                var callback = new Function( _tabLoaded( tabNum ) );
+                var tab = 'wizardStep' + tabNum;
+                var url = "$context/config/wizard/step" + tabNum + ".htm?" + getLocale();
+                AjaxUtils.load(tab, url, callback);
+            }
+
+            function nextWizardTab() {
+                showTab(nextTab);
+            }
+            function previousWizardTab() {
+                showTab(previousTab);
+            }
+            function resetWizard() {
+                showTab(startingTab);
+            }
+            function cancelWizard() {
+                YAHOO.sun.identity.config.options.wizard.hide();
+                resetWizard();
+            }
+            function startNewConfig() {
+                YAHOO.sun.identity.config.options.confComplete.hide();
+                firstFAMInstance = false;
+                startingTab = 2;
+                resetWizard();
+            }
+
+            function onPushNewInstanceConfigResponse( response ) {
+                if ( response.responseText == "true" ) {
+                    setTimeout("YAHOO.sun.identity.config.options.wizard.pushingConfig.hide()", 1500);
+                    setTimeout("YAHOO.sun.identity.config.options.confComplete.show()", 1500);
+                } else {
+                    alert(response.responseText);
+                }
+            }
+
+            function pushNewInstanceConfig() {
+                YAHOO.sun.identity.config.options.wizard.pushConfigDialog.hide();
+                YAHOO.sun.identity.config.options.wizard.pushingConfig.show();
+                ie7fix++;
+                AjaxUtils.call( "$context$path?actionLink=pushConfig&ie7fix=" + ie7fix,
+                    onPushNewInstanceConfigResponse );
+            }
+            function cancelPushNewInstanceConfig() {
+                document.location = "$context/commonTasks.htm";
+            }
+
+            function writeConfigurationAsync() {
+                ie7fix++;
+                AjaxUtils.call("$context$path?actionLink=createConfig&ie7fix=" + ie7fix,
+                    writeConfigResponse );
+            }
+            
+            function writeConfiguration() {
+            document.getElementById("returnToConfig").style.display = "none";
+                document.getElementById("setupMessage").innerHTML = "";
+                YAHOO.sun.identity.config.options.inProgress.show();
+                
+                var fr1 = window.frames['progressIframe'];
+                if ( fr1 ) {
+                    fr1.location = "$context/setup/setSetupProgress";
+                }
+                setTimeout('writeConfigurationAsync()', 2000); 
+            }
+
+            /* =============================
+               STEP 3 AND 4 SHARED FUNCTIONS
+               ============================= */
+
+            function isCustomConfigStoreValid() {
+                return configStoreHostValid &&
+                       configStoreBaseDNValid &&
+                       configStoreSessionDNValid &&
+                       configStoreLoginIdValid;
+            }
+
+            function isCustomUserStoreValid() {
+                return userStoreHostValid &&
+                       userStoreBaseDNValid &&
+                       userStoreLoginIdValid;
+            }
+
+            function disableCustomConfig( storeType ) {
+                $(storeType + 'StoreModule').style.display = "none";
+                $(storeType + 'StoreCustom').checked = false;
+                $(storeType + 'StoreDefault').checked = true;
+                if ( storeType == "config" ) {
+                    usingCustomConfigStore = false;
+                    //$('userStoreSameAsConfigStoreDiv').style.display = "none";
+                }
+                if ( storeType == "user" ) {
+                    usingCustomUserStore = false;
+                    $('userStoreSameAsConfigStoreDiv').style.display = "none";
+                }
+                clearStore( storeType );
+                $('nextTabButton').disabled = false;
+            }
+
+            function changeUserStoreConfiguration( type ) {
+                if ( type == 1 ) {
+                    $('userStoreModule').style.display = "none";
+                    $('typeConfiguration1').checked = true;
+                } else {
+                    $('userStoreModule').style.display = "";
+                    $('typeConfiguration2').checked = true;
+                }
+            }
+
+            function enableStandardPort( storeType ) {
+                $(storeType + 'StoreSecurePortNo').checked = true;
+                $(storeType + 'StorePort').value = '389';
+            }
+            function enableSecurePort( storeType ) {
+                $(storeType + 'StoreSecurePortNo').checked = false;
+                $(storeType + 'StorePort').value = '636';
+            }
+
+            function adjustNextTabButton( type ) {
+                var allValidated = false;
+                if ( type == 'config' ) {
+                    allValidated = isCustomConfigStoreValid();
+                } else {
+                    allValidated = isCustomUserStoreValid();
+                }
+                $('nextTabButton').disabled = !allValidated;
+            }
+
+            function storeServerValidated( type, response ) {
+                if( response.responseText == "true" ) {
+                    eval( type + "StoreHostValid = true;" );
+                    $(type + 'StoreHostStatus').innerHTML = '<img class="pointer" src="$context/assets/images/check_true.JPG"> ' + '<small>$page.getLocalizedString("ok.string")</small>';
+                } else {
+                    eval( type + "StoreHostValid = true;" );
+                    $(type + 'StoreHostStatus').innerHTML = response.responseText;
+                }
+                adjustNextTabButton(type);
+            }
+
+            function storeBaseDNValidated( type, response ) {
+                if( response.responseText == "true" ) {
+                    eval( type + "StoreBaseDNValid = true;" );
+                    $(type + 'StoreBaseDNStatus').innerHTML = '<img class="pointer" src="$context/assets/images/check_true.JPG"> ' +
+                                                           '<small>$page.getLocalizedString("ok.string")</small>';
+                } else {
+                    eval( type + "StoreBaseDNValid = true;" );
+                    $(type + 'StoreBaseDNStatus').innerHTML = response.responseText;
+                }
+                adjustNextTabButton(type);
+            }
+
+            function storeLoginIdValidated( type, response ) {
+                if( response.responseText == "true" ) {
+                    eval( type + "StoreLoginIdValid = true;" );
+                    $(type + 'StoreLoginIdStatus').innerHTML = '<img class="pointer" src="$context/assets/images/check_true.JPG"> ' +
+                                                           '<small>$page.getLocalizedString("ok.string")</small>';
+                } else {
+                    eval( type + "StoreLoginIdValid = true;" );
+                    $(type + 'StoreLoginIdStatus').innerHTML = response.responseText;
+                }
+                adjustNextTabButton(type);
+            }
+
+            function toPath( type ) {
+                return "/config/wizard/step" + (type == 'config' ? 3 : 4 ) + ".htm";
+            }
+       
+
+            function clearStore( type ) {
+                $(type + 'StoreHost').value = null;
+                enableStandardPort( type );
+                $(type + 'StoreHostStatus').innerHTML = "";
+                eval( type + "StoreHostValid = false;" );
+
+                $(type + 'StoreBaseDN').value = null;
+                $(type + 'StoreBaseDNStatus').innerHTML = "";
+                eval( type + "StoreBaseDNValid = false;" );
+
+                $(type + 'StoreLoginId').value = null;
+                $(type + 'StorePassword').value = null;
+                $(type + 'StoreLoginIdStatus').innerHTML = "";
+                eval( type + "StoreLoginIdValid = false;" );
+
+                var callUrl = "$context" + toPath(type) + "?actionLink=clearStore";
+                ie7fix++;
+                callUrl = callUrl + "&ie7fix=" + ie7fix;
+                AjaxUtils.call( callUrl );
+            }
+
+            function wizardAcceptChecked(){
+                document.getElementById("wizard-accept-license-button").disabled = document.getElementById("wizard-accept-check").checked ? false : true;
+            }
+
+            function wizardAcceptLicense() {
+               YAHOO.util.Dom.addClass('wizard', 'license-accepted'); 
+            }
+
+
+            function wizardInit() {
+
+                //YAHOO.util.Dom.removeClass('wizard', 'license-accepted'); 
+                //AjaxUtils.simpleCall("$context/legal-notices/license.html", renderLicenseWizard);
+
+                YAHOO.sun.identity.config.options.wizard.writeConf = new YAHOO.widget.Panel("writeConf", { width:"240px", fixedcenter:true, close:false, draggable:false, zindex:4, modal:true, visible:false });
+                YAHOO.sun.identity.config.options.wizard.writeConf.setHeader("Writing configuration.  Please wait...");
+                YAHOO.sun.identity.config.options.wizard.writeConf.setBody('<img src="$context/assets/images/rel_interstitial_loading.gif" />');
+                YAHOO.sun.identity.config.options.wizard.writeConf.render(document.body);
+
+                YAHOO.sun.identity.config.options.wizard.pushingConfig = new YAHOO.widget.Panel("pushingConfig", { width:"260px", fixedcenter:true, close:false, draggable:false, zindex:4, modal:true, visible:false });
+                YAHOO.sun.identity.config.options.wizard.pushingConfig.setHeader("Pushing configuration to new instance.  Please wait...");
+                YAHOO.sun.identity.config.options.wizard.pushingConfig.setBody('<img src="$context/assets/images/rel_interstitial_loading.gif" />');
+                YAHOO.sun.identity.config.options.wizard.pushingConfig.render(document.body);
+
+                YAHOO.sun.identity.config.options.wizard.pushConfigDialog = new YAHOO.widget.SimpleDialog("pushConfigDialog", {
+                    width: "260px",
+                    effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.25},
+                    fixedcenter:true,
+                    modal:true,
+                    visible:false,
+                    draggable:false });
+
+                var dlg = YAHOO.sun.identity.config.options.wizard.pushConfigDialog; //alias for convenience
+                dlg.setHeader("Push Configuration?")
+                dlg.setBody("Do you want to push configuration data to the new instance?");
+                dlg.cfg.setProperty("icon", YAHOO.widget.SimpleDialog.ICON_INFO);
+
+                var pushConfigButtons = [ { text:"Yes",
+                    handler:pushNewInstanceConfig,
+                    isDefault:true },
+                { text:"No",
+                    handler:cancelPushNewInstanceConfig } ];
+                dlg.cfg.queueProperty("buttons", pushConfigButtons);
+                dlg.render(document.body);
+
+                YAHOO.sun.identity.config.options.wizard.confComplete = new YAHOO.widget.Panel("confComplete", { fixedcenter: true, close: false, modal:true, visible:false, constraintoviewport:true });
+                YAHOO.sun.identity.config.options.wizard.confComplete.render();
+
+                YAHOO.util.Event.addListener("wizardCancelButton", "click", cancelWizard);
+
+                var showCurrentTab = new Function( showTab(currentTab) );
+                AjaxUtils.load('wizardStep' + currentTab, "$context/config/wizard/step" + currentTab + ".htm", showCurrentTab);
+            }
+            YAHOO.util.Event.onDOMReady(wizardInit);
+        </script>
+        <link href="$context/assets/css/Specific/wizard.css" rel="stylesheet" type="text/css" />
+
+        <div id="wizard" style="width:810px;background-color: #FFFFFF" class="wizard">
+            <div style="background-color: #FFFFFF;padding:0">
+                <div class="header">$page.getLocalizedString("configurator.main.title")</div>
+                <div id="title" class="summary">$page.getLocalizedString("configurator.custom.title")</div>
+
+                <div class="license inner-license">
+                    <pre id="wizard-license-message"> </pre> 
+                    <div class="accept-check-container clearfix">
+                        <input type="checkbox" onchange="wizardAcceptChecked();" name="wizard-accept-check"  id="wizard-accept-check" >
+                        <label for="wizard-accept-check">I accept the license agreement</label>
+                    </div>
+                </div>
+
+                <div class="summary">
+                    <div class="col1">
+                        <ol id="tabList" class="tabList" start="1" type="1">
+                            <li id="tab1">$page.getLocalizedString("general.tab")</li>
+                            <li id="tab2">$page.getLocalizedString("server.tab")</li>
+                            <li id="tab3">$page.getLocalizedString("configuration.tab")</li>
+                            <li id="tab4">$page.getLocalizedString("user.tab")</li>
+                            <li id="tab5">$page.getLocalizedString("site.tab")</li>
+                            <li id="tab6">$page.getLocalizedString("agent.tab")</li>
+                            <li id="tab7">$page.getLocalizedString("summary.tab")</li>
+                        </ol>
+                        &nbsp;
+                    </div>
+                    <div id="tabContents" class="tabContents">
+                        <div id="wizardStep1" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep2" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep3" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep4" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep5" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep6" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep7" class="tabContent" style="display:none"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="wizardFooter">
+
+                <div align="left" style="float:left" class="license">
+                    <button id="wizard-accept-license-button" type="button" onclick="wizardAcceptLicense();" class="buttonblue license" disabled>Continue</button>
+                </div>  
+                <div class="col1">&nbsp;</div>  
+
+                <div align="left" style="float:left" class="summary">
+                    <button id="previousTabButton" type="button" disabled="disabled" class="" onclick="previousWizardTab();">$page.getLocalizedString("previous.button")</button>
+                    <button id="nextTabButton" type="button" onclick="nextWizardTab();" class="buttonblue ">$page.getLocalizedString("next.button")</button>
+                    <button id="writeConfigButton" type="button" style="display:none" onclick="writeConfiguration();" class="buttonblue ">$page.getLocalizedString("create.button")</button>
+               
+                </div>
+                <div align="right">
+                    <button id="wizardCancelButton" type="button" onclick="cancelWizard();">$page.getLocalizedString("cancel.button")</button>
+                </div>
+            </div>
+            <div id="confComplete" style="visibility:hidden">
+                <div class="header">$page.getLocalizedString("config.complete.title")</div>
+                <div class="bd">
+                    <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
+
+                        <br>
+                        <h1>$page.getLocalizedString("config.complete.message")</h1>
+                        <br/>
+                        
+                        <p align="center" class="blueSmall">
+                            <a class="pointer" href="#" onclick="launchConsole(); return false">$page.getLocalizedString("launch.console")</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+                
+            </div>
+        </div>

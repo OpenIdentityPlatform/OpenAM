@@ -1,0 +1,72 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README.wssagents-jax-ws-zip,v 1.11 2009/12/03 18:57:51 mrudul_uchil Exp $
+
+   Portions Copyright 2013 ForgeRock AS
+
+-->
+
+ForgeRock OpenAM Enterprise Web Services Security (WSS) Agent - Zip file :
+
+openssowssagents.zip
+|____ wssagent/build.xml (Installer/Configurator utility for WSS Agents)
+|____ wssagent/lib/openssoclientsdk.jar (complete OpenAM clientsdk jar)
+|____ wssagent/lib/openssowssagents.jar (complete WSS Agents jar)
+|____ wssagent/lib/xmlsec.jar (XML Security library jar)
+|____ wssagent/config/AMConfig.properties (complete OpenAM client properties)
+|____ wssagent/config/client_handlers.xml (JAX-WS Handlers configuration file for Client)
+|____ wssagent/config/server_handlers.xml (JAX-WS Handlers configuration file for Server)
+|____ wssagent/config/web.xml (JAX-WS Handlers Filter configuration file for Client)
+|____ wssagent/config/WSSAgentInputData.properties (Input data file for Installer/Configurator utility)
+|____ wssagent/resources/keystore.jks (client keystore file)
+|____ wssagent/resources/.keypass (password file for key)
+|____ wssagent/resources/.storepass (password file for keystore)
+|____ wssagent/README (this file)
+|____ wssagent/license.txt
+|____ wssagent/samples/* (WSC/WSP samples using WSS Agents)
+
+
+ForgeRock OpenAM Enterprise Web Services Security (WSS) Agents are the SOAP protocol
+type of JAX-WS handlers that intercept inbound and outbound Web Service
+requests/responses (SOAP messages) in order to secure them.
+You can easily plug these handlers into the JAX-WS 2.1 runtime environment.
+
+To secure your web service application (WSC / WSP), either unsecured war file OR
+unsecured staging area, with OpenAM WSS Agents,
+using installer/configurator utility, run
+
+wssagent/ant config
+
+for WSC and WSP applications each (separately).
+You can customize "security credentials to authenticate to OpenAM server and
+read the configuration data" and "Unique agent profile name to be used for WSC"
+in wssagent/config/WSSAgentInputData.properties file, if you do not want to use
+default values set.
+You can also specify the other input data in
+wssagent/config/WSSAgentInputData.properties file so that this
+installer/configurator utility can run silently, without prompting for
+user input.
+Note : Make sure you have Ant (version "1.7" or higher) in CLASS PATH
+

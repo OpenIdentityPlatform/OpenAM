@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+-->
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+    <display-name>OpenAM Rest STS</display-name>
+    <servlet>
+        <servlet-name>rest-sts</servlet-name>
+        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
+        <init-param>
+            <param-name>connection-factory-class</param-name>
+            <param-value>org.forgerock.openam.sts.rest.service.RestSTSServiceConnectionFactoryProvider</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>rest-sts</servlet-name>
+        <url-pattern>/rest_sts/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>rest-sts-publish</servlet-name>
+        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
+        <init-param>
+            <param-name>connection-factory-class</param-name>
+            <param-value>org.forgerock.openam.sts.rest.publish.service.RestSTSPublishServiceConnectionFactoryProvider</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>rest-sts-publish</servlet-name>
+        <url-pattern>/rest_sts_publish/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>

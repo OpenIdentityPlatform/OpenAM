@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<section xml:id="web-container-requirements"
+          xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='http://docbook.org/ns/docbook
+                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ <title>OpenAM Web Application Container Requirements</title>
+
+ <itemizedlist>
+  <para>
+   ForgeRock supports customers using OpenAM server software
+   in the following web application container versions.
+  </para>
+
+  <listitem>
+   <para>
+    Apache Tomcat 6, 7, 8 (ForgeRock's preferred web container for OpenAM)
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    IBM WebSphere Application Server 8, 8.5
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    JBoss Enterprise Application Platform 6
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    JBoss Application Server 7
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Oracle WebLogic Server 11g, 12c
+   </para>
+  </listitem>
+
+ </itemizedlist>
+
+ <para>
+  The web application container
+  must be able to write to its own home directory,
+  where OpenAM stores configuration files.
+ </para>
+</section>

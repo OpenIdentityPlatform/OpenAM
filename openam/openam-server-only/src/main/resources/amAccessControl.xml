@@ -1,0 +1,467 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: amAccessControl.xml,v 1.22 2010/01/08 00:27:01 babysunil Exp $
+
+   Portions Copyrighted 2013-2014 ForgeRock AS.
+   Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+-->
+<accesscontrols>
+    <!-- REALM -->
+    <viewbean classname="com.sun.identity.console.realm.RMRealmViewBean"
+              view="sunAMRealmService,AgentService" modify="sunAMRealmService,AgentService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.realm.RealmPropertiesViewBean" view="sunAMRealmService,AgentService" modify="sunAMRealmService,AgentService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.realm.IDRepoViewBean" view="sunIdentityRepositoryService" modify="sunIdentityRepositoryService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.realm.IDRepoEditViewBean" view="sunIdentityRepositoryService" modify="sunIdentityRepositoryService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.authentication.AuthPropertiesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button1,button2,createConfigButton,deleteConfigButton,createInstanceButton,deleteInstanceButton" />
+        <table name="authenticationModuleInstanceTable,authenticationConfigurationTable" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.realm.ServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.realm.ServicesEditViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.authentication.CoreAttributesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.authentication.EditAuthTypeViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.authentication.AuthConfigViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button1,button2,addEntryButton,removeEntryButton" />
+        <table name="authConfigEntryTable" />
+    </viewbean>
+
+    <!-- POLICY -->
+    <viewbean classname="com.sun.identity.console.policy.PolicyViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="tblButtonAddReferral,tblButtonDelete,tblButtonAddNormal" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PolicyNormalEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2,tblRulesButtonAdd,tblRulesButtonDelete,tblSubjectsButtonAdd,tblSubjectsButtonDelete,tblConditionsButtonAdd,tblConditionsButtonDelete,tblResponseProvidersButtonAdd,tblResponseProvidersButtonDelete" />
+        <table name="tblRules,tblSubjects,tblConditions,tblResponseProviders" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PolicyReferralEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2,tblReferralsButtonAdd,tblReferralsButtonDelete,tblRulesButtonAdd,tblRulesButtonDelete" />
+        <table name="tblRules,tblReferrals" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.RuleEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+        <table name="tblActions" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.RuleNoResourceEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+        <table name="tblActions" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.RuleWithPrefixEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PMDefaultAuthSchemeConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PMDefaultSessionConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PMDefaultTimeConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.AuthToRealmEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.AuthToServiceEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.ResponseProviderEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.IdentitySubjectEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button2,btnFilter,button1" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.ConditionNoneEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.IDRepoResponseProviderEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PMDefaultIPConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.IdentityMembershipConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.ConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PMDefaultAuthLevelConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SessionPropertyConditionViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SessionPropertyConditionAddViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SessionPropertyConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SessionPropertyAddViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SessionPropertyEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="button1,button2,button3" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SubjectEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="btnFilter,button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.ReferralEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="btnFilter,button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SubjectNoneEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+        <actionhandler name="btnFilter,button1,button2" />
+    </viewbean>
+
+    <!-- ENTITIES -->
+    <viewbean classname="com.sun.identity.console.agentconfig.AgentsViewBean" view="sunIdentityRepositoryService/1.0/application/agent" modify="sunIdentityRepositoryService/1.0/application/agent">
+        <actionhandler name="tblButtonGroupAdd,tblButtonAdd,tblButtonDelete,tblButtonGroupDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.EntitiesViewBean" view="*" modify="*">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.EntityEditViewBean" view="*" modify="*">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.EntityServicesViewBean" view="*" modify="*">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.EntityMembersViewBean" view="*" modify="*">
+        <actionhandler name="btnSearch,button1" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.EntityMembershipViewBean" view="*" modify="*">
+        <actionhandler name="btnSearch,button1" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.ServicesEditViewBean" view="*" modify="*">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+
+
+    <!-- SERVICE MANAGEMENT -->
+    <viewbean classname="com.sun.identity.console.service.SCServiceProfileViewBean" view="null" modify="null">
+        <actionhandler name="button1,button2,tblSubConfigButtonAdd,tblSubConfigButtonDelete" />
+        <table name="tblSubConfig" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCAuthModuleEditViewBean" view="null" modify="null">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCConsoleViewBean" view="iPlanetAMAdminConsoleService" modify="iPlanetAMAdminConsoleService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+
+    <!-- PLATFORM SERVICE -->
+    <viewbean classname="com.sun.identity.console.service.SCPlatformViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
+        <actionhandler name="button1,button2,Button3,tblSiteListButtonAdd,tblSiteListButtonDelete,tblServerListButtonAdd,tblServerListButtonDelete,tblClientCharSetsButtonAdd,tblClientCharSetsButtonDelete" />
+        <table name="iplanet-am-platform-site-list,iplanet-am-platform-server-list,iplanet-am-platform-client-charsets" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCPlatform30ViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
+        <actionhandler name="button1,button2,Button3,tblClientCharSetsButtonAdd,tblClientCharSetsButtonDelete" />
+        <table name="iplanet-am-platform-client-charsets" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCPlatformServerListEditViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCPlatformClientCharSetsEditViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCPlatformSiteListEditViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+
+    <!-- SUB CONFIG -->
+    <viewbean classname="com.sun.identity.console.service.SubConfigEditViewBean" view="null" modify="null">
+        <actionhandler name="button1,button2,tblSubConfigButtonAdd,tblSubConfigButtonDelete" />
+        <table name="tblSubConfig" />
+    </viewbean>
+
+    <!-- GLOBAL POLICY -->
+    <viewbean classname="com.sun.identity.console.service.SCPolicyViewBean" view="iPlanetAMPolicyConfigService" modify="iPlanetAMPolicyConfigService">
+        <actionhandler name="button1,button2,tblResourceComparatorButtonAdd,tblResourceComparatorButtonDelete" />
+        <table name="tblResourceComparator" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCPolicyResourceComparatorEditViewBean" view="iPlanetAMPolicyConfigService" modify="iPlanetAMPolicyConfigService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+
+    <!-- CLIENT DETECTION -->
+    <viewbean classname="com.sun.identity.console.service.MAPClientManagerViewBean" view="iPlanetAMClientDetection" modify="iPlanetAMClientDetection">
+        <actionhandler name="tblButtonAdd" />
+        <statictext name="tblDataActionDeleteLabel,tblDataActionDefaultLabel,tblDataActionDuplicateLabel" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.MAPDeviceProfileViewBean" view="iPlanetAMClientDetection" modify="iPlanetAMClientDetection">
+        <actionhandler name="button1,button2,btnClassification" />
+    </viewbean>
+
+    <!-- GLOBALIZATION -->
+    <viewbean classname="com.sun.identity.console.service.SMG11NViewBean" view="iPlanetG11NSettings" modify="iPlanetG11NSettings">
+        <actionhandler name="button1,button2,tblCharsetAliasButtonAdd,tblCharsetAliasButtonDelete,tblSupportedCharsetsButtonAdd,tblSupportedCharsetsButtonDelete" />
+        <table name="sun-identity-g11n-settings-locale-charset-mapping,sun-identity-g11n-settings-charset-alias-mapping" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.G11NSupportedCharsetsEditViewBean" view="iPlanetG11NSettings" modify="iPlanetG11NSettings">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.G11NCharsetAliasEditViewBean" view="iPlanetG11NSettings" modify="iPlanetG11NSettings">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+
+    <!-- Rest STS -->
+    <viewbean view="RestSecurityTokenService" modify="RestSecurityTokenService" classname="com.sun.identity.console.reststs.RestSTSHomeViewBean">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean view="RestSecurityTokenService" modify="RestSecurityTokenService" classname="com.sun.identity.console.reststs.RestSTSAddViewBean">
+        <actionhandler name="button1,button2,button3" />
+    </viewbean>
+    <viewbean view="RestSecurityTokenService" modify="RestSecurityTokenService" classname="com.sun.identity.console.reststs.RestSTSEditViewBean">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+
+    <neednodealwith classname="com.sun.identity.console.user.UMChangeUserPasswordViewBean" />
+    <neednodealwith classname="com.sun.identity.console.idm.EndUserViewBean" />
+    <neednodealwith classname="com.sun.identity.console.user.UMUserPasswordResetOptionsViewBean" />
+
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.authentication.NewAuthConfigViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.authentication.NewAuthInstanceViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.authentication.ReorderAuthChainsViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.authentication.ScriptUploaderViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMInvalidURLViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMInvalidURLViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMLoginViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMUncaughtExceptionViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMAdminFrameViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMPostViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AuthenticatedViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.base.VersionViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RealmResourceOfferingAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RealmResourceOfferingEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RealmResourceOfferingViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RealmDiscoveryDescriptionAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RealmDiscoveryDescriptionEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RMRealmAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.IDRepoAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.IDRepoSelectTypeViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.ServicesAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.ServicesNoAttributeViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.ServicesCannotAssignServiceViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.HomePageViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.ServicesSelectViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.idm.EntityAddViewBean" />
+
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.idm.ServicesAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.idm.ServicesSelectViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.idm.EntityMembersFilteredIdentityViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.idm.HomeViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PolicyNormalAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PolicyReferralAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.SelectServiceTypeViewBean"/>
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.RuleAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.RuleNoResourceAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.RuleWithPrefixAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.ReferralAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.SelectReferralTypeViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.IDRepoResponseProviderAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.ConditionNoneAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.IdentitySubjectAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.ResponseProviderProxyViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.ReferralProxyViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMDefaultTimeConditionAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMDefaultTimeConditionViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.AuthToRealmAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.AuthToServiceAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.AuthToRealmViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.AuthToServiceViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMDefaultSessionConditionViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMDefaultSessionConditionAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.IdentityMembershipConditionViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMDefaultIPConditionViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMDefaultAuthSchemeConditionViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMDefaultAuthSchemeConditionAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.IdentitySubjectViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMDefaultAuthLevelConditionAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMDefaultIPConditionAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.IdentityMembershipConditionAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.ResponseProviderAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.SelectResponseProviderTypeViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.SelectConditionTypeViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMDefaultAuthLevelConditionViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.SubjectNoneAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.SubjectProxyViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMLDAPOrgSubjectViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMLDAPUserSubjectViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMDSAMERoleSubjectViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMLDAPGroupSubjectViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMLDAPRoleSubjectViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.ConditionProxyViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.ConditionAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PolicySelectTypeViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.SelectSubjectTypeViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.SubjectAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCConfigAuthViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCConfigConsoleViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCConfigSystemViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCConfigGlobalViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCCoreViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCGeneralViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCAuthenticationViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCPolicyResourceComparatorAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCPlatformServerListAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCPlatformClientCharSetsAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCPlatformSiteListAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SubSchemaTypeSelectViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SubConfigAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.MAPCreateDeviceViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.MAPCreateDeviceTwoViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.MAPDuplicationDeviceViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.G11NSupportedCharsetsAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.G11NCharsetAliasAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.session.SMProfileViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.delegation.DelegationViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.delegation.DelegationPropertiesViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMAuthenticatedUsersSubjectAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.SelectRealmViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.CreateCOTViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FSAuthDomainsEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FileChooserViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FederationViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.ImportEntityViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.IDFFIDPViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.IDFFSPViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.IDFFAffiliateViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.SAMLv2GeneralViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.SAMLv2SPAssertionContentViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.SAMLv2SPAssertionProcessingViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.SAMLv2SPServicesViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.SAMLv2SPAdvancedViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.SAMLv2IDPAssertionContentViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.SAMLv2IDPAssertionProcessingViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.SAMLv2IDPServicesViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.SAMLv2IDPAdvancedViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.SAMLv2PDPViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.SAMLv2PEPViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FSSAMLServiceViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FSSAMLSelectTrustedPartnerTypeViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FSSAMLTrustedPartnersAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FSSAMLTrustedPartnersEditViewBean" />
+
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerCloneViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerConfigInheritViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SiteAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SiteEditiewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerSiteViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerConfigXMLAddServerViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerConfigXMLViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditGeneralViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditSDKViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditCTSViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditSessionViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditSecurityViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditAdvancedViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerConfigXMLViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SiteEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentsViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.HomeViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.GenericAgentProfileViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentConfigInheritViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentProfileViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentConfigurationServlet" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentGroupMembersViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentTabManager" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentGroupAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentDumpViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.WebServiceSTSEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.WebServiceEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.WebServiceProviderEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.WebServiceUserCredEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.WebServiceClientEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.WebServiceUserCredAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.WebServiceUIElement" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCSAML2SOAPBindingViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCSAML2SOAPBindingRequestHandlerListAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCSAML2SOAPBindingRequestHandlerListDupViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCSAML2SOAPBindingRequestHandlerListEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SecurityTokenServiceViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.user.UMUserResourceOfferingViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.user.UMUserResourceOfferingAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.user.UMUserResourceOfferingEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.user.UMUserDiscoveryDescriptionAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.user.UMUserDiscoveryDescriptionEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMAuthenticatedUsersSubjectEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.webservices.WSAuthNServicesHandlersEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.webservices.WSPPServiceDSAttributeMapListEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.webservices.WSAuthNServicesHandlersAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.webservices.WSAuthNServicesViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.webservices.WSPersonalProfileServiceViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.webservices.WSPPServiceSupportedContainerAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.webservices.WSPPServiceSupportedContainerEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SMDiscoveryServiceViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SMDiscoveryBootstrapRefOffEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SMDiscoveryProviderResourceIdMapperEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SMDiscoveryDescriptionEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SMDiscoveryProviderResourceIdMapperAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCSOAPBindingViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCSOAPBindingRequestHandlerListEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.SCSOAPBindingRequestHandlerListDupViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.idm.WebServiceClientEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.idm.WebServiceProviderEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.idm.WebServiceUserCredAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.idm.WebServiceUserCredEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.task.HomeViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FileUploaderViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.CreateSAML2MetaDataViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.task.CompleteCreateHostedIDPViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ValidateSAML2SetupViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ConfigureGoogleAppsViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ConfigureGoogleAppsWarningViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ConfigureGoogleAppsCompleteViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ConfigureSocialAuthNViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FSSAMLSiteIDEditViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.task.ConfigureSalesForceAppsCompleteViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.FSSAMLSetTrustedPartnerTypeViewBean" />
+
+
+</accesscontrols>

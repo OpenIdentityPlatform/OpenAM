@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-backup-restore'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Backing Up and Restoring OpenAM Configurations</title>
+
+ <para>
+  OpenAM stores configuration data in an LDAP directory server and in files.
+  The directory service replicates configuration data between directory servers,
+  allowing OpenAM to share configuration data across servers in a Site.
+  During normal production operations, you rely on directory replication
+  to maintain multiple, current copies of OpenAM service configuration.
+  To recover from the loss of a server or from a serious administrative error,
+  back up directory data and configuration files.
+ </para>
+
+ <para>
+  This chapter shows how to backup and restore OpenAM configuration data
+  by backing up and restoring local configuration files
+  and local (embedded) configuration directory server data.
+  If your deployment uses an external configuration directory server,
+  then refer to the documentation for your external directory server
+  or work with your directory server administrator to back up and restore
+  configuration data stored in the external directory service.
+ </para>
+
+ <para>
+  For OpenDJ directory server you can find more information in the chapter on
+  <link
+   xlink:href="${opendjDocBase}/admin-guide/#chap-backup-restore"
+   xlink:show="new"
+  ><citetitle>Backing Up &amp; Restoring Data</citetitle></link>.
+ </para>
+
+ <itemizedlist>
+  <para>
+   In OpenAM deployments where configuration directory data is replicated,
+   you must take the following points into consideration.
+  </para>
+
+  <listitem>
+   <para>
+    Directory replication mechanically applies new changes to ensure
+    that replicated data is the same everywhere.
+    When you restore older backup data,
+    directory replication applies newer changes to the older data.
+   </para>
+
+   <para>
+    This includes new changes that the administrator sees as mistakes.
+    To recover from administrative error, you must work around this behavior
+    either by performing a change to be replicated that repairs the error
+    or by restoring all replicas to a state prior to the error.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    When preparing directory server backup and restore operations,
+    also know that data replication purge operations affect
+    the useful lifetime of any data that you back up.
+   </para>
+
+   <para>
+    Replication relies on historical data to resolve any conflicts that arise.
+    If directory servers did not eventually purge this historical data,
+    the data would continue to grow until it filled all available space.
+    Directory servers therefore purge older historical data.
+    OpenDJ purges historical data older than 3 days by default.
+   </para>
+
+   <para>
+    When the directory server encounters a gap in historical data
+    it cannot correctly complete replication operations.
+    You must make sure, therefore, that any data you restore from backup
+    is not older than the replication purge delay.
+    Otherwise your restoration operation could break replication
+    with the likely result that you must restore all servers from backup,
+    losing any changes that occurred in the meantime.
+   </para>
+  </listitem>
+ </itemizedlist>
+
+  <orderedlist>
+  <para>
+   This chapter aims to cover the following uses of backup data.
+  </para>
+
+  <listitem>
+   <para>
+    Recovery from server failure.
+   </para>
+
+   <itemizedlist>
+    <listitem>
+     <para>
+      <xref linkend="backup-for-disaster" />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <xref linkend="restore-after-disaster" />
+     </para>
+    </listitem>
+   </itemizedlist>
+  </listitem>
+
+  <listitem>
+   <para>
+    Recovery from serious administrative error.
+   </para>
+
+   <itemizedlist>
+    <listitem>
+     <para>
+      <xref linkend="export-configuration-data" />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <xref linkend="recover-from-serious-error" />
+     </para>
+    </listitem>
+   </itemizedlist>
+  </listitem>
+ </orderedlist>
+
+ <procedure xml:id="backup-for-disaster">
+  <title>To Back Up All Server Configuration Data</title>
+
+  <para>
+   This procedure backs up all the configuration data stored with the server.
+   This backup is to be restored when rebuilding a failed server.
+  </para>
+
+  <itemizedlist>
+   <para>
+    Use this procedure when the following statements are true.
+   </para>
+
+   <listitem>
+    <para>
+     OpenAM stores configuration data in the embedded OpenDJ directory server.
+    </para>
+
+    <para>
+     The embedded OpenDJ directory server files are co-located
+     with other OpenAM configuration files.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     If OpenAM stores CTS data in the embedded OpenDJ directory server,
+     then the restore operation overwrites current CTS data with older data.
+     After you restore from backup, users authenticate again as necessary.
+    </para>
+
+    <para>
+     For deployments with long-lived sessions,
+     you can limit the extent of re-authentication by using session failover.
+     For details, see the <citetitle>Installation Guide</citetitle> chapter,
+     <link
+      xlink:href="install-guide#chap-session-failover"
+      xlink:show="new"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Setting Up OpenAM Session Failover</citetitle></link>.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   If your deployment uses an external configuration directory server,
+   then refer to the documentation for your external directory server
+   or work with your directory server administrator to back up and restore
+   configuration data stored in the external directory service.
+   For OpenDJ directory server you can find more information in the chapter on
+   <link
+    xlink:href="${opendjDocBase}/admin-guide/#chap-backup-restore"
+    xlink:show="new"
+   ><citetitle>Backing Up &amp; Restoring Data</citetitle></link>.
+  </para>
+
+  <indexterm>
+   <primary>Backup</primary>
+  </indexterm>
+
+  <important>
+   <para>
+    Understand the explanation in the introductory paragraphs of this chapter
+    before you proceed.
+    Directory backup validity depends on replication purge delay,
+    which by default for OpenDJ directory server is 3 days.
+   </para>
+
+   <para>
+    Also do not restore configuration data from a backup of
+    a different release of OpenAM.
+    The structure of configuration data can change from release to release.
+   </para>
+  </important>
+
+  <para>
+   Follow these steps for each OpenAM server that you want to back up.
+  </para>
+
+  <step>
+   <para>
+    Stop OpenAM or the container in which it runs.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Backup OpenAM configuration files
+    including those of the configuration directory server
+    but skipping log and lock files.
+   </para>
+
+   <para>
+    The following example uses the default configuration location.
+    $HOME is the home directory of the user
+    who runs the web container where OpenAM is deployed,
+    and OpenAM is deployed in Apache Tomcat under <literal>openam</literal>.
+   </para>
+
+   <screen>
+$ <userinput>cd $HOME</userinput>
+$ <userinput>zip \
+ --recurse-paths \
+ /path/to/backup-`date -u +i5%F-%m-%S`.zip \
+ openam .openamcfg/AMConfig_path_to_tomcat_webapps_openam_ \
+ --exclude openam/openam/debug/* openam/openam/log/* openam/openam/stats* \
+  openam/opends/logs/* openam/opends/locks/*</userinput>
+...
+$ <userinput>ls /path/to/backup-2014-12-01-12-00.zip</userinput>
+<computeroutput>/path/to/backup-2014-12-01-12-00.zip</computeroutput>
+   </screen>
+
+   <para>
+    The backup is valid until the end of the purge delay.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Start OpenAM or the container in which it runs.
+   </para>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="restore-after-disaster">
+  <title>To Restore All Server Configuration Data</title>
+
+  <para>
+   This procedure restores all the configuration data for a server,
+   where the configuration data has been backed up as described in
+   <xref linkend="backup-for-disaster" />.
+   This procedure applies when rebuilding a failed server.
+  </para>
+
+  <itemizedlist>
+   <para>
+    Use this procedure when the following statements are true.
+   </para>
+
+   <listitem>
+    <para>
+     OpenAM stores configuration data in the embedded OpenDJ directory server.
+    </para>
+
+    <para>
+     The embedded OpenDJ directory server files are co-located
+     with other OpenAM configuration files.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     If OpenAM stores CTS data in the embedded OpenDJ directory server,
+     then the restore operation overwrites current CTS data with older data.
+     After you restore from backup, users authenticate again as necessary.
+    </para>
+
+    <para>
+     For deployments with long-lived sessions,
+     you can limit the extent of re-authentication by using session failover.
+     For details, see the <citetitle>Installation Guide</citetitle> chapter,
+     <link
+      xlink:href="install-guide#chap-session-failover"
+      xlink:show="new"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      ><citetitle>Setting Up OpenAM Session Failover</citetitle></link>.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   If your deployment uses an external configuration directory server,
+   then refer to the documentation for your external directory server
+   or work with your directory server administrator to back up and restore
+   configuration data stored in the external directory service.
+   For OpenDJ directory server you can find more information in the chapter on
+   <link
+    xlink:href="${opendjDocBase}/admin-guide/#chap-backup-restore"
+    xlink:show="new"
+   ><citetitle>Backing Up &amp; Restoring Data</citetitle></link>.
+  </para>
+
+  <indexterm>
+   <primary>Restoring</primary>
+  </indexterm>
+
+  <important>
+   <para>
+    Understand the explanation in the introductory paragraphs of this chapter
+    before you proceed.
+    Directory backup validity depends on replication purge delay,
+    which by default for OpenDJ directory server is 3 days.
+   </para>
+
+   <para>
+    Also do not restore configuration data from a backup of
+    a different release of OpenAM.
+    The structure of configuration data can change from release to release.
+   </para>
+  </important>
+
+  <para>
+   Follow these steps for each OpenAM server to restore.
+   If you are restoring OpenAM after a failure,
+   make sure you make a copy of any configuration and log files
+   that you need to investigate the problem before restoring OpenAM from backup.
+  </para>
+
+  <step>
+   <para>
+    Stop OpenAM or the container in which it runs.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Restore files in the configuration directory as necessary,
+    making sure that you restore from a valid backup,
+    one that is newer than the replication purge delay.
+   </para>
+
+   <screen>
+$ <userinput>cd $HOME</userinput>
+$ <userinput>unzip /path/to/backup-2014-12-01-12-00.zip</userinput>
+<computeroutput>Archive:  /path/to/backup-2014-12-01-12-00.zip
+replace openam/.configParam? [y]es, [n]o, [A]ll, [N]one, [r]ename: </computeroutput><userinput>A</userinput>
+...
+   </screen>
+  </step>
+
+  <step>
+   <para>
+    Start OpenAM or the container in which it runs.
+   </para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="export-configuration-data">
+  <title>To Export Only Configuration Data</title>
+
+  <para>
+   LDAP Data Interchange Format (LDIF) is a standard, text-based format
+   for storing LDAP directory data.
+   You can use LDIF excerpts to make changes to directory data.
+  </para>
+
+  <para>
+   This procedure takes an LDIF backup of OpenAM configuration data only.
+   Use this LDIF data when recovering from a serious configuration error.
+  </para>
+
+  <indexterm>
+   <primary>Backup</primary>
+  </indexterm>
+
+  <step>
+   <para>
+    Make sure that OpenAM's configuration is in correct working order
+    before exporting configuration data.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Use the OpenDJ <command>export-ldif</command> command to run a task
+    that exports only configuration data, not CTS data.
+   </para>
+
+   <para>
+    You can run this command without stopping OpenAM.
+   </para>
+
+   <para>
+    Find OpenDJ commands under the file system directory
+    that contains OpenAM configuration files.
+   </para>
+
+   <para>
+    The bind password for Directory Manager is the same
+    as the password for the OpenAM global administrator (amadmin).
+   </para>
+
+   <screen>
+$ <userinput>$HOME/openam/opends/bin/export-ldif \
+ --port 4444 \
+ --hostname openam.example.com \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword password \
+ --backendID userRoot \
+ --includeBranch ${defaultRootSuffix} \
+ --excludeBranch ou=tokens,${defaultRootSuffix} \
+ --ldifFile /path/to/backup-`date -u +%F-%m-%s`.ldif \
+ --start 0 \
+ --trustAll</userinput>
+<computeroutput>Export task 20141208113331302 scheduled to start Dec 8, 2014 11:33:31 AM CET</computeroutput>
+   </screen>
+
+   <para>
+    When the task completes, the LDIF file is at the expected location.
+   </para>
+
+   <screen>
+$ <userinput>ls /path/to/*.ldif</userinput>
+<computeroutput>/path/to/backup-2014-12-08-12-1418034808.ldif</computeroutput>
+   </screen>
+  </step>
+ </procedure>
+
+ <procedure xml:id="recover-from-serious-error">
+  <title>To Restore Configuration Data After Serious Error</title>
+
+  <para>
+   A serious configuration error is an error that you cannot easily repair
+   by using OpenAM configuration tools such as OpenAM console
+   or the <command>ssoadm</command> command.
+  </para>
+
+  <para>
+   Use this procedure to recover from a serious configuration error
+   by manually restoring configuration data to an earlier state.
+   This procedure depends on LDIF data that you exported as described in
+   <xref linkend="export-configuration-data" />.
+  </para>
+
+  <indexterm>
+   <primary>Restore</primary>
+  </indexterm>
+
+  <step>
+   <para>
+    Read the OpenDJ change log to determine the LDAP changes
+    that caused the configuration problem.
+   </para>
+
+   <para>
+    The OpenDJ change log provides an external change log mechanism
+    that allows you to read changes made to directory data
+    for replicated directory servers.
+   </para>
+
+   <para>
+    For instructions on reading the change log,
+    see the OpenDJ <citetitle>Administration Guide</citetitle> section on
+    <link
+     xlink:href="${opendjDocBase}/admin-guide/#repl-change-notification"
+     xlink:show="new"
+    ><citetitle>Change Notification For Your Applications</citetitle></link>.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Based on the data in the change log,
+    determine what changes would reverse the configuration error.
+   </para>
+
+   <para>
+    For changes that resulted in one attribute value being replaced by another,
+    you can recover the information from the change log alone.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    For deleted content not contained in the change log,
+    use the LDIF resulting from <xref linkend="export-configuration-data" />
+    to determine a prior, working state of the configuration entry
+    before the configuration error.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Prepare LDIF to modify configuration data in a way that repairs the error
+    by restoring the state of directory entries before the administrative error.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Use the OpenDJ <command>ldapmodify</command> command
+    to apply the modification.
+   </para>
+
+   <para>
+    For instructions on making changes to directory data
+    see the OpenDJ <citetitle>Administration Guide</citetitle> section on
+    <link
+     xlink:href="${opendjDocBase}/admin-guide/#write-ldap"
+     xlink:show="new"
+    ><citetitle>Updating the Directory</citetitle></link>.
+   </para>
+  </step>
+ </procedure>
+</chapter>

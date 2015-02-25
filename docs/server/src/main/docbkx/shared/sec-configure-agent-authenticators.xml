@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<section xml:id="configure-agent-auth"
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+ <title>Configuring Agent Authenticators</title>
+ <indexterm>
+  <primary>Policy agents</primary>
+  <secondary>Configuring</secondary>
+ </indexterm>
+ <para>An <firstterm>agent authenticator</firstterm> has read-only access to
+  multiple agent profiles defined in the same realm, typically allowing an
+  agent to read web service agent profiles.</para>
+
+ <para>After creating the agent profile, you access agent properties in the
+  OpenAM console under Access Control &gt; <replaceable>Realm Name</replaceable>
+  &gt; Agents &gt; Agent Authenticator &gt; <replaceable>Agent
+   Name</replaceable>.</para>
+
+ <variablelist>
+  <varlistentry>
+   <term>Password</term>
+   <listitem>
+    <para>Specifies the password the agent uses to connect to OpenAM.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Status</term>
+   <listitem>
+    <para>Specifies whether the agent profile is active, and so can be
+     used.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Agent Profiles allow to Read</term>
+   <listitem>
+    <para>Specifies which agent profiles in the realm the agent authenticator
+     can read.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Agent Root URL for CDSSO</term>
+   <listitem>
+    <para>Specifies the list of agent root URLs for CDSSO. The valid value is
+     in the format
+     <literal><replaceable>protocol</replaceable>://<replaceable>hostname</replaceable>:<replaceable>port</replaceable>/</literal>
+     where <replaceable>protocol</replaceable> represents the protocol used,
+     such as <literal>http</literal> or <literal>https</literal>,
+     <replaceable>hostname</replaceable> represents the host name of the
+     system where the agent resides, and <replaceable>port</replaceable>
+     represents the port number on which the agent is installed.
+     The slash following the port number is required.</para>
+
+    <para>If your agent system also has virtual host names, add URLs with
+     the virtual host names to this list as well. OpenAM checks that
+     <literal>goto</literal> URLs match one of the agent root URLs for
+     CDSSO.</para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+</section>

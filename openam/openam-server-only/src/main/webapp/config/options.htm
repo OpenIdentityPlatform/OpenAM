@@ -1,0 +1,407 @@
+<link rel="stylesheet" type="text/css" href="$context/assets/css/Specific/optionUpgrade.css" />
+<script type="text/javascript">
+    YAHOO.namespace("sun.identity.config.options");
+
+    var ie7fix = 1;
+
+    var okImage = '<img class="pointer" src="$context/assets/images/ok.jpg">';
+    var okString = okImage + '<small>$page.getLocalizedString("ok.string")</small>';
+    var errorImage = '<img class="pointer" src="$context/assets/images/error.jpg">';
+    var warningImage = '<img class="pointer" src="$context/assets/images/warning.jpg">';
+    var userStoreChoice;
+    var licenseTXT = '';
+    
+    //convenient alias:
+    var $ = YAHOO.util.Dom.get;
+
+    function launchConsole() {
+        document.location = "$context/UI/Login";
+    }
+
+    #if ( $upgrade || $upgradeCompleted)
+
+    function downloadInstructions() {
+        /* TODO - enable download - where does this file reside? */
+        alert( "Not implemented!" );
+    }
+
+    function onUpgradeResponse( response ) {
+        if ( response.responseText == "true" ) {
+            //operation was successful, hide the writing dialog, show the confComplete:
+
+            //in actuality, this usually happens very fast, so put a delay when removing the testUrlPanel.
+            //if we don't do this, the window blinks and looks unsightly, so we actually impose an unnecessary
+            //gui delay for a slightly cleaner 'expected' UI experience:
+            setTimeout("YAHOO.sun.identity.config.options.upgrading.hide()", 1500);
+            setTimeout("YAHOO.sun.identity.config.options.upgradeComplete.show()", 1500);
+        } else {
+            //TODO - show a specific (nice looking) error message dialog that explains why the upgrade failed.
+            //for now, just alert:
+            alert( "Unexpected error: [" + response.responseText + "].  Please contact your System " +
+                   "Administrator.  If you are the System Administrator, please direct your questions to the " +
+                   "OpenAM user's mailing list for help.");
+        }
+
+    }
+
+    function renderUpgradePanel() {
+        YAHOO.sun.identity.config.options.upgrade = new YAHOO.widget.Panel("upgrade", { fixedcenter: false, modal: true, close: true, visible:false, constraintoviewport:true });
+        YAHOO.sun.identity.config.options.upgrade.beforeHideEvent.subscribe(function() {
+            YAHOO.util.Dom.removeClass('upgrade', 'license-accepted'); 
+            document.getElementById("upgrade-accept-check").checked = false;
+            document.getElementById("upgrade-accept-license-button").disabled = true;
+        });
+        YAHOO.sun.identity.config.options.upgrade.renderEvent.subscribe(function() {
+            $("upgrade-license-message").innerHTML = licenseTXT;
+            YAHOO.util.Dom.removeClass('upgradeLink', 'disabled'); 
+            YAHOO.util.Event.addListener("upgradeLink", "click", showUpgradePanel );
+        });
+
+        YAHOO.sun.identity.config.options.upgrade.render();
+        YAHOO.sun.identity.config.options.upgrade.center();
+  
+    }
+
+    function showUpgradePanel() {
+        YAHOO.sun.identity.config.options.upgrade.show();
+    }
+
+    #else
+    var configOption = 0;
+
+    
+    function onDefaultSummarySuccess( response ) {
+        var formError = (response != null && (response.getResponseHeader["formError"] != null));
+        YAHOO.sun.identity.config.options.inProgress.hide();
+        if ( !formError ) {            
+            YAHOO.sun.identity.config.options.defaultSummary.hide(); 
+            YAHOO.sun.identity.config.options.confComplete.show();
+        } else {
+        
+            YAHOO.sun.identity.config.options.defaultSummary.show();
+        }
+    }
+    
+    function cancelDefaultSummary() {
+        YAHOO.sun.identity.config.options.defaultSummary.hide();
+    }
+
+    function onDefaultSummaryFailure(response ) {
+        YAHOO.sun.identity.config.options.defaultSummary.hide();
+        alert("configuration failed");
+        document.location = "$context/config/options.htm";
+    }
+        
+    function submitDefaultSummaryForm() {
+        YAHOO.sun.identity.config.options.defaultSummary.hide(); 
+        if ( window.frames['progressIframe'] ) {
+            window.frames['progressIframe'].location = "$context/setup/setSetupProgress";
+        }
+        YAHOO.sun.identity.config.options.inProgress.show();
+
+        AjaxUtils.doPost("defaultSummary", "$context/config/defaultSummary.htm?" + getLocale(), AjaxUtils.serializeForm("defaultForm"), onDefaultSummarySuccess, onDefaultSummaryFailure);
+    }
+
+    function getLocale() {
+        var queryString = window.top.location.search.substring(1);
+        var locale = 'locale=';
+        var localeValue = '';
+        if (queryString.length > 0) {
+            var idx = queryString.indexOf(locale);
+            if (idx != -1) {
+                idx += locale.length;
+                var idx1 = queryString.indexOf('&', idx);
+                if (idx1 == -1) {
+                    idx1 = queryString.length;
+                }
+                localeValue = queryString.substring (idx, idx1);
+            }
+        }
+        return locale + localeValue;
+    }
+
+    function renderDefaultSummary() {
+        YAHOO.sun.identity.config.options.defaultSummary = new YAHOO.widget.Panel("defaultSummary", { width:"810px", fixedcenter: false, modal: true, close: true, visible:false, constraintoviewport:true });
+        YAHOO.sun.identity.config.options.defaultSummary.beforeHideEvent.subscribe(function() {
+            YAHOO.util.Dom.removeClass('defaultSummary', 'license-accepted'); 
+            document.getElementById("accept-check").checked = false;
+            document.getElementById("acceptLicenseButton").disabled = true;
+        });
+        YAHOO.sun.identity.config.options.defaultSummary.renderEvent.subscribe(function() {
+            $("license-message").innerHTML = licenseTXT;
+            YAHOO.util.Dom.removeClass('DemoConfiguration', 'disabled'); 
+            YAHOO.util.Event.addListener("DemoConfiguration", "click", setOptionOne );
+        });
+        YAHOO.sun.identity.config.options.defaultSummary.render();
+        YAHOO.sun.identity.config.options.defaultSummary.center();
+
+    }
+
+    function setOptionOne() {
+        setOption(1);
+    }
+    function setOptionTwo() {
+        setOption(2);
+    }
+    
+    function showWizard() {
+        renderWizard();
+        YAHOO.sun.identity.config.options.wizard.show();
+    }
+
+    function renderWizard() {
+        YAHOO.sun.identity.config.options.wizard = new YAHOO.widget.Panel("wizard", { fixedcenter: false, modal: true, close: true, visible:false, constraintoviewport:true });
+        YAHOO.sun.identity.config.options.wizard.beforeHideEvent.subscribe(function() {
+            YAHOO.util.Dom.removeClass('wizard', 'license-accepted'); 
+            document.getElementById("wizard-accept-check").checked = false;
+            document.getElementById("wizard-accept-license-button").disabled = true;
+        });
+        YAHOO.sun.identity.config.options.wizard.renderEvent.subscribe(function() {
+            $("wizard-license-message").innerHTML = licenseTXT;
+            YAHOO.util.Dom.removeClass('CreateNewConf', 'disabled');
+            YAHOO.util.Event.addListener("CreateNewConf", "click", setOptionTwo );
+        });
+        YAHOO.sun.identity.config.options.wizard.render();
+        YAHOO.sun.identity.config.options.wizard.center();
+
+    }
+
+    function setOption(inOption) {
+        configOption = inOption;
+        AjaxUtils.call( "$context$path?actionLink=resetSessionAttributes", onSetOption);
+    }
+
+    function onSetOption(response) {
+        if (configOption == 1) {
+            YAHOO.sun.identity.config.options.defaultSummary.show();
+        } else if (configOption == 2) {
+            YAHOO.sun.identity.config.options.wizard.show();            
+        } else {
+            alert("Not Implemented Yet");
+        }
+    }    
+    
+    #end
+     
+    function writeConfigResponse(response) {
+        if (response.responseText === "true") {              
+            YAHOO.sun.identity.config.options.inProgress.hide();
+            YAHOO.sun.identity.config.options.confComplete.show();
+        } else {
+        document.getElementById("returnToConfig").style.display = "";
+        document.getElementById("setupMessage").innerHTML = errorImage + "&nbsp;" + response.responseText;
+        }
+    }
+    
+    var isProgressShow = false;
+    function toggleProgressDiv() {
+        var obj = document.getElementById("progressControl"); 
+        var obj1 = document.getElementById("progressDiv"); 
+        if (isProgressShow == true ) {
+            obj.innerHTML = "Show Progress";
+            obj1.style.display ="none";
+            isProgressShow = false;
+        } else {
+            obj.innerHTML = "Hide progress log";
+            obj1.style.display="block";
+            isProgressShow = true;
+        }
+    }   
+
+    function licenseReady(response) {
+        YAHOO.util.Dom.addClass('options-container', 'license-loaded'); 
+        licenseTXT = response.responseText;
+
+        #if ( $upgrade || $upgradeCompleted)
+            AjaxUtils.load('upgradeContainer', "$context/config/upgrade/upgrade.htm?" + getLocale(), renderUpgradePanel);
+        #else 
+            AjaxUtils.load('defaultSummaryContainer', "$context/config/defaultSummary.htm?" + getLocale(), renderDefaultSummary);
+            AjaxUtils.load('wizardContainer', "$context/config/wizard/wizard.htm?" + getLocale(), renderWizard);
+        #end
+       
+    }
+
+    function init() {
+
+        YAHOO.sun.identity.config.options.inProgress = new YAHOO.widget.Panel("inProgress", { width:"700px", fixedcenter: false, modal:true, close: false, visible:false, constraintoviewport:true });
+        YAHOO.sun.identity.config.options.inProgress.render();
+        YAHOO.sun.identity.config.options.inProgress.center();
+        
+        YAHOO.sun.identity.config.options.confComplete = new YAHOO.widget.Panel("confComplete", { fixedcenter: false, modal:true, close: false, visible:false, constraintoviewport:true });
+        YAHOO.sun.identity.config.options.confComplete.render();
+        YAHOO.sun.identity.config.options.confComplete.center();
+
+        #if ( $upgrade || $upgradeCompleted)
+        
+            YAHOO.sun.identity.config.options.upgradeComplete = new YAHOO.widget.Panel("upgradeComplete", { fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true });
+            YAHOO.sun.identity.config.options.upgradeComplete.render();
+            #if ($upgradeCompleted)
+                YAHOO.sun.identity.config.options.confComplete.show();
+            #end
+            YAHOO.sun.identity.config.options.upgrading = new YAHOO.widget.Panel("upgrading", { width:"240px", fixedcenter:true, close:false, draggable:false, zindex:4, modal:true, visible:false });
+            YAHOO.sun.identity.config.options.upgrading.setHeader("Upgrading configuration.  Please wait...");
+            YAHOO.sun.identity.config.options.upgrading.setBody('<img src="$context/assets/images/rel_interstitial_loading.gif" />');
+            YAHOO.sun.identity.config.options.upgrading.render(document.body);
+        #end
+
+        #if ( $isOpenDS1x )
+            YAHOO.sun.identity.config.options.cannotContinue = new YAHOO.widget.Panel("cannotContinue", { fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true });
+            YAHOO.sun.identity.config.options.cannotContinue.render();
+            YAHOO.sun.identity.config.options.cannotContinue.show();
+        #end
+
+        AjaxUtils.simpleCall("$context/legal-notices/license.txt", licenseReady);
+        
+    }        
+        
+    YAHOO.util.Event.onDOMReady(init);
+    
+</script>
+
+
+<div id="options-container">
+    <div id="container" align="center">
+        
+        <div id="options" align="left" style="width:600px">
+            #if ( $upgrade || $upgradeCompleted)
+            <h1>$page.getLocalizedString("upgrade.available")</h1>
+            <span class="yellowBlock">$page.getLocalizedString("upgrade.available.option"):<br/><span class="currentVersion">$currentVersion</span></span>
+            #else
+            <h1>$page.getLocalizedString("configuration.options.title")</h1>
+            <h4>$page.getLocalizedString("configuration.options.subtitle")</h4>
+            #end
+
+            #if ($upgrade || $upgradeCompleted)
+            <div style="width: 100%">
+                <h3>$page.getLocalizedString("upgrade.title")</h3>
+            $page.getLocalizedString("upgrade.description")
+                <a id="upgradeLink" class="blue pointer disabled">$page.getLocalizedString("upgrade.link")</a>
+            #else
+            <div class="borderRight">
+                <h3>$page.getLocalizedString("configuration.options.option1.title")</h3>
+                $page.getLocalizedString("configuration.options.option1.description")
+            <br>
+                <p>
+                <a id="DemoConfiguration" class="blue pointer disabled" >$page.getLocalizedString("configuration.options.option1.link")</a>
+                </p>
+            #end
+            </div>
+        <!-- enable if adding third option
+            <div class="borderRight">
+        -->
+                #if($upgrade || $upgradeCompleted)
+                #else
+            <div>
+                <h3>$page.getLocalizedString("configuration.options.option2.title")</h3>
+            $page.getLocalizedString("configuration.options.option2.description")
+            <br>
+                <p>
+                <a id="CreateNewConf" class="blue pointer disabled" >$page.getLocalizedString("configuration.options.option2.link")</a>
+                </p>
+            </div>
+                #end
+        </div>
+    </div>
+    #if ( $upgrade || $upgradeCompleted)
+    <style type="text/css">
+        div.colum{
+            width:280px;
+            float:left;
+            padding:5px;
+            text-align:left;
+        }
+        
+    </style>
+    <div id="upgradeContainer"></div>
+    <div id="upgradeComplete" style="width:400px;visibility:hidden">
+        <div class="header">$page.getLocalizedString("upgrade.option.complete.title")</div>
+        <div class="bd" style="background-color: white; text-align: center">
+            <h2>$page.getLocalizedString("upgrade.option.complete.body")</h2>
+            <a id="launchConsoleLink2" class="blueSmall pointer">$page.getLocalizedString("launch.console.link")</a>
+        </div>
+    </div>
+    #else
+        <div id="defaultSummaryContainer"></div>
+        <div id="wizardContainer"></div>
+    #end
+
+        <div id="inProgress" style="visibility:hidden">
+            <div class="header"> </div>
+            <div class="bd">
+                <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
+                    <br/>
+                    #if ($upgrade || $upgradeCompleted)
+                    <h2>$page.getLocalizedString("upgrade.progress")</h2>
+                    #else
+                    <h2>$page.getLocalizedString("configurator.progress")</h2>
+                    #end
+                    <img src="$context/assets/images/rel_interstitial_loading.gif" />
+
+     <br>
+
+                    <div id="progressDiv">
+                       <iframe id="progressIframe" name="progressIframe"  src="$context/assets/images/rel_interstitial_loading.gif" height=220 width=600 scrolling="no" frameborder="0">This browser cannot dipslay iframes.</iframe>
+                    </div>
+                    <br>
+            <hr>
+            <br> <br>
+            <span id="setupMessage"></span>
+            <br>
+            <br>
+            <div id="returnToConfig">
+                        <a href="#" onClick="YAHOO.sun.identity.config.options.inProgress.hide(); return false;">$page.getLocalizedString("return.config.link")</a>
+            </div>
+            <br>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="confComplete" style="visibility:hidden">
+            #if ($upgrade || $upgradeCompleted)
+                <div class="header">$page.getLocalizedString("upgrade.complete.header")</div>
+                <div class="bd">
+                    <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
+
+                        <br>
+                        <h1>$page.getLocalizedString("upgrade.complete.message")</h1>
+                        <br/>
+                        <p align="center" class="blueSmall">$page.getLocalizedString("upgrade.restart.container")</p>
+            #else
+                <div class="header">$page.getLocalizedString("configuration.option1.complete.header")</div>
+                <div class="bd">
+                    <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
+
+                        <br>
+                        <h1>$page.getLocalizedString("configuration.option1.complete.message")</h1>
+                        <br/>
+                        <p align="center" class="blueSmall">
+                            <a href="#" onclick="launchConsole(); return false">$page.getLocalizedString("go.to.login.screen")</a>
+                        </p>
+            #end
+                        </div>
+                 </div>
+        </div>
+
+    #if ( $isOpenDS1x )
+    <style type="text/css">
+        div.singlecolumn{
+            width:560px;
+            float:left;
+            padding:5px;
+            text-align:left;
+        }
+    </style>
+    <div id="cannotContinue" align="center" style="width:600px;visibility:hidden">
+        <div class="header">$page.getLocalizedString("cannot.continue.header")</div>
+        <div class="bd" style="background-color: white; height: 150px; text-align: left">
+        <h2>$page.getLocalizedString("cannot.continue.body")</h2>
+        <div class="singlecolumn">
+                <p>$page.getLocalizedString("cannot.continue.text1")</p>
+                <p>$page.getLocalizedString("cannot.continue.text2") $odsdir</p>
+                <p>$page.getLocalizedString("cannot.continue.text3")</p>
+            </div>
+        </div>
+    </div>
+    #end
+ </div>

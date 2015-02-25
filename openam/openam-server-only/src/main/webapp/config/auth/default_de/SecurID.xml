@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+
+<ModuleProperties moduleName="SecurID" version="1.0" >
+    <Callbacks length="2" order="1" timeout="120" header="Dieser Server verwendet die SecurID-Authentifizierung." >
+        <NameCallback>
+            <Prompt>Benutzer-ID eingeben</Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt>Passcode eingeben</Prompt>
+        </PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="2" timeout="120" header="Neuer PIN-Modus" >
+	<!-- TextInputCallback not implemented in UI -->
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>Meldung (Eingeben neuer PIN)</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="3" timeout="120" header="Nächster PASSCODE" >
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>Warten Sie, bis der Code auf Ihrem Token geändert wird, und geben Sie den nächsten PASSCODE ein:</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="4" timeout="120" header="Generierung einer neuen PIN" >
+	<!-- TextInputCallback not implemented in UI -->
+	<NameCallback>
+	    <Prompt>Wird immer ersetzt</Prompt>
+	</NameCallback>
+    </Callbacks>
+    <Callbacks length="1" order="5" timeout="120" header="Nächster PASSCODE" >
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>Meldung (Warten, bis Token geändert wurde)</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+</ModuleProperties>
+

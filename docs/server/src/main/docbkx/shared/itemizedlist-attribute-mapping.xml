@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<itemizedlist xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://docbook.org/ns/docbook
+                                  http://docbook.org/xml/5.0/xsd/docbook.xsd">
+ <para>
+  The default mapping implementation has additional features
+  beyond simply retrieving string attributes from the user profile.
+ </para>
+
+ <listitem>
+  <para>
+   Add an attribute that takes a static value
+   by enclosing the profile attribute name in double quotes (<literal>"</literal>).
+  </para>
+
+  <para>
+   For example, you can add a static SAML attribute
+   called <literal>partnerID</literal>
+   with a value of <literal>staticPartnerIDValue</literal>
+   by adding <literal>partnerID</literal> as the Name in Assertion
+   with <literal>"staticPartnerIDValue"</literal> as the Local Attribute Name.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   Base64 encode binary attributes when adding them to the SAML attributes
+   by adding <literal>;binary</literal> to the end of the attribute name,
+   as in the following example:
+  </para>
+
+  <literallayout class="monospaced">objectGUID=objectGUID;binary</literallayout>
+
+  <para>
+   This maps the local binary attribute <literal>objectGUID</literal>
+   to a SAML attribute called <literal>objectGUID</literal>
+   that is Base64 encoded.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   Use <literal>NameFormatURI</literal> format
+   as shown in the following example:
+  </para>
+
+  <literallayout class="monospaced"
+   >urn:oasis:names:tc:SAML:2.0:attrname-format:uri|objectGUID=objectGUID;binary</literallayout>
+ </listitem>
+</itemizedlist>

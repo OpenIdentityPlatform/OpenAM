@@ -1,0 +1,5 @@
+cot-name=FEDLET_COT
+sun-fm-cot-status=Active
+sun-fm-trusted-providers=IDP_ENTITY_ID, FEDLET_ENTITY_ID
+sun-fm-saml2-readerservice-url=
+sun-fm-saml2-writerservice-url=

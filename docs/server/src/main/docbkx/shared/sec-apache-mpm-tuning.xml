@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<section
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+ <title>Tuning Apache Multi-Processing Modules</title>
+
+ <indexterm>
+  <primary>Apache 2.2 policy agent</primary>
+  <secondary>tuning MPM</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>Apache 2.4 policy agent</primary>
+  <secondary>tuning MPM</secondary>
+ </indexterm>
+
+ <para>
+  Apache 2.0 and later comes with Multi-Processing Modules (MPMs) that extend
+  the basic functionality of a web server to support the wide variety of operating
+  systems and customizations for a particular site.
+ </para>
+ <para>
+  The key area of performance tuning for Apache is
+  to run in worker mode ensuring that they are enough processes and threads
+  available to service the expected number of client requests. Apache performance
+  is configured in the <filename>conf/extra/http-mpm.conf</filename> file.</para>
+
+ <para>
+  The key properties in this file are <literal>ThreadsPerChild</literal> and
+  <literal>MaxClients</literal>.
+  Together the properties control the maximum number of concurrent requests that can
+  be processed by Apache. The default configuration allows for 150 concurrent
+  clients spread across 6 processes of 25 threads each.</para>
+
+ <screen>
+&lt;IfModule mpm_worker_module>
+   StartServers          2
+   MaxClients          150
+   MinSpareThreads      25
+   MaxSpareThreads      75
+   ThreadsPerChild      25
+   MaxRequestsPerChild   0
+&lt;/IfModule>
+ </screen>
+
+ <important>
+  <para>
+   For the policy agent notification feature, the <literal>MaxSpareThreads</literal>,
+   <literal>ThreadLimit</literal> and <literal>ThreadsPerChild</literal> default values
+   must <emphasis>not</emphasis> be altered; otherwise
+   the notification queue listener thread cannot be registered.
+  </para>
+  <para>
+   Any other values apart from these three in the worker MPM can be customized.
+   For example, it is possible to use a combination of <literal>MaxClients</literal>
+   and <literal>ServerLimit</literal> to achieve a high level of concurrent clients.
+  </para>
+ </important>
+</section>

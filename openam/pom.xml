@@ -1,0 +1,2323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+*
+* Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
+*
+* The contents of this file are subject to the terms
+* of the Common Development and Distribution License
+* (the License). You may not use this file except in
+* compliance with the License.
+*
+* You can obtain a copy of the License at
+* http://forgerock.org/license/CDDLv1.0.html
+* See the License for the specific language governing
+* permission and limitations under the License.
+*
+* When distributing Covered Code, include this CDDL
+* Header Notice in each file and include the License file
+* at http://forgerock.org/license/CDDLv1.0.html
+* If applicable, add the following below the CDDL Header,
+* with the fields enclosed by brackets [] replaced by
+* your own identifying information:
+* "Portions Copyrighted [year] [name of copyright owner]"
+*
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Build Notes:
+
+         To Build all of OpenAM use the following Maven Command:
+         cd to openam top directory.
+         mvn clean install
+
+         To Build only a specify Module: (This will pull existing modules whichever is newest local or remote).
+         mvn clean install -pl <module Name>
+
+         To Build only specific Module and Dependencies
+         mvn clean install -pl <module Name> -am
+
+         Skipping Tests add:
+         -DskipTests=true
+
+         Running only a test or list of tests:
+         -DfailIfNoTests=false -Dtest=org.forgerock.restlet.ext.openam.OpenAMParametersTest
+
+    -->
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock</groupId>
+        <artifactId>forgerock-parent</artifactId>
+        <version>1.2.1</version>
+    </parent>
+
+    <!-- Component Definition -->
+    <name>OpenAM Project</name>
+    <groupId>org.forgerock.openam</groupId>
+    <artifactId>openam</artifactId>
+    <version>13.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <description>OpenAM</description>
+    <inceptionYear>2010</inceptionYear>
+
+    <organization>
+        <name>ForgeRock</name>
+        <url>http://www.forgerock.org</url>
+    </organization>
+    <url>http://www.forgerock.org</url>
+
+    <issueManagement>
+        <system>Jira</system>
+        <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>CDDL-1.0</name>
+            <url>http://www.opensource.org/licenses/CDDL-1.0</url>
+            <comments>Common Development and Distribution License (CDDL) 1.0.
+                This license applies to OpenAM source code as indicated in the
+                sources themselves.
+            </comments>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>CC BY-NC-ND 3.0</name>
+            <url>http://creativecommons.org/licenses/by-nc-nd/3.0/</url>
+            <comments>Creative Commons Attribution-NonCommercial-NoDerivs 3.0
+                Unported. This license applies to the site content, and to the
+                documentation as indicated in the documentation source code.
+            </comments>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- Component Properties -->
+    <properties>
+        <!-- **************************************************************** -->
+        <maven.build.timestamp.format>yyyy-MMM-dd HH:mm:ss</maven.build.timestamp.format>
+        <!-- **************************************************************** -->
+
+        <!-- Java Properties -->
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
+
+        <!-- Surefire Argument Line -->
+        <java.surefire.options>-Xms256m -Xmx256m -XX:MaxPermSize=96m</java.surefire.options>
+
+        <!-- JavaDoc Setting Properties -->
+        <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
+        <!-- Shade plugin setting for ClientSDK build -->
+        <generate.clientsdk.sources>false</generate.clientsdk.sources>
+
+        <!-- Project Encoding -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Version Properties -->
+        <opendj.server.version>2.6.2</opendj.server.version>
+        <opendj.sdk.version>2.6.9</opendj.sdk.version>
+
+        <commons.forgerock-util.version>1.3.5</commons.forgerock-util.version>
+        <commons.authfilter.version>1.5.1</commons.authfilter.version>
+        <forgerock.json.version>2.4.2</forgerock.json.version>
+        <forgerock-ui.version>1.1.10</forgerock-ui.version>
+        <restlet.version>2.1.7</restlet.version>
+        <xercesj.version>2.11.0</xercesj.version>
+        <powermock.version>1.5</powermock.version>
+        <jackson.version>2.4.2</jackson.version>
+        <guice.version>3.0</guice.version>
+        <forgerock.guice.version>1.1.0-SNAPSHOT</forgerock.guice.version>
+        <slf4j.version>1.7.5</slf4j.version>
+        <santuario.xmlsec.version>1.5.6</santuario.xmlsec.version>
+        <cxf.version>2.7.8</cxf.version>
+        <!-- Same version as required by cxf-rt-ws-security. 2.x release introduced major changes -->
+        <wss4j.version>1.6.13</wss4j.version>
+        <click.version>2.3.0</click.version>
+        <commons-beanutils.version>1.8.3</commons-beanutils.version>
+        <commons-codec.version>1.6</commons-codec.version>
+        <commons-collections.version>3.2.1</commons-collections.version>
+        <commons-digester.version>2.1</commons-digester.version>
+        <commons-fileupload.version>1.2.2</commons-fileupload.version>
+        <commons-io.version>2.3</commons-io.version>
+        <commons-lang.version>2.6</commons-lang.version>
+        <commons-logging.version>1.1.3</commons-logging.version>
+        <commons-logging-api.version>1.1</commons-logging-api.version>
+        <esapiport.version>2013-12-04</esapiport.version>
+        <geoip.version>2.0.0</geoip.version>
+        <groovy.version>2.3.3</groovy.version>
+        <groovy-sandbox.version>1.6</groovy-sandbox.version>
+        <jaxb.version>1.0.6</jaxb.version>
+        <jaxb1.version>2.0.2</jaxb1.version>
+        <jaxrpc-api.version>1.1</jaxrpc-api.version>
+        <jaxrpc-impl.version>1.1.3_01-041406</jaxrpc-impl.version>
+        <jaxrpc-spi.version>1.1.3_01</jaxrpc-spi.version>
+        <jdom.version>2.0.1</jdom.version>
+        <je.version>5.0.104</je.version>
+        <jersey-bundle.version>1.1.1-ea</jersey-bundle.version>
+        <jato.version>2005-05-04</jato.version>
+        <cc-ui.version>2008-08-08</cc-ui.version>
+        <jsr311-api.version>1.1.1</jsr311-api.version>
+        <jstl.version>1.1.2</jstl.version>
+        <log4j.version>1.2.16</log4j.version>
+        <mail.version>1.4.5</mail.version>
+        <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
+        <relaxngDatatype.version>20020414</relaxngDatatype.version>
+        <rhino.version>1.7R4</rhino.version>
+        <saaj-api.version>1.3.4</saaj-api.version>
+        <saaj-impl.version>1.3.19</saaj-impl.version>
+        <servlet-api.version>2.5</servlet-api.version>
+        <jsp-api.version>2.1</jsp-api.version>
+        <xalan.version>2.7.1</xalan.version>
+        <xsdlib.version>20060615</xsdlib.version>
+        <authapi.version>2005-08-12</authapi.version>
+        <FastInfoset.version>2006-26-09</FastInfoset.version>
+        <jdmk.version>2007-01-10</jdmk.version>
+        <jsr173_api.version>2004-30-01</jsr173_api.version>
+        <jss4.version>2007-08-11</jss4.version>
+        <publicsuffix.version>1.0.1</publicsuffix.version>
+        <webservices-extra.version>2008-03-12</webservices-extra.version>
+        <webservices-extra-api.version>2003-09-04</webservices-extra-api.version>
+        <webservices-rt.version>2009-29-07</webservices-rt.version>
+        <webservices-api.version>2009-14-01</webservices-api.version>
+        <jackson-asl.version>1.9.7</jackson-asl.version>
+        <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
+        <jquery-amd.version>1.7.1-alpha-1</jquery-amd.version>
+        <freemarker.version>2.3.19</freemarker.version>
+        <java-ipv6.version>0.14</java-ipv6.version>
+        <json.version>20090211</json.version>
+        <javax.inject.version>1</javax.inject.version>
+        <forgerock.guava.version>18.0.1</forgerock.guava.version>
+
+        <openam.version>OpenAM ${project.version}</openam.version>
+        <!--  Project web site -->
+        <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
+
+        <!-- Default license (CDDL) to package into the artifacts -->
+        <forgerock.license.groupId>org.forgerock</forgerock.license.groupId>
+        <forgerock.license.artifactId>cddl-license</forgerock.license.artifactId>
+        <forgerock.license.version>1.0.0</forgerock.license.version>
+    </properties>
+
+    <!-- Profiles -->
+    <profiles>
+        <!-- Place Default Profiles here to override and determine Environment. -->
+
+        <profile>
+            <id>default-profile</id>
+            <!-- This profile gets activated for WINDOWS and LINUX Systems -->
+            <activation>
+                <file>
+                    <exists>${env.JAVA_HOME}/lib/tools.jar</exists>
+                </file>
+            </activation>
+            <properties>
+                <toolsjar>${env.JAVA_HOME}/lib/tools.jar</toolsjar>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                    <version>${maven.compiler.source}</version>
+                    <scope>system</scope>
+                    <optional>true</optional>
+                    <systemPath>${toolsjar}</systemPath>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <generate.clientsdk.sources>true</generate.clientsdk.sources>
+            </properties>
+            <repositories>
+                <repository>
+                    <id>forgerock-internal</id>
+                    <name>Forgerock Internal Repository</name>
+                    <url>http://maven.forgerock.org/repo/internal</url>
+                </repository>
+            </repositories>
+            <dependencyManagement>
+                <dependencies>
+                    <!-- Don't include the authapi*.jar in the war for a release build -->
+                    <dependency>
+                        <groupId>external</groupId>
+                        <artifactId>authapi</artifactId>
+                        <version>${authapi.version}</version>
+                        <scope>provided</scope>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+
+        <!-- When building an Enterprise binary download, include the correct binary license terms. -->
+        <profile>
+            <!-- Overrides the default CDDL license with the Forgerock binary license. Only available from Forgerock internal repository. -->
+            <id>binary-licensing</id>
+            <repositories>
+                <repository>
+                    <id>forgerock-internal</id>
+                    <name>Forgerock Internal Repository</name>
+                    <url>http://maven.forgerock.org/repo/internal</url>
+                </repository>
+            </repositories>
+            <properties>
+                <forgerock.license.groupId>com.forgerock</forgerock.license.groupId>
+                <forgerock.license.artifactId>binary-license</forgerock.license.artifactId>
+                <forgerock.license.version>1.0.0</forgerock.license.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>development</id>
+            <repositories>
+                <repository>
+                    <id>forgerock-internal</id>
+                    <name>Forgerock Internal Repository</name>
+                    <url>http://maven.forgerock.org/repo/internal</url>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+
+    <!-- OpenAM Child Modules -->
+    <!-- Build order will be determined by the Maven Reactor. -->
+    <modules>
+
+        <module>openam-ldap-utils</module>
+        <module>openam-datastore</module>
+
+        <!-- OpenAM Shared - Common Module -->
+        <module>openam-shared</module>
+
+        <!-- OpenAM Scripting -->
+        <module>openam-scripting</module>
+
+        <!-- OpenAM Entitlement Module (XACML 3)-->
+        <module>openam-entitlements</module>
+
+        <!-- OpenAM Authentication Modules -->
+        <module>openam-authentication</module>
+
+        <!-- OpenAM Schema Modules -->
+        <module>openam-schema</module>
+
+        <!-- OpenAM CoreToken Module -->
+        <module>openam-coretoken</module>
+
+        <!-- OpenAM REST - CORE Module -->
+        <module>openam-rest</module>
+        <module>openam-restlet</module>
+
+        <module>openam-plugins</module>
+
+        <module>openam-console</module>
+
+        <!-- OpenAM Core Module -->
+        <module>openam-core</module>
+
+        <!-- OpenAM Commons Authentication Filter -->
+        <module>openam-auth-filter</module>
+
+        <!-- OpenAM CLI Module -->
+        <module>openam-cli</module>
+
+        <!-- OpenAM Federation Modules -->
+        <module>openam-federation</module>
+
+        <!-- OpenAM OAuth Token Service -->
+        <module>openam-oauth</module>
+
+        <!-- OpenAM OAuth2 Token Service -->
+        <module>openam-oauth2-common</module>
+        <module>openam-oauth2</module>
+
+        <module>openam-common-auth-ui</module>
+
+        <module>openam-server-auth-ui</module>
+
+        <module>openam-ui-policy</module>
+        <module>openam-ui-ria</module>
+
+        <module>openam-server-only</module>
+
+        <!-- OpenAM Server -->
+        <module>openam-server</module>
+
+        <!-- Tools Artifacts -->
+        <module>openam-tools</module>
+
+        <!-- Java Client SDK Artifacts -->
+        <module>openam-clientsdk</module>
+        <module>openam-distauth</module>
+
+        <!-- Documentation -->
+        <module>openam-documentation</module>
+
+        <!-- Final Packaging Distribution Kit -->
+        <module>openam-distribution</module>
+        <!-- Final Packaging Distribution Kit -->
+        <module>openam-dashboard</module>
+
+        <module>openam-examples</module>
+        <module>openam-annotations</module>
+        <module>openam-sts</module>
+        <module>openam-slf4j</module>
+        <module>openam-oauth2-saml2</module>
+        <module>openam-http-client</module>
+        <module>openam-tokens</module>
+    </modules>
+
+    <!-- Mailing Lists -->
+    <mailingLists>
+        <mailingList>
+            <name>OpenAM Users List</name>
+            <subscribe>https://lists.forgerock.org/mailman/listinfo/openam/</subscribe>
+            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam/</unsubscribe>
+            <post>openam@forgerock.org</post>
+            <archive>http://lists.forgerock.org/pipermail/openam/</archive>
+        </mailingList>
+        <mailingList>
+            <name>OpenAM Developers List</name>
+            <subscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</subscribe>
+            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</unsubscribe>
+            <post>openam-dev@forgerock.org</post>
+            <archive>http://lists.forgerock.org/pipermail/openam-dev/</archive>
+        </mailingList>
+        <mailingList>
+            <name>OpenAM Commit Notifications</name>
+            <subscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</subscribe>
+            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</unsubscribe>
+            <post>commitopenam@forgerock.org</post>
+            <archive>http://lists.forgerock.org/pipermail/commitopenam/</archive>
+        </mailingList>
+    </mailingLists>
+
+    <!-- Maven Repositories -->
+    <repositories>
+        <!-- ForgeRock Common Internal Project Repositories -->
+        <repository>
+            <id>forgerock-staging-repo</id>
+            <name>ForgeRock Release Repository</name>
+            <url>http://maven.forgerock.org/repo/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>forgerock-snapshots-repo</id>
+            <name>ForgeRock Snapshot Repository</name>
+            <url>http://maven.forgerock.org/repo/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <!-- ForgeRock Internal Project Repository -->
+        <repository>
+            <id>maven.forgerock.org</id>
+            <name>maven.forgerock.org-openam-dependencies</name>
+            <url>http://maven.forgerock.org/repo/openam-dependencies</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>restlet-cache</id>
+            <name>Restlet Cache Repository</name>
+            <url>http://maven.forgerock.org/repo/maven.restlet.org</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>oracle-repository</id>
+            <name>Oracle Repository</name>
+            <url>http://download.oracle.com/maven</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <!-- For Deployment to ForgeRock Maven Repository -->
+    <distributionManagement>
+        <repository>
+            <id>maven.forgerock.org</id>
+            <name>maven.forgerock.org-releases</name>
+            <url>http://maven.forgerock.org/repo/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.forgerock.org</id>
+            <name>maven.forgerock.org-snapshots</name>
+            <url>http://maven.forgerock.org/repo/snapshots</url>
+        </snapshotRepository>
+        <site>
+            <id>forgerock.org</id>
+            <name>OpenAM Project</name>
+            <url>${siteDistributionURL}</url>
+        </site>
+    </distributionManagement>
+
+    <!-- Source Control -->
+    <scm>
+        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/</developerConnection>
+        <url>http://sources.forgerock.org/browse/openam/trunk</url>
+    </scm>
+
+    <!-- Dependency Management -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- OpenAM project dependencies -->
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-shared</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authn-filter-config</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authn-filter-modules</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Include all Authentication Modules -->
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-ad</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-anonymous</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-adaptive</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-application</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-cert</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-datastore</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-persistentcookie</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-deviceprint-module</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-deviceprint-scripts</artifactId>
+                <version>${project.version}</version>
+                <type>js</type>
+                <classifier>min</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-hotp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-httpbasic</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-jdbc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-ldap</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-scripted</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-device-id</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-membership</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-msisdn</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-nt</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-oath</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-oauth2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-radius</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-safeword</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-securid</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-windowsdesktopsso</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-oidc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-coretoken</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-entitlements</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-restlet</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-dashboard</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-annotations</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-datastore</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-ldap-utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-federation-library</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-idpdiscovery</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>OpenFM</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-idpdiscovery-war</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-example-clientsdk-cli</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-example-clientsdk-war</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-oauth</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-oauth2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-oauth2-saml2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>oauth2-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openid-connect-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>oauth2-restlet</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openid-connect-restlet</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-installtools</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-installtools-launcher</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- OpenAM schema projects -->
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-dtd-schema</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-jaxrpc-schema</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-saml2-schema</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-mib-schema</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-wsfederation-schema</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-idsvcs-schema</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-liberty-schema</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-xacml3-schema</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-common-auth-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-server-auth-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-installer-tools</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-sts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-rest-sts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-soap-sts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-common-sts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-token-service-sts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-client-sts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-slf4j</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-scripting</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-http-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-tokens</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- New RIA Client UI -->
+            <dependency>
+                <groupId>org.forgerock.commons.ui</groupId>
+                <artifactId>forgerock-ui-user</artifactId>
+                <version>${forgerock-ui.version}</version>
+                <type>zip</type>
+                <classifier>www</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-ui-ria</artifactId>
+                <version>${project.version}</version>
+                <classifier>www</classifier>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-ui-policy</artifactId>
+                <version>${project.version}</version>
+                <classifier>www</classifier>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons.ui.libs</groupId>
+                <artifactId>jquery.qrcode</artifactId>
+                <version>0.11.0</version>
+                <type>js</type>
+                <classifier>min</classifier>
+            </dependency>
+
+            <!-- CLI components -->
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-cli-definitions</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-cli-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- License -->
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-license-manager-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-license-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-license-servlet</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-installer-utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-diagnostics-schema</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-diagnostics-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-diagnostics-plugins</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Distribution dependencies -->
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-server</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-server-only</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-console</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-clientsdk</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-distauth</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-configurator-tool</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-upgrade-tool</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-distribution-diagnostics</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-distribution-fedlet-unconfigured</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-distribution-ssoadmintools</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-distribution-ssoconfiguratortools</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authfilter-shared</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- External project dependencies -->
+            <dependency>
+                <groupId>org.apache.click</groupId>
+                <artifactId>click-extras</artifactId>
+                <version>${click.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.click</groupId>
+                <artifactId>click-nodeps</artifactId>
+                <version>${click.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons-beanutils.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons-collections.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-digester</groupId>
+                <artifactId>commons-digester</artifactId>
+                <version>${commons-digester.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>${commons-fileupload.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons-lang.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commons-logging.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging-api</artifactId>
+                <version>${commons-logging-api.version}</version>
+            </dependency>
+
+            <!-- Mozilla Rhino Javascript engine -->
+            <dependency>
+                <groupId>org.mozilla</groupId>
+                <artifactId>rhino</artifactId>
+                <version>${rhino.version}</version>
+            </dependency>
+
+            <!-- Groovy scripting support -->
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-jsr223</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <!-- Groovy JSON parsing support -->
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-json</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <!-- MIT licensed: http://groovy-sandbox.kohsuke.org/license.html -->
+                <groupId>org.kohsuke</groupId>
+                <artifactId>groovy-sandbox</artifactId>
+                <version>${groovy-sandbox.version}</version>
+                <!-- Groovy-sandbox depends on Groovy 1.8.5, so ignore that in favour of our version. -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>esapiport</artifactId>
+                <version>${esapiport.version}</version>
+            </dependency>
+
+            <!--
+            <dependency>
+                <groupId>org.owasp.esapi</groupId>
+                <artifactId>esapi</artifactId>
+                <version>2.0.1</version>
+            </dependency>
+            -->
+
+            <dependency>
+                <groupId>com.maxmind.geoip2</groupId>
+                <artifactId>geoip2</artifactId>
+                <version>${geoip.version}</version>
+            </dependency>
+
+            <!-- TODO j2ee -->
+
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb1-impl</artifactId>
+                <version>${jaxb1.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${jaxb.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-libs</artifactId>
+                <version>${jaxb.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-xjc</artifactId>
+                <version>${jaxb.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.xml</groupId>
+                <artifactId>jaxrpc-api</artifactId>
+                <version>${jaxrpc-api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>jaxrpc-impl</artifactId>
+                <version>${jaxrpc-impl.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.rpc</groupId>
+                <artifactId>jaxrpc-spi</artifactId>
+                <version>${jaxrpc-spi.version}</version>
+            </dependency>
+
+            <!-- TODO jmx -->
+
+            <dependency>
+                <groupId>org.jdom</groupId>
+                <artifactId>jdom</artifactId>
+                <version>${jdom.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sleepycat</groupId>
+                <artifactId>je</artifactId>
+                <version>${je.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-bundle</artifactId>
+                <version>${jersey-bundle.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.iplanet.jato</groupId>
+                <artifactId>jato</artifactId>
+                <version>${jato.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc</artifactId>
+                <version>${cc-ui.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc_de</artifactId>
+                <version>${cc-ui.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc_es</artifactId>
+                <version>${cc-ui.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc_fr</artifactId>
+                <version>${cc-ui.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc_it</artifactId>
+                <version>${cc-ui.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc_ja</artifactId>
+                <version>${cc-ui.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc_ko</artifactId>
+                <version>${cc-ui.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc_sv</artifactId>
+                <version>${cc-ui.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc_zh</artifactId>
+                <version>${cc-ui.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc_zh_CN</artifactId>
+                <version>${cc-ui.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc_zh_HK</artifactId>
+                <version>${cc-ui.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.web.ui</groupId>
+                <artifactId>cc_zh_TW</artifactId>
+                <version>${cc-ui.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>jsr311-api</artifactId>
+                <version>${jsr311-api.version}</version>
+            </dependency>
+
+            <!-- TODO jss4 org/mozilla/jss -->
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>jstl</artifactId>
+                <version>${jstl.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-nop</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>${mail.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                <artifactId>oauth-client</artifactId>
+                <version>${jersey-oauth.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                <artifactId>oauth-server</artifactId>
+                <version>${jersey-oauth.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                <artifactId>oauth-signature</artifactId>
+                <version>${jersey-oauth.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>relaxngDatatype</groupId>
+                <artifactId>relaxngDatatype</artifactId>
+                <version>${relaxngDatatype.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.xml.soap</groupId>
+                <artifactId>saaj-api</artifactId>
+                <version>${saaj-api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.messaging.saaj</groupId>
+                <artifactId>saaj-impl</artifactId>
+                <version>${saaj-impl.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>${servlet-api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet.jsp</groupId>
+                <artifactId>jsp-api</artifactId>
+                <version>${jsp-api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>xalan</groupId>
+                <artifactId>xalan</artifactId>
+                <version>${xalan.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.msv.datatype.xsd</groupId>
+                <artifactId>xsdlib</artifactId>
+                <version>${xsdlib.version}</version>
+            </dependency>
+
+            <!-- OpenDJ API -->
+            <dependency>
+                <groupId>org.forgerock.opendj</groupId>
+                <artifactId>opendj-ldap-sdk</artifactId>
+                <version>${opendj.sdk.version}</version>
+            </dependency>
+            <!-- OpenDJ Server - 2.6 -->
+            <dependency>
+                <groupId>org.forgerock.opendj</groupId>
+                <artifactId>opendj-server</artifactId>
+                <version>${opendj.server.version}</version>
+            </dependency>
+
+            <!-- Legacy External Libraries for OpenAM -->
+            <!-- We need to eventually ween off of these -->
+
+            <!-- Dependencies for the Build Helper Maven Plugin -->
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-plugin-api</artifactId>
+                <version>3.0.5</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-project</artifactId>
+                <version>3.0-alpha-2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.plugin-tools</groupId>
+                <artifactId>maven-plugin-annotations</artifactId>
+                <version>3.3</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>authapi</artifactId>
+                <version>${authapi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>FastInfoset</artifactId>
+                <version>${FastInfoset.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>jdmkrt</artifactId>
+                <version>${jdmk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>jdmktk</artifactId>
+                <version>${jdmk.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>jsr173_api</artifactId>
+                <version>${jsr173_api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>jss4</artifactId>
+                <version>${jss4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>publicsuffix</artifactId>
+                <version>${publicsuffix.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>webservices-extra</artifactId>
+                <version>${webservices-extra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>webservices-extra-api</artifactId>
+                <version>${webservices-extra-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>webservices-rt</artifactId>
+                <version>${webservices-rt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>external</groupId>
+                <artifactId>webservices-api</artifactId>
+                <version>${webservices-api.version}</version>
+            </dependency>
+
+            <!-- Preferred JSON Data Binding API -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-xml</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- Session HA Module Dependencies-->
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>${jackson-asl.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>${jackson-asl.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.jackson</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.xml</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.jackson</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.servlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.freemarker</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.ssl</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.simple</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.crypto</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.httpclient</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.net</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.slf4j</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <!-- Commons Dependencies -->
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>json-fluent</artifactId>
+                <version>${forgerock.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>json-resource</artifactId>
+                <version>${forgerock.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>json-resource-servlet</artifactId>
+                <version>${forgerock.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>json-web-token</artifactId>
+                <version>${forgerock.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-util</artifactId>
+                <version>${commons.forgerock-util.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-auth-filter-common</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-jaspi-runtime</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-jaspi-jwt-session-module</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>authz-framework-api</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>authz-framework</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-jaspi-openid-connect-module</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons.guava</groupId>
+                <artifactId>forgerock-guava-collect</artifactId>
+                <version>${forgerock.guava.version}</version>
+            </dependency>
+
+            <!-- JASPIC -->
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>javax.security.auth.message</artifactId>
+                <version>${javax.security.auth.message.version}</version>
+            </dependency>
+
+            <!-- DevicePrint -->
+            <dependency>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jquery-amd</artifactId>
+                <version>${jquery-amd.version}</version>
+                <type>js</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarker.version}</version>
+            </dependency>
+            <!-- Xerces-J Required for fedlet and XACML -->
+            <dependency>
+                <groupId>xerces-J</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xercesj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xerces-J</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>${xercesj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xerces-J</groupId>
+                <artifactId>xml-resolver</artifactId>
+                <version>${xercesj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xerces-J</groupId>
+                <artifactId>xml-serializer</artifactId>
+                <version>${xercesj.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.googlecode.java-ipv6</groupId>
+                <artifactId>java-ipv6</artifactId>
+                <version>${java-ipv6.version}</version>
+            </dependency>
+            <!-- Native Json Manipulation -->
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>${json.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
+                <!-- Exclude aopalliance dependency due to ambiguous licensing terms. -->
+                <classifier>no_aop</classifier>
+                <exclusions>
+                    <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject.extensions</groupId>
+                <artifactId>guice-multibindings</artifactId>
+                <version>${guice.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.inject</groupId>
+                        <artifactId>guice</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject.extensions</groupId>
+                <artifactId>guice-assistedinject</artifactId>
+                <version>${guice.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.inject</groupId>
+                        <artifactId>guice</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-guice-core</artifactId>
+                <version>${forgerock.guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-guice-servlet</artifactId>
+                <version>${forgerock.guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-guice-test</artifactId>
+                <version>${forgerock.guice.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>${javax.inject.version}</version>
+            </dependency>
+
+            <!--
+              required by the STS
+              -->
+            <dependency>
+                <groupId>org.apache.santuario</groupId>
+                <artifactId>xmlsec</artifactId>
+                <version>${santuario.xmlsec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf.services.sts</groupId>
+                <artifactId>cxf-services-sts-core</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-frontend-jaxws</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-transports-http</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-bindings-soap</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-transports-http-jetty</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-ws-policy</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-ws-security</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.security</groupId>
+                <artifactId>wss4j</artifactId>
+                <version>${wss4j.version}</version>
+            </dependency>
+
+            <!-- Test dependency -->
+            <dependency>
+                <groupId>org.codehaus.jstestrunner</groupId>
+                <artifactId>jstestrunner-junit</artifactId>
+                <version>1.0.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.easytesting</groupId>
+                <artifactId>fest-assert</artifactId>
+                <version>1.4</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>6.8.5</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>1.6.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>1.9.5</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>3.2</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- Powermock -->
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-support</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-easymock</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>httpunit</groupId>
+                <artifactId>httpunit</artifactId>
+                <version>1.7</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty-servlet-tester</artifactId>
+                <version>7.0.0.pre5</version>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-core</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-reflect</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-testng</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-testng-common</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.12.1.GA</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <!-- License: legal/CC-Public-Domain.txt -->
+                <groupId>org.hdrhistogram</groupId>
+                <artifactId>HdrHistogram</artifactId>
+                <version>2.0.3</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!-- Build -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
+                <artifactId>svn-revision-number-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <entries>
+                        <entry>
+                            <prefix>svn-revision</prefix>
+                        </entry>
+                    </entries>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>UTF-8</encoding>
+                    <!-- Override Enforcer Rules for OpenAM Compilation -->
+                    <compilerArgument>-Xlint:none</compilerArgument>
+                    <showDeprecation>false</showDeprecation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <updateBranchVersions>true</updateBranchVersions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${java.surefire.options}</argLine>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <forkMode>once</forkMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <inherited>true</inherited>
+                <configuration>
+                    <escapeString>\</escapeString>
+                    <encoding>UTF-8</encoding>
+                    <nonFilteredFileExtensions>
+                        <!-- Exclude any binary files based upon File Types. -->
+                        <nonFilteredFileExtension>bin</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bkf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bmp</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bz2</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>deb</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dll</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dmg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ear</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>exe</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gif</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gzip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpeg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>lz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rpm</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tgz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>war</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>zip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>7z</nonFilteredFileExtension>
+                        <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
+                    </nonFilteredFileExtensions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <inherited>true</inherited>
+                <configuration>
+                    <charset>utf-8</charset>
+                    <encoding>utf-8</encoding>
+                    <source>${maven.compiler.source}</source>
+                    <additionalJOption>${javadoc.options}</additionalJOption>
+                    <detectLinks>true</detectLinks>
+                    <bottom>
+                        <![CDATA[Copyright &#169; 2010-2015, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]>
+                    </bottom>
+                    <links>
+                        <link>http://docs.oracle.com/javase/6/docs/api</link>
+                        <link>http://openam.forgerock.org/apidocs/</link>
+                        <link>http://www.restlet.org/documentation/2.1/jse/api</link>
+                        <link>http://www.restlet.org/documentation/2.1/jse/ext</link>
+                        <link>http://www.restlet.org/documentation/2.1/jse/engine</link>
+                    </links>
+                    <taglets>
+                        <taglet>
+                            <tagletClass>com.sun.identity.tools.javadocs.SupportedAPITaglet</tagletClass>
+                        </taglet>
+                        <taglet>
+                            <tagletClass>com.sun.identity.tools.javadocs.SupportedAllAPITaglet</tagletClass>
+                        </taglet>
+                    </taglets>
+                    <tagletArtifact>
+                        <groupId>org.forgerock.openam</groupId>
+                        <artifactId>openam-shared</artifactId>
+                        <version>${project.version}</version>
+                    </tagletArtifact>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadoc</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>aggregate-jar</goal>
+                        </goals>
+                        <configuration>
+                            <doctitle>OpenAM ${project.version} Public API Javadoc</doctitle>
+                            <outputDirectory>${project.build.directory}/site/apidocs</outputDirectory>
+                            <finalName>openam-${project.version}-public</finalName>
+                            <subpackages>
+                                com.iplanet.am.sdk:com.iplanet.am.util:com.iplanet.dpro.parser:com.iplanet.dpro.session.service:com.iplanet.log:com.iplanet.services.cdm:com.iplanet.services.ldap:com.iplanet.services.util:com.iplanet.sso:com.iplanet.ums:com.sun.identity.authentication:com.sun.identity.entitlement:com.sun.identity.federation.accountmgmt:com.sun.identity.federation.common:com.sun.identity.federation.message:com.sun.identity.federation.message.common:com.sun.identity.federation.plugins:com.sun.identity.federation.services:com.sun.identity.idm:com.sun.identity.jaxrpc:com.sun.identity.liberty.ws.authnsvc:com.sun.identity.liberty.ws.authnsvc.mechanism:com.sun.identity.liberty.ws.authnsvc.protocol:com.sun.identity.liberty.ws.common:com.sun.identity.liberty.ws.common.wsse:com.sun.identity.liberty.ws.disco:com.sun.identity.liberty.ws.disco.plugins:com.sun.identity.liberty.ws.dst:com.sun.identity.liberty.ws.dst.service:com.sun.identity.liberty.ws.idpp.common:com.sun.identity.liberty.ws.idpp.plugin:com.sun.identity.liberty.ws.interaction:com.sun.identity.liberty.ws.interfaces:com.sun.identity.liberty.ws.paos:com.sun.identity.liberty.ws.security:com.sun.identity.liberty.ws.soapbinding:com.sun.identity.log:com.sun.identity.plugin.configuration:com.sun.identity.plugin.datastore:com.sun.identity.plugin.log:com.sun.identity.plugin.session:com.sun.identity.policy:com.sun.identity.sae.api:com.sun.identity.saml:com.sun.identity.saml2.assertion:com.sun.identity.saml2.common:com.sun.identity.saml2.ecp:com.sun.identity.saml2.plugins:com.sun.identity.saml2.profile:com.sun.identity.saml2.protocol:com.sun.identity.security:com.sun.identity.shared.debug:com.sun.identity.shared.jaxrpc:com.sun.identity.shared.locale:com.sun.identity.shared.stats:com.sun.identity.shared.whitelist:com.sun.identity.sm:com.sun.identity.wsfederation.common:com.sun.identity.wsfederation.plugins:com.sun.identity.wss.provider:com.sun.identity.wss.security:com.sun.identity.wss.security.handler:com.sun.identity.wss.sts:com.sun.identity.xacml.client:com.sun.identity.xacml.common:com.sun.identity.xacml.context:com.sun.identity.xacml.context.impl:com.sun.identity.xacml.policy:com.sun.identity.xacml.policy.impl:com.sun.identity.xacml.saml2:com.sun.identity.xacml.saml2.impl:com.sun.liberty:org.forgerock.openam.authentication.service:org.forgerock.openam.entitlement:org.forgerock.openam.ldap:org.forgerock.openam.oauth2.provider:org.forgerock.openam.session.service:org.forgerock.openam.upgrade
+                            </subpackages>
+                            <doclet>com.sun.identity.tools.javadocs.SupportedAPIDoclet</doclet>
+                            <docletArtifact>
+                                <groupId>org.forgerock.openam</groupId>
+                                <artifactId>openam-shared</artifactId>
+                                <version>${project.version}</version>
+                            </docletArtifact>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.forgerock.maven.plugins</groupId>
+                <artifactId>javadoc-updater-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>fixjavadoc</goal>
+                        </goals>
+                        <configuration>
+                            <directory>${project.reporting.outputDirectory}</directory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <inherited>true</inherited>
+                <configuration>
+                    <useDefaultManifestFile>true</useDefaultManifestFile>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>net.ju-n.maven.plugins</groupId>
+                <artifactId>checksum-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-checksum</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>artifacts</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <failOnError>false</failOnError>
+                    <algorithms>
+                        <algorithm>SHA</algorithm>
+                    </algorithms>
+                    <individualFiles>true</individualFiles>
+                    <quiet>true</quiet>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.github.searls</groupId>
+                    <artifactId>jasmine-maven-plugin</artifactId>
+                    <version>2.0-alpha-01</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.forgerock.maven.plugins</groupId>
+                    <artifactId>build-helper-plugin</artifactId>
+                    <version>${project.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>jaxb2-maven-plugin</artifactId>
+                    <version>1.3.1</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>1.8</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.portals.jetspeed-2</groupId>
+                    <artifactId>jetspeed-unpack-maven-plugin</artifactId>
+                    <version>2.2.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>net.ju-n.maven.plugins</groupId>
+                    <artifactId>checksum-maven-plugin</artifactId>
+                    <version>1.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
+                    <artifactId>svn-revision-number-maven-plugin</artifactId>
+                    <version>1.13</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.skins</groupId>
+                    <artifactId>maven-default-skin</artifactId>
+                    <version>1.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.skins</groupId>
+                    <artifactId>maven-skins</artifactId>
+                    <version>4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.bsc.maven</groupId>
+                    <artifactId>maven-processor-plugin</artifactId>
+                    <version>2.2.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>xml-maven-plugin</artifactId>
+                    <version>1.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>jslint-maven-plugin</artifactId>
+                    <version>1.0.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>webminifier-maven-plugin</artifactId>
+                    <version>1.0.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>jetty-maven-plugin</artifactId>
+                    <version>8.1.12.v20130726</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>js-import-maven-plugin</artifactId>
+                    <version>1.0.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.mcheely</groupId>
+                    <artifactId>requirejs-maven-plugin</artifactId>
+                    <version>2.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <version>1.4.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>3.3</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${checkstylePluginVersion}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.6</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>mailing-list</report>
+                            <report>issue-tracking</report>
+                            <report>license</report>
+                            <report>scm</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
+</project>

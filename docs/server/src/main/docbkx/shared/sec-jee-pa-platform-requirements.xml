@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<section xml:id="jee-pa-platform-requirements"
+          xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='http://docbook.org/ns/docbook
+                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ <title>Java EE Agents Platform Requirements</title>
+
+ <para>
+  The following table summarizes platform support.
+ </para>
+
+ <table xml:id="table-jee-pa-platform-requirements" pgwide="1">
+
+  <title>Supported Operating Systems &amp; Web Application Containers</title>
+
+  <tgroup cols="3">
+
+   <colspec colnum="1" colwidth="2*"/>
+   <colspec colnum="2" colwidth="1*"/>
+   <colspec colnum="3" colwidth="3*"/>
+
+   <thead>
+    <row>
+     <entry>Operating Systems (OS)</entry>
+     <entry>OS Versions</entry>
+     <entry>Web Application Containers &amp; Versions</entry>
+    </row>
+   </thead>
+
+   <tbody>
+    <row>
+     <entry>
+      <simplelist>
+       <member>CentOS</member>
+       <member>Red Hat Enterprise Linux</member>
+       <member>Oracle Linux</member>
+      </simplelist>
+     </entry>
+     <entry>
+      <simplelist>
+       <member>5, 6, 7</member>
+      </simplelist>
+     </entry>
+     <entry>
+      <simplelist>
+       <member>Apache Tomcat 6, 7, 8</member>
+       <member>IBM Web Sphere Application Server 8, 8.5</member>
+       <member>JBoss Enterprise Application Platform 6</member>
+       <member>JBoss Application Server 7</member>
+       <member>Jetty 8 (at least 8.1.13), 9</member>
+       <member>Oracle WebLogic Server 11g, 12c</member>
+       <member>WildFly 8</member>
+      </simplelist>
+     </entry>
+    </row>
+
+    <row>
+     <entry>
+      <simplelist>
+       <member>Microsoft Windows Server</member>
+      </simplelist>
+     </entry>
+     <entry>
+      <simplelist>
+       <member>2008, 2008 R2, 2012, 2012 R2</member>
+      </simplelist>
+     </entry>
+     <entry>
+      <simplelist>
+       <member>Apache Tomcat 6, 7, 8</member>
+      </simplelist>
+     </entry>
+    </row>
+
+    <row>
+     <entry>
+      <simplelist>
+       <member>Oracle Solaris x64</member>
+       <member>Oracle Solaris SPARC</member>
+      </simplelist>
+     </entry>
+     <entry>
+      <simplelist>
+       <member>10, 11</member>
+      </simplelist>
+     </entry>
+     <entry>
+      <simplelist>
+       <member>Apache Tomcat 6, 7, 8</member>
+       <member>Oracle WebLogic Server 11g, 12c</member>
+      </simplelist>
+     </entry>
+    </row>
+
+    <row>
+     <entry>
+      <simplelist>
+       <member>Ubuntu Linux</member>
+      </simplelist>
+     </entry>
+     <entry>
+      <simplelist>
+       <member>12.04 LTS, 14.04 LTS</member>
+      </simplelist>
+     </entry>
+     <entry>
+      <simplelist>
+       <member>Apache Tomcat 6, 7, 8</member>
+       <member>IBM Web Sphere Application Server 8, 8.5</member>
+       <member>JBoss Enterprise Application Platform 6</member>
+       <member>JBoss Application Server 7</member>
+       <member>Jetty 8 (at least 8.1.13), 9</member>
+       <member>Oracle WebLogic Server 11g, 12c</member>
+       <member>WildFly 8</member>
+      </simplelist>
+     </entry>
+    </row>
+   </tbody>
+  </tgroup>
+
+ </table>
+</section>

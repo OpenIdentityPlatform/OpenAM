@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * Copyright 2013-2014 ForgeRock AS.
+ *
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+-->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+    <id>jee-agents-websphere-v61</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <baseDirectory>j2ee_agents/websphere_v61_agent</baseDirectory>
+    <!-- Library Dependency -->
+    <dependencySets>
+        <dependencySet>
+            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}.${artifact.extension}</outputFileNameMapping>
+            <outputDirectory>lib</outputDirectory>
+            <!-- Include fully packaged Modules -->
+            <includes>
+                <include>org.forgerock.openam:openam-installtools</include>
+                <include>org.forgerock.openam:openam-installtools-launcher</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+        <!-- For backwards compatibility -->
+        <dependencySet>
+            <outputFileNameMapping>agent.jar</outputFileNameMapping>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>org.forgerock.openam.agents:jee-agents-websphere-v61</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+        <!-- For backwards compatibility -->
+        <dependencySet>
+            <outputFileNameMapping>openssoclientsdk.jar</outputFileNameMapping>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>org.forgerock.openam:openam-clientsdk</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+        <!-- For backwards compatibility -->
+        <dependencySet>
+            <outputFileNameMapping>agentapp.war</outputFileNameMapping>
+            <outputDirectory>etc</outputDirectory>
+            <includes>
+                <include>org.forgerock.openam.agents:jee-agents-agentapp:war</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+        <dependencySet>
+            <outputFileNameMapping>agentsample.ear</outputFileNameMapping>
+            <outputDirectory>sampleapp/dist</outputDirectory>
+            <includes>
+                <include>org.forgerock.openam.agents:jee-agents-sampleapp-websphere-ear:ear</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+        <dependencySet>
+            <outputFileNameMapping>license.txt</outputFileNameMapping>
+            <outputDirectory>legal-notices</outputDirectory>
+            <includes>
+                <include>${forgerock.license.groupId}:${forgerock.license.artifactId}:txt</include>
+            </includes>
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+    </dependencySets>
+    <fileSets>
+        <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.basedir}/../../legal</directory>
+            <excludes>
+                <exclude>license.txt</exclude>
+                <exclude>README.TXT</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>bin</outputDirectory>
+            <directoryMode>755</directoryMode>
+            <fileMode>755</fileMode>
+            <filtered>true</filtered>
+            <directory>${project.basedir}/../src/main/assembly/scripts</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>locale</outputDirectory>
+            <directory>${project.basedir}/../src/main/assembly/locale</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>locale</outputDirectory>
+            <directory>${project.basedir}/src/main/assembly/locale</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>etc</outputDirectory>
+            <directory>${project.basedir}/src/main/assembly/etc</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>config</outputDirectory>
+            <directory>${project.basedir}/src/main/assembly/config</directory>
+            <filtered>true</filtered>
+            <excludes>
+                <exclude>*version*</exclude>
+            </excludes>
+        </fileSet>
+        <!-- Create empty directories -->
+        <fileSet>
+            <outputDirectory>installer-logs</outputDirectory>
+            <directory>${project.basedir}/src/main/assembly/etc</directory>
+            <excludes>
+                <exclude>*</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>data</outputDirectory>
+            <directory>${project.basedir}/src/main/assembly/etc</directory>
+            <excludes>
+                <exclude>*</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
+    <files>
+        <file>
+            <destName>.version</destName>
+            <outputDirectory>config</outputDirectory>
+            <source>${project.basedir}/src/main/assembly/config/version</source>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <outputDirectory>sampleapp</outputDirectory>
+            <source>${project.basedir}/src/main/assembly/sampleapp/readme.txt</source>
+        </file>
+        <file>
+            <source>${project.basedir}/../../legal/README.TXT</source>
+        </file>
+    </files>
+</assembly>

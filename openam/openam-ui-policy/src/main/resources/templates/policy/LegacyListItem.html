@@ -1,0 +1,38 @@
+<li class="rule clearfix legacy-condition" id="legacy_{{itemID}}" tabindex="0" >
+
+	<span class="item-button-panel">
+		<span tabindex="0" class="icon-info tooltips tooltips-wide"><span>{{t "policy.conditionTypes.legacyFormat"}}</span></span>
+		<span tabindex="0" class="icon-remove"></span>
+	</span>
+
+	<div class="item-data">
+
+		{{#each itemData}}
+
+		  	{{#ifObject this}}
+		  		
+		    <div>
+			  	<h3>{{t @key}}</h3>
+				<span>{{stringify this}}</span>
+		    </div>
+		   
+		  	{{else}}
+
+		  	<div>
+			  	<h3>{{t @key}}</h3>
+				<span>{{this}}</span>
+		    </div>
+	
+		  	{{/ifObject}}
+
+		{{/each}}
+
+	</div>
+	
+</li>
+
+
+
+
+
+

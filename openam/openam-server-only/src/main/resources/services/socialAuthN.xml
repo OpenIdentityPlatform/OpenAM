@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ The contents of this file are subject to the terms of the Common Development and
+  ~ Distribution License (the License). You may not use this file except in compliance with the
+  ~ License.
+  ~
+  ~ You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  ~ specific language governing permission and limitations under the License.
+  ~
+  ~ When distributing Covered Software, include this CDDL Header Notice in each file and include
+  ~ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
+  ~ information: "Portions copyright [year] [name of copyright owner]".
+  ~
+  ~ Copyright 2014 ForgeRock AS.
+  -->
+
+
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="socialAuthNService" version="1.0">
+        <Schema serviceHierarchy="/DSAMEConfig/socialAuthNService"
+                i18nFileName="socialAuthN" revisionNumber="1"
+                i18nKey="forgerock-am-socialauthn-service-description">
+            <Organization>
+                <AttributeSchema name="MapValueValidator"
+                                 type="validator"
+                                 syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.common.configuration.MapValueValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="socialAuthNDisplayName"
+                                 type="list"
+                                 syntax="string"
+                                 uitype="maplist"
+                                 validator="MapValueValidator"
+                                 i18nKey="a101"/>
+                <AttributeSchema name="socialAuthNAuthChain"
+                                 type="list"
+                                 syntax="string"
+                                 uitype="maplist"
+                                 validator="MapValueValidator"
+                                 i18nKey="a102">
+                    <ChoiceValues>
+                        <ChoiceValuesClassName
+                                className="com.sun.identity.authentication.service.ConfiguredSocialAuthServices"/>
+                    </ChoiceValues>
+                </AttributeSchema>
+                <AttributeSchema name="socialAuthNIcon"
+                                 type="list"
+                                 syntax="string"
+                                 uitype="maplist"
+                                 validator="MapValueValidator"
+                                 i18nKey="a103"/>
+                <AttributeSchema name="socialAuthNEnabled"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a104"/>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
+

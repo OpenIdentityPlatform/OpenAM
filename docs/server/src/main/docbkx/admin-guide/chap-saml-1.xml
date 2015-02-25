@@ -1,0 +1,1397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<chapter xml:id='chap-saml-1'
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Managing SAML 1.x Single Sign-On</title>
+ <indexterm>
+  <primary>Federation</primary>
+  <secondary>SAML 1.x</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>SAML 1.x</primary>
+ </indexterm>
+
+ <para>
+  SAML 1.x describes an XML and SOAP based framework that allows
+  online trusted partners to exchange security information.
+  In particular, SAML 1.x defines mechanisms for
+  browser based web single sign-on (SSO) across independent organizations
+  that work together to permit SSO for access to resources.
+ </para>
+
+ <important>
+  <para>
+   Although not strictly compatible with SAML 1.x,
+   SAML 2.0 extends SAML 1.x to several additional use cases
+   and also clarifies how partners share metadata with each other.
+   Unless you are integrating with an existing SAML 1.x deployment
+   consider using SAML 2.0,
+   or an alternative such as OAuth 2.0 or OpenID Connect 1.0, instead.
+  </para>
+
+  <para>
+   See the following chapters for more information:
+   <link xlink:href="admin-guide#chap-federation" xlink:show="new"
+         xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+   >Managing SAML 2.0 Federation</citetitle></link>,
+   <link xlink:href="admin-guide#chap-oauth2" xlink:show="new"
+         xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+   >Managing OAuth 2.0 Authorization</citetitle></link>, and
+   <link xlink:href="admin-guide#chap-openid-connect" xlink:show="new"
+         xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+   >Managing OpenID Connect 1.0 Authorization</citetitle></link>.
+  </para>
+ </important>
+
+ <section xml:id="saml-1-about">
+  <title>About SAML 1.x</title>
+
+  <para>
+   SAML 1.x was defined in response to several technical problems.
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Web SSO solutions often use SSO session cookies.
+     Browsers do not return cookies across domains.
+     For instance, browsers do not return cookies
+     set by servers in the example.com domain
+     to servers in the example.net domain.
+     SAML 1.x works around this limitation of HTTP cookies.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Before SAML 1.x was defined, there were already proprietary SSO solutions,
+     but the solutions did not interoperate well across domains.
+    </para>
+
+    <para>
+     SAML 1.x specifies a standard, cross-domain, interoperable SSO mechanism
+     that works together with proprietary SSO services in a particular domain.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Before SAML 1.x was defined, there was not an easy way to communicate
+     security attributes across organization boundaries.
+    </para>
+
+    <para>
+     SAML 1.x simplifies the communication of security attributes
+     between different organizations.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   In SAML 1.x, business partners can play two roles.
+   The <firstterm>asserting party</firstterm>,
+   also known as the SAML authority
+   and whose domain is the Source site,
+   authenticates users and asserts information about them.
+   The <firstterm>relying party</firstterm>,
+   whose domain is known as the Destination site,
+   consumes assertions and uses information from the assertion
+   to decide whether to allows access to resources.
+  </para>
+
+  <para>
+   In the Web Browser SSO Profiles for SAML 1.x, the user generally starts
+   by authenticating with the asserting party
+   and then selecting a relying party link to browse.
+   Alternatively, the "Destination-Site-First" scenario can start
+   with the user browsing to the relying party's site
+   and being redirected to the asserting party's site to authenticate.
+  </para>
+
+  <para>
+   The SAML 1.x <firstterm>Inter-site Transfer Service</firstterm>
+   is a service that redirects the authenticated user
+   from the asserting party's site to the appropriate service
+   on the relying party's site.
+   The Inter-site Transfer Service also handles artifact and redirect generation.
+   How this service transfers the user to the relying party's site depends on
+   how the asserting party and the relying party exchange messages.
+  </para>
+
+  <para>
+   The asserting party and relying party can exchange messages either
+   by reference, where the asserting party sends
+   an <firstterm>artifact</firstterm>
+   (a base64 encoded reference to the assertion)
+   as a query string parameter value,
+   or by value, where the asserting party directs the user's browser
+   to HTTP POST the assertion to the relying party.
+  </para>
+
+  <para>
+   When the asserting party and relying party use artifacts,
+   the Inter-site Transfer Service redirects
+   the user's browser to the relying party's Artifact Receiver Service
+   with the artifact as the value of a query string parameter.
+   The relying party retrieves the artifact from the query string,
+   and then sends a SAML Request
+   to the Responder Service at the asserting party.
+   The asserting party replies
+   with a SAML Response containing one or more assertions.
+  </para>
+
+  <figure xml:id="figure-saml-1-browser-artifact-profile">
+   <title>SAML 1.x Web SSO Browser Artifact Profile</title>
+
+   <mediaobject>
+    <alt>Sequence diagram of the web SSO browser artifact profile</alt>
+    <imageobject>
+     <imagedata fileref="images/saml-1-browser-artifact-profile.png" format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>
+      Web SSO starts at the asserting party's site.
+      Authorization on the relying party's site is not shown.
+     </para>
+    </textobject>
+   </mediaobject>
+  </figure>
+
+  <para>
+   See section 4.1.1 of the <link xlink:show="new"
+   xlink:href="https://www.oasis-open.org/committees/download.php/6837/sstc-saml-tech-overview-1.1-cd.pdf"
+   >SAML 1.1 technical overview</link> for more detail.
+  </para>
+
+  <para>
+   When the assertion is sent using the Browser/POST Profile,
+   the Inter-site Transfer Service responds to the user's browser
+   with an auto-submitting form containing the SAML response.
+   The browser then submits the SAML response as form data by HTTP POST
+   to the relying party's Assertion Consumer Service.
+   The relying party's Assertion Consumer Service then processes the assertion.
+  </para>
+
+  <figure xml:id="figure-saml-1-browser-post-profile">
+   <title>SAML 1.x Web SSO Browser POST Profile</title>
+
+   <mediaobject>
+    <alt>Sequence diagram of the web SSO browser POST profile</alt>
+    <imageobject>
+     <imagedata fileref="images/saml-1-browser-post-profile.png" format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>
+      Web SSO starts at the asserting party's site.
+      Authorization on the relying party's site is not shown.
+     </para>
+    </textobject>
+   </mediaobject>
+  </figure>
+
+  <para>
+   See section 4.2.1 of the <link xlink:show="new"
+   xlink:href="https://www.oasis-open.org/committees/download.php/6837/sstc-saml-tech-overview-1.1-cd.pdf"
+   >SAML 1.1 technical overview</link> for more detail.
+  </para>
+
+  <para>
+   The Assertion Consumer Service at the relying party
+   validates the digital signature on the SAML response,
+   and redirects the browser to the target URL of the resource
+   that the user is attempting to access.
+   The server providing that resource uses
+   the relying party's authorization decision capabilities to
+   establish whether the user can access the resource.
+   If so, the resource is returned to the user's browser.
+   If the relying party is using OpenAM for example,
+   then the relying party sets an OpenAM SSO token based on the SAML response,
+   and this token is used to track the user's session for authorization.
+  </para>
+
+  <para>
+   Organizations working together to achieve SAML 1.x web SSO
+   are called <firstterm>trusted partners</firstterm> in this context.
+   Trusted partners agree on which services they provide,
+   which web SSO profiles they implement,
+   and how information is exchanged in the assertions,
+   including profile attribute values.
+   Once the trusted partners have reached agreement on how they interact,
+   you can collect information about your partners' configurations
+   and configure OpenAM to match your organization's part of the agreement.
+  </para>
+ </section>
+
+ <section xml:id="saml-1-gather-info">
+  <title>Gathering Configuration Information</title>
+
+  <para>
+   Before you can configure OpenAM to allow web SSO with trusted partners,
+   you must first gather information about the agreement itself,
+   as well as information for your site and for your partners sites.
+  </para>
+
+  <para>
+   This section lists the data that you must collect.
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     SAML protocol version to use (1.1 or 1.0; default: 1.1)
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Assertion version to use (1.1 or 1.0; default: 1.1)
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Which trusted partners play which roles (asserting party, relying party)
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Domain names of partner sites
+     (such as <literal>example.com</literal>, <literal>example.net</literal>)
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Whether assertions are exchanged by SAML artifact or by HTTP POST
+    </para>
+
+    <itemizedlist>
+     <para>
+      If assertions are exchanged by artifact, also gather this information:
+     </para>
+
+     <listitem>
+      <para>
+       SAML artifact parameter name (default: <literal>SAMLart</literal>)
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       Artifact timeout
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       URL to the relying party endpoint that receives the artifact
+       (such as <literal>https://rp.example.com/openam/SAMLAwareServlet</literal>)
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       Relying party hosts that consume artifacts
+       (by IP addresses, DNS names, or certificate aliases)
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       URL to the asserting party endpoint that responds to SAML requests
+       (such as <literal>https://ap.example.net/openam/SAMLSOAPReceiver</literal>)
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       Authentication credentials to connect to the asserting party endpoint,
+       if any (such as the username and password for HTTP Basic authentication)
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       Asserting party signing certificate alias
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+     <para>
+      If assertions are exchanged by HTTP POST, also gather this information:
+     </para>
+
+     <listitem>
+      <para>
+       URL to the relying party endpoint
+       that consumes the form data in the POST assertion
+       (such as <literal>https://rp.example.com/openam/SAMLPOSTProfileServlet</literal>)
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       Asserting party host:port issuing assertions
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       Asserting party signing certificate alias
+      </para>
+     </listitem>
+    </itemizedlist>
+   </listitem>
+
+   <listitem>
+    <para>
+     Whether the relying party sends SOAP query requests to the asserting party,
+     for example to get authorization decisions
+    </para>
+
+    <itemizedlist>
+     <para>
+      If the relying party queries the asserting party,
+      also gather this information:
+     </para>
+
+     <listitem>
+      <para>
+       Relying party hosts that consume artifacts
+       (by IP addresses, DNS names, or certificate aliases)
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       How to get SSO information,
+       and to map partner actions to authorization decisions
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       Asserting party host:port issuing assertions
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       Asserting party signing certificate alias
+      </para>
+     </listitem>
+    </itemizedlist>
+   </listitem>
+
+   <listitem>
+    <para>
+     Target specifier parameter name (default: <literal>TARGET</literal>)
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Assertion timeout
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Whether to digitally sign assertions, requests, responses
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Partners' public key certificates used for HTTPS
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Partners' public key certificates used for message signing
+     (unless included on the <literal>KeyInfo</literal> element of signed messages)
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Partners' Site IDs
+     (base64-encoded ID, such as <literal>XARFfsIAXeLX8BEWNIJg9Q8r0PE=</literal>)
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     What NameID formats are used to exchange names
+     (such as <literal>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</literal>)
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     How attributes map from an assertion to an OpenAM profile
+     (for example,
+     <literal>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress|EmailAddress=mail</literal>)
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   For more information about your own public key certificates,
+   see <xref linkend="saml-1-security" />.
+  </para>
+
+  <para>
+   For your own Site ID, see the following procedure.
+  </para>
+
+  <procedure xml:id="saml-1-own-site-id">
+   <title>To Generate a Site Identifier For an OpenAM Site</title>
+
+   <para>
+    Trusted partners should ask you for a Site ID.
+    OpenAM generates a SAML 1.x Site ID value at configuration time.
+    This Site ID value corresponds to the server.
+    To find this in OpenAM Console, see Federation
+    > SAML 1.x Configuration > Local Site Properties > Site Identifiers,
+    and then click your server URL.
+   </para>
+
+   <para>
+    If you have multiple servers in an OpenAM Site set up behind a load balancer,
+    you can generate a Site ID, and then use it for all the servers in your site.
+   </para>
+
+   <step>
+    <para>
+     Generate a Site ID for your site, using the primary site URL.
+    </para>
+
+    <para>
+     This example is for an asserting party
+     where the site load balancer host is <literal>ap.example.net</literal>.
+     The command is bundled with OpenAM server,
+     shown with lines folded to fit on the printed page.
+    </para>
+
+    <screen>
+$ <userinput>cd /path/to/tomcat/webapps/openam/WEB-INF/lib/</userinput>
+$ <userinput>java \
+ -cp ${forgerockUtilLibrary}:${sharedLibrary}:\
+    ${federationLibrary} com.sun.identity.saml.common.SAMLSiteID \
+    https://ap.example.net/openam</userinput>
+<computeroutput>9BAg4UmVS6IbjccsSj9gAFYGO9Y=</computeroutput>
+    </screen>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="saml-1-security">
+  <title>Preparing To Secure SAML 1.x Communications</title>
+
+  <para>
+   SAML communications are secured using Public Key Infrastructure (PKI).
+   Communications should be protected over the network by HTTPS,
+   and relying parties requesting assertions should use
+   SSL or TLS mutual authentication to identify each other,
+   meaning they should be able to trust each others' certificates.
+   Furthermore, when an asserting party works through the user's browser
+   to post an assertion to the relying party,
+   then the asserting party must digitally sign the SAML response.
+  </para>
+
+  <para>
+   A certificate can be trusted when the signer's certificate is trusted,
+   or when the certificate itself is trusted.
+   Trusted partners must either use public key certificates
+   signed by a well-known Certificate Authority (CA),
+   or share their self-signed or private CA signing certificates.
+  </para>
+
+  <procedure xml:id="saml-1-configure-keys">
+   <title>To Configure Keys For Protecting SAML 1.x Communications</title>
+
+   <step>
+    <para>
+     See the chapter
+     <link xlink:href="admin-guide#chap-certs-keystores" xlink:show="new"
+           xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+     >Managing Certificates</citetitle></link>
+     for instructions on handling your own key pairs.
+    </para>
+
+    <para>
+     For specific instructions on changing signing keys, see the procedure
+     <link xlink:href="admin-guide#change-signing-key" xlink:show="new"
+           xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+     >To Change the Signing Key for Federation</citetitle></link>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     If necessary, share signing certificates with trusted partners.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Import public key certificates shared by trusted partners
+     into your OpenAM key store.
+    </para>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="saml-1-configure-local-site">
+  <title>Configuring SAML 1.x For Your Site</title>
+
+  <para>
+   After you have gathered configuration information
+   and prepared to secure SAML 1.x communications
+   you can configure SAML 1.x for your site.
+  </para>
+
+  <tip>
+   <para>
+    When you enter SAML 1.x configuration data,
+    OpenAM Console escapes these special characters by default:
+    <literal>&amp; &lt; &gt; " ' /</literal>.
+    If instead you have already escaped these characters
+    in the data that you plan to enter in OpenAM Console,
+    then set the advanced configuration property
+    <literal>com.sun.identity.saml.escapeattributevalue</literal>
+    to <literal>false</literal>
+    under Configuration > Servers and Sites > Default Server Settings > Advanced,
+    and then restart OpenAM or the container in which it runs
+    to prevent OpenAM Console from escaping the characters for you.
+   </para>
+  </tip>
+
+  <itemizedlist>
+   <listitem>
+    <para><xref linkend="saml-1-configure-local-ap" /></para>
+   </listitem>
+
+   <listitem>
+    <para><xref linkend="saml-1-configure-local-rp" /></para>
+   </listitem>
+  </itemizedlist>
+
+  <procedure xml:id="saml-1-configure-local-ap">
+   <title>To Configure Asserting Party Local Site Properties</title>
+
+   <para>
+    Using the configuration information you have gathered
+    complete the following steps.
+   </para>
+
+   <step>
+    <para>
+     Login to OpenAM Console as administrator, amadmin,
+     browse to Federation > SAML 1.x Configuration,
+     and then click Local Site Properties.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     If the target specifier query string parameter
+     is something other than the standard default TARGET,
+     set it in the Target Specifier field.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     If instead of the default server Site Identifier,
+     you use a Site Identifier for the OpenAM Site,
+     click New in the Site Identifiers table,
+     and then add the information for the OpenAM Site,
+     including the Site ID that you generated.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Target URLs let you configure URLs for which HTTP POST is always used.
+    </para>
+
+    <para>
+     When the TARGET specified matches a URL in the Target URLs list,
+     then the asserting party sends the response to the relying party
+     by HTTP POST of an auto-submitting form returned to the browser.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     If necessary, set the Default Protocol Version.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Assertion section, change the values if necessary.
+    </para>
+
+    <para>
+     Remove Assertion: Yes means that assertions are deleted from memory
+     after they are used, rather than deleted only when they expire.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Artifact section, change the values if necessary.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Signing section,
+     for an asserting party using the HTTP POST profile,
+     check at least Sign SAML Assertion.
+    </para>
+
+    <para>
+     By default OpenAM signs messages using the certificate with alias test.
+    </para>
+
+    <para>
+     Check other options as required by your trusted partners.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Attribute Query section, if relying parties issue attribute queries,
+     then set the default list of profile attributes to return.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the NameID Format section,
+     map SAML NameID formats to local OpenAM user profile attributes.
+    </para>
+
+    <para>
+     This allows OpenAM to map a remote user to a local user profile.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Attribute Map section, if the parties exchange attributes,
+     then map the SAML attributes requested by relying parties
+     to local OpenAM user profile attributes.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Save your work.
+    </para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="saml-1-configure-local-rp">
+   <title>To Configure Relying Party Local Site Properties</title>
+
+   <para>
+    Using the configuration information you have gathered
+    complete the following steps.
+   </para>
+
+   <step>
+    <para>
+     Login to OpenAM Console as administrator, amadmin,
+     browse to Federation > SAML 1.x Configuration,
+     and then click Local Site Properties.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     If the target specifier query string parameter
+     is something other than the standard default TARGET,
+     set it in the Target Specifier field.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     If instead of the default server Site Identifier,
+     you use a Site Identifier for the OpenAM Site,
+     click New in the Site Identifiers table,
+     and then add the information for the OpenAM Site,
+     including the Site ID that you generated.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Ignore the Target URLs table for a relying party.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     If necessary, set the Default Protocol Version.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Assertion section, change the values if necessary.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Artifact section, change the values if necessary.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Ignore the Signing section for relying parties,
+     unless trusted partners require that your site signs SAML requests.
+    </para>
+
+    <para>
+     By default OpenAM signs messages using the certificate
+     with alias <literal>test</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Ignore the Attribute Query section for relying parties.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the NameID Format section,
+     map SAML NameID formats to local OpenAM user profile attributes.
+    </para>
+
+    <para>
+     This allows OpenAM to map a remote user to a local user profile
+     when not all the partners are using OpenAM user IDs.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Attribute Map section, if the parties exchange attributes,
+     then map the SAML attributes requested by relying parties
+     to local OpenAM user profile attributes.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Save your work.
+    </para>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="saml-1-configure-trusted-partners">
+  <title>Configuring SAML 1.x Trusted Partners</title>
+
+  <para>
+   After you have gathered configuration information
+   and if necessary imported public key certificates from trusted partners
+   you can configure SAML 1.x information for the partners.
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para><xref linkend="saml-1-configure-trusted-rp" /></para>
+   </listitem>
+
+   <listitem>
+    <para><xref linkend="saml-1-configure-trusted-ap" /></para>
+   </listitem>
+  </itemizedlist>
+
+  <procedure xml:id="saml-1-configure-trusted-rp">
+   <title>To Configure a Trusted Relying Party</title>
+
+   <para>
+    OpenAM Console refers to the relying party as the Destination,
+    because the relying party's site is the destination site.
+   </para>
+
+   <step>
+    <para>
+     Login to OpenAM Console as administrator, amadmin,
+     browse to Federation > SAML 1.x Configuration,
+     and then click New in the Trusted Partners table.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Under Destination, select the SAML profiles used with the relying party.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Common Settings section,
+     set at least a name for the partner configuration,
+     enter the partner's Site ID as the Source ID,
+     and specify the fully qualified domain, optionally with the port number,
+     of the relying party in the Target field.
+     The value in the target field is matched to TARGET parameter values,
+     so it should correspond to the real domain (and optionally port number)
+     in the URLs of resources to access at the relying party's site.
+    </para>
+
+    <para>
+     Optionally set a custom site attribute mapper,
+     a custom name identifier mapper,
+     and the SAML Version to use with the partner.
+    </para>
+
+    <para>
+     You must also set one or more values in the host list for the partner
+     to identify all hosts from the partner site that can send requests.
+     OpenAM rejects SAML requests from hosts not specified in this list.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Destination section,
+     if the SAML Artifact profile is used with the relying party,
+     set the SAML URL to the relying party's endpoint
+     that receives the artifact and contacts your asserting party.
+    </para>
+
+    <para>
+     If the SAML POST profile is used with the relying party,
+     set the Post URL to the relying party's endpoint
+     that consumes the assertion in the HTTP POST form data
+     and redirects the user's browser to the target
+     at the relying party's site.
+    </para>
+
+    <para>
+     If the relying party makes SAML SOAP query requests,
+     optionally set custom attribute or action mappers.
+    </para>
+
+    <para>
+     If the relying party signs requests,
+     then either requests include the certificate for the signing key
+     in the KeyInfo element,
+     or OpenAM must find the signing certificate elsewhere.
+     If the relying party provides the signing certificate separately,
+     import the signing certificate
+     into OpenAM's <filename>keystore.jks</filename> file,
+     and set the alias for the signing certificate here in the configuration.
+    </para>
+
+    <para>
+     Set the issuer to a host:port combination
+     corresponding to the relying party server issuing the requests.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Save your work.
+    </para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="saml-1-configure-trusted-ap">
+   <title>To Configure a Trusted Asserting Party</title>
+
+   <para>
+    OpenAM Console refers to the asserting party as the Source,
+    because the asserting party's site is the source site.
+   </para>
+
+   <step>
+    <para>
+     Login to OpenAM Console as administrator, amadmin,
+     browse to Federation > SAML 1.x Configuration,
+     and then click New in the Trusted Partners table.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Under Source, select the SAML profiles used with the asserting party.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Common Settings section,
+     set at least a name for the partner configuration
+     and enter the partner's Site ID as the Source ID.
+    </para>
+
+    <para>
+     Optionally set a custom account mapper.
+     By default OpenAM maps accounts
+     based on the NameID format configuration for your site.
+    </para>
+
+    <para>
+     If the asserting party signs assertions (or other messages)
+     and you have imported the signing certificate
+     into OpenAM's key store (also used as a trust store),
+     then enter the signing certificate alias.
+     If instead the asserting party includes the signing certificate
+     in the KeyInfo element of signed messages,
+     then you can leave the alias blank.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Source section,
+     if the SAML Artifact profile is used with the asserting party,
+     set the SOAP URL to the asserting party endpoint that responds to requests
+     such as <literal>https://ap.example.net/openam/SAMLSOAPReceiver</literal>.
+    </para>
+
+    <para>
+     If the asserting party requires authentication to the SOAP URL,
+     then configure the settings appropriately.
+    </para>
+
+    <para>
+     If the SOAP URL is accessed over HTTP, choose None or Basic.
+     If the SOAP URL is accessed over HTTPS, choose SSL/TLS or SSL/TLS with Basic.
+    </para>
+
+    <para>
+     Basic means HTTP Basic authentication (with username and password).
+     For HTTP Basic authentication,
+     the authentication at this level is performed
+     by the application server container, not OpenAM.
+     Therefore if the asserting party runs OpenAM
+     and wants to enforce HTTP Basic authentication,
+     the asserting party administrator must set up the container
+     to handle HTTP Basic authentication for the SOAP URL.
+    </para>
+
+    <para>
+     Set the SAML Version as necessary.
+    </para>
+
+    <para>
+     If the SAML POST profile is used with the asserting party,
+     set the Issuer to the issuer name, such as a host:port combination.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Save your work.
+    </para>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="saml-1-test-web-sso">
+  <title>Testing SAML 1.x Web SSO</title>
+
+  <para>
+   You can try SAML 1.x Web SSO using OpenAM
+   by following the procedures in this section.
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para><xref linkend="saml-1-test-prepare-servers" /></para>
+   </listitem>
+
+   <listitem>
+    <para><xref linkend="saml-1-test-ap" /></para>
+   </listitem>
+
+   <listitem>
+    <para><xref linkend="saml-1-test-rp" /></para>
+   </listitem>
+
+   <listitem>
+    <para><xref linkend="saml-1-try-it-out" /></para>
+   </listitem>
+  </itemizedlist>
+
+  <procedure xml:id="saml-1-test-prepare-servers">
+   <title>To Prepare the OpenAM Servers</title>
+
+   <step>
+    <para>
+     Install two separate OpenAM servers,
+     one to act as asserting party,
+     the other to act as relying party.
+    </para>
+
+    <para>
+     How you do this in practice is up to you.
+    </para>
+
+    <para>
+     You can for example set up two separate OpenAM servers on a single host
+     by adding aliases for the hosts in your hosts file,
+     and by using separate containers that listen on different ports.
+    </para>
+
+    <para>
+     For example if your host is a laptop,
+     you can add the aliases to the loopback address
+     as in the following example line
+     from an <filename>/etc/hosts</filename> file.
+    </para>
+
+    <literallayout class="monospaced"
+    >127.0.0.1    localhost ap.example.net rp.example.com</literallayout>
+
+    <para>
+     Then run one application server to listen on port 8080,
+     and another to listen on port 9080.
+    </para>
+
+    <para>
+     Deploy and configure OpenAM server with the default configuration
+     at <literal>http://ap.example.net:8080/ap</literal> for the asserting party
+     and at <literal>http://rp.example.com:9080/rp</literal> for the relying party.
+     This allows you to use the default configuration for both servers.
+    </para>
+
+    <para>
+     See the
+     <link xlink:href="install-guide#install-guide" xlink:show="new"
+           xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+     >Installation Guide</citetitle></link> for instructions.
+    </para>
+
+    <para>
+     The procedures in this section use those example URLs
+     to represent the OpenAM servers acting as asserting and relying parties.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     On the asserting party server,
+     login to OpenAM Console as administrator,
+     browse to Federation > SAML 1.x Configuration,
+     and then click Local Site Properties.
+    </para>
+
+    <para>
+     Click the server's instance ID in the Site Identifiers table.
+    </para>
+
+    <para>
+     Record the asserting party Site ID for later use.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     On the relying party server,
+     login to OpenAM Console as administrator,
+     browse to Federation > SAML 1.x Configuration,
+     and then click Local Site Properties.
+    </para>
+
+    <para>
+     Click the server's instance ID in the Site Identifiers table.
+    </para>
+
+    <para>
+     Record the asserting party Site ID for later use.
+    </para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="saml-1-test-ap">
+   <title>To Prepare to Test the Asserting Party</title>
+
+   <para>
+    Follow these steps to configure the asserting party OpenAM server.
+   </para>
+
+   <step>
+    <para>
+     Login to OpenAM Console as administrator,
+     browse to Federation > SAML 1.x Configuration,
+     and then click Local Site Properties.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     On the Local Site Properties page
+     for the asserting party server,
+     select Sign SAML Response.
+    </para>
+
+    <para>
+     The asserting party thus signs SAML responses
+     with the private key for the default test certificate.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Save your work,
+     and then click Back to Federation.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Click New in the Trusted Partners table
+     to add the relying party as a trusted partner.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Destination area of the Select trusted partner type and profile page,
+     select Artifact and Post (not SOAP Query), and then click Next.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Apply the following settings, adjusted for the host names you use.
+    </para>
+
+    <para>
+     If a field is not mentioned, accept the defaults.
+    </para>
+
+    <para>
+     Under Common Settings, use these settings:
+    </para>
+
+    <simplelist>
+     <member>Name: rp.example.com:9080</member>
+     <member>Source ID: relying party Site ID that you recorded</member>
+     <member>Target: rp.example.com:9080</member>
+    </simplelist>
+
+    <para>
+     Under Destination > Artifact, use these settings:
+    </para>
+
+    <simplelist>
+     <member>SOAP URL: http://rp.example.com:9080/rp/SAMLAwareServlet</member>
+     <member>Host List: rp.example.com</member>
+    </simplelist>
+
+    <para>
+     Under Source > Post,
+     set Post URL: http://rp.example.com:9080/rp/SAMLPOSTProfileServlet
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Click Finish to save your work.
+    </para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="saml-1-test-rp">
+   <title>To Prepare to Test the Relying Party</title>
+
+   <para>
+    Follow these steps to configure the relying party OpenAM server.
+   </para>
+
+   <step>
+    <para>
+     Login to OpenAM Console as administrator,
+     browse to Federation > SAML 1.x Configuration,
+     and then click New in the Trusted Partners table
+     to add the asserting party as a trusted partner.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Source area of the Select trusted partner type and profile page,
+     select Artifact and Post, and then click Next.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Apply the following settings, adjusted for the host names you use.
+    </para>
+
+    <para>
+     If a field is not mentioned, accept the defaults.
+    </para>
+
+    <para>
+     Under Common Settings, use these settings:
+    </para>
+
+    <simplelist>
+     <member>Name: ap.example.net:8080</member>
+     <member>Source ID: asserting party Site ID that you recorded</member>
+     <member>Signing Certificate Alias: test</member>
+    </simplelist>
+
+    <para>
+     Under Source > Artifact,
+     set SOAP URL: http://ap.example.net:8080/ap/SAMLSOAPReceiver
+    </para>
+
+    <para>
+     Under Source > Post, set Issuer: ap.example.net:8080
+    </para>
+
+    <para>
+     Click Finish to save your work.
+    </para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="saml-1-try-it-out">
+   <title>To Try SAML 1.x Web SSO</title>
+
+   <para>
+    Once you have successfully configured both parties, try SAML 1.x Web SSO.
+   </para>
+
+   <step>
+    <para>
+     Log out of OpenAM Console on both servers.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Try Web SSO using the SAML Artifact profile.
+    </para>
+
+    <substeps>
+     <step>
+      <para>
+       Simulate the OpenAM administrator browsing the asserting party's site,
+       and selecting a link to the OpenAM Console on the relying party's site.
+      </para>
+
+      <para>
+       The URL to simulate this action is something like
+       <literal>http://ap.example.net:8080/ap/SAMLAwareServlet?TARGET=http://rp.example.com:9080/rp</literal>.
+      </para>
+
+      <para>
+       OpenAM requires that you authenticate.
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Login as OpenAM demo user,
+       <literal>demo</literal> with default password <literal>changeit</literal>,
+       on the asserting party server.
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Notice that you are redirected to OpenAM Console on the relying party server,
+       and that you are successfully logged in as the demo user.
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Log out of OpenAM Console on both servers.
+      </para>
+     </step>
+    </substeps>
+   </step>
+
+   <step>
+    <para>
+     Try Web SSO using the SAML HTTP POST profile.
+    </para>
+
+    <substeps>
+     <step>
+      <para>
+       Simulate the OpenAM administrator browsing the asserting party's site,
+       and selecting a link to the OpenAM Console on the relying party's site.
+      </para>
+
+      <para>
+       The URL to simulate this action is something like
+       <literal>http://ap.example.net:8080/ap/SAMLPOSTProfileServlet?TARGET=http://rp.example.com:9080/rp</literal>.
+      </para>
+
+      <para>
+       OpenAM requires that you authenticate.
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Login as OpenAM administrator, <literal>amadmin</literal>,
+       on the asserting party server.
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Notice that you are redirected to OpenAM Console on the relying party server,
+       and that you are successfully logged in as <literal>amadmin</literal>.
+      </para>
+     </step>
+    </substeps>
+   </step>
+  </procedure>
+ </section>
+</chapter>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-troubleshooting'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Troubleshooting</title>
+
+ <indexterm>
+  <primary>troubleshooting</primary>
+ </indexterm>
+ <indexterm>
+  <primary>web policy agent</primary>
+  <secondary>troubleshooting</secondary>
+ </indexterm>
+
+ <para>This chapter offers solutions to issues during installation of OpenAM
+  policy agents.</para>
+ 
+ <qandaset xml:id="solutions-to-common-issues" defaultlabel="qanda">
+  <title>Solutions to Common Issues</title>
+
+   <para>This section offers solutions to common problems when installing 
+   OpenAM policy agents.</para>
+  
+  <qandaentry xml:id="cannot-install-over-https">
+   <question>
+    <para>I am trying to install a policy agent, connecting to OpenAM over
+    HTTPS, and seeing the following error.</para>
+
+    <screen>
+<computeroutput>OpenAM server URL: https://openam.example.com:8443/openam
+
+WARNING: Unable to connect to OpenAM server URL. Please specify the
+correct OpenAM server URL by hitting the Back button (&lt;) or if the OpenAM
+server URL is not started and you want to start it later, please proceed with
+the installation.
+If OpenAM server is SSL enabled and the root CA certificate for the OpenAM
+server certificate has been not imported into installer JVMs key store (see
+installer-logs/debug/Agent.log for detailed exception), import the root
+CA certificate and restart the installer; or continue installation without
+verifying OpenAM server URL.</computeroutput>
+    </screen>
+
+    <para>What should I do?</para>
+   </question>
+
+   <answer>
+    <para>The Java platform includes certificates from many Certificate
+    Authorities (CAs). If however you run your own CA, or you use self-signed
+    certificates for HTTPS on the container where you run OpenAM, then the
+    <command>agentadmin</command> command cannot trust the certificate
+    presented during connection to OpenAM, and so cannot complete installation
+    correctly.</para>
+
+    <para>After setting up the container where you run OpenAM to use HTTPS,
+    get the certificate to trust in a certificate file. The certificate you
+    want is the that of the CA who signed the container certificate, or the
+    certificate itself if the container certificate is self-signed.</para>
+
+    <para>Copy the certificate file to the system where you plan to install the
+    policy agent. Import the certificate into a trust store that you will use
+    during policy agent installation. If you import the certificate into the
+    default trust store for the Java platform, then the
+    <command>agentadmin</command> command can recognize it without additional
+    configuration.</para>
+
+    <para>Export and import of self-signed certificates is demonstrated in the
+    <citetitle>Administration Guide</citetitle> chapter on <link
+    xlink:show="new" xlink:href="${serverDocBase}/admin-guide/#chap-certs-keystores"
+      ><citetitle>Managing Certificates</citetitle></link>.</para>
+   </answer>
+  </qandaentry>
+
+  <qandaentry xml:id="debug-file-and-SELinux">
+   <question>
+    <para>I am trying to install the policy agent on SELinux and I am getting error messages
+  after installation. What happened?</para>
+   </question>
+   <answer>
+    <para>SELinux must be properly configured to connect the web policy agent and OpenAM
+  nodes. Either re-configure SELinux or disable it, then reinstall the policy agent.</para>
+   </answer>
+  </qandaentry>
+
+  <qandaentry xml:id="apache-defaults-to-port-80">
+   <question>
+    <para>My Apache HTTPD server is not using port 80. But when I install the
+    web policy agent it defaults to port 80. How do I fix this?</para>
+   </question>
+
+   <answer>
+    <para>You probably set <literal>ServerName</literal> in Apache HTTPD's
+    configuration to the host name, but did not specify the port number.</para>
+
+    <para>Instead you must set both the host name and port number for
+    <literal>ServerName</literal> in Apache HTTPD's configuration. For
+    example, if you have Apache HTTPD configured to listen on port 8080, then
+    set <literal>ServerName</literal> appropriately as in the following
+    excerpt.</para>
+
+    <programlisting language="plain"
+    >&lt;VirtualHost *:8080&gt;
+ServerName www.localhost.example:8080</programlisting>
+   </answer>
+  </qandaentry>
+
+  <qandaentry xml:id="web-agent-cannot-rotate-logs">
+   <question>
+    <para>My web server and web policy agent are installed as root, and the
+    agent cannot rotate logs. I am seeing this error.</para>
+
+    <literallayout class="monospaced">Could not rotate log file ... (error: 13)</literallayout>
+
+    <para>What should I do?</para>
+   </question>
+
+   <answer>
+    <para>First, avoid installing the web server (and therefore also the web
+    policy agent) as root, but instead create a web server user and install
+    as that user.</para>
+
+    <para>If however you cannot avoid installing the web server and policy agent
+    as root, the you must give all users read and write permissions to the
+    <filename>logs/</filename> and <filename>logs/debug</filename> directories
+    under the agent instance directory (
+    <filename>/path/to/web_agents/<replaceable>type</replaceable>/Agent_<replaceable>number</replaceable>/logs/</filename>).
+    Otherwise the web policy agent fails to rotate log files with the error
+    you observed.</para>
+   </answer>
+  </qandaentry>
+
+  <qandaentry xml:id="install-multiple-agents">
+   <question>
+    <para>I have multiple web servers on a single system, and want to protect each of them with a policy agent.</para>
+   </question>
+
+   <answer>
+    <para>Once both web policy agents are installed, navigate to the <filename>/path/to/Agent_00x</filename>
+     directory, and then open the <filename>OpenSSOAgentBootstrap.properties</filename> file. Near the
+     end of the file, you should see the following attribute:</para>
+
+     <literallayout class="monospaced">com.forgerock.agents.instance.id=</literallayout>
+
+    <para>Set that attribute to an appropriate unique value such as <literal>1</literal> or
+     <literal>2</literal>. Restart the web service that is being protected by the agent.
+     If successful, you should see related shared memory files, with time stamps updated for
+     the restarted web services. On a Linux system, you may see these files in the
+     <filename>/dev/shm</filename> directory. On a Solaris system, you may see these files
+     in the <filename>/tmp</filename> directory.
+    </para>
+   </answer>
+ </qandaentry>
+
+ <qandaentry xml:id="valid-goto-url-resources">
+  <question>
+   <para>How do I increase security against possible phishing attacks through
+    open redirect?
+   </para>
+  </question>
+
+  <answer>
+   <para>You can specify a list of valid URL resources against which OpenAM
+    validates the <literal>goto</literal> and <literal>gotoOnFail</literal> URL
+    using the Valid <literal>goto</literal> URL Resource service.
+   </para>
+   <para>
+    OpenAM only redirects a user if the <literal>goto</literal>
+    and <literal>gotoOnFail</literal> URL matches
+    any of the resources specified in this setting.
+    If no setting is present, it is assumed that the <literal>goto</literal>
+    and <literal>gotoOnFail</literal> URL is valid.
+   </para>
+   <para>To set the Valid <literal>goto</literal> URL Resources, use the OpenAM
+    console, and navigate to Access Control &gt; <replaceable>Realm Name </replaceable>
+    &gt; Services. Click Add, select Validation Service, and then add one or more
+    valid <literal>goto</literal> URLs.
+   </para>
+   <para>
+    You can use the "*" wildcard to define resources,
+    where "*" matches all characters except "?".
+    For example, you can use the wildcards,
+    such as <literal>https://website.example.com/*</literal>
+    or <literal>https://website.example.com/*?*</literal>.
+    For more specific patterns,
+    use resource names with wildcards as described in the procedure,
+    <link
+     xlink:href="${serverDocBase}/admin-guide/#configure-valid-goto-url-resources"
+     xlink:show="new"
+     ><citetitle>Configuring Valid goto URL Resources</citetitle></link>.
+   </para>
+  </answer>
+ </qandaentry>
+ </qandaset>
+</chapter>

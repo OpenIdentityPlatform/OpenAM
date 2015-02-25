@@ -1,0 +1,70 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: version.template,v 1.5 2009/05/19 21:25:46 dknab Exp $
+ *
+ * Abstract:
+ *
+ * Version object
+ */
+
+/*
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
+ */
+
+#ifndef _VERSION_H_
+#define _VERSION_H_
+#include "internal_macros.h"
+
+#define BUILD_TS __DATE__" "__TIME__
+
+BEGIN_PRIVATE_NAMESPACE
+
+class Version {
+public:
+    static const char* getAgentVersion() {return "@AGENT_VER@";}
+    static const char* getERVersion() {
+        char erVersion[] = "@AGENT_ER_VER@";
+        if ((erVersion != NULL) && (strcmp(erVersion,"") != 0)) {
+            return "@AGENT_ER_VER@";
+        } else {
+            return NULL;
+        }
+    }
+    static const char* getFVBMarker() {
+        char fvbMarker[] = "@AGENT_FVB_MARKER@";
+        if ((fvbMarker != NULL) && (strcmp(fvbMarker,"") != 0)) {
+            return "@AGENT_FVB_MARKER@";
+        } else {
+            return NULL;
+        }
+    }
+    static const char* getBuildRev() {return "@SVN_REVISION@";}
+    static const char* getBuildDate() {return BUILD_TS;}
+    static const char* getBuildMachine() {return "@BUILD_MACHINE@";}
+};
+
+END_PRIVATE_NAMESPACE
+
+#endif

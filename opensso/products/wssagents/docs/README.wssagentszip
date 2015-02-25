@@ -1,0 +1,47 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README.wssagentszip,v 1.12 2009/08/11 07:14:42 mrudul_uchil Exp $
+
+   Portions Copyright 2013 ForgeRock AS
+
+-->
+
+OpenAM Web Services Security Agents / Providers - Zip file
+
+openssowssproviders.zip
+             |____ lib/openssoclientsdk.jar (complete OpenAM clientsdk jar)
+             |____ lib/openssowssproviders.jar (complete WSS Providers/Agents jar - currently supported on Glassfish / AS 9.1 only)
+             |____ lib/*.jar (other jar files required for OpenAM client and WSS Providers/Agents)
+             |____ config/AMConfig.properties (complete OpenAM client properties)
+             |____ config/OpenSSOJavaPermissions.txt (Java permissions for OpenAM)
+             |____ resources/keystore.jks (client keystore file)
+             |____ resources/.keypass (password file for key)
+             |____ resources/.storepass (password file for keystore)
+             |____ README (this file)
+             |____ README.glassfish (instructions to setup glassfish environment for WSS Providers/Agents)
+             |____ license.txt
+             |____ samples/* (WSC/WSP samples using WSS Providers/Agents on Glassfish / AS 9.1 container)
+             |____ bin/wssagentadmin (installer for unix/linux)
+             |____ bin/wssagentadmin.bat (installer for Windows)

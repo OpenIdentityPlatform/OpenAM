@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: lib-svc-dst-dt.xsd,v 1.2 2008/06/25 05:48:41 qcheng Exp $
+
+-->
+
+
+<xs:schema xmlns:md="urn:liberty:metadata:2003-08" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:import namespace="urn:liberty:metadata:2003-08" schemaLocation="lib-arch-metadata.xsd"/>
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+    <xs:include schemaLocation="lib-arch-iwsf-utility.xsd"/>
+    <xs:annotation>
+        <xs:documentation>Liberty Alliance Project ID-WSF Data Services Template Data Types Schema</xs:documentation>
+        <xs:documentation>
+The source code in this XSD file was excerpted verbatim from:
+
+Liberty ID-WSF Data Services Template Specification
+Version 1.0
+12th November 2003
+
+Copyright (c) 2003 Liberty Alliance participants, see
+http://www.projectliberty.org/specs/idwsf_copyrights.html
+
+        </xs:documentation>
+    </xs:annotation>
+    <!-- Common attributes to be used by different services when found useful/needed-->
+    <xs:attribute name="id" type="IDType"/>
+    <xs:attribute name="modificationTime" type="xs:dateTime"/>
+    <xs:attributeGroup name="commonAttributes">
+        <xs:attribute ref="id"/>
+        <xs:attribute ref="modificationTime"/>
+    </xs:attributeGroup>
+    <xs:attribute name="ACC" type="xs:anyURI"/>
+    <xs:attribute name="ACCTime" type="xs:dateTime"/>
+    <xs:attribute name="modifier" type="md:entityIDType"/>
+    <xs:attributeGroup name="leafAttributes">
+        <xs:attributeGroup ref="commonAttributes"/>
+        <xs:attribute ref="ACC"/>
+        <xs:attribute ref="ACCTime"/>
+        <xs:attribute ref="modifier"/>
+    </xs:attributeGroup>
+    <xs:attribute name="script" type="xs:anyURI"/>
+    <xs:attributeGroup name="localizedLeafAttributes">
+        <xs:attributeGroup ref="leafAttributes"/>
+        <xs:attribute ref="xml:lang" use="required"/>
+        <xs:attribute ref="script"/>
+    </xs:attributeGroup>
+    <!-- Common data types to be used by different services when found useful/needed-->
+    <xs:complexType name="DSTLocalizedString">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attributeGroup ref="localizedLeafAttributes"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="DSTString">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attributeGroup ref="leafAttributes"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="DSTInteger">
+        <xs:simpleContent>
+            <xs:extension base="xs:integer">
+                <xs:attributeGroup ref="leafAttributes"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="DSTURI">
+        <xs:simpleContent>
+            <xs:extension base="xs:anyURI">
+                <xs:attributeGroup ref="leafAttributes"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="DSTDate">
+        <xs:simpleContent>
+            <xs:extension base="xs:date">
+                <xs:attributeGroup ref="leafAttributes"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="DSTMonthDay">
+        <xs:simpleContent>
+            <xs:extension base="xs:gMonthDay">
+                <xs:attributeGroup ref="leafAttributes"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+</xs:schema>

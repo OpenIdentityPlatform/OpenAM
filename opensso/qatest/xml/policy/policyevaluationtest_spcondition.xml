@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+ 
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+ 
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+ 
+   $Id: policyevaluationtest_spcondition.xml,v 1.3 2008/05/06 17:25:02 inthanga Exp $: 
+ 
+   Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+-->
+
+<!DOCTYPE Policies
+PUBLIC "-//Sun Java System Access Manager 7.1 2006Q3 Admin CLI DTD//EN"
+"jar://com/sun/identity/policy/policyAdmin.dtd"
+>
+
+<Policies>
+    <Policy name="policyevaluationtest_spcondition0"
+            referralPolicy="false"
+            description="policy with 2 diff property values"
+            active="true" >
+        <Rule name="r1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://www.spcondition0.com:80/banner.html" />
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+        </Rule>
+        
+        <Subjects name="multiple Subjects" description="">	
+            <Subject name="AmidUser" type="AMIdentitySubject" 
+                     includeType="inclusive">
+                <AttributeValuePair><Attribute name="Values"/>
+                    <Value>id=spuser0,ou=user,SM_SUFFIX</Value>                    
+                </AttributeValuePair>
+            </Subject>
+            <Subject name="AmidGroup" type="AMIdentitySubject" 
+                     includeType="inclusive">    
+                <AttributeValuePair><Attribute name="Values"/>
+                    <Value>id=spgroup1,ou=group,SM_SUFFIX</Value>
+                </AttributeValuePair>
+            </Subject>
+            <Subject name="AmidRole" type="AMIdentitySubject" 
+                     includeType="inclusive">
+                <AttributeValuePair><Attribute name="Values"/>
+                    <Value>id=sprole1, ou=role,SM_SUFFIX</Value>
+                </AttributeValuePair>
+            </Subject>
+        </Subjects>
+        <Conditions name="Conditions1" description="">
+            <Condition name="sessionproperties" type="SessionPropertyCondition">
+                <AttributeValuePair><Attribute name="valueCaseInsensitive"/>
+                    <Value>true</Value>
+                </AttributeValuePair>
+                <AttributeValuePair><Attribute name="country"/>
+                    <Value>usa</Value>
+                </AttributeValuePair>
+                <AttributeValuePair><Attribute name="state"/>
+                    <Value>ca</Value>
+                </AttributeValuePair>
+            </Condition>
+        </Conditions>
+        
+    </Policy>
+    <Policy name="policyevaluationtest_spcondition1" 
+            referralPolicy="false" description="policy with 2 diff 
+            property values with multiple values for each" active="true" >            
+        <Rule name="r1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://www.spcondition1.com:80/banner.html"/>
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+        </Rule>
+        <Subjects>
+            <Subject name="AmidUser" type="AMIdentitySubject" 
+                     includeType="inclusive">
+                <AttributeValuePair><Attribute name="Values"/>
+                    <Value>id=spuser1,ou=user,SM_SUFFIX</Value>                    
+                </AttributeValuePair>
+            </Subject>
+            <Subject name="AmidUser2" type="AMIdentitySubject" 
+                     includeType="inclusive">
+                <AttributeValuePair><Attribute name="Values"/>
+                    <Value>id=spuser2,ou=user,SM_SUFFIX</Value>                    
+                </AttributeValuePair>
+            </Subject>
+        </Subjects>
+        <Conditions name="Conditions1" description="">
+            <Condition name="sessionproperties" 
+                       type="SessionPropertyCondition">
+                <AttributeValuePair><Attribute name="valueCaseInsensitive"/>
+                    <Value>true</Value>
+                </AttributeValuePair>
+                <AttributeValuePair><Attribute name="country"/>
+                    <Value>usa</Value>            
+                    <Value>INDIA</Value>
+                </AttributeValuePair>
+                <AttributeValuePair><Attribute name="state"/>
+                    <Value>CA</Value>
+                    <Value>pa</Value>
+                </AttributeValuePair>                
+                <AttributeValuePair><Attribute name="county"/>
+                    <Value>SANTACLARA</Value>
+                    <Value>cupertino</Value>
+                </AttributeValuePair>                 
+            </Condition>
+        </Conditions>
+    </Policy>  
+    
+    <Policy name="policyevaluationtest_spcondition2" 
+            referralPolicy="false" description="policy with 2 diff 
+            property values with multiple values for each" active="true" >            
+        <Rule name="r1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://www.spcondition2.com:80/index.html"/>
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+        </Rule>
+        <Subjects>            
+            <Subject name="AmidUser2" type="AMIdentitySubject" 
+                     includeType="inclusive">
+                <AttributeValuePair><Attribute name="Values"/>
+                    <Value>id=spuser3,ou=user,SM_SUFFIX</Value>                    
+                </AttributeValuePair>
+            </Subject>
+        </Subjects>
+        <Conditions name="Conditions1" description="">
+            <Condition name="sessionproperties" type="SessionPropertyCondition">
+                <AttributeValuePair><Attribute name="valueCaseInsensitive"/>
+                    <Value>false</Value>
+                </AttributeValuePair>
+                <AttributeValuePair><Attribute name="country"/>
+                    <Value>USA</Value>
+                    <Value>INDIA</Value>
+                </AttributeValuePair>                
+                <AttributeValuePair><Attribute name="state"/>
+                    <Value>CA</Value>
+                    <Value>PA</Value>
+                </AttributeValuePair>                 
+                <AttributeValuePair><Attribute name="county"/>
+                    <Value>SANTACLARA</Value>
+                    <Value>CUPERTINO</Value>
+                </AttributeValuePair>              
+            </Condition>
+        </Conditions>
+    </Policy>
+    
+    <Policy name="policyevaluationtest_spcondition3" 
+            referralPolicy="false" description="policy with 2 diff 
+            property values with multiple values for each" active="true" >            
+        <Rule name="r1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://www.spcondition3.com:80/index.html"/>
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>deny</Value>
+            </AttributeValuePair>
+        </Rule>
+        <Subjects>
+            <Subject name="AmidUser" type="AMIdentitySubject" 
+                     includeType="inclusive">
+                <AttributeValuePair><Attribute name="Values"/>
+                    <Value>id=spuser4,ou=user,SM_SUFFIX</Value>                    
+                </AttributeValuePair>
+            </Subject>
+        </Subjects>
+        <Conditions name="Conditions1" description="">
+            <Condition name="sessionproperties" type="SessionPropertyCondition">
+                <AttributeValuePair><Attribute name="valueCaseInsensitive"/>
+                    <Value>true</Value>
+                </AttributeValuePair>
+                <AttributeValuePair><Attribute name="country"/>
+                    <Value>USA</Value>
+                    <Value>INDIA</Value>
+                </AttributeValuePair>                
+                <AttributeValuePair><Attribute name="state"/>
+                    <Value>CA</Value>
+                    <Value>PA</Value>
+                </AttributeValuePair>                 
+                <AttributeValuePair><Attribute name="county"/>
+                    <Value>SANTACLARA</Value>
+                    <Value>CUPerTino</Value>
+                </AttributeValuePair>              
+            </Condition>
+            <Condition name="condition3" type="AuthSchemeCondition">
+                <AttributeValuePair><Attribute name="AuthScheme"/>
+                    <Value>radius</Value>
+                </AttributeValuePair>
+            </Condition>
+            
+            
+        </Conditions>
+        
+    </Policy>
+    
+</Policies>
+
+
+

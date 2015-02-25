@@ -1,0 +1,661 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-rest-oauth2-oidc'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+ <title>RESTful OAuth 2.0 and OpenID Connect 1.0 Services</title>
+
+ <indexterm><primary>REST API</primary></indexterm>
+ <para>This chapter shows how to use the OpenAM RESTful interfaces for OAuth 2.0
+  and OpenID Connect 1.0.</para>
+
+ <para>In this chapter, long URLs are wrapped to fit the printed page, as some
+  of the output is formatted for easier reading.</para>
+
+ <section xml:id="rest-api-oauth2">
+  <title>OAuth 2.0 Authorization</title>
+  <indexterm>
+   <primary>OAuth 2.0</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
+
+  <itemizedlist>
+   <para>OpenAM exposes the following REST endpoints for different OAuth 2.0
+   purposes.</para>
+
+   <listitem>
+    <para>Endpoints for <link linkend="rest-api-oauth2-client-endpoints">OAuth
+    2.0 clients and resource servers</link>, mostly defined in RFC 6749,
+    <link xlink:href="http://tools.ietf.org/html/rfc6749" xlink:show="new"
+    ><citetitle>The OAuth 2.0 Authorization Framework</citetitle></link>, with
+    an additional <literal>tokeninfo</literal> endpoint useful to resource
+    servers.</para>
+   </listitem>
+
+   <listitem>
+    <para>An endpoint for <link linkend="rest-api-oauth2-token-admin-endpoint"
+    >OAuth 2.0 token administration</link>. This is specific to OpenAM.</para>
+   </listitem>
+
+   <listitem>
+    <para>An endpoint for <link linkend="rest-api-oauth2-client-admin-endpoint"
+    >OAuth 2.0 client administration</link>. This is specific to OpenAM.</para>
+   </listitem>
+  </itemizedlist>
+
+  <para>When accessing the APIs, browser-based REST clients can rely on OpenAM
+  to handle the session as usual. First authenticate with OpenAM. Then perform
+  the operations in the browser session.</para>
+
+  <para>Clients not running in a browser can authenticate as described in
+   <link xlink:href="dev-guide#rest-api-auth"
+         xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Authorization &amp; Policy Management</citetitle></link>, whereby
+   OpenAM returns a
+   <literal>token.id</literal> value. Clients pass the
+   <literal>token.id</literal> value in a header named after the
+   authentication cookie, by default <literal>iplanetDirectoryPro</literal>.</para>
+
+  <section xml:id="rest-api-oauth2-client-endpoints">
+   <title>OAuth 2.0 Client &amp; Resource Server Endpoints</title>
+
+   <para>As described in the <citetitle>Administration Guide</citetitle> chapter
+   on <link xlink:href="admin-guide#chap-oauth2"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Managing OAuth
+   2.0 Authorization</citetitle></link>, OpenAM exposes REST endpoints for
+   making calls to OpenAM acting as an authorization server.</para>
+
+   <xinclude:include href="../shared/variablelist-oauth2-endpoints.xml" />
+
+   <para>The <literal>/oauth2/authorize</literal>, and
+   <literal>/oauth2/access_token</literal> endpoints function as described
+   in RFC 6749.</para>
+
+   <para>The <literal>/oauth2/authorize</literal> endpoint is protected by the
+   policy created during OAuth 2.0 authorization server configuration, which
+   grants all authenticated users access.</para>
+
+   <para>The <literal>/oauth2/tokeninfo</literal> endpoint takes an HTTP GET
+   on <literal>/oauth2/tokeninfo?access_token=<replaceable
+   >token-id</replaceable></literal>, and returns information about the
+   token.</para>
+
+   <para>Resource servers &#8212; or any party having the token ID &#8212; can
+   get token information through this endpoint without authenticating. This
+   means any application or user can validate the token without having to be
+   registered with OpenAM.</para>
+
+   <para>The following example shows OpenAM issuing an access token, and
+   then returning token information:</para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --user "myClientID:password" \
+ --data "grant_type=password&amp;username=demo&amp;password=changeit&amp;scope=cn%20mail" \
+ https://openam.example.com:8443/openam/oauth2/access_token</userinput>
+<computeroutput>{
+    "expires_in": 599,
+    "token_type": "Bearer",
+    "refresh_token": "f6dcf133-f00b-4943-a8d4-ee939fc1bf29",
+    "access_token": "f9063e26-3a29-41ec-86de-1d0d68aa85e9"
+}</computeroutput>
+
+$ <userinput>curl https://openam.example.com:8443/openam/oauth2/tokeninfo\
+?access_token=f9063e26-3a29-41ec-86de-1d0d68aa85e9</userinput>
+<computeroutput>{
+    "mail": "demo@example.com",
+    "scope": [
+        "mail",
+        "cn"
+    ],
+    "cn": "demo",
+    "realm": "/",
+    "token_type": "Bearer",
+    "expires_in": 577,
+    "access_token": "f9063e26-3a29-41ec-86de-1d0d68aa85e9"
+}</computeroutput>
+   </screen>
+
+   <para>The resource server making decisions about whether the token is valid
+   can thus use the <literal>/oauth2/tokeninfo</literal> endpoint to retrieve
+   expiration information about the token. Depending on the scopes
+   implementation, the JSON response about the token can also contain scope
+   information. As described in the <citetitle>Administration Guide</citetitle>,
+   the default scopes implementation in OpenAM considers scopes to be names of
+   attributes in the resource owner's user profile. Notice that the JSON
+   response contains the values for those attributes from the user's profile,
+   as in the preceding example, with scopes set to <literal>mail</literal> and
+   <literal>cn</literal>.</para>
+
+   <para>
+    Both the <literal>/oauth2/authorize</literal> and
+    <literal>/oauth2/access_token</literal> endpoints
+    can take additional parameters.
+    In particular you must specify the realm using
+    the <literal>realm=<replaceable>realm-name</replaceable></literal> parameter
+    if the OpenAM OAuth 2.0 provider is configured for a subrealm
+    rather than / (Top-Level Realm).
+    For example, if the OAuth 2.0 provider is configured
+    for the <literal>/customers</literal> realm,
+    then use <literal>/oauth2/authorize?realm=/customers</literal>
+    and <literal>/oauth2/access_token?realm=/customers</literal>.
+    The realm can be passed either as a URL query string parameter as shown here,
+    or as parameters in the POST data.
+   </para>
+
+   <para>The <literal>/oauth2/authorize</literal> endpoint can also take
+   <literal>module</literal> and <literal>service</literal> parameters. Use
+   either as described in <link xlink:href="admin-guide#authn-from-browser"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Authenticating
+   To OpenAM</citetitle></link>, where <literal>module</literal> specifies the
+   authentication module instance to use or <literal>service</literal>
+   specifies the authentication chain to use when authenticating the resource
+   owner.</para>
+  </section>
+
+  <section xml:id="rest-api-oauth2-token-admin-endpoint">
+   <title>OAuth 2.0 Token Administration Endpoint</title>
+
+   <para>The OpenAM-specific OAuth 2.0 token administration endpoint lets
+   administrators read, list, and delete OAuth 2.0 tokens. OAuth 2.0 clients
+   can also manage their own tokens.</para>
+
+   <!--
+       Fix for AME-2414 requires recompilation of XUI sources
+       so the following is no longer possible with a binary release:
+
+   <para>Resource owners can manage OAuth 2.0 tokens that they authorized by
+   using the web-based OAuth 2 Token Manager. See the <citetitle>Administration
+   Guide</citetitle> section on <link
+   xlink:href="admin-guide#oauth2-manage-tokens"
+   xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>Managing OAuth 2.0 Tokens</citetitle></link> for details.</para>
+
+   -->
+
+   <para>OpenAM exposes the token administration endpoint at
+   <literal>/frrest/oauth2/token</literal>, such as
+   <literal>https://openam.example.com:8443/openam/frrest/oauth2/token</literal>.</para>
+
+   <note>
+    <para>This endpoint location is likely to change in the future.</para>
+   </note>
+
+   <para>To get a token, perform an HTTP GET on
+   <literal>/frrest/oauth2/token/<replaceable>token-id</replaceable></literal>,
+   as in the following example:</para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --user "myClientID:password" \
+ --data "grant_type=password&amp;username=demo&amp;password=changeit&amp;scope=cn" \
+ https://openam.example.com:8443/openam/oauth2/access_token</userinput>
+<computeroutput>{
+    "scope": "cn",
+    "expires_in": 60,
+    "token_type": "Bearer",
+    "access_token": "f5fb4833-ba3d-41c8-bba4-833b49c3fe2c"
+}</computeroutput>
+
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*" \
+ https://openam.example.com:8443/openam/frrest/oauth2/token/9c6a48fc...fba468b0f</userinput>
+<computeroutput>{
+    "expireTime": [
+        "1418818601396"
+    ],
+    "tokenName": [
+        "access_token"
+    ],
+    "scope": [
+        "cn"
+    ],
+    "grant_type": [
+        "password"
+    ],
+    "clientID": [
+        "myClientID"
+    ],
+    "parent": [],
+    "id": [
+        "f5fb4833-ba3d-41c8-bba4-833b49c3fe2c"
+    ],
+    "tokenType": [
+        "Bearer"
+    ],
+    "redirectURI": [],
+    "nonce": [],
+    "realm": [
+        "/"
+    ],
+    "userName": [
+        "demo"
+    ]
+}</computeroutput>
+   </screen>
+
+   <para>
+    To list tokens, perform an HTTP GET on
+    <literal>/frrest/oauth2/token/?_queryId=<replaceable>string</replaceable></literal>,
+    where <replaceable>string</replaceable> is
+    either <literal>access_token</literal> to request the list of access tokens
+    for the current user or all users if requested by <literal>amAdmin</literal>,
+    or any other string to request the list of access tokens and refresh tokens.
+   </para>
+
+   <para>
+    The following example shows a search for the demo user's access tokens.
+   </para>
+
+   <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcw..." \
+ https://openam.example.com:8443/openam/frrest/oauth2/token/?_queryId=access_token</userinput>
+<computeroutput>{
+    "result": [
+        {
+            "expireTime": "Dec 17, 2014 1:02 PM",
+            "tokenName": [
+                "access_token"
+            ],
+            "scope": [
+                "cn"
+            ],
+            "grant_type": [
+                "password"
+            ],
+            "clientID": [
+                "myClientID"
+            ],
+            "parent": [],
+            "id": [
+                "d2bbd4f9-955f-4683-bb83-bc0d7523b0f9"
+            ],
+            "tokenType": [
+                "Bearer"
+            ],
+            "redirectURI": [],
+            "nonce": [],
+            "realm": [
+                "/"
+            ],
+            "userName": [
+                "demo"
+            ],
+            "display_name": "",
+            "scopes": "cn"
+        },
+        {
+            "expireTime": "Dec 17, 2014 1:02 PM",
+            "tokenName": [
+                "access_token"
+            ],
+            "scope": [
+                "cn"
+            ],
+            "grant_type": [
+                "password"
+            ],
+            "clientID": [
+                "myClientID"
+            ],
+            "parent": [],
+            "id": [
+                "12f9907f-dbfb-4c4c-a231-2b24964fee8b"
+            ],
+            "tokenType": [
+                "Bearer"
+            ],
+            "redirectURI": [],
+            "nonce": [],
+            "realm": [
+                "/"
+            ],
+            "userName": [
+                "demo"
+            ],
+            "display_name": "",
+            "scopes": "cn"
+        }
+    ],
+    "resultCount": 2,
+    "pagedResultsCookie": null,
+    "remainingPagedResults": -1
+}</computeroutput>
+   </screen>
+
+   <para>To delete a token, perform an HTTP DELETE on
+   <literal>/frrest/oauth2/token/<replaceable>token-id</replaceable></literal>,
+   as in the following example:</para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "grant_type=client_credentials&amp;username=demo&amp;password=changeit\
+&amp;client_id=myClientID&amp;client_secret=password&amp;scope=cn%20mail" \
+ https://openam.example.com:8443/openam/oauth2/access_token</userinput>
+<computeroutput>{
+    "expires_in": 599,
+    "token_type": "Bearer",
+    "access_token": "867aaab2-61d7-4b78-9b80-4f9098034540"
+}</computeroutput>
+
+$ <userinput>curl \
+ --request DELETE \
+ --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*" \
+ https://openam.example.com:8443/openam/frrest/oauth2/token/867aaab2..098034540</userinput>
+<computeroutput>{
+    "success": "true"
+}</computeroutput>
+   </screen>
+  </section>
+
+  <section xml:id="rest-api-oauth2-client-admin-endpoint">
+   <title>OAuth 2.0 Client Administration Endpoint</title>
+
+   <para>The OAuth 2.0 administration endpoint lets OpenAM administrators and
+   agent administrators create (that is, register) and delete OAuth 2.0
+   clients.</para>
+
+   <para>OpenAM exposes this endpoint at <literal>/frrest/oauth2/client</literal>,
+   such as
+   <literal>https://openam.example.com:8443/openam/frrest/oauth2/client</literal>.</para>
+
+   <note>
+    <para>This endpoint location is likely to change in the future.</para>
+   </note>
+
+   <para>To create an OAuth 2.0 client, perform an HTTP POST to
+   <literal>/frrest/oauth2/client/?_action=create</literal>
+   with a JSON object fully specifying the client, as in the following
+   example.</para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*" \
+ --header "Content-Type: application/json" \
+ --data \
+ '{"client_id":["testClient"],
+   "realm":["/"],
+   "userpassword":["secret12"],
+   "com.forgerock.openam.oauth2provider.clientType":["Confidential"],
+   "com.forgerock.openam.oauth2provider.redirectionURIs":
+     ["www.client.com","www.example.com"],
+   "com.forgerock.openam.oauth2provider.scopes":["cn","sn"],
+   "com.forgerock.openam.oauth2provider.defaultScopes":["cn"],
+   "com.forgerock.openam.oauth2provider.name":["My Test Client"],
+   "com.forgerock.openam.oauth2provider.description":["OAuth 2.0 Client"]
+  }' \
+ https://openam.example.com:8443/openam/frrest/oauth2/client/?_action=create</userinput>
+<computeroutput>{"success":"true"}</computeroutput>
+   </screen>
+
+   <variablelist>
+    <para>When creating an OAuth 2.0 client, use the following fields in your
+    JSON object.</para>
+
+    <varlistentry>
+     <term><literal>"client_id"</literal></term>
+     <listitem>
+      <para>(Required) This field takes an array containing the client
+      identifier as defined in RFC 6749.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"realm"</literal></term>
+     <listitem>
+      <para>(Required) This field takes an array containing the OpenAM realm
+      in which to create the client as defined in RFC 6749.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"userpassword"</literal></term>
+     <listitem>
+      <para>(Required) This field takes an array containing the client
+      secret as defined in RFC 6749.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.clientType"</literal></term>
+     <listitem>
+      <para>(Required) This field takes an array containing the client
+      type, either <literal>"Confidential"</literal> or
+      <literal>"Public"</literal> as defined in RFC 6749.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.redirectionURIs"</literal></term>
+     <listitem>
+      <para>(Optional for confidential clients) This field takes an array of
+      client redirection endpoints as defined in RFC 6749.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.scopes"</literal></term>
+     <listitem>
+      <para>(Optional) This field takes an array of scopes as defined in RFC
+      6749. The default scopes implementation takes scopes to be names of
+      attributes in the resource owner profile.</para>
+      <para>Specify localized scopes in <literal><replaceable
+      >scope</replaceable>|<replaceable>locale</replaceable>|<replaceable
+      >localized description</replaceable></literal> format.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.defaultScopes"</literal></term>
+     <listitem>
+      <para>(Optional) This field takes an array of default scopes set
+      automatically when tokens are issued.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.name"</literal></term>
+     <listitem>
+      <para>(Optional) This field takes an array containing the client name to
+      display to the resource owner when the resource owner must authorize
+      client access to protected resources.</para>
+      <para>Specify localized names in <literal><replaceable
+      >locale</replaceable>|<replaceable>localized name</replaceable></literal>
+      format.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.description"</literal></term>
+     <listitem>
+      <para>(Optional) This field takes an array containing the description to
+      display to the resource owner when the resource owner must authorize
+      client access to protected resources.</para>
+      <para>Specify localized descriptions in <literal><replaceable
+      >locale</replaceable>|<replaceable>localized description</replaceable></literal>
+      format.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <para>To delete an OAuth 2.0 client, perform an HTTP DELETE on
+   <literal>/frrest/oauth2/client/<replaceable>client-id</replaceable></literal>,
+   as in the following example:</para>
+
+   <screen>
+$ <userinput>curl \
+ --request DELETE \
+ --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*" \
+ https://openam.example.com:8443/openam/frrest/oauth2/client/myClient</userinput>
+<computeroutput>{"success":"true"}</computeroutput>
+   </screen>
+   <tip><para>To delete an OAuth 2.0 client from a subrealm, add the name of the
+    subrealm in a query parameter named <literal>realm</literal>, as
+    in the following example:</para>
+<para><screen>
+$ <userinput>curl \
+ --request DELETE \
+ --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*" \
+ https://openam.example.com:8443/openam/frrest/oauth2/client/myClient?realm=myRealm</userinput>
+<computeroutput>{"success":"true"}</computeroutput></screen></para>
+   </tip>
+
+  </section>
+ </section>
+
+ <section xml:id="rest-api-openid-connect">
+  <title>OpenID Connect 1.0</title>
+  <indexterm>
+   <primary>OpenID Connect 1.0</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
+
+  <para>OpenID Connect 1.0 extends OAuth 2.0 so the client can verify claims
+  about the identity of the end user, get profile information about the end
+  user, and log the user out at the end of the OpenAM session.</para>
+
+  <itemizedlist>
+   <para>OpenAM exposes the following REST endpoints for <link xlink:show="new"
+   xlink:href="http://openid.net/connect/">OpenID Connect 1.0</link>
+   purposes.</para>
+
+   <listitem>
+    <para>Endpoints for <link linkend="rest-api-openid-connect-discovery"
+    >discovering information</link>.</para>
+   </listitem>
+
+   <listitem>
+    <para>An endpoint for <link linkend="rest-api-openid-connect-dynamic-registration"
+    >registering client applications</link>.</para>
+   </listitem>
+
+   <listitem>
+    <para>Endpoints for <link linkend="rest-api-openid-connect-authorization"
+    >client authorization</link>.</para>
+   </listitem>
+
+   <listitem>
+    <para>Endpoints for <link linkend="rest-api-openid-connect-session"
+    >session management</link>.</para>
+   </listitem>
+  </itemizedlist>
+
+  <section xml:id="rest-api-openid-connect-discovery">
+   <title>Discovering OpenID Connect 1.0 Configuration</title>
+
+   <para>OpenAM exposes endpoints for discovering information about the provider
+   configuration, and about the provider for a given end user.</para>
+
+   <itemizedlist>
+    <listitem>
+     <para><literal>/.well-known/openid-configuration</literal> allows clients
+     to retrieve OpenID Provider configuration by HTTP GET as specified by
+     OpenID Connect Discovery 1.0.</para>
+    </listitem>
+
+    <listitem>
+     <para><literal>/.well-known/webfinger</literal> allows clients to retrieve
+     the provider URL for an end user by HTTP GET as specified by OpenID Connect
+     Discovery 1.0.</para>
+    </listitem>
+   </itemizedlist>
+
+   <para>For examples, see <link xlink:show="new"
+   xlink:href="admin-guide#configure-openid-connect-discovery"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+   OpenAM For OpenID Connect Discovery</citetitle></link>.</para>
+  </section>
+
+  <section xml:id="rest-api-openid-connect-dynamic-registration">
+   <title>Registering OpenID Connect 1.0 Clients</title>
+
+   <para>OpenAM allows both static and dynamic registration of OpenID Connect
+   client applications. For dynamic registration according to the OpenID Connect
+   Dynamic Client Registration 1.0 specification, the endpoint is
+   <literal>/oauth2/connect/register</literal>. See <link xlink:show="new"
+   xlink:href="admin-guide#register-openid-connect-client-dynamic"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Register a
+   Client Dynamically</citetitle></link> for details.</para>
+  </section>
+
+  <section xml:id="rest-api-openid-connect-authorization">
+   <title>Performing OpenID Connect 1.0 Client Authorization</title>
+
+   <para>Registered clients can request authorization through OpenAM.</para>
+
+   <para>OpenID Connect 1.0 supports both a Basic Client Profile using the
+   OAuth 2.0 authorization code grant, and an Implicit Client Profile using the
+   OAuth 2.0 implicit grant. These client profiles rely on the OAuth 2.0
+   endpoints for authorization. Those endpoints are described in
+   <xref linkend="rest-api-oauth2-client-endpoints" />.</para>
+
+   <para>In addition, authorized clients can access end user information through
+   the OpenID Connect 1.0 specific endpoint
+   <literal>/oauth2/userinfo</literal>.</para>
+
+   <para>For examples, see <link xlink:show="new"
+   xlink:href="admin-guide#openid-connect-examples"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Client
+   Examples</citetitle></link>.</para>
+  </section>
+
+  <section xml:id="rest-api-openid-connect-session">
+   <title>Managing OpenID Connect 1.0 Sessions</title>
+
+   <para>Registered clients can use OpenID Connect Session Management 1.0 to
+   handle end user logout actions.</para>
+
+   <itemizedlist>
+    <listitem>
+     <para><literal>/oauth2/connect/checkSession</literal> allows clients
+     to retrieve session status notifications.</para>
+    </listitem>
+
+    <listitem>
+     <para><literal>/oauth2/connect/endSession</literal> allows clients to
+     terminate end user sessions.</para>
+    </listitem>
+   </itemizedlist>
+
+   <para>For an example, see <link xlink:show="new"
+   xlink:href="admin-guide#manage-sessions-openid-connect"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Managing User
+   Sessions</citetitle></link>.</para>
+  </section>
+ </section>
+
+</chapter>

@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-standards'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Supported Standards</title>
+
+ <para>OpenAM implements the following RFCs, Internet-Drafts, and standards.</para>
+
+ <!-- Document [link], brief description -->
+ <variablelist>
+  <varlistentry xml:id="oauth-2">
+   <term><link xlink:href="http://oauth.net/2/">OAuth 2.0</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>OAuth 2.0</secondary>
+    </indexterm>
+    <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6749"
+    >The OAuth 2.0 Authorization Framework</link>, in which OpenAM can play the
+    roles of authorization server and of client.</para>
+    <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6750"
+    >The OAuth 2.0 Authorization Framework: Bearer Token Usage</link>, in which
+    OpenAM plays the role of authorization server.</para>
+    <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-assertions"
+    >Assertion Framework for OAuth 2.0</link>, which is an Internet-Draft.</para>
+    <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-saml2-bearer"
+    >SAML 2.0 Bearer Assertion Profiles for OAuth 2.0</link>, which is an
+    Internet-Draft.</para>
+    <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-jwt-bearer"
+    >JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and
+    Authorization Grants</link>, which is an Internet-Draft.</para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry xml:id="openid-connect-1">
+   <term><link xlink:href="http://openid.net/connect/">OpenID Connect 1.0</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>OpenID Connect 1.0</secondary>
+    </indexterm>
+
+    <para>
+     OpenAM can be configured to play the role of OpenID provider.
+     The OpenID Connect specifications depend on OAuth 2.0,
+     JSON Web Token, Simple Web Discovery and related specifications.
+     The following specifications make up OpenID Connect 1.0.
+    </para>
+
+    <itemizedlist>
+     <listitem>
+      <para>
+       <link xlink:show="new"
+             xlink:href="http://openid.net/specs/openid-connect-core-1_0.html"
+       >OpenID Connect Core 1.0</link> defines core OpenID Connect 1.0 features.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link xlink:show="new"
+             xlink:href="http://openid.net/specs/openid-connect-discovery-1_0.html"
+       >OpenID Connect Discovery 1.0</link> defines how clients can
+       dynamically recover information about OpenID providers.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link xlink:show="new"
+             xlink:href="http://openid.net/specs/openid-connect-registration-1_0.html"
+       >OpenID Connect Dynamic Client Registration 1.0</link> defines how
+       clients can dynamically register with OpenID providers.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link xlink:show="new"
+             xlink:href="http://openid.net/specs/openid-connect-session-1_0.html"
+       >OpenID Connect Session Management 1.0</link> describes how
+       to manage OpenID Connect sessions, including logout.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link xlink:show="new"
+             xlink:href="http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html"
+       >OAuth 2.0 Multiple Response Type Encoding Practices</link> defines
+       additional OAuth 2.0 response types used in OpenID Connect.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link xlink:show="new"
+             xlink:href="http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html"
+       >OAuth 2.0 Form Post Response Mode</link> defines how OpenID providers
+       return OAuth 2.0 Authorization Response parameters in auto-submitting forms.
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <para>
+     OpenID Connect 1.0 also provides implementer's guides for client developers.
+    </para>
+
+    <itemizedlist>
+     <listitem>
+      <para>
+       <link xlink:show="new"
+             xlink:href="http://openid.net/specs/openid-connect-basic-1_0.html"
+       >OpenID Connect Basic Client Implementer's Guide 1.0</link>.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <link xlink:show="new"
+             xlink:href="http://openid.net/specs/openid-connect-implicit-1_0.html"
+       >OpenID Connect Implicit Client Implementer's Guide 1.0</link>.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry xml:id="rest">
+   <term><link
+   xlink:href="http://en.wikipedia.org/wiki/Representational_state_transfer"
+   >Representational State Transfer (REST)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>REST</secondary>
+    </indexterm>
+    <para>Style of software architecture for web-based, distributed
+    systems.</para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry xml:id="saml">
+   <term><link xlink:href="http://saml.xml.org/" xlink:show="new"
+   >Security Assertion Markup Language (SAML)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>SAML</secondary>
+    </indexterm>
+    <para>
+     Standard, XML-based framework for creating
+     and exchanging security information between online partners.
+     OpenAM supports multiple versions of SAML including 2.0, 1.1, and 1.0.
+    </para>
+
+    <para>
+     Specifications are available from the <link xlink:show="new"
+     xlink:href="https://www.oasis-open.org/standards">OASIS standards page</link>.
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry xml:id="liberty-id-ff">
+   <term><link
+   xlink:href="http://projectliberty.org/resource_center/specifications/liberty_alliance_id_ff_1_2_specifications/?f=resource_center/specifications/liberty_alliance_id_ff_1_2_specifications"
+   >Liberty Alliance Project Identity Federation Framework (Liberty
+   ID-FF)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>Liberty ID-FF</secondary>
+    </indexterm>
+    <para>Federation standard, whose concepts and capabilities contributed to
+    SAML 2.0.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry xml:id="soap">
+   <term><link xlink:href="http://www.w3.org/TR/soap/">Simple Object Access
+   Protocol</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>SOAP</secondary>
+    </indexterm>
+    <para>Lightweight protocol intended for exchanging structured information
+    in a decentralized, distributed environment.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry xml:id="wsdl">
+   <term><link xlink:href="http://www.w3.org/TR/wsdl">Web Services Description
+   Language (WSDL)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>WSDL</secondary>
+    </indexterm>
+    <para>XML format for describing network services as a set of endpoints
+    operating on messages containing either document-oriented or
+    procedure-oriented information.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry xml:id="ws-federation">
+   <term><link xlink:show="new"
+   xlink:href="http://en.wikipedia.org/wiki/WS-Federation"
+   >Web Services Federation Language (WS-Federation)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>WS-Federation</secondary>
+    </indexterm>
+    <para>Identity federation standard, part of the Web Services Security
+    framework.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry xml:id="xacml">
+   <term><link xlink:href="http://wiki.oasis-open.org/xacml/">eXtensible Access
+   Control Markup Language (XACML)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>XACML</secondary>
+    </indexterm>
+    <para>Declarative access control policy language implemented in XML, and
+    also a processing model, describing how to interpret policies.</para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+</chapter>

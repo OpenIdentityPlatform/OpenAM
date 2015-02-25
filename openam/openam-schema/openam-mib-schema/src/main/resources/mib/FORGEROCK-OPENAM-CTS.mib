@@ -1,0 +1,436 @@
+--
+--  Copyright 2013 ForgeRock AS.
+--  The contents of this file are subject to the terms of the Common Development and
+--  Distribution License (the License). You may not use this file except in compliance with the
+--  License.
+--
+--  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+--  specific language governing permission and limitations under the License.
+--
+--  When distributing Covered Software, include this CDDL Header Notice in each file and include
+--  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+--  Header, with the fields enclosed by brackets [] replaced by your own identifying
+--  information: "Portions copyright [year] [name of copyright owner]".
+--
+
+--
+-- MIB for CTS Monitoring
+-- Copyright (c) 2013-2014, ForgeRock AS, All Rights Reserved.
+--
+
+FORGEROCK-OPENAM-CTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, enterprises,
+    Integer32
+        FROM SNMPv2-SMI
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+--
+-- ForgeRock
+--
+
+forgerock OBJECT IDENTIFIER ::= {enterprises 36733}
+
+--
+-- SNMP
+--
+
+snmp OBJECT IDENTIFIER ::= { forgerock 1 }
+
+--
+-- openAM
+--
+
+openam OBJECT IDENTIFIER ::= { snmp 2 }
+
+--
+-- SSO CTS Monitoring
+--
+
+ctsMonitoring OBJECT IDENTIFIER ::= { openam 3 }
+
+--
+-- Instance of TokenTableEntry
+--
+
+tokenTable			OBJECT-TYPE
+    SYNTAX			SEQUENCE OF TokenEntry
+    MAX-ACCESS		not-accessible
+    STATUS			current
+    DESCRIPTION     "Token Information"
+    ::= { ctsMonitoring 1 }
+
+TokenEntry ::=
+    SEQUENCE	{
+                    tokenTableIndex		Counter64,
+                    tokenType			SnmpAdminString
+                }
+
+tokenTableIndex OBJECT-TYPE
+    SYNTAX        	Counter64
+    MAX-ACCESS    	read-only
+    STATUS        	current
+    DESCRIPTION		"Token Table Index"
+    ::= { tokenEntry 1 }
+
+tokenType OBJECT-TYPE
+    SYNTAX        	SnmpAdminString
+    MAX-ACCESS    	read-only
+    STATUS        	current
+    DESCRIPTION		"Token Type"
+    ::= { tokenEntry 2 }
+
+--
+-- TokenTableEntry
+--
+
+tokenEntry OBJECT-TYPE
+    SYNTAX 			TokenEntry
+    MAX-ACCESS		not-accessible
+    STATUS			current
+    DESCRIPTION		"Information for a token"
+    INDEX			{ tokenTableIndex }
+    ::= { tokenTable 1 }
+
+--
+-- OperationTable
+--
+
+operationTable OBJECT-TYPE
+    SYNTAX 			SEQUENCE OF OperationEntry
+    MAX-ACCESS		not-accessible
+    STATUS			current
+    DESCRIPTION		"Operation Information"
+    ::= { ctsMonitoring 2 }
+
+--
+-- OperationEntry
+--
+
+operationEntry	        OBJECT-TYPE
+    SYNTAX		    OperationEntry
+    MAX-ACCESS	    not-accessible
+    STATUS		    current
+    DESCRIPTION	    "Information regarding a specific operation type"
+    INDEX		    { operationTableIndex }
+    ::= { operationTable 1 }
+
+OperationEntry ::=
+    SEQUENCE	{
+                    operationTableIndex		Counter64,
+                    operationType		SnmpAdminString
+                }
+
+operationTableIndex      OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION     "Operation Table Index"
+    ::= { operationEntry 1 }
+
+operationType OBJECT-TYPE
+    SYNTAX			SnmpAdminString
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION     "Operation Operation Type"
+    ::= { operationEntry 2 }
+
+--
+-- ctsCRUDOperationsTable
+--
+
+ctsCRUDOperationsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CTSCRUDOperationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Rates accessed only through operation (no token type)"
+    ::= { ctsMonitoring 3 }
+
+--
+-- CTSOperationsPerTokenTypeEntry
+--
+
+ctsCRUDOperationsEntry OBJECT-TYPE
+    SYNTAX      CTSCRUDOperationsEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rate information for operation-specific (no token type) rates"
+    INDEX       { operationTableIndex }
+    ::= { ctsCRUDOperationsTable 1 }
+
+CTSCRUDOperationsEntry ::=
+    SEQUENCE        {
+                        sCumulativeCount     Counter64,
+                        sAverage             Counter64,
+                        sMinimum             Counter64,
+                        sMaximum             Counter64,
+                        sFailureCount        Counter64,
+                        sFailureAverage      Counter64,
+                        sFailureMinimum      Counter64,
+                        sFailureMaximum      Counter64
+                    }
+
+sCumulativeCount  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsEntry 1 }
+
+sAverage  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsEntry 2 }
+
+sMinimum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsEntry 3 }
+
+sMaximum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsEntry 4 }
+
+sFailureCount       OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Cumulative count of failures of this operation since server startup."
+    DEFVAL          { 0 }
+    ::= { ctsCRUDOperationsEntry 5 }
+
+sFailureAverage       OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Average rate of failures of this operation in the current period."
+    DEFVAL          { 0 }
+    ::= { ctsCRUDOperationsEntry 6 }
+
+ sFailureMinimum     OBJECT-TYPE
+     SYNTAX          Counter64
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION     "Minimum rate of failure of this operation in the current period."
+     DEFVAL          { 0 }
+     ::= { ctsCRUDOperationsEntry 7 }
+
+ sFailureMaximum     OBJECT-TYPE
+     SYNTAX          Counter64
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION     "Maximum rate of failure of this operation in the current period."
+     DEFVAL          { 0 }
+     ::= { ctsCRUDOperationsEntry 8 }
+
+--
+-- ctsCRUDOperationsPerTokenTypeTable
+--
+
+ctsCRUDOperationsPerTokenTypeTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CTSCRUDOperationsPerTokenTypeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Rates accessed through operation and token type"
+    ::= { ctsMonitoring 4 }
+
+--
+-- CTSCRUDOperationsPerTokenTypeEntry
+--
+
+ctsCRUDOperationsPerTokenTypeEntry     OBJECT-TYPE
+    SYNTAX			CTSCRUDOperationsPerTokenTypeEntry
+    MAX-ACCESS		not-accessible
+    STATUS			current
+    DESCRIPTION     "Rate information for a token & operation combination"
+    INDEX		    { tokenTableIndex, operationTableIndex }
+    ::= { ctsCRUDOperationsPerTokenTypeTable 1 }
+
+CTSCRUDOperationsPerTokenTypeEntry ::=
+    SEQUENCE 		{
+                        dCumulative         Counter64,
+                        dAverage 		    Counter64,
+                        dMinimum 		    Counter64,
+                        dMaximum 		    Counter64
+                    }
+
+dCumulativeCount  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsPerTokenTypeEntry 1 }
+
+dAverage  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsPerTokenTypeEntry 2 }
+
+dMinimum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsPerTokenTypeEntry 3 }
+
+dMaximum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsPerTokenTypeEntry 4 }
+
+
+--
+-- ctsTokenOperationsTable
+--
+
+ctsTokenOperationsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CTSTokenOperationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Values associated with information about a specific token"
+    ::= { ctsMonitoring 5 }
+
+--
+-- ctsTokenOperationsEntry
+--
+
+ctsTokenOperationsEntry OBJECT-TYPE
+    SYNTAX      CTSTokenOperationsEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Information about a specific token, related to token index supplied"
+    INDEX { tokenTableIndex }
+    ::= { ctsTokenOperationsTable 1 }
+
+CTSTokenOperationsEntry ::=
+    SEQUENCE    {
+                        totalCount  Counter64,
+                        averageDuration	Counter64
+                }
+
+totalCount OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Total count of tokens of the specified type in OpenAM"
+    DEFVAL    		{ 0 }
+    ::= { ctsTokenOperationsEntry 1 }
+
+averageDuration OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average duration of tokens of the specified type in OpenAM in seconds"
+    DEFVAL    		{ 0 }
+    ::= { ctsTokenOperationsEntry 2 }
+
+
+--
+-- ctsReaperOperationsTable
+--
+
+rateOfDeletedSessions OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Rate of deleted sessions per reaper run"
+    DEFVAL    		{ 0 }
+	::= { ctsMonitoring 6 }
+
+--
+-- ctsConnection
+--
+
+ctsConnection OBJECT IDENTIFIER ::= { ctsMonitoring 7 }
+
+ctsConnectionSuccessRate OBJECT IDENTIFIER ::= { ctsConnection 1 }
+
+successCumulative  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative number of successful connections made by connection pool"
+    DEFVAL    		{ 0 }
+    ::= { ctsConnectionSuccessRate 1 }
+
+successAverage  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average rate of successful connections made by connection pool"
+    DEFVAL    		{ 0 }
+    ::= { ctsConnectionSuccessRate 2 }
+
+successMinimum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum rate of successful connections made by connection pool"
+    DEFVAL    		{ 0 }
+    ::= { ctsConnectionSuccessRate 3 }
+
+successMaximum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum rate of successful connections made by connection pool"
+    DEFVAL    		{ 0 }
+    ::= { ctsConnectionSuccessRate 4 }
+
+ctsConnectionFailureRate OBJECT IDENTIFIER ::= { ctsConnection 2 }
+
+failureCumulative  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative number of failed connections made by connection pool"
+    DEFVAL    	 { 0 }
+    ::= { ctsConnectionFailureRate 1 }
+
+failureAverage  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average rate of failed connections made by connection pool"
+    DEFVAL    	 { 0 }
+    ::= { ctsConnectionFailureRate 2 }
+
+failureMinimum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum rate of failed connections made by connection pool"
+    DEFVAL    	 { 0 }
+    ::= { ctsConnectionFailureRate 3 }
+
+failureMaximum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum rate of failed connections made by connection pool"
+    DEFVAL    	 { 0 }
+    ::= { ctsConnectionFailureRate 4 }
+
+
+END

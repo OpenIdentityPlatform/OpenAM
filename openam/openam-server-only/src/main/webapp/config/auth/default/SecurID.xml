@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+
+<ModuleProperties moduleName="SecurID" version="1.0" >
+    <Callbacks length="2" order="1" timeout="120" header="Sign in to OpenAM" >
+        <NameCallback>
+            <Prompt>Enter Your UserId</Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt>Enter your Passcode</Prompt>
+        </PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="2" timeout="120" header="New PIN Mode" >
+	<!-- TextInputCallback not implemented in UI -->
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>enter new PIN msg</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="3" timeout="120" header="Next PASSCODE" >
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>Wait for the code on your token to change, then enter next PASSCODE:</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="4" timeout="120" header="Generating new PIN" >
+	<!-- TextInputCallback not implemented in UI -->
+	<NameCallback>
+	    <Prompt>Always gets replaced</Prompt>
+	</NameCallback>
+    </Callbacks>
+    <Callbacks length="1" order="5" timeout="120" header="Next PASSCODE" >
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>wait for token to change msg</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+</ModuleProperties>
+

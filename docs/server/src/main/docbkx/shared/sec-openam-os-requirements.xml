@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<section xml:id="os-requirements"
+          xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='http://docbook.org/ns/docbook
+                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ <title>OpenAM Operating System Requirements</title>
+
+ <itemizedlist>
+  <para>
+   ForgeRock supports customers using OpenAM server software
+   on the following operating system versions.
+  </para>
+
+  <listitem>
+   <para>
+    CentOS 6, 7
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Microsoft Windows Server 2008, 2008 R2, 2012, 2012 R2
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Oracle Linux 6, 7
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Oracle Solaris x64 10, 11
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Oracle Solaris SPARC 10, 11
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Red Hat Enterprise Linux 6, 7
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    SuSE Linux 11
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Ubuntu Linux 12.04 LTS, 14.04 LTS
+   </para>
+  </listitem>
+ </itemizedlist>
+</section>

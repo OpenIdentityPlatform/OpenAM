@@ -1,0 +1,66 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyServerConfigXMLAddServer.xml,v 1.2 2008/06/25 05:45:15 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="dummy" defaultValue="blank.header" >
+    <property required="true">
+	<label name="lblName" defaultValue="serverconfig.serverconfig.xml.attribute.label.name" labelFor="tfName" />
+	<cc name="tfName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="75" />
+	</cc>
+    </property>
+    <property required="true">
+	<label name="lblHost" defaultValue="serverconfig.serverconfig.xml.attribute.label.host" labelFor="tfHost" />
+	<cc name="tfHost" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="100" />
+	</cc>
+    </property>
+    <property required="true">
+	<label name="lblPort" defaultValue="serverconfig.serverconfig.xml.attribute.label.port" labelFor="tfPort" />
+	<cc name="tfPort" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="8" />
+	</cc>
+    </property>
+    <property required="true">
+	<label name="lblType" defaultValue="serverconfig.serverconfig.xml.attribute.label.type" labelFor="singleChoiceType" />
+	<cc name="singleChoiceType" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+            <option label="amconfig.serverconfig.xml.user.table.column.type.simple" value="SIMPLE" />;
+            <option label="amconfig.serverconfig.xml.user.table.column.type.ssl" value="SSL" />;
+	</cc>
+    </property>
+    </section>
+</propertysheet>
+

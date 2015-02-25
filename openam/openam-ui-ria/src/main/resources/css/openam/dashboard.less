@@ -1,0 +1,74 @@
+/**
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 2014 ForgeRock AS.
+ *
+ * The contents of this file are subject to the terms of the Common Development and Distribution License (the License).
+ * You may not use this file except in compliance with the License.
+ *
+ * You can obtain a copy of the License at http://forgerock.org/license/CDDLv1.0.html. See the License for the specific
+ * language governing permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL Header Notice in each file and include the License file at
+ * http://forgerock.org/license/CDDLv1.0.html. If applicable, add the following below the CDDL Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ */
+#appsList {
+  margin-bottom: 20px;
+}
+
+#trustedDevices, #oAuthTokens {
+
+  table {
+    border-collapse: collapse;
+    width:100%;
+  }
+
+  table, th {
+    border: 1px solid #ccc;
+    padding: 10px 0;
+  }
+
+  th {
+    background-color:#ddd;
+    &:last-child{  width:120px;  }
+  }
+
+  td {
+    border-left: 1px solid #ccc;
+    padding: 10px;
+    &:last-child{ text-align:center; }
+  }
+
+  tr {
+    &:nth-child(odd){  background-color:#eee; }
+    &:nth-child(even){ background-color:#fff; }
+    &:hover{ background-color:#ffe; }
+  }
+
+}
+.authn {
+  width:100%;
+  display: table;
+  padding: 20px 0px 0px 0px;
+
+  span {
+    float:left;
+    margin-right: 5px;
+  }
+  img {
+    width:45px;
+    height:41px;
+  }
+  .authn-header {
+    width:100%;
+    padding:15px 0px 15px 0px;
+  }
+  .authn-border { 
+      border-top: 1px solid #c8c8c8;
+      margin: 0 auto;
+      width:80%;
+  }
+  
+}

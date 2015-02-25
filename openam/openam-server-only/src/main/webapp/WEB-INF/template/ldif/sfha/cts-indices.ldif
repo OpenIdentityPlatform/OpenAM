@@ -1,0 +1,217 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# http://forgerock.org/license/CDDLv1.0.html
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at http://forgerock.org/license/CDDLv1.0.html
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+
+# CTS v2 Indexes
+
+dn: ds-cfg-attribute=coreTokenExpirationDate,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenExpirationDate
+ds-cfg-index-type: ordering
+
+dn: ds-cfg-attribute=coreTokenUserId,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenUserId
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString01,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString01
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString02,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString02
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString03,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString03
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString04,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString04
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString05,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString05
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString06,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString06
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString07,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString07
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString08,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString08
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString09,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString09
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString10,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString10
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString11,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString11
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString12,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString12
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString13,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString13
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString14,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString14
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenString15,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenString15
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenInteger01,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenInteger01
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenInteger02,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenInteger02
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenInteger03,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenInteger03
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenInteger04,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenInteger04
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenInteger05,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenInteger05
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenInteger06,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenInteger06
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenInteger07,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenInteger07
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenInteger08,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenInteger08
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenInteger09,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenInteger09
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenInteger10,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenInteger10
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenDate01,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenDate01
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenDate02,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenDate02
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenDate03,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenDate03
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenDate04,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenDate04
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenDate05,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: coreTokenDate05
+ds-cfg-index-type: equality

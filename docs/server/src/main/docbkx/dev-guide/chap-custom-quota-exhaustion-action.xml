@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2013-2014 ForgeRock AS
+  !
+-->
+<chapter xml:id='chap-custom-quota-exhaustion-action'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Customizing Session Quota Exhaustion Actions</title>
+
+ <para>
+  This chapter demonstrates a custom session quota exhaustion action plugin.
+  OpenAM calls a session quota exhaustion action plugin
+  when a user tries to open more sessions than their quota allows.
+ </para>
+
+ <para>
+  You only need a custom session quota exhaustion action plugin
+  if the built-in actions, described in the <citetitle>Administration
+  Guide</citetitle> procedure, <link xlink:show="new"
+  xlink:href="admin-guide#session-quotas-and-exhaustion-actions"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Configure
+  Session Quotas &amp; Exhaustion Actions</citetitle></link>, are not flexible
+  enough for your deployment.
+ </para>
+
+ <!--
+      This is based on Peter Major's work. See his blog entry on the subject:
+      http://blogs.forgerock.org/petermajor/2013/01/session-quota-basics/
+      and the example project linked in that blog entry.
+ -->
+
+ <section xml:id="create-custom-quota-exhaustion-action">
+  <title>Creating &amp; Installing a Custom Session Quota Exhaustion Action</title>
+
+  <para>
+   You build custom session quota exhaustion actions into a .jar
+   that you then plug in to OpenAM.
+   You must also add your new action to the Session service configuration,
+   and restart OpenAM in order to be able to configure it for your use.
+  </para>
+
+  <para>
+   Your custom session quota exhaustion action implements the
+   <literal>com.iplanet.dpro.session.service.QuotaExhaustionAction</literal>
+   interface, overriding the <literal>action</literal> method.
+   The <literal>action</literal> method performs the action
+   when the session quota is met, and returns <literal>true</literal>
+   only if the request for a new session should <emphasis>not</emphasis> be granted.
+  </para>
+
+  <para>
+   The example in this chapter simply removes the first session it finds
+   as the session quota exhaustion action.
+  </para>
+
+  <programlisting language="java"
+ >package org.forgerock.openam.examples.quotaexhaustionaction;
+
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.QuotaExhaustionAction;
+import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.shared.debug.Debug;
+import java.util.Map;
+
+/**
+ * This is a sample {@link QuotaExhaustionAction} implementation,
+ * which randomly kills the first session it finds.
+ */
+public class SampleQuotaExhaustionAction implements QuotaExhaustionAction {
+
+    private static Debug debug = SessionService.sessionDebug;
+
+    /**
+     * Check if the session quota for a given user has been exhausted and
+     * if so perform the necessary actions. This implementation randomly
+     * destroys the first session it finds.
+     *
+     * @param is               The InternalSession to be activated.
+     * @param existingSessions All existing sessions that belong to the same
+     *                         uuid (Map:sid-&gt;expiration_time).
+     * @return true If the session activation request should be rejected,
+     *              otherwise false.
+     */
+    @Override
+    public boolean action(
+            InternalSession is,
+            Map&lt;String, Long> existingSessions) {
+        for (Map.Entry&lt;String, Long> entry : existingSessions.entrySet()) {
+            try {
+                // Get an actual Session instance based on the session ID.
+                Session session =
+                        Session.getSession(new SessionID(entry.getKey()));
+                // Use the session to destroy itself.
+                session.destroySession(session);
+                // Only destroy the first session.
+                break;
+            } catch (SessionException se) {
+                if (debug.messageEnabled()) {
+                    debug.message("Failed to destroy existing session.", se);
+                }
+                // In this case, deny the session activation request.
+                return true;
+            }
+        }
+        return false;
+    }
+}
+</programlisting>
+
+  <para>
+   The <link
+   xlink:href="https://github.com/markcraig/openam-examples-quotaexhaustionaction/"
+   xlink:show="new">sample plugin source</link> is available online.
+   Get a local clone so that you can try the sample on your system.
+   In the sources you find the following files.
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term><filename>pom.xml</filename></term>
+    <listitem>
+     <para>
+      Apache Maven project file for the module
+     </para>
+
+     <para>
+      This file specifies how to build the sample plugin,
+      and also specifies its dependencies on OpenAM components
+      and on the Servlet API.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>src/main/java/org/forgerock/openam/examples/quotaexhaustionaction/SampleQuotaExhaustionAction.java</filename></term>
+    <listitem>
+     <para>
+      Core class for the sample quota exhaustion action plugin
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>
+   Build the module using Apache Maven.
+  </para>
+
+  <screen>
+$ <userinput>cd /path/to/openam-examples-quotaexhaustionaction</userinput>
+$ <userinput>mvn install</userinput>
+<computeroutput>[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building OpenAM Example Quota Exhaustion Action 1.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+
+...
+
+[INFO]
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ quotaexhaustionaction ---
+[INFO] Building jar: .../target/quotaexhaustionaction-1.0.0-SNAPSHOT.jar
+
+...
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 10.138s
+[INFO] Finished at: Mon Nov 25 15:59:10 CET 2013
+[INFO] Final Memory: 18M/129M
+[INFO] ------------------------------------------------------------------------</computeroutput>
+  </screen>
+
+  <para>
+   Copy the .jar to <filename>WEB-INF/lib/</filename> where OpenAM is deployed.
+  </para>
+
+  <screen>
+$ <userinput>cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</userinput>
+  </screen>
+
+  <para>
+   Using the <command>ssoadm</command> command
+   or the <literal>ssoadm.jsp</literal> page in OpenAM Console,
+   update the Session service configuration.
+  </para>
+
+  <screen>
+$ <userinput>ssoadm \
+ set-attr-choicevals \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --servicename iPlanetAMSessionService \
+ --schematype Global \
+ --attributename iplanet-am-session-constraint-handler \
+ --add \
+ --choicevalues myKey=\
+org.forgerock.openam.examples.quotaexhaustionaction.SampleQuotaExhaustionAction</userinput>
+
+<computeroutput>Choice Values were set.</computeroutput>
+  </screen>
+
+  <para>
+   Extract <filename>amSession.properties</filename>
+   and if necessary the localized versions of this file
+   from <filename>${coreLibrary}</filename>
+   to <filename>WEB-INF/classes/</filename> where OpenAM is deployed.
+   For example, if OpenAM is deployed under
+   <filename>/path/to/tomcat/webapps/openam</filename>,
+   then you could run the following commands.
+  </para>
+
+  <screen>
+$ <userinput>cd /path/to/tomcat/webapps/openam/WEB-INF/classes/</userinput>
+$ <userinput>jar -xvf ../lib/${coreLibrary} amSession.properties</userinput>
+ <computeroutput>inflated: amSession.properties</computeroutput>
+  </screen>
+
+  <para>
+   Add the following line to <filename>amSession.properties</filename>.
+  </para>
+
+  <programlisting language="ini">myKey=Randomly Destroy Session</programlisting>
+
+  <para>
+   Restart OpenAM or the container in which it runs.
+  </para>
+
+  <para>
+   You can now use the new session quota exhaustion action in OpenAM Console
+   under Configuration &gt; Global &gt; Session &gt;
+   Resulting behavior if session quota exhausted.
+  </para>
+
+  <para>
+   Before moving to your test and production environments,
+   be sure to add your .jar and updates to <filename>amSession.properties</filename>
+   into a custom .war that you can then deploy.
+   You must still update the Session service configuration
+   in order to use your custom session quota exhaustion action.
+  </para>
+ </section>
+
+ <section xml:id="list-custom-quota-exhaustion-actions">
+  <title>Listing Session Quota Exhaustion Actions</title>
+
+  <para>
+   List session quota exhaustion actions
+   by using the <command>ssoadm</command> command
+   or by using the <literal>ssoadm.jsp</literal> page.
+  </para>
+
+  <screen>
+$ <userinput>ssoadm \
+ get-attr-choicevals \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --servicename iPlanetAMSessionService \
+ --schematype Global \
+ --attributename iplanet-am-session-constraint-handler</userinput>
+<computeroutput>
+I18n Key                  Choice Value
+------------------------- ---...-----------------------------------------
+choiceDestroyOldSession   org...session.service.DestroyOldestAction
+choiceDenyAccess          org...session.service.DenyAccessAction
+choiceDestroyNextExpiring org...session.service.DestroyNextExpiringAction
+choiceDestroyAll          org...session.service.DestroyAllAction
+myKey                     org...examples...SampleQuotaExhaustionAction</computeroutput>
+  </screen>
+ </section>
+
+ <section xml:id="remove-custom-quota-exhaustion-actions">
+  <title>Removing a Session Quota Exhaustion Action</title>
+
+  <para>
+   Remove a session quota exhaustion action
+   by using the <command>ssoadm</command> command
+   or by using the <literal>ssoadm.jsp</literal> page.
+  </para>
+
+  <screen>
+$ <userinput>ssoadm \
+ remove-attr-choicevals \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --servicename iPlanetAMSessionService \
+ --schematype Global \
+ --attributename iplanet-am-session-constraint-handler \
+ --choicevalues \
+ org.forgerock.openam.examples.quotaexhaustionaction.SampleQuotaExhaustionAction</userinput>
+
+<computeroutput>Choice Values were removed.</computeroutput>
+  </screen>
+ </section>
+</chapter>

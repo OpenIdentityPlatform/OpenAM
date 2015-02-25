@@ -1,0 +1,407 @@
+dn: cn=config
+changetype: modify
+replace:nsslapd-sizelimit
+nsslapd-sizelimit: 4000
+
+dn: cn=config
+changetype: modify
+replace:nsslapd-timelimit
+nsslapd-timelimit: 120
+
+dn: cn=config,cn=ldbm database,cn=plugins,cn=config
+changetype: modify
+replace:nsslapd-lookthroughlimit
+nsslapd-lookthroughlimit: -1
+
+dn: @NORMALIZED_RS@
+objectClass: top
+objectclass:organization
+o:@RS_RDN@
+objectclass:sunNameSpace
+objectclass:sunManagedOrganization
+objectclass: sunISManagedOrganization
+sunOrganizationAlias: @SERVER_HOST@
+inetDomainStatus: Active
+sunRegisteredServiceName: iPlanetAMPolicyConfigService
+sunRegisteredServiceName: iPlanetAMAuthService
+sunRegisteredServiceName: iPlanetAMAuthLDAPService
+sunRegisteredServiceName: iPlanetAMAuthenticationDomainConfigService
+sunRegisteredServiceName: iPlanetAMProviderConfigService
+
+dn: ou=DSAME Users,@NORMALIZED_RS@
+objectClass: top
+objectClass: organizationalUnit
+
+dn:cn=schema
+changetype:modify
+add:aci
+aci: (target="ldap:///cn=schema")(targetattr="*")(version 3.0; acl "S1IS Proxy user rights"; allow (proxy) userdn = "ldap:///cn=puser,ou=DSAME Users,@NORMALIZED_RS@"; )
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:objectclass
+objectclass:sunManagedOrganization
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:objectclass
+objectclass:organization
+-
+add:o
+o:@RS_RDN@
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:objectclass
+objectclass:sunNameSpace
+-
+add: sunNameSpaceUniqueAttrs
+sunNameSpaceUniqueAttrs:@ORG_NAMING_ATTR@,sunPreferredDomain,associatedDomain,sunOrganizationAlias
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:objectclass
+objectclass: sunISManagedOrganization
+-
+add:sunOrganizationAlias
+sunOrganizationAlias: @SERVER_HOST@
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:inetDomainStatus
+inetDomainStatus: Active
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:sunRegisteredServiceName
+sunRegisteredServiceName: iPlanetAMAuthService
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:sunRegisteredServiceName
+sunRegisteredServiceName: iPlanetAMAuthLDAPService
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:sunRegisteredServiceName
+sunRegisteredServiceName: iPlanetAMPolicyConfigService
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:sunRegisteredServiceName
+sunRegisteredServiceName: iPlanetAMAuthenticationDomainConfigService
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:sunRegisteredServiceName
+sunRegisteredServiceName: iPlanetAMProviderConfigService
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetattr="*")(version 3.0; acl "S1IS Proxy user rights"; allow (proxy) userdn = "ldap:///cn=puser,ou=DSAME Users,@NORMALIZED_RS@"; )
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetattr="*")(version 3.0; acl "S1IS special dsame user rights for all under the root suffix"; allow (all) userdn = "ldap:///cn=dsameuser,ou=DSAME Users,@NORMALIZED_RS@"; )
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetattr="*")(version 3.0; acl "S1IS special ldap auth user rights"; allow (read,search) userdn = "ldap:///cn=amldapuser,ou=DSAME Users,@NORMALIZED_RS@"; )
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///cn=amldapuser,ou=DSAME Users,@NORMALIZED_RS@")(targetattr = "*") (version 3.0; acl "S1IS special ldap auth user modify right"; deny (write) roledn != "ldap:///cn=Top-level Admin Role,@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetattr="*")(version 3.0; acl "S1IS Top-level admin rights"; allow (all) roledn = "ldap:///cn=Top-level Admin Role,@NORMALIZED_RS@"; )
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///cn=Top-level Admin Role,@NORMALIZED_RS@")(targetattr="*")(version 3.0; acl "S1IS Top-level admin delete right denied"; deny (delete) userdn = "ldap:///anyone"; )
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (targetattr="iplanet-am-saml-user || iplanet-am-saml-password")(targetfilter="(objectclass=iplanet-am-saml-service)")(version 3.0; acl "S1IS Right to modify saml user and password"; deny (all) (roledn != "ldap:///cn=Top-level Admin Role,@NORMALIZED_RS@") AND (userdn != "ldap:///cn=dsameuser,ou=DSAME Users,@NORMALIZED_RS@") AND (userdn != "ldap:///cn=puser,ou=DSAME Users,@NORMALIZED_RS@"); )
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetfilter=(entrydn=@NORMALIZED_RS@))(targetattr="*")(version 3.0; acl "S1IS Default Organization delete right denied"; deny (delete) userdn = "ldap:///anyone"; )
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetfilter=(!(nsroledn=cn=Top-level Admin Role,@NORMALIZED_RS@)))(targetattr = "*") (version 3.0; acl "S1IS Top-level Help Desk Admin Role access allow"; allow (read,search) roledn = "ldap:///cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetfilter=(!(nsroledn=cn=Top-level Admin Role,@NORMALIZED_RS@)))(targetattr = "userPassword") (version 3.0; acl "S1IS Top-level Help Desk Admin Role access allow"; allow (write) roledn = "ldap:///cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,@NORMALIZED_RS@))))(targetattr = "*") (version 3.0; acl "S1IS Top-level Policy Admin Role access allow"; allow (read,search) roledn = "ldap:///cn=Top-level Policy Admin Role,@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///ou=iPlanetAMAuthService,ou=services,*@NORMALIZED_RS@")(targetattr = "*") (version 3.0; acl "S1IS Top-level Policy Admin Role access Auth Service deny"; deny (add,write,delete) roledn = "ldap:///cn=Top-level Policy Admin Role,@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///ou=services,*@NORMALIZED_RS@")(targetattr = "*") (version 3.0; acl "S1IS Top-level Policy Admin Role access allow"; allow (all) roledn = "ldap:///cn=Top-level Policy Admin Role,@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetfilter="(objectclass=@ORG_OBJECT_CLASS@)")(targetattr = "sunRegisteredServiceName") (version 3.0; acl "S1IS Top-level Policy Admin Role access allow"; allow (read,write,search) roledn = "ldap:///cn=Top-level Policy Admin Role,@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+delete:aci
+aci: (targetattr != "userPassword") (version 3.0; acl "Anonymous access"; allow (read, search, compare)userdn = "ldap:///anyone";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+delete:aci
+aci:(targetattr != "userPassword || passwordHistory") (version 3.0; acl "Anonymous access"; allow (read, search, compare)userdn = "ldap:///anyone";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+delete:aci
+aci:(targetattr != "userPassword || passwordHistory || passwordExpirationTime || passwordExpWarned || passwordRetryCount || retryCountResetTime || accountUnlockTime || passwordAllowChangeTime ") (version 3.0; acl "Anonymous access"; allow (read, search, compare)userdn = "ldap:///anyone";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+delete:aci
+aci: (targetattr != "nsroledn || aci || nsLookThroughLimit || nsSizeLimit || nsTimeLimit || nsIdleTimeout || passwordPolicySubentry ")(version 3.0; acl "S1IS Allow self entry modification except for nsroledn, aci, resource limit attributes, and passwordPolicySubentry"; allow (write)userdn ="ldap:///self";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (targetattr = "*")(version 3.0; acl "S1IS Deny deleting self"; deny (delete) userdn ="ldap:///self";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (targetattr = "objectclass || inetuserstatus || iplanet-am-user-login-status || iplanet-am-web-agent-access-allow-list || iplanet-am-domain-url-access-allow || iplanet-am-web-agent-access-deny-list || iplanet-am-user-account-life || iplanet-am-session-max-session-time || iplanet-am-session-max-idle-time || iplanet-am-session-get-valid-sessions || iplanet-am-session-destroy-sessions || iplanet-am-session-add-session-listener-on-all-sessions || iplanet-am-user-admin-start-dn || iplanet-am-auth-post-login-process-class")(targetfilter=(!(nsroledn=cn=Top-level Admin Role,@NORMALIZED_RS@)))(version 3.0; acl "S1IS User status self modification denied"; deny (write) userdn ="ldap:///self";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (targetattr != "iplanet-am-static-group-dn || uid || nsroledn || aci || nsLookThroughLimit || nsSizeLimit || nsTimeLimit || nsIdleTimeout || memberOf || iplanet-am-web-agent-access-allow-list || iplanet-am-domain-url-access-allow || iplanet-am-web-agent-access-deny-list")(version 3.0; acl "S1IS Allow self entry modification except for nsroledn, aci, and resource limit attributes"; allow (write)userdn ="ldap:///self";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (targetattr != "aci || nsLookThroughLimit || nsSizeLimit || nsTimeLimit || nsIdleTimeout || iplanet-am-domain-url-access-allow")(version 3.0; acl "S1IS Allow self entry read search except for nsroledn, aci, resource limit and web agent policy attributes"; allow (read,search)userdn ="ldap:///self";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///ou=services,@NORMALIZED_RS@")(targetfilter=(!(objectclass=sunServiceComponent)))(targetattr = "*")(version 3.0; acl "S1IS Services anonymous access"; allow (read, search, compare) userdn = "ldap:///anyone";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///ou=iPlanetAMAdminConsoleService,*,@NORMALIZED_RS@")(targetattr = "*")(version 3.0; acl "S1IS iPlanetAMAdminConsoleService anonymous access"; allow (read, search, compare) userdn = "ldap:///anyone";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///($dn),@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Policy Admin Role,@NORMALIZED_RS@))))(targetattr != "nsroledn")(version 3.0; acl "S1IS Organization Admin Role access allow all"; allow (all) roledn = "ldap:///cn=Organization Admin Role,[$dn],@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///cn=Organization Admin Role,($dn),@NORMALIZED_RS@")(targetattr="*")(version 3.0; acl "S1IS Organization Admin Role access deny"; deny (write,add,delete,compare,proxy) roledn = "ldap:///cn=Organization Admin Role,($dn),@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///($dn),@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Policy Admin Role,@NORMALIZED_RS@))))(targetattr != "nsroledn")(version 3.0; acl "S1IS Container Admin Role access allow"; allow (all) roledn = "ldap:///cn=Container Admin Role,[$dn],@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///cn=Container Admin Role,($dn),@NORMALIZED_RS@")(targetattr="*")(version 3.0; acl "S1IS Container Admin Role access deny"; deny (write,add,delete,compare,proxy) roledn = "ldap:///cn=Container Admin Role,($dn),@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetattr!="nsroledn")(version 3.0; acl "S1IS Group admin's right to the users he creates"; allow (all) userattr = "iplanet-am-modifiable-by#ROLEDN";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Policy Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,@NORMALIZED_RS@))))(targetattr = "*") (version 3.0; acl "S1IS Organization Help Desk Admin Role access allow"; allow (read,search) roledn = "ldap:///cn=Organization Help Desk Admin Role,@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Policy Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,@NORMALIZED_RS@))))(targetattr = "userPassword") (version 3.0; acl "S1IS Organization Help Desk Admin Role access allow"; allow (write) roledn = "ldap:///cn=Organization Help Desk Admin Role,@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (target="ldap:///ou=People,@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Policy Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Container Admin Role,@NORMALIZED_RS@))))(targetattr != "iplanet-am-web-agent-access-allow-list || iplanet-am-domain-url-access-allow || iplanet-am-web-agent-access-deny-list || nsroledn") (version 3.0; acl "S1IS Group and people container admin role"; allow (all) roledn = "ldap:///cn=ou=@People_NM_ORG_ROOT_SUFFIX@,@NORMALIZED_RS@";)
+
+dn:@NORMALIZED_RS@
+changetype:modify
+add:aci
+aci: (targetattr = "*")(version 3.0; acl "S1IS Deny write to anonymous user"; deny (add,write,delete) roledn ="ldap:///cn=Deny Write Access,@NORMALIZED_RS@";)
+
+dn: o=Internet,@NORMALIZED_RS@
+objectClass: top
+objectClass: organization
+
+dn: cn=Deny Write Access,@NORMALIZED_RS@
+objectClass: top
+objectClass: nsmanagedroledefinition
+objectClass: nssimpleroledefinition
+objectClass: nsroledefinition
+objectClass: ldapsubentry
+objectClass: iplanet-am-managed-role
+iplanet-am-role-type: 3
+iplanet-am-role-description: Deny Write Access
+iplanet-am-role-aci-description: Deny Write Access Description
+iplanet-am-role-aci-list:@NORMALIZED_RS@:aci: (targetattr = "*")(version 3.0; acl "S1IS Deny write to anonymous user"; deny (add,write,delete) roledn ="ldap:///cn=Deny Write Access,@NORMALIZED_RS@";)
+iplanet-am-role-display-options: actionroleproperties=viewproperties
+iplanet-am-role-display-options: actionorganizationalunitproperties=viewproperties
+iplanet-am-role-display-options: actionserviceproperties=viewproperties
+iplanet-am-role-display-options: actionorganizationproperties=viewproperties
+iplanet-am-role-display-options: actionpeoplecontainerproperties=viewproperties
+iplanet-am-role-display-options: actiongroupproperties=viewproperties
+iplanet-am-role-display-options: actiongroupcontainerproperties=viewproperties
+iplanet-am-role-display-options: actionuserproperties=viewproperties
+iplanet-am-role-display-options: actionpolicyproperties=viewproperties
+iplanet-am-role-display-options: actionentityproperties=viewproperties
+
+dn: cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@
+objectClass: top
+objectClass: nsmanagedroledefinition
+objectClass: nssimpleroledefinition
+objectClass: nsroledefinition
+objectClass: ldapsubentry
+objectClass: iplanet-am-managed-role
+iplanet-am-role-type: 2
+iplanet-am-role-description: Top-level Help Desk Admin
+iplanet-am-role-aci-description: Top-level Help Desk Admin Description
+iplanet-am-role-aci-list:@NORMALIZED_RS@:aci: (target="ldap:///@NORMALIZED_RS@")(targetattr = "*") (version 3.0; acl "S1IS Top-level Help Desk Admin Role access allow"; allow (read,search) roledn = "ldap:///cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@";)
+iplanet-am-role-managed-container-dn: @NORMALIZED_RS@
+iplanet-am-role-display-options: userprofilemenu=iplanetamuserservice,resourceoffering
+iplanet-am-role-display-options: actionroleproperties=viewproperties
+iplanet-am-role-display-options: actionorganizationalunitproperties=viewproperties
+iplanet-am-role-display-options: actionserviceproperties=viewproperties
+iplanet-am-role-display-options: actionorganizationproperties=viewproperties
+iplanet-am-role-display-options: actionpeoplecontainerproperties=viewproperties
+iplanet-am-role-display-options: actiongroupproperties=viewproperties
+iplanet-am-role-display-options: actiongroupcontainerproperties=viewproperties
+iplanet-am-role-display-options: actionuserproperties=fullaccessobject
+iplanet-am-role-display-options: actionpolicyproperties=viewproperties
+iplanet-am-role-display-options: actionentityproperties=viewproperties
+
+dn: cn=Top-level Policy Admin Role,@NORMALIZED_RS@
+objectClass: top
+objectClass: nsmanagedroledefinition
+objectClass: nssimpleroledefinition
+objectClass: nsroledefinition
+objectClass: ldapsubentry
+objectClass: iplanet-am-managed-role
+iplanet-am-role-type: 2
+iplanet-am-role-description: Top-level Policy Admin
+iplanet-am-role-aci-description: Top-level Policy Admin Description
+iplanet-am-role-aci-list:@NORMALIZED_RS@:aci: (target="ldap:///@NORMALIZED_RS@")(targetattr = "*") (version 3.0; acl "S1IS Top-level Policy Admin Role access allow"; allow (read,search) roledn = "ldap:///cn=Top-level Policy Admin Role,@NORMALIZED_RS@";)
+iplanet-am-role-managed-container-dn: @NORMALIZED_RS@
+iplanet-am-role-display-options: rootnavmenu=policies,organizations,services,policyadministrator
+iplanet-am-role-display-options: organizationnavmenu=policies,organizations,services,policyadministrator
+iplanet-am-role-display-options: actionpolicyproperties=fullaccessobject
+iplanet-am-role-display-options: actionorganizationalunitproperties=viewproperties
+iplanet-am-role-display-options: actionorganizationproperties=viewproperties
+iplanet-am-role-display-options: actionpeoplecontainerproperties=viewproperties
+iplanet-am-role-display-options: actionuserproperties=modifyproperties
+iplanet-am-role-display-options: actionroleproperties=viewproperties
+iplanet-am-role-display-options: actionserviceproperties=fullaccessobject
+iplanet-am-role-display-options: actiongroupproperties=viewproperties
+iplanet-am-role-display-options: actiongroupcontainerproperties=viewproperties
+iplanet-am-role-display-options: actionentityproperties=viewproperties
+
+dn: ou=People,@NORMALIZED_RS@
+objectClass: top
+objectClass: organizationalunit
+objectClass: iplanet-am-managed-people-container
+
+dn: cn=ou=@People_NM_ORG_ROOT_SUFFIX@,@NORMALIZED_RS@
+objectClass: top
+objectClass: nsmanagedroledefinition
+objectClass: nssimpleroledefinition
+objectClass: nsroledefinition
+objectClass: ldapsubentry
+objectClass: iplanet-am-managed-role
+iplanet-am-role-type: 2
+iplanet-am-role-description: People Container Admin
+iplanet-am-role-aci-description: People Container Admin Description
+iplanet-am-role-aci-list: @NORMALIZED_RS@:aci: (target="ldap:///ou=People,@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Policy Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Container Admin Role,@NORMALIZED_RS@))))(targetattr != "iplanet-am-web-agent-access-allow-list || iplanet-am-domain-url-access-allow || iplanet-am-web-agent-access-deny-list || nsroledn") (version 3.0; acl "S1IS People container admin role"; allow (all) roledn = "ldap:///cn=ou=@People_NM_ORG_ROOT_SUFFIX@,@NORMALIZED_RS@";)
+iplanet-am-role-managed-container-dn: ou=People,@NORMALIZED_RS@
+iplanet-am-role-display-options: userprofilemenu=iplanetamuserservice,resourceoffering
+iplanet-am-role-display-options: actionroleproperties=noaccessobject
+iplanet-am-role-display-options: actionorganizationalunitproperties=noaccessobject
+iplanet-am-role-display-options: actionserviceproperties=noaccessobject
+iplanet-am-role-display-options: actionorganizationproperties=noaccessobject
+iplanet-am-role-display-options: actionpeoplecontainerproperties=fullaccessobject
+iplanet-am-role-display-options: actiongroupproperties=noaccessobject
+iplanet-am-role-display-options: actiongroupcontainerproperties=noaccessobject
+iplanet-am-role-display-options: actionuserproperties=fullaccessobject
+iplanet-am-role-display-options: actionpolicyproperties=noaccessobject
+iplanet-am-role-display-options: actionentityproperties=noaccessobject
+
+dn: ou=Groups,@NORMALIZED_RS@
+objectClass: top
+objectClass: organizationalunit
+objectclass: iplanet-am-managed-group-container
+
+dn: cn=puser,ou=DSAME Users,@NORMALIZED_RS@
+objectclass: inetuser
+objectclass: organizationalperson
+objectclass: person
+objectclass: top
+cn: puser
+sn: puser
+userPassword: @AMLDAPUSERPASSWD@
+nsSizeLimit: 4000
+
+dn: cn=dsameuser,ou=DSAME Users,@NORMALIZED_RS@
+objectclass: inetuser
+objectclass: organizationalperson
+objectclass: person
+objectclass: top
+cn: dsameuser
+sn: dsameuser
+userPassword: @ADMIN_PWD@
+
+dn: cn=amldapuser,ou=DSAME Users,@NORMALIZED_RS@
+objectclass: inetuser
+objectclass: organizationalperson
+objectclass: person
+objectclass: top
+cn: amldapuser
+sn: amldapuser
+userPassword: @AMLDAPUSERPASSWD@
+
+dn: cn=ContainerDefaultTemplateRole,@NORMALIZED_RS@
+objectClass: top
+objectClass: nscomplexroledefinition
+objectClass: nsfilteredroledefinition
+objectClass: nsroledefinition
+objectClass: ldapsubentry
+nsRoleFilter: (objectclass=iplanet-am-managed-person)

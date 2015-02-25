@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<!DOCTYPE MBeanType SYSTEM "commo.dtd">
+
+<MBeanType
+ Name          = "AgentAuthenticator"
+ DisplayName   = "AgentAuthenticator"
+ Package       = "com.sun.identity.agents.weblogic.v10"
+ Extends       = "weblogic.management.security.authentication.Authenticator"
+ PersistPolicy = "OnUpdate"
+>
+<MBeanAttribute
+  Name          = "ProviderClassName"
+  Type          = "java.lang.String"
+  Writeable     = "false"
+  Default       = "&quot;com.sun.identity.agents.weblogic.v10.AmWLAuthProvider&quot;"
+/>
+
+<MBeanAttribute
+  Name          = "Description"
+  Type          = "java.lang.String"
+  Writeable     = "false"
+  Default       = "&quot;Policy Agent Authentication Provider&quot;"
+/>
+
+<MBeanAttribute
+  Name          = "Version"
+  Type          = "java.lang.String"
+  Writeable     = "false"
+  Default       = "&quot;1.0&quot;"
+/>
+
+</MBeanType>
+ 
+
+

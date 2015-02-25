@@ -1,0 +1,286 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+# 
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: INSTALL.txt,v 1.10 2008/06/25 05:54:29 qcheng Exp $
+#
+#
+#
+------------------------------------------------------------------------------
+Installation instructions Open Web Single Sign-On - Web Agents
+------------------------------------------------------------------------------
+
+%% Contents:
+    %% 1. Agent Installation
+    %% 2. Agent Uninstallation
+
+%% 1. Agent Installation
+
+Please make sure that the Apache Server 2.0.55 is installed and running. Also
+make sure that the Apache Agent is compiled with steps indicated in README.txt.
+
+Installation does the following:
+
+    - Creates the Apache Agent Instance Directory
+    - Tag Swapping in FAMAgentBootstrap.properties file
+    - Updating Apache Server httpd.conf file
+
+%% 1.1 Steps
+
+1.1.1 Extract  apache_v20_SunOS_x86_agent.zip installation bits.
+1.1.2 Goto web_agents/apache_agent/bin
+1.1.3 Execute agentadmin --install
+1.1.4 Accept the license agreement terms
+1.1.5 Follow the installation interactions and provide these details:
+
+    - Apache Server Config Directory
+    - Access Manager Services Hos
+    - Access Manager Services port
+    - Access Manager Services Protocol
+    - Access Manager Services Deployment URI
+    - Agent Host name
+    - Agent Host port
+    - Agent Host protocol
+    - Agent Profile name
+    - Agent Profile's plain text password file
+
+1.1.6 Restart the server
+
+
+Here is the sample of the above steps:
+
+[/opt]> unzip apache_v20_SunOS_x86_agent.zip
+
+x web_agents
+x web_agents/apache_agent
+x web_agents/apache_agent/bin
+x web_agents/apache_agent/bin/crypt_util
+x web_agents/apache_agent/bin/certutil
+x web_agents/apache_agent/bin/agentadmin
+x web_agents/apache_agent/bin/agentadmin.bat
+x web_agents/apache_agent/etc
+x web_agents/apache_agent/etc/dsame.template
+x web_agents/apache_agent/config
+x web_agents/apache_agent/config/FAMAgentBootstrap.template
+x web_agents/apache_agent/config/AMToolsConfig.properties
+x web_agents/apache_agent/config/configure.xml
+x web_agents/apache_agent/lib
+x web_agents/apache_agent/lib/libxml2.so
+x web_agents/apache_agent/lib/apache-install.jar
+x web_agents/apache_agent/lib/opensso-installtools.jar
+x web_agents/apache_agent/lib/opensso-installtools-launcher.jar
+x web_agents/apache_agent/lib/libamapc2.so
+x web_agents/apache_agent/jce
+x web_agents/apache_agent/jsse
+x web_agents/apache_agent/locale
+x web_agents/apache_agent/locale/amToolsMessages.properties
+x web_agents/apache_agent/locale/apacheTools.properties
+x web_agents/apache_agent/license.txt
+x web_agents/apache_agent/README
+
+[/opt]> cd web_agents/apache_agent/bin/
+
+[/opt]> chmod +x agentadmin crypt_util certutil
+
+[/opt/web_agents/apache_agent/bin/]> ./agentadmin --install
+
+Do you completely agree with all the terms and conditions of this License
+Agreement (yes/no): [no]: yes
+
+
+
+Enter the complete path to the directory which is used by Apache Server to
+store its configuration Files. This directory uniquely identifies the
+Apache Server instance that is secured by this Agent.
+[ ? : Help, ! : Exit ]
+Enter the Apache Server Config Directory Path [/opt/apache/conf]: /opt/apache2/conf
+
+
+Enter the fully qualified host name of the server where Access Manager
+Services are installed.
+[ ? : Help, < : Back, ! : Exit ]
+Access Manager Services Host: am.host.com
+
+
+Enter the port number of the Server that runs Access Manager Services.
+[ ? : Help, < : Back, ! : Exit ]
+Access Manager Services port [80]: 8080
+
+
+Enter http/https to specify the protocol used by the Server that runs Access
+Manager services.
+[ ? : Help, < : Back, ! : Exit ]
+Access Manager Services Protocol [http]:
+
+
+Enter the Deployment URI for Access Manager Services.
+[ ? : Help, < : Back, ! : Exit ]
+Access Manager Services Deployment URI [/amserver]:
+
+
+Enter the fully qualified host name on which the Web Server protected by the
+agent is installed.
+[ ? : Help, < : Back, ! : Exit ]
+Enter the Agent Host name: agent.host.com
+
+
+Enter the preferred port number on which the Web Server provides its
+services.
+[ ? : Help, < : Back, ! : Exit ]
+Enter the port number for Web Server instance [80]: 7000
+
+
+Select http or https to specify the protocol used by the Web server instance
+that will be protected by Access Manager Policy Agent.
+[ ? : Help, < : Back, ! : Exit ]
+Enter the Preferred Protocol for Web Server instance [http]:
+
+
+Enter a valid Agent profile name. Before proceeding with the agent
+installation, please ensure that a valid Agent profile exists in Access
+Manager.
+[ ? : Help, < : Back, ! : Exit ]
+Enter the Agent Profile name [UrlAccessAgent]:
+
+
+Enter the path to a file that contains the password to be used for identifying
+the Agent.
+[ ? : Help, < : Back, ! : Exit ]
+Enter the path to the password file: /opt/password
+
+
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Apache Server Config Directory : /opt/apache2/conf
+Access Manager Services Host : am.host.com
+Access Manager Services Port : 8080
+Access Manager Services Protocol : http
+Access Manager Services Deployment URI : /amserver
+Agent Host name : agent.host.com
+Web Server Instance Port number : 7000
+Protocol for Web Server instance : http
+Agent Profile name : UrlAccessAgent
+Agent Profile Password file name : /opt/password
+
+Verify your settings above and decide from the choices below.
+1. Continue with Installation
+2. Back to the last interaction
+3. Start Over
+4. Exit
+Please make your selection [1]:
+
+Creating directory layout and configuring Agent file for Agent_001
+instance ...DONE.
+
+Reading data from file /opt/password and encrypting it ...DONE.
+
+Generating audit log file name ...DONE.
+
+Creating tag swapped FAMAgentBootstrap.properties file for instance Agent_001 ...DONE.
+
+Creating a backup for file /opt/apache2/conf/httpd.conf ...DONE.
+
+Adding Agent parameters to /opt/web_agents/apache_agent/Agent_001/config/dsame.conf file ...DONE.
+
+Adding Agent parameters to /opt/apache2/conf/httpd.conf file ...DONE.
+
+
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Configuration file location:
+/opt/web_agents/apache_agent/Agent_001/config/FAMAgentBootstrap.properties
+Agent Audit directory location:
+/opt/web_agents/apache_agent/Agent_001/logs/audit
+Agent Debug directory location:
+/opt/web_agents/apache_agent/Agent_001/logs/debug
+
+
+Install log file location:
+/opt/web_agents/apache_agent/logs/audit/install.log
+
+Thank you for using Access Manager Policy Agent
+
+
+%% 2. Agent Uninstallation
+
+Use agentadmin --uninstall option to uninstall the agent. Uninstallation does
+the following:
+
+    - Unconfigures httpd.conf
+    - Removes agent instance's config directory.
+
+To completely remove the agent installation files, go back to web_agents and
+simply remove the directory.
+
+
+Here is the sample:
+
+
+[/opt/web_agents/apache_agent/bin]> ./agentadmin --uninstall
+
+
+
+************************************************************************
+Welcome to the Access Manager Policy Agent for Apache Server If the Policy
+Agent is used with Federation Manager services, User needs to enter
+information relevant to Federation Manager.
+
+************************************************************************
+
+
+Enter the complete path to the directory which is used by Apache Server to
+store its configuration Files. This directory uniquely identifies the
+Apache Server instance that is secured by this Agent.
+[ ? : Help, ! : Exit ]
+Enter the Apache Server Config Directory Path [/opt/apache/conf]: /opt/apache2/conf
+
+
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Apache Server Config Directory : /opt/apache2/conf
+
+Verify your settings above and decide from the choices below.
+1. Continue with Uninstallation
+2. Back to the last interaction
+3. Start Over
+4. Exit
+Please make your selection [1]:
+
+Deleting the config directory
+/opt/web_agents/apache_agent/Agent_001/config ...DONE.
+
+Removing Agent parameters from /opt/apache2/conf/httpd.conf file ...DONE.
+
+
+Uninstall log file location:
+/opt/web_agents/apache_agent/logs/audit/uninstall.log
+
+Thank you for using Access Manager Policy Agent
+
+
+%% 3. If using Apache 2.2.x server, then use apache_v22_SunOS_x86_agent.zip.
+Agent files extracted to web_agents/apache22_agent/ directory.
+Installation and uninstallation are similar as above.

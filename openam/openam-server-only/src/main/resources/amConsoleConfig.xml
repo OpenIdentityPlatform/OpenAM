@@ -1,0 +1,362 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: amConsoleConfig.xml,v 1.12 2008/09/09 18:13:57 veiming Exp $
+
+   Portions Copyrighted 2011-2013 ForgeRock AS
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+-->
+
+<consoleconfig>
+    <tabs>
+        <tab id="0" viewbean="com.sun.identity.console.task.HomeViewBean"
+             url="../task/Home"
+             label="tab.common.label"
+             tooltip="tab.common.tooltip"
+             status="tab.common.status"
+             permissions="iPlanetAMProviderConfigService"/>
+
+        <tab id="1"
+             viewbean="com.sun.identity.console.realm.RMRealmViewBean"
+             url="../realm/RMRealm"
+             label="tab.realm.label"
+             tooltip="tab.realm.tooltip"
+             status="tab.realm.status"
+             permissions="sunAMRealmService,sunIdentityRepositoryService,iPlanetAMPolicyService,AgentService,sunIdentityRepositoryService/1.0/application/agent"/>
+
+        <tab id="2" viewbean="com.sun.identity.console.federation.FederationViewBean"
+             url="../federation/Federation"
+             label="tab.federation.label"
+             tooltip="tab.federation.tooltip"
+             status="tab.federation.tooltip"
+             controller="com.sun.identity.console.controller.FedTabController"
+             permissions="iPlanetAMProviderConfigService"
+             accesslevel="globalConfig"/>
+
+        <tab id="4"
+             viewbean="com.sun.identity.console.service.SCConfigAuthViewBean"
+             url="none"
+             label="tab.configuration.label"
+             tooltip="tab.configuration.tooltip"
+             status="tab.configuration.status"
+             permissions="iPlanetAMAuth,iPlanetAMPasswordResetService,iPlanetG11NSettings,iPlanetAMAdminConsoleService,iPlanetAMClientDetection,iPlanetAMLoggingService,iPlanetAMNamingService,iPlanetAMPlatformService,iPlanetAMSessionService,iPlanetAMPolicy"
+             accesslevel="globalconfig">
+
+            <tab id="41" viewbean="com.sun.identity.console.service.SCConfigAuthViewBean"
+                 url="../service/SCConfigAuth"
+                 label="tab.configuration.service.auth.label"
+                 tooltip="tab.configuration.service.auth.tooltip"
+                 status="tab.configuration.service.auth.status"
+                 permissions="iPlanetAMAuth"
+                 accesslevel="globalconfig"/>
+
+            <tab id="43" viewbean="com.sun.identity.console.service.SCConfigConsoleViewBean"
+                 url="../service/SCConfigConsole"
+                 label="tab.configuration.service.console.label"
+                 tooltip="tab.configuration.service.console.tooltip"
+                 status="tab.configuration.service.console.status"
+                 permissions="iPlanetG11NSettings,iPlanetAMAdminConsoleService"
+                 accesslevel="globalconfig"/>
+
+            <tab id="44" viewbean="com.sun.identity.console.service.SCConfigSystemViewBean"
+                 url="../service/SCConfigSystem"
+                 label="tab.configuration.service.system.label"
+                 tooltip="tab.configuration.service.system.tooltip"
+                 status="tab.configuration.service.system.status"
+                 permissions="iPlanetAMPlatformService,iPlanetAMClientDetection,iPlanetAMLoggingService,iPlanetAMNamingService"
+                 accesslevel="globalconfig"/>
+
+            <tab id="45" viewbean="com.sun.identity.console.service.SCConfigGlobalViewBean"
+                 url="../service/SCConfigGlobal"
+                 label="tab.configuration.service.global.label"
+                 tooltip="tab.configuration.service.global.tooltip"
+                 status="tab.configuration.service.global.status"
+                 permissions="iPlanetAMPasswordResetService,iPlanetAMPolicy,iPlanetAMSessionService"
+                 accesslevel="globalconfig"/>
+
+            <tab id="42" viewbean="com.sun.identity.console.service.ServerSiteViewBean"
+                 url="../service/ServerSite"
+                 label="tab.configuration.server.label"
+                 tooltip="tab.configuration.server.tooltip"
+                 status="tab.configuration.server.status"
+                 permissions="iPlanetAMPlatformService"
+                 accesslevel="globalconfig"/>
+
+        </tab>
+
+        <!-- Session Tabs -->
+        <tab id="5" viewbean="com.sun.identity.console.session.SMProfileViewBean"
+             url="none"
+             label="tab.session.label"
+             tooltip="tab.session.tooltip"
+             status="tab.session.status"
+             permissions="iPlanetAMSessionService"
+             accesslevel="globalconfig">
+
+        <tab id="51" viewbean="com.sun.identity.console.session.SMProfileViewBean"
+             url="../session/SMProfile"
+             label="tab.session.current.label"
+             tooltip="tab.session.current.tooltip"
+             status="tab.session.current.status"
+             permissions="iPlanetAMSessionService"
+             accesslevel="globalconfig"/>
+
+        <tab id="52" viewbean="com.sun.identity.console.session.SessionHAStatisticsViewBean"
+             url="../session/SessionHAStatistics"
+             label="tab.session.statistics.label"
+             tooltip="tab.session.statistics.tooltip"
+             status="tab.session.statistics.status"
+             permissions="iPlanetAMSessionService"
+             accesslevel="globalconfig"/>
+        </tab>
+
+    </tabs>
+
+    <profiletabs>
+        <profile id="realms">
+            <tab id="11"
+                 viewbean="com.sun.identity.console.realm.RealmPropertiesViewBean"
+                 url="../realm/RMRealm"
+                 label="realm.showmenu.label.properties"
+                 tooltip="tab.sub.realm.tooltip"
+                 status="tab.sub.realm.status"
+                 permissions="sunAMRealmService,AgentService"/>
+            <tab id="12"
+                 viewbean="com.sun.identity.console.authentication.AuthPropertiesViewBean"
+                 label="realm.showmenu.label.authentication"
+                 url="../realm/RMRealm"
+                 tooltip="tab.sub.authentication.tooltip"
+                 status="tab.sub.authentication.status"
+                 permissions="iPlanetAMAuth"/>
+            <tab id="13"
+                 viewbean="com.sun.identity.console.realm.ServicesViewBean"
+                 url="../realm/RMRealm"
+                 tooltip="tab.sub.services.tooltip"
+                 status="tab.sub.services.status"
+                 label="realm.showmenu.label.services"
+                 permissions="sunAMRealmService,ANY_SERVICE"/>
+            <tab id="14"
+                 viewbean="com.sun.identity.console.realm.IDRepoViewBean"
+                 url="../realm/RMRealm"
+                 tooltip="tab.sub.repository.tooltip"
+                 status="tab.sub.repository.status"
+                 label="realm.showmenu.label.repository"
+                 permissions="sunIdentityRepositoryService"/>
+            <tab id="15"
+                 viewbean="com.sun.identity.console.delegation.DelegationViewBean"
+                 url="../delegation/Delegation"
+                 tooltip="tab.sub.delegation.tooltip"
+                 status="tab.sub.delegation.status"
+                 label="realm.showmenu.label.delegation"
+                 delegateUI="true"
+                 permissions="sunAMRealmService"/>
+            <tab id="16"
+                 viewbean="com.sun.identity.console.policy.PolicyViewBean"
+                 url="../policy/Policy"
+                 label="tab.sub.policy.label"
+                 tooltip="tab.sub.policy.tooltip"
+                 status="tab.sub.policy.status"
+                 permissions="iPlanetAMPolicyService"/>
+            <tab id="17"
+                 viewbean="com.sun.identity.console.idm.HomeViewBean"
+                 url="../idm/Home"
+                 label="tab.sub.subjects.label"
+                 tooltip="tab.sub.subjects.tooltip"
+                 status="tab.sub.subjects.status"
+                 permissions="sunIdentityRepositoryService"/>
+
+            <tab id="18"
+                 viewbean="com.sun.identity.console.agentconfig.HomeViewBean"
+                 url="../agentconfig/Home"
+                 label="tab.configuration.agentconfig.label"
+                 tooltip="tab.configuration.agentconfig.tooltip"
+                 status="tab.configuration.agentconfig.status"
+                 permissions="sunIdentityRepositoryService/1.0/application/agent"/>
+            <tab id="19"
+                 viewbean="com.sun.identity.console.reststs.RestSTSHomeViewBean"
+                 url="../reststs/RestSTSHome"
+                 label="tab.configuration.reststs.label"
+                 tooltip="tab.configuration.reststs.tooltip"
+                 status="tab.configuration.reststs.status"
+                 permissions="RestSecurityTokenService"/>
+        </profile>
+        <profile id="cscGeneral">
+            <tab id="421"
+                 viewbean="com.sun.identity.console.service.ServerEditGeneralViewBean"
+                 url="../service/ServerEditGeneral"
+                 label="serverconfiguration.showmenu.label.general.properties"
+                 tooltip="tab.serverconfiguration.showmenu.general.tooltip"
+                 status="tab.serverconfiguration.showmenu.general.tooltip"
+                 permissions="iPlanetAMPlatformService"/>
+            <tab id="422"
+                 viewbean="com.sun.identity.console.service.ServerEditSecurityViewBean"
+                 url="../service/ServerEditSecurity"
+                 label="serverconfiguration.showmenu.label.security.properties"
+                 tooltip="tab.serverconfiguration.showmenu.security.tooltip"
+                 status="tab.serverconfiguration.showmenu.security.tooltip"
+                 permissions="iPlanetAMPlatformService"/>
+            <tab id="423"
+                 viewbean="com.sun.identity.console.service.ServerEditSessionViewBean"
+                 url="../service/ServerEditSession"
+                 label="serverconfiguration.showmenu.label.session.properties"
+                 tooltip="tab.serverconfiguration.showmenu.session.tooltip"
+                 status="tab.serverconfiguration.showmenu.session.tooltip"
+                 permissions="iPlanetAMPlatformService"/>
+            <tab id="424"
+                 viewbean="com.sun.identity.console.service.ServerEditSDKViewBean"
+                 url="../service/ServerEditSDK"
+                 label="serverconfiguration.showmenu.label.sdk.properties"
+                 tooltip="tab.serverconfiguration.showmenu.sdk.tooltip"
+                 status="tab.serverconfiguration.showmenu.sdk.tooltip"
+                 permissions="iPlanetAMPlatformService"/>
+            <tab id="425"
+                 viewbean="com.sun.identity.console.service.ServerConfigXMLViewBean"
+                 url="../service/ServerConfigXML"
+                 label="serverconfiguration.showmenu.label.serverconfigxml.properties"
+                 tooltip="tab.serverconfiguration.showmenu.serverconfigxml.tooltip"
+                 status="tab.serverconfiguration.showmenu.serverconfigxml.tooltip"
+                 permissions="iPlanetAMPlatformService"/>
+            <tab id="426"
+                 viewbean="com.sun.identity.console.service.ServerEditCTSViewBean"
+                 url="../service/ServerEditCTS"
+                 label="serverconfiguration.showmenu.label.cts.properties"
+                 tooltip="tab.serverconfiguration.showmenu.cts.tooltip"
+                 status="tab.serverconfiguration.showmenu.cts.tooltip"
+                 permissions="iPlanetAMPlatformService"/>
+            <tab id="427"
+                 viewbean="com.sun.identity.console.service.ServerEditAdvancedViewBean"
+                 url="../service/ServerEditAdvanced"
+                 label="serverconfiguration.showmenu.label.advanced.properties"
+                 tooltip="tab.serverconfiguration.showmenu.advanced.tooltip"
+                 status="tab.serverconfiguration.showmenu.advanced.tooltip"
+                 permissions="iPlanetAMPlatformService"/>
+        </profile>
+
+        <profile id="SAMLv2">
+            <tab id="800" viewbean="com.sun.identity.console.federation.SAMLv2SPAssertionContentViewBean"
+                 url="../federation/SAMLv2SPAssertionContent" label="federation.SAMLv2SP.label"
+                 tooltip="federation.SAMLv2SP.tooltip" status="federation.SAMLv2SP.status"
+                 permissions="iPlanetAMProviderConfigService">
+                <tab id="8001" viewbean="com.sun.identity.console.federation.SAMLv2SPAssertionContentViewBean"
+                     url="../federation/SAMLv2SPAssertionContent"
+                     label="federation.SAMLv2SPAssertionContent.label"
+                     tooltip="federation.SAMLv2SPAssertionContent.tooltip"
+                     status="federation.SAMLv2SPAssertionContent.status"
+                     permissions="iPlanetAMProviderConfigService"/>
+                <tab id="8002" viewbean="com.sun.identity.console.federation.SAMLv2SPAssertionProcessingViewBean"
+                     url="../federation/SAMLv2SPAssertionProcessing"
+                     label="federation.SAMLv2SPAssertionProcessing.label"
+                     tooltip="federation.SAMLv2SPAssertionProcessing.tooltip"
+                     status="federation.SAMLv2SPAssertionProcessing.status"
+                     permissions="iPlanetAMProviderConfigService"/>
+                <tab id="8003" viewbean="com.sun.identity.console.federation.SAMLv2SPServicesViewBean"
+                     url="../federation/SAMLv2SPServices"
+                     label="federation.SAMLv2SPServices.label"
+                     tooltip="federation.SAMLv2SPServices.tooltip"
+                     status="federation.SAMLv2SPServices.status"
+                     permissions="iPlanetAMProviderConfigService"/>
+                <tab id="8004" viewbean="com.sun.identity.console.federation.SAMLv2SPAdvancedViewBean"
+                     url="../federation/SAMLv2SPAdvanced"
+                     label="federation.SAMLv2SPAdvanced.label"
+                     tooltip="federation.SAMLv2SPAdvanced.tooltip"
+                     status="federation.SAMLv2SPAdvanced.status"
+                     permissions="iPlanetAMProviderConfigService"/>
+            </tab>
+            <tab id="810" viewbean="com.sun.identity.console.federation.SAMLv2IDPAssertionContentViewBean"
+                 url="../federation/SAMLv2IDPAssertionContent" label="federation.SAMLv2IDP.label"
+                 tooltip="federation.SAMLv2IDP.tooltip" status="federation.SAMLv2IDP.status"
+                 permissions="iPlanetAMProviderConfigService">
+                <tab id="8101" viewbean="com.sun.identity.console.federation.SAMLv2IDPAssertionContentViewBean"
+                     url="../federation/SAMLv2IDPAssertionContent"
+                     label="federation.SAMLv2IDPAssertionContent.label"
+                     tooltip="federation.SAMLv2IDPAssertionContent.tooltip"
+                     status="federation.SAMLv2IDPAssertionContent.status"
+                     permissions="iPlanetAMProviderConfigService"/>
+                <tab id="8102" viewbean="com.sun.identity.console.federation.SAMLv2IDPAssertionProcessingViewBean"
+                     url="../federation/SAMLv2IDPAssertionProcessing"
+                     label="federation.SAMLv2IDPAssertionProcessing.label"
+                     tooltip="federation.SAMLv2IDPAssertionProcessing.tooltip"
+                     status="federation.SAMLv2IDPAssertionProcessing.status"
+                     permissions="iPlanetAMProviderConfigService"/>
+                <tab id="8103" viewbean="com.sun.identity.console.federation.SAMLv2IDPServicesViewBean"
+                     url="../federation/SAMLv2IDPServices"
+                     label="federation.SAMLv2IDPServices.label"
+                     tooltip="federation.SAMLv2IDPServices.tooltip"
+                     status="federation.SAMLv2IDPServices.status"
+                     permissions="iPlanetAMProviderConfigService"/>
+                <tab id="8104" viewbean="com.sun.identity.console.federation.SAMLv2IDPAdvancedViewBean"
+                     url="../federation/SAMLv2IDPAdvanced"
+                     label="federation.SAMLv2IDPAdvanced.label"
+                     tooltip="federation.SAMLv2IDPAdvanced.tooltip"
+                     status="federation.SAMLv2IDPAdvanced.status"
+                     permissions="iPlanetAMProviderConfigService"/>
+            </tab>
+            <tab id="820" viewbean="com.sun.identity.console.federation.SAMLv2PDPViewBean" url="../federation/SAMLv2PDP"
+                 label="federation.SAMLv2PDP.label" tooltip="federation.SAMLv2PDP.tooltip"
+                 status="federation.SAMLv2PDP.status" permissions="iPlanetAMProviderConfigService"/>
+            <tab id="830" viewbean="com.sun.identity.console.federation.SAMLv2PEPViewBean" url="../federation/SAMLv2PEP"
+                 label="federation.SAMLv2PEP.label" tooltip="federation.SAMLv2PEP.tooltip"
+                 status="federation.SAMLv2PEP.status" permissions="iPlanetAMProviderConfigService"/>
+            <tab id="840" viewbean="com.sun.identity.console.federation.SAMLv2AttrAuthorityViewBean"
+                 url="../federation/SAMLv2AttrAuthority" label="federation.SAMLv2AttrAuthority.label"
+                 tooltip="federation.SAMLv2AttrAuthority.tooltip" status="federation.SAMLv2AttrAuthority.status"
+                 permissions="iPlanetAMProviderConfigService"/>
+            <tab id="850" viewbean="com.sun.identity.console.federation.SAMLv2AttrQueryViewBean"
+                 url="../federation/SAMLv2AttrQuery" label="federation.SAMLv2AttrQuery.label"
+                 tooltip="federation.SAMLv2AttrQuery.tooltip" status="federation.SAMLv2AttrQuery.status"
+                 permissions="iPlanetAMProviderConfigService"/>
+            <tab id="860" viewbean="com.sun.identity.console.federation.SAMLv2AuthnAuthorityViewBean"
+                 url="../federation/SAMLv2AuthnAuthority" label="federation.SAMLv2AuthnAuthority.label"
+                 tooltip="federation.SAMLv2AuthnAuthority.tooltip" status="federation.SAMLv2AuthnAuthority.status"
+                 permissions="iPlanetAMProviderConfigService"/>
+            <tab id="870" viewbean="com.sun.identity.console.federation.SAMLv2AffiliateViewBean"
+                 url="../federation/SAMLv2Affiliate" label="federation.SAMLv2Affiliate.label"
+                 tooltip="federation.SAMLv2Affiliate.tooltip" status="federation.SAMLv2Affiliate.status"
+                 permissions="iPlanetAMProviderConfigService"/>
+        </profile>
+
+        <profile id="wsfed">
+            <tab id="2" viewbean="com.sun.identity.console.federation.WSFedPropertiesViewBean"
+                 url="../federation/WSFedProperties" label="General" tooltip="user.roles.tooltip"
+                 status="user.roles.status" permissions="iPlanetAMProviderConfigService"/>
+        </profile>
+
+        <profile id="idff">
+            <tab id="3" viewbean="com.sun.identity.console.federationIDFFPropertiesViewBean"
+                 url="../federation/IDFFProperties" label="General" tooltip="user.roles.tooltip"
+                 status="user.roles.status" permissions="iPlanetAMProviderConfigService"/>
+        </profile>
+
+    </profiletabs>
+
+    <servicesconfig>
+        <hidden names="iPlanetAMPolicyService, iPlanetAMEntrySpecificService"/>
+        <consoleservice
+                realmEnableHideAttrName="iplanet-am-admin-console-um-enabled, iplanet-am-admin-console-online-help, iplanet-am-admin-console-custom-jsp-dir, iplanet-am-admin-console-pc-display, iplanet-am-admin-console-ou-display, iplanet-am-admin-console-gc-display, iplanet-am-admin-console-compliance-user-deletion, iplanet-am-admin-console-group-pclist, iplanet-am-admin-console-group-type,iplanet-am-admin-console-dctree,iplanet-am-admin-console-dctree-attr-list,iplanet-am-admin-console-special-search-filters,iplanet-am-admin-console-compliance-admin-groups,iplanet-am-admin-console-role-display-options,iplanet-am-admin-console-role-default-acis,iplanet-am-admin-console-dynamic-aci-list,iplanet-am-console-service-view-bean,iplanet-am-admin-console-default-pc,iplanet-am-admin-console-default-gc,iplanet-am-admin-console-default-ac,iplanet-am-admin-console-group-default-pc,iplanet-am-admin-console-user-profile-class,iplanet-am-admin-console-user-role-display,iplanet-am-admin-console-user-groups-display,iplanet-am-admin-console-user-groups-subscribe,iplanet-am-admin-console-user-service-display,iplanet-am-admin-console-default-roles,iplanet-am-admin-console-view-menu,iplanet-am-required-services,iplanet-am-user-create-notification-list,iplanet-am-user-delete-notification-list,iplanet-am-user-modify-notification-list,iplanet-am-admin-console-display-options,iplanet-am-admin-console-enduser-profile-class,iplanet-am-console-service-listeners,iplanet-am-admin-console-pre-post-processing-modules,iplanet-am-admin-console-invalid-chars,iplanet-am-admin-console-user-password-validation-class,iplanet-am-admin-console-user-search-key,iplanet-am-admin-console-external-attribute-fetch-enabled"/>
+        <identityservice order="user,agent,*role,*group"/>
+        <agentservice order="WebAgent,J2EEAgent,WSPAgent,WSCAgent,STSAgent,DiscoveryAgent"/>
+        <combineagent pairs="STSClient=STSAgent,DiscoveryAgent"/>
+    </servicesconfig>
+</consoleconfig>
+

@@ -1,0 +1,218 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README.weblogic,v 1.5 2008/08/19 19:15:08 veiming Exp $
+
+   Portions Copyright 2013 ForgeRock AS
+
+-->
+
+===============
+README.weblogic
+===============
+
+This README contains instructions on how to secure web services using OpenAM WSS plugins on WebLogic platform 9.2.
+
+This document assumes that users have already done the following:
+
+1. Installed the WebLogic 9.2 servers that host the web services client (WSC) 
+   and web services provider (WSP). 
+2. Implemented the web services client and the web services provider.
+3. Set up the OpenAM server and profiles for the WSC and the WSP.
+   If not, please refer to the README.common file for details on setting up
+   OpenAM server and the profiles of WSC and WSP.
+
+
+Follow the steps below to secure the web services using OpenAM WSS
+plugins.
+
+I. Download the required libraries
+   1. Download saaj-impl.jar following the instruction in https://opensso.dev.java.net/source/browse/opensso/products/README?view=markup
+
+
+II. Set up SOAP runtime environment in WebLogic 9.2 server.
+    The Weblogic by default has it's own SOAP runtime environment. This is not
+    compatible with Sun's implementation. Hence the SOAP runtime in WebLogic
+    has to be overriden using Sun's implementation.
+    1. Go to WebLogic domain directory
+       e.g. cd /usr/local/bea/user_projects/domains/base_domain/bin
+    2. Edit setDomainEnv.sh or setDomainEnv.cmd to set JAVA_OPTIONS and 
+       CLASSPATH at the end of the file to use Sun's SOAP runtime.
+       JAVA_OPTIONS=${JAVA_OPTIONS} -Djavax.xml.soap.MessageFactory=com.sun.xml.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl
+       CLASSPATH=${PRE_CLASSPATH}:${WEBLOGIC_CLASSPATH}:${POST_CLASSPATH}:${WLP_POST_CLASSPATH}:<library-dir>/saaj-impl.jar
+       The <library-dir> is the directory that contains the saaj-impl.jar 
+       downloaded previously.
+    3. Restart the WebLogic 9.2 server.
+    4. Configure the OpenAM WSS Authentication Provider using
+       Weblogic 9.2 console
+       The OpenAM WSS Authentication Provider is used to
+       authenticate the subject 
+       to the container.
+       4.1. Copy famauthprovider.jar into $WL_HOME/weblogic92/server/lib/mbeantypes
+            directory.
+       4.2. Restart the WebLogic 9.2 server.
+       4.3. Login to weblogic console and follow the steps below to configure 
+            the OpenAM WSS Authentication Provider.
+          4.3.1. Login into WebLogic 9.2 console.
+          4.3.2. Click on "Lock & Edit" button.
+          4.3.3. In the left menu, click on "Security Realms" under "Services" link.
+          4.3.4. On the right pane, click on realm "myrealm" or the active realm.
+          4.3.5. Click on "Providers" tab, the Providers page shows up.
+          4.3.6. Click on New button, the "Create a new Authentication Provider"
+                 page shows up.
+          4.3.7. Set the name of the provider to FAMWSSWLAuthenticator, select
+                 FAMWSSWLAuthenticator from Type dropdown list, and click on OK.
+          4.3.8. Go back to the Providers page, click on FAMWSSWLAuthenticator.
+          4.3.9. The "Settings for FAMWSSWLAuthenticator" page shows up.
+          4.3.10. Set the "Control Flag" as OPTIONAL, and click the "Save" button.
+          4.3.11. Go back to the Providers page again, click on "DefaultAuthenticator".
+          4.3.12. Change the "Control Flag" to OPTIONAL, and click the "Save" button.
+          4.3.13. Click on the "Activate Changes" button to activate the changes.
+
+   
+III. Setting up WSS plugin at the WSC
+   The client SOAP message handler is used at the WSC to secure the outgoing 
+   request SOAP message and incoming response SOAP message. To enable the 
+   security at the WSC side, complete the following steps:
+   1. Go to a temp directory and unjar the WSC war file
+   2. Go to WEB-INF/classes
+   3. Copy resources/AMClient.properties from the openamwssproviders.zip to the
+      directory and make necessary changes. Please refer to the README.common 
+      for details of accomplishing this step.
+   4. Edit the <packageName>/<ServiceName>_internaldd.xml (<packageName> is the 
+      class package path, e.g. WEB-INF/classes/com/examples. <ServiceName> 
+      is the web services name) to add the following lines before </service-ref>      tag:
+      <j2ee:handler xmlns:j2ee="http://java.sun.com/xml/ns/j2ee">
+        <j2ee:handler-name>FAMClientHandler</j2ee:handler-name>
+        <j2ee:handler-class>com.sun.identity.wssagents.common.jaxrpc.FAMClientHandler</j2ee:handler-class>
+        <j2ee:init-param>
+          <j2ee:param-name>ClientParam1</j2ee:param-name>
+          <j2ee:param-value>value1</j2ee:param-value>
+        </j2ee:init-param>
+      </j2ee:handler>
+      Section V has an example of <ServiceName>_internaldd.xml with OpenAM
+      WSS 
+      client handler.
+   5. Copy lib/openamclientsdk.jar and lib/openssowssproviders.jar from the
+      openssowssproviders.zip to WEB-INF/lib
+   6. Regenerate the war file.
+   7. Deploy the war file using WebLogic console.
+
+  
+
+IV. Setting the WSS plugin at WSP
+   Complete the following steps to secure the WSP.
+   1. Go to a temp directory and unjar the WSP war file
+   2. Go to WEB-INF/classes
+   3. Copy resources/AMClient.properties from the openssowssproviders.zip to the 
+      directory and make necessary changes. Please refer to the README.common 
+      for details of accomplishing this step.
+   4. Go to WEB-INF and add the following servlet filter into the web.xml file
+      after the <display-name> tag.  
+   
+      <filter id="FAMWSSFilter">
+        <filter-name>FAMWSSFilter</filter-name>
+        <filter-class>
+          com.sun.identity.wssagents.weblogic.FAMWSSWLFilterImpl
+        </filter-class>
+      </filter>
+      <filter-mapping id="FAMWSSFilterMapping">
+        <filter-name>FAMWSSFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+      </filter-mapping>
+      Section V has an example of web.xml with FAM WSS servlet filter.
+   5. Copy lib/openssoclientsdk.jar and lib/openssowssproviders.jar from the 
+      openssowssproviders.zip to WEB-INF/lib
+   6. Regenerate the war file.
+   7. Deploy the war file using WebLogic console.
+
+After completing all the above steps, the WSC and WSP are now secured using
+OpenAM WSS plugin.
+
+
+
+V. An example of <ServiceName>_internaldd.xml with OpenAM WSS
+client handler
+
+<?xml version='1.0' encoding='UTF-8'?>
+<weblogic-wsee-standaloneclient xmlns="http://www.bea.com/ns/weblogic/90" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <service-ref>
+    <j2ee:service-ref-name xmlns:j2ee="http://java.sun.com/xml/ns/j2ee">unused information</j2ee:service-ref-name>
+    <j2ee:service-interface xmlns:j2ee="http://java.sun.com/xml/ns/j2ee">com.examples.StockService</j2ee:service-interface>
+    <j2ee:wsdl-file xmlns:j2ee="http://java.sun.com/xml/ns/j2ee">com/examples/StockService_saved_wsdl.wsdl</j2ee:wsdl-file>
+    <j2ee:jaxrpc-mapping-file xmlns:j2ee="http://java.sun.com/xml/ns/j2ee">com/examples/StockService_java_wsdl_mapping.xml</j2ee:jaxrpc-mapping-file>
+    <j2ee:service-qname xmlns:j2ee="http://java.sun.com/xml/ns/j2ee" xmlns:stoc="http://sun.com/stockquote.wsdl">stoc:StockService</j2ee:service-qname>
+    <j2ee:handler xmlns:j2ee="http://java.sun.com/xml/ns/j2ee">
+      <j2ee:handler-name>FAMClientHandler</j2ee:handler-name>
+      <j2ee:handler-class>com.sun.identity.wssagents.common.jaxrpc.FAMClientHandler</j2ee:handler-class>
+      <j2ee:init-param>
+        <j2ee:param-name>ClientParam1</j2ee:param-name>
+        <j2ee:param-value>value1</j2ee:param-value>
+      </j2ee:init-param>
+    </j2ee:handler>
+  </service-ref>
+</weblogic-wsee-standaloneclient>
+
+
+
+VI. An example of web.xml with OpenAM WSS servlet filter
+
+<?xml version='1.0' encoding='UTF-8'?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.4" id="WebApp_ID">
+  <display-name>StockQuoteService</display-name>
+    <filter id="FAMWSSFilter">
+        <filter-name>FAMWSSFilter</filter-name>
+        <filter-class>
+            com.sun.identity.wssagents.weblogic.FAMWSSWLFilterImpl
+        </filter-class>
+    </filter>
+    <filter-mapping id="FAMWSSFilterMapping">
+        <filter-name>FAMWSSFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+  <servlet>
+    <servlet-name>StockServiceServlethttp</servlet-name>
+    <servlet-class>com.samples.StockQuotePortTypeImpl</servlet-class>
+    <load-on-startup>0</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>StockServiceServlethttp</servlet-name>
+    <url-pattern>/StockService</url-pattern>
+  </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+
+  <login-config>
+    <auth-method>CLIENT-CERT</auth-method>
+    <realm-name>NoSuchRealm</realm-name>
+  </login-config>
+
+</web-app>

@@ -1,0 +1,410 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: WebServicesSecurityLogMessageIDs.xml,v 1.1 2008/07/29 20:03:47 mrudul_uchil Exp $
+
+-->
+
+
+<!DOCTYPE logmessages
+    PUBLIC "Sun Java System Access Manager Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="WebServicesSecurity">
+    <logmessage name="UNSUPPORTED_TOKEN_TYPE" id="1"
+        loglevel="LL_INFO"
+        description="Unsupported Token Type sent to STS for Security Token 
+            creation.">
+        <datainfo>
+            <item>Token Type sent by client to STS</item>
+        </datainfo>
+        <triggers>
+            <item>Invalid or unsupported token type sent by client to STS.</item>
+        </triggers>
+        <actions>
+            <item>Check the Token Type sent by client to STS.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="CREATED_SAML11_ASSERTION" id="2"
+        loglevel="LL_INFO"
+        description="Successfully created SAML 1.1 assertion by STS.">
+        <datainfo>
+            <item>Assertion ID</item>
+            <item>Issuer of this SAML assertion</item>
+            <item>Service Provider for which this Assertion is created or 
+                applies to</item>
+            <item>Confirmation Method</item>
+            <item>Token Type</item>
+            <item>Key Type</item>
+        </datainfo>
+        <triggers>
+            <item>Valid parameters sent by client to STS to create SAML assetion.
+            </item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CREATED_SAML20_ASSERTION" id="3"
+        loglevel="LL_INFO"
+        description="Successfully created SAML 2.0 assertion by STS.">
+        <datainfo>
+            <item>Assertion ID</item>
+            <item>Issuer of this SAML assertion</item>
+            <item>Service Provider for which this Assertion is created or 
+                applies to</item>
+            <item>Confirmation Method</item>
+            <item>Token Type</item>
+            <item>Key Type</item>
+        </datainfo>
+        <triggers>
+            <item>Valid parameters sent by client to STS to create SAML assetion.
+            </item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="ERROR_SIGNING_SAML_ASSERTION" id="4"
+        loglevel="LL_INFO"
+        description="Error during signing SAML assertion by STS.">
+        <datainfo>
+            <item>Actual Error message</item>
+        </datainfo>
+        <triggers>
+            <item>Problem in STS's Certificate or Private key.</item>
+        </triggers>
+        <actions>
+            <item>Check the certificate of STS.</item> 
+            <item>Check the Private Key of STS.</item>  
+        </actions>
+    </logmessage>
+    <logmessage name="ERROR_CREATING_SAML11_ASSERTION" id="5"
+        loglevel="LL_INFO"
+        description="Error during creation of SAML 1.1 Assertion by STS.">
+        <datainfo>
+            <item>Actual Error message</item>
+        </datainfo>
+        <triggers>
+            <item>Invalid parameters sent to create SAML 1.1 Assertion.</item>
+        </triggers>
+        <actions>
+            <item>Check all the parameters sent to create SAML 1.1 Assertion.
+            </item>   
+        </actions>
+    </logmessage>
+    <logmessage name="ERROR_CREATING_SAML20_ASSERTION" id="6"
+        loglevel="LL_INFO"
+        description="Error during creation of SAML 2.0 Assertion by STS.">
+        <datainfo>
+            <item>Actual Error message</item>
+        </datainfo>
+        <triggers>
+            <item>Invalid parameters sent to create SAML 2.0 Assertion.</item>
+        </triggers>
+        <actions>
+            <item>Check all the parameters sent to create SAML 2.0 Assertion.
+            </item>   
+        </actions>
+    </logmessage>
+    <logmessage name="IDENTITY_SUBJECT_NAME" id="7"
+        loglevel="LL_INFO"
+        description="Security token being created for this Identity.">
+        <datainfo>
+            <item>Subject or Identity of the token</item>
+        </datainfo>
+        <triggers/>
+        <actions/>
+    </logmessage>
+    <logmessage name="ATTR_MAP_FOR_SP" id="8"
+        loglevel="LL_INFO"
+        description="Security token being created with this Attribute Map for 
+            Service Provider.">
+        <datainfo>
+            <item>Attribute Map required by Service Provider</item>
+        </datainfo>
+        <triggers>
+            <item>Service Provider needs Attributes to be populated in Security 
+                token.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCESS_VALIDATE_REQUEST" id="9"
+        loglevel="LL_INFO"
+        description="Successfully validated the incoming SOAP request.">
+        <datainfo>
+            <item>Provider name to identify the STS service or WSP profile
+            </item>
+            <item>Security Mechanism or authentication token sent by client
+            </item>
+        </datainfo>
+        <triggers/>
+        <actions/>
+    </logmessage>
+    <logmessage name="REQUEST_TO_BE_VALIDATED" id="10"
+        loglevel="LL_FINE"
+        description="Incoming SOAP request to be validated.">
+        <datainfo>
+            <item>Complete SOAP request</item>
+        </datainfo>
+        <triggers/>
+        <actions/>
+    </logmessage>
+    <logmessage name="RESPONSE_TO_BE_SECURED" id="11"
+        loglevel="LL_FINE"
+        description="Outgoing SOAP response to be secured.">
+        <datainfo>
+            <item>Complete SOAP response</item>
+        </datainfo>
+        <triggers/>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCESS_SECURE_RESPONSE" id="12"
+        loglevel="LL_INFO"
+        description="Successfully secured the outgoing SOAP response.">
+        <datainfo>
+            <item>Provider name to identify the STS service or WSP profile
+            </item>
+        </datainfo>
+        <triggers/>
+        <actions/>
+    </logmessage>
+    <logmessage name="REQUEST_TO_BE_SECURED" id="13"
+        loglevel="LL_FINE"
+        description="Outgoing SOAP request to be secured.">
+        <datainfo>
+            <item>Complete SOAP request</item>
+        </datainfo>
+        <triggers/>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCESS_SECURE_REQUEST" id="14"
+        loglevel="LL_INFO"
+        description="Successfully secured the outgoing SOAP request.">
+        <datainfo>
+            <item>Provider name to identify the STS client or WSC profile</item>
+            <item>Security Mechanism or authentication token sent by client
+            </item>
+        </datainfo>
+        <triggers/>
+        <actions/>
+    </logmessage>
+    <logmessage name="RESPONSE_TO_BE_VALIDATED" id="15"
+        loglevel="LL_FINE"
+        description="Incoming SOAP response to be validated.">
+        <datainfo>
+            <item>Complete SOAP response</item>
+        </datainfo>
+        <triggers/>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCESS_VALIDATE_RESPONSE" id="16"
+        loglevel="LL_INFO"
+        description="Successfully validated the incoming SOAP response.">
+        <datainfo>
+            <item>Provider name to identify the STS client or WSC profile</item>
+        </datainfo>
+        <triggers/>
+        <actions/>
+    </logmessage>
+    <logmessage name="AUTHENTICATION_FAILED" id="17"
+        loglevel="LL_INFO"
+        description="Authentication of the incoming SOAP request failed at 
+            server or WSP.">
+        <datainfo>
+            <item>Security Mechanism or Security token sent by client</item>
+        </datainfo>
+        <triggers>
+            <item>Invalid Security Mechanism or Security token sent by client.
+            </item>
+        </triggers>
+        <actions>
+            <item>Check Security Mechanism or Security token sent by client.
+            </item>
+        </actions>
+    </logmessage>
+    <logmessage name="ERROR_PARSING_SOAP_HEADERS" id="18"
+        loglevel="LL_INFO"
+        description="Error in parsing SOAP headers from incoming SOAP request.">
+        <datainfo>
+            <item>Actual error message</item>
+        </datainfo>
+        <triggers>
+            <item>Client has sent incorrect SOAP headers.</item>
+        </triggers>
+        <actions>
+            <item>Check SOAP headers.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ERROR_ADDING_SECURITY_HEADER" id="19"
+        loglevel="LL_INFO"
+        description="Error in adding Security header in outgoing SOAP request.">
+        <datainfo>
+            <item>Actual error message</item>
+        </datainfo>
+        <triggers>
+            <item>Error in adding namespaces or creating Security Header element.
+            </item>
+        </triggers>
+        <actions>
+            <item>Check namespaces and Secuirty Header.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SIGNATURE_VALIDATION_FAILED" id="20"
+        loglevel="LL_INFO"
+        description="Signature validation failed in incoming SOAP request / 
+            response.">
+        <datainfo>
+            <item>Actual error message</item>
+        </datainfo>
+        <triggers>
+            <item>Error in signing request / response by client / server.</item>
+        </triggers>
+        <actions>
+            <item>Check keystore and certificate used for signing.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="UNABLE_TO_SIGN" id="21"
+        loglevel="LL_INFO"
+        description="Unable to sign SOAP request or response.">
+        <datainfo>
+            <item>Actual error message</item>
+        </datainfo>
+        <triggers>
+            <item>Error in retrieving certificate from the keystore.</item>
+        </triggers>
+        <actions>
+            <item>Check keystore configuration and certificate used for signing.
+            </item>
+            <item>Check debug file for detailed info.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="UNABLE_TO_ENCRYPT" id="22"
+        loglevel="LL_INFO"
+        description="Unable to encrypt SOAP request or response.">
+        <datainfo>
+            <item>Actual error message</item>
+        </datainfo>
+        <triggers>
+            <item>Error in retrieving certificate from the keystore.</item>
+        </triggers>
+        <actions>
+            <item>Check keystore configuration and certificate used for 
+                encryption.</item>
+            <item>Check debug file for detailed info.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="UNABLE_TO_DECRYPT" id="23"
+        loglevel="LL_INFO"
+        description="Unable to decrypt SOAP request or response.">
+        <datainfo>
+            <item>Actual error message</item>
+        </datainfo>
+        <triggers>
+            <item>Error in retrieving certificate from the keystore.</item>
+        </triggers>
+        <actions>
+            <item>Check keystore configuration and certificate used for 
+                decryption.</item>
+            <item>Check debug file for detailed info.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SUCCESS_RETRIEVING_TOKEN_FROM_STS" id="24"
+        loglevel="LL_INFO"
+        description="Successfully retrieved Security Token from STS service.">
+        <datainfo>
+            <item>Web Service Provider end point for which Security Token being 
+                generated</item>
+            <item>Security Token Service end point to which STS client talks to
+            </item>
+            <item>Security Token Service MEX end point address</item>
+            <item>End user credential (if "null" then the Identity of the 
+                generated Security token is Web Service Client, else it is owned 
+                by Authenticated End user)</item>
+            <item>Key Type</item>
+            <item>Token Type</item>
+        </datainfo>
+        <triggers>
+            <item>All the required input data parameters are correct.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="ERROR_RETRIEVING_TOKEN_FROM_STS" id="25"
+        loglevel="LL_INFO"
+        description="Error in retrieving Security Token from STS service.">
+        <datainfo>
+            <item>Actual error message</item>
+        </datainfo>
+        <triggers>
+            <item>Some or more required input data parameters are not correct.
+            </item>
+        </triggers>
+        <actions>
+            <item>Check all the required input data parameters.</item>
+            <item>Check debug file for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ERROR_RETRIEVING_TOKEN_FROM_STS" id="26"
+        loglevel="LL_SEVERE"
+        description="Error in retrieving Security Token from STS service.">
+        <datainfo>
+            <item>Actual error message</item>
+        </datainfo>
+        <triggers>
+            <item>Some or more required input data parameters are not correct.
+            </item>
+        </triggers>
+        <actions>
+            <item>Check all the required input data parameters.</item>
+            <item>Check debug file for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ERROR_CREATING_SAML11_ASSERTION" id="27"
+        loglevel="LL_SEVERE"
+        description="Error during creation of SAML 1.1 Assertion by STS.">
+        <datainfo>
+            <item>Actual Error message</item>
+        </datainfo>
+        <triggers>
+            <item>Invalid parameters sent to create SAML 1.1 Assertion.</item>
+        </triggers>
+        <actions>
+            <item>Check all the parameters sent to create SAML 1.1 Assertion.
+            </item>
+            <item>Check debug file for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ERROR_CREATING_SAML20_ASSERTION" id="28"
+        loglevel="LL_SEVERE"
+        description="Error during creation of SAML 2.0 Assertion by STS.">
+        <datainfo>
+            <item>Actual Error message</item>
+        </datainfo>
+        <triggers>
+            <item>Invalid parameters sent to create SAML 2.0 Assertion.</item>
+        </triggers>
+        <actions>
+            <item>Check all the parameters sent to create SAML 2.0 Assertion.
+            </item>
+            <item>Check debug file for detailed error.</item>
+        </actions>
+    </logmessage>
+</logmessages>

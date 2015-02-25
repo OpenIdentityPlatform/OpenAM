@@ -1,0 +1,413 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.24 2010/02/05 00:56:01 leiming Exp $
+
+-->
+
+<!--
+    Portions Copyrighted 2010-2014 ForgeRock AS
+-->
+
+<project name="open-source-web-agents" default="usage">
+                
+    <description>Open Web Single Sign-On Web Agents for Windows</description>
+
+    <tstamp>
+        <format property="build.date" pattern="MMM dd yyyy HH:mm:ss"/>
+    </tstamp>
+    <!-- agent version number appended to end of agent zip file name -->
+    <property name="agentversion" value="4.0.0-SNAPSHOT"/>
+    <property name="AGENT_VER" value="${agentversion}"/>
+    <property name="AGENT_ER_VER" value=""/>
+    <property name="AGENT_FVB_MARKER" value=""/>
+    <property name="BUILD_MACHINE" value="dali.internal.forgerock.com"/>
+    <property name="BUILD_DATE" value="${build.date}"/>
+  
+    <property name="build.debug" value=""/>
+    <property name="build.type" value="32"/>
+    <property name="webagents.base.dir" value="."/>
+    <property name="prd.nightly.dist.dir" value="dist"/>
+    <property name="target.jdk.set" value="1.6"/>
+    <property name="build.sysclasspath" value="ignore"/>
+    
+    <import file="webagents.xml" />
+    
+    <tstamp>
+        <format property="nightly.date" pattern="yyyyMMdd" />
+    </tstamp>
+    
+    <condition property="build.debug32">
+        <and>
+            <equals arg1="${build.debug}" arg2="1"/> 
+            <not> 
+                <equals arg1="${build.type}" arg2="64"/>
+            </not> 
+        </and>
+    </condition>
+
+    <condition property="build.debug64">
+        <and>
+            <equals arg1="${build.debug}" arg2="1"/> 
+            <equals arg1="${build.type}" arg2="64"/> 
+        </and>
+    </condition>
+
+    <condition property="build.nondebug32">
+        <and>
+            <not>
+                <equals arg1="${build.debug}" arg2="1"/> 
+            </not>
+            <not> 
+                <equals arg1="${build.type}" arg2="64"/>
+            </not> 
+        </and>
+    </condition>
+
+    <condition property="build.nondebug64">
+        <and>
+            <not>
+                <equals arg1="${build.debug}" arg2="1"/> 
+            </not>
+            <equals arg1="${build.type}" arg2="64"/>
+        </and>
+    </condition>
+
+    <condition property="build.type.suffix.sdk" value="_64bit" else="">
+        <equals arg1="${build.type}" arg2="64"/>
+    </condition>
+    
+    <condition property="build.os" value="WINNT">
+        <os family="windows"/>
+    </condition>
+
+    <condition property="iis.build.ok" value="true">
+        <os family="windows"/>
+    </condition>
+
+    <condition property="winnt.lib.ext" value="_64" else="">
+        <equals arg1="${build.type}" arg2="64"/>
+    </condition>
+
+    <condition property="winnt.ext" value="_64" else="">
+        <equals arg1="${build.type}" arg2="64"/>
+    </condition>
+
+    <condition property="build.type.suffix" value="_64" else="">
+        <equals arg1="${build.type}" arg2="64"/>
+    </condition>
+
+    <condition property="target.jdk.set" value="${target.jdk}">
+        <isset property="target.jdk"/>
+    </condition>
+    <condition property="target.jdk.set" value="1.5">
+        <not>
+            <isset property="target.jdk"/>
+        </not>
+    </condition>
+    
+    <target name="preparebuild">
+        <mkdir dir="${webagents.built.dir}"/>
+        <mkdir dir="${webagents.dist.dir}"/>
+    </target>
+
+    <target name="clean">
+        <echo message="Dispatch to clean"/>
+        <delete>
+            <fileset dir="agents" includes="**/*.obj"/>
+            <fileset dir="agents" includes="**/*.manifest"/>
+            <fileset dir="agents" includes="**/*.lib"/>
+            <fileset dir="agents" includes="**/*.dll"/>
+            <fileset dir="agents" includes="**/*.pdb"/>
+            <fileset dir="agents" includes="**/*.idb"/>
+            <fileset dir="agents" includes="**/*.exp"/>
+            <fileset dir="agents" includes="**/*.res"/>
+            <fileset dir="agents" includes="**/*.d"/>
+            <fileset dir="agents" includes="**/*.o"/>
+            <fileset dir="agents" includes="**/*.so"/> 
+            <fileset dir="am" includes="**/*.obj"/>
+            <fileset dir="am" includes="**/*.manifest"/>
+            <fileset dir="am" includes="**/*.lib"/>
+            <fileset dir="am" includes="**/*.dll"/>
+            <fileset dir="am" includes="**/*.pdb"/>
+            <fileset dir="am" includes="**/*.idb"/>
+            <fileset dir="am" includes="**/*.exp"/>
+            <fileset dir="am" includes="**/*.exe"/>
+            <fileset dir="am" includes="**/*.res"/>
+            <fileset dir="am" includes="**/*.d"/>
+            <fileset dir="am" includes="**/*.o"/>
+            <fileset dir="am" includes="**/*.so"/>
+            <fileset dir="am" includes="**/*.tli"/>
+            <fileset dir="am" includes="**/*.tlh"/>
+            <fileset dir="." includes="*.pdb"/>
+            <fileset dir="." includes="*.idb"/>
+            <fileset dir="." includes="svn.properties"/>
+        </delete>
+        <delete includeemptydirs="true">
+            <fileset dir="built"/>
+        </delete>
+    </target>
+
+    <target name="get-arch">
+        <condition property="is64bit">
+            <not>
+                <equals arg1="${build.type}" arg2="64"/>
+            </not>
+        </condition>
+        <condition property="is32bit">
+            <equals arg1="${build.type}" arg2="64"/>
+        </condition>
+    </target>
+    
+    <target name="all" depends="get-arch" unless="is32bit">
+        <antcall target="apache22" />
+        <antcall target="apache24" />
+        <antcall target="iis6" />
+        <antcall target="iis7" />
+        <antcall target="sdk" />
+        <antcall target="jsFiles" />
+    </target>
+        
+    <target name="all64" depends="get-arch" unless="is64bit">
+        <antcall target="iis6" />
+        <antcall target="iis7" />
+        <antcall target="apache24" />
+        <antcall target="sdk" />
+        <antcall target="jsFiles64" />
+    </target>
+   
+    <target name="apache22" depends="preparebuild">
+        <echo message="Dispatch to Apache 22"/>
+        <property name="containername" value="apache22"/>
+        <antcall target="nmake" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml" 
+             target="all" inheritRefs="true"/>
+    </target>
+    
+    <target name="apache24" depends="preparebuild">
+        <echo message="Dispatch to Apache 24"/>
+        <property name="containername" value="apache24"/>
+        <antcall target="nmake" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml" 
+             target="all" inheritRefs="true"/>
+    </target>
+
+    <property name="webagents.iis6.src.dir" location="${webagents.basedir}/agents/source/iis6"/>
+
+    <property name="webagents.iis7.src.dir" location="${webagents.basedir}/agents/source/iis7"/>
+
+    <target name="iis6" depends="preparebuild">
+        <echo message="Dispatch to iis6"/>
+        <property name="containername" value="iis6"/>
+        <antcall target="nmake" inheritRefs="true"/>
+        <ant antfile="build_agent.xml"
+             target="all" inheritRefs="true"/>
+    </target>
+
+    <target name="iis7" depends="preparebuild">
+        <echo message="Dispatch to iis7"/>
+        <property name="containername" value="iis7"/>
+        <antcall target="nmake" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml"
+             target="all" inheritRefs="true"/>
+    </target>
+
+    <target name="sdk" depends="preparebuild">
+        <echo message="Dispatch to build OpenAM C-SDK"/>
+        <property name="containername" value="sdk"/>
+        <antcall target="nmake" inheritRefs="true"/>
+        <antcall target="arch_sdk" inheritRefs="true"/>
+    </target>
+
+    <target name="nmake" depends="fixVersion,nmake1,nmake2,nmake3,nmake4"/>
+
+    <target name="nmake1" if="build.debug32">
+        <echo message="Dispatch to compile of agent c code"/>
+        <exec executable="nmake" failonerror="true">
+            <arg value="/E" />
+            <arg value="DEBUG=1" />
+            <arg value="-f" />
+            <arg value="Makefile.nmake" />
+            <arg value="${containername}" />
+        </exec>
+    </target>
+
+    <target name="nmake2" if="build.debug64">
+        <echo message="Dispatch to compile of agent c code"/>
+        <exec executable="nmake" failonerror="true">
+            <arg value="/E" />
+            <arg value="DEBUG=1" />
+            <arg value="/E" />
+            <arg value="X64=1" />
+            <arg value="-f" />
+            <arg value="Makefile.nmake" />
+            <arg value="${containername}" />
+        </exec>
+    </target>
+
+    <target name="nmake3" if="build.nondebug32">
+        <echo message="Dispatch to compile of agent c code"/>
+        <exec executable="nmake" failonerror="true">
+            <arg value="-f" />
+            <arg value="Makefile.nmake" />
+            <arg value="${containername}" />
+        </exec>
+    </target>
+
+    <target name="nmake4" if="build.nondebug64">
+        <echo message="Dispatch to compile of agent c code"/>
+        <exec executable="nmake" failonerror="true">
+            <arg value="/E" />
+            <arg value="X64=1" />
+            <arg value="-f" />
+            <arg value="Makefile.nmake" />
+            <arg value="${containername}" />
+        </exec>
+    </target>
+
+    <exec executable="svn" output="svn.properties">
+        <arg value="info" />
+    </exec>
+    <property prefix="svn" file="svn.properties"/>
+
+    <target name="fixVersion">
+        <delete file="${webagents.basedir}/am/source/version.h" quiet="true"/>
+        <copy file="${webagents.basedir}/am/source/version.template.win"
+              tofile="${webagents.basedir}/am/source/version.h" >
+            <filterchain>
+                <replacetokens>
+                    <token key="AGENT_VER" value="${AGENT_VER}"/>
+                    <token key="AGENT_ER_VER" value="${AGENT_ER_VER}"/>
+                    <token key="AGENT_FVB_MARKER" value="${AGENT_FVB_MARKER}"/>
+                    <token key="SVN_REVISION" value="Revision: ${svn.Revision}"/>
+                    <token key="BUILD_MACHINE" value="${BUILD_MACHINE}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+        <delete file="${webagents.basedir}/.version" quiet="true"/>
+        <echo file="${webagents.basedir}/.version">Version: ${AGENT_VER}${line.separator}Revision: ${svn.Revision}${line.separator}Build date: ${BUILD_DATE}${line.separator}Build platform: ${BUILD_MACHINE}${line.separator}${AGENT_ER_VER}${line.separator}${AGENT_FVB_MARKER}</echo>
+    </target>
+    
+    <target name="arch_sdk">
+        <echo message="Dispatch to archive OpenAM C-SDK"/>
+        <delete file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}.zip" quiet="true"/>
+        <copy file="${webagents.basedir}/am/source/samples/README.TXT" tofile="${webagents.built.dir}/README.TXT" overwrite="true"/>
+        <copy file="${webagents.basedir}/conf/OpenSSOAgentBootstrap.template" tofile="${webagents.built.dir}/OpenSSOAgentBootstrap.template" overwrite="true"/>
+        <copy file="${webagents.basedir}/conf/OpenSSOAgentConfiguration.template" tofile="${webagents.built.dir}/OpenSSOAgentConfiguration.template" overwrite="true"/>
+        <replaceregexp file="${webagents.built.dir}/README.TXT"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
+        <replaceregexp file="${webagents.built.dir}/OpenSSOAgentBootstrap.template"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
+        <replaceregexp file="${webagents.built.dir}/OpenSSOAgentConfiguration.template"
+                       match="AGENT_VER" replace="${agentversion}" byline="true"/>
+        <zip file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}.zip">  
+            <zipfileset prefix="bin" dir="${webagents.basedir}/am/source/" includes="cryptit.exe"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_auth.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_log.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_map.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_notify.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_policy.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_properties.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_sso.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_string_set.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_types.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_utils.h"/>
+            <zipfileset prefix="include" dir="${webagents.basedir}/am/source/" includes="am_web.h"/>
+            <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.dll"/>
+            <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.lib"/>
+            <zipfileset prefix="lib" dir="${webagents.basedir}/am/source/" includes="amsdk.pdb"/>
+            <zipfileset dir="${webagents.built.dir}" includes="OpenSSOAgentBootstrap.template" fullpath="config/OpenSSOAgentBootstrap.template.orig"/>
+            <zipfileset dir="${webagents.built.dir}" includes="OpenSSOAgentConfiguration.template" fullpath="config/OpenSSOAgentConfiguration.template.orig"/>
+            <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="**/am_*.c"/>
+            <zipfileset prefix="samples" dir="${webagents.built.dir}/" includes="README.TXT"/>
+            <zipfileset prefix="samples" dir="${webagents.basedir}/am/source/samples" includes="Makefile.nmake"/>
+        </zip>
+        <delete file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}_build_date.js" quiet="true"/>
+        <echo file="${webagents.dist.dir}/common_3_0_windows${build.type.suffix.sdk}_build_date.js">document.write("${nightly.date}");</echo>  
+    </target>
+
+    <target name="jsFiles">
+        <filter token="DATE" value="${nightly.date}" />
+        <filter token="OS" value="${build.os}" />
+        <filter token="ARCH" value="${build.type.suffix}" />
+        <filter token="BUILD_DATE" value="${nightly.date}" />
+        <copy file="${webagents.basedir}/agents/source/apache22/build_date.js.template"
+              tofile="${webagents.dist.dir}/apache_v22_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/apache24/build_date.js.template"
+              tofile="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/iis6/build_date.js.template"
+              tofile="${webagents.dist.dir}/iis_v6_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/iis7/build_date.js.template"
+              tofile="${webagents.dist.dir}/iis_v7_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/sjsws/build_date.js.template"
+              tofile="${webagents.dist.dir}/sjsws_v70_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+    </target>
+
+    <target name="jsFiles64">
+        <filter token="DATE" value="${nightly.date}" />
+        <filter token="OS" value="${build.os}" />
+        <filter token="ARCH" value="${build.type.suffix}" />
+        <filter token="BUILD_DATE" value="${nightly.date}" />
+        <copy file="${webagents.basedir}/agents/source/iis6/build_date.js.template"
+              tofile="${webagents.dist.dir}/iis_v6_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/iis7/build_date.js.template"
+              tofile="${webagents.dist.dir}/iis_v7_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+        <copy file="${webagents.basedir}/agents/source/apache24/build_date.js.template"
+              tofile="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_build_date.js" filtering="true"/>
+    </target>
+
+    <target name="postnightly">
+        <copy todir="${prd.nightly.dist.dir}/webagents/${nightly.date}">
+            <fileset dir="${webagents.dist.dir}" />
+        </copy>
+    </target>
+
+
+    <target name="usage">
+        <echo message=" "/>
+        <echo message=" Following targets are available for Web Agents:"/>
+        <echo message=" "/>
+        <echo message=" all             : builds all the Web agents (32bit)"/>
+        <echo message=" all64           : builds all the Web agents (64bit), requires -Dbuild.type=64 option"/>
+        <echo message=" clean           : deletes all the generated files"/>
+        <echo message=" apache22        : builds the Apache Web Server 2.2.x agent"/>
+        <echo message=" apache24        : builds the Apache Web Server 2.4.x agent"/>
+        <echo message=" iis6            : builds the Microsoft Internet Information Services 6 agent"/>
+        <echo message=" iis7            : builds the Microsoft Internet Information Services 7 agent"/>
+        <echo message=" sdk             : builds OpenAM C-SDK"/>
+        <echo message=" "/>
+        <echo message=" Following build options are available:"/>
+        <echo message=" "/>
+        <echo message=" -Dbuild.debug=1           : builds agent debug version"/>
+        <echo message=" -Dbuild.type=64           : builds 64bit agent version"/>
+        <echo message=" usage           : displays this usage message"/>
+        <echo message=" "/>
+        <echo message=" To run a target, issue the following command:"/>
+        <echo message=" "/>
+        <echo message=" ant &lt;target-name&gt;"/>
+        <echo message=" "/>
+    </target>
+
+</project>

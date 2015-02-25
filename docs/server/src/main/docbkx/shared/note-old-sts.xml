@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<note xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+      xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+      xsi:schemaLocation='http://docbook.org/ns/docbook
+      http://docbook.org/xml/5.0/xsd/docbook.xsd'
+      xmlns:xlink='http://www.w3.org/1999/xlink'>
+
+ <para>
+  The current implementation of the WSSAuth Authentication module, along with
+  the Web Service Provider, Web Service Client and STS Client Policy agents,
+  were developed for versions 1.0 and 1.3 of the WS-Trust standard. ForgeRock
+  now includes configuration options for the RESTful Security Token Service
+  (STS), compatible with version 1.4 of the WS-Trust standard, which uses
+  client certificate and Kerberos JASPI authentication modules.
+ </para>
+
+ <para>
+  For more information on the new implementation of STS, see
+  <link xlink:role="http://docbook.org/xlink/role/olink" xlink:show="new"
+        xlink:href="admin-guide#chap-rest-sts"><citetitle>The RESTful Security
+   Token Service</citetitle></link>.
+ </para>
+</note>

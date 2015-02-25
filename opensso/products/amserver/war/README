@@ -1,0 +1,105 @@
+------------------------------------------------------------------------------
+README file for OpenAM Web Single Sign-On WAR
+------------------------------------------------------------------------------
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+  
+The contents of this file are subject to the terms
+of the Common Development and Distribution License
+(the License). You may not use this file except in
+compliance with the License.
+
+You can obtain a copy of the License at
+https://opensso.dev.java.net/public/CDDLv1.0.html or
+opensso/legal/CDDLv1.0.txt
+See the License for the specific language governing
+permission and limitations under the License.
+
+When distributing Covered Code, include this CDDL
+Header Notice in each file and include the License file
+at opensso/legal/CDDLv1.0.txt.
+If applicable, add the following below the CDDL Header,
+with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+$Id: README,v 1.3 2008/06/25 05:44:24 qcheng Exp $
+
+Portions Copyright 2013 ForgeRock AS
+
+------------------------------------------------------------------------------
+Portions Copyrighted 2011 ForgeRock AS
+------------------------------------------------------------------------------
+
+%% Contents:
+    %% 1. About this WAR
+    %% 2. Building the WAR (server)
+    %% 3. Deploying the WAR
+    %% 4. Configuring the web application
+
+%% 1. About this WAR
+
+This WAR contains all the implementations for OpenAM server.
+After the WAR is built, there will be a WAR file, openam.war under the
+distribution directory, openam/products/amserver/built/war/dist. Deploy it
+on a J2EE compliant web container. Visit a configuration page with a web
+browser, click on a button to configure openam server. Then server is
+ready for use.
+
+After you have authenticated to the server, you will be brought to an
+administrator console. where you can further configure/administer the
+server.  Refer to http://openam.forgerock.org/doc/admin-guide/index.html for
+more information
+
+%% 2. Building the WAR
+
+You can start the WAR build by issuing the "war" build target, (ant war).
+Do a "ant clean" if you have previously build your workspace. Note that this
+"war" target must be executed from within the workspace root directory 
+located at opensso/products/amserver. Even though a build.xml file exists
+under the opensso/products/amserver/war directory, it cannot be used 
+directly since the war requires the complete workspace to be built prior
+to its own compilation.
+
+When you issue the war build target at the workspace root, the build target
+of the main workspace is first invoked, after which the control is handed
+to the war/build.xml build file for executing its default target. This 
+results in the building of both the workspace and war sources together.
+
+The shell commands are 
+    cd <your-workspace/opensso/products/amserver
+    ant clean
+    ant war
+
+The war build process does the followings
+
+2.1.1 Compile the OpenAM source code under opensso/products/amserver/source
+2.1.2 Compile the war source code under opensso/products/amserver/war/source
+2.1.3 Create a WAR file that contains all the necessary resources. This WAR
+      file is created at opensso/products/amserver/built/war/dist/opensso.war.
+
+%% 3. Deploying the WAR
+Deploy the web application, opensso/products/amserver/built/war/dist/opensso.war
+with the deployment URI of <deploy-uri> in the web container designated for the
+server host on the machine.
+
+%% 4. Configuring the web application
+Open a web browser (with Javascript and cookie enabled), visit
+<protocol>://<hostname>:<port>/<deploy-uri> where <protocol>, <hostname>
+and <port> are the protocol, hostname and port number of the web server
+respectively.
+
+You will be redirected to a configuration page,
+<protocol>://<hostname>:<port>/<deploy-uri>/config/options.htm where you need to
+go through the wizard and fill in the required fields
+the page are already pre-popuplate with defaults values.
+
+Click on the "Configure" button to start the configuration process.
+This process will take approximately one minute to complete.
+Once completed you can then access the login page.
+
+Enter the username and password provided in the configurator page to
+access the administration console. The default username is amadmin.
+This user (amadmin) is the super user of the opensso system and has
+permission to perform all administrative tasks. 

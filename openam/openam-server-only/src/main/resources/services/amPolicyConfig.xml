@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: amPolicyConfig.xml,v 1.9 2009/05/05 18:53:03 mrudul_uchil Exp $
+
+-->
+<!-- Portions Copyrighted 2014 ForgeRock, AS. -->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMPolicyConfigService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/iPlanetAMPolicyConfigService"
+            i18nFileName="amPolicyConfig"
+            revisionNumber="60"
+            i18nKey="iplanet-am-policy-config-service-description">
+            <Global>
+                <AttributeSchema name="serviceObjectClasses"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>iplanet-am-policy-config-service</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-resource-comparator"
+		    type="list"
+                    syntax="string"
+		    validator="ResourceComparatorValidator"
+		    i18nKey="a100">
+		    <DefaultValues>
+			<Value>serviceType=iPlanetAMWebAgentService|class=com.sun.identity.policy.plugins.HttpURLResourceName|wildcard=*|oneLevelWildcard=-*-|delimiter=/|caseSensitive=false</Value>
+			<Value>serviceType=sunIdentityServerDiscoveryService|class=com.sun.identity.policy.plugins.PrefixResourceName|wildcard=*|oneLevelWildcard=-*-|delimiter=;|caseSensitive=false</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+
+                <AttributeSchema name="iplanet-am-policy-config-continue-evaluation-on-deny-decision"
+		    type="single"
+                    syntax="boolean"
+                    uitype="radio"
+		    i18nKey="a100a">
+		    <BooleanValues>
+			<BooleanTrueValue i18nKey="a100b">true</BooleanTrueValue>
+			<BooleanFalseValue i18nKey="a100c">false</BooleanFalseValue>
+		    </BooleanValues>
+		    <DefaultValues>
+			<Value>false</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+
+                <AttributeSchema name="sun-am-policy-config-org-alias-mapped-resources-enabled" 
+		    type="single"
+                    syntax="boolean"
+                    uitype="radio"
+		    i18nKey="a100e">
+		    <BooleanValues>
+			<BooleanTrueValue i18nKey="a100b">true</BooleanTrueValue>
+			<BooleanFalseValue i18nKey="a100c">false</BooleanFalseValue>
+		    </BooleanValues>
+		    <DefaultValues>
+			<Value>false</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+
+                <AttributeSchema name="sun-am-policy-config-advices-handleable-by-am"
+		    type="list"
+                    syntax="string"
+		    i18nKey="">
+		    <DefaultValues>
+			<Value>AuthLevelConditionAdvice</Value>
+			<Value>AuthSchemeConditionAdvice</Value>
+			<Value>AuthenticateToRealmConditionAdvice</Value>
+			<Value>AuthenticateToServiceConditionAdvice</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+		<AttributeSchema name="ResourceComparatorValidator"
+                    type="validator"
+                    syntax="string">
+                    <DefaultValues>
+			<Value>com.sun.identity.policy.ResourceComparatorValidator</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="openam-referrals-enabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a100f">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global>
+
+            <Organization>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-server"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a101">
+		    <DefaultValues>
+			<Value>@UM_DIRECTORY_SERVER@:@UM_DIRECTORY_PORT@</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-base-dn"
+		    type="single"
+                    syntax="string"
+		    i18nKey="">
+		    <DefaultValues>
+                        <Value>@UM_NORMALIZED_ORGBASE@</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-users-base-dn"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1021">
+                    <DefaultValues>
+                        <Value>@UM_NORMALIZED_ORGBASE@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-is-roles-base-dn"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1022">
+                    <DefaultValues>
+                        <Value>@UM_NORMALIZED_ORGBASE@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-bind-dn"
+		    type="single"
+                    syntax="string"
+		    i18nKey="a103">
+		    <DefaultValues>
+                        <Value>@UM_DS_DIRMGRDN@</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-bind-password"
+		    type="single"
+                    syntax="password"
+		    i18nKey="a104">
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-organizations-search-filter"
+		    type="single"
+                    syntax="xml"
+		    i18nKey="a105">
+		    <DefaultValues>
+                        <Value>(objectclass=@ORG_OBJECT_CLASS@)</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-organizations-search-scope"
+		    type="single_choice"
+                    syntax="string"
+		    i18nKey="">
+		    <ChoiceValues>
+                        <ChoiceValue i18nKey="a126">SCOPE_BASE</ChoiceValue>
+                        <ChoiceValue i18nKey="a127">SCOPE_ONE</ChoiceValue>
+                        <ChoiceValue i18nKey="a128">SCOPE_SUB</ChoiceValue>
+                    </ChoiceValues>
+		    <DefaultValues>
+                        <Value>SCOPE_SUB</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-groups-search-filter"
+		    type="single"
+                    syntax="xml"
+		    i18nKey="">
+		    <DefaultValues>
+                        <Value>(objectclass=groupOfUniqueNames)</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-groups-search-scope"
+		    type="single_choice"
+                    syntax="string"
+		    i18nKey="">
+		    <ChoiceValues>
+                        <ChoiceValue i18nKey="a126">SCOPE_BASE</ChoiceValue>
+                        <ChoiceValue i18nKey="a127">SCOPE_ONE</ChoiceValue>
+                        <ChoiceValue i18nKey="a128">SCOPE_SUB</ChoiceValue>
+                    </ChoiceValues>
+		    <DefaultValues>
+                        <Value>SCOPE_SUB</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-users-search-filter"
+		    type="single"
+                    syntax="xml"
+		    i18nKey="a109">
+		    <DefaultValues>
+                        <Value>(objectclass=@USER_OBJECT_CLASS@)</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-users-search-scope"
+		    type="single_choice"
+                    syntax="string"
+		    i18nKey="a110">
+		    <ChoiceValues>
+                        <ChoiceValue i18nKey="a126">SCOPE_BASE</ChoiceValue>
+                        <ChoiceValue i18nKey="a127">SCOPE_ONE</ChoiceValue>
+                        <ChoiceValue i18nKey="a128">SCOPE_SUB</ChoiceValue>
+                    </ChoiceValues>
+		    <DefaultValues>
+                        <Value>SCOPE_SUB</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-roles-search-filter"
+		    type="single"
+                    syntax="xml"
+		    i18nKey="">
+		    <DefaultValues>
+                        <Value>(&amp;(objectclass=ldapsubentry)(objectclass=nsroledefinition))</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-roles-search-scope"
+		    type="single_choice"
+                    syntax="string"
+		    i18nKey="">
+		    <ChoiceValues>
+                        <ChoiceValue i18nKey="a126">SCOPE_BASE</ChoiceValue>
+                        <ChoiceValue i18nKey="a127">SCOPE_ONE</ChoiceValue>
+                        <ChoiceValue i18nKey="a128">SCOPE_SUB</ChoiceValue>
+                    </ChoiceValues>
+		    <DefaultValues>
+                        <Value>SCOPE_SUB</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-is-roles-search-scope"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a1121">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a126">SCOPE_BASE</ChoiceValue>
+                        <ChoiceValue i18nKey="a127">SCOPE_ONE</ChoiceValue>
+                        <ChoiceValue i18nKey="a128">SCOPE_SUB</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>SCOPE_SUB</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-organizations-search-attribute"
+		    type="single"
+                    syntax="string"
+		    i18nKey="">
+		    <DefaultValues>
+                        <Value>@ORG_NAMING_ATTR@</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-groups-search-attribute"
+		    type="single"
+                    syntax="string"
+		    i18nKey="">
+		    <DefaultValues>
+                        <Value>cn</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-users-search-attribute"
+		    type="single"
+                    syntax="string"
+		    i18nKey="a115">
+		    <DefaultValues>
+                        <Value>@USER_NAMING_ATTR@</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-roles-search-attribute"
+		    type="single"
+                    syntax="string"
+		    i18nKey="">
+		    <DefaultValues>
+                        <Value>cn</Value>
+                    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-search-limit"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a117">
+                    <DefaultValues>
+                        <Value>100</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-search-timeout"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a118">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-ldap-ssl-enabled"
+		    type="single"
+                    syntax="boolean"
+		    i18nKey="a119">
+		    <DefaultValues>
+			<Value>@UM_SSL@</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-connection_pool_min_size"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a120">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-connection_pool_max_size"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a121">
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-selected-subjects"
+                    type="multiple_choice"
+                    syntax="string"
+                    i18nKey="">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a144">WebServicesClients</ChoiceValue>
+                        <ChoiceValue i18nKey="a129">Organization</ChoiceValue>
+                        <ChoiceValue i18nKey="a130">IdentityServerRoles</ChoiceValue>
+                        <ChoiceValue i18nKey="a131">LDAPGroups</ChoiceValue>
+                        <ChoiceValue i18nKey="a132">LDAPRoles</ChoiceValue>
+                        <ChoiceValue i18nKey="a133">LDAPUsers</ChoiceValue>
+			            <ChoiceValue i18nKey="a143">AuthenticatedUsers</ChoiceValue>
+                        <ChoiceValue i18nKey="a145">AMIdentitySubject</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>WebServicesClients</Value>
+			            <Value>AuthenticatedUsers</Value>
+                        <Value>AMIdentitySubject</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-selected-conditions"
+                    type="multiple_choice"
+                    syntax="string"
+                    i18nKey="">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a134">AuthLevelCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="a134a">LEAuthLevelCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="a135">AuthSchemeCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="a135a">AuthenticateToRealmCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="a135b">AuthenticateToServiceCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="a136">IPCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="a137">SimpleTimeCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="a141">SessionCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="a141a">SessionPropertyCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="a141fc">LDAPFilterCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="a141amc">AMIdentityMembershipCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="a151">ResourceEnvIPCondition</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>AuthLevelCondition</Value>
+                        <Value>LEAuthLevelCondition</Value>
+                        <Value>AuthSchemeCondition</Value>
+                        <Value>AuthenticateToRealmCondition</Value>
+                        <Value>AuthenticateToServiceCondition</Value>
+                        <Value>SimpleTimeCondition</Value> 
+                        <Value>IPCondition</Value>
+                        <Value>SessionCondition</Value>
+                        <Value>SessionPropertyCondition</Value>
+                        <Value>LDAPFilterCondition</Value>
+                        <Value>AMIdentityMembershipCondition</Value>
+                        <Value>ResourceEnvIPCondition</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sun-am-policy-selected-responseproviders"
+                    type="multiple_choice"
+                    syntax="string"
+                    i18nKey="">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a201">IDRepoResponseProvider</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>IDRepoResponseProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sun-am-policy-dynamic-response-attributes"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-selected-referrals"
+                    type="multiple_choice"
+                    syntax="string"
+                    i18nKey="">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a138">PeerOrgReferral</ChoiceValue>
+                        <ChoiceValue i18nKey="a139">SubOrgReferral</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>PeerOrgReferral</Value>
+                        <Value>SubOrgReferral</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-subjects-result-ttl" 
+                    type="single"
+                    syntax="number"
+                    i18nKey="a125">
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-user-alias-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a150">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+	    </Organization>
+	</Schema>
+	<Configuration>
+	    <OrganizationConfiguration name="/">
+		<AttributeValuePair>
+		    <Attribute name="iplanet-am-policy-config-ldap-bind-dn"/>
+		    <Value>@UM_DS_DIRMGRDN@</Value>
+		</AttributeValuePair>
+		<AttributeValuePair>
+		    <Attribute name="iplanet-am-policy-config-ldap-bind-password"/>
+		    <Value>@UM_DS_DIRMGRPASSWD@</Value>
+		</AttributeValuePair>
+	    </OrganizationConfiguration>
+	</Configuration>
+
+    </Service>
+</ServicesConfiguration>

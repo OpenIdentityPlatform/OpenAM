@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+    Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+    Copyright 2011 Cybernetica AS.
+
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    http://forgerock.org/license/CDDLv1.0.html
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at http://forgerock.org/license/CDDLv1.0.html
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+-->
+<!--
+    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+    Portions Copyrighted 2013 Nomura Research Institute, Ltd
+-->
+
+<!DOCTYPE ServicesConfiguration
+PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+"jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="sunAMAuthOAuthService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthOAuthService"
+            i18nFileName="amAuthOAuth"
+            revisionNumber="1"
+            i18nKey="description">
+
+            <Organization>
+                <AttributeSchema name="iplanet-am-auth-oauth-client-id"
+                                 type="single" syntax="string" i18nKey="a101">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oauth-client-secret"
+                                 type="single" syntax="password" i18nKey="a102">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oauth-auth-service"
+                                 type="single" syntax="string" i18nKey="a103">
+                    <DefaultValues>
+                        <Value>https://www.facebook.com/dialog/oauth</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oauth-token-service"
+                                 type="single" syntax="string" i18nKey="a104">
+                    <DefaultValues>
+                        <Value>https://graph.facebook.com/oauth/access_token</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oauth-user-profile-service"
+                                 type="single" syntax="string" i18nKey="a105">
+                    <DefaultValues>
+                        <Value>https://graph.facebook.com/me</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oauth-scope"
+                                 type="single" syntax="string" i18nKey="a106">
+                    <DefaultValues>
+                        <Value>email,read_stream</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oauth-user-profile-param"
+                                 type="single" syntax="string" i18nKey="a107">
+                    <DefaultValues>
+                        <Value>access_token</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oauth-sso-proxy-url"
+                                 type="single" syntax="string" i18nKey="a108">
+                    <DefaultValues>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/oauth2c/OAuthProxy.jsp</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-account-provider"
+                                 type="single" syntax="string" i18nKey="a108a">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-account-mapper"
+                                 type="single" syntax="string" i18nKey="a109">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-account-mapper-configuration"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a110">
+                    <DefaultValues>
+                        <Value>id=facebook-id</Value>
+                        <Value>email=mail</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper"
+                                 type="list" syntax="string" i18nKey="a111">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper-configuration"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a112">
+                    <DefaultValues>
+                        <Value>first_name=givenname</Value>
+                        <Value>last_name=sn</Value>
+                        <Value>name=cn</Value>
+                        <Value>email=mail</Value>
+                        <Value>id=facebook-id</Value>
+                        <Value>first_name=facebook-fname</Value>
+                        <Value>last_name=facebook-lname</Value>
+                        <Value>email=facebook-email</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-save-attributes-to-session-flag"
+                                 type="single" syntax="boolean" i18nKey="a115">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-mail-attribute"
+                                 type="single" syntax="string" i18nKey="a118">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-createaccount-flag"
+                                 type="single" syntax="boolean" i18nKey="a120">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-prompt-password-flag"
+                                 type="single" syntax="boolean" i18nKey="a122">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-map-to-anonymous-flag"
+                                 type="single" syntax="boolean" i18nKey="a124">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-anonymous-user"
+                                 type="single" syntax="string" i18nKey="a126">
+                    <DefaultValues>
+                        <Value>anonymous</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-logout-service-url"
+                                 type="single" syntax="string" i18nKey="a128">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-logout-behaviour"
+                                 type="single_choice" syntax="string" i18nKey="a130">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="prompt">prompt</ChoiceValue>
+                        <ChoiceValue i18nKey="logout">logout</ChoiceValue>
+                        <ChoiceValue i18nKey="donotlogout">donotlogout</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>prompt</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-email-gwy-impl"
+                                 type="single" syntax="string" i18nKey="a132">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-smtp-hostname"
+                                 type="single" syntax="string" i18nKey="a134">
+                    <DefaultValues>
+                        <Value>localhost</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-smtp-port"
+                                 type="single" syntax="string" i18nKey="a136">
+                    <DefaultValues>
+                        <Value>25</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-smtp-username"
+                                 type="single" syntax="string" i18nKey="a138">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-smtp-password"
+                                 type="single" syntax="password" i18nKey="a140">
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-smtp-ssl_enabled"
+                                 type="single" syntax="boolean" i18nKey="a142">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-smtp-email-from"
+                                 type="single" syntax="string" i18nKey="a144">
+                    <DefaultValues>
+                        <Value>info@forgerock.com</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oauth-auth-level"
+                                 type="single" syntax="number_range" rangeStart="0"
+                                 rangeEnd="2147483647" i18nKey="a500">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="openam-auth-openidconnect-issuer-name"
+                                 type="single" syntax="string" i18nKey="oidc.issuer_name">
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
+                                 type="single_choice" syntax="string" i18nKey="oidc.crypto_context_type">
+                    <ChoiceValues>
+                        <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
+                        <ChoiceValue>jwk_url</ChoiceValue>
+                        <ChoiceValue>client_secret</ChoiceValue>
+                    </ChoiceValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
+                                 type="single" syntax="string" i18nKey="oidc.crypto_context_value">
+                </AttributeSchema>
+
+                <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="iplanet-am-auth-oauth-client-id"
+                                     type="single" syntax="string" i18nKey="a101">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oauth-client-secret"
+                                     type="single" syntax="password" i18nKey="a102">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oauth-auth-service"
+                                     type="single" syntax="string" i18nKey="a103">
+                        <DefaultValues>
+                            <Value>https://www.facebook.com/dialog/oauth</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oauth-token-service"
+                                     type="single" syntax="string" i18nKey="a104">
+                        <DefaultValues>
+                            <Value>https://graph.facebook.com/oauth/access_token</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oauth-user-profile-service"
+                                     type="single" syntax="string" i18nKey="a105">
+                        <DefaultValues>
+                            <Value>https://graph.facebook.com/me</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oauth-scope"
+                                     type="single" syntax="string" i18nKey="a106">
+                        <DefaultValues>
+                            <Value>email,read_stream</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oauth-user-profile-param"
+                                     type="single" syntax="string" i18nKey="a107">
+                        <DefaultValues>
+                            <Value>access_token</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oauth-sso-proxy-url"
+                                     type="single" syntax="string" i18nKey="a108">
+                        <DefaultValues>
+                            <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/oauth2c/OAuthProxy.jsp</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-account-provider"
+                                     type="single" syntax="string" i18nKey="a108a">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-account-mapper"
+                                     type="single" syntax="string" i18nKey="a109">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-account-mapper-configuration"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a110">
+                        <DefaultValues>
+                            <Value>id=facebook-id</Value>
+                            <Value>email=mail</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper"
+                                     type="list" syntax="string" i18nKey="a111">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper-configuration"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a112">
+                        <DefaultValues>
+                            <Value>first_name=givenname</Value>
+                            <Value>last_name=sn</Value>
+                            <Value>name=cn</Value>
+                            <Value>email=mail</Value>
+                            <Value>id=facebook-id</Value>
+                            <Value>first_name=facebook-fname</Value>
+                            <Value>last_name=facebook-lname</Value>
+                            <Value>email=facebook-email</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-save-attributes-to-session-flag"
+                                     type="single" syntax="boolean" i18nKey="a115">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-mail-attribute"
+                                     type="single" syntax="string" i18nKey="a118">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-createaccount-flag"
+                                     type="single" syntax="boolean" i18nKey="a120">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-prompt-password-flag"
+                                     type="single" syntax="boolean" i18nKey="a122">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-map-to-anonymous-flag"
+                                     type="single" syntax="boolean" i18nKey="a124">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-anonymous-user"
+                                     type="single" syntax="string" i18nKey="a126">
+                        <DefaultValues>
+                            <Value>anonymous</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-logout-service-url"
+                                     type="single" syntax="string" i18nKey="a128">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-logout-behaviour"
+                                     type="single_choice" syntax="string" i18nKey="a130">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="prompt">prompt</ChoiceValue>
+                            <ChoiceValue i18nKey="logout">logout</ChoiceValue>
+                            <ChoiceValue i18nKey="donotlogout">donotlogout</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>prompt</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-email-gwy-impl"
+                                     type="single" syntax="string" i18nKey="a132">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-smtp-hostname"
+                                     type="single" syntax="string" i18nKey="a134">
+                        <DefaultValues>
+                            <Value>localhost</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-smtp-port"
+                                     type="single" syntax="string" i18nKey="a136">
+                        <DefaultValues>
+                            <Value>25</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-smtp-username"
+                                     type="single" syntax="string" i18nKey="a138">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-smtp-password"
+                                     type="single" syntax="password" i18nKey="a140">
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-smtp-ssl_enabled"
+                                     type="single" syntax="boolean" i18nKey="a142">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-smtp-email-from"
+                                     type="single" syntax="string" i18nKey="a144">
+                        <DefaultValues>
+                            <Value>info@forgerock.com</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oauth-auth-level"
+                                     type="single" syntax="number_range" rangeStart="0"
+                                     rangeEnd="2147483647" i18nKey="a500">
+                        <DefaultValues>
+                            <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-issuer-name"
+                                     type="single" syntax="string" i18nKey="oidc.issuer_name">
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
+                                     type="single_choice" syntax="string" i18nKey="oidc.crypto_context_type">
+                        <ChoiceValues>
+                            <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
+                            <ChoiceValue>jwk_url</ChoiceValue>
+                            <ChoiceValue>client_secret</ChoiceValue>
+                        </ChoiceValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
+                                     type="single" syntax="string" i18nKey="oidc.crypto_context_value">
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

@@ -1,0 +1,69 @@
+dn: dc=openam,dc=forgerock,dc=org
+dc: openam
+objectClass: domain
+objectClass: top
+
+dn: cn=users,dc=openam,dc=forgerock,dc=org
+cn: users
+objectClass: container
+objectClass: top
+
+dn: ou=groups,dc=openam,dc=forgerock,dc=org
+ou: Groups
+objectClass: organizationalUnit
+objectClass: top
+
+dn: cn=Demo,cn=users,dc=openam,dc=forgerock,dc=org
+cn: Demo
+sn: demo
+givenName: demo
+mail: demo@example.com
+userpassword: changeit
+objectclass: inetorgperson
+objectclass: organizationalPerson
+objectclass: inetuser
+objectclass: top
+objectclass: person
+l: DemoLand
+
+dn: cn=Administrator,cn=users,dc=openam,dc=forgerock,dc=org
+cn: Administrator
+sn: admin
+givenName: admin
+mail: admin@example.com
+userpassword: helloworld
+objectclass: inetorgperson
+objectclass: organizationalPerson
+objectclass: inetuser
+objectclass: top
+objectclass: person
+l: AdminLand
+
+dn: cn=duplicate,cn=users,dc=openam,dc=forgerock,dc=org
+cn: duplicate
+sn: duplicate
+givenName: duplicate
+mail: duplicate@example.com
+userpassword: changeit
+objectclass: inetorgperson
+objectclass: organizationalPerson
+objectclass: inetuser
+objectclass: top
+objectclass: person
+
+dn: cn=domain users,cn=users,dc=openam,dc=forgerock,dc=org
+cn: domain users
+objectclass: top
+objectclass: container
+
+dn: cn=duplicate,cn=domain users,cn=users,dc=openam,dc=forgerock,dc=org
+cn: duplicate
+sn: duplicate
+givenName: duplicate
+mail: duplicate@example.com
+userpassword: changeit
+objectclass: inetorgperson
+objectclass: organizationalPerson
+objectclass: inetuser
+objectclass: top
+objectclass: person

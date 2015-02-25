@@ -1,0 +1,46 @@
+<!DOCTYPE logmessages
+        PUBLIC "OpenSSO Log Message DTD/EN"
+        "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+        >
+
+<logmessages prefix="Rest">
+    <!-- Token operations -->
+    <logmessage name="ATTEMPT_ACCESS" id="1"
+                loglevel="LL_INFO"
+                description="Attempted to access a REST resource.">
+        <datainfo>
+            <item>resource</item>
+            <item>operation</item>
+        </datainfo>
+        <triggers>
+            <item>Attempting to access a REST resource.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ACCESS_GRANT" id="2"
+                loglevel="LL_INFO"
+                description="Access granted to a REST resource.">
+        <datainfo>
+            <item>resource</item>
+            <item>operation</item>
+            <item>authzModule</item>
+        </datainfo>
+        <triggers>
+            <item>Access was granted to the requested resource.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ACCESS_DENY" id="3"
+                loglevel="LL_INFO"
+                description="Access denied to a REST resource.">
+        <datainfo>
+            <item>resource</item>
+            <item>operation</item>
+            <item>authzModule</item>
+        </datainfo>
+        <triggers>
+            <item>Access was denied to the requested resource.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+</logmessages>

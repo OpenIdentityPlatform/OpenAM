@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<chapter xml:id='chap-install-multiple'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Installing Multiple Servers</title>
+
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>multiple servers</secondary>
+ </indexterm>
+
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>load balancer</secondary>
+ </indexterm>
+
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>proxy settings</secondary>
+ </indexterm>
+
+ <para>
+  This chapter covers what to do when installing multiple OpenAM servers.
+ </para>
+
+ <section xml:id="considerations-multiple-servers">
+  <title>Things to Consider When Installing Multiple Servers</title>
+
+  <para>
+   When installing multiple servers, consider the following points.
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     You generally install multiple servers to provide service availability.
+     If one server is down for any reason, another server can respond instead.
+     This means that you need something between incoming traffic and OpenAM
+     to route around servers that are down.
+    </para>
+
+    <para>
+     OpenAM has the concept of OpenAM <firstterm>site</firstterm> for this purpose.
+     In an OpenAM site, multiple OpenAM servers are configured in the same way,
+     and accessed through a load balancer layer.<footnote>
+      <para>
+       Technically it is possible to configure a site with only one OpenAM server.
+      </para>
+     </footnote>
+     The load balancer can be implemented in hardware or software,
+     but it is separate and independent from OpenAM software.
+     When installed properly, a site configuration improves service availability,
+     as the load balancer routes around OpenAM servers that are down,
+     sending traffic to other servers in the site.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     You can use a load balancer layer to protect OpenAM services as well.
+     The load balancer can restrict access to OpenAM services,
+     throttle traffic, offload HTTPS encryption, and so forth.
+    </para>
+
+    <para>
+     As an alternative, or in addition,
+     you can use a separate reverse proxy service,
+     or the OpenAM distributed authentication UI.
+     The distributed authentication UI exposes a subset of OpenAM functionality.
+     For instructions on setting up the distributed authentication UI, see
+     <link
+      xlink:show="new"
+      xlink:href="install-guide#chap-install-das"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Installing OpenAM Distributed Authentication</citetitle></link>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     When you are protecting OpenAM with a load balancer or proxy service,
+     configure your container so that OpenAM can trust
+     the load balancer or proxy service.
+     OpenAM trusts the distributed authentication UI
+     as the distributed authentication UI uses
+     credentials registered with OpenAM.
+    </para>
+   </listitem>
+
+   <listitem>
+     <para>
+      OpenAM authentication can depend on information
+      about the user to authenticate,
+      such as the IP address where the request originated.
+      When OpenAM is accessed through a load balancer or proxy layer,
+      pass this information along using request headers.
+      Also configure OpenAM to consume and to forward the headers as necessary.
+      See <xref linkend="handle-request-headers" /> for details.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="configure-sites">
+  <title>Configuring OpenAM Sites</title>
+
+  <indexterm>
+   <primary>sites</primary>
+   <secondary>configuring</secondary>
+  </indexterm>
+
+  <para>
+   The most expedient way to configure a server in a site
+   is to set the site up during the initial OpenAM configuration.
+   In the GUI configurator, this is done in the Site Configuration screen.
+   It is also possible to configure a site separately.
+  </para>
+
+  <itemizedlist>
+   <para>
+    This section includes the following procedures.
+   </para>
+
+   <listitem>
+    <para>
+     <xref linkend="configure-site-after-installation" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="configure-site-load-balancing" />
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <procedure xml:id="configure-site-after-installation">
+   <title>To Configure a Site with a First OpenAM Server</title>
+
+   <para>
+    You might already have configured an OpenAM server before realizing
+    that a site is what you want.
+   </para>
+
+   <para>
+    The following steps show how to set up the site for the first OpenAM server.
+   </para>
+
+   <step>
+    <para>
+     Login to OpenAM Console as administrator,
+     by default <literal>amadmin</literal>,
+     and then browse to Configuration > Servers and Sites > Sites.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Click New to start configuring the new site.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     On the New Site page enter the site name,
+     and set the Primary URL to the load balancer URL
+     that is the entry point for the site,
+     such as <literal>https://lb.example.com/openam</literal>.
+    </para>
+
+    <para>
+     The site URL is the URL to the load balancer in front of
+     the OpenAM servers in the site.
+     For example, if your load balancer listens for
+     HTTPS on host <literal>lb.example.com</literal>
+     and port <literal>443</literal>,
+     with OpenAM under <literal>/openam</literal>,
+     then your site URL is <literal>https://lb.example.com/openam</literal>.
+    </para>
+
+    <para>
+     Client applications and policy agents access the servers in the site
+     through the site URL.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Click Save to keep the site configuration.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Under Configuration > Servers and Sites > Server,
+     click the link to the server configuration.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     On the server configuration General tab page,
+     set the Parent Site to the name of the site you just created,
+     and then click Save to keep your changes.
+    </para>
+
+    <para>
+     At this point the server is part of the new site you have configured.
+    </para>
+
+    <para>
+     For all additional servers in the OpenAM site,
+     add them to the site at configuration time as described in
+     <link
+      xlink:show="new"
+      xlink:href="install-guide#add-servers-to-site"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>To Add a Server to a Site</citetitle></link>.
+    </para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="configure-site-load-balancing">
+   <title>To Configure Site Load Balancing</title>
+
+   <para>
+    If you did not set up the site during initial configuration,
+    first follow the instructions in
+    <xref linkend="configure-site-after-installation" />,
+    and then follow all the steps below.
+   </para>
+
+   <step>
+    <para>
+     For each OpenAM server in the site, select
+     Configuration > Servers and Sites > Servers > <replaceable>Server Name</replaceable>,
+     set Parent Site to the site you created,
+     and then Save your work.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Make the <literal>amlbcookie</literal> value unique for each OpenAM server.
+    </para>
+
+    <para>
+     In an OpenAM site, the server that authenticated a user
+     is the server that continues to manage that user's session,
+     unless the server is no longer available.
+     The load balancer should send subsequent requests to that server
+     to avoid overhead resulting from the server that gets the
+     request being different from the server that authenticated the user.
+    </para>
+
+    <para>
+     When traffic is protected with HTTPS, this approach requires
+     that you terminate the connection on the load balancer.
+     You then either re-encrypt the traffic from the load balancer to OpenAM,
+     or make connections from the load balancer to OpenAM over HTTP.
+    </para>
+
+    <substeps>
+     <step>
+      <para>
+       For each OpenAM server console in the site, browse to
+       Configuration > Servers and Sites > Servers
+       > <replaceable>Server Name</replaceable> > Advanced,
+       and set <literal>com.iplanet.am.lbcookie.value</literal>
+       to a unique value.
+      </para>
+
+      <para>
+       By default, the cookie value is set to the OpenAM server ID.
+      </para>
+
+      <para>
+       Changes take effect only after you restart the OpenAM server.
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Restart each OpenAM server where you changed the cookie value.
+      </para>
+
+      <para>
+       You can then check the cookie value by logging in to OpenAM console,
+       and examining the <literal>amlbcookie</literal> cookie in your browser.
+      </para>
+     </step>
+    </substeps>
+   </step>
+
+   <step>
+    <para>
+     Configure your load balancer to perform sticky load balancing
+     based on the <literal>amlbcookie</literal> value.
+    </para>
+
+    <para>
+     In other words, the load balancer layer must keep track of
+     which <literal>amlbcookie</literal> cookie value
+     corresponds to which OpenAM server.
+    </para>
+
+    <para>
+     When the load balancer receives a request,
+     it inspects the value of the <literal>amlbcookie</literal> cookie,
+     and then forwards the request to the corresponding OpenAM server.
+    </para>
+   </step>
+  </procedure>
+  <note>
+   <para>Sticky load balancing based on the value of the
+    <literal>amlbcookie</literal> cookie does not guarantee request forwarding
+    to the corresponding OpenAM server in all cases. For example,
+    ForgeRock Common REST API calls do not typically use cookies. Therefore,
+    load balancers are not able to route these calls to the OpenAM server
+    on which a user's session resides.
+   </para>
+   <para>
+    When an OpenAM request to read a session arrives at a server that does not
+    hold the user's session, the OpenAM server attempts to locate the session
+    from the Core Token Service session store by default.
+   </para>
+   <para>
+    OpenAM servers can also use crosstalk to locate
+    remote sessions. With crosstalk, OpenAM servers
+    communicate with each other through a back channel to locate remote sessions.
+    Because crosstalk generates network traffic, locating sessions from the
+    Core Token Service session store is preferred for performance reasons.
+   </para>
+   <para>
+    Requests to log out or set a session attribute always use crosstalk to
+    ensure the integrity of the update requests.
+   </para>
+   <para>
+   See
+   <link
+    xlink:show="new"
+    xlink:href="install-guide#chap-session-failover"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Setting Up OpenAM Session Failover</citetitle></link>
+   for information about configuring remote session location options.
+  </para>
+  </note>
+ </section>
+
+ <section xml:id="handle-request-headers">
+  <title>Handling HTTP Request Headers</title>
+
+  <indexterm>
+   <primary>HTTP request headers</primary>
+   <secondary>handling</secondary>
+  </indexterm>
+
+  <para>
+   HTTP requests can include information needed for access management,
+   such as the client IP address used for adaptive risk-based authentication.
+  </para>
+
+  <para>
+   Configure your load balancer or proxy to
+   pass the information to OpenAM by using request headers.
+   For example, the load balancer or proxy can send the client IP address
+   by using the <literal>X-Forwarded-For</literal> HTTP request header.
+  </para>
+
+  <para>
+   If you use the distributed authentication UI, you can retain headers
+   by using the <literal>openam.retained.http.request.headers</literal> setting
+   as described in
+   <link
+    xlink:show="new"
+    xlink:href="install-guide#chap-install-das"
+    xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>Installing OpenAM Distributed Authentication</citetitle></link>.
+  </para>
+
+  <para>
+   Also configure OpenAM to consume and to forward the headers as necessary.
+   When configuring OpenAM through the console, you set the following properties
+   under Configuration > Servers and Sites > Servers
+   > <replaceable>Server Name</replaceable> > Advanced.
+  </para>
+
+  <para>
+   For example, to configure OpenAM to look for the client IP address
+   in the <literal>X-Forwarded-For</literal> request header,
+   set the advanced configuration property
+   <literal>com.sun.identity.authentication.client.ipAddressHeader</literal>
+   to <literal>X-Forwarded-For</literal>.
+  </para>
+
+  <para>
+   In a site configuration where one OpenAM server
+   can forward requests to another OpenAM server,
+   you can retain the header by adding it to the advanced configuration property
+   <literal>openam.retained.http.request.headers</literal>.
+   If <literal>X-Forwarded-For</literal> is the only additional header to retain,
+   set <literal>openam.retained.http.request.headers</literal> to
+   <literal>X-DSAMEVersion,X-Forwarded-For</literal>, for example.
+  </para>
+ </section>
+</chapter>

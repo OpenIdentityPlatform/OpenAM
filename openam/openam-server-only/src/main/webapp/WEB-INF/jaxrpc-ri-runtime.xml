@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: jaxrpc-ri-runtime.xml,v 1.2 2008/06/25 05:48:39 qcheng Exp $
+
+-->
+
+<endpoints xmlns='http://java.sun.com/xml/ns/jax-rpc/ri/runtime' version='1.0'>
+    <endpoint
+        name='SMSObjectIF'
+        interface='com.sun.identity.sm.jaxrpc.SMSObjectIF'
+        implementation='com.sun.identity.sm.jaxrpc.SMSJAXRPCObjectImpl'
+        tie='com.sun.identity.sm.jaxrpc.SMSObjectIF_Tie'
+        model=''
+        wsdl='/WEB-INF/wsdl/IdentityManagementServices.wsdl'
+        service='IdentityManagementServices'
+        port='SMSObjectIFPort'
+        urlpattern='/jaxrpc/SMSObjectIF'/>
+    <endpoint
+        name='DirectoryManagerIF'
+        interface='com.iplanet.am.sdk.remote.DirectoryManagerIF'
+        implementation='com.iplanet.am.sdk.remote.DirectoryManagerImpl'
+        tie='com.iplanet.am.sdk.remote.DirectoryManagerIF_Tie'
+        model=''
+        wsdl='/WEB-INF/wsdl/IdentityManagementServices.wsdl'
+        service='IdentityManagementServices'
+        port='DirectoryManagerIFPort'
+        urlpattern='/jaxrpc/DirectoryManagerIF'/>
+    <endpoint
+        name='EntityObjectIF'
+        interface='com.sun.identity.entity.EntityObjectIF'
+        implementation='com.sun.identity.entity.EntityObjectImpl'
+        tie='com.sun.identity.entity.EntityObjectIF_Tie'
+        model=''
+        wsdl='/WEB-INF/wsdl/IdentityManagementServices.wsdl'
+        service='IdentityManagementServices'
+        port='EntityObjectIFPort'
+        urlpattern='/jaxrpc/EntityObjectIF'/>
+    <endpoint
+        name='IdentityServices'
+        interface='com.sun.identity.idsvcs.IdentityServices'
+        implementation='com.sun.identity.idsvcs.opensso.IdentityServicesImpl'
+        tie='com.sun.identity.idsvcs.IdentityServicesImpl_Tie'
+        mode=''
+        wsdl='/WEB-INF/wsdl/IdentityServices.wsdl'
+        service='IdentityServices'
+        port='IdentityServicesPort'
+        urlpattern='/identityservices/IdentityServices'/>
+    <endpoint
+        name='AssertionManagerIF'
+        interface='com.sun.identity.saml.AssertionManagerIF'
+        implementation='com.sun.identity.saml.AssertionManagerImpl'
+        tie='com.sun.identity.saml.AssertionManagerIF_Tie'
+        model=''
+        wsdl=''
+        service='AssertionManagerService'
+        port='AssertionManagerIFPort'
+        urlpattern='/AssertionManagerServlet/AssertionManagerIF'/>
+    <endpoint
+        name='FSAssertionManagerIF'
+        interface='com.sun.identity.federation.services.FSAssertionManagerIF'
+        implementation='com.sun.identity.federation.services.FSAssertionManagerImpl'
+        tie='com.sun.identity.federation.services.FSAssertionManagerIF_Tie'
+        model=''
+        wsdl=''
+        service='FSAssertionManagerService'
+        port='FSAssertionManagerIFPort'
+        urlpattern='/FSAssertionManagerServlet/FSAssertionManagerIF'/>
+    <endpoint
+        name='SecurityTokenManagerIF'
+        interface='com.sun.identity.liberty.ws.security.SecurityTokenManagerIF'
+        implementation='com.sun.identity.liberty.ws.security.SecurityTokenManagerImpl'
+        tie='com.sun.identity.liberty.ws.security.SecurityTokenManagerIF_Tie'
+        model=''
+        wsdl=''
+        service='SecurityTokenManagerService'
+        port='SecurityTokenManagerIFPort'
+        urlpattern='/SecurityTokenManagerServlet/SecurityTokenManagerIF'/>
+    <endpoint
+        name='LibertyManagerIF'
+        interface='com.sun.liberty.jaxrpc.LibertyManagerIF'
+        implementation='com.sun.liberty.jaxrpc.LibertyManagerImpl'
+        tie='com.sun.liberty.jaxrpc.LibertyManagerIF_Tie'
+        model=''
+        wsdl=''
+        service='LibertyManagerService'
+        port='LibertyManagerIFPort'
+        urlpattern='/jaxrpc/LibertyManagerIF'/>
+</endpoints>

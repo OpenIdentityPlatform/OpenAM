@@ -1,0 +1,26 @@
+<li class="rule clearfix invalid-rule" id="subject_{{itemID}}" tabindex="0" >
+
+	<span class="item-button-panel">
+		<span tabindex="0" class="icon-pencil"></span>
+		<span tabindex="0" class="icon-remove"></span>
+	</span>
+
+	<div class="item-data">
+
+		<div class="field-float-select data-obj" id="typeSelector">
+			<label for="selection" >{{t "policy.common.type"}}</label>
+			<select id="selection" class="placeholdertext" tabindex="0" >
+				<option value="" selected disabled >{{t "policy.common.select"}}</option>
+				{{#subjects}}
+                <option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{i18nKey}}</option>
+                {{/subjects}}
+			</select>
+		</div>
+
+	</div>
+
+	<span class="item-button-panel">
+		<span tabindex="0" class="icon-checkmark"></span>
+	</span>
+
+</li>

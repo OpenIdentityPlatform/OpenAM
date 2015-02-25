@@ -1,0 +1,367 @@
+     <parameter name="groupName" value="@mode@"/>
+     <test name="IDWSFTestIndex0">
+        <parameter name="testIndex" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idff.ConfigureIDFF"/>
+            <class name="com.sun.identity.qatest.idwsf.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.idff.UnconfigureIDFF"/>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test> 
+    <test name="IDWSFTestIndex1">
+        <parameter name="testIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex2">
+        <parameter name="testIndex" value="2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex3">
+        <parameter name="testIndex" value="3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex4">
+        <parameter name="testIndex" value="4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex5">
+        <parameter name="testIndex" value="5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex6">
+        <parameter name="testIndex" value="6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+<!--    <test name="IDWSFTestIndex7">
+        <parameter name="testIndex" value="7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>-->
+    <test name="IDWSFTestIndex8">
+        <parameter name="testIndex" value="8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex9">
+        <parameter name="testIndex" value="9"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+<!--    <test name="IDWSFTestIndex10">
+        <parameter name="testIndex" value="10"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test> -->
+    <test name="IDWSFTestIndex11">
+        <parameter name="testIndex" value="11"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex12">
+        <parameter name="testIndex" value="12"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+<!--    <test name="IDWSFTestIndex13">
+        <parameter name="testIndex" value="13"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>-->
+<!--    <test name="IDWSFTestIndex14">
+        <parameter name="testIndex" value="14"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>-->
+    <test name="IDWSFTestIndex15">
+        <parameter name="testIndex" value="15"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex16">
+        <parameter name="testIndex" value="16"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex17">
+        <parameter name="testIndex" value="17"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+<!--    <test name="IDWSFTestIndex18">
+        <parameter name="testIndex" value="18"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex19">
+        <parameter name="testIndex" value="19"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex20">
+        <parameter name="testIndex" value="20"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex21">
+        <parameter name="testIndex" value="21"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex22">
+        <parameter name="testIndex" value="22"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex23">
+        <parameter name="testIndex" value="23"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test> -->
+    <test name="IDWSFTestIndex24">
+        <parameter name="testIndex" value="24"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex25">
+        <parameter name="testIndex" value="25"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex26">
+        <parameter name="testIndex" value="26"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex27">
+        <parameter name="testIndex" value="27"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+<!--    <test name="IDWSFTestIndex28">
+        <parameter name="testIndex" value="28"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex29">
+        <parameter name="testIndex" value="29"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+    <test name="IDWSFTestIndex30">
+        <parameter name="testIndex" value="30"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test> -->
+    <test name="IDWSFTestIndex31">
+        <parameter name="testIndex" value="31"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test>
+<!--    <test name="IDWSFTestIndex32">
+        <parameter name="testIndex" value="32"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idwsf.IDWSFSmokeTest"/>
+        </classes>
+    </test> -->

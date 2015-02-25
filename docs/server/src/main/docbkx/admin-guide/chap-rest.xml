@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-rest'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Configuring REST APIs</title>
+ <indexterm><primary>REST API</primary></indexterm>
+
+  <para>You can configure the default behavior OpenAM will take when a REST
+   call does not specify explicit version information using either of the
+   following procedures.</para>
+  <itemizedlist>
+   <listitem><para><xref linkend="configure-versioning-ui" /></para></listitem>
+   <listitem><para><xref linkend="configure-versioning-ssoadm" /></para></listitem>
+  </itemizedlist>
+
+  <para>The available options for default behavior are as follows.</para>
+
+  <variablelist>
+   <varlistentry>
+    <term><emphasis>Latest</emphasis></term>
+    <listitem>
+     <para>The latest available supported version of the API is used.</para>
+     <para>This is the preset default for new installations of OpenAM.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><emphasis>Oldest</emphasis></term>
+    <listitem>
+     <para>The oldest available supported version of the API is used.</para>
+     <para>This is the preset default for upgraded OpenAM instances.</para>
+     <note><para>The oldest supported version may not be the first that was
+      released, as APIs versions become <link
+       xlink:show="new"
+       xlink:href="release-notes#deprecated"
+       xlink:role="http://docbook.org/xlink/role/olink">
+       <citetitle>deprecated </citetitle></link>or unsupported.</para>
+     </note>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><emphasis>None</emphasis></term>
+    <listitem>
+     <para>No version will be used. When a REST client application calls a REST
+      API without specifying the version, OpenAM returns an error and the
+      request fails.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <procedure xml:id="configure-versioning-ui">
+   <title>Configure Versioning Behavior by using the Web-based Console</title>
+
+   <step>
+    <para>Login as OpenAM administrator, <literal>amadmin</literal>.</para>
+   </step>
+
+   <step>
+    <para>Click Configuration > Global > REST APIs.</para>
+   </step>
+
+   <step>
+    <para>In 'Default Version', select the required response to a REST
+     API request that does not specify an explicit version; 'Latest', 'Oldest',
+     or 'None'.</para>
+    <mediaobject xml:id="figure-rest-api-default-version-config">
+    <alt>REST API Default Version Configuration page.</alt>
+    <imageobject>
+     <imagedata fileref="images/rest-api-default-version-config.png" format="PNG" />
+    </imageobject>
+    <textobject><para>Select the default version behavior from either Latest,
+     Oldest, or None. Optionally enable a warning header when
+     explicit version information is not provided.</para></textobject>
+   </mediaobject>
+   </step>
+
+   <step performance="optional">
+    <para>Optionally, enable 'Warning Header' to include warning messages in the
+     headers of responses to requests.</para>
+   </step>
+
+   <step>
+    <para>Save your work.</para>
+   </step>
+
+  </procedure>
+
+  <procedure xml:id="configure-versioning-ssoadm">
+   <title>Configure Versioning Behavior by using SSOADM</title>
+
+   <step>
+    <para>Use the <literal>ssoadm set-attr-defs</literal> command, with
+     the <literal>openam-rest-apis-default-version</literal> attribute set
+     to either <literal>LATEST</literal>, <literal>OLDEST</literal> or
+     <literal>NONE</literal>, as in the following example.</para>
+    <screen>
+     $ <userinput>ssh openam.example.com</userinput>
+     $ <userinput>cd /path/to/openam-tools/admin/openam/bin</userinput>
+     $ <userinput>./ssoadm \
+     set-attr-defs \
+     --adminid amadmin \
+     --password-file /tmp/pwd.txt \
+     --servicename RestApisService \
+     --schematype Global \
+     --attributevalues openam-rest-apis-default-version=NONE</userinput>
+
+     <computeroutput>Schema attribute defaults were set.</computeroutput>
+    </screen>
+   </step>
+  </procedure>
+
+</chapter>

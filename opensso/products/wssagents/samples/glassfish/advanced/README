@@ -1,0 +1,226 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README,v 1.5 2008/10/08 22:56:29 mallas Exp $
+
+   Portions Copyright 2013 ForgeRock AS
+
+-->
+
+README
+=======
+
+This README explains the steps for advanced web services security usecases.
+
+Before you begin:
+=================
+
+The web services security for JAX-WS based web services is achieved using
+JSR196 providers. Before you begin, follow the README.glassfish from the 
+install directory of the zip file. 
+
+General Description: 
+====================
+
+
+This sample describes a web services proxy model where there is an 
+intermediatory web service acts as a mediator. The sample desribes a 
+simple loan process where an end user requests a loan via the loan 
+requestor by submitting his information. The loan requestor submits
+the user information to a loan processor probably a bank who verifies
+the user information and informs the informal status whether it's
+approved or rejected.
+
+The sample is developed using JAX-WS for web services development. 
+There are three separate applications in this use case:
+
+  1. LoanProcessor: This application is EJB based web service and has the 
+     business logic of processing loan application.
+
+  2. LoanRequestor:  This is a standard J2EE web application with a proxy
+     web service which makes a request to the Loan Processor on behalf of 
+     the user.
+
+  3. LoanRequestorClient: The LoanRequestorClient is another J2EE web 
+     application which provides an interface for the end user to fill the
+     application and submit it to the LoanRequestor. 
+
+
+Deployment of samples:
+======================
+
+The sample applications are located under $zipfiledir/samples/glassfish/advanced
+Each sample contains a convenient build script for building and deploying the
+samples.  Before you build, update glassfish.properties located under
+ $zipfiledir/samples/glassfish.  These samples requires a locally installed 
+Glassfish for compilation and building.
+
+The properties in glassfish.properties are:
+   glassfish.home = <glassfish root directory>
+   build.class.path = <path to webservices-tools.jar>:<path to javaee.jar>
+   jaxws.endorsed.dir=<path to glassfish lib directory> 
+                      (Note: This is for JDK1.6)
+
+Also, set the JAVA_HOME and java is in the path before building the samples.
+Use the ant script from <glassfish-install>/lib/bin/ant directory.
+Build and deploy the samples in the following order
+
+1. Deploy the LoanProcessor Application:
+
+
+   cd LoanProcessor and run "ant -f build.xml". This will build
+   and deploy the LoanProcessor EJB application onto the glassfish container.
+   
+
+2. Deploy the LoanRequestor Application
+   cd LoanRequestor and run "ant -f build.xml". This will build
+   and deploy the LoanRequestor web application onto the glassfish container.
+
+   Note: This sample assumes that LoanProcessor is deployed onto glassfish
+   install configured with localhost:8080. If this is not true, change the 
+   URL in src/com/sun/samples/loanrequestor/LoanRequestor.java
+
+3. Deploy the LoanRequestorClient Application
+   cd LoanRequestorClient and run "ant -f build.xml". This will build and
+   deploy the LoanRequestorClient web application onto the glassfish container.
+
+   Note: This sample assumes that the LoanRequestor is deployed onto glassfish
+   installation configured with localhost:8080. If this is not true, change the
+   URL in src/com/sun/samples/loanrequestor/LoanApplication.java
+
+
+Use case scenarios:
+====================
+
+There are two proxy cases can be tested using this samples. This sample is 
+primarily used for SAML Tokens since the other tokens are relatively restricted to use locally generated tokens.
+
+A. Web services proxying using a passthrough token. In this case, the proxy 
+   web service LoanRequestor just uses the same token that is obtained from 
+   web services client before it makes a request to the LoanProcessor.  
+
+B. Web services proxy case where the intermediary obtains a new token using
+   the token that is authenticated by the LoanRequestorClient.
+
+
+Configuring OpenAM for passthrough (use case A):
+=============================================
+
+
+1.  Login into the OpenAM Console with user
+    amadmin and <amadmin password>
+
+    openamserver_protocol://openamserver_host:openamserver_port/openamserver_deploy_uri
+
+    Note: If you have logged in as any other user, click Logout on the console
+    page and Login again and make sure that you access the Federated
+    OpenAM Console.
+
+2. Create agent profiles for "LoanRequestorService" WSC :
+      Create "WSC" profile for "LoanRequestorService"
+      Go to Access Control -> Default realm -> Agents ->
+      Select Web Service Client -> under Agent, click "new" -> 
+      enter name as "LoanRequestorService" and other required fields -> Save.
+      Click on above saved profile to edit -> Select required Security 
+      Mechanism, "Preserve Security Headers in Message" as
+      false (unchecked) and "Is Request Signed" as true (checked).
+      Save changes. Use security mechanism as any of the SAML Token profiles
+      only. You can also STSSecurity, however, you may need to configure
+      STSClient agent profile.
+
+      Note: If you are using "agentAuth" as the application user name,
+      add the LoanRequestorService to the Agent Authenticator list.
+      Go to Access Control -> Default realm -> Agents -> AgentAuthenticator
+      Select the available in the allowed agents to read and save.
+
+3. Create agent profiles for "LoanProcessorService" WSC:
+
+      Create "WSC" profile for "LoanProcessorService"
+      Go to Access Control -> Default realm -> Agents ->
+      Select Web Service Client -> under Agent, click "new" -> 
+      enter name as "LoanProcessorService" and other required fields -> Save.
+      Click on above saved profile to edit -> Select required Security 
+      Mechanism, "Preserve Security Headers in Message" as
+      false (unchecked) and "Is Request Signed" as true (checked).
+      Check usePassThroughToken to true (checked).
+      Save changes. Use security mechanism as any of the SAML Token profiles
+      only.  You should not use STSSecurity for the passthrough use case.
+
+      Note: If you are using "agentAuth" as the application user name,
+      add the LoanProcessorService to the Agent Authenticator list.
+      Go to Access Control -> Default realm -> Agents -> AgentAuthenticator
+      Select the available in the allowed agents to read and save.
+
+
+4. Create agent profiles for "WSP" :
+
+      Create "WSP" profile (if not already created)
+      Select Web Service Provider -> under Agent, click "new" -> 
+      enter name as "wsp" and other required fields -> Save.
+      Click on above saved profile to edit -> Select all Security Mechanisms.
+      Select Web Service End Point as default and 
+      "Is Request Signature Verified" as true (checked).
+      "Preserve Security Headers in Message" as false (unchecked) 
+      Save changes. 
+
+      Note: One wsp can be used for both LoanRequestor and LoanProcessor
+      applications, however, if you choose to use a different one, create
+      two new profiles as "proxywsp" and "wsp" and in "proxywsp" create the
+      end point as the LoanReqestorService web service endpoint.
+
+5.  Logout of OpenAM Administration console.
+
+Configuring OpenAM for proxying with a new token (use case B):
+==========================================================
+TODO-Later
+
+
+
+
+
+Run the samples
+===============
+
+1. Access the loan requestor client application.
+
+   http://<host>:<port>/LoanRequestorClient/loan.jsp
+
+
+2. Enter user application details. (Note: fill all the details, there is no
+   error validation for this).
+
+   Sample info:
+     Applicant Name: jsmith
+     Social Security Number: 123456789
+     Gender: Male or Female
+     Age: 30 (If you enter less than 15 you will be rejected)
+     Address: 1234 Street, San Francisco, CA
+     Email: jsmith@sun.com
+     Annual Salary: 750000 
+     Loan Requested: 750000
+
+3. Click on Apply Loan
+   If successful, Loan Application Status is displayed. Otherwise 
+   "unable to process" is displayed. Enable the glassfish logging for Security
+   log module to "finest" to see all the web service protocol interactions. 

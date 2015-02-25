@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ 
+  The contents of this file are subject to the terms
+  of the Common Development and Distribution License
+  (the License). You may not use this file except in
+  compliance with the License.
+
+  You can obtain a copy of the License at
+  https://opensso.dev.java.net/public/CDDLv1.0.html or
+  opensso/legal/CDDLv1.0.txt
+  See the License for the specific language governing
+  permission and limitations under the License.
+
+  When distributing Covered Code, include this CDDL
+  Header Notice in each file and include the License file
+  at opensso/legal/CDDLv1.0.txt.
+  If applicable, add the following below the CDDL Header,
+  with the fields enclosed by brackets [] replaced by
+  your own identifying information:
+  "Portions Copyrighted [year] [name of copyright owner]"
+
+  $Id: defaultDelegationPolicies.xml,v 1.16 2009/11/26 17:06:07 veiming Exp $
+
+-->
+                                                                                
+<!DOCTYPE Policies
+    PUBLIC "-//iPlanet//OpenSSO 2005Q4 Admin CLI DTD//EN"    "jar://com/sun/identity/policy/policyAdmin.dtd">
+                                                                                
+<Policies>
+<!-- Delegation policy for all authenticated users to use DAI,admin console,IdRepo Service -->
+<Policy name="AllUserReadableServices1" referralPolicy="false" active="true" >
+    <Rule name="delegation-rule1">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://@SM_CONFIG_ROOT_SUFFIX@/sunIdentityRepositoryService/1.0/globalConfig/*" />
+        <ResourceName name="sms://@SM_CONFIG_ROOT_SUFFIX@/DAI/1.0/globalConfig/*" />
+        <ResourceName name="sms://@SM_CONFIG_ROOT_SUFFIX@/iPlanetAMAdminConsoleService/1.0/globalConfig/*" />
+        <ResourceName name="sms://@SM_CONFIG_ROOT_SUFFIX@/sunFMSAML2MetadataService/1.0/OrganizationConfig/*" />
+        <ResourceName name="sms://@SM_CONFIG_ROOT_SUFFIX@/sunFMCOTConfigService/1.0/OrganizationConfig/*" />
+
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Subjects name="Subjects" description="">
+        <Subject name="delegation-subject" type="AuthenticatedUsers" includeType="inclusive">
+        </Subject>
+    </Subjects>
+</Policy>
+
+
+<!-- Delegation policy for users to read their attributes -->
+<Policy name="SelfReadAttributes" referralPolicy="false" active="true" >
+    <Rule name="user-read-rule">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://*@SM_CONFIG_ROOT_SUFFIX@/sunIdentityRepositoryService/1.0/application/*" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Subjects name="Subjects" description="">
+        <Subject name="delegation-subject" type="AuthenticatedUsers" includeType="inclusive">
+        </Subject>
+    </Subjects>
+    <Conditions name="AttrCondition" description="">
+        <Condition name="condition" type="UserSelfCheckCondition">
+            <AttributeValuePair>
+                <Attribute name="attributes"/>
+                <Value>*</Value>
+            </AttributeValuePair>
+        </Condition>
+    </Conditions>
+</Policy>
+
+<!-- Delegation policy for users to write their attributes -->
+<Policy name="SelfWriteAttributes" referralPolicy="false" active="true" >
+    <Rule name="user-read-rule">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://*@SM_CONFIG_ROOT_SUFFIX@/sunIdentityRepositoryService/1.0/application/*" />
+        <AttributeValuePair>
+            <Attribute name="MODIFY" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Subjects name="Subjects" description="">
+        <Subject name="delegation-subject" type="AuthenticatedUsers" includeType="inclusive">
+        </Subject>
+    </Subjects>
+    <Conditions name="AttrCondition" description="">
+        <Condition name="condition" type="UserSelfCheckCondition">
+            <AttributeValuePair>
+                <Attribute name="attributes"/>
+                <Value>givenname</Value>
+                <Value>sn</Value>
+                <Value>cn</Value>
+                <Value>userpassword</Value>
+                <Value>mail</Value>
+                <Value>telephonenumber</Value>
+                <Value>postaladdress</Value>
+                <Value>preferredlocale</Value>
+                <Value>iplanet-am-user-password-reset-options</Value>
+                <Value>iplanet-am-user-password-reset-question-answer</Value>
+                <Value>description</Value>
+                <Value>sunIdentityServerDeviceKeyValue</Value>
+                <Value>sunIdentityServerDeviceStatus</Value>
+            </AttributeValuePair>
+
+<!-- To check for permissions based on attributes not allowed by the user, the 
+following "notAttributes" AttributeValuePair can be used. If defined, users 
+will not be able perform the specified action in these attributes. The 
+comments section below provides an example. Please remove the 'Comment tags' 
+to define the "notAttributes" AttributeValuePair.
+
+            <AttributeValuePair>
+                <Attribute name="notAttributes"/>
+                <Value>nsroledn</Value>
+                <Value>aci</Value>
+                <Value>nsLookThroughLimit</Value>
+                <Value>nsSizeLimit</Value>
+                <Value>nsTimeLimit</Value>
+                <Value>nsIdleTimeout</Value>
+                <Value>passwordPolicySubentry</Value>
+                <Value>objectclass</Value>
+                <Value>inetuserstatus</Value>
+                <Value>iplanet-am-user-login-status</Value>
+                <Value>iplanet-am-web-agent-access-allow-list</Value>
+                <Value>iplanet-am-web-agent-access-deny-list</Value>
+                <Value>iplanet-am-domain-url-access-allow</Value>
+                <Value>iplanet-am-user-account-life</Value>
+                <Value>iplanet-am-session-max-session-time</Value>
+                <Value>iplanet-am-session-max-idle-time</Value>
+                <Value>iplanet-am-session-get-valid-sessions</Value>
+                <Value>iplanet-am-session-destroy-sessions</Value>
+                <Value>iplanet-am-session-add-session-listener-on-all-sessions
+                </Value>
+                <Value>iplanet-am-user-admin-start-dn</Value>
+                <Value>iplanet-am-auth-post-login-process-class</Value>
+                <Value>iplanet-am-static-group-dn</Value>
+                <Value>uid</Value>
+            </AttributeValuePair>
+End of comment for "notAttributes" AttributeValuePair -->
+
+        </Condition>
+    </Conditions>
+</Policy>
+
+
+<!-- Delegation policy for shared agents to read the profile of other agents -->
+<Policy name="SharedAgentReadOnlyPermission" referralPolicy="false" active="true" >
+    <Rule name="sharedagent-idrepo-read-rule">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://*@SM_CONFIG_ROOT_SUFFIX@/sunIdentityRepositoryService/1.0/application/agent*" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Subjects name="Subjects" description="">
+        <Subject name="AuthenticatedSharedAgents" type="AuthenticatedSharedAgents" includeType="inclusive">
+        </Subject>
+    </Subjects>
+    <Conditions name="AttrCondition" description="">
+        <Condition name="condition" type="AuthenticatedSharedAgentsCondition">
+        </Condition>
+    </Conditions>
+</Policy>
+
+<!-- Delegation policy for agents to read the SMS Tree -->
+<Policy name="AgentRealmPermission" referralPolicy="false" active="true" >
+    <Rule name="agent-realm-read-rule">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://*@SM_CONFIG_ROOT_SUFFIX@/sunAMRealmService/*" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Subjects name="Subjects" description="">
+        <Subject name="AuthenticatedAgents" type="AuthenticatedAgents" includeType="inclusive">
+        </Subject>
+    </Subjects>
+</Policy>
+
+<Policy name="@SM_ROOT_SUFFIX_HAT@^^AgentLogging" referralPolicy="false" active="true" >
+    <Rule name="delegation-rule1">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://*@SM_CONFIG_ROOT_SUFFIX@/iPlanetAMLoggingService/1.0/application/*" />
+        <AttributeValuePair>
+            <Attribute name="MODIFY" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Subjects name="Subjects" description="">
+        <Subject name="AuthenticatedAgents" type="AuthenticatedAgents" includeType="inclusive">
+        </Subject>
+    </Subjects>
+</Policy>
+
+<Policy name="@SM_ROOT_SUFFIX_HAT@^^EntitlementEval" referralPolicy="false" active="true" >
+    <Rule name="delegation-rule1">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/decision" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Rule name="delegation-rule2">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/decisions" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Rule name="delegation-rule3">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/entitlement" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Rule name="delegation-rule4">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/entitlements" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Rule name="delegation-rule5">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://@SM_CONFIG_ROOT_SUFFIX@/sunEntitlementService/1.0/application/ws/1/entitlement/listener*" />
+        <AttributeValuePair>
+            <Attribute name="MODIFY" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Subjects name="Subjects" description="">
+        <Subject name="AuthenticatedAgents" type="AuthenticatedAgents" includeType="inclusive">
+        </Subject>
+    </Subjects>
+</Policy>
+
+</Policies>

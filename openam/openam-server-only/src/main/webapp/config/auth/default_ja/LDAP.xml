@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: LDAP.xml,v 1.10 2009/07/16 04:12:02 cbasha Exp $
+
+-->
+
+<!--
+    Portions Copyrighted 2011-2013 ForgeRock AS
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+        "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+
+<ModuleProperties moduleName="LDAP" version="1.0" >
+    <Callbacks length="2" order="1" timeout="120" header="このサーバーは LDAP 認証を使用します" >
+        <NameCallback>
+            <Prompt>ユーザー名:</Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt>パスワード:</Prompt>
+        </PasswordCallback>
+    </Callbacks>
+    <Callbacks length="4" order="2" timeout="120" header="パスワードの変更&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
+        <PasswordCallback echoPassword="false" >
+            <Prompt>古いパスワード</Prompt>
+        </PasswordCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt>新しいパスワード</Prompt>
+        </PasswordCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt>パスワードの確認</Prompt>
+        </PasswordCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>送信</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>取消し</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <Callbacks length="0" order="3" timeout="120" header="パスワードが期限切れになりました。パスワードをリセットするには、サービスデスクにお問い合わせください。" error="true"  />
+    <Callbacks length="0" order="4" timeout="120" template="user_inactive.jsp" error="true"/>
+    <Callbacks length="0" order="5" timeout="120" header=" アカウントがロックされています。ロックを解除したい場合は、サービスデスクへお問い合わせください。" error="true" />
+
+</ModuleProperties>

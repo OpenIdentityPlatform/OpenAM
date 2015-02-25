@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock, Inc.
+  !    
+-->
+<chapter xml:id='chap-apache-22'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+ <title>Installing the Apache 2.2 Policy Agent</title>
+
+ <indexterm>
+  <primary>Apache 2.2 policy agent</primary>
+  <secondary>installation of</secondary>
+ </indexterm>
+
+ <para>This chapter covers installation of the policy agent for Apache
+ HTTP Server 2.2.x.</para>
+ 
+ <section xml:id="before-apache22-agent-install">
+  <title>Before You Install</title>
+
+  <indexterm>
+   <primary>Apache 2.2 policy agent</primary>
+   <secondary>before you install</secondary>
+  </indexterm>
+
+  <para>Make sure OpenAM is installed, running, that you can contact OpenAM
+  from the system running the policy agent. Next, create a profile for your
+  policy agent as described in
+  <link
+   xlink:show="new"
+   xlink:href="web-users-guide#chap-web-agents"
+   xlink:role="http://docbook.org/xlink/role/olink"
+  ><citetitle>Configuring Web Policy Agent Profiles</citetitle></link>.
+  To protect resources with the agent also create
+  at least one policy as described in the section on <link
+  xlink:href="${serverDocBase}/admin-guide/#configure-authz-policy"
+  xlink:show="new"><citetitle>Configuring
+  Policies</citetitle></link>. Consider creating a simple policy, such as a
+  policy that allows only authenticated users to access your resources, in order
+  to test your policy agent after installation.</para>
+
+  <para>You must install Apache HTTP Server before you install the policy
+  agent, and you must stop the server during installation.</para>
+
+  <xinclude:include href="../shared/para-java-support.xml" />
+
+      <screen>
+$ <userinput>echo $JAVA_HOME</userinput>
+<computeroutput>/path/to/java</computeroutput>
+      </screen>
+  
+  <xinclude:include href="../shared/para-download-agent.xml" />
+  
+  <para>Unzip the file in the directory where you plan to install the web
+  policy agent. The agent you install stores its configuration and logs
+  under this directory.</para>
+  
+
+  <para>When you unzip the policy agent .zip download, you find the following
+   directories under the <filename>web_agents/apache22_agent</filename>
+   directory.</para>
+
+  <xinclude:include href="../shared/variablelist-agentadmin-folders.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
+
+  <xinclude:include href="../shared/sec-apache-mpm-tuning.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
+ </section>
+
+ <section xml:id="install-apache22-web-agent">
+  <title>Installing Apache 2.2 Web Policy Agent</title>
+
+  <indexterm>
+   <primary>Apache 2.2 policy agent</primary>
+   <secondary>installing</secondary>
+  </indexterm>
+
+  <para>Complete the following procedures to install the policy agent.</para>
+
+  <xinclude:include href="../shared/procedure-create-web-agent-profile.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
+
+  <xinclude:include href="../shared/procedure-create-password-file.xml">
+   <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+  </xinclude:include>
+  
+  <procedure xml:id="install-agent-into-apache22">
+   <title>To Install the Policy Agent into Apache 2.2</title>
+   
+   <step>
+    <para>Shut down the Apache 2.2 server where you plan to install the
+    agent.</para>
+
+    <screen>
+$ <userinput>/path/to/apache22/bin/apachectl -k stop</userinput>
+    </screen>
+
+   </step>
+   <step>
+    <para>Make sure OpenAM is running.</para>
+   </step>
+   <step>
+    <para>Run <command>./agentadmin --install</command> to install the agent.</para>
+
+    <xinclude:include href="../shared/para-licensing-agreement-procedure.xml">
+     <xinclude:fallback>
+      <para>
+       Error: failed to include file
+      </para>
+     </xinclude:fallback>
+    </xinclude:include>
+
+    <screen>
+$ <userinput>cd /path/to/web_agents/apache22_agent/bin/</userinput>
+$ <userinput>./agentadmin --install --acceptLicense</userinput>
+<computeroutput>...
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Apache Server Config Directory : /path/to/apache22/conf 
+OpenAM server URL : http://openam.example.com:8080/openam 
+Agent URL : http://www.example.com:80
+Agent Profile name : Apache Web Agent 
+Agent Profile Password file name : /tmp/pwd.txt 
+
+...
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Bootstrap file location:
+/path/to/web_agents/apache22_agent/Agent_001/config/
+ <?eval ${agentsBootstrapFile}?>
+Agent Configuration Tag file location
+/path/to/web_agents/apache22_agent/Agent_001/config/
+ <?eval ${agentsConfigurationFile}?>
+Agent Audit directory location:
+/path/to/web_agents/apache22_agent/Agent_001/logs/audit
+Agent Debug directory location:
+/path/to/web_agents/apache22_agent/Agent_001/logs/debug
+
+
+Install log file location:
+/path/to/web_agents/apache22_agent/installer-logs/audit/install.log
+...</computeroutput>
+    </screen>
+
+    <para>Upon successful completion, the installer has added the agent as
+    a module to the Apache 2.2 configuration, and also set up configuration
+    and log directories for the agent.</para>
+    <note>
+     <para>If the agent is in a different domain than the server,
+     refer to <citetitle>Administration Guide</citetitle> procedure, <link
+   xlink:href="${serverDocBase}/admin-guide/#chap-cdsso"
+   xlink:show="new"><citetitle>Configuring Cross-Domain
+   Single Sign On</citetitle></link>.</para>
+    </note>
+   </step>
+   <step>
+    <para>Take note of the configuration files and log locations.</para>
+    <para>Each agent instance that you install on the system has its own
+    numbered configuration and logs directory. The first agent's configuration
+    and logs are thus located under the directory
+    <filename>web_agents/apache22_agent/Agent_001/</filename>.</para>
+    <variablelist>
+     <varlistentry>
+      <term><filename>config/<?eval ${agentsBootstrapFile}?></filename></term>
+      <listitem>
+       <para>Used to bootstrap the web policy agent, allowing the agent to
+       connect to OpenAM and download its configuration</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><filename>config/<?eval ${agentsConfigurationFile}?></filename></term>
+      <listitem>
+       <para>Only used if you configured the web policy agent to use local
+       configuration</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><filename>logs/audit/</filename></term>
+      <listitem>
+       <para>Operational audit log directory, only used if remote logging
+       to OpenAM is disabled</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><filename>logs/debug/</filename></term>
+      <listitem>
+       <para>Debug directory where the <filename>amAgent</filename> debug file
+       resides. Useful in troubleshooting policy agent issues.</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </step>
+   <step>
+    <para>If your policy agent configuration is not in the top-level realm (/),
+       then you must edit config/<?eval ${agentsBootstrapFile}?> to identify
+       the sub-realm that has your policy agent configuration.
+       Find com.sun.identity.agents.config.organization.name and change
+       the / to the path to your policy agent profile. This allows the policy agent
+       to properly identify itself to the OpenAM server. </para>
+    </step>
+   <step>
+    <para>Start the Apache 2.2 server where you installed the agent.</para>
+
+    <screen>
+$ <userinput>/path/to/apache22/bin/apachectl -k start</userinput>
+    </screen>
+
+   </step>
+  </procedure>
+  
+  <procedure xml:id="check-apache22-agent-installation">
+   <title>To Check the Policy Agent Installation</title>
+
+   <indexterm>
+    <primary>Apache 2.2 policy agent</primary>
+    <secondary>installing</secondary>
+    <tertiary>checking the install</tertiary>
+   </indexterm>
+
+   <step>
+    <para>Check the Apache 2.2 error log after you start the server to make
+    sure startup completed successfully.</para>
+
+    <screen>
+$ <userinput>tail -n 2 /path/to/apache22/logs/error_log</userinput>
+<computeroutput>[Sat Sep 03 13:28:16 2011] [notice] Policy web agent shared memory conf...
+[Sat Sep 03 13:28:16 2011] [notice] Apache/2.2.19 (Unix) DSAME/3.0 configured</computeroutput>
+ -- resuming normal operations
+    </screen>
+
+   </step>
+   <step>
+    <para>Check the <filename>amAgent</filename> debug log to verify that
+    no errors occurred on startup.</para>
+
+    <screen>
+$ <userinput>tail /path/to/web_agents/apache22_agent/Agent_001/logs/debug/amAgent</userinput>
+<computeroutput>2011-09-03 13:28:16.971    -1 32686:9daae60 all: ==============...=====
+2011-09-03 13:28:16.972    -1 32686:9daae60 all: Version: ...
+2011-09-03 13:28:16.972    -1 32686:9daae60 all: 
+2011-09-03 13:28:16.972    -1 32686:9daae60 all: Build Date: ...
+2011-09-03 13:28:16.972    -1 32686:9daae60 all: Build Machine: ..forgerock.com
+2011-09-03 13:28:16.972    -1 32686:9daae60 all: ==============...=====</computeroutput>
+    </screen>
+
+   </step>
+   <step performance="optional">
+    <para>If you have a policy configured, you can test your policy agent.
+    For example, try to browse to a resource that your policy agent protects.
+    You should be redirected to OpenAM to authenticate, for example as user
+    <literal>demo</literal>, password <literal>changeit</literal>. After
+    you authenticate, OpenAM then redirects you back to the resource you tried
+    to access.</para>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="install-apache22-agent-windows">
+  <title>Installing Apache 2.2 Web Policy Agent (Windows)</title>
+
+  <indexterm>
+   <primary>Apache 2.2 policy agent</primary>
+   <secondary>installing (Windows)</secondary>
+  </indexterm>
+
+    <para>The instructions for installing the Apache 2.2 Web Policy Agent on a
+            Windows system mirror those on the Unix/Linux systems.
+    Run the following procedures.</para>
+
+    <procedure xml:id="before-you-begin-windows">
+        <title>Before You Begin</title>
+
+        <para>
+         First read the pre-install requirements in
+         <xref linkend="before-apache22-agent-install" />.
+        </para>
+
+        <step>
+         <xinclude:include href="../shared/para-java-support.xml" />
+        </step>
+        <step><para>Make sure you have installed Apache HTTP server.
+        Stop the HTTP server prior to installing the Apache 2.2 Web Policy Agent.</para></step>
+        <step><para>Make sure you have an installed and running OpenAM server.
+        The OpenAM server should be installed and running
+        with at least one policy agent profile configured.</para>
+        </step>
+        <step>
+         <xinclude:include href="../shared/para-download-agent.xml" />
+
+         <para>
+        Unzip the file in the directory where you plan to install the web
+        policy agent.
+         </para>
+        </step>
+    </procedure>
+
+    <procedure xml:id="create-apache22-agent-profile-windows">
+        <title>To Create the Apache 2.2 Web Agent Profile</title>
+        <step>
+         <para>
+          Follow the instructions presented in
+          <link
+           xlink:show="new"
+           xlink:href="web-users-guide#chap-web-agents"
+           xlink:role="http://docbook.org/xlink/role/olink"
+          ><citetitle>Configuring Web Policy Agent Profiles</citetitle></link>
+          to create the profile.
+         </para>
+        </step>
+    </procedure>
+
+    <procedure xml:id="create-apache22-agent-pwdfile-windows">
+        <title>To Create the Password File</title>
+
+        <step>
+            <para>Create a text file containing only the password.</para>
+
+            <screen>
+C:\> <userinput>echo password > pwd.txt</userinput>
+            </screen>
+
+        </step>
+        <step>
+            <para>Open the Properties dialog on the password file,
+            click the Read-only box, and then click OK.</para>
+        </step>
+    </procedure>
+
+    <procedure xml:id="install-agent-into-apache22-windows">
+    <title>To Install the Policy Agent into Apache 2.2</title>
+
+    <step>
+        <para>Shut down the Apache 2.2 server where you plan to install the agent.</para>
+
+        <screen>
+C:\> <userinput>C:\Apache2.2\bin\httpd -k stop</userinput>
+        </screen>
+
+    </step>
+    <step>
+        <para>Make sure OpenAM is running.</para>
+    </step>
+    <step>
+        <para>Change to the Web Agent directory.</para>
+
+        <screen>
+C:\> <userinput>cd web_agents\apache22_agent\bin</userinput>
+        </screen>
+
+    </step>
+
+    <step>
+    <para>Install the agent. When prompted for information,
+        enter the inputs appropriate for your deployment.</para>
+
+    <screen>
+C:\path\to\web_agents\apache22_agent\bin> <userinput>agentadmin.bat --install</userinput>
+<computeroutput>
+Please read the following License Agreement carefully:
+
+[Press &lt;Enter&gt; to continue...] or [Enter n To Finish] n
+
+Do you completely agree with all the terms and conditions of this License
+Agreement (yes/no): [no]: yes
+
+
+...
+
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Apache Server Config Directory : C:\Apache2.2\conf
+OpenAM server URL : http://openam.example.com:8080/openam
+Agent URL : http://ec2-54-194-46-210.eu-west-1.compute.amazonaws.com:8080
+Agent Profile name : winagent
+Agent Profile Password file name : C:\pwd.txt
+
+Verify your settings above and decide from the choices below.
+1. Continue with Installation
+2. Back to the last interaction
+3. Start Over
+4. Exit
+Please make your selection [1]:
+
+Creating directory layout and configuring Agent file for Agent_001
+instance ...DONE.
+
+Reading data from file C:\pwd.txt and encrypting it ...DONE.
+
+Generating audit log file name ...DONE.
+
+Creating tag swapped OpenSSOAgentBootstrap.properties file for instance
+Agent_001 ...DONE.
+
+Creating a backup for file C:\Apache2.2\conf/httpd.conf ...DONE.
+
+Adding Agent parameters to
+C:/web_agents/apache22_agent/Agent_001/config/dsame.conf file ...DONE.
+
+Adding Agent parameters to C:\Apache2.2\conf/httpd.conf file ...DONE.
+
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Bootstrap file location:
+C:/web_agents/apache22_agent/Agent_001/config/OpenSSOAgentBootstrap.properties
+Agent Configuration Tag file location:
+C:/web_agents/apache22_agent/Agent_001/config/OpenSSOAgentConfiguration.properties
+Agent Audit directory location:
+C:/web_agents/apache22_agent/Agent_001/logs/audit
+Agent Debug directory location:
+C:/web_agents/apache22_agent/Agent_001/logs/debug
+
+
+Install log file location:
+C:/web_agents/apache22_agent/installer-logs/audit/install.log
+
+Thank you for using OpenAM Policy Agent</computeroutput>
+    </screen>
+
+    </step>
+    </procedure>
+    <procedure xml:id="check-apache22-agent-windows">
+        <title>To Check the Policy Agent Installation (Windows)</title>
+
+        <step>
+            <para>Check the Apache 2.2 error log after you start the server to make
+            sure startup completed successfully.</para>
+
+            <programlisting language="none">
+[Mon Jan 27 13:28:15 2014] [notice] Policy web agent shared memory conf...
+[Mon Jan 27 13:28:15 2014] [notice] Apache\2.2.19 (Windows) DSAME\3.0 configured
+                -- resuming normal operations
+            </programlisting>
+
+        </step>
+        <step>
+            <para>Check the <filename>amAgent</filename> debug log to verify that
+                no errors occurred on startup.</para>
+
+            <programlisting language="none">
+2014-01-27 13:28:16.971    -1 1944:9daae60 all: ==============...=====
+2014-01-27 13:28:16.972    -1 1944:9daae60 all: Version: ...
+2014-01-27 13:28:16.972    -1 1944:9daae60 all:
+2014-01-27 13:28:16.972    -1 1944:9daae60 all: Build Date: ...
+2014-01-27 13:28:16.972    -1 1944:9daae60 all: Build Machine: ..example.com
+2014-01-27 13:28:16.972    -1 1944:9daae60 all: ==============...=====
+            </programlisting>
+
+        </step>
+
+        <step performance="optional">
+            <para>If you have a policy configured, you can test your policy agent.
+                For example, try to browse to a resource that your policy agent protects.
+                You should be redirected to OpenAM to authenticate, for example as user
+                <literal>demo</literal>, password <literal>changeit</literal>. After
+                you authenticate, OpenAM then redirects you back to the resource you tried
+                to access.</para>
+        </step>
+    </procedure>
+</section>
+
+ <section xml:id="custom-apache22-agent-installation">
+  <title>Custom Apache 2.2 Web Policy Agent Installation</title>
+
+  <indexterm>
+   <primary>Apache 2.2 policy agent</primary>
+   <secondary>installing</secondary>
+   <tertiary>custom</tertiary>
+  </indexterm>
+  
+  <para>When running multiple Apache 2.2 servers on the same host, use
+  <command>./agentadmin --custom-install</command>. If you want to suppress
+  the license agreement prompt, add the <command>--acceptLicense</command> option to
+  the command.</para>
+  
+  <para>When performing a scripted, silent installation, use
+  <command>./agentadmin --install --saveResponse
+  <replaceable>response-file</replaceable></command>
+  to create a response file for scripted installation. Then install silently
+  using <command>./agentadmin --install --acceptLicense --useResponse
+  <replaceable>response-file</replaceable></command>.</para>
+
+  <para>With <command>./agentadmin --custom-install</command>, you can opt to
+  create the policy agent profile during installation. The OpenAM administrator
+  must first create an agent administrator user, as described in <link
+  xlink:href="${serverDocBase}/admin-guide/#delegate-agent-profile-creation"
+  xlink:show="new"><citetitle>Delegating Agent
+  Profile Creation</citetitle></link>, and provide you with the agent
+  administrator user name and password. Before running the
+  <command>./agentadmin --custom-install</command> command, put the password
+  alone in a read-only file only the user installing can access, as for the
+  agent password. When the <command>agentadmin</command> command prompts you to
+  create the profile during installation, enter <literal>true</literal>, and
+  then respond to the <command>agentadmin</command> prompts for the agent
+  administrator user name and password file.</para>
+ </section>
+ 
+ <section xml:id="uninstall-apache22-agent">
+  <title>Remove Apache 2.2 Web Policy Agent Software</title>
+
+  <indexterm>
+   <primary>Apache 2.2 policy agent</primary>
+   <secondary>removing</secondary>
+  </indexterm>
+
+  <para>Shut down the Apache 2.2 server before you uninstall the
+    policy agent.</para>
+  
+  <screen>
+$ <userinput>/path/to/apache22/bin/apachectl -k stop</userinput>
+  </screen>
+  
+  <para>To remove the web policy agent, use <command>./agentadmin
+  --uninstall</command>.</para>
+  
+  <screen>
+$ <userinput>./agentadmin --uninstall</userinput>
+<computeroutput>...
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Apache Server Config Directory : /path/to/apache22/conf 
+
+...
+Deleting the config directory
+/path/to/web_agents/apache22_agent/Agent_001/config
+...DONE.
+
+Removing Agent parameters from /path/to/apache22/conf/httpd.conf file
+...DONE.
+
+
+Uninstall log file location:
+/path/to/web_agents/apache22_agent/installer-logs/audit/uninstall.log
+...</computeroutput>
+  </screen>
+
+ </section>
+
+</chapter>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-before-you-install'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Before You Install OpenAM <?eval ${serverDocTargetVersion}?> Software</title>
+
+ <para>
+  This chapter covers software and hardware prerequisites
+  for installing and running OpenAM server software.
+ </para>
+ 
+ <xinclude:include href="../shared/para-requirements-support.xml" />
+
+ <xinclude:include href="../shared/sec-openam-os-requirements.xml" />
+
+ <section xml:id="java-requirements">
+  <title>Java Requirements</title>
+
+  <para>
+   OpenAM server software runs in a Java EE Web container,
+   and requires a Java Development Kit.
+  </para>
+
+  <xinclude:include href="../shared/itemizedlist-java-requirements.xml" />
+ </section>
+
+ <xinclude:include href="../shared/sec-openam-web-container-requirements.xml" />
+
+ <xinclude:include href="../shared/sec-openam-data-store-requirements.xml" />
+
+ <xinclude:include href="../shared/sec-browser-requirements.xml" />
+
+ <xinclude:include href="../shared/sec-native-application-platforms.xml" />
+
+ <xinclude:include href="../shared/sec-special-requests.xml" />
+</chapter>

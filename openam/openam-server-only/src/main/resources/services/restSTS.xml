@@ -1,0 +1,302 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+    Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+
+    The contents of this file are subject to the terms of the Common Development and
+    Distribution License (the License). You may not use this file except in compliance with the
+    License.
+
+    You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+    specific language governing permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL Header Notice in each file and include
+    the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+    Header, with the fields enclosed by brackets [] replaced by your own identifying
+    information: "Portions Copyrighted [year] [name of copyright owner]"
+-->
+<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="RestSecurityTokenService" version="1.0">
+        <Schema
+                serviceHierarchy="/DSAMEConfig/RestSecurityTokenService"
+                i18nFileName="restSTS" revisionNumber="1"
+                i18nKey="rest_security_token_service_description"
+                propertiesViewBeanURL="../reststs/RestSTSEdit">
+
+            <Organization>
+<!--
+Note that if this AttributeSchema element is un-commented, then adding the service blows up because no value is
+provided for required attributes upon service registration.
+                <AttributeSchema name="RequiredValueValidator"
+                                 type="validator"
+                                 syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+-->
+                <AttributeSchema name="issuer-name"
+                                 type="single" syntax="string" i18nKey="issuer_name"
+                                 validator="RequiredValueValidator">
+                </AttributeSchema>
+                <AttributeSchema name="supported-token-transforms"
+                                 type="list"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="supported_token_transforms">
+                    <DefaultValues>
+                        <Value>USERNAME|SAML2|true</Value>
+                        <Value>OPENIDCONNECT|SAML2|true</Value>
+                        <Value>OPENAM|SAML2|false</Value>
+                        <Value>X509|SAML2|true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="deployment-realm"
+                                 type="single" syntax="string" i18nKey="deployment_realm"
+                                 validator="RequiredValueValidator">
+                </AttributeSchema>
+                <AttributeSchema name="deployment-url-element"
+                                 type="single" syntax="string" i18nKey="deployment_url_element"
+                                 validator="RequiredValueValidator">
+                </AttributeSchema>
+                <AttributeSchema name="deployment-auth-target-mappings"
+                                 type="list"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="deployment_auth_target_mappings">
+                    <DefaultValues>
+                        <Value>USERNAME|service|ldapService</Value>
+                        <Value>OPENIDCONNECT|module|oidc|oidc_id_token_auth_target_header_key=oidc_id_token</Value>
+                        <Value>X509|module|cert_module|x509_token_token_auth_target_header_key=client_cert</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="deployment-offloaded-two-way-tls-header-key"
+                                 type="single" syntax="string" i18nKey="deployment_offloaded_two_way_tls_header_key">
+                </AttributeSchema>
+                <AttributeSchema name="deployment-tls-offload-engine-hosts"
+                                 type="list" syntax="string" i18nKey="deployment_tls_offload_engine_hosts">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-name-id-format"
+                                 type="single" syntax="string" i18nKey="saml2_name_id_format"
+                                 validator="RequiredValueValidator">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-token-lifetime-seconds"
+                                 type="single" syntax="number" i18nKey="saml2_token_lifetime_seconds">
+                    <DefaultValues>
+                        <Value>600</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="saml2-custom-conditions-provider-class-name"
+                                 type="single" syntax="string" i18nKey="saml2_custom_conditions_provider_class_name">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-custom-subject-provider-class-name"
+                                 type="single" syntax="string" i18nKey="saml2_custom_subject_provider_class_name">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-custom-authentication-statements-provider-class-name"
+                                 type="single" syntax="string" i18nKey="saml2_custom_authentication_statements_provider_class_name">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-custom-attribute-statements-provider-class-name"
+                                 type="single" syntax="string" i18nKey="saml2_custom_attribute_statements_provider_class_name">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-custom-authz-decision-statements-provider-class-name"
+                                 type="single" syntax="string" i18nKey="saml2_custom_authz_decision_statements_provider_class_name">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-custom-attribute-mapper-class-name"
+                                 type="single" syntax="string" i18nKey="saml2_custom_attribute_mapper_class_name">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-custom-authn-context-mapper-class-name"
+                                 type="single" syntax="string" i18nKey="saml2_custom_authn_context_mapper_class_name">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-sign-assertion"
+                                 type="single" syntax="boolean" i18nKey="saml2_sign_assertion">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-sp-entity-id"
+                                 type="single" syntax="string" i18nKey="saml2_sp_entity_id"
+                                 validator="RequiredValueValidator">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-sp-acs-url"
+                                 type="single" syntax="string" i18nKey="saml2_sp_acs_url">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encrypt-attributes"
+                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_attributes">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encrypt-assertion"
+                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_assertion">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encrypt-nameid"
+                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_nameid">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encryption-algorithm"
+                                 type="single_choice" syntax="string" i18nKey="saml2_encryption_algorithm">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_128">http://www.w3.org/2001/04/xmlenc#aes128-cbc</ChoiceValue>
+                        <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_192">http://www.w3.org/2001/04/xmlenc#aes192-cbc</ChoiceValue>
+                        <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_256">http://www.w3.org/2001/04/xmlenc#aes256-cbc</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>http://www.w3.org/2001/04/xmlenc#aes128-cbc</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encryption-algorithm-strength"
+                                 type="single" syntax="number" i18nKey="saml2_encryption_algorithm_strength">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-keystore-filename"
+                                 type="single" syntax="string" i18nKey="saml2_keystore_filename">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-keystore-password"
+                                 type="single" syntax="password" i18nKey="saml2_keystore_password">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encryption-key-alias"
+                                 type="single" syntax="string" i18nKey="saml2_encryption_key_alias">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-signature-key-alias"
+                                 type="single" syntax="string" i18nKey="saml2_signature_key_alias"
+                                 validator="RequiredValueValidator">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-signature-key-password"
+                                 type="single" syntax="password" i18nKey="saml2_signature_key_password">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-attribute-map"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="saml2_attribute_map">
+                </AttributeSchema>
+
+                <!--
+                Appears to be necessary to have multiple rest STS instances per realm, like authN mdoules.
+                -->
+                <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="issuer-name"
+                                     type="single" syntax="string" i18nKey="issuer_name"
+                                     validator="RequiredValueValidator">
+                    </AttributeSchema>
+                    <AttributeSchema name="supported-token-transforms"
+                                     type="list"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="supported_token_transforms">
+                        <DefaultValues>
+                            <Value>USERNAME|SAML2|true</Value>
+                            <Value>OPENIDCONNECT|SAML2|true</Value>
+                            <Value>OPENAM|SAML2|false</Value>
+                            <Value>X509|SAML2|true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="deployment-realm"
+                                     type="single" syntax="string" i18nKey="deployment_realm"
+                                     validator="RequiredValueValidator">
+                    </AttributeSchema>
+                    <AttributeSchema name="deployment-url-element"
+                                     type="single" syntax="string" i18nKey="deployment_url_element"
+                                     validator="RequiredValueValidator">
+                    </AttributeSchema>
+                    <AttributeSchema name="deployment-auth-target-mappings"
+                                     type="list"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="deployment_auth_target_mappings">
+                        <DefaultValues>
+                            <Value>USERNAME|service|ldapService</Value>
+                            <Value>OPENIDCONNECT|module|oidc|oidc_id_token_auth_target_header_key=oidc_id_token</Value>
+                            <Value>X509|module|cert_module|x509_token_token_auth_target_header_key=client_cert</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="deployment-offloaded-two-way-tls-header-key"
+                                     type="single" syntax="string" i18nKey="deployment_offloaded_two_way_tls_header_key">
+                    </AttributeSchema>
+                    <AttributeSchema name="deployment-tls-offload-engine-hosts"
+                                     type="list" syntax="string" i18nKey="deployment_tls_offload_engine_hosts">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-name-id-format"
+                                     type="single" syntax="string" i18nKey="saml2_name_id_format"
+                                     validator="RequiredValueValidator">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-token-lifetime-seconds"
+                                     type="single" syntax="number" i18nKey="saml2_token_lifetime_seconds">
+                        <DefaultValues>
+                            <Value>600</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-custom-conditions-provider-class-name"
+                                     type="single" syntax="string" i18nKey="saml2_custom_conditions_provider_class_name">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-custom-subject-provider-class-name"
+                                     type="single" syntax="string" i18nKey="saml2_custom_subject_provider_class_name">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-custom-authentication-statements-provider-class-name"
+                                     type="single" syntax="string" i18nKey="saml2_custom_authentication_statements_provider_class_name">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-custom-attribute-statements-provider-class-name"
+                                     type="single" syntax="string" i18nKey="saml2_custom_attribute_statements_provider_class_name">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-custom-authz-decision-statements-provider-class-name"
+                                     type="single" syntax="string" i18nKey="saml2_custom_authz_decision_statements_provider_class_name">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-custom-attribute-mapper-class-name"
+                                     type="single" syntax="string" i18nKey="saml2_custom_attribute_mapper_class_name">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-custom-authn-context-mapper-class-name"
+                                     type="single" syntax="string" i18nKey="saml2_custom_authn_context_mapper_class_name">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-sign-assertion"
+                                     type="single" syntax="boolean" i18nKey="saml2_sign_assertion">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-sp-entity-id"
+                                     type="single" syntax="string" i18nKey="saml2_sp_entity_id"
+                                     validator="RequiredValueValidator">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-sp-acs-url"
+                                     type="single" syntax="string" i18nKey="saml2_sp_acs_url">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encrypt-attributes"
+                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_attributes">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encrypt-assertion"
+                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_assertion">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encrypt-nameid"
+                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_nameid">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encryption-algorithm"
+                                     type="single_choice" syntax="string" i18nKey="saml2_encryption_algorithm">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_128">http://www.w3.org/2001/04/xmlenc#aes128-cbc</ChoiceValue>
+                            <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_192">http://www.w3.org/2001/04/xmlenc#aes192-cbc</ChoiceValue>
+                            <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_256">http://www.w3.org/2001/04/xmlenc#aes256-cbc</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>http://www.w3.org/2001/04/xmlenc#aes128-cbc</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encryption-algorithm-strength"
+                                     type="single" syntax="number" i18nKey="saml2_encryption_algorithm_strength">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-keystore-filename"
+                                     type="single" syntax="string" i18nKey="saml2_keystore_filename">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-keystore-password"
+                                     type="single" syntax="password" i18nKey="saml2_keystore_password">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encryption-key-alias"
+                                     type="single" syntax="string" i18nKey="saml2_encryption_key_alias">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-signature-key-alias"
+                                     type="single" syntax="string" i18nKey="saml2_signature_key_alias"
+                                     validator="RequiredValueValidator">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-signature-key-password"
+                                     type="single" syntax="password" i18nKey="saml2_signature_key_password">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-attribute-map"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="saml2_attribute_map">
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

@@ -1,0 +1,26 @@
+
+   <test name="SessionConstraints Global">
+       <parameter name="inheritancelevel" value="Global"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.session.ConfigUnconfig"/>
+            <class name=
+            "com.sun.identity.qatest.session.GlobalRealmSessionConstraints"/>
+        </classes>
+    </test>
+    <test name="SessionConstraints Realm">
+       <parameter name="inheritancelevel" value="Realm"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name=
+            "com.sun.identity.qatest.session.GlobalRealmSessionConstraints"/>
+        </classes>
+    </test>

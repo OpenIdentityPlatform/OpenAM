@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+
+<section xml:id="configure-apps-with-console"
+          xmlns='http://docbook.org/ns/docbook'
+          version='5.0' xml:lang='en' xml:base="../"
+          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+          xmlns:xlink='http://www.w3.org/1999/xlink'
+          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+    <title>Configuring Applications by Using the OpenAM Console</title>
+    <indexterm>
+     <primary>Application</primary>
+     <secondary>Configuring</secondary>
+    </indexterm>
+    <para>This section describes the process of creating applications, which are
+     used as templates for policies protecting a web site or web application,
+     using the OpenAM console.</para>
+
+    <procedure xml:id="create-app-xui">
+
+        <title>To Configure an Application by Using the Policy Editor</title>
+
+        <step>
+            <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
+            Name</replaceable> &gt; Policies.</para>
+            <substeps>
+             <step>
+              <para>To create a new application, click Add New
+                Application.</para>
+             </step>
+             <step>
+              <para>To modify an existing application, in the row
+               containing the application, click the Edit
+               Application icon.</para>
+             </step>
+             <step><para>To discard any changes and return to the previous page,
+              click Cancel.</para></step>
+            </substeps>
+        </step>
+
+        <step>
+            <para>Provide a name for the application, and optionally a
+             description, and then click Next.
+            </para>
+
+            <para>
+             Do not use special characters within policy, application or referral names
+             (for example, "my+referral") using the Policy Editor or REST endpoints as
+             OpenAM returns a 400 Bad Request error.
+             The special characters are: double quotes ("), plus sign (+), comma (,),
+             less than (&lt;), equals (=), greater than (&gt;), backslash (\), and
+             null (\u0000).
+            </para>
+
+        </step>
+     <step>
+     <para>Define resource patterns that policies within this
+      application use as the basis for their rules, by following the steps
+      below:</para>
+     <substeps>
+        <step>
+            <para>In the Available patterns section, click
+             the row containing an asterisk (<literal>*</literal>) to move the
+             pattern to the Create your resources section.</para>
+            <mediaobject xml:id="figure-resource-patterns-step1">
+             <alt>Move available starter patterns to the right of the screen to
+              configure the resource patterns that policies in this
+              application use.</alt>
+             <imageobject>
+              <imagedata
+               fileref="./images/resource-pattern-templates-step1.png"
+                         format="PNG" />
+             </imageobject>
+             <textobject><para>Click the arrow to move the pattern to
+              the right.</para></textobject>
+            </mediaobject>
+        </step>
+
+
+          <step performance="optional">
+            <para>Optionally, in the Create your resources section, replace the
+             asterisk with a pattern that the policies in the application use as
+             a template for specifying resources.</para>
+
+         <mediaobject xml:id="figure-resource-patterns-step2">
+          <alt>Create resource patterns, with optional wildcards,
+           that policies in this application use.</alt>
+          <imageobject>
+           <imagedata
+            fileref="images/resource-pattern-templates-step2.png"
+            format="PNG" />
+          </imageobject>
+          <textobject><para>Enter the resource pattern.</para></textobject>
+         </mediaobject>
+         <para>For information on specifying patterns that the
+          policies use for matching resources, see
+          <link xlink:href="admin-guide#policy-patterns-wildcards"
+                xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink">
+           <citetitle>Specifying Resource Patterns with Wildcards</citetitle></link>.</para>
+      </step>
+      <step>
+
+        <para>Click the Add icon to move the pattern into
+         the Resources section.</para>
+
+         <mediaobject xml:id="figure-resource-patterns-step3">
+          <alt>Add the completed resource template to the Resources section
+           by clicking the Add icon.</alt>
+          <imageobject>
+           <imagedata
+            fileref="images/resource-pattern-templates-step3.png"
+            format="PNG" />
+          </imageobject>
+          <textobject><para>Add the resource pattern to the Resources
+           section.</para></textobject>
+         </mediaobject>
+      </step>
+     </substeps>
+      <tip><para>To remove a resource pattern,
+       click the Delete icon.</para></tip>
+      <para>Repeat these steps to add all the resource patterns your
+            policies may require, and then click Next.</para>
+        </step>
+
+        <step>
+            <para>Review your configuration.</para>
+
+            <tip><para>If the configuration is not visible, click the maximized
+             link to switch to maximized view.</para></tip>
+
+         <para>To make changes to the configuration, either click the step in
+            the list, or click the item to amend in the Review
+           Configuration and Finish section to jump to the relevant
+          step, and make your changes.</para>
+
+            <para>When the configuration is complete,
+             click Finish.</para>
+        </step>
+    </procedure>
+
+  <itemizedlist>
+   <para>
+    To make use of the new application and any policies it contains,
+    you must perform one of the following procedures:
+   </para>
+
+   <listitem>
+    <para>Configure a policy agent to use the application for
+     policy decisions.
+    </para>
+
+    <para>
+     For details see the procedure
+     <link
+      xlink:href="admin-guide#agent-realm-application-for-policy-decisions"
+      xlink:show="new"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>To Specify the Realm and Application for Policy Decisions</citetitle></link>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Create a referral to the realm the application is in.
+    </para>
+
+    <para>
+     For details see the procedure
+     <link
+      xlink:href="admin-guide#create-referral-xui"
+      xlink:show="new"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>To Enable Referrals in the Policy Editor</citetitle></link>.
+    </para>
+   </listitem>
+  </itemizedlist>
+</section>

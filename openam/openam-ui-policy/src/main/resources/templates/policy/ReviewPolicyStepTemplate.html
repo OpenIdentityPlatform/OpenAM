@@ -1,0 +1,123 @@
+<p>{{t "policy.summaryReview.policyDescription"}}</p>
+<p>{{#if advancedMode}}{{t "policy.summaryReview.advancedTrue"}}{{else}}{{t "policy.summaryReview.advancedFalse"}}{{/if}}</p>
+
+{{! The IDs are used for testing }}
+<div class="col2">
+    <div class="review-row clearfix{{#equals '' entity.name}} invalid{{/equals}}{{#if options.invalidName}} invalid{{/if}}" tabindex="0">
+        <h2>{{t "policy.common.name"}}</h2>
+        {{#unless advancedMode}}
+        {{#if entity.name}}
+        <span class="icon-arrow-down2"></span>
+        {{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+
+            <p id="reviewName"{{#unless entity.name}} class="invalid"{{/unless}}>{{#if entity.name}}{{entity.name}}{{else}}{{t "policy.summaryReview.noName"}}{{/if}}</p>
+
+            {{#if entity.description}}
+            <h2>{{t "policy.common.description"}}</h2>
+            <p id="reviewDesc">{{entity.description}}</p>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resources}} invalid{{/unless}}" tabindex="0">
+        <h2>{{t "policy.common.resources"}}</h2>
+        {{#unless advancedMode}}
+        {{#if entity.resources}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if entity.resources}}
+            <ul id="reviewRes">
+                {{#each entity.resources}}<li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>{{/each}}
+            </ul>
+            {{else}}
+            <p class="invalid">{{t "policy.common.noResources"}}</p>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="review-row clearfix" tabindex="0">
+        <h2>{{t "policy.common.actions"}}</h2>
+        {{#unless advancedMode}}
+        {{#if actionsSelected}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if actionsSelected}}
+            <ul id="reviewActions">
+                {{#each entity.actions}}
+                {{#if selected}}
+                <li><span>{{action}}:</span>{{#if value}} {{t "policy.actions.allowed"}} {{else}} {{t "policy.actions.denied"}} {{/if}}</li>
+                {{/if}}
+                {{/each}}
+            </ul>
+            {{else}}
+            <p>{{t "policy.common.noActions"}}</p>
+            {{/if}}
+        </div>
+    </div>
+</div>
+
+<div class="col2">
+    <div class="review-row clearfix" tabindex="0">
+        <h2>{{t "policy.common.subjects"}}</h2>
+        {{#unless advancedMode}}
+        {{#if subjectString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if subjectString}}
+            <pre>{{subjectString}}</pre>
+            {{else}}
+            <p>{{t "policy.summaryReview.noSubjectConditions"}}</p>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="review-row clearfix" tabindex="0">
+        <h2>{{t "policy.common.environments"}}</h2>
+        {{#unless advancedMode}}
+        {{#if environmentString}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            {{#if environmentString}}
+            <pre>{{environmentString}}</pre>
+            {{else}}
+            <p>{{t "policy.summaryReview.noEnvironmentConditions"}}</p>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="review-row clearfix" tabindex="0">
+        <h2 {{#if advancedMode}}id="responseAttributesHeader"{{/if}}>{{t "policy.common.responseAttributes"}}</h2>
+        {{#unless advancedMode}}
+        {{#if responseAttrs}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>{{/if}}
+        {{/unless}}
+        <div class="advanced-mode">
+            <h3>{{t "policy.common.staticAttributes"}}</h3>
+            {{#if combinedStaticAttrs}}
+            <ul>
+                {{#each combinedStaticAttrs}}
+                <li>
+                    <span>{{propertyName}}:</span> {{#each propertyValues}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+                </li>
+                {{/each}}
+            </ul>
+            {{else}}
+            <p>{{t "policy.common.noStaticAttributes"}}</p>
+            {{/if}}
+        </div>
+
+        <div class="advanced-mode">
+            <h3>{{t "policy.common.subjectAttributes"}}</h3>
+            {{#if userAttrs}}
+            <ul>
+                {{#each userAttrs}}
+                <li>{{propertyName}}</li>
+                {{/each}}
+            </ul>
+            {{else}}
+            <p>{{t "policy.common.noSubjectAttributes"}}</p>
+            {{/if}}
+        </div>
+    </div>
+</div>

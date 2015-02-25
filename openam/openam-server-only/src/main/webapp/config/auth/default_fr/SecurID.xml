@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+
+<ModuleProperties moduleName="SecurID" version="1.0" >
+    <Callbacks length="2" order="1" timeout="120" header="Ce serveur utilise l&apos;authentification SecurID." >
+        <NameCallback>
+            <Prompt>Entrez votre ID utilisateur</Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt>Entrez votre mot de passe.</Prompt>
+        </PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="2" timeout="120" header="Nouveau mode de numéro d&apos;identification personnel" >
+	<!-- TextInputCallback not implemented in UI -->
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>Entrez le nouveau message du numéro d&apos;identification personnel</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="3" timeout="120" header="MOT DE PASSE suivant" >
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>Attendez que le code du jeton change et entrez le MOT DE PASSE suivant :</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="4" timeout="120" header="Génération d&apos;un numéro d&apos;identification personnel" >
+	<!-- TextInputCallback not implemented in UI -->
+	<NameCallback>
+	    <Prompt>Toujours remplacé</Prompt>
+	</NameCallback>
+    </Callbacks>
+    <Callbacks length="1" order="5" timeout="120" header="MOT DE PASSE suivant" >
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>Attendez le jeton pour changer le message</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+</ModuleProperties>
+

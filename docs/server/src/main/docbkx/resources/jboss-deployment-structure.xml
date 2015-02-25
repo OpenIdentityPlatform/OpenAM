@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+  <deployment>
+   <exclusions>
+    <module name="sun.jdk" />
+   </exclusions>
+   <exclude-subsystems>
+    <subsystem name="jaxrs" />
+    <subsystem name="webservices" />
+   </exclude-subsystems>
+  <dependencies>
+   <module name="sun.jdk" >
+    <imports>
+     <exclude-set>
+      <path name="com/sun/org/apache/xml/internal/security/transforms/implementations"/>
+     </exclude-set>
+    </imports>
+   </module>
+   <system>
+    <paths>
+     <path name="sun/security/x509" />
+     <path name="com/sun/org/apache/xpath/internal" />
+     <path name="com/sun/org/apache/xerces/internal/dom" />
+     <path name="com/sun/org/apache/xml/internal/utils" />
+    </paths>
+   </system>
+  </dependencies>
+ </deployment>
+</jboss-deployment-structure>

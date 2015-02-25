@@ -1,0 +1,78 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyFSCreateRemoteIdentityProvider.xml,v 1.2 2008/06/25 05:45:09 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="common" defaultValue="entityDescriptor.provider.section.title.commonAttributes" >
+        <property>
+        	<label name="lblDescription" defaultValue="entityDescriptor.provider.attribute.label.description" labelFor="tfDescription" />
+        	<cc name="tfDescription" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+        	    <attribute name="size" value="75" />
+                <attribute name="autoSubmit" value="false" />
+        	</cc>
+        </property>
+        
+        <property>
+        	<label name="lblProtocolSupportEnum" defaultValue="entityDescriptor.provider.attribute.label.protocolSupportEnum" labelFor="txtProtocolSupportEnum" />
+        	<cc name="txtProtocolSupportEnum" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+        	<option label="urn:liberty:iff:2003-08" value="urn:liberty:iff:2003-08" />
+        	<option label="urn:liberty:iff:2002-12" value="urn:liberty:iff:2002-12" />
+        	</cc>
+        </property>
+    </section>
+
+    <section name="communicationURLs" defaultValue="entityDescriptor.provider.section.title.communicationURLs" >
+        <property required="true">
+        	<label name="lblSingleSignOnServiceURL" defaultValue="entityDescriptor.provider.attribute.label.singleSignOnServiceURL" labelFor="tfSingleSignOnServiceURL" />
+        	<cc name="tfSingleSignOnServiceURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            	<attribute name="size" value="75" />
+        	</cc>
+        </property>
+    </section>
+
+    <section name="communicationProfile" defaultValue="entityDescriptor.provider.section.title.communicationProfile" >
+        <property required="true">
+        	<label name="lblFederationProfile" defaultValue="entityDescriptor.provider.attribute.label.federationProfile" labelFor="singleChoiceFederationProfile" />
+        	<cc name="singleChoiceFederationProfile" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
+        	    <option label="entityDescriptor.provider.attribute.option.profile.BrowserPost" value="http://projectliberty.org/profiles/brws-post" />
+        	    <option label="entityDescriptor.provider.attribute.option.profile.BrowserArt" value="http://projectliberty.org/profiles/brws-art" />
+        	    <option label="entityDescriptor.provider.attribute.option.profile.LECP" value="http://projectliberty.org/profiles/lecp" />
+        	</cc>
+        	<fieldhelp name="helpFederationProfile" defaultValue="entityDescriptor.provider.attribute.help.federationProfile" />
+        </property>
+    </section>
+
+    <section name="authenticationDomains" defaultValue="entityDescriptor.provider.section.title.authenticationDomains" >
+        <property span="true">
+        	<cc name="arlistAuthenticationDomains" tagclass="com.sun.web.ui.taglib.addremove.CCAddRemoveTag" />
+        	<fieldhelp name="helpAuthenticationDomains" defaultValue="entityDescriptor.provider.attribute.help.authenticationDomains" />
+        </property>
+    </section>
+
+</propertysheet>

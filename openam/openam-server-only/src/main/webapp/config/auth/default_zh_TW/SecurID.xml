@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+
+<ModuleProperties moduleName="SecurID" version="1.0" >
+    <Callbacks length="2" order="1" timeout="120" header="此伺服器使用 SecurID 認證" >
+        <NameCallback>
+            <Prompt>輸入您的 UserId</Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt>輸入您的密碼</Prompt>
+        </PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="2" timeout="120" header="新 PIN 模式" >
+	<!-- TextInputCallback not implemented in UI -->
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>輸入新的 PIN 訊息</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="3" timeout="120" header="下一個密碼" >
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>等待變更記號代碼，然後輸入下一個密碼:</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+    <Callbacks length="1" order="4" timeout="120" header="產生新 PIN" >
+	<!-- TextInputCallback not implemented in UI -->
+	<NameCallback>
+	    <Prompt>總是替代</Prompt>
+	</NameCallback>
+    </Callbacks>
+    <Callbacks length="1" order="5" timeout="120" header="下一個密碼" >
+	<PasswordCallback echoPassword="false" >
+	    <Prompt>等待記號變更訊息</Prompt>
+	</PasswordCallback>
+    </Callbacks>
+</ModuleProperties>
+

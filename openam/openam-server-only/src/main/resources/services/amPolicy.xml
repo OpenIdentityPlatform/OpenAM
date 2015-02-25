@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: amPolicy.xml,v 1.10 2009/08/19 05:40:40 veiming Exp $
+
+-->
+<!-- Portions Copyrighted 2014 ForgeRock, AS. -->
+
+
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMPolicyService" version="1.0">
+        <Schema
+                i18nFileName="amPolicy"
+                revisionNumber="60"
+                i18nKey="iplanet-policy-service-name">
+
+            <Organization>
+                <SubSchema name="Policies" inheritance="multiple">
+                    <SubSchema name="NamedPolicy"
+                               inheritance="multiple">
+                        <AttributeSchema
+                                name="xmlpolicy"
+                                type="single"
+                                syntax="xml"/>
+                    </SubSchema>
+                </SubSchema>
+
+                <SubSchema name="Resources" inheritance="multiple">
+                    <SubSchema name="ServiceType"
+                               inheritance="multiple">
+                        <AttributeSchema
+                                name="xmlresources"
+                                type="single"
+                                syntax="xml"/>
+                        <AttributeSchema
+                                name="resourceprefixes"
+                                type="list"
+                                syntax="xml"/>
+                    </SubSchema>
+                </SubSchema>
+
+                <SubSchema name="RealmSubjects">
+                    <AttributeSchema
+                            name="xmlRealmSubjects"
+                            type="single"
+                            syntax="xml"/>
+                </SubSchema>
+
+            </Organization>
+
+            <PluginInterface
+                    name="ResourceName"
+                    interface="com.sun.identity.policy.interfaces.ResourceName"
+                    i18nKey="iplanet-policy-resource-interface-name"/>
+            <PluginInterface
+                    name="Referral"
+                    interface="com.sun.identity.policy.interfaces.Referral"
+                    i18nKey="iplanet-policy-referral-interface-name"/>
+            <PluginInterface
+                    name="Subject"
+                    interface="com.sun.identity.policy.interfaces.Subject"
+                    i18nKey="iplanet-policy-subject-interface-name"/>
+            <PluginInterface
+                    name="Condition"
+                    interface="com.sun.identity.policy.interfaces.Condition"
+                    i18nKey="iplanet-policy-condition-interface-name"/>
+            <PluginInterface
+                    name="ResponseProvider"
+                    interface="com.sun.identity.policy.interfaces.ResponseProvider"
+                    i18nKey="iplanet-policy-responseprovider-name"/>
+        </Schema>
+
+        <PluginSchema
+                name="PeerOrgReferral"
+                interfaceName="Referral"
+                className="com.sun.identity.policy.plugins.PeerOrgReferral"
+                i18nKey="iplanet-peerorg-referral"/>
+        <PluginSchema
+                name="SubOrgReferral"
+                interfaceName="Referral"
+                className="com.sun.identity.policy.plugins.SubOrgReferral"
+                i18nKey="iplanet-suborg-referral"/>
+
+        <PluginSchema
+                name="Organization"
+                interfaceName="Subject"
+                className="com.sun.identity.policy.plugins.Organization"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-subject-Org-name"
+                propertiesViewBeanURL="../policy/PMLDAPOrgSubject"/>
+        <PluginSchema
+                name="IdentityServerRoles"
+                interfaceName="Subject"
+                className="com.sun.identity.policy.plugins.DSAMERole"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-subject-IdentityServerRoles-name"
+                propertiesViewBeanURL="../policy/PMDSAMERoleSubject"/>
+        <PluginSchema
+                name="LDAPGroups"
+                interfaceName="Subject"
+                className="com.sun.identity.policy.plugins.LDAPGroups"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-subject-LDAPGroups-name"
+                propertiesViewBeanURL="../policy/PMLDAPGroupSubject"/>
+        <PluginSchema
+                name="LDAPRoles"
+                interfaceName="Subject"
+                className="com.sun.identity.policy.plugins.LDAPRoles"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-subject-LDAPRoles-name"
+                propertiesViewBeanURL="../policy/PMLDAPRoleSubject"/>
+        <PluginSchema
+                name="LDAPUsers"
+                interfaceName="Subject"
+                className="com.sun.identity.policy.plugins.LDAPUsers"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-subject-LDAPUsers-name"
+                propertiesViewBeanURL="../policy/PMLDAPUserSubject"/>
+        <PluginSchema
+                name="AuthenticatedUsers"
+                interfaceName="Subject"
+                className="com.sun.identity.policy.plugins.AuthenticatedUsers"
+                i18nFileName="amPolicy"
+                i18nKey="SunIdentityServer-subject-AuthenticatedUsers-name"
+                propertiesViewBeanURL="../policy/PMAuthenticatedUsersSubject"/>
+        <PluginSchema
+                name="AMIdentitySubject"
+                interfaceName="Subject"
+                className="com.sun.identity.policy.plugins.AMIdentitySubject"
+                i18nFileName="amPolicy"
+                i18nKey="SunIdentityServer-subject-AMIdentitySubject-name"
+                propertiesViewBeanURL="../policy/IdentitySubject"/>
+        <PluginSchema
+                name="PrivilegeSubject"
+                interfaceName="Subject"
+                className="com.sun.identity.policy.plugins.PrivilegeSubject"
+                i18nFileName="amPolicy"
+                i18nKey="SunIdentityServer-subject-PrivilegeSubject-name"/>
+        <PluginSchema
+                name="AuthRoleCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.AuthRoleCondition"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-authrole-condition-name"/>
+        <PluginSchema
+                name="AuthLevelCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.AuthLevelCondition"
+                propertiesViewBeanURL="../policy/PMDefaultAuthLevelCondition"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-authlevel-condition-name"/>
+        <PluginSchema
+                name="LEAuthLevelCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.LEAuthLevelCondition"
+                propertiesViewBeanURL="../policy/PMDefaultAuthLevelCondition"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-leauthlevel-condition-name"/>
+        <PluginSchema
+                name="AuthSchemeCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.AuthSchemeCondition"
+                propertiesViewBeanURL="../policy/PMDefaultAuthSchemeCondition"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-authscheme-condition-name"/>
+        <PluginSchema
+                name="IPCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.IPCondition"
+                propertiesViewBeanURL="../policy/PMDefaultIPCondition"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-ip-condition-name"/>
+        <PluginSchema
+                name="SimpleTimeCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.SimpleTimeCondition"
+                propertiesViewBeanURL="../policy/PMDefaultTimeCondition"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-time-condition-name"/>
+        <PluginSchema
+                name="SessionCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.SessionCondition"
+                propertiesViewBeanURL="../policy/PMDefaultSessionCondition"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-session-condition-name"/>
+        <PluginSchema
+                name="UserSelfCheckCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.UserSelfCheckCondition"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-userselfcheck-condition-name"/>
+        <PluginSchema
+                name="AuthenticatedSharedAgentsCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.AuthenticatedSharedAgentsCondition"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-sharedagents-condition-name"/>
+        <PluginSchema
+                name="SessionPropertyCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.SessionPropertyCondition"
+                propertiesViewBeanURL="../policy/SessionPropertyCondition"
+                i18nFileName="amPolicy"
+                i18nKey="sun-sessionproperty-condition-name"/>
+        <PluginSchema
+                name="AuthenticateToRealmCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.AuthenticateToRealmCondition"
+                propertiesViewBeanURL="../policy/AuthToRealm"
+                i18nFileName="amPolicy"
+                i18nKey="sun-authenticatetorealm-condition-name"/>
+        <PluginSchema
+                name="AuthenticateToServiceCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.AuthenticateToServiceCondition"
+                propertiesViewBeanURL="../policy/AuthToService"
+                i18nFileName="amPolicy"
+                i18nKey="sun-authenticatetoservice-condition-name"/>
+        <PluginSchema
+                name="LDAPFilterCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.LDAPFilterCondition"
+                i18nFileName="amPolicy"
+                i18nKey="sun-ldapfilter-condition-name"/>
+        <PluginSchema
+                name="PrivilegeCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.PrivilegeCondition"
+                i18nFileName="amPolicy"
+                i18nKey="sun-privilege-condition-name"/>
+        <PluginSchema
+                name="AMIdentityMembershipCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.AMIdentityMembershipCondition"
+                i18nFileName="amPolicy"
+                i18nKey="sun-amidentitymembership-condition-name"
+                propertiesViewBeanURL="../policy/IdentityMembershipCondition"/>
+        <PluginSchema
+                name="ResourceEnvIPCondition"
+                interfaceName="Condition"
+                className="com.sun.identity.policy.plugins.ResourceEnvIPCondition"
+                i18nFileName="amPolicy"
+                i18nKey="sun-resourceenvip-condition-name"/>
+        <PluginSchema
+                name="IDRepoResponseProvider"
+                interfaceName="ResponseProvider"
+                className="com.sun.identity.policy.plugins.IDRepoResponseProvider"
+                propertiesViewBeanURL="../policy/IDRepoResponseProvider"
+                i18nFileName="amPolicy"
+                i18nKey="iplanet-idrepo-responseprovider-name"/>
+        <PluginSchema
+                name="AuthenticatedAgents"
+                interfaceName="Subject"
+                className="com.sun.identity.policy.plugins.AuthenticatedAgents"
+                i18nFileName="amPolicy"/>
+        <PluginSchema
+                name="AuthenticatedSharedAgents"
+                interfaceName="Subject"
+                className="com.sun.identity.policy.plugins.AuthenticatedSharedAgents"
+                i18nFileName="amPolicy"
+                i18nKey="SunIdentityServer-subject-AuthenticatedSharedAgents-name"
+                propertiesViewBeanURL="../policy/PMAuthenticatedSharedAgentsSubject"/>
+        <PluginSchema name="WebServicesClients"
+                      interfaceName="Subject"
+                      className="com.sun.identity.policy.plugins.WebServicesClients"
+                      i18nFileName="amPolicy"
+                      i18nKey="SunIdentityServer-subject-WebServicesClients-name"/>
+
+    </Service>
+</ServicesConfiguration>

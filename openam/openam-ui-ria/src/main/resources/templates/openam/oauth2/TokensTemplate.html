@@ -1,0 +1,27 @@
+<div id="oAuthTokens">
+    {{#if tokens}}
+    <h2 class="header">{{t "templates.oauth.tokenList"}}</h2>
+    <div class="content-bg">
+        
+        <table id="oAuthTokensTable">
+
+            <tr>
+                <th id="oAuthTokensAppName"     scope="col">{{t "openam.oAuth2.tokens.appName"}}</th>
+                <th id="oAuthTokensScope"       scope="col">{{t "openam.oAuth2.tokens.scope"}}</th>
+                <th id="oAuthTokensExpiryDate"  scope="col">{{t "openam.oAuth2.tokens.expiryDate"}}</th>
+                <th id="oAuthTokensDeleteBtn"   scope="col"></th>
+            </tr>
+
+            {{#each tokens}}
+            <tr id="oAuthToken_{{@index}}">
+                <td>{{this.display_name}} </td>
+                <td>{{this.scopes}} </td>
+                <td>{{this.expireTime}} </td>
+                <td><a class="deleteToken" href="#" id="{{this.id}}">{{t "openam.oAuth2.tokens.deleteToken"}}</a></td>
+            </tr>
+            {{/each}}
+
+        </table>
+    </div>
+    {{/if}}
+</div>

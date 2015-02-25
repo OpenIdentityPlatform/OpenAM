@@ -1,0 +1,1718 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<chapter xml:id="chap-cts-oids"
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+ http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Core Token Service (CTS) Object Identifiers</title>
+  <indexterm>
+   <primary>Core Token Service</primary>
+  </indexterm>
+
+ <!-- Editing note: due to the length of descriptions, the build for
+some of these tables wraps to the next line. It's more pronounced in the PDF.
+I don't think it's a big deal, but am not sure. -->
+
+  <para>The OIDs related to SNMP monitoring of CTS follow guidance described in
+   <link xlink:show="new"
+    xlink:href="http://tools.ietf.org/html/rfc1271">RFC 1271</link>.</para>
+
+  <para>The OIDs in the following tables include the prefix assigned to
+   ForgeRock, <literal>enterprises.36733</literal>. It also includes the
+   entries associated with OpenAM (1), SNMP (2), and CTS monitoring (3):
+   <literal>1.2.3</literal>.</para>
+
+  <para>
+   So the root OID for all CTS monitored components is:
+   <literal>enterprises.36733.1.2.3</literal>. All individual
+   monitored CTS components are suffixes which are consistent with
+   the image shown here.
+  </para>
+ <mediaobject xml:id="cts-oid-big-diagram">
+  <alt>
+   Diagram of CTS OIDs
+  </alt>
+  <imageobject>
+   <imagedata fileref="images/cts-top-diagram.png" format="PNG" />
+  </imageobject>
+  <textobject>
+   <para>A visual diagram of OIDs related to the Core Token Service.</para>
+  </textobject>
+ </mediaobject>
+
+
+ <para>
+   A number of CTS OIDs specify some "in period" time. By default, that period
+   is 10 seconds. Four related measures of tokens are included:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     <literal>Cumulative</literal>: Number of tokens since OpenAM started.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <literal>Maximum (in period)</literal>: Average number of tokens, per
+     second, in the given period of time.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <literal>Minimum (in period)</literal>: Minimum number of tokens in the
+     given period of time.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <literal>Maximum (in period)</literal>: Maximum number of tokens in the
+     given period of time.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   Different OIDs are also available, based on token type (Session, SAML 2,
+   OAuth 2.0, and REST), as well as CRUD (and List) functionality.
+  </para>
+
+  <para>
+   For example, if you wanted to find the OID associated with the average
+   number of SAML2 tokens created "in period", read the table associated
+   with <link xlink:href="reference#cts-token-table-oid-saml2"
+   xlink:role="http://docbook.org/xlink/role/olink">
+   <citetitle>CTS CRUD Operations for SAML2 Tokens</citetitle></link>. The
+   applicable OID is <literal>enterprises.36733.1.2.3.4.1.2.2.1</literal>.
+  </para>
+
+  <note>
+   <para>
+    In the following tables, "operations" has been shortened to "ops".
+   </para>
+  </note>
+
+
+  <section xml:id="oid-token-types">
+   <title>CTS Token Type OIDs</title>
+
+   <para>The table below shows how OIDs are split into four different
+    token types. Do not forget the prefix. For example, the complete OID
+    for monitoring SAML2 tokens is
+    <literal>enterprises.36733.1.2.3.1.1.2</literal></para>
+
+   <para>
+    The options for the token table are shown in the following table.
+    For example, the token table OID for SAML 2 is based on
+    the entries associated with ForgeRock, <literal>enterprises.36733</literal>,
+    OpenAM <literal>1</literal>, SNMP <literal>2</literal>, CTS Monitoring
+    <literal>3</literal>, token table <literal>1</literal>, entry
+    <literal>1</literal>, and SAML 2 <literal>2</literal>, which is
+    <literal>enterprises.36733.1.2.3.1.1.2</literal>.
+   </para>
+
+   <table xml:id="cts-monitoring-oid-token-types">
+    <title>CTS Monitoring OID Categories</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="1*"/>
+
+     <thead>
+      <row>
+       <entry>OID, By Token Type</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.1.1.1</entry>
+       <entry>Session</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.1.1.2</entry>
+       <entry>SAML2</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.1.1.3</entry>
+       <entry>OAuth 2.0</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.1.1.4</entry>
+       <entry>REST</entry>
+      </row>
+     </tbody>
+
+    </tgroup>
+
+   </table>
+  </section>
+
+  <section xml:id="cts-monitoring-oid-operation-type">
+   <title>CTS Monitoring Operation Types</title>
+
+   <para>
+    OIDs related to CTS monitoring operations are based on basic CRUD
+    operations (plus list).
+   </para>
+
+   <para>
+    The options for the operation table are shown in the following table.
+   </para>
+
+   <table xml:id="cts-monitoring-oid-op-type">
+    <title>CTS Monitoring Operation Types</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="1*"/>
+
+     <thead>
+      <row>
+       <entry>OID, by Operation</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.2.1.1</entry>
+       <entry>Create</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.2.1.2</entry>
+       <entry>Read</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.2.1.3</entry>
+       <entry>Update</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.2.1.4</entry>
+       <entry>Delete</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.2.1.5</entry>
+       <entry>List</entry>
+      </row>
+     </tbody>
+
+    </tgroup>
+   </table>
+
+  </section>
+
+  <section xml:id="cts-monitoring-oid-operation-count">
+   <title>CTS CRUD Operation Entries</title>
+
+   <para>
+    The OIDs in this table relate to all CRUD (and list) operations.
+   </para>
+
+   <para>
+    The options for the CRUD operations table are shown in the following tables.
+    Each value from <literal>cumulativeCount</literal> to
+    <literal>failureMinimum</literal> is associated with CRUD and List
+    operations.
+   </para>
+
+   <table xml:id="cts-monitoring-oid-ops-entries">
+    <title>CTS CRUD Operation Entries</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="1*"/>
+
+     <thead>
+      <row>
+       <entry>OID, by Operation Entry</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.1</entry>
+       <entry>Cumulative count</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.2</entry>
+       <entry>Average (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.3</entry>
+       <entry>Minimum (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.4</entry>
+       <entry>Maximum (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.5</entry>
+       <entry>Cumulative failure count</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.6</entry>
+       <entry>Average failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.7</entry>
+       <entry>Minimum failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.8</entry>
+       <entry>Maximum failures (in period)</entry>
+      </row>
+     </tbody>
+
+    </tgroup>
+
+   </table>
+
+   <para>Each of the options in this table can be divided into
+    CRUD and list related operations. The suffix OID for such
+    operations is as follows:</para>
+
+   <itemizedlist>
+    <listitem>
+     <para>1: Create</para>
+    </listitem>
+    <listitem>
+     <para>2: Read</para>
+    </listitem>
+    <listitem>
+     <para>3: Update</para>
+    </listitem>
+    <listitem>
+     <para>4: Delete</para>
+    </listitem>
+    <listitem>
+     <para>5: List</para>
+    </listitem>
+   </itemizedlist>
+
+   <para>For example, since the OID for
+    cumulative count is <literal>enterprises.36733.1.2.3.3.1.1</literal>,
+    the OID for the cumulative count of delete operations is
+    <literal>enterprises.36733.1.2.3.3.1.1.4</literal></para>
+
+    <table xml:id="cts-monitoring-oid-ops-cumulative" pgwide="1">
+     <title>CTS CRUD Operation Table Cumulative Ops</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Cumulative Count Ops OID</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.3.1.1.1</entry>
+        <entry>Cumulative count of CREATE ops</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.3.1.1.2</entry>
+        <entry>Cumulative count of READ ops</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.3.1.1.3</entry>
+        <entry>Cumulative count of UPDATE ops</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.3.1.1.4</entry>
+        <entry>Cumulative count of DELETE ops</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.3.1.1.5</entry>
+        <entry>Cumulative count of LIST ops</entry>
+       </row>
+
+      </tbody>
+     </tgroup>
+    </table>
+
+   <table xml:id="cts-monitoring-oid-ops-average" pgwide="1">
+    <title>CTS CRUD Operation Table Average Ops (In Period)</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Average Number Ops OID</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.2.1</entry>
+       <entry>Average number of CREATE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.2.2</entry>
+       <entry>Average number of READ ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.2.3</entry>
+       <entry>Average number of UPDATE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.2.4</entry>
+       <entry>Average number of DELETE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.2.5</entry>
+       <entry>Average number of LIST ops (in period)</entry>
+      </row>
+
+     </tbody>
+    </tgroup>
+   </table>
+
+   <table xml:id="cts-monitoring-oid-ops-min" pgwide="1">
+    <title>CTS CRUD Operation Table Minimum Ops (In Period)</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Minimum Number Ops OID</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.3.1</entry>
+       <entry>Minimum number of CREATE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.3.2</entry>
+       <entry>Minimum number of READ ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.3.3</entry>
+       <entry>Minimum number of UPDATE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.3.4</entry>
+       <entry>Minimum number of DELETE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.3.5</entry>
+       <entry>Minimum number of LIST ops (in period)</entry>
+      </row>
+
+     </tbody>
+    </tgroup>
+   </table>
+
+   <table xml:id="cts-monitoring-oid-ops-max" pgwide="1">
+    <title>CTS CRUD Operation Table Maximum Ops (In Period)</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Maximum Number Ops OID</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.4.1</entry>
+       <entry>Maximum number of CREATE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.4.2</entry>
+       <entry>Maximum number of READ ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.4.3</entry>
+       <entry>Maximum number of UPDATE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.4.4</entry>
+       <entry>Maximum number of DELETE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.4.5</entry>
+       <entry>Maximum number of LIST ops (in period)</entry>
+      </row>
+
+     </tbody>
+    </tgroup>
+   </table>
+
+   <table xml:id="cts-monitoring-oid-ops-cumu-fail" pgwide="1">
+    <title>CTS CRUD Operation Table Cumulative Failure Ops</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Cumulative Failure Ops OID</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.5.1</entry>
+       <entry>Cumulative Failure of CREATE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.5.2</entry>
+       <entry>Cumulative Failure of READ ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.5.3</entry>
+       <entry>Cumulative Failure of UPDATE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.5.4</entry>
+       <entry>Cumulative Failure of DELETE ops (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.5.5</entry>
+       <entry>Cumulative Failure of LIST ops (in period)</entry>
+      </row>
+
+     </tbody>
+    </tgroup>
+   </table>
+
+   <table xml:id="cts-monitoring-oid-ops-avg-fail" pgwide="1">
+    <title>CTS CRUD Operation Table Average Failure Ops in Period</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Average Number, Failure Ops OID</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.6.1</entry>
+       <entry>Average number of CREATE ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.6.2</entry>
+       <entry>Average number of READ ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.6.3</entry>
+       <entry>Average number of UPDATE ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.6.4</entry>
+       <entry>Average number of DELETE ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.6.5</entry>
+       <entry>Average number of LIST ops failures (in period)</entry>
+      </row>
+
+     </tbody>
+    </tgroup>
+   </table>
+
+   <table xml:id="cts-monitoring-oid-ops-min-fail" pgwide="1">
+    <title>CTS CRUD Operation Table Minimum Ops Failures in Period</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Minimum Number, Ops Failures OID</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.7.1</entry>
+       <entry>Minimum number of CREATE ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.7.2</entry>
+       <entry>Minimum number of READ ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.7.3</entry>
+       <entry>Minimum number of UPDATE ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.7.4</entry>
+       <entry>Minimum number of DELETE ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.7.5</entry>
+       <entry>Minimum number of LIST ops failures (in period)</entry>
+      </row>
+
+     </tbody>
+    </tgroup>
+   </table>
+
+   <table xml:id="cts-monitoring-oid-ops-max-fail" pgwide="1">
+    <title>CTS CRUD Operation Table Maximum Ops Failures in Period</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Maximum Number, Ops Failures OID</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.8.1</entry>
+       <entry>Maximum number of CREATE ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.8.2</entry>
+       <entry>Maximum number of READ ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.8.3</entry>
+       <entry>Maximum number of UPDATE ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.8.4</entry>
+       <entry>Maximum number of DELETE ops failures (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.3.1.8.5</entry>
+       <entry>Maximum number of LIST ops failures (in period)</entry>
+      </row>
+
+     </tbody>
+    </tgroup>
+   </table>
+
+
+  </section>
+
+  <section xml:id="cts-monitoring-oid-operation-token-type">
+   <title>CTS CRUD Operations Per Token Type</title>
+
+   <para>OIDs that start with <literal>enterprises.36733.1.2.3.4.1</literal>
+   are labels for CTS CRUD operations per token type. To review, four token
+   types are configured for CTS: Session, SAML2, OAuth 2, and REST.</para>
+
+   <para>Tokens of each type can be CREATED, READ, UPDATED, DELETED, and LISTED.
+   Each of these types can be measured cumulatively. They can also be
+   measured over a period of time (default=10 seconds), as an average, minimum, and
+   maximum.</para>
+
+   <para>
+    The options for CRUD operations, by token type, are shown in the following
+    tables. Each entry between <literal>cumulativeCount</literal>,
+    and <literal>minimum</literal> is associated with the four basic token
+    types: <literal>Session</literal>, <literal>SAML 2</literal>,
+    <literal>OAuth2</literal>, and <literal>REST</literal>. Each token type
+    is used in CRUD and List operations. So the following tables describe 80
+    different OIDs.
+   </para>
+
+   <para>For tokens in this section, the following table specifies the base OIDs
+   for various values. The token type (Session, SAML2, OAuth 2, REST), followed
+   by the CRUD / List value, is added on as the OID suffix.</para>
+
+   <table xml:id="cts-token-table-oid-counts" pgwide="1">
+    <title>CTS CRUD Operations Per Token Type</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Ops Per Token Type, Counts</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.4.1.1</entry>
+       <entry>CRUD Ops, Token Type, Cumulative</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.4.1.2</entry>
+       <entry>CRUD Ops, Token Type, Average (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.4.1.3</entry>
+       <entry>CRUD Ops, Token Type, Minimum (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.4.1.4</entry>
+       <entry>CRUD Ops, Token Type, Maximum (in period)</entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+
+   <para>The following sections include tables with subset OIDs. They
+    relate to Session, SAML2, OAuth 2, and REST tokens that are
+    created, read, updated, and deleted.</para>
+
+   <section xml:id="cts-token-table-oid-session">
+    <title>CTS CRUD Operations For Session Tokens</title>
+
+    <para>
+     The four tables in this section relate to CTS CRUD operations
+     on Session tokens. Each CRUD operation can be measured as before, with
+     a cumulative count, an average, as well as a minimum and a maximum
+     number.
+    </para>
+
+    <table xml:id="cts-token-session-oid-count-create" pgwide="1">
+     <title>CTS CRUD Create Operations, Session Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Created Session Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.1.1</entry>
+        <entry>Cumulative count of created session tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.1.1</entry>
+        <entry>Average created session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.1.1</entry>
+        <entry>Minimum created session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.1.1</entry>
+        <entry>Maximum created session tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>The following table specifies OIDs for session tokens that
+    are read.</para>
+
+    <table xml:id="cts-token-session-oid-count-read" pgwide="1">
+     <title>CTS CRUD Read Operations, Session Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Read Session Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.1.2</entry>
+        <entry>Cumulative count of read session tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.1.2</entry>
+        <entry>Average read session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.1.2</entry>
+        <entry>Minimum read session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.1.2</entry>
+        <entry>Maximum read session tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>The following table specifies OIDs for session tokens that
+     are updated.</para>
+
+    <table xml:id="cts-token-session-oid-count-update" pgwide="1">
+     <title>CTS CRUD Update Operations, Session Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Updated Session Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.1.3</entry>
+        <entry>Cumulative count of updated session tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.1.3</entry>
+        <entry>Average updated session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.1.3</entry>
+        <entry>Minimum updated session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.1.3</entry>
+        <entry>Maximum updated session tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>The following table specifies OIDs for session tokens that
+     are deleted.</para>
+
+    <table xml:id="cts-token-session-oid-count-delete" pgwide="1">
+     <title>CTS CRUD Delete Operations, Session Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Deleted Session Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.1.4</entry>
+        <entry>Cumulative count of deleted session tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.1.4</entry>
+        <entry>Average deleted session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.1.4</entry>
+        <entry>Minimum deleted session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.1.4</entry>
+        <entry>Maximum deleted session tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>The following table specifies OIDs for session tokens that
+     are listed.</para>
+
+    <table xml:id="cts-token-session-oid-count-list" pgwide="1">
+     <title>CTS CRUD List Operations, Session Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Listed Session Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.1.5</entry>
+        <entry>Cumulative count of listed session tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.1.5</entry>
+        <entry>Average listed session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.1.5</entry>
+        <entry>Minimum listed session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.1.5</entry>
+        <entry>Maximum listed session tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section xml:id="cts-token-table-oid-saml2">
+    <title>CTS CRUD Operations For SAML2 Tokens</title>
+
+    <para>
+     The four tables in this section relate to CTS CRUD operations
+     on SAML2 tokens. Each CRUD operation can be measured as before, with
+     a cumulative count, an average, as well as a minimum and a maximum
+     number.
+    </para>
+
+    <table xml:id="cts-token-saml2-oid-count-create" pgwide="1">
+     <title>CTS CRUD Create Operations, SAML2 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Created SAML2 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.2.1</entry>
+        <entry>Cumulative count of created SAML2 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.2.1</entry>
+        <entry>Average created SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.2.1</entry>
+        <entry>Minimum created SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.2.1</entry>
+        <entry>Maximum created SAML2 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>OIDs are also assigned for SAML2 tokens that
+     are read.</para>
+
+    <table xml:id="cts-token-saml2-oid-count-read" pgwide="1">
+     <title>CTS CRUD Read Operations, SAML2 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Read SAML2 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.2.2</entry>
+        <entry>Cumulative count of read SAML2 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.2.2</entry>
+        <entry>Average read SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.2.2</entry>
+        <entry>Minimum read SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.2.2</entry>
+        <entry>Maximum read SAML2 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>The following table specifies OIDs for SAML2 tokens that
+     are updated.</para>
+
+    <table xml:id="cts-token-saml2-oid-count-update" pgwide="1">
+     <title>CTS CRUD Update Operations, SAML2 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Updated SAML2 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.2.3</entry>
+        <entry>Cumulative count of updated SAML2 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.2.3</entry>
+        <entry>Average updated SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.2.3</entry>
+        <entry>Minimum updated SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.2.3</entry>
+        <entry>Maximum updated SAML2 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>OIDs are also assigned for SAML2 tokens that
+     are deleted.</para>
+
+    <table xml:id="cts-token-saml2-oid-count-delete" pgwide="1">
+     <title>CTS CRUD Delete Operations, SAML2 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Deleted SAML2 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.2.4</entry>
+        <entry>Cumulative count of deleted SAML2 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.2.4</entry>
+        <entry>Average deleted SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.2.4</entry>
+        <entry>Minimum deleted SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.2.4</entry>
+        <entry>Maximum deleted SAML2 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>OIDs are also assigned for SAML2 tokens that
+     are listed.</para>
+
+    <table xml:id="cts-token-saml2-oid-count-list" pgwide="1">
+     <title>CTS CRUD Delete Operations, SAML2 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Listed SAML2 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.2.5</entry>
+        <entry>Cumulative count of listed SAML2 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.2.5</entry>
+        <entry>Average listed SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.2.5</entry>
+        <entry>Minimum listed SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.2.5</entry>
+        <entry>Maximum listed SAML2 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section xml:id="cts-token-table-oid-oauth2">
+    <title>CTS CRUD Operations For OAuth 2.0 Tokens</title>
+
+    <para>
+     The four tables in this section relate to CTS CRUD operations
+     on OAuth 2.0 tokens. Each CRUD operation can be measured as before, with
+     a cumulative count, an average, as well as a minimum and a maximum
+     number.
+    </para>
+
+    <table xml:id="cts-token-oauth2-oid-count-create" pgwide="1">
+     <title>CTS CRUD Create Operations, OAuth 2.0 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Created OAuth 2.0 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.3.1</entry>
+        <entry>Cumulative count of created OAuth 2.0 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.3.1</entry>
+        <entry>Average created OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.3.1</entry>
+        <entry>Minimum created OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.3.1</entry>
+        <entry>Maximum created OAuth 2.0 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>OIDs are also assigned for OAuth 2.0 tokens that
+     are read.</para>
+
+    <table xml:id="cts-token-oauth2-oid-count-read" pgwide="1">
+     <title>CTS CRUD Read Operations, OAuth 2.0 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Read OAuth 2.0 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.3.2</entry>
+        <entry>Cumulative count of read OAuth 2.0 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.3.2</entry>
+        <entry>Average read OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.3.2</entry>
+        <entry>Minimum read OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.3.2</entry>
+        <entry>Maximum read OAuth 2.0 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>The following table specifies OIDs for OAuth 2.0 tokens that
+     are updated.</para>
+
+    <table xml:id="cts-token-oauth2-oid-count-update" pgwide="1">
+     <title>CTS CRUD Update Operations, OAuth 2.0 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Updated OAuth 2.0 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.3.3</entry>
+        <entry>Cumulative count of updated OAuth 2.0 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.3.3</entry>
+        <entry>Average updated OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.3.3</entry>
+        <entry>Minimum updated OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.3.3</entry>
+        <entry>Maximum updated OAuth 2.0 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>OIDs are also assigned for OAuth 2.0 tokens that
+     are deleted.</para>
+
+    <table xml:id="cts-token-oauth2-oid-count-delete" pgwide="1">
+     <title>CTS CRUD Delete Operations, OAuth 2.0 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Deleted OAuth 2.0 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.3.4</entry>
+        <entry>Cumulative count of deleted OAuth 2.0 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.3.4</entry>
+        <entry>Average deleted OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.3.4</entry>
+        <entry>Minimum deleted OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.3.4</entry>
+        <entry>Maximum deleted OAuth 2.0 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>OIDs are also assigned for OAuth 2.0 tokens that
+     are listed.</para>
+
+    <table xml:id="cts-token-oauth2-oid-count-list" pgwide="1">
+     <title>CTS CRUD List Operations, OAuth 2.0 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Listed OAuth 2.0 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.3.5</entry>
+        <entry>Cumulative count of listed OAuth 2.0 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.3.5</entry>
+        <entry>Average listed OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.3.5</entry>
+        <entry>Minimum listed OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.3.5</entry>
+        <entry>Maximum listed OAuth 2.0 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section xml:id="cts-token-table-oid-rest">
+    <title>CTS CRUD Operations For REST Tokens</title>
+
+    <para>
+     The four tables in this section relate to CTS CRUD operations
+     on REST tokens. Each CRUD operation can be measured as before, with
+     a cumulative count, an average, as well as a minimum and a maximum
+     number.
+    </para>
+
+    <table xml:id="cts-token-rest-oid-count-create" pgwide="1">
+     <title>CTS CRUD Create Operations, REST Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Created REST Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.4.1</entry>
+        <entry>Cumulative count of created REST tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.4.1</entry>
+        <entry>Average created REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.4.1</entry>
+        <entry>Minimum created REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.4.1</entry>
+        <entry>Maximum created REST tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>OIDs are also assigned for REST tokens that
+     are read.</para>
+
+    <table xml:id="cts-token-rest-oid-count-read" pgwide="1">
+     <title>CTS CRUD Read Operations, REST Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Read REST Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.4.2</entry>
+        <entry>Cumulative count of read REST tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.4.2</entry>
+        <entry>Average read REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.4.2</entry>
+        <entry>Minimum read REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.4.2</entry>
+        <entry>Maximum read REST tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>The following table specifies OIDs for REST tokens that
+     are updated.</para>
+
+    <table xml:id="cts-token-rest-oid-count-update" pgwide="1">
+     <title>CTS CRUD Update Operations, REST Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Updated REST Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.4.3</entry>
+        <entry>Cumulative count of updated REST tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.4.3</entry>
+        <entry>Average updated REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.4.3</entry>
+        <entry>Minimum updated REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.4.3</entry>
+        <entry>Maximum updated REST tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>OIDs are also assigned for REST tokens that
+     are deleted.</para>
+
+    <table xml:id="cts-token-rest-oid-count-delete" pgwide="1">
+     <title>CTS CRUD Delete Operations, REST Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Deleted REST Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.4.4</entry>
+        <entry>Cumulative count of deleted REST tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.4.4</entry>
+        <entry>Average deleted REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.4.4</entry>
+        <entry>Minimum deleted REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.4.4</entry>
+        <entry>Maximum deleted REST tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>OIDs are also assigned for REST tokens that
+     are listed.</para>
+
+    <table xml:id="cts-token-rest-oid-count-list" pgwide="1">
+     <title>CTS CRUD List Operations, REST Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Listed REST Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.1.4.4</entry>
+        <entry>Cumulative count of listed REST tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.2.4.4</entry>
+        <entry>Average listed REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.3.4.4</entry>
+        <entry>Minimum listed REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.3.4.1.4.4.4</entry>
+        <entry>Maximum listed REST tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+  </section>
+
+  <section xml:id="cts-monitoring-oid-operation-token-numbers">
+   <title>CTS Token Operation Status</title>
+
+   <para>The CTS token OIDs defined in this section specify the
+   total number of tokens of each type (Session, SAML 2, OAuth 2.0, REST),
+   along with their average current lifetimes.</para>
+
+   <para>
+    The options for Token Operations are shown in the following tables.
+    Total and Average Current Lifetimes are associated with
+    the four basic token types: Session, SAML 2, OAuth 2, and REST.
+   </para>
+
+   <table xml:id="cts-token-totals" pgwide="1">
+    <title>CTS Total Tokens, by Type</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Total Tokens, by Type</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.5.1.1.1</entry>
+       <entry>Total number of Session tokens</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.5.1.1.2</entry>
+       <entry>Total number of SAML2 tokens</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.5.1.1.3</entry>
+       <entry>Total number of OAuth 2.0 tokens</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.5.1.1.4</entry>
+       <entry>Total number of REST tokens</entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+
+   <table xml:id="cts-token-avg-life" pgwide="1">
+    <title>CTS Token Average Lifetime, by Type</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Average Token Lifetime, by Type</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.5.1.2.1</entry>
+       <entry>Total number of Session tokens</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.5.1.2.2</entry>
+       <entry>Total number of SAML2 tokens</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.5.1.2.3</entry>
+       <entry>Total number of OAuth 2.0 tokens</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.5.1.2.4</entry>
+       <entry>Total number of REST tokens</entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+
+  </section>
+
+  <section xml:id="cts-reaper-oids">
+   <title>CTS Reaper Run Information</title>
+
+   <!-- Based in part on my interpretation of the CTSReaperWatchDog
+   and CoreTokenConfig classes -->
+
+   <para>
+    The CTS Reaper deletes unused or expired tokens. Unless OpenAM is in a
+    shutdown cycle, the CTS Reaper is designed to run continuously.
+    By default, the CTS Reaper runs in fixed intervals, unless OpenAM
+    is in the process of shutting down.
+   </para>
+
+   <!-- I could say "By default, the CTS Reaper is run in 60 second periods."
+    but that should be variable.-->
+
+   <para>
+    One OID relates to the CTS Reaper, which specifies the average rate of
+    deleted tokens per CTS Reaper Run:
+   </para>
+
+   <para><literal>enterprises.36733.1.2.3.6.0</literal></para>
+
+  </section>
+
+  <section xml:id="cts-conn-factory-oids">
+   <title>CTS Connection Factory OIDs</title>
+
+    <!-- Based on my reading of the CTSConnectionFactory class -->
+
+    <para>
+     Every request for a CTS token is a request to the
+     <literal>CTSConnectionFactory</literal>. Such requests can either
+     succeed or fail. The following OIDs provide measures for both
+     such connections. The CTSConnectionFactory OIDs are also measured
+     using a rate window system, similar to all the other CTS OIDs,
+     except the CTS Reaper.
+    </para>
+
+    <para>
+     As there are no indexes required to look up the value of
+     CTSConnectionFactory OIDs, they end in 0. Success or failure of
+     these OIDs are not specific to any operation or token type.
+    </para>
+
+   <para>
+    The following tables list the OIDs related to the CTSConnectionFactory.
+   </para>
+
+   <table xml:id="cts-token-factory-success" pgwide="1">
+    <title>CTSConnectionFactory, Successful Connections</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Successes, CTSConnectionFactory</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.7.1.1.0</entry>
+       <entry>Cumulative number of successful connections</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.7.1.2.0</entry>
+       <entry>Average number of successful connections (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.7.1.3.0</entry>
+       <entry>Minimum number of successful connections (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.7.1.4.0</entry>
+       <entry>Maximum number of successful connections (in period)</entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+
+   <table xml:id="cts-token-factory-fail" pgwide="1">
+    <title>CTSConnectionFactory, Failed Connections</title>
+
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="4*"/>
+
+     <thead>
+      <row>
+       <entry>Failures, CTSConnectionFactory</entry>
+       <entry>Description</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>enterprises.36733.1.2.3.7.2.1.0</entry>
+       <entry>Cumulative number of failed connections</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.7.2.2.0</entry>
+       <entry>Average number of failed connections (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.7.2.3.0</entry>
+       <entry>Minimum number of failed connections (in period)</entry>
+      </row>
+      <row>
+       <entry>enterprises.36733.1.2.3.7.2.4.0</entry>
+       <entry>Maximum number of failed connections (in period)</entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+
+  </section>
+
+</chapter>

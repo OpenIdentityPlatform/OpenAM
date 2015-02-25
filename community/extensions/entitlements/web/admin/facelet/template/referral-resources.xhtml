@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: referral-resources.xhtml,v 1.3 2009/06/06 05:35:09 farble1670 Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['referral-resources.sectionTitle']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['referral-resources.sectionDetails']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+            <ice:selectManyCheckbox
+                id="referral-resource-select"
+                layout="spread"
+                partialSubmit="true"
+                value="#{referralResourcesBean.resources}"
+                converter="referralResourceConverter">
+                <f:selectItems
+                    value="#{referralResourcesBean.availableResourceItems}"/>
+            </ice:selectManyCheckbox>
+            <ice:panelGroup>
+                <ice:panelSeries
+                    var="referralResource"
+                    value="#{referralResourcesBean.availableResources}">
+                    <ice:panelGroup
+                        styleClass="referral-resource-outer">
+                            <o:referralresourcepanel
+                                allowExceptions="false"
+                                referralResource="#{referralResource}"/>
+                    </ice:panelGroup>
+                </ice:panelSeries>
+            </ice:panelGroup>
+        </ui:define>
+    </o:section>
+</span>

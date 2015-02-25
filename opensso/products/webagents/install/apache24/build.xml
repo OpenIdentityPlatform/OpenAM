@@ -1,0 +1,195 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.10 2009/12/09 23:01:00 krishna_indigo Exp $
+
+-->
+
+<!-- Portions Copyrighted 2010-2012 ForgeRock Inc -->
+
+<project name="open-source-web-agents-install-apache24" default="build">
+    <description>Open Web Single Sign-On Apache agent install</description>
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** Apache Agent may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="containername"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <property name="webagents.install.apache24.src.dir" 
+        location="${webagents.install.dir}/${containername}/source"/>
+
+    <target name="build">
+        <javac destdir="${webagents.container.classes.dir}" 
+               source="${target.jdk.set}" target="${target.jdk.set}"
+               debug="${build.debug}" debuglevel="${build.debuglevel}">
+            <src path="${webagents.install.apache24.src.dir}"/>
+            <classpath refid="build.class.path"/>
+        </javac>
+
+        <!-- Copy version file -->
+        <copy todir="${webagents.container.classes.dir}">
+            <fileset dir="${webagents.install.dir}/${containername}">
+                <include name=".version"/>
+            </fileset>
+        </copy>
+        <concat destfile="${webagents.container.classes.dir}/.version" append="true">
+             <filelist dir="${webagents.base.dir}" files=".version"/>
+        </concat>
+
+        <jar destfile="${webagents.container.archive.dir}/apache24_agent.jar" 
+             basedir="${webagents.container.classes.dir}"/>
+
+        <!-- 
+             The following are the necessary copy statements for the
+             distribution of Apache agent bits archive
+        -->
+        <!-- Copy config files -->
+        <copy todir="${container.web_agent.config.dir}">
+            <fileset dir="${webagents.install.dir}/${containername}/xml">
+                <include name="configure.xml"/>
+            </fileset>
+        </copy>
+
+        <!-- Copy locale files -->
+        <copy todir="${container.web_agent.locale.dir}">
+            <fileset dir="${webagents.install.dir}/${containername}/resources">
+                <include name="apache24Tools.properties"/>
+            </fileset>
+        </copy>
+
+        <!-- Copy etc files -->
+        <copy file="${webagents.apache22.src.dir}/dsame.conf"
+              tofile="${container.web_agent.etc.dir}/dsame.template"/>
+
+        <!-- Copy install related jar files -->
+        <copy todir="${container.web_agent.lib.dir}">
+            <fileset dir="${webagents.basedir}/extlib">
+                <include name="opensso-installtools-launcher.jar"/>
+                <include name="opensso-installtools.jar"/>
+            </fileset>
+            <fileset dir="${webagents.container.archive.dir}">
+                <include name="apache24_agent.jar"/>
+            </fileset>
+        </copy>
+
+        <!-- Copy Apache agent c library-->
+        <antcall target="copy-${build.os}-library"/>
+
+	<!-- Generate Apache agent install archive -->
+	<zip destfile="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_agent_${agentversion}.zip">
+             <fileset dir="${webagents.container.scratch.dir}" excludes="**/bin/**"/>
+             <zipfileset dir="${container.web_agent.bin.dir}" filemode="755"
+                         prefix="web_agents/apache24_agent/bin"/>
+        </zip>
+        <checksum file="${webagents.dist.dir}/apache_v24_${build.os}${build.type.suffix}_agent_${agentversion}.zip"
+            algorithm="SHA" fileext=".sha" />
+        
+    </target>
+
+    <target name="copy-Linux-library">
+        <copy todir="${container.web_agent.lib.dir}">
+            <fileset dir="${webagents.apache24.src.dir}">
+                    <include name="libamapc24.so"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="copy-SunOS_sparc-library">
+        <copy todir="${container.web_agent.lib.dir}">
+            <fileset dir="${webagents.apache24.src.dir}">
+                    <include name="libamapc24.so"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="copy-SunOS_x86-library">
+        <copy todir="${container.web_agent.lib.dir}">
+            <fileset dir="${webagents.apache24.src.dir}">
+                    <include name="libamapc24.so"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="copy-HP-UX-library">
+	<copy todir="${container.web_agent.lib.dir}">
+	   <fileset dir="${webagents.apache24.src.dir}">
+		<include name="libamapc24.sl"/>
+	   </fileset>
+	</copy>
+    </target>
+
+    <target name="copy-WINNT-library">
+        <!-- don't copy to lib, copy to bin. FIXME when we have the manifests correct
+        <copy todir="${container.web_agent.lib.dir}">-->
+        <copy todir="${container.web_agent.bin.dir}">
+            <fileset dir="${webagents.apache24.src.dir}">
+                    <include name="libamapc24.dll"/>
+                    <include name="libamapc24.pdb"/>
+            </fileset>
+        </copy>
+        <!-- FIXME: this is only here until we fix the manifests-->
+        <copy todir="${container.web_agent.bin.dir}">
+            <fileset dir="${container.web_agent.lib.dir}">
+                    <include name="*"/>
+            </fileset>
+        </copy>
+
+        <!-- delete unncessary files/directories, since these are not used -->
+        <delete dir="${container.web_agent.lib.dir}"/>
+        <mkdir dir="${container.web_agent.lib.dir}"/>
+        <copy todir="${container.web_agent.lib.dir}">
+            <fileset dir="${container.web_agent.bin.dir}">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+        <delete>
+            <fileset dir="${container.web_agent.bin.dir}">
+                <include name="*.jar"/>
+            </fileset>
+        </delete>
+        <!-- end fixme -->
+    </target>
+
+    <target name="copy-AIX-library">
+        <copy todir="${container.web_agent.lib.dir}">
+            <fileset dir="${webagents.apache24.src.dir}">
+                    <include name="libamapc24.so"/>
+            </fileset>
+        </copy>
+    </target>
+
+
+</project>
+
+

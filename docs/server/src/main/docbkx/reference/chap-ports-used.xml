@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-ports-used'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Ports Used</title>
+ 
+ <indexterm><primary>Ports used</primary></indexterm>
+ <indexterm><primary>Default ports</primary></indexterm>
+ <para>OpenAM software uses the following TCP/IP ports by default. Sometimes multiple
+ services are configured on a single system with slightly different port numbers. For
+ example, while the default port number for a servlet container such as Tomcat is 8080,
+ a second instance of Tomcat might be configured with a port number of 18080. In
+ all cases shown, communications proceed using TCP.</para>
+
+ <para>When you configure a firewall for OpenAM, make sure to include open ports for any
+ installed and related components, including web services (80, 443), servlet
+ containers (8009, 8080, 8443), and external applications such as a Remote Access Dial In
+ User Service (1645).</para>
+
+ <para>Additional ports may be used, depending on other components of your deployment. If
+ you are using external OpenDJ servers, refer to the <link xlink:show="new"
+ xlink:href="${opendjDocBase}/admin-guide/#appendix-ports-used"><citetitle>Ports Used</citetitle></link>
+ appendix of the OpenDJ Administration Guide.</para>
+
+ <table xml:id="openam-default-ports">
+     <title>Default TCP/IP Ports Used by OpenAM</title>
+     <tgroup cols="2">
+         <colspec colnum="1" colwidth="1*" />
+         <colspec colnum="2" colwidth="4*" />
+         <thead>
+             <row>
+                 <entry>Port Number</entry>
+                 <entry>Description</entry>
+             </row>
+         </thead>
+         <tbody>
+             <row>
+                 <entry>1689</entry>
+                 <entry>Port for Java Management eXtension traffic, disabled by default</entry>
+             </row>
+             <row>
+                 <entry>4444</entry>
+                 <entry>Port for the embedded administration connector, enabled by default.</entry>
+             </row>
+             <row>
+                 <entry>8080</entry>
+                 <entry>Web application container port number</entry>
+             </row>
+             <row>
+                 <entry>8082</entry>
+                 <entry>HTTP port for monitoring OpenAM, disabled by default</entry>
+             </row>
+             <row>
+                 <entry>8085</entry>
+                 <entry>SNMP port for monitoring OpenAM, disabled by default</entry>
+             </row>
+             <row>
+                 <entry>9999</entry>
+                 <entry>RMI port for monitoring OpenAM, disabled by default.</entry>
+             </row>
+             <row>
+                 <entry>50389, 50899, 58989</entry>
+                 <entry>Supports LDAP communication between embedded OpenAM data stores.</entry>
+             </row>
+
+             <xinclude:include href="../shared/securid/row-ports-used${skipSecurID}.xml">
+              <xinclude:fallback>
+               <!-- Module not present in nightly builds -->
+              </xinclude:fallback>
+             </xinclude:include>
+
+         </tbody>
+
+     </tgroup>
+ </table>
+
+</chapter>

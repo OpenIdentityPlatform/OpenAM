@@ -1,0 +1,30 @@
+<div id="condition-management">
+
+	<ol id='dropOffArea' class="condition-management-group environment-area"></ol>
+	<div id="outter-arrow-up"><div id="inner-arrow-up"></div></div>
+	<div id="pickUpArea" class="clearfix">
+
+		<div class="clearfix">
+
+			<ol class='condition-management-group clearfix' id='pickUpItem'></ol>
+
+			<div class="clearfix">
+				<div class="pickup-actions-block float-left">
+					<a class="icon-plus button" id="addCondition" tabindex="0" ><span>{{conditionName}}</span></a>
+					<a class="icon-plus button" id="addOperator" tabindex="0" ><span>{{t "policy.editPolicies.logical"}}</span></a>
+				</div>
+
+				<div class="pickup-actions-block float-right">
+					<a class="button inactive" id="clear" tabindex="0" >{{t "policy.common.clear"}}</a>
+				</div>
+			</div>
+
+			<div class="clearfix rules-help">
+			<p>{{t "policy.editPolicies.manageRulesDescription"}}</p>
+			</div>
+
+		</div>
+		
+	</div>
+	
+</div>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: amMonitoring.xml,v 1.3 2009/11/10 01:30:07 bigfatrat Exp $
+
+-->
+<!--
+    Portions Copyrighted 2011-2014 ForgeRock AS
+-->
+<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMMonitoringService" version="1.0">
+        <Schema serviceHierarchy="/DSAMEConfig/iPlanetAMMonitoringService"
+            i18nFileName="amMonitoring"
+            revisionNumber="10"
+            i18nKey="iplanet-am-monitoring-service-description">
+            <Global>
+                <AttributeSchema name="serviceObjectClasses"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>iplanet-am-monitoring-service</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a100">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nNo">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-http-port"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="65535"
+                    i18nKey="a101">
+                    <DefaultValues>
+                        <Value>8082</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-http-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a102">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nNo">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-authfile-path"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1021">
+                    <DefaultValues>
+                        <Value>%BASE_DIR%/%SERVER_URI%/openam_mon_auth</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-rmi-port"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="65535"
+                    i18nKey="a103">
+                    <DefaultValues>
+                        <Value>9999</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-rmi-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a104">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nNo">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-snmp-port"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="65535"
+                    i18nKey="a105">
+                    <DefaultValues>
+                        <Value>8085</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-snmp-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a106">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nNo">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-policy-window"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="100" rangeEnd="1000000"
+                                 i18nKey="a107">
+                    <DefaultValues>
+                        <Value>10000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-session-window"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="100" rangeEnd="1000000"
+                                 i18nKey="a108">
+                    <DefaultValues>
+                        <Value>10000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
+

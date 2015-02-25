@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2015 ForgeRock AS.
+  !
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+ <modelVersion>4.0.0</modelVersion>
+
+ <parent>
+  <groupId>org.forgerock</groupId>
+  <artifactId>forgerock-parent</artifactId>
+  <version>1.2.7</version>
+ </parent>
+
+ <groupId>org.forgerock.openam</groupId>
+ <artifactId>openam-jee-agents-doc</artifactId>
+ <version>3.5.0-SNAPSHOT</version>
+ <packaging>pom</packaging>
+
+ <name>OpenAM Java EE Policy Agents Documentation</name>
+
+ <inceptionYear>2011</inceptionYear>
+
+ <description>
+   DocBook XML source for OpenAM Java EE Policy Agents user documentation.
+ </description>
+
+ <url>http://openam.forgerock.org/</url>
+
+ <distributionManagement>
+  <repository>
+   <id>maven.forgerock.org</id>
+   <name>maven.forgerock.org-releases</name>
+   <url>http://maven.forgerock.org/repo/releases</url>
+  </repository>
+  <snapshotRepository>
+   <id>maven.forgerock.org</id>
+   <name>maven.forgerock.org-snapshots</name>
+   <url>http://maven.forgerock.org/repo/snapshots</url>
+  </snapshotRepository>
+  <site>
+   <id>forgerock.org</id>
+   <name>OpenAM Project</name>
+   <url>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs/</url>
+  </site>
+ </distributionManagement>
+
+ <mailingLists>
+  <mailingList>
+   <name>OpenAM Users Mailing List</name>
+   <archive>http://lists.forgerock.org/pipermail/openam/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/openam/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam/</unsubscribe>
+   <post>openam@forgerock.org</post>
+  </mailingList>
+  <mailingList>
+   <name>OpenAM Developers Mailing List</name>
+   <archive>http://lists.forgerock.org/pipermail/openam-dev/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</unsubscribe>
+   <post>openam-dev@forgerock.org</post>
+  </mailingList>
+  <mailingList>
+   <name>OpenAM Commit Notifications</name>
+   <archive>http://lists.forgerock.org/pipermail/commitopenam/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</unsubscribe>
+   <post>commitopenam@forgerock.org</post>
+  </mailingList>
+ </mailingLists>
+
+ <scm>
+  <url>https://svn.forgerock.org/openam/trunk/docs/jee-agents/</url>
+  <connection>scm:svn:https://svn.forgerock.org/openam/trunk/docs/jee-agents/</connection>
+  <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/docs/jee-agents/</developerConnection>
+ </scm>
+
+ <issueManagement>
+  <system>Jira</system>
+  <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
+ </issueManagement>
+
+ <licenses>
+  <license>
+   <name>CC BY-NC-ND 3.0</name>
+   <url>http://creativecommons.org/licenses/by-nc-nd/3.0/</url>
+   <comments>
+    Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported.
+    This license applies to the site content, and to the documentation
+    as indicated in the documentation source code.
+   </comments>
+   <distribution>repo</distribution>
+  </license>
+ </licenses>
+
+ <repositories>
+  <repository>
+   <id>forgerock-staging-repository</id>
+   <name>ForgeRock Release Repository</name>
+   <url>http://maven.forgerock.org/repo/releases</url>
+   <snapshots>
+    <enabled>false</enabled>
+   </snapshots>
+  </repository>
+  <repository>
+   <id>forgerock-snapshots-repository</id>
+   <name>ForgeRock Snapshot Repository</name>
+   <url>http://maven.forgerock.org/repo/snapshots</url>
+   <releases>
+    <enabled>false</enabled>
+   </releases>
+  </repository>
+ </repositories>
+
+ <properties>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <frDocPluginVersion>2.1.5</frDocPluginVersion>
+
+  <serverDocTargetVersion>13.0.0-SNAPSHOT</serverDocTargetVersion>
+  <agentsDocTargetVersion>${project.version}</agentsDocTargetVersion>
+
+  <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
+  <agentsConfigurationFile>OpenSSOAgentConfiguration.properties</agentsConfigurationFile>
+
+  <!--
+    For release docs, this should point to the OpenAM release docs:
+      -DserverDocBase=http://docs.forgerock.org/en/openam/${serverDocTargetVersion}
+  -->
+  <serverDocBase>http://openam.forgerock.org/doc</serverDocBase>
+
+  <!--
+    Release date and publication date are set at release build time.
+      -D"releaseDate=Software release date: January 1, 1970"
+      -D"pubDate=Publication date: December 31, 1969"
+    At all other times, the dates should be empty.
+  -->
+  <releaseDate />
+  <softwareReleaseDate>${releaseDate}</softwareReleaseDate>
+  <pubDate />
+  <publicationDate>${pubDate}</publicationDate>
+  <gaId>UA-23412190-7</gaId>
+ </properties>
+
+ <build>
+  <pluginManagement>
+   <plugins>
+    <plugin>
+     <groupId>org.forgerock.commons</groupId>
+     <artifactId>forgerock-doc-maven-plugin</artifactId>
+     <version>${frDocPluginVersion}</version>
+     <configuration>
+      <projectName>OpenAM</projectName>
+      <projectVersion>${agentsDocTargetVersion}</projectVersion>
+      <googleAnalyticsId>${gaId}</googleAnalyticsId>
+      <overwriteGeneratedSource>true</overwriteGeneratedSource>
+     </configuration>
+     <executions>
+      <execution>
+       <id>copy-common</id>
+       <phase>pre-site</phase>
+       <goals>
+        <goal>boilerplate</goal>
+       </goals>
+      </execution>
+      <execution>
+       <id>filter-sources</id>
+       <phase>pre-site</phase>
+       <goals>
+        <goal>filter</goal>
+       </goals>
+      </execution>
+      <execution>
+       <id>prepare-sources</id>
+       <phase>pre-site</phase>
+       <goals>
+        <goal>prepare</goal>
+       </goals>
+      </execution>
+      <execution>
+       <id>build-doc</id>
+       <phase>pre-site</phase>
+       <goals>
+        <goal>build</goal>
+       </goals>
+      </execution>
+      <execution>
+       <id>layout-doc</id>
+       <phase>site</phase>
+       <goals>
+        <goal>layout</goal>
+       </goals>
+      </execution>
+     </executions>
+    </plugin>
+   </plugins>
+  </pluginManagement>
+
+  <plugins>
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-dependency-plugin</artifactId>
+    <executions>
+     <execution>
+      <goals>
+       <goal>unpack</goal>
+      </goals>
+      <phase>pre-site</phase>
+      <configuration>
+       <artifactItems>
+        <artifactItem>
+         <groupId>org.forgerock.openam</groupId>
+         <artifactId>openam-server-doc</artifactId>
+         <version>${serverDocTargetVersion}</version>
+         <classifier>agent-docs</classifier>
+         <outputDirectory>${project.build.directory}/docbkx-generated</outputDirectory>
+        </artifactItem>
+       </artifactItems>
+      </configuration>
+     </execution>
+    </executions>
+   </plugin>
+
+   <plugin>
+    <groupId>org.forgerock.commons</groupId>
+    <artifactId>forgerock-doc-maven-plugin</artifactId>
+   </plugin>
+
+   <!--
+       Most of the site is generated by the OpenAM project.
+       This project only contributes project documentation.
+
+       Therefore, skip site generation (reports, etc.)
+       to avoid overwriting OpenAM project site files
+       with reports from this project.
+   -->
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-site-plugin</artifactId>
+    <executions>
+     <execution>
+      <id>default-site</id>
+      <phase>site</phase>
+      <goals>
+       <goal>site</goal>
+      </goals>
+      <configuration>
+       <generateReports>false</generateReports>
+       <skip>false</skip>
+      </configuration>
+     </execution>
+    </executions>
+   </plugin>
+
+  </plugins>
+ </build>
+</project>

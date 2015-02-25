@@ -1,0 +1,190 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2010-2014 ForgeRock AS. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# http://forgerock.org/license/CDDLv1.0.html
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at http://forgerock.org/license/CDDLv1.0.html
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+
+## Makefile for building AMSDK and PA with Microsoft VC++ and nmake
+## Use: nmake -f Makefile.nmake
+##
+
+CC = cl
+LINK = link
+RC = rc
+MC = mc
+
+AM_WIN32_SRC = am\source\action_decision.cpp am\source\agent_config_cache.cpp am\source\agent_configuration.cpp \
+               am\source\agent_profile_service.cpp am\source\am_auth.cpp am\source\am_log.cpp am\source\am_main.cpp \
+               am\source\am_map.cpp am\source\am_policy.cpp am\source\am_properties.cpp am\source\am_resource.cpp \
+               am\source\am_sso.cpp am\source\am_string_set.cpp am\source\am_utils.cpp am\source\am_web.cpp \
+               am\source\auth_context.cpp am\source\auth_svc.cpp am\source\base_service.cpp am\source\connection_win.cpp \
+               am\source\fqdn_handler.cpp am\source\http.cpp am\source\key_value_map.cpp am\source\log.cpp \
+               am\source\log_service.cpp am\source\naming_service.cpp am\source\p_cache.cpp \
+               am\source\pnotify_handler.cpp am\source\policy_decision.cpp am\source\policy_engine.cpp am\source\policy_entry.cpp \
+               am\source\policy_service.cpp am\source\properties.cpp am\source\ref_cnt_ptr.cpp am\source\server_info.cpp \
+               am\source\service.cpp am\source\service_info.cpp am\source\session_info.cpp am\source\session_service.cpp \
+               am\source\sso_entry.cpp am\source\sso_token.cpp am\source\sso_token_service.cpp am\source\string_util.cpp \
+               am\source\thread_pool.cpp am\source\tree.cpp am\source\url.cpp am\source\utils.cpp am\source\xml_attribute_win.cpp \
+               am\source\xml_element_win.cpp am\source\xml_tree_win.cpp 
+
+AM_IIS6_SRC = agents\source\iis6\IisAgent6.c
+AM_IIS7_SRC = agents\source\iis7\agent_main.cpp agents\source\iis7\Iis7Agent.cpp
+AM_APA22_SRC = agents\source\apache22\apache_agent.c
+AM_APA24_SRC = agents\source\apache24\apache_agent.c
+
+DEP_INCPATH = \
+!IFDEF X64
+   /I"extlib\WINNT\pcre_64\include"
+!ELSE
+   /I"extlib\WINNT\pcre\include"
+!ENDIF
+
+DEP_LIBS = kernel32.lib user32.lib ws2_32.lib winhttp.lib crypt32.lib pcre.lib advapi32.lib shlwapi.lib \
+!IFDEF X64
+        amsdk64.lib
+!ELSE
+        amsdk32.lib
+!ENDIF
+
+DEP_LIBPATH = \
+!IFDEF X64
+  /LIBPATH:"extlib\WINNT\pcre_64\lib"
+!ELSE
+  /LIBPATH:"extlib\WINNT\pcre\lib"
+!ENDIF
+
+LDFLAGS = /NOLOGO /INCREMENTAL:NO /errorReport:none \
+   /MANIFEST:NO /LTCG /DYNAMICBASE /NXCOMPAT /DEBUG \
+   /OPT:REF /OPT:ICF \
+!IFDEF X64 
+   /MACHINE:X64
+!ELSE
+   /MACHINE:X86
+!ENDIF
+
+LDFLAGS_LIB = /NOLOGO /ERRORREPORT:none /LTCG /NODEFAULTLIB \
+!IFDEF X64 
+   /MACHINE:X64
+!ELSE
+   /MACHINE:X86
+!ENDIF
+
+CFLAGS = /O2 /Oi /GL /Gy /D _WINDLL /FD /D_CRT_SECURE_NO_WARNINGS \
+   /D AM_BUILDING_LIB /wd4996 /wd4101 /wd4244 /D WINNT \
+   /EHsc /nologo /Zi /errorReport:none /Iam\source /MD /W3 /D PCRE_STATIC /c
+
+#
+# AMSDK and cryptit begin
+#
+.cpp.obj::
+	$(CC) $(CFLAGS) $(DEP_INCPATH) /Foam\source\ $< 
+
+crypt_util.obj	: am\source\crypt_util.c
+	$(CC) $(CFLAGS) $(DEP_INCPATH) /Foam\source\crypt_util.obj am\source\crypt_util.c
+
+notenforcedip.obj : am\source\notenforcedip.c
+	$(CC) $(CFLAGS) $(DEP_INCPATH) /Foam\source\notenforcedip.obj am\source\notenforcedip.c
+
+naming_valid.obj : am\source\naming_valid.c
+	$(CC) $(CFLAGS) $(DEP_INCPATH) /Foam\source\naming_valid.obj am\source\naming_valid.c
+
+cryptutil.obj	: am\source\crypt_util.c
+	$(CC) $(CFLAGS) /MT $(DEP_INCPATH) /U _WINDLL /U AM_BUILDING_LIB /Foam\source\cryptutil.obj am\source\crypt_util.c
+				
+AM_WIN32_OBJECTS = $(AM_WIN32_SRC:.cpp=.obj)
+
+amsdk.dll : crypt_util.obj notenforcedip.obj naming_valid.obj $(AM_WIN32_OBJECTS)
+	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /PDB:"am\source\amsdk.pdb" \
+	/DLL /OUT:"am\source\amsdk.dll" am\source\crypt_util.obj am\source\notenforcedip.obj am\source\naming_valid.obj $(AM_WIN32_OBJECTS) kernel32.lib user32.lib ws2_32.lib winhttp.lib crypt32.lib pcre.lib advapi32.lib shlwapi.lib
+
+amsdk.lib: crypt_util.obj notenforcedip.obj naming_valid.obj $(AM_WIN32_OBJECTS)
+	lib $(LDFLAGS_LIB) \
+!IFDEF X64
+        /OUT:"am\source\amsdk64.lib" \
+!ELSE
+        /OUT:"am\source\amsdk32.lib" \
+!ENDIF
+        am\source\crypt_util.obj am\source\notenforcedip.obj am\source\naming_valid.obj $(AM_WIN32_OBJECTS)
+
+cryptit : cryptutil.obj
+	$(LINK) $(LDFLAGS) /SUBSYSTEM:CONSOLE /OUT:"am\source\cryptit.exe" am\source\cryptutil.obj 
+
+#
+# AMSDK and cryptit end
+#
+
+#
+# IIS6 and IIS7 Agent begin
+#
+
+ii6.obj : $(AM_IIS6_SRC)
+	$(CC) $(CFLAGS) $(DEP_INCPATH) /DXP_WIN32 /DWINNT /Iagents\source\iis6 /Foagents\source\iis6\ $(AM_IIS6_SRC)
+
+iis6i : ii6.obj
+	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /EXPORT:GetExtensionVersion /EXPORT:HttpExtensionProc /EXPORT:TerminateExtension \
+		/PDB:"agents\source\iis6\amiis6.pdb" \
+		/DLL /OUT:"agents\source\iis6\amiis6.dll" agents\source\iis6\IisAgent6.obj /LIBPATH:"am\source" $(DEP_LIBS)
+
+
+iis7.obj : $(AM_IIS7_SRC)
+	$(CC) /I"C:\Program Files\Microsoft SDKs\Windows\v7.1\Include" $(CFLAGS) $(DEP_INCPATH) /D WIN32 /Iagents\source\iis7 /Foagents\source\iis7\ $(AM_IIS7_SRC)
+
+iis7i	: iis7.obj
+	$(LINK) $(LDFLAGS) $(DEP_LIBPATH) /EXPORT:RegisterModule \
+	/PDB:"agents\source\iis7\amiis7module.pdb" \
+	/DLL /OUT:"agents\source\iis7\amiis7module.dll" agents\source\iis7\agent_main.obj \
+        agents\source\iis7\Iis7Agent.obj /LIBPATH:"am\source" $(DEP_LIBS)
+
+#
+# IIS6 and IIS7 Agent end
+#
+
+#
+# Apache 2.2 and 2.4 Agent begin
+#
+
+apache22.obj : $(AM_APA22_SRC)
+	$(CC) $(CFLAGS) /I"extlib\WINNT\apache22\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /Iagents\source\apache22 /Foagents\source\apache22\ /Tc $(AM_APA22_SRC)
+
+apache2i : apache22.obj
+	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache22\lib" $(DEP_LIBPATH) \
+		/PDB:"agents\source\apache22\libamapc22.pdb" \
+		/DLL /OUT:agents\source\apache22\libamapc22.dll /LIBPATH:"extlib\WINNT\apache2\lib" agents\source\apache22\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libhttpd.lib
+
+apache24.obj : $(AM_APA24_SRC)
+	$(CC) $(CFLAGS) /I"extlib\WINNT\apache24\include" $(DEP_INCPATH) /DWIN32 /DAPACHE2 /DAPACHE24 /Iagents\source\apache24 /Foagents\source\apache24\ /Tc $(AM_APA24_SRC)
+
+apache24i : apache24.obj
+	$(LINK) $(LDFLAGS) /LIBPATH:"extlib\WINNT\apache24\lib" $(DEP_LIBPATH) \
+		/PDB:"agents\source\apache24\libamapc24.pdb" \
+		/DLL /OUT:agents\source\apache24\libamapc24.dll /LIBPATH:"extlib\WINNT\apache24\lib" agents\source\apache24\apache_agent.obj /LIBPATH:"am\source" $(DEP_LIBS) libapr-1.lib libhttpd.lib
+
+
+#
+# Apache 2.2 and 2.4 Agent end
+#
+
+all: amsdk.lib cryptit iis6i iis7i apache2i apache24i
+sdk: amsdk.dll cryptit
+iis6: amsdk.lib cryptit iis6i
+iis7: amsdk.lib cryptit iis7i
+apache22: amsdk.lib cryptit apache2i
+apache24: amsdk.lib cryptit apache24i

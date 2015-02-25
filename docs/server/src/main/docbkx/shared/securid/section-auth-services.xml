@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<section xml:id="securid-module-conf-hints"
+         xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd">
+ <title>Hints For the SecurID Authentication Module</title>
+
+ <para>
+  The SecurID module lets OpenAM authenticate users
+  with RSA Authentication Manager software and RSA SecurID authenticators.
+ </para>
+
+ <orderedlist>
+  <para>
+   In order to use the SecurID authentication module,
+   you must first build an OpenAM war file
+   that includes the supporting library,
+   <filename>authapi-2005-08-12.jar</filename>.
+  </para>
+
+  <listitem>
+   <para>
+    Unpack the OpenAM .war file.
+   </para>
+
+   <screen>
+$ <userinput>mkdir /tmp/openam</userinput>
+$ <userinput>cd /tmp/openam/</userinput>
+$ <userinput>jar -xf ~/Downloads/openam/${coreWarFile}</userinput>
+   </screen>
+  </listitem>
+
+  <listitem>
+   <para>
+    Copy <filename>authapi-2005-08-12.jar</filename>
+    into the <filename>WEB-INF/lib</filename> directory.
+   </para>
+
+   <screen>
+$ <userinput>cp /path/to/authapi-2005-08-12.jar WEB-INF/lib/</userinput>
+   </screen>
+  </listitem>
+
+  <listitem>
+   <para>
+    Pack up the OpenAM .war file to deploy.
+   </para>
+
+   <screen>
+$ <userinput>jar -cf ../openam.war *</userinput>
+   </screen>
+  </listitem>
+
+  <listitem>
+   <para>Deploy the new .war file.</para>
+
+   <para>
+    In this example the .war file to deploy is
+    <filename>/tmp/openam.war</filename>.
+   </para>
+  </listitem>
+ </orderedlist>
+
+ <indexterm>
+  <primary>Authentication</primary>
+  <secondary>SecurID</secondary>
+ </indexterm>
+
+ <para>
+  <command>ssoadm</command> service name:
+  <literal>iPlanetAMAuthSecurIDService</literal>
+ </para>
+
+ <variablelist>
+  <varlistentry>
+   <term>ACE/Server Configuration Path</term>
+
+   <listitem>
+    <para>
+     Specify the directory where
+     the SecurID ACE/Server <filename>sdconf.rec</filename> file is located,
+     which by default is expected under the OpenAM configuration directory,
+     such as <filename>$HOME/openam/openam/auth/ace/data</filename>.
+     The directory must exist before OpenAM can use SecurID authentication.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>iplanet-am-auth-securid-server-config-path</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Authentication Level</term>
+
+   <listitem>
+    <para>
+     Sets the authentication level used
+     to indicate the level of security associated with the module.
+     The value can range from 0 to any positive integer.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>iplanet-am-auth-securid-auth-level</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+</section>

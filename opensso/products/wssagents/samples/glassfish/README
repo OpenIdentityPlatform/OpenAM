@@ -1,0 +1,154 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README,v 1.16 2009/06/12 22:17:28 huacui Exp $
+
+   Portions Copyright 2013 ForgeRock AS
+
+-->
+
+======
+README
+======
+
+This README contains instructions on how to secure web services using 
+OpenAM WSS providers on Glassfish V2 or SUN Application Server 9.1
+
+
+General Description:
+====================
+
+The samples provided here are JAX-WS based web service, a web services
+client and a standalone client.
+The sample demonstrates a simple stock quote service where given
+a stock ticker symbol it obtains stock data. The secure communication
+between stock quote web services client is achieved using Federation
+OpenAM web services security agents. The web services security
+agents profile configuation is stored in backend repository information
+like regular OpenAM agents.
+
+
+The following diagram depicts a simple deployment scenario where the 
+profiles of WSC and WSP are all hosted on a single OpenAM instance
+
+                GF1                             GF2
+           _______________                   ________________
+          |              |                  |               |
+          |              |                  |               |
+          |     WSC      |<---------------->|     WSP       |
+          |(Stock Client)|                  |(Stock Service)|
+          |              |<---------------->|               |
+          |______________|    |      |      |_______________|
+                              |      |
+               Machine 1      |      |           Machine 2
+                            __V______V_
+                            |          |
+                            |          | Machine 3
+                            | OpenAM  |
+                            |(WSC,WSP  |
+                            | Profiles)|
+                            |__________|
+
+Sections:
+I.   Installing Glassfish and OpenAM
+II.  Installing WSS Agents and Configuring WSC and WSP profiles
+III. Building and Deploying the samples
+IV.  Testing the sample.
+
+Section I.
+
+1. Install Glassfish that hosts the Web Services Client (WSC). 
+2. Install Glassfish that hosts the Web Services Provider (WSP). 
+3. Install Glassfish and deploy OpenAM on this Glassfish instance.
+Note that the OpenAM server need not be deployed on Glassfish. They can
+be deployed on any container. Only the WSC and WSP need to be on Glassfish.
+
+Section II
+
+Refer to the README.glassfish with the WSS Agent on installing WSS 
+Agents on WSC/WSP containers and configuring WSC/WSP profiles
+in OpenAM server.
+
+
+III.  Building and Deploying the samples
+
+The samples here are provided with convenient "ant" build script to
+build and deploy the samples. This sample comes with two directories
+StockQuoteClient and StockService which are for the web services client
+and web service respectively. Also, it has a file name called as 
+glassfish.properties. 
+
+Repeat the steps on WSC and WSP machines:
+
+1. Open glassfish.properties and edit for properties
+    glassfish.home = <WSC/WSP Glassfish installation directory>
+    glassfish.host = <WSC/WSP Host where glassfish is installed>
+    glasfish.passwordfile = </tmp/app_passwd>
+    
+    Note: For the glassfish password file, make sure the password file
+    is like this, and has read permissions
+    AS_ADMIN_password=<password>
+
+    The properties build.class.path and jaxws.endorsed.dir are not
+    used for the stock samples, but for advanced samples.
+       
+2. Make sure that JAVA_HOME is set to JDK1.5 installation and similarly
+   make sure java and javac are in the PATH before executing the samples.
+
+3. Use the ant command from <WSC/WSP-ApplicationServer-install>/lib/ant/bin/ant
+
+4. The StockQuoteClient Sample assumes the web service (StockService)
+   is deployed on localhost and port 8080. However, if they are different
+   edit and replace localhost and 8080 in the following files: 
+
+   StockQuoteClient/src/java/com/samples/GetQuote.java
+   StockQuoteClient/src/java/com/samples/SOAPMessage.java
+
+5. cd StockQuoteClient and run "ant all". This will build
+   and deploy the StockQuoteClient onto glassfish container. Please make
+   sure you run this on a WSC instance.
+
+6. cd StockService and run "ant all". This will build
+   and deploy the StockQuoteService onto glassfish container. Please make
+   sure you run this on a WSP instance
+
+Note: If you have logged in as any other user, click Logout on the console page and Login again and make sure that you access the OpenAM Console.
+
+
+IV.  Testing the sample.
+
+1. Access the stock quote client page.
+
+   http://<wsc-host-name:portnumber>/StockQuoteClient/index.jsp
+
+2. You will be redirected to OpenAM's Authentication service
+   for end user login. Enter any existing OpenAM user with
+   its password. Upon successful end user authentication, 
+   you will be redirected back to 
+   http://<host>:<port>/StockQuoteClient/ page.
+
+3. Enter "JAVA" as stock ticker symbol and click "Get Quote".
+
+4. If successful, this will display the stock values.
+

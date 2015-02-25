@@ -1,0 +1,1396 @@
+    <parameter name="groupName" value="@mode@"/>
+    <!--<test name="SAMLv2IDPProxySmokeTestsSSOArtSLOHTTP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.ConfigureSAMLv2IDPProxy"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySmokeTest"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.UnconfigureSAMLv2IDPProxy"/>
+        </classes>
+    </test>-->
+    <test name="SAMLv2IDPProxySmokeTestsSSOArtSLOSOAP">
+        <parameter name="ssoprofile" value="Artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySmokeTest"/>
+        </classes>
+    </test>
+    <test name="SAMLv2IDPProxySmokeTestsSSOPostSLOHTTP">
+        <parameter name="ssoprofile" value="Post"/>
+        <parameter name="sloprofile" value="http"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySmokeTest"/>
+        </classes>
+    </test>
+    <test name="SAMLv2IDPProxySmokeTestsSSOPostSLOSOAP">
+        <parameter name="ssoprofile" value="Post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySmokeTest"/>
+        </classes>
+    </test>
+    <!--<test name="SAMLv2IDPProxyFeatureTestsSSOArtSLOHTTP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyAutoFederationTests"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyRelayStateTests"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyDefaultRelayStateSPTests"/>
+        </classes>
+    </test>-->
+    <test name="SAMLv2IDPProxyFeatureTestsSSOArtSLOSOAP">
+        <parameter name="ssoprofile" value="Artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyAutoFederationTests"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyRelayStateTests"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyDefaultRelayStateSPTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2IDPProxyFeatureTestsSSOPostSLOHTTP">
+        <parameter name="ssoprofile" value="Post"/>
+        <parameter name="sloprofile" value="http"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyAutoFederationTests"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyRelayStateTests"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyDefaultRelayStateSPTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2IDPProxyFeatureTestsSSOPostSLOSOAP">
+        <parameter name="ssoprofile" value="Post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyAutoFederationTests"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyRelayStateTests"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyDefaultRelayStateSPTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2WantAuthnRequestsSigned_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2WantAuthnRequestsSigned_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2WantAuthnRequestsSigned_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2WantAuthnRequestsSigned_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2WantAuthnRequestsSigned_IDP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2WantAuthnRequestsSigned_IDP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2WantAuthnRequestsSigned_IDP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2WantAuthnRequestsSigned_IDP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2AuthnRequestsSigned_SP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2AuthnRequestsSigned_SP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2AuthnRequestsSigned_SP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2AuthnRequestsSigned_SP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="WantAuthnRequestsSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2WantAssertionsSigned_SP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="WantAssertionsSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2WantAssertionsSigned_SP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="WantAssertionsSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2WantAssertionsSigned_SP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="WantAssertionsSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2WantAssertionsSigned_SP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="WantAssertionsSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantLogoutRequestSigned_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutRequestSigned_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutRequestSigned_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutRequestSigned_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutRequestSigned_IDP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutRequestSigned_IDP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutRequestSigned_IDP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutRequestSigned_IDP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutRequestSigned_SP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantLogoutRequestSigned_SP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantLogoutRequestSigned_SP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantLogoutRequestSigned_SP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutRequestSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantLogoutResponseSigned_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutResponseSigned_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutResponseSigned_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutResponseSigned_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutResponseSigned_IDP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutResponseSigned_IDP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutResponseSigned_IDP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutResponseSigned_IDP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantLogoutResponseSigned_SP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantLogoutResponseSigned_SP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantLogoutResponseSigned_SP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantLogoutResponseSigned_SP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantLogoutResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantMNIRequestSigned_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIRequestSigned_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIRequestSigned_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIRequestSigned_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIRequestSigned_IDP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIRequestSigned_IDP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIRequestSigned_IDP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIRequestSigned_IDP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIRequestSigned_SP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantMNIRequestSigned_SP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantMNIRequestSigned_SP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantMNIRequestSigned_SP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIRequestSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantMNIResponseSigned_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIResponseSigned_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIResponseSigned_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIResponseSigned_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIResponseSigned_IDP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIResponseSigned_IDP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIResponseSigned_IDP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIResponseSigned_IDP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantMNIResponseSigned_SP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantMNIResponseSigned_SP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantMNIResponseSigned_SP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantMNIResponseSigned_SP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantMNIResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantNameIDEncrypted_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantNameIDEncrypted_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantNameIDEncrypted_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantNameIDEncrypted_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="both"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantNameIDEncrypted_IDP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantNameIDEncrypted_IDP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantNameIDEncrypted_IDP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantNameIDEncrypted_IDP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantNameIDEncrypted_SP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantNameIDEncrypted_SP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantNameIDEncrypted_SP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantNameIDEncrypted_SP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantNameIDEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantArtifactResolveSigned_IDP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantArtifactResolveSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantArtifactResolveSigned_IDP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantArtifactResolveSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantArtifactResolveSigned_IDP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantArtifactResolveSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantArtifactResolveSigned_IDP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantArtifactResolveSigned"/>
+        <parameter name="metadata" value="idp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test>
+    <test name="SAMLv2wantArtifactResponseSigned_SP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantArtifactResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantArtifactResponseSigned_SP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantArtifactResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantArtifactResponseSigned_SP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantArtifactResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantArtifactResponseSigned_SP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantArtifactResponseSigned"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantAssertionEncrypted_SP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantAssertionEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantAssertionEncrypted_SP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantAssertionEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantAssertionEncrypted_SP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantAssertionEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantAssertionEncrypted_SP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantAssertionEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantAttributeEncrypted_SP_SSOArt_SLOhttp">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantAttributeEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantAttributeEncrypted_SP_SSOArt_SLOSOAP">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantAttributeEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantAttributeEncrypted_SP_SSOpost_SLOhttp">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="http"/>
+        <parameter name="attribute" value="wantAttributeEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 
+    <test name="SAMLv2wantAttributeEncrypted_SP_SSOpost_SLOSOAP">
+        <parameter name="ssoprofile" value="post"/>
+        <parameter name="sloprofile" value="SOAP"/>
+        <parameter name="attribute" value="wantAttributeEncrypted"/>
+        <parameter name="metadata" value="sp"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySigningEncryptionTests"/>
+        </classes>
+    </test> 

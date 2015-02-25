@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<chapter xml:id='chap-web-agents'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+ <title>Configuring Web Policy Agent Profiles</title>
+
+ <indexterm>
+  <primary>policy agent profiles</primary>
+  <secondary>configuring</secondary>
+ </indexterm>
+
+ <!-- The following two paras are used in the admin guide, j2ee pa users and web pa users guides -->
+ <para> You install policy agents in web servers and web application containers
+  to enforce access policies OpenAM applies to protected web sites and web
+  applications. Policy agents depend on OpenAM for all authentication and
+  authorization decisions. Their primary responsibility consists in enforcing
+  what OpenAM decides in a way that is unobtrusive to the user. In organizations
+  with many servers, you might well install many policy agents.</para>
+
+ <para>Policy agents can have local configurations where they are installed,
+  but usually you store all policy agent configuration information in the
+  OpenAM configuration store, defining policy agent profiles for each, and then
+  you let the policy agents access their profiles through OpenAM such that you
+  manage all agent configuration changes centrally. This chapter describes how
+  to set up policy agent profiles in OpenAM for centralized configuration.</para>
+
+
+ <!-- The following sections are being reused in multiple docs -->
+ <xinclude:include href="../shared/sec-gateway-or-policy-agent.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
+
+ <xinclude:include href="../shared/sec-kinds-of-agent-profiles.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
+
+ <xinclude:include href="../shared/sec-create-agent-profiles.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
+
+ <xinclude:include href="../shared/sec-delegate-agent-profile-creation.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
+
+ <!-- The following section will be reused in the web policy agent users guide  -->
+ <xinclude:include href="../shared/sec-configuring-web-policy-agents.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
+
+ <xinclude:include href="../shared/sec-configure-agent-authenticators.xml">
+  <xinclude:fallback><!-- Error: failed to include file --></xinclude:fallback>
+ </xinclude:include>
+</chapter>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+
+<section xml:id="configure-referrals-with-console"
+          xmlns='http://docbook.org/ns/docbook'
+          version='5.0' xml:lang='en'
+          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+          xmlns:xlink='http://www.w3.org/1999/xlink'
+          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+    <title>Configuring Referrals by Using the OpenAM Console</title>
+
+    <para>This section describes the process of creating referrals within an
+     application by using the OpenAM Console.</para>
+
+ <para>By default, referrals are not displayed in the policy editor
+  within the OpenAM console.</para>
+ <procedure xml:id="enable-referrals-xui">
+ <title>To Enable Referrals in the Policy Editor</title>
+ <indexterm>
+  <primary>Referral</primary>
+  <secondary>Enabling</secondary>
+ </indexterm>
+
+ <step>
+  <para>In the OpenAM console, select Configuration &gt; Global &gt; Policy
+   Configuration, set Activate Referrals to
+   <literal>Enabled</literal>, and then click Save.</para>
+ </step>
+ </procedure>
+
+ <para>Referrals enable applications and policies to exist in
+  different realms, and redirect incoming authorization requests to those
+  realms.</para>
+
+ <procedure xml:id="create-referral-xui">
+  <title>To Configure Referrals by Using the Policy Editor</title>
+  <indexterm>
+   <primary>Referral</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+  <step>
+   <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; Policies, and then click the name of the
+    application to create a referral in.</para>
+   <substeps>
+    <step><para>To create a new referral, click Add New Referral.</para></step>
+    <step><para>To modify an existing referral, click the name of the
+     referral.</para></step>
+    <step><para>To discard any changes and return to the previous page,
+     click Cancel.</para></step>
+   </substeps>
+  </step>
+
+  <step>
+   <para>Provide a name for the referral, and then click Next.</para>
+
+   <para>
+    Do not use special characters within policy, application or referral names
+    (for example, "my+referral") using the Policy Editor or REST endpoints as
+    OpenAM returns a 400 Bad Request error.
+    The special characters are: double quotes ("), plus sign (+), comma (,),
+    less than (&lt;), equals (=), greater than (&gt;), backslash (\), and
+    null (\u0000).
+   </para>
+  </step>
+
+  <step>
+   <para>To define resources that the referral applies to,
+    follow the steps below:</para>
+   <substeps>
+    <step>
+     <para>In the Available patterns section, click the
+      row containing the pattern to use as the template for a resource pattern
+      to move it to the Create your resources section.</para>
+     <mediaobject xml:id="figure-resource-patterns-referrals-step1">
+      <alt>Modify the resource patterns to specify the resources the
+       policy applies to.</alt>
+      <imageobject>
+       <imagedata
+        fileref="images/resource-pattern-step1.png"
+        format="PNG" />
+      </imageobject>
+      <textobject><para>Select a resource pattern.</para></textobject>
+     </mediaobject>
+    </step>
+
+    <step performance="optional">
+     <para>Optionally, in the Create your resources section, replace the
+      asterisks with values to define the resources that the referral applies
+      to.</para>
+
+     <mediaobject xml:id="figure-resource-referrals-step2">
+      <alt>Edit the resource pattern if required.</alt>
+      <imageobject>
+       <imagedata
+        fileref="images/resource-pattern-step2.png"
+        format="PNG" />
+      </imageobject>
+      <textobject><para>Optionally, edit the resource pattern.</para></textobject>
+     </mediaobject>
+
+     <para>For information on specifying patterns for matching resources, see
+      <link xlink:href="admin-guide#policy-patterns-wildcards"
+            xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink">
+       <citetitle>Specifying Resource Patterns with Wildcards</citetitle>
+      </link>.</para>
+    </step>
+
+    <step>
+     <para>Click the Add icon to move the resource into the Resources
+      section.</para>
+
+     <mediaobject xml:id="figure-resource-referrals-step3">
+      <alt>Add the completed resource to the Resources section
+       by clicking the Add icon.</alt>
+      <imageobject>
+       <imagedata
+        fileref="images/resource-pattern-step3.png"
+        format="PNG" />
+      </imageobject>
+      <textobject><para>Add the resource to the Resources section.</para></textobject>
+     </mediaobject>
+    </step>
+   </substeps>
+   <tip><para>To remove a resource, click the Delete icon.</para></tip>
+   <para>Repeat these steps to add all the resources your
+    referral applies to,  and then click Next.</para>
+  </step>
+
+  <step>
+   <para>
+    In the Available realms drop-down, select a realm to which the
+    referral redirects requests, and then click the Add icon. You can add
+    multiple target realms.</para>
+   <note><para>A referral can only redirect requests to a child,
+    or sibling of the realm it is created in. The Available
+     realms drop-down only displays valid realms.</para></note>
+   <para>To remove an entry, click the Delete icon in the
+    row containing the realm to remove.</para>
+   </step>
+
+  <step>
+   <para>Review your configuration.</para>
+
+   <tip><para>If the configuration is not visible, click the maximized
+    link to switch to maximized view.</para></tip>
+
+   <para>To make changes to the configuration, either click the relevant step,
+    or click the item to jump to the relevant step and make amendments to
+    the configuration.</para>
+
+   <para>When the configuration is completed, click Finish.</para>
+  </step>
+ </procedure>
+</section>

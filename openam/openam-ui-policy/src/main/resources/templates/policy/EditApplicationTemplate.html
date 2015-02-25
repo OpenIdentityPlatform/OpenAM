@@ -1,0 +1,63 @@
+<div class="content-bg">
+    <div class="policy-header">
+        <a href="#apps/" class="button float-right" id="backButton">{{t "common.form.cancel"}}</a>
+        {{#if entity.name}}
+        <h1>{{t "policy.editApplications.editApplication"}}: <span>{{entity.name}}</span></h1>
+        {{else}}
+        <h1>{{t "policy.editApplications.title"}}</h1>
+        {{/if}}
+        <h2><span>{{t "policy.common.realm"}}:</span> {{policyEditorRealmUrlHelper entity.realm}}</h2>
+    </div>
+
+    <div class="policy-content">
+        <p>{{t "policy.editApplications.description"}}</p>
+
+        <form class="form">
+            <div class="accordion">
+
+                <h1 class="accordion-header" tabindex="0">
+                    {{t "policy.editApplications.step1"}}
+                    <span class="help-link" data-help-key="app.nameAndDescription"></span>
+                </h1>
+                <section class="accordion-step clearfix">
+
+                    <div class="clearfix">
+                        <div class="group-field-block col2 ">
+                            <label class="prop-name" for="appName">{{t "policy.common.name"}}</label>
+                            <input class="prop-val" id="appName" type="text" value="{{entity.name}}" data-field="name" placeholder="{{t 'common.form.validation.required'}}" required autofocus/>
+                        </div>
+                    </div>
+
+                    <div class="group-field-block">
+                        <label class="prop-name" for="appDescription">{{t "policy.common.descriptionOptional"}}</label>
+                        <textarea class="prop-val" id="appDescription" data-field="description">{{entity.description}}</textarea>
+                    </div>
+                    <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="button"/>
+
+                </section>
+
+                <h1 class="accordion-header" tabindex="0">
+                    {{t "policy.editApplications.step2"}}
+                    <span class="help-link" data-help-key="app.resources"></span>
+                </h1>
+                <section class="accordion-step clearfix">
+
+                    <div class="clearfix">
+                        <div class="col2" id="patterns"></div>
+                        <div class="col2" id="resourcesList"></div>
+                    </div>
+
+                    <input type="button" class="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton"/>
+                </section>
+
+                <h1 class="accordion-header" tabindex="0">{{t "policy.editApplications.step3"}}</h1>
+                <section class="accordion-step clearfix">
+
+                    <div id="reviewInfo" class="clearfix"></div>
+                    <input type="button" class="button" value="{{t 'policy.common.buttons.finish'}}" name="submitForm"/>
+
+                </section>
+            </div>
+        </form>
+    </div>
+</div>

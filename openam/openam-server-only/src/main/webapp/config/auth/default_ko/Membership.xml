@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: Membership.xml,v 1.11 2009/07/16 04:12:02 cbasha Exp $
+
+-->
+
+<!--
+    Portions Copyrighted 2011-2013 ForgeRock AS
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+        "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="Membership" version="1.0" >
+
+    <Callbacks length="3" order="1" timeout="120" header="자동 등록 모듈" template="membership.jsp" >
+        <NameCallback>
+            <Prompt>사용자 이름:</Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt>비밀번호:</Prompt>    
+        </PasswordCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>로그인</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>새 사용자</Value>
+                </OptionValue>
+             </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="0" order="2" timeout="120" template="disclaimerDeclined.jsp" error="true" />
+    
+    <Callbacks length="0" order="3" timeout="120" template="profileError.jsp" error="true" />
+
+    <Callbacks length="8" order="4" timeout="300" header="자동 등록" template="register.jsp" >
+        <NameCallback isRequired="true" attribute="uid" >
+            <Prompt>사용자 이름:</Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" isRequired="true" attribute="userPassword" >
+            <Prompt>비밀번호:</Prompt>    
+        </PasswordCallback>
+        <PasswordCallback echoPassword="false" isRequired="true" >
+            <Prompt>비밀번호 확인:</Prompt>    
+        </PasswordCallback>
+        <NameCallback isRequired="true" attribute="givenname" >
+            <Prompt>이름:</Prompt>
+        </NameCallback>
+        <NameCallback isRequired="true" attribute="sn" >
+            <Prompt>성:</Prompt>
+        </NameCallback>
+        <NameCallback isRequired="true" attribute="cn" >
+            <Prompt>전체 이름:</Prompt>
+        </NameCallback>
+        <NameCallback attribute="mail" >
+            <Prompt>전자 메일 주소:</Prompt>
+        </NameCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>등록</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>취소</Value>
+                </OptionValue>
+             </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="2" order="5" timeout="120" header="자동 등록" >
+        <ChoiceCallback attribute="uid" >
+            <Prompt>입력한 사용자 이름을 가진&lt;BR&gt;사용자가 이미 있습니다.&lt;BR&gt;다음 사용자 이름 중 하나를 &lt;BR&gt;선택하거나 새로 &lt;BR&gt;만드십시오.</Prompt>
+            <ChoiceValues>
+              <ChoiceValue>
+                  <Value>내 이름 만들기</Value>
+              </ChoiceValue>
+            </ChoiceValues>
+        </ChoiceCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>제출</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="1" order="6" timeout="120" template="disclaimer.jsp" >
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>동의함</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>동의 안 함</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+</ModuleProperties>

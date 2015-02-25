@@ -1,0 +1,33 @@
+{
+    "configuration": {
+        "lang": "en",
+        "policyEditor": {
+            "defaultApplications": {
+                "config": {
+                    "hideByDefault": true,
+                    "exceptThese": []
+                },
+                "defaultApplicationList": ["calendar", "crestPolicyService", "im", "openProvisioning", "paycheck", "sunAMDelegationService", "sunBank", "sunIdentityServerDiscoveryService", "sunIdentityServerLibertyPPService"]
+            },
+            "documentation": {
+                "app": {
+                    "nameAndDescription": "",
+                    "resources": ""
+                },
+                "policy": {
+                    "nameAndDescription": "",
+                    "resources": "",
+                    "actions": "",
+                    "subjectConditions": "",
+                    "environmentConditions": "",
+                    "resourceAttributes": ""
+                },
+                "referral": {
+                    "name": "",
+                    "resources": "",
+                    "realms": ""
+                }
+            }
+        }
+    }
+}

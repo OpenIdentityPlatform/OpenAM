@@ -1,0 +1,382 @@
+
+    <test name="CSDKAuthTestLDAPModule">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testMode" value="module"/>
+         <parameter name="testModeNo" value="3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestLDAPService">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testMode" value="service"/>
+         <parameter name="testModeNo" value="4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestLDAPAuthLevel">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testMode" value="authlevel"/>
+         <parameter name="testModeNo" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestAnonymousModule">
+        <parameter name="testModule" value="anonymous"/>
+        <parameter name="testMode" value="module"/>
+         <parameter name="testModeNo" value="3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestAnonymousService">
+        <parameter name="testModule" value="anonymous"/>
+        <parameter name="testMode" value="service"/>
+         <parameter name="testModeNo" value="4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestAnonymousAuthLevel">
+        <parameter name="testModule" value="anonymous"/>
+        <parameter name="testMode" value="authlevel"/>
+         <parameter name="testModeNo" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestDataStoreModule">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testMode" value="module"/>
+         <parameter name="testModeNo" value="3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestDataStoreService">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testMode" value="service"/>
+         <parameter name="testModeNo" value="4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestDataStoreAuthLevel">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testMode" value="authlevel"/>
+         <parameter name="testModeNo" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+     <test name="CSDKAuthTestADUser">
+        <parameter name="testModule" value="ad"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="testModeNo" value="2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test> 
+  <test name="CSDKAuthTestADModule">
+        <parameter name="testModule" value="ad"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="testModeNo" value="3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+   <test name="CSDKAuthTestADService">
+        <parameter name="testModule" value="ad"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="testModeNo" value="4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestADAuthLevel">
+        <parameter name="testModule" value="ad"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="testModeNo" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+   <test name="CSDKAuthTestNTUser">
+        <parameter name="testModule" value="nt"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="testModeNo" value="2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestNTModule">
+        <parameter name="testModule" value="nt"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="testModeNo" value="3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestNTService">
+        <parameter name="testModule" value="nt"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="testModeNo" value="4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestNTAuthLevel">
+        <parameter name="testModule" value="nt"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="testModeNo" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestJDBCUser">
+        <parameter name="testModule" value="jdbc"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="testModeNo" value="2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test> 
+    <test name="CSDKAuthTestJDBCModule">
+        <parameter name="testModule" value="jdbc"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="testModeNo" value="3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestJDBCService">
+        <parameter name="testModule" value="jdbc"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="testModeNo" value="4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestJDBCAuthLevel">
+        <parameter name="testModule" value="jdbc"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="testModeNo" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestRadiusUser">
+        <parameter name="testModule" value="radius"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="testModeNo" value="2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestRadiusModule">
+        <parameter name="testModule" value="radius"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="testModeNo" value="3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestRadiusService">
+        <parameter name="testModule" value="radius"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="testModeNo" value="4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestRadiusAuthLevel">
+        <parameter name="testModule" value="radius"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="testModeNo" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test> 
+  <test name="CSDKAuthTestUnixUser">
+        <parameter name="testModule" value="unix"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="testModeNo" value="2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestUnixModule">
+        <parameter name="testModule" value="unix"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="testModeNo" value="3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestUnixService">
+        <parameter name="testModule" value="unix"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="testModeNo" value="4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestUnixAuthLevel">
+        <parameter name="testModule" value="unix"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="testModeNo" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>    
+    
+    
+   

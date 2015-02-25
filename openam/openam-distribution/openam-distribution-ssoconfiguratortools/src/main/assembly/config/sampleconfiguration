@@ -1,0 +1,210 @@
+##############################################################################
+###
+### SERVER_URL is the URL of the web container on which OpenAM Server is
+### deployed.
+###
+### DEPLOYMENT_URI is the OpenAM Server deployment URI.
+###
+### BASE_DIR is the configuration directory
+###
+### locale is the user locale.
+###
+### PLATFORM_LOCALE is is the locale of OpenAM Server.
+###
+### AM_ENC_KEY is the password encryption key.  In a multiserver installation,
+### this parameter must have the same value as the other servers.  By default,
+### AM_ENC_KEY is set to "" which means that OpenAM Server will generate a 
+### random password encryption key.
+###
+### ADMIN_PWD is the password for the default user, amAdmin. The password must
+### be at least 8 characters in length. If this configuration will be part of
+### an existing deployment, the password you enter must match that of the
+### original deployment.
+###
+### AMLDAPUSERPASSWD is the password for default policy agent [UrlAccessAgent].
+### The password must be at least 8 characters in length. If this configuration
+### will be part of an existing deployment, the password you enter must match
+### that of the original deployment.
+###
+### COOKIE_DOMAIN is the name of the trusted DNS domain that OpenAM Server
+### returns to a browser when it grants a session ID to a user.
+###
+### ACCEPT_LICENSES is an optional boolean value, which can be set to always
+### skip displaying the license to the user. Use of this variable will
+### take presidence over the --acceptLicense flag which can be passed in
+### to the application. The value true will auto-accept the license, any other
+### value will be assumed to equal false, resulting in presentation of the
+### license.
+###
+#############################################################################
+SERVER_URL=http://server1.example.com:8080
+DEPLOYMENT_URI=/openam
+BASE_DIR=/openam
+locale=en_US
+PLATFORM_LOCALE=en_US
+AM_ENC_KEY=
+ADMIN_PWD=11111111
+AMLDAPUSERPASSWD=00000000
+COOKIE_DOMAIN=.example.com
+ACCEPT_LICENSES=false
+
+##############################################################################
+###
+### DATA_STORE is the type of configuration data store. Valid values are
+### 'embedded' - OpenAM embedded OpenDJ server
+### 'dirServer' - ForgeRock OpenDJ or Oracle Directory Server Enterprise Edition
+### If 'dirServer' is specified and the configuration data store contains
+### configuration of existing OpenAM Servers, this OpenAM Server will be
+### added to the existing multi-server setup.
+###
+### DIRECTORY_SSL specifies if the configuration data store is using SSL.
+### Valid values are
+### 'SSL' - SSL
+### 'SIMPLE' - none SSL
+###
+### DIRECTORY_SERVER is the host name of the configuration data store.
+###
+### DIRECTORY_PORT is the port on which the configuration data store is
+### listening for connections.
+###
+### DIRECTORY_ADMIN_PORT is the admin port on which the configuration data
+### store listens for administrative functions. This setting is only required
+### if you are using the embedded OpenDJ, if you are using an external
+### configuration store you can ignore this property
+###
+### DIRECTORY_JMX_PORT is the jmx port on which the configuration data
+### store listens for JMX connections. This setting is only required
+### if you are using the embedded OpenDJ, if you are using an external
+### configuration store you can ignore this property
+###
+### ROOT_SUFFIX is the initial or root suffix of the configuration data store.
+###
+### DS_DIRMGRDN is the DN (distinguished name) of the directory manager,
+### the user who has unrestricted access to the configuration data store.
+###
+### DS_DIRMGRPASSWD is the password for the directory manager of the
+### configuration data store.
+###
+#############################################################################
+DATA_STORE=embedded
+DIRECTORY_SSL=SIMPLE
+DIRECTORY_SERVER=server1.example.com
+DIRECTORY_PORT=50389
+DIRECTORY_ADMIN_PORT=4444
+DIRECTORY_JMX_PORT=1689
+ROOT_SUFFIX=dc=openam,dc=forgerock,dc=org
+DS_DIRMGRDN=cn=Directory Manager
+DS_DIRMGRPASSWD=11111111
+
+
+##############################################################################
+###
+### DS_EMB_REPL_FLAG is the flag for enabling configuration data store in
+### multi-server setup. This flag is valid only if DATA_STORE is set to
+### 'embedded'. To enable this flag, the value needs to be 'embReplFlag'.
+###
+### DS_EMB_REPL_REPLPORT1 is replication port of the configuration data store
+### of the new OpenAM Server.
+###
+### DS_EMB_REPL_HOST2 is the host name of the existing OpenAM Server.
+###
+### DS_EMB_REPL_PORT2 is no longer used as of OpenAM Snapshot 9.5
+###
+### DS_EMB_REPL_ADMINPORT2 is the listening admin port of the configuration
+### data store of the existing OpenAM Server.
+###
+### DS_EMB_REPL_REPLPORT2 is replication port of the configuration 
+### data store of the existing OpenAM Server
+###
+### 'existingserverid' is the URL of the existing OpenAM Server.
+### 'existingserverid' property should only be added to the
+###    second instance of the multi server setup.
+### 'existingserverid' should have the value of this format;
+### http://FQDN of existing OpenAM Server:port of existing 
+###    OpenAM Server/<DEPLOYMENT_URI>
+### eg.,
+### http://server2.example.com:8080/openam
+###
+##############################################################################
+#DS_EMB_REPL_FLAG=embReplFlag
+#DS_EMB_REPL_REPLPORT1=58989
+#DS_EMB_REPL_HOST2=server2.example.com
+#DS_EMB_REPL_ADMINPORT2=4444
+#DS_EMB_REPL_REPLPORT2=50889
+#existingserverid=http://server1.example.com:8080/openam
+
+
+##############################################################################
+###
+### The following properties will not be used in a multi-server setup.
+###
+### USERSTORE_TYPE is the type of user data store. Valid values are
+###
+### 'LDAPv3ForODSEE'  - Oracle Directory Server Enterprise Edition.
+### 'LDAPv3ForAD'     - Active Directory Server with Host and Port.
+### 'LDAPv3ForADDC'   - Active Directory with Domain Name.
+### 'LDAPv3ForADAM'   - Active Directory Application Mode.
+### 'LDAPv3ForOpenDS' - ForgeRock OpenDJ.
+### 'LDAPv3ForTivoli' - IBM Tivoli Directory Server.
+###
+### If DATA_STORE is 'embedded', this property can be commented out or can be
+### with no value. In this case, the configuration data store will be used as
+### user data store. The remaining user data store properties will be ignored.
+###
+### USERSTORE_SSL specifies if the user data store is using SSL.
+### Valid values are
+### 'SSL' - SSL
+### 'SIMPLE' - none SSL
+###
+### USERSTORE_DOMAINNAME is the Domain Name of the Active Directory
+### user data store.
+### If USERSTORE_TYPE is LDAPv3ForADDC, then USERSTORE_DOMAINNAME
+### should be set to a valid Active Directory Domain Name value.
+### If USERSTORE_TYPE is LDAPv3ForADDC, then USERSTORE_HOST,
+### USERSTORE_PORT and USERSTORE_SUFFIX should not be set.
+### These would be derived from the Active directory domain.
+###
+### Example for domain name and notes:
+### A Domain name such as 'mspress.microsoft.com' will identify 
+### Active Directory domain controllers responsible for the domain, 
+### so any client with DNS access can locate a domain controller. 
+### Active Directory clients can use DNS resolution to locate any 
+### number of services.
+### Reference : http://technet.microsoft.com/en-us/library/bb742424.aspx#XSLTsection126121120120
+###
+### USERSTORE_HOST is the host name of the user data store.
+###
+### USERSTORE_PORT is the port on which the user data store is listening for
+### connections.
+###
+### USERSTORE_SUFFIX is the initial or root suffix of the user data store.
+###
+### USERSTORE_MGRDN is the DN (distinguished name) of the directory manager,
+### the user who has unrestricted access to the user data store.
+###
+### USERSTORE_PASSWD  is the password for the directory manager of the user
+### data store
+##############################################################################
+#USERSTORE_TYPE=LDAPv3ForODSEE
+#USERSTORE_SSL=SIMPLE
+#USERSTORE_DOMAINNAME=addc.example.com 
+#USERSTORE_HOST=server1.example.com
+#USERSTORE_PORT=389
+#USERSTORE_SUFFIX=dc=openam,dc=forgerock,dc=org
+#USERSTORE_MGRDN=cn=Directory Manager
+#USERSTORE_PASSWD=11111111
+
+
+##############################################################################
+###
+### LB_SITE_NAME is the name of the site.
+###
+### LB_PRIMARY_URL is the load balancer URL.
+###
+### LB_SESSION_HA_SFO specifies whether session failover should be enabled in
+### the site configuration. Set to "true" to enable SFO.
+###
+##############################################################################
+#LB_SITE_NAME=lb
+#LB_PRIMARY_URL=http://lb.example.com:80/openam
+#LB_SESSION_HA_SFO=false

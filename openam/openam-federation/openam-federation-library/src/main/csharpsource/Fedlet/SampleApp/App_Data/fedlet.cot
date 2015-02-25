@@ -1,0 +1,5 @@
+cot-name=cot.example.com
+sun-fm-cot-status=Active
+sun-fm-trusted-providers=http://idp.example.com:8080/opensso, http://sp.example.com/SampleApp
+sun-fm-saml2-readerservice-url=
+sun-fm-saml2-writerservice-url=

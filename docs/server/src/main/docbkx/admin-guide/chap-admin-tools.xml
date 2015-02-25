@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-admin-tools'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Administration Interfaces &amp; Tools</title>
+
+ <indexterm>
+  <primary>Administration tools</primary>
+ </indexterm>
+
+ <para>This chapter provides a brief introduction to the web-based OpenAM
+ console. It also lists and describes each command line interface (CLI)
+ administration tool.</para>
+ 
+ <section xml:id="openam-console-overview">
+  <title>OpenAM Web-Based Console</title>
+
+  <indexterm>
+   <primary>Admin Console</primary>
+   <secondary>overview</secondary>
+  </indexterm>
+
+  <para>After you install OpenAM, login to the web-based console as OpenAM
+  Administrator, <literal>amadmin</literal> with the password you set during
+  installation. Navigate to a URL such as
+  <literal>http://openam.example.com:8080/openam</literal>. In this case,
+  communications proceed over the HTTP protocol to a FQDN
+  (<literal>openam.example.com</literal>), over a standard Java EE web container
+  port number (8080), to a specific deployment URI (<literal>/openam</literal>).</para>
+  
+  <mediaobject xml:id="figure-console-as-amadmin">
+   <alt>How the console looks to amadmin</alt>
+   <imageobject>
+    <imagedata fileref="images/console-as-amadmin.png" format="PNG" />
+   </imageobject>
+   <textobject><para>The OpenAM Administrator sees all capabilities of the
+   console.</para></textobject>
+  </mediaobject>
+  
+  <para>When you login as the OpenAM Administrator, <literal>amadmin</literal>,
+  you have access to the complete OpenAM console. In addition, OpenAM has set a
+  cookie in your browser that lasts until the session expires, you logout, or
+  you close your browser.<footnote>
+  <para>Persistent cookies can remain valid when you
+  close your browser. This section reflects OpenAM default behavior before
+  you configure additional functionality.</para></footnote></para>
+  
+  <para>When you login to the OpenAM console as a non-administrative end user,
+  you do not have access to the administrative console. Your access is limited
+  to a configuration page with your account information.</para>
+  
+  <mediaobject xml:id="figure-console-non-admin-user">
+   <alt>How the console looks to an end user</alt>
+   <imageobject>
+    <imagedata fileref="images/console-non-admin-user.png" format="PNG" />
+   </imageobject>
+   <textobject><para>OpenAM console directs an end user to a page where she
+   can view and update her account information.</para></textobject>
+  </mediaobject>
+  
+  <para>If you configure OpenAM to grant administrative capabilities to
+  another user, then that user also sees the console after login. For
+  instance, the OpenAM Administrator granted Kirsten Vaughan privileges to
+  administer the OpenAM Top Level Realm. (This can be done through the console
+  under Access Control &gt; / (Top Level Realm) &gt; Privileges. Kirsten
+  has authorization to read and write policy properties and configured
+  policy agent properties.) When Kirsten logs in, she sees only part of the
+  console capabilities.<footnote><para>For more on delegated administration,
+  see the chapter covering realms.</para></footnote></para>
+  
+  <mediaobject xml:id="figure-console-as-kvaughan">
+   <alt>How the console looks to an administrator</alt>
+   <imageobject>
+    <imagedata fileref="images/console-as-kvaughan.png" format="PNG" />
+   </imageobject>
+   <textobject><para>OpenAM console appears differently to an administrator
+   with limited rights.</para></textobject>
+  </mediaobject>
+ </section>
+ 
+ <section xml:id="openam-cli-overview">
+  <title>OpenAM Command-Line Tools</title>
+
+  <indexterm>
+   <primary>command-line tools</primary>
+   <secondary>overview</secondary>
+  </indexterm>
+
+  <para>The script tools in the following list have <literal>.bat</literal>
+  versions for use on Microsoft Windows.</para>
+
+  <indexterm><primary>Silent installation</primary></indexterm>
+
+  <variablelist>
+   <para>You can install the following OpenAM command-line tools.</para>
+   <varlistentry>
+    <term><command>agentadmin</command></term>
+    <listitem>
+     <para>This tool lets you manage OpenAM policy agent installations.</para>
+     <para>Unpack this tool as part of policy agent installation.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><command>ampassword</command></term>
+    <listitem>
+     <para>This tool lets you change OpenAM Administrator passwords, and
+     display encrypted password values.</para>
+     <para>Install this from the <filename><?eval ${ssoadminZipFile}?></filename>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><command>amverifyarchive</command></term>
+    <listitem>
+     <para>This tool checks log archives for tampering.</para>
+     <para>Install this from <filename><?eval ${ssoadminZipFile}?></filename>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><command>${configJarFile}</command></term>
+    <listitem>
+     <para>This executable .jar file lets you perform a silent installation of an OpenAM
+     server with a configuration file. For example, the <command>java -jar configurator.jar -f
+     config.file</command> command couples the <filename>configurator.jar</filename> archive
+     with the <replaceable>config.file</replaceable>. The <filename>sampleconfiguration</filename>
+     file provided with the tool is set up with the format for the <filename>config.file</filename>,
+     and it must be adapted for your environment.</para>
+     <para>Install this from <filename><?eval ${ssoconfigZipFile}?></filename>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><command>ssoadm</command></term>
+    <listitem>
+     <para>This tool provides a rich command-line interface for the configuration
+     of OpenAM core services.</para>
+     <para>In a test environment you can activate
+     <filename>ssoadm.jsp</filename> to access the same functionality in your
+     browser. Once active, you can use many features of the <command>ssoadm</command>
+     command, by navigating to the <filename>ssoadm.jsp</filename> URI, in a URL such as
+     <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
+     <para>Install this from <filename><?eval ${ssoadminZipFile}?></filename>.</para>
+     <para>To translate settings applied in OpenAM console to service attributes
+     for use with <command>ssoadm</command>, login to the OpenAM console
+     as <literal>amadmin</literal> and access the services page, in a URL such as
+     <literal>http://openam.example.com:8080/openam/services.jsp</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <!--
+   <varlistentry>
+    <term><command>ssodtool.sh</command></term>
+    <listitem>
+     <para>This extensible diagnostic tool runs in GUI mode by default, but can
+     also be run in command-line mode. The tool helps you check configuration
+     settings and verify configuration integrity, test connectivity, and
+     generate test reports.</para>
+     <para>Install this from <filename><?eval ${diagnosticsZipFile}?></filename>.</para>
+    </listitem>
+   </varlistentry>
+   -->
+  </variablelist>
+  
+  <para>The commands access the OpenAM configuration over HTTP (or HTTPS).
+  When using the administration commands in a site configuration, the
+  commands access the configuration through the front end load balancer.</para>
+  <itemizedlist>
+   <para>Sometimes a command cannot access the load balancer, because:</para>
+   <listitem>
+    <para>Network routing restrictions prevent the tool from accessing
+    the load balancer.</para>
+   </listitem>
+   <listitem>
+    <para>For testing purposes, the load balancer uses a self-signed
+    certificate for HTTPS, and the tool does not have a way of trusting the
+    self-signed certificate.</para>
+   </listitem>
+   <listitem>
+    <para>The load balancer is temporarily unavailable.</para>
+   </listitem>
+  </itemizedlist>
+  <para>In such cases you can work around the problem by adding an option for each
+   node, such as the following to the <command>java</command> command in the
+   tool's script.</para>
+
+  <para>Node 1:</para>
+  <programlisting language="none">
+   -D"com.iplanet.am.naming.map.site.to.server=https://lb.example.com:443/openam=
+   http://server1.example.com:8080/openam"
+  </programlisting>
+
+  <para>Node 2:</para>
+  <programlisting language="none">
+   -D"com.iplanet.am.naming.map.site.to.server=https://lb.example.com:443/openam=
+   http://server2.example.com:8080/openam"
+  </programlisting>
+
+  <para>In the above example the load balancer is on the <literal>lb</literal>
+   host, <literal>https://lb.example.com:443/openam</literal> is the site name,
+   and the OpenAM servers in the site are on <literal>server1</literal> and
+   <literal>server2</literal>.</para>
+
+  <para>The <command>ssoadm</command> command will only use the latest value in the
+   map, so if you have a mapping like: </para>
+
+  <programlisting language="none">
+   -D"com.iplanet.am.naming.map.site.to.server=https://lb.example.com:443/openam=
+   http://server1.example.com:8080/openam, https://lb.example.com:443/openam=
+   http://server2.example.com:8080/openam"
+  </programlisting>
+
+  <para>The <command>ssoadm</command> command will always talk to:</para>
+  <programlisting language="none">
+   http://server2.example.com:8080/openam
+  </programlisting>
+ </section>
+
+ <section xml:id="openam-ssoadm-jsp-overview">
+  <title>OpenAM ssoadm.jsp</title>
+
+  <indexterm>
+   <primary>ssoadm.jsp</primary>
+   <secondary>enabling</secondary>
+  </indexterm>
+
+  <para>You can use the <command>ssoadm.jsp</command> page to access a large
+  subset of the configuration capabilities of the <command>ssoadm</command>
+  command. Yet, <command>ssoadm.jsp</command> is disabled by default to prevent
+  potential misuse.</para>
+  <procedure xml:id="enable-ssoadm-jsp">
+   <title>To Enable ssoadm.jsp</title>
+   <indexterm><primary>Enabling ssoadm.jsp</primary></indexterm>
+   <step>
+    <para>Login as OpenAM administrator, <literal>amadmin</literal>.</para>
+   </step>
+   <step>
+    <para>Click Configuration &gt; Servers and Sites &gt;
+    Servers &gt; <replaceable>URL of your server</replaceable>.</para>
+   </step>
+   <step>
+    <para>Click Advanced to display the Advanced Properties table,
+    and then click Add. In the text boxes that appear, include the following
+    information, and then click Save.</para>
+    <variablelist>
+     <varlistentry>
+      <term>Property Name</term>
+      <listitem><para>ssoadm.disabled</para></listitem>
+     </varlistentry>
+     <varlistentry>
+       <term>Property Value</term>
+      <listitem><para>false</para></listitem>
+     </varlistentry>
+    </variablelist>
+   </step>
+   <step>
+    <para>To see if the change worked, navigate to the URL of OpenAM with the
+    <literal>/ssoadm.jsp</literal> URI. For the aforementioned URL, you would
+    navigate to <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
+   </step>
+  </procedure>
+ </section>
+</chapter>

@@ -1,0 +1,279 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: sms.dtd,v 1.8 2008/09/04 23:59:39 veiming Exp $
+  
+-->
+<!--
+    Portions Copyrighted 2014 ForgeRock AS.
+-->
+
+<!-- This DTD defines the data structure that will be used by services to define their configuration information and their management tasks.
+Unique Declaration name for DOCTYPE tag:
+
+
+"Service Management Services (SMS) 1.0 DTD"
+-->
+
+<!-- Provides the I18N key required to get the parameter description in a given locale. If this is not provided it uses the name of the configuration parameter as the I18N key. -->
+<!ENTITY % i18nIndex "i18nKey CDATA #IMPLIED" >
+
+<!-- ServicesConfiguration is the root node for all services' configuration parameters and tasks. Multiple services can be registered using a single XML file.  The version attribute specifies the version of the ServiceConfiguration. -->
+<!ELEMENT ServicesConfiguration ( Service )+ >
+<!ATTLIST ServicesConfiguration
+        version                NMTOKEN                "1.0"
+>
+
+<!-- Service defines configuratin parameters' schema (Schema), plugin configuration parameters' schema (PluginSchema), and/or configuration data (Configuration). Examples of services are authentication, session, log, user management (ums), policy, etc. The name attribute provides the name of the service, and version attribute specifies the version of the service. -->
+<!ELEMENT        Service                ( Schema?, PluginSchema*, Configuration? ) >
+<!ATTLIST        Service
+        name                 NMTOKEN                #REQUIRED 
+        version                NMTOKEN                #REQUIRED
+>
+
+<!-- Schema defines the schema for the configuration parameters of the service. The sub-elements define the service's specific Server configuration attributes for the respective parameter grouping (global, organization, dynamic, user, policy and generic).  The Generic sub-element can be used for managing general configuration attributes. The attributes provide information for I18N properties file name and the URL of the jar file which contains the properties file. Additionally defines the ServiceHierarchy which defines where the service will be displayed in the OpenSSO admin. console.  The propertiesViewBeanURL provides the Admin Console viewbean URL associated with this schema. The i18nIndex attribute provides the I18N key used to get the localized display name-->
+<!ELEMENT Schema ( Global?, Organization?, Dynamic?, Policy?, User?, Group?, Domain?,
+                Generic*, PluginInterface* ) >
+<!ATTLIST Schema i18nJarURL CDATA #IMPLIED
+        i18nFileName CDATA #IMPLIED
+        serviceHierarchy CDATA #IMPLIED
+        propertiesViewBeanURL CDATA #IMPLIED
+        revisionNumber NMTOKEN "10"
+        %i18nIndex; >
+
+<!-- Global element provides grouping of configuration parameters that are globally applicable to all instances of its service. In the case of services that are grouped, these configuration parameters are global to that group. The schema of the configuration parameters is provided by AttributeSchema, and if there is any necessity to sub-group additional configuration parameters, they can be grouped using the SubSchema element. The attribute validate is by default considered yes, but if it is set to no, then the validation of configuration data against the schema is disabled. This also disables the inheritance of default values from the schema. -->
+<!ELEMENT Global ( AttributeSchema | SubSchema )* >
+<!ATTLIST Global validate ( yes | no ) "yes" >
+
+<!-- Organization element provides a grouping of configuration parameters that can be configured differently for various organizations. Examples are parameters like organization's authentication mechanisms, logging information, etc. The schema of the configuration parameters is provided by AttributeSchema and if there is any necessity to sub-group additional configuration parameters they can be grouped using the SubSchema element. Additionally if some of the configuration parameters need to be obtained during creation of the organization, they can be specifed under OrganizationAttributeSchema element. -->
+<!ELEMENT Organization ( AttributeSchema*, SubSchema*, OrganizationAttributeSchema? ) >
+
+<!-- OrganizationAttributeSchema element provides a grouping of configuration parameters that will be obtained at the time of organization creation and will be managed as part of the organization attributes. --> 
+<!ELEMENT OrganizationAttributeSchema ( AttributeSchema* ) >
+
+<!-- Dynamic element provides a grouping of configuration parameters that are applicable to all user objects, with respect to this service. These attributes are usually implemented as CoS (Class of Service) privided by iDS 5.2. Examples are parameters like status attributes, mail address, etc. The schema of the configuration parameters is provided by AttributeSchem.  The AttributeSchema provides the schema of the configuration parameters. -->
+<!ELEMENT Dynamic ( AttributeSchema* ) >
+
+<!-- Group element provides a grouping of configuration parameters that are applicable to group objects, with respect to this service. Examples are parameters like social security number, email address, etc. The AttributeSchema provides the schema of the configuration parameters. -->
+<!ELEMENT Group ( AttributeSchema* ) >
+<!ATTLIST Group
+        statusAttribute CDATA #IMPLIED
+>
+
+<!-- Domain element provides a grouping of configuration parameters that are applicable to domain objects,
+ with respect to this service. Examples are parameters like social security number, email address, etc
+. The AttributeSchema provides the schema of the configuration parameters. -->
+<!ELEMENT Domain ( AttributeSchema* ) >
+<!ATTLIST Domain
+        statusAttribute CDATA #IMPLIED
+>
+
+<!-- User element provides a grouping of configuration parameters that are applicable to user objects,
+ with respect to this service. Examples are parameters like social security number, email address, etc
+. The AttributeSchema provides the schema of the configuration parameters. -->
+<!ELEMENT User ( AttributeSchema* ) >
+<!ATTLIST User
+        statusAttribute CDATA #IMPLIED
+>
+
+<!-- Generic element provides grouping of configuration parameters that donot fit in any of the other specific categories. The The AttributeSchema provides the schema of the configuration parameters. The attribute type provides the name for the generic collection of attributes. -->
+<!ELEMENT Generic ( AttributeSchema* ) >
+<!ATTLIST Generic
+        type        NMTOKEN  #REQUIRED
+>
+
+<!-- Policy element provides grouping of actions (or privileges) that are specific to the service. Examples of actions are canForwardEmailAddress, canChangeSalaryInformation, etc. The The schema of the configuration parameters is provided by AttributeSchema.  The AttributeSchema provides the schema of the configuration parameters.  -->
+<!ELEMENT Policy ( AttributeSchema* ) >
+
+<!-- SubSchema defines the schema for a service that are grouped for logical purposes. The configuration information is stored as a subordinate node under the service. The name attribute provides the name for the sub-schema. The inheritance attribute specifies whether this schema can be inherited by only one or multiple configuration nodes using SubConfiguration elements. The default inheritance is single. The maintainPriority attribute suggests if priority must be honored among its peer SubConfig elements. The i18nIndex attribute provides the I18N key used to get the localized display name.  The attribute validate is by default considered yes, but if it is set to no, then the validation of configuration data against the schema is disabled. This also disables the inheritance of default values from the schema. -->
+<!ELEMENT SubSchema ( AttributeSchema | SubSchema )* >
+<!ATTLIST SubSchema name CDATA #REQUIRED
+        inheritance ( single | multiple ) "single" 
+        maintainPriority ( yes | no ) "no"
+        validate ( yes | no ) "yes"
+        supportsApplicableOrganization ( yes | no ) "no"
+        i18nFileName CDATA #IMPLIED
+        %i18nIndex;
+>
+
+<!-- PluginInterface provides the definition of a pluggable interface to be used by a service, which has a pluggable architecture. The name attribute name provides the name for the plugin interface, and the attribute "interface" provides the fully qualified Java interface class name. The i18nIndex attribute provides the I18N key used to get the localized display name -->
+<!ELEMENT PluginInterface EMPTY>
+<!ATTLIST PluginInterface
+        name NMTOKEN #REQUIRED
+        interface NMTOKEN #REQUIRED
+        %i18nIndex;
+>
+
+<!-- PluginSchema provides the information needed to dynamically download and instantiate the plugin for a service. The name attribute gives the name for the plugin, interfaceName provides the name of plugin interface defined by the plugin, className gives the name of the java class that implements the plugin interface, jarURL gives the URL of the jar file where the java class can be found.  The organizationName if specified determines the organization to which the plugin schema is added. The i18nJarURL specifies the URL to the jar file that contains the i18nFile.  The i18nFileName specifies the name of the properties file used to get the localized display name.  The propertiesViewBeanURL provides the name of the Admin Console viewbean associated with this pluginSchema.  The i18nIndex attribute provides the I18N key used to get the localized display name  -->
+<!ELEMENT PluginSchema (AttributeSchema*) >
+<!ATTLIST PluginSchema
+        name NMTOKEN #REQUIRED
+        interfaceName NMTOKEN #REQUIRED
+        className NMTOKEN #REQUIRED
+        jarURL CDATA #IMPLIED
+        organizationName CDATA #IMPLIED
+        i18nJarURL CDATA #IMPLIED
+        i18nFileName CDATA #IMPLIED
+        propertiesViewBeanURL CDATA #IMPLIED
+        %i18nIndex;
+>
+
+<!-- AttributeSchema defines a single configuration parameter for a service. The attribute name gives the name for the configurable parameter, The type specifies the kind of value the attribute will take.  Possible values are: single, list, single_choice, multi_choice, signature, or validator type.  For single_choice, a default value must be defined from the list of choice values. The default value for type is list; The uitype specifies the display type as radio, link, button, or name_value_list; The syntax defines whether the parameter is boolean, string, paragraph, password, encrypted_password, dn, email, url, numeric, percent, number, decimal_number, number_range, decimal_range, xml, or date.  The cosQualifier defines how the OpenSSO will resolve conflicting cosQulaifier attributes assigned to the same user object.  The default value for syntax is string; The rangeStart and rangeEnd provide the starting and ending values for attribute syntax decimal_range and number range, respectively; The minValue and maxValue provide the minimun and maximun acceptable values respectively.  The validator specifies the name of the class that would validate this attribute.  The any provides means for service developers to add service-specific information.  The propertiesViewBeanURL specifies the name of the Admin Console viewbean associated with this attribute. The i18nIndex attribute provides the I18N key used to get the localized display name.  The elements IsOptional, IsServiceIdentifier, IsResourceNameAllowed, IsStatusAttribute represent whether the attribute is optional, a service identifier (CoS specifier), resource name allowed or status attribute, respectievely. The element BooleanValues provide the boolean true and false values. The element DefaultValues provides the default values for the parameter. The element ChoiceValues provides the possible values for the parameter if it is of choice type. The element Condition, if present specifies boolean operations which determine if the attribute is valid based on the current configuration data. If multiple Condition elements are present it is sufficient if at least one of them statisfy the requirement (this provides "OR" implementation). -->
+<!ELEMENT AttributeSchema (IsOptional?, IsServiceIdentifier?, IsResourceNameAllowed?,
+        IsStatusAttribute?, ChoiceValues?, BooleanValues?, DefaultValues?,
+        Condition* ) >
+<!ATTLIST AttributeSchema
+        name NMTOKEN #REQUIRED
+        type ( single | list | single_choice | multiple_choice |
+                signature | validator ) "list"
+        uitype ( radio | link | button | name_value_list | unorderedlist |
+                orderedlist | maplist | globalmaplist | addremovelist ) #IMPLIED
+        syntax ( boolean | string | paragraph | password | encrypted_password | 
+                dn | email | url | numeric | percent | number |
+                decimal_number | number_range | decimal_range | xml | date | script ) "string"
+        cosQualifier        ( default | override |
+                         operational | merge-schemes )                "default"
+        listOrder ( natural | insertion ) "natural"
+        rangeStart CDATA #IMPLIED
+        rangeEnd CDATA #IMPLIED
+        minValue CDATA #IMPLIED
+        maxValue CDATA #IMPLIED
+        validator CDATA #IMPLIED
+        any CDATA #IMPLIED
+        propertiesViewBeanURL CDATA #IMPLIED
+        isSearchable ( yes | no ) "no"
+        %i18nIndex;
+>
+
+<!-- DefaultValues provide the default values for the attribute. The values are statically defined via the sub-element Value, or can be dynamically computed by calling the class defined by the sub-element DefaultValuesClassName. -->
+<!ELEMENT DefaultValues ( Value* | DefaultValuesClassName ) >
+
+<!-- DefaultValuesClassName provides the name of a java class that implements the abstract class com.sun.identity.sm.DefaultValues and provides the implementation for the method getDefaultValues that returns the default values for the AttributeSchema. -->
+<!ELEMENT DefaultValuesClassName ( AttributeValuePair* ) >
+<!ATTLIST DefaultValuesClassName
+        className        NMTOKEN                #REQUIRED
+>
+
+<!-- ChoiceValues provide the only possible values for the attribute. The values are statically defined via the sub-element Value or can be dynamically computed by calling the class defined by the sub-element ChoiceValuesClassName. -->
+<!ELEMENT ChoiceValues ( ChoiceValue* | ChoiceValuesClassName ) >
+
+<!-- ChoiceValuesClassName provides the name of a java class that implements the abstract class com.sun.identity.sm.ChoiceValues and provides the implementation for the method getChoiceValues that returns the choice values for the AttributeSchema. -->
+<!ELEMENT ChoiceValuesClassName ( AttributeValuePair* ) >
+<!ATTLIST ChoiceValuesClassName
+        className        NMTOKEN                #REQUIRED
+>
+
+<!-- ChoiceValue provides one of the possible choice values for an attribute and whether it is the default value, and its i18n key used to get the localized display name. -->
+<!ELEMENT ChoiceValue (#PCDATA) >
+<!ATTLIST ChoiceValue
+        %i18nIndex;
+>
+
+<!-- BooleanValues provides the values associated with "true" and "false" boolean values -->
+<!ELEMENT BooleanValues ( BooleanTrueValue, BooleanFalseValue ) >
+
+<!-- BooleanTrueValue defines the value for the "true" .  The i18nIndex specifies the I18N key used to get the localized display name -->
+<!ELEMENT BooleanTrueValue        (#PCDATA) >
+<!ATTLIST BooleanTrueValue
+        %i18nIndex;
+>
+
+<!-- BooleanFalseValue defines the value for the "false" .  The i18nIndex specifies the I18N key used to get the localized display name -->
+<!ELEMENT BooleanFalseValue        (#PCDATA) >
+<!ATTLIST BooleanFalseValue
+        %i18nIndex;
+>
+
+<!-- IsOptional defines that the attribute is optional. -->
+<!ELEMENT IsOptional EMPTY >
+
+<!-- IsServiceIdentifier defines that the attribute identifies the kind of service offered. -->
+<!ELEMENT IsServiceIdentifier EMPTY >
+
+<!-- IsStatusAttribute defines that the attribute will be used to determine the service status. -->
+<!ELEMENT IsStatusAttribute EMPTY >
+
+<!-- IsResourceNameAllowed defines that the attribute(or action in Policy) can have a resource name. -->
+<!ELEMENT IsResourceNameAllowed EMPTY >
+
+<!-- Condition specifies the condition of a peer attribute-value pair that must be satisfied for conditional attributes. Only if the current condition is satisfied, sub-ordinate conditions, if present, are evaluated (this provides AND implementation). The attribute operator provides a boolean OR operation, and attributes attributeName and attributeValue provide the condition that must be met. -->
+<!ELEMENT        Condition        ( Condition* ) >
+<!ATTLIST        Condition
+        operator        ( equals | notEquals )                "equals"
+        attributeName        NMTOKEN        #REQUIRED
+        attributeValue        CDATA         #IMPLIED
+>
+
+<!-- Configuration defines service-specific configuration data. It also provides the service instance names, configuration parameters for the respective parameter grouping (global and organization), configuration for plugins. -->
+<!ELEMENT Configuration (Instance*, GlobalConfiguration*, OrganizationConfiguration*, PluginConfiguration*) >
+
+<!-- Instance defines an instance of the service by providing its name and optionally its group membership and its URI. The name attribute gives a user-friendly name that can used to identify the instance of the service, group attribute gives the group name from which it obtains its configuration data, and uri gives the URL for the service. -->
+<!ELEMENT Instance ( AttributeValuePair* ) >
+<!ATTLIST Instance
+        name NMTOKEN "default"
+        group NMTOKEN "default"
+        uri CDATA #IMPLIED
+>
+
+<!-- GlobalConfiguration defines the configuration parameters for all instances within a service group. The element AttributeValuePair provides the configuration data; and element SubConfiguration provides the configuration data for further sub-grouping of configuration parameters. -->
+<!ELEMENT GlobalConfiguration (AttributeValuePair*, SubConfiguration*) >
+<!ATTLIST GlobalConfiguration
+        group NMTOKEN "default"
+>
+
+<!-- OrganizationConfiguration defines the configuration parameters for a particular organization. The attribute name provides the name of the organization. The element AttributeValuePair provides the configuration data and SubConfiguration provides the configuration data for further sub-grouping of configuration parameters. The element OrganizationAttributeValuePair provides the organization specific configuration defined by OrganizationAttributeSchema, these configuration parameters are searchable and are usually indexed by the configuration store. The i18nIndex specifies the I18N key used to get the localized display name. -->
+<!ELEMENT OrganizationConfiguration (AttributeValuePair*, SubConfiguration*, OrganizationAttributeValuePair?) >
+<!ATTLIST OrganizationConfiguration name CDATA #REQUIRED
+        group NMTOKEN "default"
+        %i18nIndex; >
+
+<!-- SubConfiguration defines the configuration information for the sub-nodes of the service specified by SubSchema. The attribute id refers to the name of the SubSchema whose schema is being used; name provides the name for this group's configuration parameters, and priority specifies the priority level for this configuration.   The i18nIndex specifies the I18N key used to get the localized display name. -->
+<!ELEMENT SubConfiguration (AttributeValuePair*, SubConfiguration*) >
+<!ATTLIST SubConfiguration name CDATA #REQUIRED
+        id CDATA #IMPLIED
+        priority NMTOKEN #IMPLIED
+        %i18nIndex; >
+
+<!-- OrganizationAttributeValuePair defines the configuration parameters that will be required at the time of organization creation and will be managed as part of the organization attributes. -->
+<!ELEMENT OrganizationAttributeValuePair ( AttributeValuePair* ) >
+
+<!-- PluginConfiguration defines the configuration information for a plugin as defined by its plugin schema. The attribute name provides a user friendly name for the plugin configuration, pluginSchemaName specifies the name of the plugin schema for which the configuration parameters are provided, organizationName if specified determines the organization to which the plugin configuration is to be applied, and priority specifies the priority for this plugin. -->
+<!ELEMENT PluginConfiguration        ( AttributeValuePair* ) >
+<!ATTLIST PluginConfiguration
+        name                    NMTOKEN         #REQUIRED
+        pluginSchemaName        NMTOKEN         #REQUIRED
+        interfaceName           NMTOKEN         #REQUIRED
+        organizationName        CDATA           #IMPLIED
+        priority                NMTOKEN         #IMPLIED
+>
+
+<!-- AttributeValuePair defines generic attribute-value pairs that can used to specify configuration information. -->
+<!ELEMENT AttributeValuePair (Attribute, Value*) >
+
+<!-- Attribute defines the attribute name i.e., a configuration parameter -->
+<!ELEMENT Attribute EMPTY>
+<!ATTLIST Attribute name NMTOKEN #REQUIRED >
+
+<!-- Value defines the value within an attribute-value pair. -->
+<!ELEMENT Value (#PCDATA) >

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2012-2014 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-change-hosts'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Changing Host Names</title>
+
+ <para>
+  When you change the OpenAM host name,
+  you must make manual changes to the configuration.
+  This chapter describes what to do.
+  If you must also
+  move an embedded configuration directory from one host to another,
+  see the OpenDJ <citetitle>Administration Guide</citetitle> chapter,
+  <link xlink:show="new"
+  xlink:href="${opendjDocBase}/admin-guide/#chap-mv-servers"
+  ><citetitle>Moving Servers</citetitle></link>.
+ </para>
+
+ <itemizedlist>
+  <para>Changing OpenAM host names involves the following high level
+  steps.</para>
+  <listitem>
+   <para>Adding the new host name to the Realm/DNS Aliases list</para>
+  </listitem>
+  <listitem>
+   <para>Exporting, editing, then importing the configuration</para>
+   <para>
+    This step relies on the <command>ssoadm</command> command,
+    which you install separately from OpenAM as described in the procedure,
+    <link xlink:show="new" xlink:href="install-guide#install-openam-admin-tools"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
+    Administration Tools</citetitle></link>.
+   </para>
+  </listitem>
+  <listitem>
+   <para>Stopping OpenAM and editing configuration files</para>
+  </listitem>
+  <listitem>
+   <para>Removing the old host name from the Realm/DNS Aliases list</para>
+  </listitem>
+ </itemizedlist>
+
+ <para>
+  Before you start,
+  make sure you have a current backup of your current installation.
+  See <link xlink:show="new" xlink:href="admin-guide#chap-backup-restore"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+  >Backing Up and Restoring OpenAM Configurations</citetitle></link>
+  for instructions.
+ </para>
+
+ <procedure xml:id="add-new-alias">
+  <title>To Add the New Host Name As an Alias</title>
+
+  <step>
+   <para>Login to OpenAM console as administrator,
+   <literal>amadmin</literal>.</para>
+  </step>
+  <step>
+   <para>Under Access Control &gt; / (Top Level Realm), add the new host name
+   to the Realm/DNS Aliases list, and then save your work.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="change-host-in-service-config">
+  <title>To Export, Edit, &amp; Import the Service Configuration</title>
+
+  <step>
+   <para>Export the service configuration.</para>
+
+   <screen>
+$ <userinput>ssoadm \
+ export-svc-cfg \
+ --adminid amadmin \
+ --encryptsecret myEncryptSecretString1234 \
+ --password-file /tmp/pwd.txt \
+ --outfile config.xml</userinput>
+
+<computeroutput>Service Configuration was exported.</computeroutput>
+   </screen>
+
+   <para>OpenAM uses the value entered in <option>--encryptsecret</option> to
+    encrypt passwords stored in the backup file. It can be any value,
+    and is required when restoring a configuration.</para>
+  </step>
+  <step>
+   <para>Edit the service configuration file.</para>
+   <itemizedlist>
+    <listitem>
+     <para>Change the fully qualified domain name, such as
+     <literal>openam.example.com</literal>, throughout the file.</para>
+    </listitem>
+    <listitem>
+     <para>
+      If you are changing the context path, such as <literal>/openam</literal>,
+      then make the following changes.
+     </para>
+
+     <itemizedlist>
+      <listitem>
+       <para>
+        Change the value of
+        <literal>com.iplanet.am.services.deploymentDescriptor</literal>.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Change <replaceable>contextPath</replaceable> in the value of the
+        <literal>propertiesViewBeanURL="<replaceable
+        >contextPath</replaceable>/auth/ACServiceInstanceList"</literal>.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Change <replaceable>contextPath</replaceable> in the value of
+        <literal>propertiesViewBeanURL="<replaceable
+        >contextPath</replaceable>/auth/ACModuleList"</literal>.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Change the context path in a &lt;Value&gt; element
+        that is a child of an &lt;AttributeValuePair&gt; element.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Change the context path where it occurs throughout the file
+        in the full URL to OpenAM, such as
+        <literal>http:&amp;#47;&amp;#47;openam.example.com:8080&amp;#47;<replaceable
+        >contextPath</replaceable></literal>.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+    <listitem>
+     <para>If you are changing the port number, then change the value of
+     <literal>com.iplanet.am.server.port</literal>.</para>
+     <para>Also change the port number in <literal><replaceable>host</replaceable
+     >:<replaceable>port</replaceable></literal> combinations throughout the
+     file.</para>
+    </listitem>
+    <listitem>
+     <para>If you are changing the domain name, then change the cookie domain
+     such as <literal>&lt;Value&gt;.example.com&lt;/Value&gt;</literal>
+     throughout the file.</para>
+    </listitem>
+   </itemizedlist>
+  </step>
+  <step>
+   <para>Import the updated service configuration.</para>
+
+   <screen>
+$ <userinput>ssoadm \
+ import-svc-cfg \
+ --adminid amadmin \
+ --encryptsecret myEncryptSecretString1234 \
+ --password-file /tmp/pwd.txt \
+ --xmlfile config.xml</userinput>
+
+<computeroutput>Directory Service contains existing data. Do you want to delete it? [y|N]</computeroutput> <userinput>y</userinput>
+<computeroutput>Please wait while we import the service configuration...
+Service Configuration was imported.</computeroutput>
+   </screen>
+  </step>
+ </procedure>
+
+ <procedure xml:id="edit-config-files">
+  <title>To Edit OpenAM Configuration Files For the New Host Name</title>
+
+  <step>
+   <para>
+    Stop OpenAM or the web container where it runs.
+   </para>
+  </step>
+  <step>
+   <para>
+    Edit the bootstrap file, such as <filename>/home/user/openam/bootstrap</filename>,
+    changing the FQDN, port, and context path for OpenAM as necessary.
+   </para>
+  </step>
+  <step>
+   <para>
+    If you are changing the context path,
+    then move the folder containing OpenAM configuration,
+    such as <filename>/home/user/openam/</filename>,
+    to match the new context path,
+    such as <filename>/home/user/openam2/</filename>.
+   </para>
+  </step>
+  <step>
+   <para>
+    If you are changing the location or context path,
+    change the name of the file
+    in the <filename>/home/user/.openamcfg</filename> folder,
+    such as <filename>AMConfig_path_to_tomcat_webapps_openam_</filename>,
+    to match the new location and context path.
+   </para>
+
+   <para>
+    Also edit the path name in the file
+    to match the change you made when moving the folder.
+   </para>
+  </step>
+  <step>
+   <para>
+    Restart OpenAM or the web container where it runs.
+   </para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="remove-old-alias">
+  <title>To Remove the Old Host Name As an Alias</title>
+
+  <step>
+   <para>Login to OpenAM console as administrator,
+   <literal>amadmin</literal>.</para>
+  </step>
+  <step>
+   <para>Under Access Control &gt; / (Top Level Realm), remove the old host
+   name from the Realm/DNS Aliases list, and then save your work.</para>
+  </step>
+ </procedure>
+</chapter>

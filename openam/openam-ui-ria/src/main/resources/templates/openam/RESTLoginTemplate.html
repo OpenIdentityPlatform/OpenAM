@@ -1,0 +1,12 @@
+<div class="container-shadow" id="login-container">
+{{#if reqs.header}}<h1>{{{reqs.header}}}</h1>{{/if}}
+    <form action="" method="post" class="form clearfix" autocomplete="off">
+        <fieldset>
+            {{#each reqs.callbacks}}
+            <div class="field {{#if isSubmit}}field-submit{{/if}}">
+                {{callbackRender}}
+            </div>
+            {{/each}}
+        </fieldset>
+    </form>
+</div>
