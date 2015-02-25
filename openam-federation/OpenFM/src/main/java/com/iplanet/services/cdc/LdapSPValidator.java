@@ -27,11 +27,23 @@
  */
 
 /*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
 package com.iplanet.services.cdc;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;
 import com.iplanet.dpro.session.TokenRestriction;
@@ -50,17 +62,6 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.forgerock.openam.dpro.session.NoOpTokenRestriction;
 
 
@@ -83,24 +84,14 @@ public class LdapSPValidator implements SPValidator {
     private Exception exception;
 
     public LdapSPValidator() {
-        try {
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
-            amIdRepo = new AMIdentityRepository(adminToken, null);
-            if (amIdRepo == null) {
-                exception = new IdRepoException(
-                    IdRepoBundle.getString("32"), "32");
-            }
-        } catch (SSOException e) {
-            exception = e;
-            CDCServlet.debug.error("CDC:LdapSPValidator.<init>: " +
-                "unable to get SSO Token: ", e);
-        } catch (IdRepoException e) {
-            exception = e;
-            CDCServlet.debug.error("CDC:LdapSPValidator.<init>: " +
-                "unable to get Root Realm/Organization: ", e);
+        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
+            AdminTokenAction.getInstance());
+        amIdRepo = new AMIdentityRepository(adminToken, null);
+        if (amIdRepo == null) {
+            exception = new IdRepoException(
+                IdRepoBundle.getString("32"), "32");
         }
-    }   
+    }
 
     /**
      * Returns token restriction.

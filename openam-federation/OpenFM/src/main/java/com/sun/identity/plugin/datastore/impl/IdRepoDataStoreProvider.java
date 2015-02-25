@@ -27,16 +27,19 @@
  */
 
 /**
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 package com.sun.identity.plugin.datastore.impl;
 
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.locale.Locale;
+import java.security.AccessController;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
@@ -49,16 +52,10 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.plugin.datastore.DataStoreProvider;
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.SMSEntry;
 import org.forgerock.openam.utils.CollectionUtils;
-
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
 
 /**
  * The <code>IdRepoDataStoreProvider</code> is an implementation of 
@@ -351,26 +348,15 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
         String realm)
         throws DataStoreProviderException
     {
-        AMIdentityRepository amIdentityRepository = null;
-        try {
-            SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
-            amIdentityRepository = (AMIdentityRepository) idRepoMap.get(realm);
-            if (amIdentityRepository == null) {
-                amIdentityRepository = new AMIdentityRepository(adminToken, realm);
-                idRepoMap.put(realm, amIdentityRepository);
-                if (debug.messageEnabled()) {
-                    debug.message("IdRepoDataStoreProvider.getAMIdRepo : " 
-                         + " create IdRepo for realm " + realm);
-                }
+        SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+        AMIdentityRepository amIdentityRepository = (AMIdentityRepository) idRepoMap.get(realm);
+        if (amIdentityRepository == null) {
+            amIdentityRepository = new AMIdentityRepository(adminToken, realm);
+            idRepoMap.put(realm, amIdentityRepository);
+            if (debug.messageEnabled()) {
+                debug.message("IdRepoDataStoreProvider.getAMIdRepo : "
+                     + " create IdRepo for realm " + realm);
             }
-        } catch (IdRepoException ie) {
-            debug.error("IdRepoDataStoreProvider.getAMIdRepo : " + 
-                "IdRepoException: ", ie);
-            throw new DataStoreProviderException(ie);
-        } catch (SSOException se) {
-            debug.error("IdRepoDataStoreProvider.getAMIdRepo : " + 
-                "SSOException: ", se);
-            throw new DataStoreProviderException(se);
         }
         return amIdentityRepository;
     } 

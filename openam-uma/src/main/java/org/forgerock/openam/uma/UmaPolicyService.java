@@ -81,4 +81,9 @@ public interface UmaPolicyService {
      */
     Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queryPolicies(ServerContext context,
             QueryRequest request);
+
+    /**
+     * Clears the cache of backend policies.
+     */
+    void clearCache();
 }

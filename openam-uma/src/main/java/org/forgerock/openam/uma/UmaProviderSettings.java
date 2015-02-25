@@ -32,7 +32,7 @@ import javax.security.auth.Subject;
  *
  * @since 13.0.0
  */
-interface UmaProviderSettings {
+public interface UmaProviderSettings {
 
     /**
      * Gets the supported version of the UMA specification.
@@ -193,4 +193,22 @@ interface UmaProviderSettings {
     Evaluator getPolicyEvaluator(Subject subject) throws EntitlementException;
 
     UmaTokenStore getUmaTokenStore();
+
+    /**
+     * Gets whether a Resource Server's policies should be deleted when the Resource Server OAuth2
+     * agent entry is removed, or the "uma_protection" scope is removed.
+     *
+     * @return {@code true} if the policies should be deleted.
+     * @throws ServerException If there is a problem reading the configuration.
+     */
+    boolean onDeleteResourceServerDeletePolicies() throws ServerException;
+
+    /**
+     * Gets whether a Resource Server's resource sets should be deleted when the Resource Server
+     * OAuth2 agent entry is removed, or the "uma_protection" scope is removed.
+     *
+     * @return {@code true} if the resource sets should be deleted.
+     * @throws ServerException If there is a problem reading the configuration.
+     */
+    boolean onDeleteResourceServerDeleteResourceSets() throws ServerException;
 }

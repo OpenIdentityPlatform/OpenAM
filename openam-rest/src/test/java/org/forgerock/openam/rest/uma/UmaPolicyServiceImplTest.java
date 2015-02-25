@@ -122,7 +122,7 @@ public class UmaPolicyServiceImplTest {
     private JsonValue createBackendScopeAPolicyJson() {
         return json(object(
                 field("name", "POLICY_ID - SCOPE_A"),
-                field("resources", array("http://POLICY_ID")),
+                field("resources", array("uma://POLICY_ID")),
                 field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
                 field("actionValues", object(field("SCOPE_A", true))),
                 field("subject", object(
@@ -144,7 +144,7 @@ public class UmaPolicyServiceImplTest {
     private JsonValue createBackendScopeBPolicyJson() {
         return json(object(
                 field("name", "POLICY_ID - SCOPE_B"),
-                field("resources", array("http://POLICY_ID")),
+                field("resources", array("uma://POLICY_ID")),
                 field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
                 field("actionValues", object(field("SCOPE_B", true))),
                 field("subject", object(
@@ -189,7 +189,7 @@ public class UmaPolicyServiceImplTest {
         createdPolicies.add(createdPolicy2);
         Promise<List<Resource>, ResourceException> createPolicyPromise = Promises.newSuccessfulPromise(createdPolicies);
 
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.getIfPresent("RESOURCE_SET_UID")).willReturn(null);
         given(policyResourceDelegate.createPolicies(eq(context), Matchers.<Set<JsonValue>>anyObject()))
                 .willReturn(createPolicyPromise);
@@ -198,8 +198,8 @@ public class UmaPolicyServiceImplTest {
         UmaPolicy umaPolicy = policyService.createPolicy(context, policy).getOrThrowUninterruptibly();
 
         //Then
-        verify(umaPolicyStore).getUserCache("RESOURCE_OWNER_ID");
-        verify(umaPolicyStore).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("RESOURCE_SET_UID"), Matchers.<UmaPolicy>anyObject());
+        verify(umaPolicyStore).getUserCache("RESOURCE_OWNER_ID", "/");
+        verify(umaPolicyStore).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("/"), eq("RESOURCE_SET_UID"), Matchers.<UmaPolicy>anyObject());
         assertThat(umaPolicy.getId()).isEqualTo("RESOURCE_SET_UID");
         assertThat(umaPolicy.getRevision()).isNotNull();
         assertThat(umaPolicy.asJson().asMap()).hasSize(3)
@@ -222,7 +222,7 @@ public class UmaPolicyServiceImplTest {
         Cache<String, UmaPolicy> userCache = mock(Cache.class);
         UmaPolicy cacheEntry = mock(UmaPolicy.class);
 
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.getIfPresent("RESOURCE_SET_UID")).willReturn(cacheEntry);
 
         //When
@@ -230,8 +230,8 @@ public class UmaPolicyServiceImplTest {
             policyService.createPolicy(context, policy).getOrThrowUninterruptibly();
         } catch (ResourceException e) {
             //Then
-            verify(umaPolicyStore).getUserCache("RESOURCE_OWNER_ID");
-            verify(umaPolicyStore, never()).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("RESOURCE_SET_UID"),
+            verify(umaPolicyStore).getUserCache("RESOURCE_OWNER_ID", "/");
+            verify(umaPolicyStore, never()).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("/"), eq("RESOURCE_SET_UID"),
                     Matchers.<UmaPolicy>anyObject());
             verifyZeroInteractions(policyResourceDelegate);
             throw e;
@@ -311,7 +311,7 @@ public class UmaPolicyServiceImplTest {
         Cache<String, UmaPolicy> userCache = mock(Cache.class);
         UmaPolicy cacheEntry = mock(UmaPolicy.class);
 
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.getIfPresent("POLICY_ID"))
                 .willReturn(null)
                 .willReturn(cacheEntry);
@@ -321,8 +321,8 @@ public class UmaPolicyServiceImplTest {
         UmaPolicy umaPolicy = policyService.readPolicy(context, "POLICY_ID").getOrThrowUninterruptibly();
 
         //Then
-        verify(umaPolicyStore, times(2)).getUserCache("RESOURCE_OWNER_ID");
-        verify(umaPolicyStore).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("RESOURCE_SET_UID"),
+        verify(umaPolicyStore, times(2)).getUserCache("RESOURCE_OWNER_ID", "/");
+        verify(umaPolicyStore).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("/"), eq("RESOURCE_SET_UID"),
                 Matchers.<UmaPolicy>anyObject());
         assertThat(umaPolicy).isEqualTo(cacheEntry);
     }
@@ -336,7 +336,7 @@ public class UmaPolicyServiceImplTest {
         Cache<String, UmaPolicy> userCache = mock(Cache.class);
         UmaPolicy cacheEntry = mock(UmaPolicy.class);
 
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.getIfPresent("RESOURCE_SET_UID")).willReturn(cacheEntry);
 
         //When
@@ -344,8 +344,8 @@ public class UmaPolicyServiceImplTest {
 
         //Then
         verifyZeroInteractions(policyResourceDelegate);
-        verify(umaPolicyStore).getUserCache("RESOURCE_OWNER_ID");
-        verify(umaPolicyStore, never()).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("RESOURCE_SET_UID"),
+        verify(umaPolicyStore).getUserCache("RESOURCE_OWNER_ID", "/");
+        verify(umaPolicyStore, never()).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("/"), eq("RESOURCE_SET_UID"),
                 Matchers.<UmaPolicy>anyObject());
         assertThat(umaPolicy).isEqualTo(cacheEntry);
     }
@@ -358,7 +358,7 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         Cache<String, UmaPolicy> userCache = mock(Cache.class);
 
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.getIfPresent("RESOURCE_SET_UID")).willReturn(null);
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
@@ -372,8 +372,8 @@ public class UmaPolicyServiceImplTest {
             policyService.readPolicy(context, "RESOURCE_SET_UID").getOrThrowUninterruptibly();
         } catch (ResourceException e) {
             //Then
-            verify(umaPolicyStore).getUserCache("RESOURCE_OWNER_ID");
-            verify(umaPolicyStore, never()).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("RESOURCE_SET_UID"),
+            verify(umaPolicyStore).getUserCache("RESOURCE_OWNER_ID", "/");
+            verify(umaPolicyStore, never()).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("/"), eq("RESOURCE_SET_UID"),
                     Matchers.<UmaPolicy>anyObject());
             throw e;
         }
@@ -400,7 +400,7 @@ public class UmaPolicyServiceImplTest {
                 .getOrThrowUninterruptibly();
 
         //Then
-        verify(umaPolicyStore).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("RESOURCE_SET_UID"), Matchers.<UmaPolicy>anyObject());
+        verify(umaPolicyStore).addToUserCache(eq("RESOURCE_OWNER_ID"), eq("/"), eq("RESOURCE_SET_UID"), Matchers.<UmaPolicy>anyObject());
         assertThat(umaPolicy.getId()).isEqualTo("POLICY_ID");
         assertThat(umaPolicy.getRevision()).isNotNull();
         assertThat(umaPolicy.asJson().asMap()).isEqualTo(createUmaPolicyJson("SCOPE_A", "SCOPE_B").asMap());
@@ -485,7 +485,7 @@ public class UmaPolicyServiceImplTest {
         readPolicies.add(readPolicy2);
         Promise<List<Resource>, ResourceException> deletePoliciesPromise = Promises.newSuccessfulPromise(readPolicies);
 
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.getIfPresent("RESOURCE_SET_UID"))
                 .willReturn(null)
                 .willReturn(cacheEntry);
@@ -512,7 +512,7 @@ public class UmaPolicyServiceImplTest {
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> readPoliciesPromise =
                 Promises.newFailedPromise(exception);
 
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.getIfPresent("RESOURCE_SET_UID"))
                 .willReturn(null);
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
@@ -539,7 +539,7 @@ public class UmaPolicyServiceImplTest {
         ResourceException exception = mock(ResourceException.class);
         Promise<List<Resource>, ResourceException> deletePoliciesPromise = Promises.newFailedPromise(exception);
 
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.getIfPresent("RESOURCE_SET_UID"))
                 .willReturn(null)
                 .willReturn(cacheEntry);
@@ -570,7 +570,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When
@@ -594,7 +594,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When
@@ -618,7 +618,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When
@@ -642,7 +642,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When
@@ -669,7 +669,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When
@@ -696,7 +696,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When
@@ -723,7 +723,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When
@@ -750,7 +750,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When
@@ -777,7 +777,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When
@@ -804,7 +804,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When
@@ -831,7 +831,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When
@@ -858,7 +858,7 @@ public class UmaPolicyServiceImplTest {
         policyMap.put("RESOURCE_SET_UID", UmaPolicy.valueOf(resourceSet, createUmaPolicyJson()));
 
         mockLoadUserUmaPolicies(context);
-        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID")).willReturn(userCache);
+        given(umaPolicyStore.getUserCache("RESOURCE_OWNER_ID", "/")).willReturn(userCache);
         given(userCache.asMap()).willReturn(policyMap);
 
         //When

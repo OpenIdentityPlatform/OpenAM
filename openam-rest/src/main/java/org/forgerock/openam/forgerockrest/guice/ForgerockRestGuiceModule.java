@@ -24,6 +24,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
@@ -34,6 +35,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
+import com.sun.identity.idm.IdRepoCreationListener;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
@@ -42,6 +44,7 @@ import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.VersionSelector;
+import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
@@ -74,7 +77,9 @@ import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.DelegationEvaluatorProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
+import org.forgerock.openam.rest.uma.UmaIdRepoCreationListener;
 import org.forgerock.openam.rest.uma.UmaPolicyServiceImpl;
+import org.forgerock.openam.rest.uma.UmaResourceSetRegistrationListener;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.Config;
@@ -157,6 +162,12 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         bind(UmaPolicyService.class).to(UmaPolicyServiceImpl.class);
         bind(SoapSTSAgentIdentity.class).to(SoapSTSAgentIdentityImpl.class);
         bind(SpecialUserIdentity.class).to(SpecialUserIdentityImpl.class);
+
+        Multibinder.newSetBinder(binder(), IdRepoCreationListener.class)
+                .addBinding().to(UmaIdRepoCreationListener.class);
+
+        Multibinder.newSetBinder(binder(), ResourceSetRegistrationListener.class)
+                .addBinding().to(UmaResourceSetRegistrationListener.class);
     }
 
     @Provides

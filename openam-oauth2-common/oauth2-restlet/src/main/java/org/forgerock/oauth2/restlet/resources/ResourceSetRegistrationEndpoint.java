@@ -27,16 +27,14 @@ import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
@@ -68,7 +66,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ResourceSetDescriptionValidator validator;
     private final OAuth2RequestFactory<Request> requestFactory;
-    private final TokenStore tokenStore;
+    private final Set<ResourceSetRegistrationListener> listeners;
 
     /**
      * Construct a new ResourceSetRegistrationEndpoint instance.
@@ -76,15 +74,16 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
      * @param providerSettingsFactory An instance of the {@link OAuth2ProviderSettingsFactory}.
      * @param validator An instance of the {@link ResourceSetDescriptionValidator}.
      * @param requestFactory An instance of the OAuth2RequestFactory.
-     * @param tokenStore An instance of the TokenStore.
+     * @param listeners A {@code Set} of {@code ResourceSetRegistrationListener}s.
      */
     @Inject
     public ResourceSetRegistrationEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            ResourceSetDescriptionValidator validator, OAuth2RequestFactory<Request> requestFactory, TokenStore tokenStore) {
+            ResourceSetDescriptionValidator validator, OAuth2RequestFactory<Request> requestFactory,
+            Set<ResourceSetRegistrationListener> listeners) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.validator = validator;
         this.requestFactory = requestFactory;
-        this.tokenStore = tokenStore;
+        this.listeners = listeners;
     }
 
     /**
@@ -183,8 +182,21 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
             BadRequestException, NotFoundException {
         ResourceSetDescription resourceSetDescription = new ResourceSetDescription(null, resourceSetId, getClientId(),
                 getResourceOwnerId(), validator.validate(toMap(entity)));
-        ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        store.create(requestFactory.create(getRequest()), resourceSetDescription);
+        OAuth2Request oAuth2Request = requestFactory.create(getRequest());
+        ResourceSetStore store = providerSettingsFactory.get(oAuth2Request).getResourceSetStore();
+        try {
+            store.create(oAuth2Request, resourceSetDescription);
+            for (ResourceSetRegistrationListener listener : listeners) {
+                listener.resourceSetCreated(oAuth2Request.<String>getParameter("realm"), resourceSetDescription);
+            }
+        } catch (ServerException e) {
+            throw e;
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (NotFoundException e) {
+            throw e;
+        }
+
         return createJsonResponse(resourceSetDescription, false, true);
     }
 

@@ -93,7 +93,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * {@inheritDoc}
      */
     @Override
-    public Promise<UmaPolicy, ResourceException> createPolicy(ServerContext context, JsonValue policy) {
+    public Promise<UmaPolicy, ResourceException> createPolicy(final ServerContext context, JsonValue policy) {
         UmaPolicy umaPolicy;
         final String userId;
         final ResourceSetDescription resourceSet;
@@ -102,7 +102,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             userId = getLoggedInUserId(context);
             umaPolicy = UmaPolicy.valueOf(resourceSet, policy);
             validateScopes(resourceSet, umaPolicy.getScopes());
-            verifyPolicyDoesNotAlreadyExist(resourceSet, userId);
+            verifyPolicyDoesNotAlreadyExist(resourceSet, userId, getRealm(context));
         } catch (ResourceException e) {
             return Promises.newFailedPromise(e);
         }
@@ -112,7 +112,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                     public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) {
                         try {
                             UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, value);
-                            umaPolicyStore.addToUserCache(userId, resourceSet.getId(), umaPolicy);
+                            umaPolicyStore.addToUserCache(userId, getRealm(context), resourceSet.getId(), umaPolicy);
                             return Promises.newSuccessfulPromise(umaPolicy);
                         } catch (ResourceException e) {
                             return Promises.newFailedPromise(e);
@@ -126,26 +126,32 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                 });
     }
 
-    private void verifyPolicyDoesNotAlreadyExist(ResourceSetDescription resourceSet, String userId) throws ConflictException {
-        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId);
+    private void verifyPolicyDoesNotAlreadyExist(ResourceSetDescription resourceSet, String userId, String realm)
+            throws ConflictException {
+        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId, realm);
         if (userCache != null && userCache.getIfPresent(resourceSet.getId()) != null) {
             throw new ConflictException("Policy already exists for Resource Server, "
                             + resourceSet.getClientId() + ", Resource Set, " + resourceSet.getId());
         }
     }
 
+    private String getRealm(ServerContext context) {
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        return realmContext.getResolvedRealm();
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public Promise<UmaPolicy, ResourceException> readPolicy(ServerContext context, final String resourceSetUid) {
+    public Promise<UmaPolicy, ResourceException> readPolicy(final ServerContext context, final String resourceSetUid) {
         final String userId;
         try {
             userId = getLoggedInUserId(context);
         } catch (ResourceException e) {
             return Promises.newFailedPromise(e);
         }
-        UmaPolicy umaPolicy = localRead(resourceSetUid, userId);
+        UmaPolicy umaPolicy = localRead(resourceSetUid, userId, getRealm(context));
         if (umaPolicy != null) {
             return Promises.newSuccessfulPromise(umaPolicy);
         }
@@ -153,7 +159,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                 .thenAsync(new AsyncFunction<Void, UmaPolicy, ResourceException>() {
                     @Override
                     public Promise<UmaPolicy, ResourceException> apply(Void value) {
-                        UmaPolicy umaPolicy = localRead(resourceSetUid, userId);
+                        UmaPolicy umaPolicy = localRead(resourceSetUid, userId, getRealm(context));
                         if (umaPolicy != null) {
                             return Promises.newSuccessfulPromise(umaPolicy);
                         } else {
@@ -163,8 +169,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                 });
     }
 
-    private UmaPolicy localRead(String resourceSetUid, String userId) {
-        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId);
+    private UmaPolicy localRead(String resourceSetUid, String userId, String realm) {
+        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId, realm);
         if (userCache != null) {
             return userCache.getIfPresent(resourceSetUid);
         } else {
@@ -176,7 +182,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * {@inheritDoc}
      */
     @Override
-    public Promise<UmaPolicy, ResourceException> updatePolicy(ServerContext context, final String resourceSetUid, JsonValue policy) {
+    public Promise<UmaPolicy, ResourceException> updatePolicy(final ServerContext context, final String resourceSetUid,
+            JsonValue policy) {
         final UmaPolicy umaPolicy;
         final String userId;
         final ResourceSetDescription resourceSet;
@@ -192,7 +199,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                 .thenAsync(new AsyncFunction<List<Resource>, UmaPolicy, ResourceException>() {
                     @Override
                     public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) throws ResourceException {
-                        umaPolicyStore.addToUserCache(userId, resourceSet.getId(),
+                        umaPolicyStore.addToUserCache(userId, getRealm(context), resourceSet.getId(),
                                 UmaPolicy.fromUnderlyingPolicies(resourceSet, value));
                         return Promises.newSuccessfulPromise(umaPolicy);
                     }
@@ -225,7 +232,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                 .thenAsync(new AsyncFunction<List<Resource>, Void, ResourceException>() {
                     @Override
                     public Promise<Void, ResourceException> apply(List<Resource> value) {
-                        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId);
+                        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId, getRealm(context));
                         if (userCache != null) {
                             userCache.invalidate(resourceSetUid);
                         }
@@ -252,7 +259,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                     @Override
                     public Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> apply(Void value) {
                         Collection<UmaPolicy> umaPolicies;
-                        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId);
+                        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId, getRealm(context));
                         if (userCache != null) {
                             umaPolicies = userCache.asMap().values();
                         } else {
@@ -278,6 +285,14 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         }
                     }
                 });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clearCache() {
+        umaPolicyStore.clearCache();
     }
 
     private Promise<Void, ResourceException> loadUserUmaPolicies(final ServerContext context) {
@@ -315,7 +330,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         try {
                             for (Map.Entry<String, Set<Resource>> entry : policyMapping.entrySet()) {
                                 ResourceSetDescription resourceSet = getResourceSetDescription(entry.getKey(), context);
-                                umaPolicyStore.addToUserCache(userId, resourceSet.getId(),
+                                umaPolicyStore.addToUserCache(userId, getRealm(context), resourceSet.getId(),
                                         UmaPolicy.fromUnderlyingPolicies(resourceSet, entry.getValue()));
                             }
                             return Promises.newSuccessfulPromise(null);

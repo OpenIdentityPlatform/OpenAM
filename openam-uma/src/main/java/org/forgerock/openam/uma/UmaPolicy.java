@@ -256,7 +256,8 @@ public class UmaPolicy {
         }
         return json(object(
                 field(BACKEND_POLICY_NAME_KEY, policyName),
-                field(BACKEND_POLICY_RESOURCE_TYPE_KEY, "76656a38-5f8e-401b-83aa-4ccb74ce88d2"), //TODO this value will change once we have an application per resource server
+                field("applicationName", getResourceServerId().toLowerCase()), //Lowercase as ldap is case insensitive
+                field(BACKEND_POLICY_RESOURCE_TYPE_KEY, resourceSet.getId()),
                 field(BACKEND_POLICY_RESOURCES_KEY, array(UMA_POLICY_SCHEME + getId())),
                 field(BACKEND_POLICY_ACTION_VALUES_KEY, object(
                                 field(aggregatePolicy.getPointer().get(0), true))

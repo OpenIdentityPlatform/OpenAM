@@ -76,6 +76,7 @@ import org.forgerock.oauth2.restlet.RestletQueryParameterAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.TokenRequestHook;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationEndpoint;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationExceptionFilter;
+import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
@@ -192,6 +193,8 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         Multibinder.newSetBinder(binder(), TokenIntrospectionHandler.class)
                 .addBinding().to(OAuth2TokenIntrospectionHandler.class);
+
+        Multibinder.newSetBinder(binder(), ResourceSetRegistrationListener.class);
     }
 
     @Provides

@@ -27,11 +27,14 @@ public final class UmaConstants {
         //Private utility constructor
     }
 
-    static final String SERVICE_NAME = "UmaProvider";
-    static final String SERVICE_VERSION = "1.0";
+    public static final String SERVICE_NAME = "UmaProvider";
+    public static final String SERVICE_VERSION = "1.0";
 
     /** Constant for the UMA policy scheme. */
-    public static final String UMA_POLICY_SCHEME = "http://";//"uma://"; //TODO need this until we have a new ApplicationType/Application
+    public static final String UMA_POLICY_SCHEME = "uma://";
+    /** Constant for the UMA policy scheme pattern. */
+    public static final String UMA_POLICY_SCHEME_PATTERN = UMA_POLICY_SCHEME + "-*-";
+
     /** */
     public static final String UMA_POLICY_APPLICATION_TYPE = "iPlanetAMWebAgentService"; //TODO
     /** Constant for the PolicyResource backend bound in Guice. */
@@ -39,6 +42,10 @@ public final class UmaConstants {
 
     static final String RPT_LIFETIME_ATTR_NAME = "uma-rpt-lifetime";
     static final String PERMISSION_TIKCET_LIFETIME_ATTR_NAME = "uma-permission-ticket-lifetime";
+    public static final String DELETE_POLICIES_ON_RESOURCE_SERVER_DELETION = "uma-delete-policies-on-resource-server-deletion";
+    public static final String DELETE_RESOURCE_SETS_ON_RESOURCE_SERVER_DELETION
+            = "uma-delete-resource-sets-on-resource-server-deletion";
+    static final String BACKEND_POLICIES_CACHE_SIZE = "uma-backend-policy-cache-size";
     static final String SUPPORTED_PAT_PROFILES_ATTR_NAME = "uma-supported-pat-profiles";
     static final String SUPPORTED_AAT_PROFILES_ATTR_NAME = "uma-supported-aat-profiles";
     static final String SUPPORTED_RPT_PROFILES_ATTR_NAME = "uma-supported-rpt-profiles";

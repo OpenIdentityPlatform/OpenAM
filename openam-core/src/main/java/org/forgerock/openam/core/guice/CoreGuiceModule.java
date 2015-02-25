@@ -16,16 +16,51 @@
 
 package org.forgerock.openam.core.guice;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
+import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
+import com.iplanet.dpro.session.operations.SessionOperationStrategy;
+import com.iplanet.dpro.session.service.SessionConstants;
+import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.services.ldap.DSConfigMgr;
+import com.iplanet.services.ldap.LDAPServiceException;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.configuration.ConfigurationObserver;
+import com.sun.identity.delegation.DelegationManager;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.entitlement.xacml3.XACMLConstants;
+import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdRepoCreationListener;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.setup.ServicesDefaultValues;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSEntry;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceManagementDAO;
+import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
@@ -49,7 +84,6 @@ import org.forgerock.openam.cts.adapters.SAMLAdapter;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.SAMLToken;
-import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.cts.impl.query.reaper.ReaperConnection;
 import org.forgerock.openam.cts.impl.query.reaper.ReaperQuery;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
@@ -69,6 +103,7 @@ import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
+import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.sm.SMSConfigurationFactory;
 import org.forgerock.openam.sm.ServerGroupConfiguration;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
@@ -81,39 +116,6 @@ import org.forgerock.opendj.ldap.SearchResultHandler;
 import org.forgerock.util.promise.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.thread.ExecutorServiceFactory;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
-import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
-import com.iplanet.dpro.session.operations.SessionOperationStrategy;
-import com.iplanet.dpro.session.service.SessionConstants;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.services.ldap.DSConfigMgr;
-import com.iplanet.services.ldap.LDAPServiceException;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.configuration.ConfigurationObserver;
-import com.sun.identity.delegation.DelegationManager;
-import com.sun.identity.entitlement.EntitlementConfiguration;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.entitlement.xacml3.XACMLConstants;
-import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.setup.ServicesDefaultValues;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.SMSEntry;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceManagementDAO;
-import com.sun.identity.sm.ServiceManagementDAOWrapper;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -246,6 +248,12 @@ public class CoreGuiceModule extends AbstractModule {
                     }
 
                 });
+
+        install(new FactoryModuleBuilder()
+                .implement(AMIdentityRepository.class, AMIdentityRepository.class)
+                .build(AMIdentityRepositoryFactory.class));
+
+        Multibinder.newSetBinder(binder(), IdRepoCreationListener.class);
     }
 
     @Provides @Inject @Named(PolicyMonitorImpl.EXECUTOR_BINDING_NAME)

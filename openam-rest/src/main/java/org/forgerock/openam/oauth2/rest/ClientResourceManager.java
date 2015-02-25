@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -58,13 +58,7 @@ public class ClientResourceManager {
     private AMIdentity getIdentity(String uName, String realm) throws InternalServerErrorException {
         AMIdentity theID = null;
         AMIdentityRepository amIdRepo = null;
-        try{
-            amIdRepo = new AMIdentityRepository(getAdminToken() , realm);
-        } catch (IdRepoException e){
-            throw new InternalServerErrorException("Unable to get idrepo", e);
-        } catch (SSOException e){
-            throw new InternalServerErrorException("Unable to get idrepo", e);
-        }
+        amIdRepo = new AMIdentityRepository(getAdminToken() , realm);
         IdSearchControl idsc = new IdSearchControl();
         idsc.setRecursive(true);
         idsc.setAllReturnAttributes(true);

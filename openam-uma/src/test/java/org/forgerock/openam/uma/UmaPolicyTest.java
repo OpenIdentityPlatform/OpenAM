@@ -70,8 +70,9 @@ public class UmaPolicyTest {
     private JsonValue createUnderlyingScopeAPolicyJson(String id) {
         return json(object(
                 field("name", id + " - SCOPE_A"),
-                field("resources", array("http://POLICY_ID")),
-                field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
+                field("applicationName", "client_id"),
+                field("resources", array("uma://POLICY_ID")),
+                field("resourceTypeUuid", "RESOURCE_SET_UID"),
                 field("actionValues", object(field("SCOPE_A", true))),
                 field("subject", object(
                         field("type", "OR"),
@@ -96,8 +97,9 @@ public class UmaPolicyTest {
     private JsonValue createUnderlyingScopeBPolicyJson(String id) {
         return json(object(
                 field("name", id + " - SCOPE_B"),
-                field("resources", array("http://POLICY_ID")),
-                field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
+                field("applicationName", "client_id"),
+                field("resources", array("uma://POLICY_ID")),
+                field("resourceTypeUuid", "RESOURCE_SET_UID"),
                 field("actionValues", object(field("SCOPE_B", true))),
                 field("subject", object(
                                 field("type", "OR"),

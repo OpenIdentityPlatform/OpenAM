@@ -27,10 +27,12 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm;
 
+import javax.inject.Inject;
+import javax.security.auth.callback.Callback;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,17 +41,15 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.security.auth.callback.Callback;
-
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
-
+import com.google.inject.assistedinject.Assisted;
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.ldap.LDAPDN;
+import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
@@ -78,9 +78,11 @@ public final class AMIdentityRepository {
     public static Debug debug = Debug.getInstance("amIdm");
     public static Map listeners = new CaseInsensitiveHashMap();
 
+    private static Set<IdRepoCreationListener> creationListeners = new HashSet<IdRepoCreationListener>();
+
     /**
      * @supported.api
-     * 
+     *
      * Constructor for the <code>AMIdentityRepository</code> object. If a null
      * is passed for the organization identifier <code>realmName</code>, then
      * the "root" realm is assumed.
@@ -89,16 +91,39 @@ public final class AMIdentityRepository {
      *            Single sign on token of the user
      * @param realmName
      *            Name of the realm (can be a Fully qualified DN)
-     * @throws IdRepoException
-     *             if there are repository related error conditions.
-     * @throws SSOException
-     *             if user's single sign on token is invalid.
      */
-    public AMIdentityRepository(SSOToken ssotoken, String realmName)
-            throws IdRepoException, SSOException {
+    @Inject
+    public AMIdentityRepository(@Assisted SSOToken ssotoken, @Assisted final String realmName) {
         token = ssotoken;
         idRealmName = realmName;
         organizationDN = DNMapper.orgNameToDN(realmName);
+        notifyCreationListeners();
+    }
+
+    /**
+     * Adds a creation listener that will be notified each time a {@code AMIdentityRepository} is created .
+     *
+     * @param listener The listener.
+     */
+    public static void addCreationListener(IdRepoCreationListener listener) {
+        creationListeners.add(listener);
+    }
+
+    /**
+     * Removes a creation listener so that it will no longer be notified when a
+     * {@code AMIdentityRepository} is created.
+     *
+     * @param listener The listener.
+     * @return {@code true} if the listener was removed.
+     */
+    public static boolean removeCreationListener(IdRepoCreationListener listener) {
+        return creationListeners.remove(listener);
+    }
+
+    private void notifyCreationListeners() {
+        for (IdRepoCreationListener listener : creationListeners) {
+            listener.notify(this, idRealmName);
+        }
     }
 
     /**
@@ -139,7 +164,6 @@ public final class AMIdentityRepository {
             SSOException {
         IdServices idServices = IdServicesFactory.getDataStoreServices();
         return idServices.getSupportedOperations(token, type, organizationDN);
-
     }
 
     /**
@@ -488,7 +512,7 @@ public final class AMIdentityRepository {
         while (it.hasNext()) {
             AMIdentity id = (AMIdentity) it.next();
             IdServices idServices = IdServicesFactory.getDataStoreServices();
-            idServices.delete(token, id.getType(), id.getName(), organizationDN, 
+            idServices.delete(token, id.getType(), id.getName(), organizationDN,
                     id.getDN());
         }
     }

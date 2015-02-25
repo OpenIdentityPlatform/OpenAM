@@ -25,25 +25,23 @@
  * $Id: IdRepoSample.java,v 1.2 2008/06/25 05:41:13 qcheng Exp $
  *
  */
+/*
+ * Portions Copyright 2015 ForgeRock AS.
+ */
 
 package com.sun.identity.samples.clientsdk.idrepo;
 
-import java.io.*;
-import java.util.*;
-import java.lang.Integer;
+import java.util.Iterator;
+import java.util.Set;
 
-import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
-
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.OrganizationConfigManager;
 
 /**
  * This class 
@@ -192,23 +190,8 @@ public class IdRepoSample {
                         issr.selectSubRealm (currentSubRealms);
                     if (nextSubRealm != currentRealm) {
                         currentRealm = nextSubRealm;
-                        try {
-                            idRepo = new AMIdentityRepository(ssoToken,
-                                currentRealm);
-                        } catch (IdRepoException ire) {
-                            System.err.println(
-                                "idRepoProcessing: IdRepoException getting " +
-                                "AMIdentityRepository object for '" +
-                                currentRealm + "': " +
-                                ire.getMessage());
-                            break;
-                        } catch (SSOException ssoe) {
-                            System.err.println(
-                                "idRepoProcessing: SSOException getting " +
-                                "AMIdentityRepository object for '" +
-                                currentRealm + "': " +
-                                ssoe.getMessage());
-                        }
+                        idRepo = new AMIdentityRepository(ssoToken,
+                            currentRealm);
                         doCurrentRealm();
                     }
                     break;

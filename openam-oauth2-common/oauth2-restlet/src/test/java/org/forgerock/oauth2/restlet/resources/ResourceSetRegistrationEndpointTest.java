@@ -16,16 +16,12 @@
 
 package org.forgerock.oauth2.restlet.resources;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.json.fluent.JsonValue.*;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.net.URI;
 import java.util.Collections;
@@ -36,13 +32,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -71,9 +68,6 @@ import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class ResourceSetRegistrationEndpointTest {
 
     private static final JsonValue RESOURCE_SET_DESCRIPTION_CONTENT = json(object(field("name", "NAME"),
@@ -87,6 +81,7 @@ public class ResourceSetRegistrationEndpointTest {
 
     private ResourceSetStore store;
     private ResourceSetDescriptionValidator validator;
+    private ResourceSetRegistrationListener listener;
 
     private Response response;
 
@@ -97,7 +92,9 @@ public class ResourceSetRegistrationEndpointTest {
         store = mock(ResourceSetStore.class);
         validator = mock(ResourceSetDescriptionValidator.class);
         OAuth2RequestFactory<Request> requestFactory = mock(OAuth2RequestFactory.class);
-        TokenStore tokenStore = mock(TokenStore.class);
+        Set<ResourceSetRegistrationListener> listeners = new HashSet<ResourceSetRegistrationListener>();
+        listener = mock(ResourceSetRegistrationListener.class);
+        listeners.add(listener);
 
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
         OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
@@ -105,7 +102,7 @@ public class ResourceSetRegistrationEndpointTest {
         given(providerSettings.getResourceSetStore()).willReturn(store);
 
         endpoint = spy(new ResourceSetRegistrationEndpoint(providerSettingsFactory, validator, requestFactory,
-                tokenStore));
+                listeners));
 
         Request request = mock(Request.class);
         ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC);
@@ -115,7 +112,6 @@ public class ResourceSetRegistrationEndpointTest {
 
         AccessToken accessToken = mock(AccessToken.class);
         given(accessToken.getClientId()).willReturn("CLIENT_ID");
-        given(tokenStore.readAccessToken(Matchers.<OAuth2Request>anyObject(), eq("PAT"))).willReturn(accessToken);
 
         response = mock(Response.class);
         given(endpoint.getResponse()).willReturn(response);
@@ -213,6 +209,7 @@ public class ResourceSetRegistrationEndpointTest {
         Map<String, Object> responseBody = (Map<String, Object>) new ObjectMapper()
                 .readValue(response.getText(), Map.class);
         assertThat(responseBody).containsKey("_id");
+        verify(listener).resourceSetCreated(anyString(), Matchers.<ResourceSetDescription>anyObject());
     }
 
     @Test

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
@@ -20,6 +20,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
+import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
@@ -28,13 +29,13 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.forgerock.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.ClientBuilder;
 import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -65,6 +66,13 @@ public class OpenAMClientDAO implements ClientDAO {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
 
+    private final AMIdentityRepositoryFactory idRepoFactory;
+
+    @Inject
+    public OpenAMClientDAO(AMIdentityRepositoryFactory idRepoFactory) {
+        this.idRepoFactory = idRepoFactory;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -73,7 +81,7 @@ public class OpenAMClientDAO implements ClientDAO {
         try {
             final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
             final String realm = request.getParameter("realm");
-            AMIdentityRepository repo = AMIdentityRepositoryFactory.createAMIdentityRepository(token, realm);
+            AMIdentityRepository repo = idRepoFactory.create(token, realm);
             repo.createIdentity(IdType.AGENTONLY, client.getClientID(), attrs);
         } catch (Exception e) {
             logger.error("ConnectClientRegistration.Validate(): Unable to create client", e);
@@ -90,7 +98,7 @@ public class OpenAMClientDAO implements ClientDAO {
             AMIdentity theID = null;
             final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
             final String realm = request.getParameter("realm");
-            AMIdentityRepository repo = AMIdentityRepositoryFactory.createAMIdentityRepository(token, realm);
+            AMIdentityRepository repo = idRepoFactory.create(token, realm);
 
             IdSearchControl idsc = new IdSearchControl();
             idsc.setRecursive(true);
@@ -147,7 +155,7 @@ public class OpenAMClientDAO implements ClientDAO {
             //get the AMIdentity
             final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
             final String realm = request.getParameter("realm");
-            AMIdentityRepository repo = AMIdentityRepositoryFactory.createAMIdentityRepository(token, realm);
+            AMIdentityRepository repo = idRepoFactory.create(token, realm);
 
             AMIdentity theID = null;
 

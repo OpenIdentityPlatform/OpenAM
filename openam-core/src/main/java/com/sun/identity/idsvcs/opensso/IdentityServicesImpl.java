@@ -24,7 +24,7 @@
  *
  * $Id: IdentityServicesImpl.java,v 1.20 2010/01/06 19:11:17 veiming Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.idsvcs.opensso;
 
@@ -1306,11 +1306,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
     	if ((realm == null) || (realm.length() == 0)) {
     		realm = "/";
     	}
-        try {
-    	    return new AMIdentityRepository(token, realm);
-        } catch (SSOException ssoe) {
-            throw (new TokenExpired(ssoe.getMessage()));
-        }
+        return new AMIdentityRepository(token, realm);
     }
 
     private AMIdentityRepository getRepo(Token admin, String realm)

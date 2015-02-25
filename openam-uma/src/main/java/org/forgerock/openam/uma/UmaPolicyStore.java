@@ -19,9 +19,35 @@ package org.forgerock.openam.uma;
 import org.forgerock.guava.common.cache.Cache;
 import org.forgerock.json.resource.InternalServerErrorException;
 
+/**
+ * UMA Policy store, which caches users UMA policies.
+ *
+ * @since 13.0.0
+ */
 public interface UmaPolicyStore {
 
-    Cache<String, UmaPolicy> getUserCache(String userId);
+    /**
+     * Gets the cache of the given user.
+     *
+     * @param userId The id of the user.
+     * @param realm The realm.
+     * @return The cache.
+     */
+    Cache<String, UmaPolicy> getUserCache(String userId, String realm);
 
-    void addToUserCache(String userId, String uid, UmaPolicy policy) throws InternalServerErrorException;
+    /**
+     * Adds a given policy to the users cache.
+     *
+     * @param userId The id of the user.
+     * @param realm The realm.
+     * @param uid The uid of the policy.
+     * @param policy The policy.
+     * @throws InternalServerErrorException If the cache entry could not be created.
+     */
+    void addToUserCache(String userId, String realm, String uid, UmaPolicy policy) throws InternalServerErrorException;
+
+    /**
+     * Clears the cache of backend policies.
+     */
+    void clearCache();
 }

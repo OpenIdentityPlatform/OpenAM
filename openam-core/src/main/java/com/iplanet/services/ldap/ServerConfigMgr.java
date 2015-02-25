@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.iplanet.services.ldap;
 
@@ -443,8 +443,6 @@ public class ServerConfigMgr {
                 return amir.authenticate(idCallbacks);
             }
             return true;
-        } catch (SSOException ex) {
-            return false;
         } catch (AuthLoginException ex) {
             return false;
         } catch (IdRepoException ex) {

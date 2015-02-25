@@ -33,7 +33,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
@@ -61,7 +60,7 @@ import org.restlet.ext.servlet.ServletUtils;
  * @since 13.0.0
  */
 @Singleton
-class UmaProviderSettingsFactory {
+public class UmaProviderSettingsFactory {
 
     private final Map<String, UmaProviderSettingsImpl> providerSettingsMap =
             new HashMap<String, UmaProviderSettingsImpl>();
@@ -105,7 +104,10 @@ class UmaProviderSettingsFactory {
      * @return A UmaProviderSettings instance.
      */
     UmaProviderSettings get(Request req) throws NotFoundException {
-        OAuth2Request request = new RestletOAuth2Request(req);
+        return get(new RestletOAuth2Request(req));
+    }
+
+    public UmaProviderSettings get(OAuth2Request request) throws NotFoundException {
         String realm = request.getParameter("realm");
         return getInstance(request, realmNormaliser.normalise(realm));
     }
@@ -351,6 +353,32 @@ class UmaProviderSettingsFactory {
         @Override
         public UmaTokenStore getUmaTokenStore() {
             return tokenStore;
+        }
+
+        @Override
+        public boolean onDeleteResourceServerDeletePolicies() throws ServerException {
+            try {
+                return getBooleanSetting(realm, DELETE_POLICIES_ON_RESOURCE_SERVER_DELETION);
+            } catch (SMSException e) {
+                logger.error(e.getMessage());
+                throw new ServerException(e);
+            } catch (SSOException e) {
+                logger.error(e.getMessage());
+                throw new ServerException(e);
+            }
+        }
+
+        @Override
+        public boolean onDeleteResourceServerDeleteResourceSets() throws ServerException {
+            try {
+                return getBooleanSetting(realm, DELETE_RESOURCE_SETS_ON_RESOURCE_SERVER_DELETION);
+            } catch (SMSException e) {
+                logger.error(e.getMessage());
+                throw new ServerException(e);
+            } catch (SSOException e) {
+                logger.error(e.getMessage());
+                throw new ServerException(e);
+            }
         }
 
         /**

@@ -8,6 +8,10 @@
         <listener-class>org.forgerock.guice.core.GuiceInitialisationFilter</listener-class>
     </listener>
 
+    <listener>
+        <listener-class>org.forgerock.openam.identity.idm.AMIdentityRepositoryListenerInitializer</listener-class>
+    </listener>
+
     <context-param>
         <param-name>jato:enforceStrictSessionTimeout</param-name>
         <param-value>true</param-value>

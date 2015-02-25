@@ -48,11 +48,47 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="uma-delete-policies-on-resource-server-deletion"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a103">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="uma-delete-resource-sets-on-resource-server-deletion"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a104">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="uma-backend-policy-cache-size"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a105">
+                    <DefaultValues>
+                        <Value>1000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <!-- TODO bearer MUST always be supported so should we just added it always and not have here? or have here as well? -->
                 <AttributeSchema name="uma-supported-pat-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a103">
+                                 i18nKey="a106">
                     <DefaultValues>
                         <Value>bearer</Value>
                     </DefaultValues>
@@ -62,7 +98,7 @@
                 <AttributeSchema name="uma-supported-aat-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a104">
+                                 i18nKey="a107">
                     <DefaultValues>
                         <Value>bearer</Value>
                     </DefaultValues>
@@ -72,7 +108,7 @@
                 <AttributeSchema name="uma-supported-rpt-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a105">
+                                 i18nKey="a108">
                     <DefaultValues>
                         <Value>bearer</Value>
                     </DefaultValues>
@@ -81,7 +117,7 @@
                 <AttributeSchema name="uma-supported-claim-token-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a106">
+                                 i18nKey="a109">
                     <DefaultValues>
                     </DefaultValues>
                 </AttributeSchema>
@@ -89,7 +125,7 @@
                 <AttributeSchema name="uma-supported-uma-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a107">
+                                 i18nKey="a110">
                     <DefaultValues>
                     </DefaultValues>
                 </AttributeSchema>
@@ -116,11 +152,47 @@
                         </DefaultValues>
                     </AttributeSchema>
 
+                    <AttributeSchema name="uma-delete-policies-on-resource-server-deletion"
+                                     type="single"
+                                     syntax="boolean"
+                                     i18nKey="a103">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="uma-delete-resource-sets-on-resource-server-deletion"
+                                     type="single"
+                                     syntax="boolean"
+                                     i18nKey="a104">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="uma-backend-policy-cache-size"
+                                     type="single"
+                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a105">
+                        <DefaultValues>
+                            <Value>1000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
                     <!-- TODO bearer MUST always be supported so should we just added it always and not have here? or have here as well? -->
                     <AttributeSchema name="uma-supported-pat-profiles"
                                      type="list"
                                      syntax="string"
-                                     i18nKey="a103">
+                                     i18nKey="a106">
                         <DefaultValues>
                             <Value>bearer</Value>
                         </DefaultValues>
@@ -130,7 +202,7 @@
                     <AttributeSchema name="uma-supported-aat-profiles"
                                      type="list"
                                      syntax="string"
-                                     i18nKey="a104">
+                                     i18nKey="a107">
                         <DefaultValues>
                             <Value>bearer</Value>
                         </DefaultValues>
@@ -140,7 +212,7 @@
                     <AttributeSchema name="uma-supported-rpt-profiles"
                                      type="list"
                                      syntax="string"
-                                     i18nKey="a105">
+                                     i18nKey="a108">
                         <DefaultValues>
                             <Value>bearer</Value>
                         </DefaultValues>
@@ -149,7 +221,7 @@
                     <AttributeSchema name="uma-supported-claim-token-profiles"
                                      type="list"
                                      syntax="string"
-                                     i18nKey="a106">
+                                     i18nKey="a109">
                         <DefaultValues>
                         </DefaultValues>
                     </AttributeSchema>
@@ -157,7 +229,7 @@
                     <AttributeSchema name="uma-supported-uma-profiles"
                                      type="list"
                                      syntax="string"
-                                     i18nKey="a107">
+                                     i18nKey="a110">
                         <DefaultValues>
                         </DefaultValues>
                     </AttributeSchema>
