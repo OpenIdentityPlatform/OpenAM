@@ -695,7 +695,7 @@ define([
 
             QUnit.asyncTest("Create new resource type", function () {
                 editResourceTypeView.element = $("<div>")[0];
-                $("#qunit-fixture").append(editAppView.element);
+                $("#qunit-fixture").append(editResourceTypeView.element);
 
                 editResourceTypeView.render([], function () {
                     var entity = editResourceTypeView.data.entity,
