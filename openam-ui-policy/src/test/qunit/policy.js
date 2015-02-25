@@ -41,8 +41,13 @@ define([
     "org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsUserView",
     "org/forgerock/openam/ui/policy/policies/ResourcesView",
     "org/forgerock/openam/ui/policy/resources/CreatedResourcesView",
-    "org/forgerock/openam/ui/policy/common/StripedListView"
-], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolicyView, manageAppsView, policyListView, actionsView, ResponseAttrsStaticView, responseAttrsUserView, policyResourcesView, createdResourcesView, StripedList) {
+    "org/forgerock/openam/ui/policy/common/StripedListView",
+    "org/forgerock/openam/ui/policy/resourcetypes/EditResourceTypeView",
+    "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypePatternsView",
+    "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypeActionsView",
+    "org/forgerock/openam/ui/policy/resourcetypes/ManageResourceTypesView"
+], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolicyView, manageAppsView, policyListView, actionsView, ResponseAttrsStaticView, responseAttrsUserView, policyResourcesView, createdResourcesView,
+             StripedList, editResourceTypeView, resTypePatternsView, resTypeActionsView, manageResTypesView) {
     return {
         executeAll: function (server) {
 
@@ -591,6 +596,195 @@ define([
                         QUnit.equal(totalNumberOfPages, 1, 'Total number of pages is calculated correctly');
                     }
 
+                    QUnit.start();
+                });
+            });
+
+            module('Resource Types');
+
+            QUnit.asyncTest("Edit Resource Type", function () {
+                var resTypeUUID = '6a90eabe-9638-4333-b688-3223aec7f58a';
+
+                editResourceTypeView.element = $("<div>")[0];
+                $("#qunit-fixture").append(editResourceTypeView.element);
+
+                editResourceTypeView.render([resTypeUUID], function () {
+                    var entity = editResourceTypeView.data.entity,
+                        actions = editResourceTypeView.data.actions,
+                        actionsList = new resTypeActionsView(),
+                        patternList = new resTypePatternsView();
+
+                    // Step 1
+                    QUnit.ok(editResourceTypeView.validationFields && editResourceTypeView.validationFields.length > 0, 'Validation is present');
+                    QUnit.equal(editResourceTypeView.$el.find('[name="submitForm"]').is(':disabled'), false, 'Submit button is enabled');
+
+                    QUnit.equal(editResourceTypeView.accordion.getActive(), 2, "Last step of accordion is selected");
+                    QUnit.equal(editResourceTypeView.$el.find('#backButton').length, 1, "Cancel button is present");
+
+                    QUnit.equal(editResourceTypeView.$el.find('#resTypeName').val(), entity.name, "Name is set");
+
+                    QUnit.ok(editResourceTypeView.$el.find('#resTypeDescription').val() === (entity.description ? entity.description : ''), "Description is set");
+
+                    // Step 2
+                    actionsList.render(entity, actions, '#resTypeActions', function () {
+                        var listItems = editResourceTypeView.$el.find('#resTypeActions ul li'),
+                            valid = true;
+
+                        _.each(listItems, function (item) {
+                            valid = valid && $(item).text().trim() === item.dataset.itemName;
+                        });
+
+                        // last item is 'add new' item
+                        QUnit.equal(listItems.length - 1, editResourceTypeView.data.actions.length, "Correct number of actions are displayed");
+                        QUnit.ok(valid, "Action names are displayed correctly");
+
+                        QUnit.ok(listItems.last().hasClass('editing'), "Add new action element is displayed");
+                    });
+
+                    patternList.render(entity, entity.patterns, '#resTypePatterns', function () {
+                        var listItems = editResourceTypeView.$el.find('#resTypePatterns ul li'),
+                            valid = true;
+
+                        // last item is 'add new' item
+                        QUnit.equal(listItems.length - 1, entity.patterns.length, "Correct number of patterns are displayed");
+                        _.each(listItems, function (item) {
+                            valid = valid && $(item).text().trim() === item.dataset.itemName;
+                        });
+                        QUnit.ok(valid, "Patterns are displayed correctly");
+
+                        QUnit.ok(listItems.last().hasClass('editing'), "Add new patern element is displayed");
+                    });
+
+                    // Step 3
+                    $('#reviewInfo', editResourceTypeView.$el).html(uiUtils.fillTemplateWithData('templates/policy/resourcetypes/ReviewResourceTypeStepTemplate.html', editResourceTypeView.data, function () {
+                        QUnit.ok(editResourceTypeView.$el.find('#reviewName').text().trim() === entity.name, "Correct name is displayed in the review step");
+                        if ((!editResourceTypeView.$el.find('#reviewDesc').html()) && (!entity.description)) {
+                            // both are undefined.
+                            QUnit.ok(true, "Correct description is displayed in the review step");
+                        } else {
+                            QUnit.ok(editResourceTypeView.$el.find('#reviewDesc').html() === (entity.description ? entity.description : ''), "Correct description is displayed in the review step");
+                        }
+
+                        // Patterns
+                        if (entity.patterns.length) {
+                            var patterns = [];
+                            _.each(editResourceTypeView.$el.find('ul#reviewPatterns').find('li'), function (value, key) {
+                                patterns[key] = value.innerHTML;
+                            });
+
+                            QUnit.ok(_.isEqual(patterns, entity.patterns), "Correct patterns are displayed in the review step");
+                        }
+
+                        // Actions
+                        if (entity.actions.length) {
+                            QUnit.ok(_.isEqual(editResourceTypeView.$el.find('ul#reviewActions').find('li').lenght, entity.actions.length), "Correct count actions are displayed in the review step");
+
+                            var valid = true;
+
+                            _.each(editResourceTypeView.$el.find('ul#reviewActions').find('li'), function (item) {
+                                valid = valid && $(item).text().trim() === item.dataset.itemName;
+                            });
+
+                            QUnit.ok(valid, "Correct actions are displayed in the review step");
+                        }
+
+                        QUnit.start();
+                    }));
+                });
+            });
+
+            QUnit.asyncTest("Create new resource type", function () {
+                editResourceTypeView.element = $("<div>")[0];
+                $("#qunit-fixture").append(editAppView.element);
+
+                editResourceTypeView.render([], function () {
+                    var entity = editResourceTypeView.data.entity,
+                        actions = editResourceTypeView.data.actions,
+                        actionsList = new resTypeActionsView(),
+                        patternList = new resTypePatternsView();
+
+                    QUnit.ok(editResourceTypeView.accordion.getActive() === 0, "First step of accordion is selected");
+                    QUnit.ok(editResourceTypeView.$el.find('#backButton').length, "Cancel button is available");
+
+                    // Step 1
+                    QUnit.ok(editResourceTypeView.$el.find('#resTypeName').val() === '', "Name is empty");
+                    QUnit.ok(editResourceTypeView.$el.find('#resTypeDescription').val() === '', "Description is empty");
+
+                    // Step 2
+                    actionsList.render(entity, editResourceTypeView.data.actions, '#resTypeActions', function () {
+                        var listItems = editResourceTypeView.$el.find('#resTypeActions ul li');
+
+                        QUnit.equal(listItems.length, 0, "No resource types are displayed");
+                    });
+
+                    patternList.render(entity, entity.patterns, '#resTypePatterns', function () {
+                        var listItems = editResourceTypeView.$el.find('#resTypePatterns ul li');
+
+                        QUnit.equal(listItems.length, 0, "No patterns are displayed");
+                    });
+
+                    // Step 3
+                    $('#reviewInfo', editResourceTypeView.$el).html(uiUtils.fillTemplateWithData('templates/policy/resourcetypes/ReviewResourceTypeStepTemplate.html', editResourceTypeView.data, function () {
+                        QUnit.ok(editResourceTypeView.$el.find('#reviewName').hasClass('invalid'), 'Name field is marked as invalid');
+                        QUnit.equal(editResourceTypeView.$el.find('#reviewRes').length,0, 'Resources field is not displayed in review step as it is invalid');
+                        QUnit.ok(editResourceTypeView.$el.find('[name="submitForm"]').is(':disabled'), 'Submit button is disabled');
+
+                        QUnit.start();
+                    }));
+                });
+            });
+
+            QUnit.asyncTest("List all resource types", function () {
+                manageResTypesView.element = $("<div>")[0];
+                $("#qunit-fixture").append(manageResTypesView.element);
+
+                manageResTypesView.render([], function () {
+                    var table = $('#resTypes', manageResTypesView.$el),
+                        postedData = table.jqGrid('getGridParam', 'postData'),
+                        rowData = table.jqGrid('getRowData'),
+                        recordsTotal = table.jqGrid('getGridParam', 'records'),
+                        totalNumberOfPages = table.jqGrid('getGridParam', 'lastpage'),
+                        recordsPerPage = table.jqGrid('getGridParam', 'rowNum'),
+                        rowList = table.jqGrid('getGridParam', 'rowList'),
+                        remaining = table.jqGrid('getGridParam', 'userData').remaining;
+
+
+                    QUnit.equal(manageResTypesView.$el.find('.ui-jqgrid').length, 1, 'Table is rendered');
+                    QUnit.equal(manageResTypesView.$el.find('.global-actions').length, 1, 'Table actions are rendered');
+
+                    QUnit.ok(rowData.length > 0, "At least one resource type listed in the table");
+                    QUnit.ok(rowData.length === table.find("tr[id]").length, "Number of rows in grid match number displayed");
+
+                    QUnit.ok(table.jqGrid('getGridParam', 'colNames').length === table.find("tr[id]")[0].children.length,
+                        'Total number of columns displayed matches number of columns requested');
+
+                    // sorting
+                    QUnit.ok(manageResTypesView.$el.find('#resTypes_name').find('.s-ico').length === 1,
+                        'Sort icon is present for the name column');
+
+                    QUnit.ok(manageResTypesView.$el.find('#resTypes_name').find('span[sort=desc]').hasClass('ui-state-disabled'),
+                        'Name is sorted in ascending order');
+
+                    // Pagination
+                    QUnit.ok($('#resTypesPager', manageResTypesView.$el).length === 1, 'Pager is present');
+
+                    QUnit.ok(rowData.length + postedData._pagedResultsOffset + remaining === recordsTotal,
+                        'Total number of records is calculated correctly');
+
+                    QUnit.ok(recordsPerPage >= rowData.length,
+                        'Number of rows in grid is less than or equal to number of rows requested');
+
+                    if (recordsTotal > recordsPerPage) {
+                        QUnit.ok(totalNumberOfPages === recordsTotal % recordsPerPage === 0 ?
+                            recordsTotal / recordsPerPage : Math.floor(recordsTotal / recordsPerPage) + 1,
+                            'Total number of pages is calculated correctly');
+                    } else {
+                        QUnit.ok(totalNumberOfPages === 1,
+                            'Total number of pages is calculated correctly');
+                    }
+
+                    // Show/hide columns
+                    QUnit.ok($('.navtable', manageResTypesView.$el).length === 1, 'Columns Button is available');
                     QUnit.start();
                 });
             });
