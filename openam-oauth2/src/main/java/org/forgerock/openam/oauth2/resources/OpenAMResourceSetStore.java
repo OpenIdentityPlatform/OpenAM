@@ -16,9 +16,6 @@
 
 package org.forgerock.openam.oauth2.resources;
 
-import static org.forgerock.util.query.QueryFilter.and;
-import static org.forgerock.util.query.QueryFilter.equalTo;
-
 import javax.inject.Inject;
 import java.util.Iterator;
 import java.util.Set;
@@ -32,7 +29,6 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -82,44 +78,12 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
         }
     }
 
-    private ResourceSetDescription readResourceSet(String resourceSetId, String clientId) throws ServerException {
-        Set<ResourceSetDescription> results;
-        try {
-            results = delegate.query(and(
-                    equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId),
-                    equalTo(ResourceSetTokenField.CLIENT_ID, clientId)));
-        } catch (org.forgerock.openam.sm.datalayer.store.ServerException e) {
-            throw new ServerException(e);
-        }
-        if (results.isEmpty() || results.size() > 1) {
-            return null;
-        } else {
-            ResourceSetDescription resourceSet = results.iterator().next();
-            if (!realm.equals(resourceSet.getRealm())) {
-                return null;
-            }
-            return resourceSet;
-        }
-    }
-
     @Override
-    public ResourceSetDescription read(String resourceSetId, String clientId) throws NotFoundException, ServerException {
-        ResourceSetDescription token = readResourceSet(resourceSetId, clientId);
-        if (token == null) {
-            if (logger.warningEnabled()) {
-                logger.warning("Resource set corresponding to id: " + resourceSetId + " not found");
-            }
-            throw new NotFoundException("Resource set corresponding to id: " + resourceSetId + " not found");
-        }
-        return token;
-    }
-
-    @Override
-    public ResourceSetDescription read(String resourceSetUID) throws NotFoundException, ServerException {
+    public ResourceSetDescription read(String resourceSetId) throws NotFoundException, ServerException {
         try {
-            return delegate.read(resourceSetUID);
+            return delegate.read(resourceSetId);
         } catch (org.forgerock.openam.sm.datalayer.store.NotFoundException e) {
-            throw new NotFoundException("Resource set does not exist with id " + resourceSetUID);
+            throw new NotFoundException("Resource set does not exist with id " + resourceSetId);
         } catch (org.forgerock.openam.sm.datalayer.store.ServerException e) {
             throw new ServerException(e);
         }
@@ -141,9 +105,9 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     }
 
     @Override
-    public void delete(String resourceSetId, String clientId) throws NotFoundException, ServerException {
+    public void delete(String resourceSetId) throws NotFoundException, ServerException {
         try {
-            ResourceSetDescription token = readResourceSet(resourceSetId, clientId);
+            ResourceSetDescription token = read(resourceSetId);
             if (token == null) {
                 if (logger.errorEnabled()) {
                     logger.error("Resource set corresponding to id: " + resourceSetId + " not found");

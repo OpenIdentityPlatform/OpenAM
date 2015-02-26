@@ -144,7 +144,7 @@ public class PermissionRequestEndpoint extends ServerResource {
     private ResourceSetDescription getResourceSet(String resourceSetId, String clientId, OAuth2ProviderSettings providerSettings) throws UmaException {
         try {
             ResourceSetStore store = providerSettings.getResourceSetStore();
-            return store.read(resourceSetId, clientId);
+            return store.read(resourceSetId);
         } catch (NotFoundException e) {
             throw new UmaException(400, "invalid_resource_set_id", e.getMessage());
         } catch (ServerException e) {

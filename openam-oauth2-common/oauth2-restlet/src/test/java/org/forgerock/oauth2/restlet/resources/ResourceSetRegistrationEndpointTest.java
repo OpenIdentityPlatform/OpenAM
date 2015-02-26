@@ -220,7 +220,7 @@ public class ResourceSetRegistrationEndpointTest {
                 "RESOURCE_OWNER_ID", RESOURCE_SET_DESCRIPTION_CONTENT.asMap());
 
         setUriResourceSetId();
-        given(store.read("RESOURCE_SET_ID", "CLIENT_ID")).willReturn(resourceSetDescription);
+        given(store.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
 
         //When
         Representation responseRep = endpoint.readOrListResourceSet();
@@ -243,7 +243,7 @@ public class ResourceSetRegistrationEndpointTest {
 
         setUriResourceSetId();
         addCondition();
-        given(store.read("RESOURCE_SET_ID", "CLIENT_ID")).willReturn(resourceSetDescription);
+        given(store.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
 
         //When
         Representation responseRep = endpoint.updateResourceSet(entity);
@@ -277,7 +277,7 @@ public class ResourceSetRegistrationEndpointTest {
         Representation responseRep = endpoint.deleteResourceSet();
 
         //Then
-        verify(store).delete("RESOURCE_SET_ID", "CLIENT_ID");
+        verify(store).delete("RESOURCE_SET_ID");
         assertThat(responseRep.getText()).isNull();
         ArgumentCaptor<Status> responseStatusCaptor = ArgumentCaptor.forClass(Status.class);
         verify(response).setStatus(responseStatusCaptor.capture());

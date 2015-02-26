@@ -17,14 +17,12 @@
 package org.forgerock.openam.oauth2.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +35,6 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
-import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 import org.forgerock.util.query.BaseQueryFilterVisitor;
@@ -113,64 +110,22 @@ public class OpenAMResourceSetStoreTest {
         verify(dataStore).create(resourceSetDescription);
     }
 
-    @Test(expectedExceptions = NotFoundException.class)
-    public void readShouldThrowNotFoundExceptionWhenNoResourceSetFound() throws Exception {
-        //Given
-        given(dataStore.query(Matchers.<QueryFilter<String>>anyObject()))
-                .willReturn(Collections.<ResourceSetDescription>emptySet());
-
-        //When
-        store.read("RESOURCE_SET_ID", "CLIENT_ID");
-
-        //Then
-        //Excepted NotFoundException
-    }
-
-    @Test(expectedExceptions = NotFoundException.class)
-    public void readShouldThrowNotFoundExceptionWhenMultipleResourceSetsFound() throws Exception {
-
-        //Given
-        ResourceSetDescription resourceSet1 = mock(ResourceSetDescription.class);
-        ResourceSetDescription resourceSet2 = mock(ResourceSetDescription.class);
-        Set<ResourceSetDescription> resourceSets = new HashSet<ResourceSetDescription>();
-        resourceSets.add(resourceSet1);
-        resourceSets.add(resourceSet2);
-
-        given(dataStore.query(Matchers.<QueryFilter<String>>anyObject()))
-                .willReturn(resourceSets);
-
-        //When
-        store.read("RESOURCE_SET_ID", "CLIENT_ID");
-
-        //Then
-        //Excepted NotFoundException
-    }
-
     @Test
     public void shouldReadResourceSetToken() throws Exception {
 
         //Given
         ResourceSetDescription resourceSetDescription =
-                new ResourceSetDescription("123", "CLIENT_ID", "RESOURCE_OWNER_ID",
+                new ResourceSetDescription("RESOURCE_SET_ID", "CLIENT_ID", "RESOURCE_OWNER_ID",
                         Collections.<String, Object>emptyMap());
 
-        given(dataStore.query(Matchers.<QueryFilter<String>>anyObject()))
-                .willReturn(asSet(resourceSetDescription));
+        given(dataStore.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
         resourceSetDescription.setRealm("REALM");
 
         //When
-        ResourceSetDescription readResourceSetDescription = store.read("RESOURCE_SET_ID", "CLIENT_ID");
+        ResourceSetDescription readResourceSetDescription = store.read("RESOURCE_SET_ID");
 
         //Then
-        ArgumentCaptor<QueryFilter> queryCaptor = ArgumentCaptor.forClass(QueryFilter.class);
-        verify(dataStore).query(queryCaptor.capture());
-
-        QueryFilter<String> query = queryCaptor.getValue();
-        Map<String, String> params = query.accept(QUERY_PARAMS_EXTRACTOR, new HashMap<String, String>());
-
-        assertThat(params).containsOnly(
-                entry(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
-                entry(ResourceSetTokenField.CLIENT_ID, "CLIENT_ID"));
+        verify(dataStore).read("RESOURCE_SET_ID");
         assertThat(readResourceSetDescription).isEqualTo(readResourceSetDescription);
     }
     
@@ -231,7 +186,7 @@ public class OpenAMResourceSetStoreTest {
                 .willReturn(Collections.<ResourceSetDescription>emptySet());
 
         //When
-        store.delete("RESOURCE_SET_ID", "CLIENT_ID");
+        store.delete("RESOURCE_SET_ID");
 
         //Then
         //Excepted NotFoundException
@@ -241,19 +196,17 @@ public class OpenAMResourceSetStoreTest {
     public void shouldDeleteResourceSetToken() throws Exception {
 
         //Given
-        Token token = mock(Token.class);
         ResourceSetDescription resourceSetDescription = new ResourceSetDescription();
 
-        resourceSetDescription.setId("ID");
+        resourceSetDescription.setId("RESOURCE_SET_ID");
         resourceSetDescription.setRealm("REALM");
-        given(dataStore.query(Matchers.<QueryFilter<String>>anyObject()))
-                .willReturn(Collections.singleton(resourceSetDescription));
+        given(dataStore.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
 
         //When
-        store.delete("RESOURCE_SET_ID", "CLIENT_ID");
+        store.delete("RESOURCE_SET_ID");
 
         //Then
-        verify(dataStore).delete("ID");
+        verify(dataStore).delete("RESOURCE_SET_ID");
     }
 
     @Test

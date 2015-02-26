@@ -16,11 +16,12 @@
 
 package org.forgerock.openam.uma.audit;
 
+import java.util.Set;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.oauth2.core.AccessToken;
@@ -40,10 +41,6 @@ import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 import org.forgerock.openam.uma.UmaException;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 @Singleton
 public class UmaAuditLogger {
@@ -100,14 +97,14 @@ public class UmaAuditLogger {
 
     private String getResourceName(String resourceSetId, Request request) throws NotFoundException, UmaException, org.forgerock.oauth2.core.exceptions.ServerException {
         OAuth2ProviderSettings providerSettings = oauth2ProviderSettingsFactory.get(requestFactory.create(request));
-        ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, getClientId(request), providerSettings);
+        ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, providerSettings);
         return resourceSetDescription.getName();
     }
 
-    private ResourceSetDescription getResourceSet(String resourceSetId, String clientId, OAuth2ProviderSettings providerSettings) throws UmaException {
+    private ResourceSetDescription getResourceSet(String resourceSetId, OAuth2ProviderSettings providerSettings) throws UmaException {
         try {
             ResourceSetStore store = providerSettings.getResourceSetStore();
-            return store.read(resourceSetId, clientId);
+            return store.read(resourceSetId);
         } catch (NotFoundException e) {
             throw new UmaException(400, "invalid_resource_set_id", e.getMessage());
         } catch (org.forgerock.oauth2.core.exceptions.ServerException e) {

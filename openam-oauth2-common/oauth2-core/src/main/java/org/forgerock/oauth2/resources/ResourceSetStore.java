@@ -16,7 +16,6 @@
 
 package org.forgerock.oauth2.resources;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -44,16 +43,6 @@ public interface ResourceSetStore {
             NotFoundException, BadRequestException;
 
     /**
-     * Read a {@code ResourceSetDescription} out of the store.
-     *
-     * @param resourceSetId The identifier of the resource set.
-     * @param clientId The identifier of the client (resource server).
-     * @return The {@code ResourceSetDescription} found.
-     * @throws ServerException When the resource set description cannot be loaded.
-     */
-    ResourceSetDescription read(String resourceSetId, String clientId) throws NotFoundException, ServerException;
-
-    /**
      * Reads a {@code ResourceSetDescription} out of the store using its OpenAM Unique ID.
      *
      * @param resourceSetUID The OpenAM Unique ID assigned to the resource set.
@@ -76,10 +65,9 @@ public interface ResourceSetStore {
      * Remove a {@code ResourceSetDescription} with the given ID from the store.
      *
      * @param resourceSetId The identifier of the {@code ResourceSetDescription} being removed.
-     * @param clientId The identifier of the client (resource server).
      * @throws ServerException When an error occurs during removal.
      */
-    void delete(String resourceSetId, String clientId) throws NotFoundException, ServerException;
+    void delete(String resourceSetId) throws NotFoundException, ServerException;
 
     /**
      * Query the store for {@code ResourceSetDescription} instances.

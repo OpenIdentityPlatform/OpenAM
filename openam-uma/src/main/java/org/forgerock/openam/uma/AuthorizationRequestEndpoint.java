@@ -101,7 +101,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         final String requestingUserId = authorisationApiToken.getResourceOwnerId();
         final String resourceSetId = permissionTicket.getResourceSetId();
         final Request request = getRequest();
-        final String resourceOwnerId = getResourceOwnerId(authorisationApiToken, resourceSetId);
+        final String resourceOwnerId = getResourceOwnerId(resourceSetId);
 
         auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.REQUEST, request, requestingUserId);
 
@@ -118,11 +118,9 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         //TODO not sure where "need_info" error fits in....
     }
 
-    private String getResourceOwnerId(AccessToken authorisationApiToken, String resourceSetId) throws NotFoundException, UmaException {
+    private String getResourceOwnerId(String resourceSetId) throws NotFoundException, UmaException {
         OAuth2ProviderSettings providerSettings = oauth2ProviderSettingsFactory.get(requestFactory.create(getRequest()));
-        final String clientId = authorisationApiToken.getClientId();
-        ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, clientId,
-                providerSettings);
+        ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, providerSettings);
         return resourceSetDescription.getResourceOwnerId();
     }
 
@@ -138,7 +136,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         try {
             ResourceSetStore store = oauth2ProviderSettingsFactory.get(requestFactory.create(getRequest()))
                     .getResourceSetStore();
-            resourceName += store.read(resourceSetId, permissionTicket.getClientId()).getId();
+            resourceName += store.read(resourceSetId).getId();
         } catch (NotFoundException e) {
             debug.message("Couldn't find resource that permission ticket is registered for", e);
             throw new ServerException("Couldn't find resource that permission ticket is registered for");
@@ -232,10 +230,10 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         }
     }
 
-    private ResourceSetDescription getResourceSet(String resourceSetId, String clientId, OAuth2ProviderSettings providerSettings) throws UmaException {
+    private ResourceSetDescription getResourceSet(String resourceSetId, OAuth2ProviderSettings providerSettings) throws UmaException {
         try {
             ResourceSetStore store = providerSettings.getResourceSetStore();
-            return store.read(resourceSetId, clientId);
+            return store.read(resourceSetId);
         } catch (NotFoundException e) {
             throw new UmaException(400, "invalid_resource_set_id", e.getMessage());
         } catch (ServerException e) {

@@ -110,7 +110,7 @@ public class AuthorizationRequestEndpointTest {
         resourceSetStore = mock(ResourceSetStore.class);
         ResourceSetDescription resourceSet = new ResourceSetDescription();
         resourceSet.setId(RS_DESCRIPTION_ID);
-        given(resourceSetStore.read(RS_ID, RS_CLIENT_ID)).willReturn(resourceSet);
+        given(resourceSetStore.read(RS_ID)).willReturn(resourceSet);
 
         umaProviderSettings = mock(UmaProviderSettings.class);
         policyEvaluator = mock(Evaluator.class);
