@@ -81,7 +81,7 @@ public class OpenAMClientDAO implements ClientDAO {
         try {
             final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
             final String realm = request.getParameter("realm");
-            AMIdentityRepository repo = idRepoFactory.create(token, realm);
+            AMIdentityRepository repo = idRepoFactory.create(realm, token);
             repo.createIdentity(IdType.AGENTONLY, client.getClientID(), attrs);
         } catch (Exception e) {
             logger.error("ConnectClientRegistration.Validate(): Unable to create client", e);
@@ -98,7 +98,7 @@ public class OpenAMClientDAO implements ClientDAO {
             AMIdentity theID = null;
             final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
             final String realm = request.getParameter("realm");
-            AMIdentityRepository repo = idRepoFactory.create(token, realm);
+            AMIdentityRepository repo = idRepoFactory.create(realm, token);
 
             IdSearchControl idsc = new IdSearchControl();
             idsc.setRecursive(true);
@@ -155,7 +155,7 @@ public class OpenAMClientDAO implements ClientDAO {
             //get the AMIdentity
             final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
             final String realm = request.getParameter("realm");
-            AMIdentityRepository repo = idRepoFactory.create(token, realm);
+            AMIdentityRepository repo = idRepoFactory.create(realm, token);
 
             AMIdentity theID = null;
 

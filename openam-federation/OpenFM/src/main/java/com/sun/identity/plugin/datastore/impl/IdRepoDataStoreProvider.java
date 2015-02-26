@@ -351,7 +351,7 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
         SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
         AMIdentityRepository amIdentityRepository = (AMIdentityRepository) idRepoMap.get(realm);
         if (amIdentityRepository == null) {
-            amIdentityRepository = new AMIdentityRepository(adminToken, realm);
+            amIdentityRepository = new AMIdentityRepository(realm, adminToken);
             idRepoMap.put(realm, amIdentityRepository);
             if (debug.messageEnabled()) {
                 debug.message("IdRepoDataStoreProvider.getAMIdRepo : "

@@ -208,7 +208,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         searchControl.setAllReturnAttributes(true);
         searchControl.setMaxResults(0);
         SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
-        IdSearchResults searchResults = idRepoFactory.create(adminToken, identity.getRealm())
+        IdSearchResults searchResults = idRepoFactory.create(identity.getRealm(), adminToken)
                 .searchIdentities(IdType.AGENT, identity.getName(), searchControl);
         if (searchResults.getSearchResults().size() != 1) {
             throw new IdRepoException("UmaPolicyApplicationListener.getIdentityAttributes : More than one agent found");

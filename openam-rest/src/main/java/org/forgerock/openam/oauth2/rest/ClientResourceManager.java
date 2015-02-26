@@ -58,7 +58,7 @@ public class ClientResourceManager {
     private AMIdentity getIdentity(String uName, String realm) throws InternalServerErrorException {
         AMIdentity theID = null;
         AMIdentityRepository amIdRepo = null;
-        amIdRepo = new AMIdentityRepository(getAdminToken() , realm);
+        amIdRepo = new AMIdentityRepository(realm, getAdminToken());
         IdSearchControl idsc = new IdSearchControl();
         idsc.setRecursive(true);
         idsc.setAllReturnAttributes(true);

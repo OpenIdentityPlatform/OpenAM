@@ -190,8 +190,7 @@ public class IdRepoSample {
                         issr.selectSubRealm (currentSubRealms);
                     if (nextSubRealm != currentRealm) {
                         currentRealm = nextSubRealm;
-                        idRepo = new AMIdentityRepository(ssoToken,
-                            currentRealm);
+                        idRepo = new AMIdentityRepository(currentRealm, ssoToken);
                         doCurrentRealm();
                     }
                     break;

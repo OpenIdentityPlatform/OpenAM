@@ -27,9 +27,9 @@ public interface AMIdentityRepositoryFactory {
     /**
      * Creates a {@code AMIdentityRepository} instance.
      *
-     * @param token The {@code SSOToken}.
      * @param realm The realm to create the instance in.
+     * @param token The {@code SSOToken}.
      * @return The {@code AMIdentityRepository} instance.
      */
-    AMIdentityRepository create(SSOToken token, String realm);
+    AMIdentityRepository create(String realm, SSOToken token);
 }

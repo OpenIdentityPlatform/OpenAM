@@ -1306,7 +1306,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
     	if ((realm == null) || (realm.length() == 0)) {
     		realm = "/";
     	}
-        return new AMIdentityRepository(token, realm);
+        return new AMIdentityRepository(realm, token);
     }
 
     private AMIdentityRepository getRepo(Token admin, String realm)

@@ -437,7 +437,7 @@ public class ServerConfigMgr {
         idCallbacks[1] = passwordCallback;
         
         try {
-            AMIdentityRepository amir = new AMIdentityRepository(ssoToken, "/");
+            AMIdentityRepository amir = new AMIdentityRepository("/", ssoToken);
             if (!amir.authenticate(idCallbacks)) {
                 passwordCallback.setPassword(newPassword.toCharArray());
                 return amir.authenticate(idCallbacks);

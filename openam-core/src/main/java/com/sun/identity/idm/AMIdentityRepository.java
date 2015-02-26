@@ -91,10 +91,28 @@ public final class AMIdentityRepository {
      *            Single sign on token of the user
      * @param realmName
      *            Name of the realm (can be a Fully qualified DN)
+     * @throws IdRepoException Never thrown, required by legacy code.
+     * @throws SSOException Never thrown, required by legacy code.
+     * @deprecated in 13.0.0, use {@link #AMIdentityRepository(String, com.iplanet.sso.SSOToken)} instead
+     */
+    @Deprecated
+    public AMIdentityRepository(SSOToken ssotoken, String realmName)
+            throws IdRepoException, SSOException {
+        this(realmName, ssotoken);
+    }
+
+    /**
+     * @supported.api
+     *
+     * Constructor for the {@code AMIdentityRepository} object. If a {@code null} is passed for
+     * the organization identifier {@code realmName}, then the "root" realm is assumed.
+     *
+     * @param ssoToken Single sign on token of the user.
+     * @param realmName Name of the realm (can be a Fully qualified DN).
      */
     @Inject
-    public AMIdentityRepository(@Assisted SSOToken ssotoken, @Assisted final String realmName) {
-        token = ssotoken;
+    public AMIdentityRepository(@Assisted String realmName, @Assisted SSOToken ssoToken) {
+        token = ssoToken;
         idRealmName = realmName;
         organizationDN = DNMapper.orgNameToDN(realmName);
         notifyCreationListeners();

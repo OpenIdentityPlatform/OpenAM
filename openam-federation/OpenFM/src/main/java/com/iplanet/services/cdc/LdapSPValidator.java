@@ -86,7 +86,7 @@ public class LdapSPValidator implements SPValidator {
     public LdapSPValidator() {
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
-        amIdRepo = new AMIdentityRepository(adminToken, null);
+        amIdRepo = new AMIdentityRepository(null, adminToken);
         if (amIdRepo == null) {
             exception = new IdRepoException(
                 IdRepoBundle.getString("32"), "32");
