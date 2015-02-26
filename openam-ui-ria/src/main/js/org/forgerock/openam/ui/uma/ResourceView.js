@@ -71,11 +71,18 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
                 RevokeCell = backgridUtils.TemplateCell.extend({
                     template: "templates/uma/backgrid/cell/RevokeCell.html",
                     events: {
-                        "click": "revoke"
+                        "click revoke": "revoke",
+                        "click save":   "save",
+                        "click cancel": "cancel"
                     },
                     revoke: function(e) {
-                        e.preventDefault();
-                        // TODO: Make a call to the policy delegate to revoke this access
+                        // TODO:
+                    },
+                    save: function(e) {
+                        // TODO:
+                    },
+                    cancel: function(e) {
+                        // TODO:
                     }
                 });
 

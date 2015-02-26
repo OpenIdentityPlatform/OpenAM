@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
         template: "templates/uma/ResourceListTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
-            'click td': 'openPolicy'
+            'click td.uri-cell': 'openPolicy'
         },
 
         render: function(args, callback) {
@@ -125,7 +125,12 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
         openPolicy: function(e) {
             e.preventDefault();
             var policy = $(e.currentTarget).data();
-            router.routeTo( router.configuration.routes.resourceActivity, {args: [policy.policyId], trigger: true});
+            if (policy.policyId) {
+                router.routeTo( router.configuration.routes.resourceActivity, {args: [policy.policyId], trigger: true});
+            } else {
+                // throw an error message
+                console.log(e);
+            }
         }
 
     });

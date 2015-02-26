@@ -84,64 +84,6 @@ span.item-button-panel {
     }
 }
 
-.striped-list {
-
-    border: 1px solid #ccc;
-    border-bottom:none;
-    border-radius: 3px 3px 3px 3px;
-    margin:0 10px 0 0;
-
-
-    h3 {
-        font-size: 14px;
-        background:#5a646d;
-        color:#fff;
-        padding-left:8px;
-        border-radius: 3px 3px 0 0px;
-        font-weight:normal;
-    }
-
-    li {
-        padding:8px;
-        border-bottom: 1px solid #ccc;
-        &:nth-child(odd){  background-color:#eee; }
-        &:nth-child(even){ background-color:#fff; }
-
-        .icon-close, .icon-arrow-right, .icon-plus{
-            opacity:0;
-            transition: all 300ms ease-in-out;
-            color: #555;
-            display: block;
-        }
-
-        .icon-arrow-right{
-            padding-right: 10px;
-        }
-
-        .key{
-            font-weight: bold;
-            padding-right: 4px;
-        }
-
-    }
-
-    li {
-        &.highlight-info {
-            background:#ffc;
-            transition: background 0.2s linear;
-        }
-
-        &.highlight-warning {
-            background:#fcc;
-            transition: background 0.2s linear;
-        }
-
-        &.highlight-good {
-            background:#CCFFDE;
-            transition: background 0.2s linear;
-        }
-    }
-}
 
 .content-bg {
     padding: 20px 10px;
@@ -242,10 +184,6 @@ html .selectize-dropdown .optgroup-header{
 }
 
 /* XUI Overrides */
-#content {
-    /*stop dragged items from cropping when they go out of content bounds*/
-    overflow: visible;
-}
 body{
     /* This will prevent to sudden shift of content which can sometimes occur
     * when navigating between them long views which require a scroll bar and
@@ -255,9 +193,9 @@ body{
 }
 
 
-#uma{
+#uma {
 
-    input[type="text"]:invalid:required, input[type="text"].invalid{
+    input[type="text"]:invalid:required, input[type="text"].invalid {
         .invalid-background;
         transition: background-color 200ms linear;
     }
@@ -268,21 +206,21 @@ body{
         min-height:100px;
     }
 
-    #selectUser{
+    #selectUser {
         width: 370px;
         margin: 0 15px 10px 0;
     }
 
-    #selectPermission{
+    #selectPermission {
         min-width:370px;
         margin: 0 15px 10px 0;
     }
 
-    #resourceList{
+    #resourceList {
         margin-bottom:30px;
     }
 
-    input.button{
+    input.button {
         padding-top: 5px;
         padding-bottom: 5px;
         margin: 26px 0 0 0;
@@ -312,14 +250,11 @@ body{
                 background-color: #B0DCFF;
                 cursor:pointer;
             }
-
         }
 
-        td:not(.uri-cell){
+        td:not(.uri-cell) a {
             // Adds the click event to the td so that the entire cell is clickable so underline not needed
-            a {
-                text-decoration: underline;
-            }
+            text-decoration: underline;
         }
 
         th {
@@ -345,7 +280,6 @@ body{
                 color: @table-base-color;
                 padding-right:0;
             }
-
         }
 
         thead tr {
@@ -381,7 +315,6 @@ body{
                     font-weight:bold;
                 }
             }
-
         }
         .ascending .sort-caret{
             border-bottom: 4px solid @table-base-color;
@@ -390,14 +323,30 @@ body{
         .descending .sort-caret {
             border-top: 4px solid @table-base-color;
         }
+
+        tbody tr.unsaved-changes {
+
+            background-color:#fff;
+            transition: background 0.2s linear;
+
+            .backgrid-revoke-cell {
+                #revoke {
+                    display:none;
+                }
+
+                #save, #cancel{
+                    display:block;
+                }
+            }
+        }
     }
 
     .backgrid-container{
         width: 100%;
         overflow-x: scroll;
         border: 1px solid lighten(@table-base-color, 45%);
-        border-bottom:none;
-        height:auto;
+        border-bottom: none;
+        height: auto;
         overflow: auto;
 
     }
@@ -408,12 +357,31 @@ body{
     }
 
     .backgrid-revoke-cell {
-        font-size: 12px;
-        padding: 13px 2px 13px 10px;
-        &:hover, &:focus{
-            color: @color-error;
+
+        width: 64px;
+
+        [class^="icon-"], [class*=" icon-"] {
+            font-size: 12px;
+            padding: 13px 10px 13px 10px;
+
+            &:hover, &:focus{
+                color: @color-error;
+            }
         }
+
+        #save {
+            &:hover, &:focus{
+                color: @color-success;
+            }
+        }
+
+        #save, #cancel {
+            display: none;
+        }
+
     }
+
+
 
     .selectize-cell {
         width: 300px;

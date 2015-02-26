@@ -45,9 +45,9 @@ require.config({
         multiselect:    "libs/ui.multiselect-0.3",
         jqgrid:         "libs/jquery.jqGrid-4.5.4-min",
         selectize:      "libs/selectize-0.11.2-min",
-        LoginDialog:            "org/forgerock/commons/ui/common/LoginDialog",
-        LoginView:              "org/forgerock/commons/ui/common/LoginView",
-        ThemeManager:           "org/forgerock/openam/ui/common/util/ThemeManager"
+        LoginDialog:    "org/forgerock/commons/ui/common/LoginDialog",
+        LoginView:      "org/forgerock/commons/ui/common/LoginView",
+        ThemeManager:   "org/forgerock/openam/ui/common/util/ThemeManager"
     },
 
     shim: {
