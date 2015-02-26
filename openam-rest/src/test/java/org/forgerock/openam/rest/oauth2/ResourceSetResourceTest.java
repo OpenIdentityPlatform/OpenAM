@@ -16,14 +16,16 @@
 
 package org.forgerock.openam.rest.oauth2;
 
-import static org.forgerock.json.fluent.JsonValue.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.mockito.BDDMockito.any;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
@@ -38,15 +40,16 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.RootContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
-import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.resource.RealmContext;
-import org.forgerock.openam.uma.UmaPolicyService;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -55,18 +58,13 @@ public class ResourceSetResourceTest {
 
     private ResourceSetResource resource;
 
-    private ResourceSetStore resourceSetStore;
+    private ResourceSetService resourceSetService;
 
     @BeforeMethod
     public void setup() {
+        resourceSetService = mock(ResourceSetService.class);
 
-        ResourceSetStoreFactory resourceSetStoreFactory = mock(ResourceSetStoreFactory.class);
-        resourceSetStore = mock(ResourceSetStore.class);
-        UmaPolicyService policyService = mock(UmaPolicyService.class);
-
-        resource = new ResourceSetResource(resourceSetStoreFactory, policyService);
-
-        given(resourceSetStoreFactory.create("REALM")).willReturn(resourceSetStore);
+        resource = new ResourceSetResource(resourceSetService);
     }
 
     @Test
@@ -81,11 +79,14 @@ public class ResourceSetResourceTest {
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceSetDescription resourceSet = new ResourceSetDescription();
         resourceSet.setDescription(json(object()));
+        Promise<ResourceSetDescription, ResourceException> resourceSetPromise
+                = Promises.newSuccessfulPromise(resourceSet);
 
-        given(resourceSetStore.read("RESOURCE_SET_UID")).willReturn(resourceSet);
+        given(resourceSetService.getResourceSet(context, "REALM", "RESOURCE_SET_ID", false))
+                .willReturn(resourceSetPromise);
 
         //When
-        resource.readInstance(context, "RESOURCE_SET_UID", request, handler);
+        resource.readInstance(context, "RESOURCE_SET_ID", request, handler);
 
         //Then
         verify(handler).handleResult(Matchers.<Resource>anyObject());
@@ -207,18 +208,32 @@ public class ResourceSetResourceTest {
         QueryRequest request = mock(QueryRequest.class);
         given(request.getFields()).willReturn(Arrays.asList(new JsonPointer("/fred")));
         QueryResultHandler handler = mock(QueryResultHandler.class);
-        ResourceSetDescription resourceSet = new ResourceSetDescription();
-        resourceSet.setId("abc123");
-        resourceSet.setClientId("myclient");
-        resourceSet.setDescription(json(object()));
+        ResourceSetDescription resourceSet = mock(ResourceSetDescription.class);
+        QueryFilter queryFilter = QueryFilter.and(
+                QueryFilter.equalTo("/name", "NAME"),
+                QueryFilter.equalTo("/resourceServer", "myclient"),
+                QueryFilter.equalTo("/policy/permissions/subject", "SUBJECT"));
+        Promise<Collection<ResourceSetDescription>, ResourceException> resourceSetsPromise
+                = Promises.newSuccessfulPromise((Collection<ResourceSetDescription>) asSet(resourceSet));
 
-        given(request.getQueryFilter()).willReturn(QueryFilter.equalTo(new JsonPointer("/name"), 5));
-        given(resourceSetStore.query(any(org.forgerock.util.query.QueryFilter.class))).willReturn(asSet(resourceSet));
+        given(request.getQueryFilter()).willReturn(queryFilter);
+        given(resourceSetService.getResourceSets(eq(context), eq("REALM"),
+                Matchers.<ResourceSetWithPolicyQuery>anyObject(), eq(false))).willReturn(resourceSetsPromise);
 
         //When
         resource.queryCollection(context, request, handler);
 
         //Then
+        ArgumentCaptor<ResourceSetWithPolicyQuery> queryCaptor
+                = ArgumentCaptor.forClass(ResourceSetWithPolicyQuery.class);
+        verify(resourceSetService).getResourceSets(eq(context), eq("REALM"), queryCaptor.capture(), eq(false));
+        assertThat(queryCaptor.getValue().getOperator()).isEqualTo("AND");
+        assertThat(queryCaptor.getValue().getPolicyQuery())
+                .isEqualTo(QueryFilter.equalTo("/permissions/subject", "SUBJECT"));
+        assertThat(queryCaptor.getValue().getResourceSetQuery())
+                .isEqualTo(org.forgerock.util.query.QueryFilter.and(
+                        org.forgerock.util.query.QueryFilter.equalTo("name", "NAME"),
+                        org.forgerock.util.query.QueryFilter.equalTo("clientId", "myclient")));
         verify(handler).handleResult(any(QueryResult.class));
     }
 }

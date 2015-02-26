@@ -49,6 +49,7 @@ public class ResourceSetDescription {
     private String resourceOwnerId;
     @Field(field = CoreTokenField.BLOB, converter = JsonValueToJsonBytesConverter.class)
     private JsonValue description;
+    private JsonValue policy;
 
     /**
      * Constructs a new ResourceSetDescription instance.
@@ -133,6 +134,15 @@ public class ResourceSetDescription {
     @Field(field = CoreTokenField.STRING_SIX)
     public String getName() {
         return description.get("name").asString();
+    }
+
+    /**
+     * Gets the name of the policy linked to this resource set.
+     *
+     * @return The policy.
+     */
+    public JsonValue getPolicy() {
+        return policy;
     }
 
     /**
@@ -222,6 +232,10 @@ public class ResourceSetDescription {
 
     public void setName(String name) {
         description.put("name", name);
+    }
+
+    public void setPolicy(JsonValue policy) {
+        this.policy = policy;
     }
 
     @Override
