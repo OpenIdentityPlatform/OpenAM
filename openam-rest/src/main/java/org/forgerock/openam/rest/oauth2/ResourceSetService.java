@@ -110,6 +110,11 @@ public class ResourceSetService {
                         resourceSet.setPolicy(result.asJson());
                         return Promises.newSuccessfulPromise(resourceSet);
                     }
+                }, new AsyncFunction<ResourceException, ResourceSetDescription, ResourceException>() {
+                    @Override
+                    public Promise<ResourceSetDescription, ResourceException> apply(ResourceException e) throws ResourceException {
+                        return Promises.newSuccessfulPromise(resourceSet);
+                    }
                 });
     }
 

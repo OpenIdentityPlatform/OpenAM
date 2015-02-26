@@ -26,6 +26,7 @@ import java.util.Map;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -110,6 +111,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
 
     private JsonValue getResourceSetJson(ResourceSetDescription resourceSet) {
         HashMap<String, Object> content = new HashMap<String, Object>(resourceSet.asMap());
+        content.put("_id", resourceSet.getId());
         content.put("resourceServer", resourceSet.getClientId());
         if (resourceSet.getPolicy() != null) {
             JsonValue policy = new JsonValue(new HashMap<String, Object>(resourceSet.getPolicy().asMap()));
@@ -198,7 +200,15 @@ public class ResourceSetResource implements CollectionResourceProvider {
 
         final ResourceSetWithPolicyQuery query;
         try {
-            query = request.getQueryFilter().accept(new ResourceSetQueryFilter(), new ResourceSetWithPolicyQuery());
+            if (request.getQueryId() != null && request.getQueryId().equals("*")) {
+                query = new ResourceSetWithPolicyQuery();
+                query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.<String>alwaysTrue());
+            } else if (request.getQueryFilter() != null) {
+                query = request.getQueryFilter().accept(new ResourceSetQueryFilter(), new ResourceSetWithPolicyQuery());
+            } else {
+                handler.handleError(new BadRequestException("Invalid query"));
+                return;
+            }
         } catch (UnsupportedOperationException e) {
             handler.handleError(new NotSupportedException(e.getMessage()));
             return;

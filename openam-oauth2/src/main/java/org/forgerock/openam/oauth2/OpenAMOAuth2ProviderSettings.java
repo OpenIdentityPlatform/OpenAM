@@ -701,7 +701,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public String getResourceSetRegistrationPolicyEndpoint(String resourceSetId) {
-        return getBaseUrl("/policyEditor/#uma/share/") + resourceSetId;
+        return getBaseUrl("/XUI/#uma/share/") + resourceSetId;
     }
 
     /**
