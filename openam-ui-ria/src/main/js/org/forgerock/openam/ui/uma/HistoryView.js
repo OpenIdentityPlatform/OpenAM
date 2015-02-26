@@ -30,8 +30,10 @@ define("org/forgerock/openam/ui/uma/HistoryView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/uma/util/BackgridUtils"
-], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils) {
+    "org/forgerock/openam/ui/uma/util/BackgridUtils",
+    "backgrid"
+
+], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, Backgrid) {
     var HistoryView = AbstractView.extend({
         template: "templates/uma/HistoryTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",

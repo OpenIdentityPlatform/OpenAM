@@ -22,13 +22,14 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define Backgrid Backbone _ $*/
+/*global define Backgrid, Backbone, _, $*/
 
 define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
-  "moment",
-  "org/forgerock/commons/ui/common/util/UIUtils",
-  "org/forgerock/commons/ui/common/main/Configuration"
-], function (moment, uiUtils, conf) {
+    "moment",
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "backgrid"
+], function (moment, uiUtils, conf, Backgrid) {
     /**
      * @exports org/forgerock/openam/ui/uma/util/BackgridUtils
      */

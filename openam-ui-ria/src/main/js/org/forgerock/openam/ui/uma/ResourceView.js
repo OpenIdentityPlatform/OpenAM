@@ -33,8 +33,9 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
     "org/forgerock/openam/ui/uma/util/UmaUtils",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/uma/delegates/UmaDelegate"
-], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, umaUtils, router, umaDelegate) {
+    "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
+    "backgrid"
+], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, umaUtils, router, umaDelegate, Backgrid) {
     var ResourceView = AbstractView.extend({
         template: "templates/uma/ResourceTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",

@@ -31,8 +31,9 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
-    "org/forgerock/commons/ui/common/main/Router"
-], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, router) {
+    "org/forgerock/commons/ui/common/main/Router",
+    "backgrid"
+], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, router, Backgrid) {
 
     var ResourceListView = AbstractView.extend({
         template: "templates/uma/ResourceListTemplate.html",
@@ -48,7 +49,7 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
                 grid,
                 paginator,
                 ResourceSetCollection,
-                realm = backgridUtils.getRealm(); 
+                realm = backgridUtils.getRealm();
 
             ResourceSetCollection = Backbone.PageableCollection.extend({
                 url: "/" + constants.context + "/json" + realm + "/users/" + conf.loggedUser.username + '/uma/policies',

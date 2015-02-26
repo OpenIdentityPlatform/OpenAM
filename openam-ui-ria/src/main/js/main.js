@@ -44,7 +44,7 @@ require.config({
         handlebars           : "libs/handlebars-1.3.0-min",
         moment               : "libs/moment-2.8.1-min",
         selectize            : "libs/selectize-0.11.2-min",
-        backgrid             : "libs/backgrid-min",
+        backgrid             : "libs/backgrid.min",
         "backgrid.paginator" : "libs/backgrid-paginator.min",
         "backgrid.filter"    : "libs/backgrid-filter.min",
         ThemeManager         : "org/forgerock/openam/ui/common/util/ThemeManager",
@@ -92,7 +92,7 @@ require.config({
             deps: ["jquery"]
         },
         backgrid: {
-            deps: ["jquery", "underscore"],
+            deps: ["jquery", "underscore", "backbone"],
             exports: "Backgrid"
         },
         "backgrid.paginator": {
