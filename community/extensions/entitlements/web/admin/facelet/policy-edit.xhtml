@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: policy-edit.xhtml,v 1.11 2009/08/04 18:50:47 farble1670 Exp $
+
+-->
+
+<ui:composition
+    template="template/page.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ui:define name="panel-title">
+        <ice:outputText value="#{resources['policy-edit.panelTitle']}" />
+    </ui:define>
+    <ui:define name="panel-details">
+        <ice:outputText value="#{resources['policy-edit.panelDetails']}" />
+    </ui:define>
+    <ui:define name="panel-body">
+        <o:wizard
+            wizardHandler="#{policyEditWizardHandler}"
+            steps="5"
+            wizardBean="#{policyEditWizardBean}">
+            <ui:define name="wizard-steps">
+                <o:wstep
+                    step="0"
+                    label="#{policyEditWizardBean.namePanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/policy-name.xhtml">
+                            <ui:param
+                                name="policyNameBean"
+                                value="#{policyEditWizardBean}"/>
+                            <ui:param
+                                name="policyNameHandler"
+                                value="#{policyEditWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="1"
+                    label="#{policyEditWizardBean.resourcesPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include
+                            src="#{policyEditWizardBean.viewApplication.viewApplicationType.resourceTemplate}">
+                            <ui:param
+                                name="resourcesBean"
+                                value="#{policyEditWizardBean}"/>
+                            <ui:param
+                                name="allowExceptions"
+                                value="true"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="2"
+                    label="#{policyEditWizardBean.subjectsPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/policy-subjects.xhtml">
+                            <ui:param
+                                name="policySubjectsBean"
+                                value="#{policyEditWizardBean}"/>
+                            <ui:param
+                                name="policySubjectsHandler"
+                                value="#{policyEditWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="3"
+                    label="#{policyEditWizardBean.advancedPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/policy-advanced.xhtml">
+                            <ui:param
+                                name="policyWizardBean"
+                                value="#{policyEditWizardBean}"/>
+                            <ui:param
+                                name="policyWizardHandler"
+                                value="#{policyEditWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="4"
+                    label="#{policyEditWizardBean.summaryPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/policy-summary.xhtml">
+                            <ui:param
+                                name="policySummaryBean"
+                                value="#{policyEditWizardBean}"/>
+                            <ui:param
+                                name="policySummaryHandler"
+                                value="#{policyEditWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+            </ui:define>
+        </o:wizard>
+    </ui:define>
+</ui:composition>

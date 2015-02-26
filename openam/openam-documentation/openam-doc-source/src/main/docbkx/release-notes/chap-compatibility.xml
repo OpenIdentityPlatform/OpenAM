@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-compatibility'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>OpenAM Changes &amp; Deprecated Functionality</title>
+
+ <para>This chapter covers both major changes to existing functionality, and
+ also deprecated and removed functionality.</para>
+
+ <section xml:id="changes">
+  <title>Major Changes to Existing Functionality</title>
+
+  <itemizedlist>
+
+   <!-- OPENAM-2051: Document the OpenAM suffix configuration changes -->
+   <listitem>
+    <para>When you create a new OpenAM custom configuration that uses an
+    external LDAP directory server for the configuration data store, you must
+    use a root suffix DN with at least two domain components, such as
+    <literal>dc=example,dc=com</literal>.</para>
+   </listitem>
+
+     <listitem>
+      <para>The advanced server property used to set the HTTP header name,
+      <literal>com.sun.identity.authentication.client.ipAddressHeader </literal>,
+      has replaced the legacy OpenSSO property
+      <literal>com.sun.identity.session.httpClientIPHeader</literal> (<link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1879"
+      xlink:show="new">OPENAM-1879</link>).</para>
+     </listitem>
+
+   <listitem>
+    <para>Legacy naming conventions have been changed to conform to the
+    current product name, OpenAM.</para>
+
+    <para><filename>$HOME/.openamcfg/</filename> is the new name for
+    <filename>$HOME/.openssocfg/</filename>. If you upgrade, OpenAM still
+    supports use of <filename>$HOME/.openssocfg/</filename>, and does not
+    rename the folder. For new OpenAM installs, OpenAM creates the directory
+    with the new name, <filename>$HOME/.openamcfg/</filename>, at configuration
+    time.</para>
+
+    <para>Other files, such as the <filename>openam.war</filename> file, and
+    paths have been modified to ensure consistency with the naming
+    conventions.</para>
+   </listitem>
+
+   <listitem>
+    <para>OpenAM now ships with multiple .war files. You no longer have to
+    build custom .war files for core server-only or distributed authentication
+    UI installations for example.</para>
+   </listitem>
+
+<!-- Fix for OpenAM-699
+   <listitem>
+    <para>RSA has marked the RSA Authentication API used in earlier versions of
+    OpenAM as End of Life. The current API version used in OpenAM is now 8.1.
+    As a result, OpenAM now supports RSA Authentication Manager versions 6.1.2
+    and 7.1.</para>
+   </listitem>
+ -->
+
+   <!-- Fix for OPENAM-1578 -->
+   <listitem>
+    <para>In earlier versions the default root suffix DN for OpenAM
+    configuration and profile data was
+    <literal>dc=opensso,dc=java,dc=net</literal>.
+    The default root suffix is now
+    <literal><?eval ${defaultRootSuffix}?></literal>.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="deprecated">
+  <title>Deprecated Functionality</title>
+  
+  <para>The following functionality is deprecated in OpenAM
+  <?eval ${serverDocTargetVersion}?>, and is likely to be removed in a future
+  release.</para>
+
+  <itemizedlist>
+
+   <listitem>
+    <para>With the implementation of OAuth 2.0 in this release, OAuth 1.0 has been 
+    deprecated. OAuth 1.0 support was originally provided in OpenAM 9.</para>
+   </listitem>
+
+   <listitem>
+    <para>The Netscape LDAP API is to be removed from OpenAM, with OpenAM
+    using the OpenDJ LDAP SDK instead. This affects all classes in
+    <literal>com.sun.identity.shared.ldap.*</literal> packages.</para>
+   </listitem>
+
+   <listitem>
+    <para>OpenAM currently uses Sun Java System Application Framework (JATO).
+    JATO is deprecated and is likely to be replaced in a future release.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="removed">
+  <title>Removed Functionality</title>
+
+  <itemizedlist>
+   <listitem>
+    <para>For OpenAM <?eval ${serverDocTargetVersion}?>, the use of the
+    previous session failover implementation has been removed.</para>
+   </listitem>
+
+   <listitem>
+    <para>With the updated session failover, SAML 2 and session persistence have
+    changed. The methods used prior to OpenAM 10.1.0 are no longer
+    available.</para>
+   </listitem>
+
+   <listitem>
+    <!-- Fix for OpenAM-837 -->
+    <para>Support for Liberty Identity Web Services Framework (ID-WSF) has been
+    removed.</para>
+   </listitem>
+
+   <listitem>
+    <para>The advanced server property,
+    <literal>openam.session.destroy_all_sessions</literal>, has been replaced
+    by the built-in Global Session Service setting,
+    <literal>DESTROY_OLD_SESSIONS</literal>.</para>
+   </listitem>
+
+   <listitem>
+    <para>Resources for integrating OpenAM with third-party access and identity
+    management software are not delivered with the distribution.</para>
+   </listitem>
+
+   <listitem>
+    <para>Javadoc for the client SDK is no longer delivered with the
+    distribution, but instead is <link xlink:show="new"
+    xlink:href="http://openam.forgerock.org/apidocs/">available online</link>.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+</chapter>

@@ -1,0 +1,78 @@
+' The contents of this file are subject to the terms
+' of the Common Development and Distribution License
+' (the License). You may not use this file except in
+' compliance with the License.
+'
+' You can obtain a copy of the License at
+' https://opensso.dev.java.net/public/CDDLv1.0.html or
+' opensso/legal/CDDLv1.0.txt
+' See the License for the specific language governing
+' permission and limitations under the License.
+'
+' When distributing Covered Code, include this CDDL
+' Header Notice in each file and include the License file
+' at opensso/legal/CDDLv1.0.txt.
+' If applicable, add the following below the CDDL Header,
+' with the fields enclosed by brackets [] replaced by
+' your own identifying information:
+' "Portions Copyrighted [year] [name of copyright owner]"
+'
+' $Id: IIS7Resource.en,v 1.3 2009/07/28 18:42:11 robertis Exp $
+'
+' Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+'
+'
+'--------------------------------------------------------------------
+101 = Enter the Agent URL (Example: http://agent.example.com:80) :
+102 = Displaying the list of Web Sites and its corresponding Identifiers (id)
+103 = Site Name (Site Id)
+104 = Web Site Identifier :
+105 = Invalid Agent URL. 
+106 = Enter the Agent profile password file : 
+107 = The password file does not exist.
+
+108 = Enter the URL where the OpenAM server is running. Please include the deployment URI also as shown in the example (Example: http://openam.example.com:58080/openam):
+109 = Invalid server Url.
+110 = Agent Configuration file created : 
+111 = Primary Server Deployment URI [/openam] :
+112 = Primary Server Console URI [/openam] :
+
+113 = Failover Server Host :
+114 = Failover Server Protocol [http] :
+115 = Failover Server Port Number
+116 = Failover Server Deployment URI [/openam] :
+117 = Failover Server Console URI [/openam] :
+
+118 = Please enter the path to the password file :
+119 = Password file is empty 
+
+120 = CDSSO Enabled [false] :
+
+121 = Enter a valid Web Site Identifier
+122 = Invalid protocol value entered, enter http or https
+123 = Non-numeric value entered for Agent Port
+124 = Non-numeric value entered for Primary Server Port
+125 = Non-numeric value entered for Failover Server Port
+126 = Password cannot be empty, re-enter the password
+127 = Passwords entered do not match. Please enter the same passwords both times
+128 = Invalid value entered, enter true or false
+
+129 = Creating the Agent Config Directory
+130 = Creating the OpenSSOAgentBootstrap.properties and OpenSSOAgentConfiguration.properties File
+131 = Updating the Windows Product Registry
+132 = Loading the IIS 7.0 Agent
+133 = Completed Configuring the IIS 7.0 Agent
+
+134 = Removing the Agent Config file
+135 = Removing the Agent Config Directory
+136 = Removing the entries from Windows Product Registry
+137 = Unloading the IIS7 Agent
+138 = Completed Unconfiguring the IIS 7.0 Agent
+139 = Unable to find Agent Config file
+140 = Unable to find Agent Config Directory
+141 = Unable to find entries in Windows Product Registry
+142 = IIS 7.0 Agent already Unconfigured for this site
+
+143 = Removing the Agent Bootstrap file
+144 = Unable to find Agent Bootstrap file
+145 = Please enter the Agent Profile name :

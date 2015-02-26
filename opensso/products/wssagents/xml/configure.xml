@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<configure>
+    <class-prefix>
+        <package type="system" 
+            name="com.sun.identity.install.tools.configurator"/>
+        <package type="common" 
+            name="com.sun.identity.agents.install.appserver"/>
+        <package type="custom" 
+            name="com.sun.identity.agents.install.appserver.v91"/>
+        <package type="agentsdk" 
+            name="com.sun.identity.agents.install.configurator"/>
+    </class-prefix>
+    <welcome-message>
+        <i18n key="WELCOME_MESSAGE" group="as91Tools"/>
+    </welcome-message>
+    <exit-message>
+        <i18n key="EXIT_MESSAGE" group="as91Tools"/>
+    </exit-message>
+    <instance-finder>    
+        <home-dir-locator>
+            <class name="HomeDirLocator" type="custom"/>
+        </home-dir-locator>
+        <instance-finder-interactions>
+            <interaction lookupkey="CONFIG_DIR">
+                <i18n key="INT_CONFIG_DIR" group="as91Tools"/>
+                <default-value-finder>
+                    <class name="ConfigFinder" type="custom"/>
+                </default-value-finder>
+                <validations>
+                    <validation name="DIR_EXISTS">
+                        <class name="FileSystemValidator" type="system"/>
+                    </validation>
+                    <validation name="VALID_AS_CONFIG_DIR">
+                        <class name="ConfigDirValidator" type="custom"/>
+                    </validation>
+                </validations>
+                <value-normalizer>
+                    <class name="PathNormalizer" type="system"/>
+                </value-normalizer>
+            </interaction>
+            <interaction lookupkey="INSTANCE_NAME" optional-display="false">
+                <i18n key="INT_INSTANCE_NAME" group="as91Tools"/>
+                <default-value-finder>
+                    <class name="StaticDefaultValueFinder" type="system"/>
+                    <static value="server"/>
+                </default-value-finder>
+                <validations>
+                    <validation name="VALID_STRING">
+                        <class name="StringValidator" type="system"/>
+                    </validation>
+                </validations>
+            </interaction>
+        </instance-finder-interactions>
+    </instance-finder>    
+    <install>
+        <common-interactions>
+            <interaction lookupkey="AM_SERVER_URL" persistent="false">
+                <i18n key="INT_AM_SERVER_URL" group="amToolsMessages"/>
+                <validations>            
+                    <validation name="VALID_SERVER_URL">
+                        <class name="ValidateServerURL" type="agentsdk"/>
+                    </validation>
+                </validations>
+            </interaction>
+        </common-interactions>
+        <instance-interactions>
+            <interaction lookupkey="AGENT_PROFILE_NAME" persistent="false">
+                <i18n key="INT_AGENT_PROFILE_NAME" group="amToolsMessages"/>
+                <validations>
+                    <validation name="VALID_STRING">
+                        <class name="StringValidator" type="system"/>
+                    </validation>
+                </validations>
+            </interaction>
+            <interaction lookupkey="AGENT_PASSWORD_FILE" persistent="false">
+                <i18n key="INT_AGENT_PASSWORD_FILE" group="amToolsMessages"/>
+                <validations>
+                    <validation name="FILE_VALID">
+                        <class name="FileSystemValidator" type="system"/>
+                    </validation>
+                    <validation name="FILE_READABLE">
+                        <class name="FileSystemValidator" type="system"/>
+                    </validation>
+                    <validation name="VALID_PASSWORD">
+                        <class name="PasswordValidator" type="system"/>
+                        <property name="minLen" value="1"/>
+                        <property name="maxLen" value="256"/>
+                    </validation>
+                </validations>
+                <value-normalizer>
+                    <class name="PathNormalizer" type="system"/>
+                </value-normalizer>
+            </interaction>
+        </instance-interactions>
+        <common-tasks>
+        </common-tasks>
+        <instance-tasks>
+            <task name="CREATE_LAYOUT">
+                <class name="CreateLayoutTask" type="system"/>
+            </task>
+            <task name="ENCRYPT_DATA">
+                 <class name="EncryptTask" type="agentsdk"/>
+                 <property name="DATA_FILE_LOOKUP_KEY"
+                                        value="AGENT_PASSWORD_FILE"/>
+                 <property name="ENCRYPTION_KEY_LOOKUP_KEY"
+                                        value="AGENT_ENCRYPT_KEY"/>
+                 <property name="ENCRYPTED_VALUE_KEY_LOOKUP_KEY"
+                                        value="AGENT_ENCRYPTED_PASSWORD"/>
+            </task>
+            <task name="CONFIGURE_AGENT_PROPS">
+                <class name="ConfigureWSSAgentPropertiesTask" type="agentsdk"/> 
+                <property name="CONFIG_WSS_AGENT_CONFIG_TEMPLATE"
+                          value="AMConfig.properties"/>
+                <property name="CONFIG_WSS_AGENT_CONFIG"
+                          value="AMConfig.properties"/>
+            </task>
+            <task name="BACKUP_FILE">
+                <class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_DOMAIN_XML_FILE"/>
+            </task>
+            <task name="CONFIGURE_DOMAIN_XML">                  
+                 <class name="ConfigureDomainXMLTask" type="custom"/>
+            </task>                        
+            <task name="BACKUP_FILE">
+                <class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_WS_RT_JAR_FILE"/>
+            </task>
+            <task name="BACKUP_FILE">
+                <class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_WS_TOOLS_JAR_FILE"/>
+            </task>
+            <task name="BACKUP_FILE">
+                <class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_WS_API_JAR_FILE"/>
+            </task>
+            <task name="COPY_JARS">
+                <class name="CopyJarsTask" type="custom"/>
+            </task>
+        </instance-tasks>
+    </install>
+    <custom-install>
+        <common-interactions>
+            <interaction lookupkey="AM_SERVER_URL" persistent="false">
+                <i18n key="INT_AM_SERVER_URL" group="amToolsMessages"/>
+                <validations>            
+                    <validation name="VALID_SERVER_URL">
+                        <class name="ValidateServerURL" type="agentsdk"/>
+                    </validation>
+                </validations>
+            </interaction>
+        </common-interactions>
+        <instance-interactions>
+            <interaction lookupkey="AGENT_PROFILE_NAME" persistent="false">
+                <i18n key="INT_AGENT_PROFILE_NAME" group="amToolsMessages"/>
+                <validations>
+                    <validation name="VALID_STRING">
+                        <class name="StringValidator" type="system"/>
+                    </validation>
+                </validations>
+            </interaction>
+            <interaction lookupkey="AGENT_PASSWORD_FILE" persistent="false">
+                <i18n key="INT_AGENT_PASSWORD_FILE" group="amToolsMessages"/>
+                <validations>
+                    <validation name="FILE_VALID">
+                        <class name="FileSystemValidator" type="system"/>
+                    </validation>
+                    <validation name="FILE_READABLE">
+                        <class name="FileSystemValidator" type="system"/>
+                    </validation>
+                    <validation name="VALID_PASSWORD">
+                        <class name="PasswordValidator" type="system"/>
+                        <property name="minLen" value="1"/>
+                        <property name="maxLen" value="256"/>
+                    </validation>
+                </validations>
+                <value-normalizer>
+                    <class name="PathNormalizer" type="system"/>
+                </value-normalizer>
+            </interaction>
+        </instance-interactions>
+        <common-tasks/>
+        <instance-tasks>
+            <task name="CREATE_LAYOUT">
+                <class name="CreateLayoutTask" type="system"/>
+            </task>
+            <task name="ENCRYPT_DATA">
+                 <class name="EncryptTask" type="agentsdk"/>
+                 <property name="DATA_FILE_LOOKUP_KEY"
+                                        value="AGENT_PASSWORD_FILE"/>
+                 <property name="ENCRYPTION_KEY_LOOKUP_KEY"
+                                        value="AGENT_ENCRYPT_KEY"/>
+                 <property name="ENCRYPTED_VALUE_KEY_LOOKUP_KEY"
+                                        value="AGENT_ENCRYPTED_PASSWORD"/>
+            </task>
+            <task name="CONFIGURE_AGENT_PROPS">
+                <class name="ConfigureWSSAgentPropertiesTask" type="agentsdk"/> 
+                <property name="CONFIG_WSS_AGENT_CONFIG_TEMPLATE"
+                          value="AMConfig.properties"/>
+                <property name="CONFIG_WSS_AGENT_CONFIG"
+                          value="AMConfig.properties"/>
+            </task>
+            <task name="BACKUP_FILE">
+                <class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_DOMAIN_XML_FILE"/>
+            </task>
+            <task name="CONFIGURE_DOMAIN_XML">                  
+                 <class name="ConfigureDomainXMLTask" type="custom"/>
+            </task>                        
+            <task name="BACKUP_FILE">
+                <class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_WS_RT_JAR_FILE"/>
+            </task>
+            <task name="BACKUP_FILE">
+                <class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_WS_TOOLS_JAR_FILE"/>
+            </task>
+            <task name="BACKUP_FILE">
+                <class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_WS_API_JAR_FILE"/>
+            </task>
+            <task name="COPY_JARS">
+                <class name="CopyJarsTask" type="custom"/>
+            </task>
+        </instance-tasks>
+    </custom-install>
+    <uninstall>
+        <common-interactions/>
+        <instance-interactions/>
+        <common-tasks/>
+        <instance-tasks>
+            <task name="REMOVE_JARS">
+                <class name="RemoveJarsTask" type="custom"/>
+            </task>
+            <task name="UNCONFIGURE_DOMAIN_XML">
+                <class name="UnconfigureDomainXMLTask" type="custom"/>                
+            </task>
+            <task name="DELETE_LAYOUT">
+                <class name="DeleteLayoutTask" type="system"/>
+            </task>
+        </instance-tasks>
+    </uninstall>    
+    <migrate>
+        <common-interactions/>
+        <instance-interactions/>
+        <common-tasks/>
+        <instance-tasks/>
+    </migrate>
+</configure>

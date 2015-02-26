@@ -1,0 +1,12 @@
+<test name="PolicyTimeTest">
+	<groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.policy.PolicyEvaluationTimeTest"/>
+	</classes>
+    </test>
+ 

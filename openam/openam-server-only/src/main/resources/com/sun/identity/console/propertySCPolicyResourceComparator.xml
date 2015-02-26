@@ -1,0 +1,82 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertySCPolicyResourceComparator.xml,v 1.2 2008/06/25 05:45:15 qcheng Exp $
+
+-->
+<!--
+    Portions Copyrighted 2012 ForgeRock Inc
+    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="dummy" defaultValue="blank.header">
+    <property required="true">
+	<label name="lblServiceType" defaultValue="policy.service.resource.comparator.service.type" labelFor="serviceType" />
+	<cc name="serviceType" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="75" />
+	</cc>
+        <fieldhelp name="help-serviceType" defaultValue="policy.service.resource.comparator.service.type.help" />
+    </property>
+    <property>
+	<label name="lblClazz" defaultValue="policy.service.resource.comparator.clazz" labelFor="clazz" />
+	<cc name="clazz" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="100" />
+	</cc>
+        <fieldhelp name="help-clazz" defaultValue="policy.service.resource.comparator.clazz.help" />
+    </property>
+    <property>
+	<label name="lblDelimiter" defaultValue="policy.service.resource.comparator.delimiter" labelFor="delimiter" />
+	<cc name="delimiter" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+        </cc>
+        <fieldhelp name="help-delimiter" defaultValue="policy.service.resource.comparator.delimiter.help" />
+    </property>
+    <property>
+	<label name="lblWildcard" defaultValue="policy.service.resource.comparator.wildcard" labelFor="wildcard" />
+	<cc name="wildcard" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+        </cc>
+    </property>
+    <property>
+	<label name="lblOneLevelWildcard" defaultValue="policy.service.resource.comparator.oneLevelWildcard" labelFor="oneLevelWildcard" />
+	<cc name="oneLevelWildcard" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+        </cc>
+    </property>
+    <property>
+	<label name="lblCaseSensitive" defaultValue="policy.service.resource.comparator.case.sensitive" labelFor="caseSensitive" />
+	<cc name="caseSensitive" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+    </property>
+    </section>
+</propertysheet>

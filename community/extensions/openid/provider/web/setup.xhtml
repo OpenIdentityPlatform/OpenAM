@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC
+"-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+  The contents of this file are subject to the terms
+  of the Common Development and Distribution License
+  (the License). You may not use this file except in
+  compliance with the License.
+
+  You can obtain a copy of the License at
+  https://opensso.dev.java.net/public/CDDLv1.0.html or
+  opensso/legal/CDDLv1.0.txt
+  See the License for the specific language governing
+  permission and limitations under the License.
+
+  When distributing Covered Code, include this CDDL
+  Header Notice in each file and include the License file
+  at opensso/legal/CDDLv1.0.txt.
+  If applicable, add the following below the CDDL Header,
+  with the fields enclosed by brackets [] replaced by
+  your own identifying information:
+  "Portions Copyrighted [year] [name of copyright owner]"
+
+  $Id: setup.xhtml,v 1.3 2009/04/24 21:01:56 rparekh Exp $
+
+  Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+  Portions Copyrighted 2007 Paul C. Bryan
+-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:my="http://sun.com/identity/openid/provider"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <ui:composition template="page.xhtml">
+        <ui:param name="title" value="#{msg.page_title}"/>
+        <ui:define name="body">
+            <f:view beforePhaseListener="#{setupBean.beforePhase}">
+                <h:form>
+                    <h1>#{msg.page_title}</h1>
+                    <div class="set">
+                        <p>
+                            <h:outputFormat value="#{msg.confirm_message}" escape="false">
+                                <f:param value="#{my:strong(my:escape(setupBean.trustRoot))}"/>
+                                <f:param value="#{my:strong(my:escape(setupBean.identity))}"/>
+                            </h:outputFormat>
+                        </p>
+                    </div>
+                    <c:if test="#{setupBean.attrX}">
+                        <div class="set">
+                            <h2>#{msg.form_ax_title}</h2>
+                            <p>
+                                #{msg.confirm_attributes_exchange}#{" "}
+                                
+                            </p>
+                            <table class="form">
+                                <my:field bean="#{setupBean}" name="UID" type="text" size="32"/>
+                                <my:field bean="#{setupBean}" name="firstname" type="text" size="32"/>
+                                <my:field bean="#{setupBean}" name="lastname" type="text" size="32"/>
+                                                                
+                            </table>
+                            
+                            <p>
+                                <c:if test="#{my:size(setupBean.required) > 0}">
+                                    <span class="required">*</span> #{msg.form_ax_required}
+                                </c:if>
+                                #{msg.form_deselect}
+                            </p>
+                            
+                        </div>
+                    </c:if>
+                    
+                    
+                    
+                    
+                    <c:if test="#{setupBean.sr}">
+                        <div class="set">
+                            <h2>#{msg.form_title}</h2>
+                            <p>
+                                #{msg.confirm_registration}#{" "}
+                                
+                            </p>
+                            <table class="form">
+                                
+                                <my:field_sr bean="#{setupBean}" name="nickname" type="text" size="32"/>
+                                <my:field_sr bean="#{setupBean}" name="email" type="text" size="32"/>
+                                <my:field_sr bean="#{setupBean}" name="fullname" type="text" size="32"/>
+                                <my:field_sr bean="#{setupBean}" name="dob" type="date"/>
+                                <my:field_sr bean="#{setupBean}" name="gender" type="select" items="genders"/>
+                                <my:field_sr bean="#{setupBean}" name="postcode" type="text" size="16"/>
+                                <my:field_sr bean="#{setupBean}" name="country" type="select" items="countries"/>
+                                <my:field_sr bean="#{setupBean}" name="language" type="select" items="languages"/>
+                                <my:field_sr bean="#{setupBean}" name="timezone" type="select" items="timezones"/>        
+                                
+                                
+                                
+                            </table>
+                            
+                            <p>
+                                <c:if test="#{my:size(setupBean.requiredSR) > 0}">
+                                    <span class="required">*</span> #{msg.form_required}
+                                </c:if>
+                                #{msg.form_deselect}
+                            </p>
+                            
+                        </div>
+                    </c:if>
+                    
+                    
+                    <div class="set">
+	                    
+	                        <c:choose>
+	                            <c:when test="#{my:size(setupBean.requested) > 0}">
+	                                <c:if test="#{setupBean.persistEnabled}">
+	                            		<h:selectBooleanCheckbox value="#{setupBean.saved}"/>#{msg.confirm_save_reg}<br></br>
+	                                </c:if>
+	                                	#{msg.confirm_trust_reg}
+	                            </c:when>                          
+	                            <c:otherwise>
+	                            		#{msg.confirm_trust_id}
+	                            </c:otherwise>
+	                        </c:choose>
+	                    
+                    </div>
+                    <p class="center">
+                        <my:button bean="#{setupBean}" name="grantOnce"/>
+                        <my:button bean="#{setupBean}" name="denyOnce" immediate="true"/>
+                    </p>
+                </h:form>
+            </f:view>
+        </ui:define>
+    </ui:composition>
+</html>

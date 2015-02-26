@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <system systemId="jar://com/sun/identity/log/messageid/amLogMessage.dtd" uri="../../../../../openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/amLogMessage.dtd"/>
+</catalog>

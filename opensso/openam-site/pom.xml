@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ <modelVersion>4.0.0</modelVersion>
+ <parent>
+  <groupId>org.forgerock.openam</groupId>
+  <artifactId>forgerock-parent</artifactId>
+  <version>1.0.0</version>
+ </parent>
+ <repositories>
+  <repository>
+   <id>forgerock-staging-repository</id>
+   <name>ForgeRock Release Repository</name>
+   <url>http://maven.forgerock.org/repo/releases</url>
+   <snapshots>
+    <enabled>false</enabled>
+   </snapshots>
+  </repository>
+  <repository>
+   <id>forgerock-snapshots-repository</id>
+   <name>ForgeRock Snapshot Repository</name>
+   <url>http://maven.forgerock.org/repo/snapshots</url>
+   <releases>
+    <enabled>false</enabled>
+   </releases>
+  </repository>
+ </repositories>
+ <groupId>org.forgerock.openam</groupId>
+ <artifactId>openam-site</artifactId>
+ <version>10</version>
+ <name>OpenAM Project</name>
+ <inceptionYear>2011</inceptionYear>
+ <packaging>pom</packaging>
+ <description>DocBook XML source for OpenAM core user documentation. Java API reference documentation is generated from OpenAM source code.</description>
+ <url>http://openam.forgerock.org/</url>
+ <mailingLists>
+  <mailingList>
+   <name>OpenAM Users Mailing List</name>
+   <archive>http://lists.forgerock.org/pipermail/openam/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/openam/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam/</unsubscribe>
+   <post>openam@forgerock.org</post>
+  </mailingList>
+  <mailingList>
+   <name>OpenAM Developers Mailing List</name>
+   <archive>http://lists.forgerock.org/pipermail/openam-dev/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</unsubscribe>
+   <post>openam-dev@forgerock.org</post>
+  </mailingList>
+  <mailingList>
+   <name>OpenAM Commit Notifications</name>
+   <archive>http://lists.forgerock.org/pipermail/commitopenam/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</unsubscribe>
+   <post>commitopenam@forgerock.org</post>
+  </mailingList>
+ </mailingLists>
+ <scm>
+  <url>https://svn.forgerock.org/openam/trunk/opensso/</url>
+  <connection>scm:svn:https://svn.forgerock.org/openam/trunk/opensso/</connection>
+  <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/opensso/</developerConnection>
+  <tag>HEAD</tag>
+ </scm>
+ <issueManagement>
+  <system>Jira</system>
+  <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
+ </issueManagement>
+ <licenses>
+  <license>
+   <name>CDDL-1.0</name>
+   <url>http://www.opensource.org/licenses/cddl1.php</url>
+   <comments>Common Development and Distribution License (CDDL) 1.0.
+   This license applies to OpenAM source code as indicated in the
+   sources themselves.
+   </comments>
+   <distribution>repo</distribution>
+  </license>
+  <license>
+   <name>CC BY-NC-ND 3.0</name>
+   <url>http://creativecommons.org/licenses/by-nc-nd/3.0/</url>
+   <comments>Creative Commons Attribution-NonCommercial-NoDerivs 3.0
+   Unported. This license applies to the site content, and to the
+   documentation as indicated in the documentation source code.
+   </comments>
+   <distribution>repo</distribution>
+  </license>
+ </licenses>
+ <properties>
+  <serverDocTargetVersion>10.1.0</serverDocTargetVersion>
+  <currentMajorVersion>10</currentMajorVersion>
+  <agentsDocTargetVersion>3</agentsDocTargetVersion>
+  <webAgentsDocTargetVersion>3.0.5</webAgentsDocTargetVersion>
+  <javaEEAgentsDocTargetVersion>3.0.5</javaEEAgentsDocTargetVersion>
+  <site-out>${basedir}/target/site</site-out>
+  <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
+  <products-basedir>${basedir}/../products</products-basedir>
+  <gaId>UA-23412190-7</gaId>
+  <defaultRootSuffix>dc=openam,dc=java,dc=net</defaultRootSuffix>
+ </properties>
+ <distributionManagement>
+  <site>
+   <id>forgerock.org</id>
+   <name>OpenAM Project</name>
+   <url>${siteDistributionURL}</url>
+  </site>
+ </distributionManagement>
+ <build>
+  <plugins>
+   <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>xml-maven-plugin</artifactId>
+    <version>1.0</version>
+    <executions>
+     <execution>
+      <phase>generate-resources</phase>
+      <goals>
+       <goal>transform</goal>
+      </goals>
+      <configuration>
+       <transformationSets>
+        <transformationSet>
+         <dir>../products</dir>
+         <includes>
+          <include>amserver/xml/log/AuthenticationLogMessageIDs.xml</include>
+          <include>amserver/xml/log/CLILogMessageIDs.xml</include>
+          <include>amserver/xml/log/ConsoleLogMessageIDs.xml</include>
+          <include>amserver/xml/log/CoreTokenLogMessageIDs.xml</include>
+          <include>amserver/xml/log/EntitlementLogMessageIDs.xml</include>
+          <include>amserver/xml/log/LoggingLogMessageIDs.xml</include>
+          <include>amserver/xml/log/PolicyLogMessageIDs.xml</include>
+          <include>amserver/xml/log/SessionLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/COTLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/IDFFLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/LibertyLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/SAML2LogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/SAMLLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/WebServicesSecurityLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/WSFederationLogMessageIDs.xml</include>
+          <include>legacy/xml/log/Amadmin_CLILogMessageIDs.xml</include>
+         </includes>
+         <stylesheet>src/main/xslt/logs.xsl</stylesheet>
+         <outputProperties>
+          <outputProperty>
+           <name>omit-xml-declaration</name>
+           <value>yes</value>
+          </outputProperty>
+         </outputProperties>
+         <validating>false</validating>
+        </transformationSet>
+       </transformationSets>
+       <catalogs>
+        <catalog>src/main/xslt/catalog.xml</catalog>
+       </catalogs>
+       <validating>true</validating>
+      </configuration>
+     </execution>
+    </executions>
+    <dependencies>
+     <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.7.1</version>
+     </dependency>
+    </dependencies>
+   </plugin>
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-antrun-plugin</artifactId>
+    <executions>
+     <execution>
+      <id>generate-log-message-ref</id>
+      <phase>generate-resources</phase>
+      <inherited>false</inherited>
+      <goals>
+       <goal>run</goal>
+      </goals>
+      <configuration>
+       <detail>true</detail>
+       <target>
+        <concat destfile="${project.build.directory}/generated-resources/chap-log-messages.xml">
+         <header file="${basedir}/src/main/docbkx/reference/log-messages-preface.header" />
+         <fileset dir="${project.build.directory}/generated-resources/xml/xslt" includes="**/*.xml"/>
+         <footer file="${basedir}/src/main/docbkx/reference/log-messages-preface.footer" />
+        </concat>
+       </target>
+      </configuration>
+     </execution>
+     <execution>
+      <id>generate-javadoc</id>
+      <phase>generate-resources</phase>
+      <inherited>false</inherited>
+      <configuration>
+       <target>
+        <ant antfile="${products-basedir}/shared/build.xml">
+         <target name="all" />
+        </ant>
+        <ant antfile="${products-basedir}/federation/library/build.xml">
+         <target name="build" />
+        </ant>
+        <ant antfile="${products-basedir}/federation/openfm/build.xml">
+         <target name="publicdoc" />
+        </ant>
+       </target>
+      </configuration>
+      <goals>
+       <goal>run</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>unpack-javadoc</id>
+      <phase>site</phase>
+      <inherited>false</inherited>
+      <configuration>
+       <target>
+        <mkdir dir="${site-out}/doc/public-api" />
+        <unjar
+         src="${products-basedir}/federation/openfm/built/dist/opensso-public-javadocs.jar"
+         dest="${site-out}/doc/public-api" />
+       </target>
+      </configuration>
+      <goals>
+       <goal>run</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>clean</id>
+      <phase>clean</phase>
+      <inherited>false</inherited>
+      <configuration>
+       <target>
+        <ant antfile="${products-basedir}/build.xml">
+         <target name="clean" />
+        </ant>
+       </target>
+      </configuration>
+      <goals>
+       <goal>run</goal>
+      </goals>
+     </execution>
+    </executions>
+   </plugin>
+   <plugin>
+    <groupId>org.forgerock.commons</groupId>
+    <artifactId>forgerock-doc-maven-plugin</artifactId>
+    <inherited>false</inherited>
+    <configuration>
+     <projectName>OpenAM</projectName>
+     <googleAnalyticsId>${gaId}</googleAnalyticsId>
+    </configuration>
+    <version>1.1.0-SNAPSHOT</version>
+    <executions>
+     <execution>
+      <id>build-doc</id>
+      <phase>pre-site</phase>
+      <goals>
+       <goal>build</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>layout-doc</id>
+      <phase>site</phase>
+      <goals>
+       <goal>layout</goal>
+      </goals>
+     </execution>
+    </executions>
+   </plugin>
+  </plugins>
+ </build>
+ <modules>
+  <module>site-helper</module>
+ </modules>
+</project>

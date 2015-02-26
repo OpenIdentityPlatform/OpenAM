@@ -1,0 +1,193 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertySAMLv2IDPAssertionContentRemote.xml,v 1.5 2008/06/25 05:51:06 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>  
+    <section name="signnencrypt" defaultValue="samlv2idp.provider.section.title.signnencrypt" >
+        <property>
+            <label name="lblSigned" defaultValue="samlv2idp.attribute.label.sign" />
+            <fieldhelp name="helpSigning" defaultValue="help.signing" />
+            <ccgroup>
+                <property>
+                    <label name="lblIDPWantAuthnRequestsSigned"
+                           defaultValue="samlv2idp.attribute.label.idpwantauthnrequestssigned"
+                           labelFor="WantAuthnRequestsSigned" />
+                    <cc name="WantAuthnRequestsSigned" 
+                        tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+                </property>        
+                
+                <property>
+                    <label name="lblIDPwantArtifactResolveSigned"
+                           defaultValue="samlv2idp.attribute.label.idpwantartifactresolvesigned"
+                           labelFor="wantArtifactResolveSigned" />
+                    <cc name="wantArtifactResolveSigned" 
+                        tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+                </property>
+                
+                <property>
+                    <label name="lblIDPwantLogoutRequestSigned"
+                           defaultValue="samlv2idp.attribute.label.idpwantlogoutrequestsigned"
+                           labelFor="wantLogoutRequestSigned" />
+                    <cc name="wantLogoutRequestSigned" 
+                        tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+                </property>
+                
+                <property>
+                    <label name="lblIDPwantLogoutResponseSigned"
+                           defaultValue="samlv2idp.attribute.label.idpwantlogoutresponsesigned"
+                           labelFor="wantLogoutResponseSigned" />
+                    <cc name="wantLogoutResponseSigned" 
+                        tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+                </property>
+                
+                <property>
+                    <label name="lblIDPwantMNIRequestSigned"
+                           defaultValue="samlv2idp.attribute.label.idpwantmnirequestsigned"
+                           labelFor="wantMNIRequestSigned" />
+                    <cc name="wantMNIRequestSigned" 
+                        tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+                </property>
+                
+                <property>
+                    <label name="lblIDPwantMNIResponseSigned"
+                           defaultValue="samlv2idp.attribute.label.idpwantmniresponsesigned"
+                           labelFor="wantMNIResponseSigned" />
+                    <cc name="wantMNIResponseSigned" 
+                        tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+                </property>
+            </ccgroup>
+        </property>
+        <property>
+            <label name="lblEncryptDet" defaultValue="samlv2.attribute.label.EncryptDetails" />
+            <ccgroup>
+                <property>
+                    <label name="lblIDPwantNameIDEncrypted"
+                           defaultValue="samlv2idp.attribute.label.idpwantnameidencrypted"
+                           labelFor="wantNameIDEncrypted" />
+                    <cc name="wantNameIDEncrypted" 
+                        tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+                </property>
+            </ccgroup>
+        </property>
+        <property>
+            <label name="lblSignCertiAlias" defaultValue="samlv2idp.attribute.label.signcertialias" />
+            <ccgroup>
+                <property>
+                    <label name="lblSigncertAlias"
+                           defaultValue="samlv2idp.attribute.label.signcertAlias"
+                           labelFor="signingCertAlias" />
+                    
+                    <cc name="signingCertAlias" 
+                        tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>                
+                <property>
+                    <label name="lblEncryptioncertAlias"
+                           defaultValue="samlv2idp.attribute.label.encryptionCertAlias"
+                           labelFor="encryptionCertAlias" />
+                    <cc name="encryptionCertAlias" 
+                        tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>                                
+                <property>
+                    <label name="lblEncryptionKeySize" 
+                           defaultValue="samlv2.attribute.label.keysize" 
+                           labelFor="keySize" />
+                    <cc name="keySize" 
+                        tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>                
+                <property>
+                    <label name="lblEncryptionAlgorithm" 
+                           defaultValue="samlv2.attribute.label.algorithm" 
+                           labelFor="Algorithm" />
+                    <cc name="Algorithm" 
+                        tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+            </ccgroup>
+        </property>
+    </section>
+    
+    <section name="attributes" defaultValue="samlv2idp.provider.section.title.nameidformat" >
+        <property>
+            <label name="lblNameidlist"
+                   defaultValue="samlv2idp.attribute.label.nameidlist"
+                   labelFor="nameidlist" />                 
+        </property>
+        <property>
+            <ccgroup>           
+                <property>
+                    <cc name="nameidlist" 
+                        tagclass=
+                        "com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                        <attribute name="name" value="list" />
+                        <attribute name="listboxLabel" 
+                                   value="label.current.value" />
+                        <attribute name="textboxLabel"
+                                   value="label.new.value" />
+                    </cc>
+                    <fieldhelp name="helpidpnameidlist" defaultValue="samlv2idp.attribute.help.nameidlist" />
+                </property>
+            </ccgroup>
+        </property>       
+    </section>
+    <section name="auth" defaultValue="samlv2idp.provider.section.title.basicauth" >
+        <property>
+            <fieldhelp name="helpbasicAuthentication" defaultValue="samlv2.spac.help.basicAuthentication" />
+            <ccgroup>
+                <property>
+                    <label name="lblIDPbasicAuthOn"
+                           defaultValue="samlv2idp.attribute.label.idpbasicauthon"
+                           labelFor="basicAuthOn" />
+                    <cc name="basicAuthOn" 
+                        tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+                </property>
+                <property>
+                    <label name="lblIDPbasicAuthUser"
+                           defaultValue="samlv2idp.attribute.label.idpbasicauthuser"
+                           labelFor="basicAuthUser" />
+                    <cc name="basicAuthUser" 
+                        tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="25" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>
+                <property>
+                    <label name="lblIDPbasicAuthPassword"
+                           defaultValue="samlv2idp.attribute.label.idpbasicauthpassword"
+                           labelFor="basicAuthPassword" />
+                    <cc name="basicAuthPassword" 
+                        tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="15" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>
+            </ccgroup>
+        </property>
+    </section>
+</propertysheet>

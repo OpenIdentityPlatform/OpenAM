@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock, Inc.
+  !
+-->
+<chapter xml:id='chap-web-agents-ssl'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+    <title>SSL Functionality in the OpenAM Web Policy Agents</title>
+
+    <para>Once an agent is installed, you may choose to configure encrypted
+    communications between the Agent and the OpenAM server. The way OpenAM
+    <?eval ${agentsDocTargetVersion}?> Web Policy Agents are installed,
+    you can configure it with the help of the
+    <filename>OpenSSOAgentBootstrap.properties</filename> file along with the
+    <filename>certutil</filename> command. For Windows-based agents, the
+    <filename>certutil.exe</filename> command is functionally equivalent.</para>
+
+    <para>The following sections address SSL configuration on both sides of
+    the communication. In other words, you will need to do some work on both the
+    system with the web policy agent (WPA) and the system with the OpenAM server.</para>
+
+    <section xml:id="ssl-on-web-agent">
+    <title>Configure the Web Agent to Verify OpenAM SSL Certificates</title>
+
+        <para>This section assumes a deployment with an OpenAM server that has
+        been configured to listen for HTTPS connections on a port such as 8443.
+        It also assumes that the OpenAM server is configured with a valid certificate
+        issued by a trusted Certificate Authority (CA). The governing root CA would be
+        installed on both the system with the WPA and the system with the OpenAM server.</para>
+
+        <para>All WPAs described in this document come with a command tool called
+        <filename>certutil</filename>. Once the WPA is installed, you can find that
+        command in the <filename>/path/to/web_agents/agent_name/bin</filename>
+        directory. For Windows WPAs, the <filename>certutil.exe</filename> command
+        is functionally equivalent. In either case, the command is designed to
+        manipulate NSS databases. For more information, see the section that follows on
+        <link xlink:href="web-agent-install-guide#certutil-and-attributes"
+            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>The certutil
+            Command and Web Agent Attributes</citetitle></link>.</para>
+
+        <para>The appropriate location for database files is the
+        <filename>config/</filename> directory of the installed agent, normally
+        located in the <filename>/path/to/web_agents/agent_name</filename> directory.</para>
+
+        <para>Now take the following steps:</para>
+
+        <itemizedlist>
+            <listitem>
+                <para>Create the database files. If this were the first agent for
+                Apache 2.2.x, you would run the following command:</para>
+                <screen># certutil -N -d /path/to/web_agents/apache22_agent/Agent_001/config</screen>
+                <para>Enter a password when prompted. If you are configuring multiple databases
+                include the <command>-P prefix</command> option to the <command>certutil</command>
+                command.</para>
+            </listitem>
+            <listitem>
+                <para>Make sure that the database files, which have a <filename>.db</filename>
+                extension, are configured with read/write permissions solely for the owner.
+                In addition, these files should be owned by the same user as the owner of the
+                protected service, such as user <filename>apache</filename> or <filename>httpd</filename>,
+                as defined in the associated service configuration file. For agents that protect the
+                Apache Web server, that user name should be defined in the accompanying configuration file
+                such as <filename>httpd.conf</filename> or <filename>apache2.conf</filename>.</para>
+            </listitem>
+            <listitem>
+                <para>Import the CA certificate. The following command adds (-A) a certificate to
+                the previously configured database directory (-d), named (-n) CA, with an ASCII
+                encoded certificate (-a), from the <filename>/path/to/CA.crt</filename> file,
+                based on a trust configuration (-t) from a valid and trusted CA (-t TC,TC,TC):</para>
+                <screen># certutil -A -d /path/to/web_agents/apache22_agent/Agent_001/config \
+-n CA -a -i /path/to/CA.crt -t TC,TC,TC</screen>
+            </listitem>
+            <listitem>
+                <para>Review and adjust settings in the newly created
+                <filename>OpenSSOAgentBootstrap.properties</filename> file in the
+                <filename>/path/to/web_agents/apache22_agent/Agent_001/config</filename> directory per:</para>
+                <informalexample>
+                    <?dbfo pgwide="1"?>
+                    <programlisting language="ini">com.sun.identity.agents.config.sslcert.dir=/path/to/web_agents/apache22_agent/Agent_001/config
+com.sun.identity.agents.config.certdb.prefix=
+com.sun.identity.agents.config.certdb.password=encrypted password
+com.sun.identity.agents.config.certificate.alias=
+com.sun.identity.agents.config.trust.server.certs=false</programlisting>
+                </informalexample>
+                <para>If a prefix has been configured, make sure it is included with the
+                <literal>com.sun.identity.agents.config.certdb.prefix=</literal> directive.</para>
+            </listitem>
+        </itemizedlist>
+
+    </section>
+
+    <section xml:id="ssl-on-openam-with-agent">
+        <title>Configure OpenAM with an SSL Certificate</title>
+
+        <para>This section assumes that the OpenAM web container is configured to accept connections
+        only from clients with valid certificates. To configure OpenAM for valid certificates, see the
+        <citetitle>Administration Guide</citetitle>, chapter on <link xlink:show="new"
+        xlink:href="admin-guide#chap-certs-keystores" xlink:role="http://docbook.org/xlink/role/olink">
+        <citetitle>Managing Certificates</citetitle></link>.</para>
+
+        <para>This section assumes that you have completed the steps described in the related section on
+        <xref linkend="ssl-on-web-agent" />. With the following steps, you can generate a key pair for
+        the Web agent, generate a certificate request for the key pair, submit that requires to the CA,
+        and finally, import the certificate from the CA.</para>
+
+        <itemizedlist>
+            <listitem>
+                <para>Generate the key pair. The following command generates (-G) a key pair
+                in the noted directory (-d) with the following command:</para>
+                <screen># certutil -G -d /path/to/web_agents/apache22_agent/Agent_001/config</screen>
+                <para>If desired, you can specify the number of bits for the key with the
+                <command>-g bits</command> option.</para>
+            </listitem>
+            <listitem>
+                <para>Generate the certificate request. The following command generates the request (-R)
+                in the noted directory (-d) with the noted subject name (-s) directory server labels,
+                with the certificate request output into the <filename>request1.req</filename> file
+                based on a key size (-k) of 2048 bits, in ASCII (-a) format.</para>
+                <screen># certutil -R -d /path/to/web_agents/apache22_agent/Agent_001/config -s \
+"cn=testvm1.example.com,ou=Org1,ou=Org2,o=MyCompany,c=US" -o request1.req -g 2048 -a</screen>
+            </listitem>
+            <listitem>
+                <para>Send the certificate request, including the <filename>request1.req</filename> file
+                to the CA. Details vary by CA. Since the certificate is issued against the FQDN, that is the
+                most important part of the request.</para>
+            </listitem>
+            <listitem>
+                <para>Import the CA generated certificate. The following command adds (-A) a certificate
+                file (-i) named <filename>agentcert1.crt</filename> with a nickname (-n) of cert-agent
+                for clients (-t u,u,u):</para>
+                <screen># certutil -A -d /path/to/web_agents/apache22_agent/Agent_001/config \
+-n cert-agent -a -i agentcert1.crt -t u,u,u</screen>
+            </listitem>
+            <listitem>
+                <para>Review and adjust the settings in the newly created
+                    <filename>OpenSSOAgentBootstrap.properties</filename> file in the
+                    <filename>/path/to/web_agents/apache22_agent/Agent_001/config</filename> directory per:</para>
+                <informalexample>
+                <?dbfo pgwide="1"?>
+                <programlisting language="ini">com.sun.identity.agents.config.sslcert.dir = /path/to/web_agents/apache22_agent/Agent_001/config
+com.sun.identity.agents.config.certdb.prefix =
+com.sun.identity.agents.config.certdb.password = encrypted password
+com.sun.identity.agents.config.certificate.alias = cert-agent
+com.sun.identity.agents.config.trust.server.certs = false</programlisting></informalexample>
+            </listitem>
+        </itemizedlist>
+
+    </section>
+
+    <section xml:id="certutil-and-attributes">
+        <title>The certutil Command and Web Agent Attributes</title>
+
+        <para>When you run the <command>certutil</command> command to manage certificates, you may need to change one
+        or more of the following attributes in the <filename>OpenSSOAgentBootstrap.properties</filename> file:</para>
+
+        <itemizedlist>
+            <listitem>
+                <para><literal>com.sun.identity.agents.config.sslcert.dir</literal>: Assign to the directory with the
+                <filename>OpenSSOAgentBootstrap.properties</filename> file.</para>
+            </listitem>
+            <listitem>
+                <para><literal>com.sun.identity.agents.config.certdb.prefix</literal>: Used when multiple CA databases
+                are configured.</para>
+            </listitem>
+            <listitem>
+                <para><literal>com.sun.identity.agents.config.certdb.password</literal>: Set to the encrypted password
+                for the agent.</para>
+            </listitem>
+            <listitem>
+                <para><literal>com.sun.identity.agents.config.certificate.alias</literal>: Used with multiple
+                certificate files. You can specify it with the <command>certutil -n (cert nickname)</command>
+                command.</para>
+            </listitem>
+            <listitem>
+                <para><literal>com.sun.identity.agents.config.trust.server.certs</literal>: Set to true or false.
+                When set to true, the agent trusts the certificate presented by a connected OpenAM server.</para>
+            </listitem>
+        </itemizedlist>
+
+    </section>
+
+
+</chapter>

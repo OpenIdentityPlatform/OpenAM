@@ -1,0 +1,85 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.4 2008/06/25 05:52:15 qcheng Exp $
+
+-->
+
+<project name="WebLogic 10 Agent MBeans" default="build">
+
+    <!--
+    update these properties to relevenat directories
+    REPLACE_WEB_LOGIC_10_SERVER_LIB  set it to your installation of \bea\wlserver_10.0\server\lib
+    and 
+    REPLACE_JAVA_HOME_LIB  set to something to your installation of \bea\jdk150_06\lib
+    -->
+
+    <property name="weblogic.lib.dir" value="REPLACE_WEB_LOGIC_10_SERVER_LIB"/>
+    <property name="java.lib" value="REPLACE_JAVA_HOME_LIB" />
+
+    <property name="mbeans.build.dir" value="build"/>
+    <property name="mbeans.dist.dir" value="dist"/>
+    <property name="mbeanmaker.classname" value="weblogic.management.commo.WebLogicMBeanMaker"/>
+
+    <target name="rebuild" depends="clean,build,deploy"/>
+
+    <target name="clean">
+	<delete dir="${mbeans.build.dir}"/>
+	<delete dir="${mbeans.dist.dir}"/>
+    </target>
+
+    <target name="preparebuild">
+	<mkdir dir="${mbeans.build.dir}"/>
+	<mkdir dir="${mbeans.dist.dir}"/>
+	<copy file="${weblogic.lib.dir}/commo.dtd" todir="${mbeans.build.dir}"/> 
+	<copy file="./AgentAuthenticator.xml" todir="${mbeans.build.dir}"/> 
+    </target>
+
+    <!-- build class path -->
+    <path id="build.class.path">
+        <pathelement location="${weblogic.lib.dir}/weblogic.jar"/>
+        <pathelement location="${java.lib}/tools.jar"/>
+        <pathelement location="${mbeans.build.dir}"/>
+    </path>
+
+    <property name="printthispath" refid="build.class.path" />
+
+    <target name="build" depends="preparebuild">
+     <echo>
+       "classpath is ${printthispath}"
+     </echo>
+	<java classname="${mbeanmaker.classname}" fork="true">
+	  <arg line="-files ${mbeans.build.dir} -MDF ${mbeans.build.dir}/AgentAuthenticator.xml -createStubs -verbose"/>
+	  <classpath refid="build.class.path"/>
+	</java>     
+	<java classname="${mbeanmaker.classname}" fork="true">
+	  <arg line="-files ${mbeans.build.dir} -MJF ${mbeans.dist.dir}/amauthprovider.jar -createStubs -verbose"/>
+	  <classpath refid="build.class.path"/>
+      </java> 
+    </target>
+
+    <target name="deploy" depends="build">
+	<copy file="${mbeans.dist.dir}/amauthprovider.jar" todir="../etc"/>
+    </target>
+</project>

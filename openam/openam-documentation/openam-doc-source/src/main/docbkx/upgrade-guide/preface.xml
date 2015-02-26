@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock, Inc.
+  !    
+-->
+<preface xml:id='preface'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Preface</title>
+ 
+ <para>This guide provides information on upgrades for core OpenAM services, 
+ policy agents, and components.</para>
+
+ <section>
+  <title>Who Should Use this Guide</title>
+  
+  <para>This guide is for anyone who needs to upgrade an OpenAM deployment. 
+  This guide defines the different release types and the steps to complete an upgrade. 
+  It is likely you will need to periodically use this guide to keep your OpenAM instance
+  current.</para>
+   
+  <itemizedlist>
+   <para>This guide is organized as follows:</para>
+  
+   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-intro"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Introduction to Upgrades</citetitle></link>  
+     defines the three version numbers and how they indicate what type of release 
+     you are considering. It also provides basic information about migrating legacy 
+     deployments and upgrading OpenAM components, like tools and policy agents. </para> 
+   </listitem>
+
+   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-upgrade"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Upgrading an OpenAM Deployment</citetitle></link> includes the procedure
+     to upgrade your OpenAM instance and an example to illustrate the procedure.
+     <!-- Add after testing It also provides the steps required to upgrade multiple OpenAM instances 
+     without downtime.--></para>
+   </listitem>
+      
+<!--   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-upgrade-server-only"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Upgrading OpernAM Server-Only Deployments</citetitle></link> 
+     includes the procedure to upgrade a server-only OpenAM deployment
+     and an example to illustrate the procedure.</para>
+   </listitem> -->
+   
+   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-legacy"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Migrating from a Legacy OpenAM Deployment</citetitle></link> 
+     describes legacy deployments of OpenAM and procedures on how to upgrade to  
+     a more current version.</para>
+   </listitem>
+
+   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-upgrade-components"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Upgrading OpenAM Components</citetitle></link> includes the procedure
+     to update policy agents and an example of updating the Apache 2.2 web agent, 
+     to upgrade the tools and examples, and to upgrade Distributed Authentication 
+     services with an example.</para>
+   </listitem>
+
+   <listitem>
+    <para><link xlink:href="upgrade-guide#appendix-best-practices"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Best Practices
+     for Upgrading Your OpenAM Deployment</citetitle></link> gives general advice and 
+     instructions for backing up your deployment prior to upgrading, applying your
+     current customizations to the new OpenAM <filename>.war</filename>, and  
+     rolling back OpenAM core and configuration store. It does not cover 
+     information for instances that have a dependency on an external replicated 
+     directory server. Restoration of earlier policy agents is included in the 
+     appendix.</para>
+   </listitem>
+
+   <listitem>
+    <para><link xlink:href="upgrade-guide#appendix-troubleshooting"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Troubleshooting 
+     the Upgrade Process</citetitle></link> provides information on ways
+     to troubleshoot issues you may encounter.</para>
+   </listitem>
+
+<!--    <listitem>
+    <para><link xlink:href="upgrade-guide#appendix-maven-artifacts"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Maven Artifacts</citetitle></link> 
+     provides a closer look at the changes to OpenAM starting with OpenAM 10.1.0.
+     The maven build uses different artifacts than the original ant build,
+     so this appendix serves as a guide to help you better understand the changes.</para>
+   </listitem>
+
+
+  <listitem>
+    <para>The <link xlink:href="upgrade-guide#chap-update-glossary"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle></para>
+   </listitem>
+-->
+
+  </itemizedlist>
+   
+  <para>You do not need to be an OpenAM wizard to learn something from
+  this guide, though a background in access management and maintaining
+  web application software can help. You do need some background in
+  managing services on your operating systems and in your application
+  servers. You can nevertheless get started with this guide, and then
+  learn more as you go.</para>
+ </section>
+
+ <xinclude:include href="../shared/sec-formatting-conventions.xml" />
+ <xinclude:include href="../shared/sec-accessing-doc-online.xml" />
+ <xinclude:include href="../shared/sec-joining-the-community.xml" />
+</preface>

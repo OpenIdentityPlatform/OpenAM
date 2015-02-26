@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions Copyrighted [year] [name of copyright owner]".
+
+  Copyright © 2011 ForgeRock AS. All rights reserved.
+-->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    <id>default</id>
+    <baseDirectory>/</baseDirectory>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}/src/main/resources</directory>
+            <outputDirectory>/openam</outputDirectory>
+        </fileSet>
+    </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <includes>
+                <include>org.forgerock.openam:openam-auth-deviceprint-module</include>
+            </includes>
+            <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.forgerock.openam:openam-auth-deviceprint-common</include>
+            </includes>
+            <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.forgerock.openam:openam-auth-deviceprint-datastore</include>
+            </includes>
+            <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.forgerock.openam:openam-auth-deviceprint-acceptance-module</include>
+            </includes>
+            <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
+        </dependencySet>
+        <!--dependencySet>
+            <includes>
+                <include>org.forgerock.extensions.authndeviceprint:deviceprint-hotp-module</include>
+            </includes>
+            <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
+        </dependencySet-->
+        <dependencySet>
+            <includes>
+                <include>net.sf.json-lib:json-lib</include>
+            </includes>
+            <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.codehaus.jackson:jackson-mapper-lgpl</include>
+            </includes>
+            <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.codehaus.jackson:jackson-core-lgpl</include>
+            </includes>
+            <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>net.sf.ezmorph:ezmorph</include>
+            </includes>
+            <outputDirectory>/openam/WEB-INF/lib</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.forgerock.openam:openam-auth-deviceprint-scripts</include>
+            </includes>
+            <outputDirectory>/openam/js</outputDirectory>
+            <outputFileNameMapping>openam-authnmodule-adaptive-deviceprint-scripts-min.js</outputFileNameMapping>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>requirejs:requirejs</include>
+            </includes>
+            <outputDirectory>/openam/js</outputDirectory>
+            <outputFileNameMapping>require-jquery.js</outputFileNameMapping>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.codehaus.mojo:jquery-amd</include>
+            </includes>
+            <outputDirectory>/openam/js</outputDirectory>
+            <outputFileNameMapping>jquery-amd-min.js</outputFileNameMapping>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>evercookie:evercookie-modified</include>
+            </includes>
+            <outputDirectory>/openam/js/evercookie/evercookie-modified/0.4</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>swfobject:swfobject</include>
+            </includes>
+            <outputDirectory>/openam/js/swfobject/swfobject/2.2</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>json2:json2</include>
+            </includes>
+            <outputDirectory>/openam/js/json2/json2/1.0</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>requirejs:order</include>
+            </includes>
+            <outputDirectory>/openam/js/requirejs/order/1.0.8</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.codehaus.mojo:jquery-amd</include>
+            </includes>
+            <outputDirectory>/openam/js/org/codehaus/mojo/jquery-amd/1.7.1-alpha-1</outputDirectory>
+            <outputFileNameMapping>jquery-amd-1.7.1-alpha-1.js</outputFileNameMapping>
+        </dependencySet>
+    </dependencySets>
+</assembly>

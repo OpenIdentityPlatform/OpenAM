@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+*
+* Copyright (c) 2012 ForgeRock Inc. All Rights Reserved
+*
+* The contents of this file are subject to the terms
+* of the Common Development and Distribution License
+* (the License). You may not use this file except in
+* compliance with the License.
+*
+* You can obtain a copy of the License at
+* http://forgerock.org/license/CDDLv1.0.html
+* See the License for the specific language governing
+* permission and limitations under the License.
+*
+* When distributing Covered Code, include this CDDL
+* Header Notice in each file and include the License file
+* at http://forgerock.org/license/CDDLv1.0.html
+* If applicable, add the following below the CDDL Header,
+* with the fields enclosed by brackets [] replaced by
+* your own identifying information:
+* "Portions Copyrighted [year] [name of copyright owner]"
+*
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock.openam</groupId>
+        <artifactId>openam-examples</artifactId>
+        <version>10.2.0-SNAPSHOT</version>
+    </parent>
+
+    <!-- Component Definition -->
+    <name>OpenAM Example ClientSDK WAR</name>
+    <description>OpenAM Example ClientSDK WAR</description>
+    <artifactId>openam-example-clientsdk-war</artifactId>
+    <packaging>war</packaging>
+
+    <!-- Build -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+<!--                    <packagingExcludes>
+                        WEB-INF/lib/ant-contrib-1.0b3.jar,
+                        WEB-INF/lib/jersey-core-1.1.5.2.jar,
+                        WEB-INF/lib/jaxb-api-1.0.6.jar,
+                        WEB-INF/lib/jaxb-impl-1.0.6.jar,
+                        WEB-INF/lib/jaxb-libs-1.0.6.jar,
+                        WEB-INF/lib/jaxb-xjc-1.0.6.jar,
+                        WEB-INF/lib/jdom-2.0.1.jar,
+                        WEB-INF/lib/jaxp-api-1.4.2.jar,
+                        WEB-INF/lib/jaxws-api-2.2.8.jar,
+                        WEB-INF/lib/jaxws-rt-2.2.7-promoted-b73.jar,
+                        WEB-INF/lib/stax-api-1.0-2.jar,
+                        WEB-INF/lib/webservices-api-2.1-b16.jar
+                    </packagingExcludes>-->
+                    <archive>
+                        <manifestEntries>
+                            <Specification-Title>OpenAM Example ClientSDK WAR</Specification-Title>
+                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
+                            <Specification-Vendor>ForgeRock</Specification-Vendor>
+                            <Implementation-Title>OpenAM Example ClientSDK WAR</Implementation-Title>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
+                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                        </manifestEntries>
+                    </archive>
+                    <nonFilteredFileExtensions>
+                        <!-- Exclude any binary files based upon File Types. -->
+                        <nonFilteredFileExtension>bin</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bkf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bmp</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bz2</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>deb</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dll</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dmg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ear</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>exe</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gif</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gzip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpeg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>lz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rpm</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tgz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>war</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>zip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>7z</nonFilteredFileExtension>
+                        <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
+                    </nonFilteredFileExtensions>
+<!--                    <webResources>
+                        <webResource>
+                            <directory>${project.build.directory}/XUI/</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>XUI</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${basedir}/src/main/webapp</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>META-INF</exclude>
+                                <exclude>WEB-INF</exclude>
+                                <exclude>com_sun_web_ui/images</exclude>
+                            </excludes>
+                            <targetPath/>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${basedir}/src/main/webapp/com_sun_web_ui/images</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>com_sun_web_ui/images</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/src/main/webapp/WEB-INF</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>WEB-INF</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>
+                                ${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml
+                            </directory>
+                            <includes>
+                                <include>*.xsl</include>
+                                <include>*.xml</include>
+                            </includes>
+                            <excludes>
+                                <exclude>web.xml</exclude>
+                            </excludes>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-federation/OpenFM/src/main/wsdl</directory>
+                            <includes>
+                                <include>*.wsdl</include>
+                                <include>*.xsd</include>
+                            </includes>
+                            <targetPath>WEB-INF/wsdl</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-schema/openam-idsvcs-schema/src/main/resources/xml
+                            </directory>
+                            <includes>
+                                <include>*.wsdl</include>
+                            </includes>
+                            <targetPath>WEB-INF/wsdl</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.build.directory}/unpacked/jaxrpc
+                            </directory>
+                            <includes>
+                                <include>IdentityManagementServices.wsdl</include>
+                            </includes>
+                            <targetPath>WEB-INF/wsdl</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss
+                            </directory>
+                            <includes>
+                                <include>sun-jaxws.xml</include>
+                            </includes>
+                            <targetPath>WEB-INF</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                             This pickup the remaining moved elements build from the
+                                 "openam-server-prepare-war"
+                                 step from a Temp Area 
+                            <directory>${project.build.directory}/openam_TEMP
+                            </directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath />
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif
+                            </directory>
+                            <includes>
+                                 These Files get moved into Place when installing OpenDJ. 
+                                <include>cts-add-schema.ldif</include>
+                                <include>cts-delete-schema.ldif</include>
+                                <include>odsee-cts-indices-schema.ldif</include>
+                            </includes>
+                            <targetPath>WEB-INF/template/ldif/sfha</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+			            <webResource>
+                            <directory>${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources
+                            </directory>
+                            <includes>
+                                 These Files get moved into Place when installing OpenDJ. 
+                                <include>99-oauth2attributes.ldif</include>
+                            </includes>
+                            <targetPath>WEB-INF/template/ldif/oauth2</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                    </webResources>-->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-clientsdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+    </dependencies>
+</project>
+

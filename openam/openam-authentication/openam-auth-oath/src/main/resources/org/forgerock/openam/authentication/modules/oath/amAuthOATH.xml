@@ -1,0 +1,268 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+
+<!--
+
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright © 2012 ForgeRock Inc. All rights reserved.
+ 
+  The contents of this file are subject to the terms
+  of the Common Development and Distribution License
+  (the License). You may not use this file except in
+  compliance with the License.
+ 
+  You can obtain a copy of the License at
+  http://forgerock.org/license/CDDLv1.0.html
+  See the License for the specific language governing
+  permission and limitations under the License.
+ 
+  When distributing Covered Code, include this CDDL
+  Header Notice in each file and include the License file
+  at http://forgerock.org/license/CDDLv1.0.html
+  If applicable, add the following below the CDDL Header,
+  with the fields enclosed by brackets [] replaced by
+  your own identifying information:
+  "Portions Copyrighted 2012 ForgeRock AS"
+ 
+-->
+
+
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAuthOATHService" version="1.0">
+        <Schema
+                serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthOATHService"
+                i18nFileName="amAuthOATH"
+                revisionNumber="1"
+                i18nKey="iPlanetAMAuthOATHServiceDescription">
+
+            <Organization>
+                <AttributeSchema name="iplanet-am-auth-oath-auth-level"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a500">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oath-password-length"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a501">
+                    <DefaultValues>
+                        <Value>6</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oath-min-secret-key-length"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a502">
+                    <DefaultValues>
+                        <Value>32</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oath-secret-key-attribute"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a503">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oath-algorithm"
+                                 type="single_choice"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a504">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="HOTP">HOTP</ChoiceValue>
+                        <ChoiceValue i18nKey="TOTP">TOTP</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>HOTP</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oath-hotp-window-size"
+                                 type="single"
+                                 syntax="number"
+                                 i18nKey="a505">
+                    <DefaultValues>
+                        <Value>100</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oath-hotp-counter-attribute"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a506">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oath-add-checksum"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a507">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="true">True</ChoiceValue>
+                        <ChoiceValue i18nKey="false">False</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>False</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oath-truncation-offset"
+                                 type="single"
+                                 syntax="number"
+                                 i18nKey="a508">
+                    <DefaultValues>
+                        <Value>-1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oath-size-of-time-step"
+                                 type="single"
+                                 syntax="number"
+                                 i18nKey="a509">
+                    <DefaultValues>
+                        <Value>30</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oath-steps-in-window"
+                                 type="single"
+                                 syntax="number"
+                                 i18nKey="a510">
+                    <DefaultValues>
+                        <Value>2</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oath-last-login-time-attribute-name"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a511">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="iplanet-am-auth-oath-auth-level"
+                                     type="single"
+                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                     i18nKey="a500">
+                        <DefaultValues>
+                            <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oath-password-length"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a501">
+                        <DefaultValues>
+                            <Value>6</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oath-min-secret-key-length"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a502">
+                        <DefaultValues>
+                            <Value>32</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oath-secret-key-attribute"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a503">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oath-algorithm"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a504">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="HOTP">HOTP</ChoiceValue>
+                            <ChoiceValue i18nKey="TOTP">TOTP</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>HOTP</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oath-hotp-window-size"
+                                     type="single"
+                                     syntax="number"
+                                     i18nKey="a505">
+                        <DefaultValues>
+                            <Value>100</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oath-hotp-counter-attribute"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a506">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oath-add-checksum"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a507">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="true">True</ChoiceValue>
+                            <ChoiceValue i18nKey="false">False</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>False</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oath-truncation-offset"
+                                     type="single"
+                                     syntax="number"
+                                     i18nKey="a508">
+                        <DefaultValues>
+                            <Value>-1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oath-size-of-time-step"
+                                     type="single"
+                                     syntax="number"
+                                     i18nKey="a509">
+                        <DefaultValues>
+                            <Value>30</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oath-steps-in-window"
+                                     type="single"
+                                     syntax="number"
+                                     i18nKey="a510">
+                        <DefaultValues>
+                            <Value>2</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oath-last-login-time-attribute-name"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a511">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+        <Configuration>
+            <OrganizationConfiguration name="/">
+                <AttributeValuePair>
+                    <Attribute name="iplanet-am-auth-oath-auth-level"/>
+                    <Value>0</Value>
+                </AttributeValuePair>
+            </OrganizationConfiguration>
+        </Configuration>
+    </Service>
+</ServicesConfiguration>

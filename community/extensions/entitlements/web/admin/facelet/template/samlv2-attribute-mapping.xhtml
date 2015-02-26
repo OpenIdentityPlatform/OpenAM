@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: samlv2-attribute-mapping.xhtml,v 1.3 2009/06/26 09:02:18 asyhuang Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+    <ice:panelGroup>
+        <o:section>
+            <ui:define name="section-title">
+                <ice:outputText
+                    value="#{resources['samlv2-attribute-mapping.sectionTitle']}"/>
+            </ui:define>
+            <ui:define name="section-details">
+                <ice:outputText
+                    value="#{resources['samlv2-attribute-mapping.sectionDetails']}"/>
+            </ui:define>
+            <ui:define name="section-links">
+                <ice:panelGrid
+                    columns="1">
+                    <o:clink
+                        handler="#{wizardHandler}"
+                        listenerMethod="addListener"
+                        type="add"/>
+                </ice:panelGrid>
+            </ui:define>
+            <ui:define name="section-body">
+
+                <ice:panelGrid
+                    styleClass="user-attributes"
+                    columnClasses="user-attributes-selected,user-attributes-gutter,user-attributes-available"
+                    columns="3">
+                    <ice:panelGroup
+                        dropTarget="true"
+                        dropListener="#{wizardHandler.dropListener}">
+                        <ice:dataTable
+                            visible="#{o:size(wizardBean.viewAttributes) > 0}"
+                            columnClasses="attributesCol1,attributesCol2,attributesCol3"
+                            value="#{wizardBean.viewAttributes}"
+                            var="attribute">
+                            <ice:column>
+                                <f:facet name="header">
+                                    <ice:outputText value="#{resources['samlv2-attribute-mapping.attribute.assertionname']}"/>
+                                </f:facet>
+                                <ice:panelGroup
+                                    visible="#{!attribute.nameEditable}">
+                                    <ice:commandLink
+                                        styleClass="command-link"
+                                        actionListener="#{wizardHandler.editNameListener}">
+                                        <f:attribute
+                                            name="viewAttribute"
+                                            value="#{attribute}"/>
+                                        <ice:outputText
+                                            value="#{attribute.name}"/>
+                                    </ice:commandLink>
+                                </ice:panelGroup>
+                                <ice:panelGroup
+                                    visible="#{attribute.nameEditable}">
+                                    <ice:inputText
+                                        styleClass="inline-input"
+                                        style="width: 100%"
+                                        valueChangeListener="#{wizardHandler.nameEditedListener}"
+                                        value="#{attribute.name}">
+                                        <f:attribute
+                                            name="viewAttribute"
+                                            value="#{attribute}"/>
+                                    </ice:inputText>
+                                </ice:panelGroup>
+
+                            </ice:column>
+                            <ice:column>
+                                <f:facet name="header">
+                                    <ice:outputText value="#{resources['samlv2-attribute-mapping.attribute.localattrname']}"/>
+                                </f:facet>
+                                <ice:panelGroup
+                                    visible="#{attribute.isAdded and !attribute.valueEditable}">
+                                    <ice:commandLink
+                                        styleClass="command-link"
+                                        actionListener="#{wizardHandler.editValueListener}">
+                                        <f:attribute
+                                            name="viewAttribute"
+                                            value="#{attribute}"/>
+                                        <ice:outputText
+                                            value="#{attribute.value}"/>
+                                    </ice:commandLink>
+                                </ice:panelGroup>
+
+                                <ice:panelGroup
+                                    visible="#{!attribute.isAdded}">
+                                    <ice:outputText
+                                        value="#{attribute.value}"/>
+                                </ice:panelGroup>
+
+                                <ice:panelGroup
+                                    visible="#{attribute.valueEditable}">
+                                    <ice:inputText
+                                        styleClass="inline-input"
+                                        style="width: 100%"
+                                        valueChangeListener="#{wizardHandler.valueEditedListener}"
+                                        value="#{attribute.value}">
+                                        <f:attribute
+                                            name="viewAttribute"
+                                            value="#{attribute}"/>
+                                    </ice:inputText>
+                                </ice:panelGroup>
+                            </ice:column>
+                            <ice:column>
+                                <f:facet name="header">
+                                    <ice:outputText value="#{resources['samlv2-attribute-mapping.attribute.remove']}"/>
+                                </f:facet>
+                                <ice:panelGroup>
+                                    <ice:commandLink
+                                        actionListener="#{wizardHandler.removeListener}">
+                                        <f:attribute
+                                            name="viewAttribute"
+                                            value="#{attribute}"/>
+                                        <ice:graphicImage
+                                            value="../image/remove-16.png"/>
+                                    </ice:commandLink>
+                                </ice:panelGroup>
+                            </ice:column>
+                        </ice:dataTable>
+                        <ice:panelGroup
+                            styleClass="drop-target">
+                            <ice:outputText
+                                value="#{resources['samlv2-attribute-mapping.drop']}"/>
+                        </ice:panelGroup>
+                    </ice:panelGroup>
+                    <ice:panelGroup>
+                        <o:multipanel
+                            visible="true"
+                            expanded="#{userAttributesPanelBean.expanded}"
+                            bean="#{userAttributesPanelBean}"
+                            handler="#{basicMultiPanelHandler}"
+                            collapsible="true"
+                            removeable="false">
+                            <ui:define name="panel-title">
+                                <ice:panelGroup>
+                                    <ice:outputText
+                                        value="#{resources['samlv2-attribute-mapping.available']}"/>
+                                </ice:panelGroup>
+                            </ui:define>
+                            <ui:define name="panel-body">
+                                <ice:panelGroup
+                                    visible="#{o:size(wizardBean.availableViewAttributes) == 0}">
+                                    <ice:outputText
+                                        value="#{resources['samlv2-attribute-mapping.noAvailable']}"/>
+                                </ice:panelGroup>
+                                <ice:panelGroup
+                                    scrollHeight="200px">
+                                    <ice:panelSeries
+                                        value="#{wizardBean.availableViewAttributes}"
+                                        var="viewAttribute">
+                                        <ice:panelGroup
+                                            styleClass="draggable"
+                                            draggable="true"
+                                            dragMask="dragging,drag_cancel,hover_start,hover_end,dropped"
+                                            dragValue="#{viewAttribute}"
+                                            dragOptions="dragGhost">
+                                            <ice:panelGrid columns="2">
+                                                <ice:graphicImage
+                                                    value="../image/device.png"/>
+                                                <ice:panelGroup>
+                                                    <ice:outputText
+                                                        value="#{viewAttribute.value}"/>
+                                                </ice:panelGroup>
+                                            </ice:panelGrid>
+                                        </ice:panelGroup>
+                                    </ice:panelSeries>
+                                </ice:panelGroup>
+                            </ui:define>
+                        </o:multipanel>
+                    </ice:panelGroup>
+                </ice:panelGrid>
+            </ui:define>
+        </o:section>
+    </ice:panelGroup>
+</span>
+

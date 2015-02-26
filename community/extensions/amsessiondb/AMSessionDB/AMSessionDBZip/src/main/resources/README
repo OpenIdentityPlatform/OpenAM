@@ -1,0 +1,110 @@
+------------------------------------------------------------------------------
+README file for amsessiondb
+------------------------------------------------------------------------------
+
+ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+ Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+
+ The contents of this file are subject to the terms
+ of the Common Development and Distribution License
+ (the License). You may not use this file except in
+ compliance with the License.
+
+ You can obtain a copy of the License at
+ http://forgerock.org/license/CDDLv1.0.html
+ See the License for the specific language governing
+ permission and limitations under the License.
+
+ When distributing Covered Code, include this CDDL
+ Header Notice in each file and include the License file
+ at http://forgerock.org/license/CDDLv1.0.html
+ If applicable, add the following below the CDDL Header,
+ with the fields enclosed by brackets [] replaced by
+ your own identifying information:
+ "Portions Copyrighted [year] [name of copyright owner]"
+
+------------------------------------------------------------------------------
+
+1. Overview
+
+amsessiondb is designed as a drop in replacement for the existing OpenAM session
+failover system that uses MQ and Berkley DB.
+
+2. Installation
+
+Copy the following files into your OpenAM webapp WEB-INF/lib directory and
+restart the container.
+
+* AMSessionRepository-0.1-SNAPSHOT.jar
+* AMSessionStoreCommon-0.1-SNAPSHOT.jar
+* org.restlet.lib.org.json-2.0.jar
+* commons-net-2.2.jar                    
+* jackson-core-asl-1.4.3.jar             
+* jackson-mapper-asl-1.4.3.jar           
+* org.osgi.core-4.0.0.jar                
+* org.restlet-2.0.6.jar                  
+* org.restlet.ext.jackson-2.0.6.jar      
+* org.restlet.ext.json-2.0.6.jar
+
+3. Configuration
+
+3.1. OpenAM Configuration 
+
+For OpenAM session failover to be configured, OpenAM must be running in a site
+configuration. Please site this article to assist in configuring sites:
+
+https://wikis.forgerock.org/confluence/display/openam/5+Extending+to+a+Dual+Instance+Deployment
+
+When configuring the session service in OpenAM; the same procedure should be 
+followed only with these configuration changes to the secondary session 
+configuration instance.
+
+* Session Store User : admin
+* Session Store Password : <password>
+* Session Store Password (confirm) : <password>
+* Maximum Wait Time : 5000
+* Database Url : http://localhost:8182/amsessiondb
+* Session Failover Enabled : (True) Enabled
+
+3.2 amsessiondb configuration.
+
+amsessiondb is configured using the configuration files in the config directory:
+
+* amsessiondb.properties : General configuration; port number, URI et cetera
+* amsessiondblog.properties : Controls the log level of the components
+* dbconfig.xml : Configures the embedded OrientDB server
+
+4. Startup
+
+In the amsessiondb/bin directory, run the start.sh command.
+
+5. Operational
+
+When the amsessiondb server is running, there are two useful URLs:
+
+http://localhost:8182/amsessiondb/stats
+
+This returns the following information in JSON format.
+
+* uptime : The uptime of the server in ms
+* numSessions : The number of sessions in the database
+* totalRequests : The total number of requests received.
+* totalReads : The total number of read requests received.
+* totalWrites : The total number of write requests received.
+* totalDeletes : The total number of delete requests received.
+* totalReadSessionCount : The total number of read session count requests 
+  received.
+
+http://localhost:8182/amsessiondb/config
+
+This returns the configuration of the amsessiondb server in JSON format. This is
+useful for debugging and support purposes.
+
+6. Troubleshooting
+
+amsessiondb logs its operations to the amsessiondb-0-0.log in the logs 
+directory.
+
+To enable debugging change this entry amsessiondb.level in the 
+amsessiondblog.properties configuration file to FINEST and restart.

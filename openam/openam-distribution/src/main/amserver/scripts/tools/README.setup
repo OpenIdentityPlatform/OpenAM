@@ -1,0 +1,97 @@
+------------------------------------------------------------------------------
+DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+
+The contents of this file are subject to the terms
+of the Common Development and Distribution License
+(the License). You may not use this file except in
+compliance with the License.
+
+You can obtain a copy of the License at
+https://opensso.dev.java.net/public/CDDLv1.0.html or
+opensso/legal/CDDLv1.0.txt
+See the License for the specific language governing
+permission and limitations under the License.
+
+When distributing Covered Code, include this CDDL
+Header Notice in each file and include the License file
+at opensso/legal/CDDLv1.0.txt.
+If applicable, add the following below the CDDL Header,
+with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+$Id: README.setup,v 1.15 2008/10/09 23:48:21 ww203982 Exp $
+
+------------------------------------------------------------------------------
+Portions  Copyrighted 2011 ForgeRock AS
+------------------------------------------------------------------------------
+                                                                               
+OpenAM: openam-ssoAdminTools.zip
+====================================================
+
+This file contains information on installing and using ssoAdminTools.zip.
+It is assumed that OpenAM Server is available.
+
+Table of contents:
+-----------------
+1. Supported versions of Java Runtime
+2. Installing ssoAdminTools.zip
+3. What does this package contain?
+
+1. Supported versions of Java Runtime
+-------------------------------------
+Java Runtime Environment 1.5 or higher.
+
+2. What does this package contain?
+----------------------------------
+<ZIP_ROOT>
+|
+|----README (this file)
+|
+|----lib
+|      |
+|      |----*.jar (binaries needed for the scripts)
+|
+|----locale
+|      |
+|      |----*.properties (properties file for binaries)
+|
+|----setup (setup script for linux and unix)
+|
+|----setup.bat (setup script for windows)
+|
+|----template
+|      |
+|      |----unix/bin/*.template (template of scripts for unix and linux)
+|      |
+|      |----windows/bin/* (required windows specific libraries)
+
+3. Installing ssoAdminTools.zip
+------------------------------- 
+
+Before setting up ssoAdminTools.zip, JAVA_HOME environment variable needs to be
+initialized to a path of a compatible Java Runtime.
+
+Steps involved in installing ssoAdminTools.zip are:
+
+Step 1: Unzip ssoAdminTools.zip to the desired directory.
+
+Step 2: Go to the directory which has the ssoAdminTools.zip unzipped.
+        Run the setup command as follows:
+        "./setup" or "setup"
+        for Unix and Windows respectively.
+        Enter the configuration directory when prompted.
+        "Path to config files of OpenAM server [~/openam]:"
+        Enter the path to Debug Directory
+        "Debug Directory [~/ssoadm/debug]:"
+        Enter the path to the Log Directory
+        "Log Directory [~/ssoadm/log]:"
+
+Step 3: After step 2 is performed, the CLIs can be run under the following
+        directory:
+        <TOOLS_DIR>/<OPENAM_INSTANCE_NAME>/bin
+        where <TOOLS_DIR> is the directory which has ssoAdminTools.zip unzipped
+        (ie: current directory), and <OPENAM_INSTANCE_NAME> is the deployment
+        URI of OpenAM.
