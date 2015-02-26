@@ -62,7 +62,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
 
     private static final String RESOURCE_SET_ID_KEY = "rsid";
     private static final String ID_FIELD = "_id";
-    private static final String POLICY_URI_FIELD = "policy_uri";
+    private static final String POLICY_URI_FIELD = "user_access_policy_uri";
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ResourceSetDescriptionValidator validator;
@@ -138,7 +138,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         ResourceSetDescription resourceSetDescription = store.read(getResourceSetId())
                 .update(validator.validate(toMap(entity)));
         store.update(resourceSetDescription);
-        return createEmptyResponse(resourceSetDescription);
+        return createJsonResponse(resourceSetDescription, false, true);
     }
 
     /**
@@ -161,7 +161,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
 
     private Representation readResourceSet(String resourceSetId) throws NotFoundException, ServerException {
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        return createJsonResponse(store.read(resourceSetId));
+        return createJsonResponse(store.read(resourceSetId), true, true);
     }
 
     private Representation listResourceSets() throws ServerException, NotFoundException {

@@ -234,6 +234,7 @@ public class ResourceSetRegistrationEndpointTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldUpdateResourceSetDescription() throws Exception {
 
         //Given
@@ -260,10 +261,9 @@ public class ResourceSetRegistrationEndpointTest {
         assertThat(resourceSetCaptor.getValue().getScopes()).containsExactly("NEW_SCOPE");
         assertThat(resourceSetCaptor.getValue().getIconUri()).isEqualTo(URI.create("NEW_ICON_URI"));
 
-        assertThat(responseRep.getText()).isNull();
-        ArgumentCaptor<Status> responseStatusCaptor = ArgumentCaptor.forClass(Status.class);
-        verify(response).setStatus(responseStatusCaptor.capture());
-        assertThat(responseStatusCaptor.getValue().getCode()).isEqualTo(204);
+        Map<String, Object> responseBody = (Map<String, Object>) new ObjectMapper()
+                .readValue(responseRep.getText(), Map.class);
+        assertThat(responseBody).containsKey("_id");
     }
 
     @Test
