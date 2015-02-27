@@ -38,6 +38,4 @@ define([
     "./views/share/BaseShare",
     "./views/share/CommonShare",
     "./views/share/DialogShare",
-
-    "./AppsView"
 ]);

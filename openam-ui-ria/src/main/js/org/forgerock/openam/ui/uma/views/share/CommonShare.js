@@ -24,7 +24,7 @@
 
 /*global define, require, $, _ , Backbone,  */
 
-define("org/forgerock/openam/ui/uma/CommonView", [
+define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/uma/CommonView", [
         UMAPolicyPermission = require("org/forgerock/openam/ui/uma/models/UMAPolicyPermission"),
         UMAPolicyPermissionCollection = require("org/forgerock/openam/ui/uma/models/UMAPolicyPermissionCollection"),
         User = require("org/forgerock/openam/ui/uma/models/User"),
-        CommonView = AbstractView.extend({
+        CommonShare = AbstractView.extend({
             template: "templates/uma/views/share/CommonShare.html",
             events: {
               "click input#shareButton": "save"
@@ -190,5 +190,5 @@ define("org/forgerock/openam/ui/uma/CommonView", [
             }
         });
 
-    return CommonView;
+    return CommonShare;
 });
