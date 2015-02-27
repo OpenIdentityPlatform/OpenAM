@@ -24,15 +24,15 @@
 
 /*global define, $, _ */
 
-define("org/forgerock/openam/ui/uma/ResourceEditDialog", [
+define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
         "org/forgerock/commons/ui/common/components/Dialog",
-        "org/forgerock/openam/ui/uma/ShareView",
-        "org/forgerock/openam/ui/uma/ResourceView",
+        "org/forgerock/openam/ui/uma/views/share/CommonShare",
+        "org/forgerock/openam/ui/uma/views/resource/EditResource",
         "org/forgerock/commons/ui/common/main/Router"
-], function(Dialog, ShareView, resourceView, router) {
+], function(Dialog, CommonShare, editResourceView, router) {
 
-    var ResourceEditDialog = Dialog.extend({
-        contentTemplate: "templates/uma/UmaInnerTemplate.html", //TODO .. need to use a blank base
+    var DialogShare = Dialog.extend({
+        contentTemplate: "templates/uma/views/share/BaseShare.html", //TODO .. need to use a blank base
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
 
         events: {
@@ -44,7 +44,7 @@ define("org/forgerock/openam/ui/uma/ResourceEditDialog", [
             $("#dialogs").hide();
             this.show(_.bind(function() {
                 $("#dialogs").show();
-                this.shareView = new ShareView();
+                this.shareView = new CommonShare();
                 this.shareView.baseTemplate= 'templates/common/DefaultBaseTemplate.html';
                 this.shareView.element = '#dialogs .dialogContent';
                 this.shareView.render(args, callback);
@@ -64,12 +64,12 @@ define("org/forgerock/openam/ui/uma/ResourceEditDialog", [
 
         saveThenClose: function(e){
             //TODO :Add save code here.
-            resourceView.data.userPolicies.fetch({reset: true, processData: false});
-            router.routeTo( router.configuration.routes.resourceActivity, {args: [this.data.resourceSet.uid], trigger: true});
+            editResourceView.data.userPolicies.fetch({reset: true, processData: false});
+            router.routeTo( router.configuration.routes.editResource, {args: [this.data.resourceSet.uid], trigger: true});
 
             this.close(e);
         }
     });
 
-    return new ResourceEditDialog();
+    return new DialogShare();
 });

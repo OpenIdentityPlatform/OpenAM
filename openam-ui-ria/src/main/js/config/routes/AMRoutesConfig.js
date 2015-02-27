@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -87,66 +87,63 @@ define("config/routes/AMRoutesConfig", [
 
 
         "uma": {
-            view: "org/forgerock/openam/ui/uma/ResourceEditView",
-            url: /^uma\//,
-            pattern: "uma/",
-            role: "ui-user,ui-admin"
+            view: "org/forgerock/openam/ui/uma/views/resource/ListResource",
+            url: /^uma/,
+            pattern: "uma/resource/",
+            role: "ui-user"
         },
-        "share": {
-            view: "org/forgerock/openam/ui/uma/ResourceEditView",
+        "dialogShare": {
+            base: "editResource",
+            dialog: "org/forgerock/openam/ui/uma/views/share/DialogShare",
+            role: "ui-user",
+            url: /^uma\/resources\/(.+?)\/(share)\//,
+            pattern: "uma/resources/?/share/"
+        },
+        "editResource": {
+            view: "org/forgerock/openam/ui/uma/views/resource/EditResource",
+            url: /^uma\/resources\/(.*?)(?:\/){0,1}$/,
+            role: "ui-user",
+            pattern: "uma/resources/?"
+        },
+        "listResource": {
+            view: "org/forgerock/openam/ui/uma/views/resource/ListResource",
+            url: /^uma\/resources\/$/,
+            defaults: [""],
+            role: "ui-user",
+            pattern: "uma/resources/"
+        },/*
+        "listSubject": {
+            view: "org/forgerock/openam/ui/uma/views/subject/SubjectListView",
+            url: /^uma\/resources\/(.+?)\/(users)\//,
+            role: "ui-user",
+            pattern: "uma/resources/?/users/"
+        },*/
+        "baseShare": {
+            view: "org/forgerock/openam/ui/uma/views/share/BaseShare",
             url: /^uma\/share\/(.*?)(?:\/){0,1}$/,
             pattern: "uma/share/?",
             defaults: [""],
-            role: "ui-user,ui-admin"
+            role: "ui-user"
         },
-        "resourceList": {
-            view: "org/forgerock/openam/ui/uma/ResourceListView",
-            url: /^uma\/resources\/(.*?)(?:\/){0,1}$/,
-            defaults: [""],
-            role: "ui-user,ui-admin",
-            pattern: "uma/resources/?"
-        },
-        "resourceActivity": {
-            view: "org/forgerock/openam/ui/uma/ResourceView",
-            url: /^uma\/resources\/(.+?)\/(activity)\//,
-            role: "ui-user,ui-admin",
-            pattern: "uma/resources/?/activity/"
-        },
-        "resourceUsers": {
-            view: "org/forgerock/openam/ui/uma/ResourceView",
-            url: /^uma\/resources\/(.+?)\/(users)\//,
-            role: "ui-user,ui-admin",
-            pattern: "uma/resources/?/users/"
-        },
-        "resourceEdit": {
-            base: "resourceActivity",
-            dialog: "org/forgerock/openam/ui/uma/ResourceEditDialog",
-            role: "ui-user,ui-admin",
-            url: /^uma\/resources\/(.+?)\/(edit)\//,
-            pattern: "uma/resources/?/edit/"
-        },
-        "history": {
+        "listHistory": {
             view: "org/forgerock/openam/ui/uma/views/history/ListHistory",
-            role: "ui-user,ui-admin",
+            role: "ui-user",
             url: /^uma\/history\/$/,
             pattern: "uma/history/"
         },
-        "users": {
-            view: "org/forgerock/openam/ui/uma/UsersView",
-            role: "ui-user,ui-admin",
+        "listSubject": {
+            view: "org/forgerock/openam/ui/uma/views/subjects/ListSubject",
+            role: "ui-user",
             url: /^uma\/users\/$/,
             pattern: "uma/users/"
         },
-        "apps": {
-            view: "org/forgerock/openam/ui/uma/AppsView",
-            role: "ui-user,ui-admin",
+        "listApplication": {
+            view: "org/forgerock/openam/ui/uma/views/application/ListApplication",
+            role: "ui-user",
             defaults: [""],
             url: /^uma\/apps\/(.*?)(?:\/){0,1}$/,
             pattern: "uma/apps/?"
         }
-
-
-
 
     };
 

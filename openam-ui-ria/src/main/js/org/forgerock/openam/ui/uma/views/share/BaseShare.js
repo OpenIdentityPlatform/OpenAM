@@ -24,18 +24,18 @@
 
 /*global define, $, _ */
 
-define("org/forgerock/openam/ui/uma/ResourceEditView", [
+define("org/forgerock/openam/ui/uma/views/share/BaseShare", [
         "org/forgerock/commons/ui/common/main/AbstractView",
-        "org/forgerock/openam/ui/uma/ShareView"
-], function(AbstractView, ShareView) {
+        "org/forgerock/openam/ui/uma/views/share/CommonShare"
+], function(AbstractView, CommonShare) {
 
-    var ResourceEditView = AbstractView.extend({
-        template: "templates/uma/UmaBaseTemplate.html",
+    var BaseShare = AbstractView.extend({
+        template: "templates/uma/views/share/BaseShare.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         render: function(args, callback) {
 
             var self = this;
-            self.shareView = new ShareView();
+            self.shareView = new CommonShare();
             self.shareView.element = "#umaInnerContent";
             self.shareView.noBaseTemplate = true;
             self.parentRender(function(){
@@ -46,5 +46,5 @@ define("org/forgerock/openam/ui/uma/ResourceEditView", [
 
     });
 
-    return new ResourceEditView();
+    return new BaseShare();
 });

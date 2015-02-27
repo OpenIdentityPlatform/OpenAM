@@ -24,7 +24,7 @@
 
 /*global define, $, _ */
 
-define("org/forgerock/openam/ui/uma/AppsView", [
+define("org/forgerock/openam/ui/uma/views/subject/ListSubjects", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -33,8 +33,8 @@ define("org/forgerock/openam/ui/uma/AppsView", [
     "org/forgerock/openam/ui/uma/delegates/UmaDelegate"
 ], function(AbstractView, conf, eventManager, uiUtils, constants, umaDelegate) {
 
-    var AppsView = AbstractView.extend({
-        template: "templates/uma/AppsTemplate.html",
+    var ListSubjects = AbstractView.extend({
+        template: "templates/uma/views/subject/ListSubects.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: { },
         render: function(args, callback) {
@@ -44,5 +44,5 @@ define("org/forgerock/openam/ui/uma/AppsView", [
 
     });
 
-    return new AppsView();
+    return new ListSubjects();
 });

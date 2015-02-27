@@ -25,13 +25,13 @@
 /*global define*/
 
 define([
+    "./views/application/ListApplication",
     "./views/history/ListHistory",
-    "./ResourceListView",
-    "./ResourceView",
-    "./ResourceEditView",
-    "./ResourceEditDialog",
-    "./UsersView",
-    "./AppsView",
+    "./views/resource/EditResource",
+    "./views/resource/ListResource",
+    "./views/share/BaseShare",
+    "./views/share/CommonShare",
+    "./views/share/DialogShare",
 
     "./models/User"
 ]);

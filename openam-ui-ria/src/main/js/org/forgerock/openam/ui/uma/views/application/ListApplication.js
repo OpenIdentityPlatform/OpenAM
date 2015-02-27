@@ -24,7 +24,7 @@
 
 /*global define, $, _ */
 
-define("org/forgerock/openam/ui/uma/UsersView", [
+define("org/forgerock/openam/ui/uma/views/application/ListApplication", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -33,8 +33,8 @@ define("org/forgerock/openam/ui/uma/UsersView", [
     "org/forgerock/openam/ui/uma/delegates/UmaDelegate"
 ], function(AbstractView, conf, eventManager, uiUtils, constants, umaDelegate) {
 
-    var UsersView = AbstractView.extend({
-        template: "templates/uma/UsersTemplate.html",
+    var ListApplication = AbstractView.extend({
+        template: "templates/uma/views/application/ListApplication.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: { },
         render: function(args, callback) {
@@ -44,5 +44,5 @@ define("org/forgerock/openam/ui/uma/UsersView", [
 
     });
 
-    return new UsersView();
+    return new ListApplication();
 });

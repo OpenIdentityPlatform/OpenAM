@@ -24,7 +24,7 @@
 
 /*global define, $, _ */
 
-define("org/forgerock/openam/ui/uma/ShareView", [
+define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -34,8 +34,8 @@ define("org/forgerock/openam/ui/uma/ShareView", [
     "org/forgerock/openam/ui/uma/util/UmaUtils",
     "org/forgerock/openam/ui/uma/models/User"
 ], function(AbstractView, conf, eventManager, uiUtils, constants, umaDelegate, umaUtils, User) {
-    var ShareView = AbstractView.extend({
-        template: "templates/uma/UmaInnerTemplate.html",
+    var CommonShare = AbstractView.extend({
+        template: "templates/uma/views/share/CommonShare.html",
         events: {
           "click input#shareButton": "onShareButtonClicked"
         },
@@ -134,5 +134,5 @@ define("org/forgerock/openam/ui/uma/ShareView", [
         }
     });
 
-    return ShareView;
+    return CommonShare;
 });

@@ -48,7 +48,7 @@ define("config/AppConfiguration", [
                         RegisterView : "org/forgerock/openam/ui/user/profile/RegisterView",
                         ChangeSecurityDataDialog : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
                         ConfirmPasswordDialog : "org/forgerock/commons/ui/user/profile/ConfirmPasswordDialog",
-                        ResourceEditDialog : "org/forgerock/openam/ui/uma/ResourceEditDialog"
+                        ResourceEditDialog : "org/forgerock/openam/ui/uma/share/DialogShare"
                     }
                 },
                 {
@@ -147,11 +147,11 @@ define("config/AppConfiguration", [
                                         "icon": "glyph-icon-user",
                                         "name": "config.AppConfiguration.Navigation.links.uma",
                                         "urls": {
-                                            "resources": {
+                                            "listResource": {
                                                 "url": "#uma/resources/",
                                                 "name": "config.AppConfiguration.Navigation.links.umaLinks.resources"
                                             },
-                                            "history": {
+                                            "listHistory": {
                                                 "url": "#uma/history/",
                                                 "name": "config.AppConfiguration.Navigation.links.umaLinks.history"
                                             },
@@ -159,7 +159,7 @@ define("config/AppConfiguration", [
                                                 "url": "#uma/users/",
                                                 "name": "config.AppConfiguration.Navigation.links.umaLinks.users"
                                             },*/
-                                            "apps": {
+                                            "listApplication": {
                                                 "url": "#uma/apps/",
                                                 "name": "config.AppConfiguration.Navigation.links.umaLinks.apps"
                                             }

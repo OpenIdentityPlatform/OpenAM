@@ -24,7 +24,7 @@
 
 /*global define, $, _, Backgrid, Backbone */
 
-define("org/forgerock/openam/ui/uma/ResourceView", [
+define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -36,8 +36,8 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
     "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
     "backgrid"
 ], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, umaUtils, router, umaDelegate, Backgrid) {
-    var ResourceView = AbstractView.extend({
-        template: "templates/uma/ResourceTemplate.html",
+    var EditResource = AbstractView.extend({
+        template: "templates/uma/views/resource/EditResource.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
             "click a#revokeAll": "revokeAll",
@@ -198,11 +198,11 @@ define("org/forgerock/openam/ui/uma/ResourceView", [
         share: function(e) {
             e.preventDefault();
             eventManager.sendEvent(constants.EVENT_SHOW_DIALOG,{
-                route: router.configuration.routes.resourceEdit,
+                route: router.configuration.routes.dialogShare,
                 args: [this.data.resourceSet.uid]
             });
         }
     });
 
-    return new ResourceView();
+    return new EditResource();
 });

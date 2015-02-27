@@ -24,7 +24,7 @@
 
 /*global define, $, _, Backgrid, Backbone*/
 
-define("org/forgerock/openam/ui/uma/ResourceListView", [
+define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -35,8 +35,8 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
     "backgrid"
 ], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, router, Backgrid) {
 
-    var ResourceListView = AbstractView.extend({
-        template: "templates/uma/ResourceListTemplate.html",
+    var ListResource = AbstractView.extend({
+        template: "templates/uma/views/resource/ListResource.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
             'click td.uri-cell': 'openPolicy'
@@ -79,7 +79,7 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
                     cell: backgridUtils.UriExtCell,
                     headerCell: backgridUtils.FilterHeaderCell,
                     href: function(rawValue, formattedValue, model){
-                        return "#uma/resources/" +  model.get('policyId') + "/activity/";
+                        return "#uma/resource/" + model.get('policyId');
                     },
                     model: true,
                     editable: false
@@ -127,7 +127,7 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
             e.preventDefault();
             var policy = $(e.currentTarget).data();
             if (policy.policyId) {
-                router.routeTo( router.configuration.routes.resourceActivity, {args: [policy.policyId], trigger: true});
+                router.routeTo( router.configuration.routes.editResource, {args: [policy.policyId], trigger: true});
             } else {
                 // throw an error message
                 console.log(e);
@@ -136,5 +136,5 @@ define("org/forgerock/openam/ui/uma/ResourceListView", [
 
     });
 
-    return new ResourceListView();
+    return new ListResource();
 });
