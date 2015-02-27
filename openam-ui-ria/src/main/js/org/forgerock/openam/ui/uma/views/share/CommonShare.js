@@ -22,117 +22,173 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, _ */
+/*global define, require, $, _ , Backbone,  */
 
-define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
+define("org/forgerock/openam/ui/uma/CommonView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
-    "org/forgerock/openam/ui/uma/util/UmaUtils",
-    "org/forgerock/openam/ui/uma/models/User"
-], function(AbstractView, conf, eventManager, uiUtils, constants, umaDelegate, umaUtils, User) {
-    var CommonShare = AbstractView.extend({
-        template: "templates/uma/views/share/CommonShare.html",
-        events: {
-          "click input#shareButton": "onShareButtonClicked"
-        },
+    "org/forgerock/openam/ui/uma/util/UmaUtils"
+], function(AbstractView, conf, eventManager, uiUtils, constants, umaDelegate, umaUtils) {
+    var ResourceSet = require("org/forgerock/openam/ui/uma/models/ResourceSet"),
+        UMAPolicy = require("org/forgerock/openam/ui/uma/models/UMAPolicy"),
+        UMAPolicyPermission = require("org/forgerock/openam/ui/uma/models/UMAPolicyPermission"),
+        UMAPolicyPermissionCollection = require("org/forgerock/openam/ui/uma/models/UMAPolicyPermissionCollection"),
+        User = require("org/forgerock/openam/ui/uma/models/User"),
+        CommonView = AbstractView.extend({
+            template: "templates/uma/views/share/CommonShare.html",
+            events: {
+              "click input#shareButton": "save"
+            },
 
-        render: function(args, callback) {
-            var self = this,
-                promise = umaUtils.getResourceSet(args[0], self.data.resourceSet);
+            load: function(id) {
+                var self = this,
+                    resourceSetPromise;
 
-            self.data.policyId = args[0];
-            self.data.selected = {};
+                this.data.policy = new UMAPolicy({
+                    policyId: id
+                });
 
-            $.when(promise).done(function(resourceSet){
-                self.data.resourceSet = resourceSet;
+                this.data.resourceSet = new ResourceSet({
+                    _id: id
+                });
+                resourceSetPromise = this.data.resourceSet.fetch();
+                resourceSetPromise
+                .done(function() {
+                    self.data.notFound = false;
+                })
+                .fail(function() {
+                    self.data.notFound = true;
+                });
 
-                self.parentRender(function(){
-                    self.$el.find('#selectUser select').selectize({
-                        valueField: 'username',
-                        labelField: 'username',
-                        searchField: 'username',
-                        create: false,
-                        load: function(query, callback) {
-                            if (query.length < self.MIN_QUERY_LENGTH) { return callback(); }
+                this.data.policyPermission = new UMAPolicyPermission();
+                this.listenTo(this.data.policyPermission, 'change', this.onPolicyPermissionChanged);
 
-                            umaDelegate.searchUsers(query)
-                            .then(function(data) {
-                                return _.map(data.result, function(username) {
-                                    return new User(username);
-                                });
-                            })
-                            .done(function(users) {
-                                callback(users);
-                            })
-                            .fail(function(event){
-                                console.error('error', event);
-                                callback();
-                            });
-                        },
-
-                        onChange: function(value) {
-                            if (value === "") {
-                                self.data.selected.user = null;
-                            } else {
-                              umaDelegate.getUser(value)
-                              .done(function(data) {
-                                  var user = new User(data.username);
-                                      user.universalid = data.universalid[0];
-
-                                  self.data.selected.user = user;
-                              })
-                              .fail(function() {
-                                  self.$el.find("#selectUser select")[0].selectize.clear();
-                                  self.enableShareButton();
-                              });
-                            }
-
-                            self.enableShareButton();
-                        }
-                    });
-
-                    self.$el.find('#selectPermission select').selectize({
-                        plugins: ['restore_on_backspace'],
-                        delimiter: ',',
-                        persist: false,
-                        create: false,
-                        hideSelected: true,
-                        onChange: function(value){
-                            self.data.selected.permissions = value;
-                            self.enableShareButton();
-                        }
+                // TODO: Should also be catching failure (umaPolicy fails if the policy is new)
+                $.when(this.data.policy.fetch(), resourceSetPromise)
+                .always(function() {
+                    self.parentRender(function() {
+                        self.renderUserSelect();
+                        self.renderPermissionSelect();
+                        self.renderInfo();
                     });
                 });
-            });
-        },
+            },
 
-        enableShareButton: function(){
-            var complete = _.every(this.$el.find(".selectize-input"), function(element) {
-                return $(element).hasClass("has-items");
-            });
-            this.$el.find('input#shareButton').prop('disabled', !complete);
-        },
+            onPolicyPermissionChanged: function(model, options) {
+                this.$el.find("#selectPermission select")[0].selectize.setValue(model.get("scopes"));
+                this.$el.find('input#shareButton').prop('disabled', !model.isValid());
+            },
 
-        onShareButtonClicked: function() {
-          var self = this,
-              permissions = [{
-                  subject: this.data.selected.user.universalid,
-                  scopes: this.data.selected.permissions
-              }];
+            render: function(args, callback) {
+                this.load(args[0]);
 
-          umaDelegate.createPolicy(conf.loggedUser.username, this.data.policyId, permissions).done(function(data, textStatus, xhr) {
-              eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
-              self.$el.find("#selectUser select")[0].selectize.clear();
-              self.$el.find("#selectPermission select")[0].selectize.clear();
-          }).fail(function(xhr, textStatus, errorThrown) {
-              eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedFail");
-          });
-        }
-    });
+                if(callback) { callback(); }
+            },
 
-    return CommonShare;
+            renderInfo: function() {
+                var text = $.t("uma.share.info", { context: "none" });
+                if(this.data.policy.get("permissions").length) {
+                    text = $.t("uma.share.info", { count: this.data.policy.get("permissions").length });
+                }
+                this.$el.find(".policy-footer > div").text(text);
+            },
+
+            renderPermissionSelect: function() {
+                var self = this;
+
+                this.$el.find('#selectPermission select').selectize({
+                    plugins: ['restore_on_backspace'],
+                    delimiter: ',',
+                    persist: false,
+                    create: false,
+                    hideSelected: true,
+                    onChange: function(values) {
+                        // TODO: This is not ideal, reset from defaults?
+                        values = values || [];
+                        self.data.policyPermission.set("scopes", values);
+                    }
+                });
+            },
+
+            renderUserSelect: function() {
+                var self = this;
+
+                this.$el.find('#selectUser select').selectize({
+                    valueField: 'username',
+                    labelField: 'username',
+                    searchField: 'username',
+                    create: false,
+                    load: function(query, callback) {
+                        if (query.length < self.MIN_QUERY_LENGTH) { return callback(); }
+
+                        umaDelegate.searchUsers(query)
+                        .then(function(data) {
+                            return _.map(data.result, function(username) {
+                                return new User(username);
+                            });
+                        })
+                        .done(function(users) {
+                            callback(users);
+                        })
+                        .fail(function(event){
+                            console.error('error', event);
+                            callback();
+                        });
+                    },
+                    onChange: function(value) {
+                        self.data.policyPermission.set("subject", value);
+
+                        if(value) {
+                            umaDelegate.getUser(value)
+                            .done(function(data) {
+                                var universalID = data.universalid[0],
+                                    existingPolicyPermission = self.data.policy.get("permissions").findWhere({subject: universalID});
+
+                                self.data.policyPermission.set("subject", universalID);
+                                if(existingPolicyPermission) {
+                                    self.data.policyPermission.set("scopes", existingPolicyPermission.get("scopes"));
+                                }
+                            });
+                        }
+                    }
+                });
+            },
+
+            reset: function() {
+                this.data.policyPermission.clear().set(this.data.policyPermission.defaults);
+
+                this.$el.find("#selectUser select")[0].selectize.clear();
+                this.$el.find("#selectPermission select")[0].selectize.clear();
+                this.$el.find('input#shareButton').prop('disabled', true);
+
+                this.renderInfo();
+            },
+
+            save: function() {
+                var self = this,
+                    existing = this.data.policy.get("permissions").findWhere({subject: self.data.policyPermission.get("subject")});
+
+                if(existing) {
+                    existing.set(self.data.policyPermission.attributes);
+                } else {
+                    this.data.policy.get("permissions").add(self.data.policyPermission);
+                }
+
+                this.data.policy.save()
+                .done(function(response) {
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
+
+                    self.reset();
+                })
+                .fail(function() {
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedFail");
+                });
+            }
+        });
+
+    return CommonView;
 });

@@ -393,6 +393,9 @@
             "people": "Search for people",
             "permission": "Select Permission",
             "share": "Share",
+            "info": "Shared with __count__ person",
+            "info_plural": "Shared with __count__ people",
+            "info_none": "Not shared",
             "messages": {
                 "success": "Resource successfully shared",
                 "fail": "Failed to share resource"

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,21 +23,22 @@
  */
 
 /*global define*/
+define("org/forgerock/openam/ui/uma/models/ResourceSet", [
+    "backbone",
+    "org/forgerock/openam/ui/uma/util/URLHelper"
+], function(Backbone, URLHelper) {
+    return Backbone.Model.extend({
+        idAttribute: "_id",
+        sync: function(method, model, options) {
+            options.beforeSend = function(xhr) {
+                xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
+            };
 
-define([
-    "./models/ResourceSet",
-    "./models/UMAPolicy",
-    "./models/UMAPolicyPermission",
-    "./models/UMAPolicyPermissionCollection",
-    "./models/User",
-
-    "./views/application/ListApplication",
-    "./views/history/ListHistory",
-    "./views/resource/EditResource",
-    "./views/resource/ListResource",
-    "./views/share/BaseShare",
-    "./views/share/CommonShare",
-    "./views/share/DialogShare",
-
-    "./AppsView"
-]);
+            return Backbone.Model.prototype.sync.call(this, method, model, options);
+        },
+        urlRoot:  function() {
+            // FIXME: Has to be wrapped in a clojure as __username__ can't resolve early on. Race condition
+            return URLHelper.substitute("__api__/users/__username__/oauth2/resourcesets");
+        }
+    });
+});

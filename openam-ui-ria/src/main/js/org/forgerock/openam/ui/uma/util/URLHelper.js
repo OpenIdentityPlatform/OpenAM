@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,21 +23,18 @@
  */
 
 /*global define*/
+define("org/forgerock/openam/ui/uma/util/URLHelper", [
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/Constants"
+], function(Configuration, Constants) {
+    return {
+        substitute: function(url) {
+            url = url.replace("__api__", Constants.host + "/" + Constants.context + "/json")
+                     .replace("__host__", Constants.host)
+                     .replace("__context__", Constants.context)
+                     .replace("__username__", Configuration.loggedUser.username);
 
-define([
-    "./models/ResourceSet",
-    "./models/UMAPolicy",
-    "./models/UMAPolicyPermission",
-    "./models/UMAPolicyPermissionCollection",
-    "./models/User",
-
-    "./views/application/ListApplication",
-    "./views/history/ListHistory",
-    "./views/resource/EditResource",
-    "./views/resource/ListResource",
-    "./views/share/BaseShare",
-    "./views/share/CommonShare",
-    "./views/share/DialogShare",
-
-    "./AppsView"
-]);
+            return url;
+        }
+    };
+});

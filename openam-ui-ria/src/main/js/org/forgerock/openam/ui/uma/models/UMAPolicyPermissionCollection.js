@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,21 +23,11 @@
  */
 
 /*global define*/
-
-define([
-    "./models/ResourceSet",
-    "./models/UMAPolicy",
-    "./models/UMAPolicyPermission",
-    "./models/UMAPolicyPermissionCollection",
-    "./models/User",
-
-    "./views/application/ListApplication",
-    "./views/history/ListHistory",
-    "./views/resource/EditResource",
-    "./views/resource/ListResource",
-    "./views/share/BaseShare",
-    "./views/share/CommonShare",
-    "./views/share/DialogShare",
-
-    "./AppsView"
-]);
+define("org/forgerock/openam/ui/uma/models/UMAPolicyPermissionCollection", [
+    "backbone",
+    "org/forgerock/openam/ui/uma/models/UMAPolicyPermission"
+], function(Backbone, UMAPolicyPermission) {
+    return Backbone.Collection.extend({
+        model: UMAPolicyPermission
+    });
+});
