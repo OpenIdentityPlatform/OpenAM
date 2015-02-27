@@ -24,9 +24,6 @@
  *
  * $Id: AuthViewBeanBase.java,v 1.13 2010/01/22 03:31:35 222713 Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2013-2015 Nomura Research Institute, Ltd.
  */
@@ -41,6 +38,10 @@ import com.iplanet.jato.view.html.StaticTextField;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.shared.encode.Base64;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.ResourceBundle;
@@ -49,9 +50,6 @@ import java.util.Set;
 import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.io.UnsupportedEncodingException;
 
 /**
  * This class is a default implementation of <code>ViewBean</code> auth UI.
@@ -209,28 +207,20 @@ public abstract class AuthViewBeanBase extends ViewBeanBase {
     public String getValidatedInputURL(String inputURL, String encoded, 
         HttpServletRequest request) {
         String returnURL = "";
-        if ((inputURL != null) && (inputURL.length() != 0) && 
-            (!inputURL.equalsIgnoreCase("null"))){
-            if ((encoded == null) || (encoded.length() == 0) || 
-                (encoded.equals("false"))) {
-                returnURL = getEncodedInputURL(inputURL, request);
-            } else {
-                try {
-                    String msg = new String(Base64.decode(inputURL), "UTF-8");
-                    returnURL = inputURL;
-                } catch (RuntimeException rtex) {
-                    loginDebug.warning(
-                        "getValidatedInputURL:RuntimeException");                
-                } catch (UnsupportedEncodingException ueex) {
-                    loginDebug.warning("getValidatedInputURL:" + 
-                                       "UnsupportedEncodingException");                
-                }  
+        if (inputURL != null && !inputURL.isEmpty() && !inputURL.equalsIgnoreCase("null")) {
+            if (Boolean.parseBoolean(encoded)) {
+                byte[] decoded = Base64.decode(inputURL);
+                if (decoded == null || decoded.length == 0) {
+                    return returnURL;
+                }
+
+                inputURL = new String(decoded, Charset.forName("UTF-8"));
             }
+            returnURL = getEncodedInputURL(inputURL, request);
         }
 
         if (loginDebug.messageEnabled()) {
-            loginDebug.message("getValidatedInputURL:returnURL : " 
-                               + returnURL);
+            loginDebug.message("getValidatedInputURL:returnURL : " + returnURL);
         }
         return returnURL;
     }
