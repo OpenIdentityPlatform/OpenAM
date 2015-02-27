@@ -126,7 +126,7 @@ define("config/routes/AMRoutesConfig", [
             pattern: "uma/resources/?/edit/"
         },
         "history": {
-            view: "org/forgerock/openam/ui/uma/HistoryView",
+            view: "org/forgerock/openam/ui/uma/views/history/ListHistory",
             role: "ui-user,ui-admin",
             url: /^uma\/history\/$/,
             pattern: "uma/history/"

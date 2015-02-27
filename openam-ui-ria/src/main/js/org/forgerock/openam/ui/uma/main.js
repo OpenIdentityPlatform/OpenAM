@@ -25,7 +25,7 @@
 /*global define*/
 
 define([
-    "./HistoryView",
+    "./views/history/ListHistory",
     "./ResourceListView",
     "./ResourceView",
     "./ResourceEditView",
