@@ -1055,11 +1055,15 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
             try {
                 String userPassword = value.get(USER_PASSWORD).asString();
-                if (userPassword == null || userPassword.isEmpty()) {
+                if (isNullOrEmpty(userPassword)) {
                     throw new BadRequestException("'" + USER_PASSWORD + "' attribute not set in JSON content.");
                 }
 
                 String currentPassword = value.get(CURRENT_PASSWORD).asString();
+                if (isNullOrEmpty(currentPassword)) {
+                    throw new BadRequestException("'" + CURRENT_PASSWORD + "' attribute not set in JSON content.");
+                }
+
                 if (!checkValidPassword(resourceId, currentPassword.toCharArray(), realm)) {
                     throw new BadRequestException("Invalid Password");
                 }
