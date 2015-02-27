@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.provider;
@@ -66,12 +66,8 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
                                     String realm,
                                     String restLogoutUriElement,
                                     UrlConstituentCatenator urlConstituentCatenator) throws MalformedURLException {
-        StringBuilder sb = new StringBuilder(urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, jsonRestRoot));
-        if (!AMSTSConstants.ROOT_REALM.equals(realm)) {
-            sb = urlConstituentCatenator.catentateUrlConstituent(sb, realm);
-        }
-        sb = urlConstituentCatenator.catentateUrlConstituent(sb, restLogoutUriElement);
-        return new URL(sb.toString());
+
+        return new URL(urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement));
     }
 
     @Override

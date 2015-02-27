@@ -19,7 +19,7 @@
     <display-name>OpenAM STS</display-name>
 
     <listener>
-        <listener-class>org.forgerock.openam.sts.soap.publish.SoapSTSPublishContextListener</listener-class>
+        <listener-class>org.forgerock.openam.sts.soap.bootstrap.SoapSTSContextListener</listener-class>
     </listener>
     <!--
     Non-spring-based CXF requires a subclass of the CXFNonSpringServlet to be the servlet serving the non-spring

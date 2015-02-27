@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.sts.soap.publish;
 
-import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -28,6 +27,7 @@ import org.forgerock.guava.common.collect.Maps;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSPublishException;
+import org.forgerock.openam.sts.soap.config.SoapSTSInjectorHolder;
 import org.forgerock.openam.sts.soap.config.SoapSTSInstanceModule;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 
@@ -96,46 +96,51 @@ public class SoapSTSInstancePublisherImpl implements SoapSTSInstancePublisher {
 
     @Override
     public void run() {
-        Set<SoapSTSInstanceConfig> serverProvidedConfigurations;
+        //run method will be in a global try/catch(Exception) block because an uncaught exception will terminate subsequent runs
         try {
-            /*
-            When the ScheduledExecutorService#shutdownNow is called, running threads will be interrupted. Respond ASAP.
-             */
-            if (Thread.currentThread().isInterrupted() ) {
+            Set<SoapSTSInstanceConfig> serverProvidedConfigurations;
+            try {
+                /*
+                When the ScheduledExecutorService#shutdownNow is called, running threads will be interrupted. Respond ASAP.
+                */
+                if (Thread.currentThread().isInterrupted()) {
+                    return;
+                }
+                serverProvidedConfigurations = publishServiceConsumer.getPublishedInstances();
+            } catch (ResourceException e) {
+                /*
+                Don't log to error - many log messages will be generated as this Runnable runs periodically, and this
+                exception is thrown if the OpenAM mothership is down.
+                */
+                logger.warn("Soap sts instances published on the home OpenAM server cannot be exposed as a " +
+                        "web-service because their configuration state could not be obtained from the home server. " +
+                        "Exception: " + e, e);
                 return;
             }
-            serverProvidedConfigurations = publishServiceConsumer.getPublishedInstances();
-        } catch (STSPublishException e) {
             /*
-            Don't log to error - many log messages will be generated as this Runnable runs periodically, and this
-            exception is thrown if the OpenAM mothership is down.
-             */
-            logger.warn("Soap sts instances published on the home OpenAM server cannot be exposed as a " +
-                    "web-service because their configuration state could not be obtained from the home server. " +
-                    "Exception: " + e, e);
-            return;
-        }
-        /*
-        When the ScheduledExecutorService#shutdownNow is called, running threads will be interrupted. Respond ASAP.
-         */
-        if (Thread.currentThread().isInterrupted() ) {
-            return;
-        }
-        /*
-        Three cases must be handled:
-        1. a new instance has been published
-        2. an instances has been removed
-        3. an instance has been updated
-        The guava Maps#difference method will make this easy - first marshal the returned instances to map view
-        equivalent to that maintained in publishedAndExposedInstances.
-         */
-        Map<String, ConfigAndServerHolder> serverProvidedConfigurationMap =
-                marshalPublishedConfigToCommonFormat(serverProvidedConfigurations);
-        MapDifference<String, ConfigAndServerHolder> diff = Maps.difference(publishedAndExposedInstances, serverProvidedConfigurationMap);
+            When the ScheduledExecutorService#shutdownNow is called, running threads will be interrupted. Respond ASAP.
+            */
+            if (Thread.currentThread().isInterrupted()) {
+                return;
+            }
+            /*
+            Three cases must be handled:
+            1. a new instance has been published
+            2. an instances has been removed
+            3. an instance has been updated
+            The guava Maps#difference method will make this easy - first marshal the returned instances to map view
+            equivalent to that maintained in publishedAndExposedInstances.
+            */
+            Map<String, ConfigAndServerHolder> serverProvidedConfigurationMap =
+                    marshalPublishedConfigToCommonFormat(serverProvidedConfigurations);
+            MapDifference<String, ConfigAndServerHolder> diff = Maps.difference(publishedAndExposedInstances, serverProvidedConfigurationMap);
 
-        exposeNewInstances(diff.entriesOnlyOnRight().values());
-        removeDeletedInstances(diff.entriesOnlyOnLeft().values());
-        updateInstances(diff.entriesDiffering().values());
+            exposeNewInstances(diff.entriesOnlyOnRight().values());
+            removeDeletedInstances(diff.entriesOnlyOnLeft().values());
+            updateInstances(diff.entriesDiffering().values());
+        } catch (Exception e) {
+            logger.error("Unexpected exception caught in SoapSTSInstancePublisherImpl#run: " + e, e);
+        }
     }
 
     /*
@@ -214,19 +219,21 @@ public class SoapSTSInstancePublisherImpl implements SoapSTSInstancePublisher {
     private void publishInstance(SoapSTSInstanceConfig instanceConfig) throws STSPublishException {
         Injector injector;
         try {
-            injector = Guice.createInjector(new SoapSTSInstanceModule(instanceConfig));
+            injector = SoapSTSInjectorHolder.getInstance(Key.get(Injector.class))
+                    .createChildInjector(new SoapSTSInstanceModule(instanceConfig));
+            final Server server = soapSTSInstanceLifecycleManager.exposeSTSInstanceAsWebService(
+                    injector.getInstance(Key.get(new TypeLiteral<Map<String, Object>>() {},
+                            Names.named(AMSTSConstants.STS_WEB_SERVICE_PROPERTIES))),
+                    injector.getInstance(SecurityTokenServiceProvider.class),
+                    instanceConfig);
+            publishedAndExposedInstances.put(instanceConfig.getDeploymentSubPath(),
+                    new ConfigAndServerHolder(instanceConfig, server));
+            //TODO: add the sts element, or whatever is exposed in web.xml to the log message?
+            logger.info("The following soap-sts instance has been successfully exposed at "
+                    + instanceConfig.getDeploymentSubPath() + ":\n" + instanceConfig);
         } catch (Exception e) {
             throw new STSPublishException(ResourceException.INTERNAL_ERROR, "Could not create injector corresponding to the " +
                     "to-be-published instance " + instanceConfig.getDeploymentSubPath() + "; The exception: " + e, e);
         }
-        final Server server = soapSTSInstanceLifecycleManager.exposeSTSInstanceAsWebService(
-                injector.getInstance(Key.get(new TypeLiteral<Map<String, Object>>() {}, Names.named(AMSTSConstants.STS_WEB_SERVICE_PROPERTIES))),
-                injector.getInstance(SecurityTokenServiceProvider.class),
-                instanceConfig);
-        publishedAndExposedInstances.put(instanceConfig.getDeploymentSubPath(),
-                new ConfigAndServerHolder(instanceConfig, server));
-        //TODO: add the sts element, or whatever is exposed in web.xml to the log message?
-        logger.info("The following soap-sts instance has been successfully exposed at "
-                + instanceConfig.getDeploymentSubPath() + ":\n" + instanceConfig);
     }
 }

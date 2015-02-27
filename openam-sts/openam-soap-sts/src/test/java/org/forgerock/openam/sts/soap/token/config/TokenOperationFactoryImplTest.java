@@ -36,7 +36,7 @@ import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
-import org.forgerock.openam.sts.soap.publish.PublishServiceAccessTokenProvider;
+import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.soap.token.provider.SoapSamlTokenProvider;
 import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapper;
 import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapperImpl;
@@ -103,7 +103,7 @@ public class TokenOperationFactoryImplTest {
             bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
             bind(XmlTokenAuthnContextMapper.class).to(XmlTokenAuthnContextMapperImpl.class);
             bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
-            bind(PublishServiceAccessTokenProvider.class).toInstance(mock(PublishServiceAccessTokenProvider.class));
+            bind(SoapSTSAccessTokenProvider.class).toInstance(mock(SoapSTSAccessTokenProvider.class));
             bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class);
             bind(HttpURLConnectionWrapperFactory.class);
         }

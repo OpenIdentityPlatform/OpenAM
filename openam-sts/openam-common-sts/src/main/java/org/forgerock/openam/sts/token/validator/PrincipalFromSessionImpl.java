@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.validator;
@@ -26,7 +26,6 @@ import org.forgerock.openam.sts.STSPrincipal;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.utils.JsonValueBuilder;
-import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -51,7 +50,6 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
     private final String amSessionCookieName;
     private final String crestVersionUsersService;
     private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
-    private final Logger logger;
 
     @Inject
     public PrincipalFromSessionImpl(
@@ -62,8 +60,7 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
             @Named(AMSTSConstants.REALM) String realm,
             @Named(AMSTSConstants.CREST_VERSION_USERS_SERVICE) String crestVersionUsersService,
             UrlConstituentCatenator urlConstituentCatenator,
-            HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
-            Logger logger) {
+            HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory) {
         this.amDeploymentUrl = amDeploymentUrl;
         this.amJsonRestBase = jsonRestBase;
         this.amRestIdFromSessionUriElement = idFromSessionUriElement;
@@ -72,7 +69,6 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
         this.crestVersionUsersService = crestVersionUsersService;
         this.urlConstituentCatenator = urlConstituentCatenator;
         this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
-        this.logger = logger;
     }
     @Override
     public Principal getPrincipalFromSession(String sessionId) throws TokenValidationException {
@@ -85,12 +81,7 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
      * @return A String representing the url of OpenAM's Restful principal from session id service
      */
     private String constitutePrincipalFromSessionUrl() {
-        StringBuilder sb = new StringBuilder(urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, amJsonRestBase));
-        if (!AMSTSConstants.ROOT_REALM.equals(realm)) {
-            sb = urlConstituentCatenator.catentateUrlConstituent(sb, realm);
-        }
-        sb = urlConstituentCatenator.catentateUrlConstituent(sb, amRestIdFromSessionUriElement);
-        return sb.toString();
+        return urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, amJsonRestBase, realm, amRestIdFromSessionUriElement);
     }
 
     private Principal obtainPrincipalFromSession(String sessionToUsernameUrl, String sessionId) throws TokenValidationException {

@@ -47,10 +47,10 @@ public enum SoapSTSInjectorHolder {
 
     /**
      * Returns the appropriate instance for the given injection key.
-     * Avoid using this method, in favor of having Guice inject your dependencies ahead of time. The
-     * SoapSTSInstanceModule uses it to obtain the global url elements which allow each Rest STS instance
-     * to integrate with OpenAM -e.g. /authenticate, /sessions?_action=logout, /users/?_action=idFromSession, etc). It
-     * is also used to obtain the appropriate version headers for each of these services.
+     * Avoid using this method, in favor of having Guice inject your dependencies ahead of time. This method is called
+     * by the STSBroker, to obtain the SoapSTSLifecycle implementation which bootstraps the soap sts context. It is also
+     * used by the SoapSTSContextListener, to shut-down the soap sts context, and by the SoapSTSInstancePublisherImpl, to
+     * get this common injector, which is the parent of all Injectors corresponding to published soap-sts instances.
      * @param key The key that defines the class to get.
      * @param <T> The type of class defined by the key.
      * @return An instance of the class defined by the key.

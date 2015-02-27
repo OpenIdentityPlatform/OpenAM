@@ -32,7 +32,7 @@ import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
-import org.forgerock.openam.sts.soap.publish.PublishServiceAccessTokenProvider;
+import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.soap.token.provider.SoapSamlTokenProvider;
 import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapper;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
@@ -59,7 +59,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
     private final XmlTokenAuthnContextMapper xmlTokenAuthnContextMapper;
     private final XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller;
     private final Provider<AMSessionInvalidator> amSessionInvalidatorProvider;
-    private final PublishServiceAccessTokenProvider publishServiceAccessTokenProvider; //TODO: temporary, until the soap-sts authz requirements solidified
+    private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
     private final Logger logger;
 
     /**
@@ -78,7 +78,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
             XmlTokenAuthnContextMapper xmlTokenAuthnContextMapper,
             XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller,
             Provider<AMSessionInvalidator> amSessionInvalidatorProvider,
-            PublishServiceAccessTokenProvider publishServiceAccessTokenProvider,
+            SoapSTSAccessTokenProvider soapSTSAccessTokenProvider,
             Logger logger) {
         this.wssUsernameTokenValidatorProvider = wssUsernameTokenValidatorProvider;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
@@ -90,7 +90,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
         this.xmlTokenAuthnContextMapper = xmlTokenAuthnContextMapper;
         this.amSessionTokenXmlMarshaller = amSessionTokenXmlMarshaller;
         this.amSessionInvalidatorProvider = amSessionInvalidatorProvider;
-        this.publishServiceAccessTokenProvider = publishServiceAccessTokenProvider;
+        this.soapSTSAccessTokenProvider = soapSTSAccessTokenProvider;
         this.logger = logger;
     }
     /**
@@ -158,7 +158,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
                     .xmlUtilities(xmlUtilities)
                     .authnContextMapper(xmlTokenAuthnContextMapper)
                     .amSessionTokenXmlMarshaller(amSessionTokenXmlMarshaller)
-                    .publishServiceAccessTokenProvider(publishServiceAccessTokenProvider)
+                    .soapSTSAccessTokenProvider(soapSTSAccessTokenProvider)
                     .logger(logger)
                     .build();
         }
@@ -178,7 +178,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
                     .xmlUtilities(xmlUtilities)
                     .authnContextMapper(xmlTokenAuthnContextMapper)
                     .amSessionTokenXmlMarshaller(amSessionTokenXmlMarshaller)
-                    .publishServiceAccessTokenProvider(publishServiceAccessTokenProvider)
+                    .soapSTSAccessTokenProvider(soapSTSAccessTokenProvider)
                     .logger(logger)
                     .build();
         } else {

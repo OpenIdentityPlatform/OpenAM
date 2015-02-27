@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 22014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token;
+
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * @see org.forgerock.openam.sts.token.UrlConstituentCatenator
@@ -22,21 +24,43 @@ package org.forgerock.openam.sts.token;
 public class UrlConstituentCatenatorImpl implements UrlConstituentCatenator {
     private static final String FORWARD_SLASH = "/";
     private static final String QUESTION_MARK = "?";
-    //TODO: varargs here - why just two constituents?
-    public String catenateUrlConstituents(String first, String second) {
-        if ((first==null) || (second==null)) {
-            throw new IllegalArgumentException("Arguments cannot be null.");
+    private static final char FORWARD_SLASH_CHAR = '/';
+
+    @Override
+    public String catenateUrlConstituents(String... constituents) {
+        StringBuilder aggregator = new StringBuilder(constituents.length);
+        boolean queryParamDelimiterEncountered = false;
+        for (String constituent : constituents) {
+            queryParamDelimiterEncountered |= catenateUrlConstituentsInternal(aggregator, constituent,
+                    queryParamDelimiterEncountered);
         }
-        if (!first.endsWith(FORWARD_SLASH) && !second.startsWith(FORWARD_SLASH) && !second.startsWith(QUESTION_MARK)) {
-            return new StringBuilder(first).append(FORWARD_SLASH).append(second).toString();
-        } else if (first.endsWith(FORWARD_SLASH) && second.startsWith(FORWARD_SLASH)) {
-            return new StringBuilder(first).append(second.substring(1)).toString();
-        } else {
-            return new StringBuilder(first).append(second).toString();
-        }
+        return aggregator.toString();
     }
 
-    public StringBuilder catentateUrlConstituent(StringBuilder existingUrl, String toBeAddedConstituent) {
-        return new StringBuilder(catenateUrlConstituents(existingUrl.toString(), toBeAddedConstituent));
+    private boolean catenateUrlConstituentsInternal(StringBuilder aggregator, String toBeAddedConstituent,
+                                                    boolean queryParamDelimiterPreviouslyEncountered) {
+        if (aggregator == null) {
+            throw new IllegalArgumentException("StringBuilder parameter cannot be null.");
+        }
+        if (StringUtils.isEmpty(toBeAddedConstituent)) {
+            return false;
+        }
+        boolean newQueryParamDelimiterEncountered = toBeAddedConstituent.contains(QUESTION_MARK) ||
+                (!queryParamDelimiterPreviouslyEncountered && aggregator.toString().contains(QUESTION_MARK));
+        int aggregatorLength = aggregator.length();
+        if (aggregatorLength == 0) {
+            aggregator.append(toBeAddedConstituent);
+        } else if ((FORWARD_SLASH_CHAR != aggregator.charAt(aggregatorLength - 1)) &&
+                !toBeAddedConstituent.startsWith(FORWARD_SLASH) && !toBeAddedConstituent.startsWith(QUESTION_MARK)
+                && !newQueryParamDelimiterEncountered && !queryParamDelimiterPreviouslyEncountered) {
+            aggregator.append(FORWARD_SLASH).append(toBeAddedConstituent);
+        } else if ((FORWARD_SLASH_CHAR == aggregator.charAt(aggregatorLength - 1)) && toBeAddedConstituent.startsWith(FORWARD_SLASH)) {
+            aggregator.append(toBeAddedConstituent.substring(1));
+        } else if ((FORWARD_SLASH_CHAR == aggregator.charAt(aggregatorLength - 1)) && toBeAddedConstituent.startsWith(QUESTION_MARK)) {
+            aggregator.deleteCharAt(aggregatorLength - 1).append(toBeAddedConstituent);
+        } else {
+            aggregator.append(toBeAddedConstituent);
+        }
+        return newQueryParamDelimiterEncountered;
     }
 }

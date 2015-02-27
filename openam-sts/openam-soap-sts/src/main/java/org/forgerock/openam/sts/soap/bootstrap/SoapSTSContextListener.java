@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.soap.publish;
+package org.forgerock.openam.sts.soap.bootstrap;
 
 import com.google.inject.Key;
 import org.forgerock.openam.sts.soap.config.SoapSTSInjectorHolder;
@@ -32,13 +32,13 @@ import javax.servlet.ServletContextListener;
  * this process cannot be initialized until after the STSBroker servlet has been initialized. Thus this initialization will
  * occur in the STSBroker#loadBus method, and the STSBroker servlet will be a load-on-startup servlet.
  */
-public class SoapSTSPublishContextListener implements ServletContextListener {
+public class SoapSTSContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        SoapSTSInjectorHolder.getInstance(Key.get(SoapSTSPublishPoller.class)).shutdownPublishPolling();
+        SoapSTSInjectorHolder.getInstance(Key.get(SoapSTSLifecycle.class)).shutdown();
     }
 }

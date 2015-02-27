@@ -32,14 +32,13 @@ import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSRuntimeException;
-import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
-import org.forgerock.openam.sts.soap.publish.PublishServiceAccessTokenProvider;
+import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
@@ -65,8 +64,7 @@ public class SoapSamlTokenProvider implements TokenProvider {
         private XMLUtilities xmlUtilities;
         private XmlTokenAuthnContextMapper authnContextMapper;
         private XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller;
-        //TODO: temporary re-use prior to solidifying the soap-sts authn/authz details
-        private PublishServiceAccessTokenProvider publishServiceAccessTokenProvider;
+        private SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
         private Logger logger;
 
         public SoapSamlTokenProviderBuilder tokenGenerationServiceConsumer(TokenGenerationServiceConsumer tokenGenerationServiceConsumer) {
@@ -109,8 +107,8 @@ public class SoapSamlTokenProvider implements TokenProvider {
             return this;
         }
 
-        public SoapSamlTokenProviderBuilder publishServiceAccessTokenProvider(PublishServiceAccessTokenProvider publishServiceAccessTokenProvider) {
-            this.publishServiceAccessTokenProvider = publishServiceAccessTokenProvider;
+        public SoapSamlTokenProviderBuilder soapSTSAccessTokenProvider(SoapSTSAccessTokenProvider soapSTSAccessTokenProvider) {
+            this.soapSTSAccessTokenProvider = soapSTSAccessTokenProvider;
             return this;
         }
 
@@ -132,8 +130,7 @@ public class SoapSamlTokenProvider implements TokenProvider {
     private final XMLUtilities xmlUtilities;
     private final XmlTokenAuthnContextMapper authnContextMapper;
     private final XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller;
-    //TODO: temporary re-use prior to solidifying the soap-sts authn/authz details
-    private final PublishServiceAccessTokenProvider publishServiceAccessTokenProvider;
+    private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
     private final Logger logger;
 
     /*
@@ -148,7 +145,7 @@ public class SoapSamlTokenProvider implements TokenProvider {
         this.xmlUtilities = builder.xmlUtilities;
         this.authnContextMapper = builder.authnContextMapper;
         this.amSessionTokenXmlMarshaller = builder.amSessionTokenXmlMarshaller;
-        this.publishServiceAccessTokenProvider = builder.publishServiceAccessTokenProvider;
+        this.soapSTSAccessTokenProvider = builder.soapSTSAccessTokenProvider;
         this.logger = builder.logger;
     }
 
@@ -557,15 +554,15 @@ public class SoapSamlTokenProvider implements TokenProvider {
                     "Unexpected SAML2SubjectConfirmation in AMSAMLTokenProvider: " + subjectConfirmation);
         } finally {
             if (consumptionToken != null) {
-                publishServiceAccessTokenProvider.invalidatePublishServiceAccessToken(consumptionToken);
+                soapSTSAccessTokenProvider.invalidateAccessToken(consumptionToken);
             }
         }
     }
 
     private String getTokenGenerationServiceConsumptionToken() throws TokenCreationException {
         try {
-            return publishServiceAccessTokenProvider.getPublishServiceAccessToken();
-        } catch (STSPublishException e) {
+            return soapSTSAccessTokenProvider.getAccessToken();
+        } catch (ResourceException e) {
             throw new TokenCreationException(e.getCode(), e.getMessage(), e);
         }
     }

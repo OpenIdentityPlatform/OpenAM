@@ -24,8 +24,8 @@ import java.net.URL;
  * @see org.forgerock.openam.sts.HttpURLConnectionFactory
  */
 public class DefaultHttpURLConnectionFactory implements HttpURLConnectionFactory {
-    private static final int READ_TIMEOUT = 30000;
-    private static final int CONNECT_TIMEOUT = 10000;
+    private static final int READ_TIMEOUT = 10000;
+    private static final int CONNECT_TIMEOUT = 5000;
     @Override
     public HttpURLConnection getHttpURLConnection(URL url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();

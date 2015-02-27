@@ -17,7 +17,6 @@
 package org.forgerock.openam.sts.soap.config;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
@@ -26,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.inject.Provider;
 
-import com.google.inject.name.Names;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
@@ -51,7 +49,6 @@ import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.soap.STSEndpoint;
 import org.forgerock.openam.sts.soap.SoapSTSCallbackHandler;
-import org.forgerock.openam.sts.soap.publish.PublishServiceAccessTokenProvider;
 import org.forgerock.openam.sts.soap.token.config.TokenIssueOperationProvider;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactory;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactoryImpl;
@@ -103,16 +100,13 @@ import org.slf4j.Logger;
  *
  */
 public class SoapSTSInstanceModule extends AbstractModule {
-
     private final SoapSTSInstanceConfig stsInstanceConfig;
-
 
     public SoapSTSInstanceModule(SoapSTSInstanceConfig stsInstanceConfig) {
         this.stsInstanceConfig = stsInstanceConfig;
     }
 
     public void configure() {
-//        bind(AMTokenCache.class).to(AMTokenCacheImpl.class).in(Scopes.SINGLETON);
         bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class).in(Scopes.SINGLETON);
         bind(AMTokenParser.class).to(AMTokenParserImpl.class);
 
@@ -175,16 +169,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
          */
         bind(new TypeLiteral<List<TokenDelegationHandler>>(){}).toProvider(TokenDelegationHandlersProvider.class);
 
-    }
-
-    //TODO: Temporary binding for providing token needed by TGS - replace with final binding. Also should we be
-    //referencing global binding state in this fashion - can't bind the PublishServiceAccessTokenProviderImpl locally,
-    //or else I will have to bind the properties, or at least the interface/impl that wraps the decryption of the
-    //username and password properties - functionality which will be encapsulated anyways.
-    @Provides
-    @Singleton
-    PublishServiceAccessTokenProvider getAccessTokenProvider() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(PublishServiceAccessTokenProvider.class));
     }
 
     /**
@@ -336,13 +320,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
         return stsInstanceConfig.getDeploymentConfig().getAmDeploymentUrl();
     }
 
-    @Provides
-    @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME)
-    String getAMSessionCookieName() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
-                Names.named(SoapSTSModule.AM_SESSION_COOKIE_NAME_PROPERTY_KEY)));
-    }
-
     /*
     This method is used to identify the soap sts instance. This identification is necessary when consuming
     the TokenGenerationService, as it is used to look-up the sts-instance-specific configuration state
@@ -386,11 +363,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
     }
 
     @Provides
-    Logger getSlf4jLogger() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(Logger.class));
-    }
-
-    @Provides
     @Inject
     AMSessionInvalidator getAMSessionInvalidator(@Named(AMSTSConstants.AM_DEPLOYMENT_URL) String amDeploymentUrl,
                                                  @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRestRoot,
@@ -408,91 +380,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
             //TODO: throwing providers?
             throw new RuntimeException("URL elements passed to the AMSessionInvalidator constitute a malformed url: " + e, e);
         }
-    }
-
-    /*
-    The following five strings are used to constitute the various urls used to consume various restful services - e.g.
-     authentication, session, token-generation-service, etc.
-     */
-
-    @Provides
-    @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT)
-    String getJsonRoot() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
-                Names.named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT)));
-    }
-
-    @Provides
-    @Singleton
-    @Named (AMSTSConstants.REST_AUTHN_URI_ELEMENT)
-    String restAuthnUriElement() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
-                Names.named(AMSTSConstants.REST_AUTHN_URI_ELEMENT)));
-    }
-
-
-    @Provides
-    @Singleton
-    @Named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT)
-    String restLogoutUriElement() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
-                Names.named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT)));
-    }
-
-    @Provides
-    @Singleton
-    @Named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT)
-    String restAMTokenValidationUriElement() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
-                Names.named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT)));
-    }
-
-    @Provides
-    @Singleton
-    @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
-    String tokenGenerationServiceUriElement() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
-                Names.named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)));
-    }
-
-    /*
-     * The value corresponding to the Accept-API-Version header specifying the version of CREST services to consume. Note
-     * that the soap-sts run-time consumes the rest authN (classes in the wss/disp package), the token generation
-     * service (TokenGenerationServiceConsumerImpl), the service to obtain a principal from a session (PrincipalFromSessionImpl),
-     * and the session invalidation service (AMSessionInvalidatorImpl).
-     * All of these will specify the version returned below. If different versions need to be consumed, different strings
-     * can be @Named and provided for the various clients.
-     */
-    @Provides
-    @Singleton
-    @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE)
-    String getSessionServiceVersion() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
-                Names.named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE)));
-    }
-
-    @Provides
-    @Singleton
-    @Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE)
-    String getAuthNServiceVersion() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
-                Names.named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE)));
-    }
-
-    @Provides
-    @Singleton
-    @Named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)
-    String getTokenGenServiceVersion() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
-                Names.named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)));
-    }
-
-    @Provides
-    @Singleton
-    @Named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)
-    String getUsersServiceVersion() {
-        return SoapSTSInjectorHolder.getInstance(Key.get(String.class,
-                Names.named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)));
     }
 
     /*

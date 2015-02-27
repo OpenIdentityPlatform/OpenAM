@@ -14,13 +14,12 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.soap.publish;
+package org.forgerock.openam.sts.soap.bootstrap;
 
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionWrapper;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
-import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.soap.config.SoapSTSModule;
 import org.forgerock.openam.sts.token.AMTokenParser;
@@ -37,25 +36,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @see org.forgerock.openam.sts.soap.publish.PublishServiceAccessTokenProvider
- *
- * This is currently using admin credentials - will probably use application credentials soon, when the sts-publish
- * service is protected by something other than admin credentials (or perhaps only the soap version).TODO
- *
+ * @see SoapSTSAccessTokenProvider
  */
-public class PublishServiceAccessTokenProviderImpl implements PublishServiceAccessTokenProvider {
+public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvider {
+    private static final String QUESTION_MARK = "?";
+    private static final String AMPERSAND = "&";
+    private static final String AUTH_INDEX_TYPE_PARAM = "authIndexType=";
+    private static final String AUTH_INDEX_VALUE_PARAM = "authIndexValue=";
+    private static final String MODULE = "module";
+    private static final String APPLICATION = "Application";
+
     private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
     private final AMTokenParser amTokenParser;
     private final String amSessionCookieName;
     private final URL authenticateUrl;
     private final URL logoutUrl;
     private final String authNServiceVersion;
-    private final String publishServiceConsumerUsername;
-    private final String publishServiceConsumerPassword;
+    private final String sessionServiceVersion;
+    private final SoapSTSAgentCredentialsAccess credentialsAccess;
     private final Logger logger;
 
     @Inject
-    PublishServiceAccessTokenProviderImpl(HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
+    SoapSTSAccessTokenProviderImpl(HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
                                           AMTokenParser amTokenParser,
                                           @Named(SoapSTSModule.AM_SESSION_COOKIE_NAME_PROPERTY_KEY) String amSessionCookieName,
                                           @Named(SoapSTSModule.OPENAM_HOME_SERVER_PROPERTY_KEY) String openamUrl,
@@ -63,47 +65,47 @@ public class PublishServiceAccessTokenProviderImpl implements PublishServiceAcce
                                           @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRoot,
                                           @Named(AMSTSConstants.REST_AUTHN_URI_ELEMENT) String authNUriElement,
                                           @Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE) String authNServiceVersion,
-                                          @Named(SoapSTSModule.PUBLISH_SERVICE_CONSUMER_USERNAME_PROPERTY_KEY) String publishServiceConsumerUsername,
-                                          @Named(SoapSTSModule.PUBLISH_SERVICE_CONSUMER_PASSWORD_PROPERTY_KEY) String publishServiceConsumerPassword,
+                                          @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE) String sessionServiceVersion,
+                                          @Named(SoapSTSModule.AGENT_REALM) String agentRealm,
                                           @Named (AMSTSConstants.REST_LOGOUT_URI_ELEMENT) String restLogoutUriElement,
-                                          Logger logger)
-                                            throws MalformedURLException {
+                                          SoapSTSAgentCredentialsAccess credentialsAccess,
+                                          Logger logger) throws MalformedURLException {
         this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
         this.amTokenParser = amTokenParser;
         this.amSessionCookieName = amSessionCookieName;
         this.authNServiceVersion = authNServiceVersion;
-        this.publishServiceConsumerUsername = publishServiceConsumerUsername;
-        this.publishServiceConsumerPassword = publishServiceConsumerPassword;
-        this.authenticateUrl = constituteLoginUrl(urlConstituentCatenator, openamUrl, jsonRoot, authNUriElement);
-        this.logoutUrl = constituteLogoutUrl(urlConstituentCatenator, openamUrl, jsonRoot, restLogoutUriElement);
+        this.sessionServiceVersion = sessionServiceVersion;
+        this.credentialsAccess = credentialsAccess;
+        this.authenticateUrl = constituteLoginUrl(urlConstituentCatenator, openamUrl, jsonRoot, agentRealm, authNUriElement);
+        this.logoutUrl = constituteLogoutUrl(urlConstituentCatenator, openamUrl, jsonRoot, agentRealm, restLogoutUriElement);
         this.logger = logger;
     }
 
     private URL constituteLoginUrl(UrlConstituentCatenator urlConstituentCatenator,
                                    String openamUrl,
                                    String jsonRoot,
-                                   String authNUriElement) throws MalformedURLException{
-        StringBuilder stringBuilder =
-                new StringBuilder(urlConstituentCatenator.catenateUrlConstituents(openamUrl, jsonRoot));
-        return new URL(urlConstituentCatenator.catentateUrlConstituent(stringBuilder, authNUriElement).toString());
+                                   String agentRealm,
+                                   String authNUriElement) throws MalformedURLException {
+        final String urlString = urlConstituentCatenator.catenateUrlConstituents(openamUrl, jsonRoot, agentRealm,
+                authNUriElement, QUESTION_MARK, AUTH_INDEX_TYPE_PARAM, MODULE, AMPERSAND, AUTH_INDEX_VALUE_PARAM, APPLICATION);
+        return new URL(urlString);
     }
 
     private URL constituteLogoutUrl(UrlConstituentCatenator urlConstituentCatenator,
                                     String openamUrl,
                                     String jsonRoot,
+                                    String agentRealm,
                                     String restLogoutUriElement) throws MalformedURLException {
-        StringBuilder sb = new StringBuilder(urlConstituentCatenator.catenateUrlConstituents(openamUrl, jsonRoot));
-        sb = urlConstituentCatenator.catentateUrlConstituent(sb, restLogoutUriElement);
-        return new URL(sb.toString());
+        return new URL(urlConstituentCatenator.catenateUrlConstituents(openamUrl, jsonRoot, agentRealm, restLogoutUriElement));
     }
 
     @Override
-    public String getPublishServiceAccessToken() throws STSPublishException {
+    public String getAccessToken() throws ResourceException {
         Map<String, String> headerMap = new HashMap<String, String>();
         headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
         headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, authNServiceVersion);
-        headerMap.put(AMSTSConstants.AM_REST_AUTHN_USERNAME_HEADER, publishServiceConsumerUsername);
-        headerMap.put(AMSTSConstants.AM_REST_AUTHN_PASSWORD_HEADER, publishServiceConsumerPassword);
+        headerMap.put(AMSTSConstants.AM_REST_AUTHN_USERNAME_HEADER, credentialsAccess.getAgentUsername());
+        headerMap.put(AMSTSConstants.AM_REST_AUTHN_PASSWORD_HEADER, credentialsAccess.getAgentPassword());
         try {
             HttpURLConnectionWrapper.ConnectionResult connectionResult =
                     httpURLConnectionWrapperFactory
@@ -113,26 +115,26 @@ public class PublishServiceAccessTokenProviderImpl implements PublishServiceAcce
                             .makeInvocation();
             final int responseCode = connectionResult.getStatusCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                throw new STSPublishException(responseCode, "Non-200 response authenticating against " + authenticateUrl);
+                throw ResourceException.getException(responseCode, "Non-200 response authenticating against " + authenticateUrl);
             } else {
                 try {
                     return amTokenParser.getSessionFromAuthNResponse(connectionResult.getResult());
                 } catch (TokenValidationException e) {
-                    throw new STSPublishException(ResourceException.INTERNAL_ERROR, "Exception caught obtaining the session " +
-                            "token necessary to consume the sts-publish service: " + e, e);
+                    throw ResourceException.getException(ResourceException.INTERNAL_ERROR, "Exception caught obtaining " +
+                            "the soap-sts-agent token " + e, e);
                 }
             }
         } catch (IOException ioe) {
-            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
-                    "IOException caught obtaining the token used to consume the sts-publish service: " + ioe, ioe);
+            throw ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                    "IOException caught obtaining the soap-sts-agent token: " + ioe, ioe);
         }
     }
 
     @Override
-    public void invalidatePublishServiceAccessToken(String sessionId){
+    public void invalidateAccessToken(String sessionId){
         Map<String, String> headerMap = new HashMap<String, String>();
         headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-        headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, "protocol=1.0, resource=1.0");
+        headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, sessionServiceVersion);
         headerMap.put(amSessionCookieName, sessionId);
         try {
             HttpURLConnectionWrapper.ConnectionResult connectionResult =
@@ -143,12 +145,11 @@ public class PublishServiceAccessTokenProviderImpl implements PublishServiceAcce
                             .makeInvocation();
             final int responseCode = connectionResult.getStatusCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                logger.error("Non-200 response invalidating the session token necessary to consume the sts-publish service. " +
+                logger.error("Non-200 response invalidating the soap-sts-agent token. " +
                         "This likely means that the session was not invalidated. The return code: " + responseCode);
             }
         } catch (IOException ioe) {
-            logger.error("IOException caught invalidating the session token necessary to consume the sts-publish service: "
-                    + ioe, ioe);
+            logger.error("IOException caught invalidating the soap-sts-agent token: " + ioe, ioe);
         }
     }
 }

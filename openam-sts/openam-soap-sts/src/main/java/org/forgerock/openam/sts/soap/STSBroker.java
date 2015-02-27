@@ -19,8 +19,8 @@ package org.forgerock.openam.sts.soap;
 import com.google.inject.Key;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
+import org.forgerock.openam.sts.soap.bootstrap.SoapSTSLifecycle;
 import org.forgerock.openam.sts.soap.config.SoapSTSInjectorHolder;
-import org.forgerock.openam.sts.soap.publish.SoapSTSPublishPoller;
 
 import javax.servlet.ServletConfig;
 
@@ -43,7 +43,10 @@ public class STSBroker extends CXFNonSpringServlet {
         class, which is the entry point for all web-service invocations.
          */
         BusFactory.setDefaultBus(getBus());
-        // reference the SoapSTSInjectorHolder to trigger the process of exposing published soap-sts instances
-        SoapSTSInjectorHolder.getInstance(Key.get(SoapSTSPublishPoller.class)).initiatePublishPolling();
+        /*
+         kick off the soap-sts bootstrap functionality, which includes obtaining the sts agent config, and kicking off
+         the publish polling logic.
+          */
+        SoapSTSInjectorHolder.getInstance(Key.get(SoapSTSLifecycle.class)).startup();
     }
 }

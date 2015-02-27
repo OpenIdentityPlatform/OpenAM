@@ -21,8 +21,8 @@ import com.google.inject.Guice;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider;
 import org.forgerock.guava.common.collect.Sets;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.config.user.SAML2Config;
@@ -75,7 +75,7 @@ public class SoapSTSInstancePublisherImplTest {
     }
 
     @Test
-    public void testPublishAndRemove() throws STSPublishException, UnsupportedEncodingException {
+    public void testPublishAndRemove() throws ResourceException, UnsupportedEncodingException {
         Set<SoapSTSInstanceConfig> initialSet = Sets.newHashSet(createInstanceConfig("instanceOne",
                 "http://host.com:8080/am", WITH_KEYSTORE_CONFIG, WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION));
         when(mockPublishServiceConsumer.getPublishedInstances()).thenReturn(initialSet);
@@ -95,7 +95,7 @@ public class SoapSTSInstancePublisherImplTest {
     }
 
     @Test
-    public void testNoUpdate() throws STSPublishException, UnsupportedEncodingException {
+    public void testNoUpdate() throws ResourceException, UnsupportedEncodingException {
         SoapSTSInstanceConfig instanceConfig = createInstanceConfig("instanceOne",
                 "http://host.com:8080/am", WITH_KEYSTORE_CONFIG, WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION);
         Set<SoapSTSInstanceConfig> initialSet = Sets.newHashSet(instanceConfig);
@@ -114,7 +114,7 @@ public class SoapSTSInstancePublisherImplTest {
     }
 
     @Test
-    public void testUpdate() throws STSPublishException, UnsupportedEncodingException {
+    public void testUpdate() throws ResourceException, UnsupportedEncodingException {
         SoapSTSInstanceConfig instanceConfig = createInstanceConfig("instanceOne",
                 "http://host.com:8080/am", WITH_KEYSTORE_CONFIG, WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION);
         Set<SoapSTSInstanceConfig> initialSet = Sets.newHashSet(instanceConfig);

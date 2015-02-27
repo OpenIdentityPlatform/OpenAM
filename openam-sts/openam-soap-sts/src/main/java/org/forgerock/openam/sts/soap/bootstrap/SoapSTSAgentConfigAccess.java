@@ -11,16 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.soap.publish;
+package org.forgerock.openam.sts.soap.bootstrap;
+
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ResourceException;
 
 /**
- * This interface is essentially a marker interface which allows Guice to inject a specific Runnable into the
- * SoapSTSLifecycleImpl. The implementation of this interface is responsible for consulting the OpenAM home
- * server for published soap-sts instances (via consumption of the PublishServiceConsumer), and then exposing them
- * as web-services (via consumption of the SoapSTSInstanceLifecycleManager).
+ * This interface defines the concerns of accessing the configuration state corresponding to the soap STS agent from
+ * OpenAM
  */
-public interface SoapSTSInstancePublisher extends Runnable {
+public interface SoapSTSAgentConfigAccess {
+    /**
+     * @return the configuration state, in json format, corresponding to this soap-sts agent.
+     * @throws ResourceException If an exception is encountered obtaining this configuration state.
+     */
+    JsonValue getConfigurationState() throws ResourceException;
 }

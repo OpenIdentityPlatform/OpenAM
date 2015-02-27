@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.validator.wss.url;
@@ -28,10 +28,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
+ * @see org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider
  */
 public class AuthenticationUrlProviderImpl implements AuthenticationUrlProvider {
-    private static final Character QUESTION_MARK = '?';
-    private static final Character AMPERSAND = '&';
+    private static final String QUESTION_MARK = "?";
+    private static final String AMPERSAND = "&";
     private static final String AUTH_INDEX_TYPE_PARAM = "authIndexType=";
     private static final String AUTH_INDEX_VALUE_PARAM = "authIndexValue=";
 
@@ -61,20 +62,17 @@ public class AuthenticationUrlProviderImpl implements AuthenticationUrlProvider 
 
     @Override
     public URL authenticationUrl(Object token) throws TokenValidationException {
-        StringBuilder stringBuilder =
-                new StringBuilder(urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, jsonRoot));
-        if (!AMSTSConstants.ROOT_REALM.equals(realm)) {
-            stringBuilder = urlConstituentCatenator.catentateUrlConstituent(stringBuilder, realm);
-        }
-        stringBuilder = urlConstituentCatenator.catentateUrlConstituent(stringBuilder, restAuthnUriElement);
+        String urlString;
         AuthTargetMapping.AuthTarget target = authTargetMapping.getAuthTargetMapping(token.getClass());
         if (target != null) {
-            stringBuilder.append(QUESTION_MARK);
-            stringBuilder.append(AUTH_INDEX_TYPE_PARAM).append(target.getAuthIndexType());
-            stringBuilder.append(AMPERSAND).append(AUTH_INDEX_VALUE_PARAM).append(target.getAuthIndexValue());
+            urlString = urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl,
+                    jsonRoot, realm, restAuthnUriElement, QUESTION_MARK, AUTH_INDEX_TYPE_PARAM, target.getAuthIndexType(),
+                    AMPERSAND, AUTH_INDEX_VALUE_PARAM, target.getAuthIndexValue());
+        } else {
+            urlString = urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, jsonRoot, realm, restAuthnUriElement);
         }
         try {
-            return new URL(stringBuilder.toString());
+            return new URL(urlString);
         } catch (MalformedURLException e) {
             throw new TokenValidationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
         }

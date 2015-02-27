@@ -139,6 +139,13 @@ public class AMSTSConstants {
     public static final String SOAP_STS_PUBLISH_SERVICE_URI_ELEMENT = "am_soap_sts_publish_service";
 
     /*
+    Used in conjunction with a @Named annotation to provide the uri element corresponding to the agents profile service.
+    Consumed by the SoapSTSAgentConfigAccessImpl to build up the uri necessary to obtain the profile state corresponding
+    to the soap-sts agent.
+     */
+    public static final String AGENTS_PROFILE_SERVICE_URI_ELEMENT = "am_agent_profile_service";
+
+    /*
     Used in conjunction with a @Named annotation to inject the url string corresponding to the AM deployment.
      */
     public static final String AM_DEPLOYMENT_URL = "am_deployment_url";
@@ -399,6 +406,11 @@ public class AMSTSConstants {
      * Used in context of a @Named annotation to identify the String identifying the version of targeted CREST services.
      */
     public static final String CREST_VERSION_SOAP_STS_PUBLISH_SERVICE = "crest_version_soap_sts_publish_service";
+
+    /**
+     * Used in context of a @Named annotation to identify the String identifying the version of targeted CREST services.
+     */
+    public static final String CREST_VERSION_AGENTS_PROFILE_SERVICE = "crest_version_agents_profile_service";
 
     /**
      * Used in context of a @Named annotation to specify the Set of TokenTypes for which token validators are plugged-into

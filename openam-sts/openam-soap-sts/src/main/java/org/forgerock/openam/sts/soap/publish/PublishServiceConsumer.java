@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.soap.publish;
 
-import org.forgerock.openam.sts.STSPublishException;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 
 import java.util.Set;
@@ -30,5 +30,5 @@ public interface PublishServiceConsumer {
      *
      * @return a non-null list containing the published instances (empty if no instances have been published)
      */
-    Set<SoapSTSInstanceConfig> getPublishedInstances() throws STSPublishException;
+    Set<SoapSTSInstanceConfig> getPublishedInstances() throws ResourceException;
 }

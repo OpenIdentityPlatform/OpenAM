@@ -23,6 +23,7 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionWrapper;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.STSPublishException;
+import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.soap.config.SoapSTSModule;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
@@ -48,7 +49,7 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
     private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
     private final UrlConstituentCatenator urlConstituentCatenator;
     private final String soapSTSPublishServiceVersion;
-    private final PublishServiceAccessTokenProvider publishServiceAccessTokenProvider;
+    private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
     private final String amSessionCookieName;
     private final String publishServiceUriElement;
     private final Logger logger;
@@ -58,7 +59,7 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
                                HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
                                UrlConstituentCatenator urlConstituentCatenator,
                                @Named(AMSTSConstants.CREST_VERSION_SOAP_STS_PUBLISH_SERVICE) String soapSTSPublishServiceVersion,
-                               PublishServiceAccessTokenProvider publishServiceAccessTokenProvider,
+                               SoapSTSAccessTokenProvider soapSTSAccessTokenProvider,
                                @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String amSessionCookieName,
                                @Named(AMSTSConstants.SOAP_STS_PUBLISH_SERVICE_URI_ELEMENT) String publishServiceUriElement,
                                Logger logger) {
@@ -66,17 +67,17 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
         this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
         this.urlConstituentCatenator = urlConstituentCatenator;
         this.soapSTSPublishServiceVersion = soapSTSPublishServiceVersion;
-        this.publishServiceAccessTokenProvider = publishServiceAccessTokenProvider;
+        this.soapSTSAccessTokenProvider = soapSTSAccessTokenProvider;
         this.amSessionCookieName = amSessionCookieName;
         this.publishServiceUriElement = publishServiceUriElement;
         this.logger = logger;
     }
 
     @Override
-    public Set<SoapSTSInstanceConfig> getPublishedInstances() throws STSPublishException {
+    public Set<SoapSTSInstanceConfig> getPublishedInstances() throws ResourceException {
         String sessionId = null;
         try {
-            sessionId = publishServiceAccessTokenProvider.getPublishServiceAccessToken();
+            sessionId = soapSTSAccessTokenProvider.getAccessToken();
             Map<String, String> headerMap = new HashMap<String, String>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, soapSTSPublishServiceVersion);
@@ -101,7 +102,7 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
                     "Exception caught invoking obtaining published soap sts instance state from publish service: " + e);
         } finally {
             if (sessionId != null) {
-                publishServiceAccessTokenProvider.invalidatePublishServiceAccessToken(sessionId);
+                soapSTSAccessTokenProvider.invalidateAccessToken(sessionId);
             }
         }
     }
@@ -124,7 +125,7 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
         }
         for (String key : json.asMap().keySet()) {
             JsonValue value = json.get(key);
-            JsonValue jsonInstanceConfig = null;
+            JsonValue jsonInstanceConfig;
             try {
                 jsonInstanceConfig = JsonValueBuilder.toJsonValue(value.asString());
             } catch (JsonException e) {

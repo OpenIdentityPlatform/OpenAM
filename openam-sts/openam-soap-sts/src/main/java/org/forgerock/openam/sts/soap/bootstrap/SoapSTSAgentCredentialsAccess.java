@@ -14,21 +14,12 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.soap.publish;
+package org.forgerock.openam.sts.soap.bootstrap;
 
 /**
- * This interface defines the concerns of polling the OpenAM home server to obtain the SoapSTSInstanceConfig instances
- * corresponding to published-soap-sts instances. It simply defines lifecycle operations, and will initiate when the
- * soap-sts is deployed, and will shutdown after the soap-sts instance is undeployed.
+ * Defines the concerns of access to the soap-sts agent username and password, including any necessary decryption.
  */
-public interface SoapSTSPublishPoller {
-    /**
-     * Initiate the polling of sts-publish/soap on the OpenAM home server.
-     */
-    public void initiatePublishPolling();
-
-    /**
-     * Shutdown the polling of sts-publish/soap on the OpenAM home server. Will shutdown the ScheduledExecutorService.
-     */
-    public void shutdownPublishPolling();
+public interface SoapSTSAgentCredentialsAccess {
+    String getAgentUsername();
+    String getAgentPassword();
 }
