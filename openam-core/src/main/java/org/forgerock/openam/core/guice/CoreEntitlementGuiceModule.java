@@ -34,7 +34,6 @@ public class CoreEntitlementGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ResourceTypeConfiguration.class).to(ResourceTypeConfigurationImpl.class);
-        bind(ResourceTypeService.class).to(ResourceTypeServiceImpl.class);
     }
 
 }
