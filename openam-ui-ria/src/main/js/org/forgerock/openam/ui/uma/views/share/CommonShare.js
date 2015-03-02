@@ -94,7 +94,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 if(this.data.policy.get("permissions").length) {
                     text = $.t("uma.share.info", { count: this.data.policy.get("permissions").length });
                 }
-                this.$el.find(".policy-footer > div").text(text);
+                this.$el.find("#shareCounter > p").text(text);
             },
 
             renderPermissionSelect: function() {

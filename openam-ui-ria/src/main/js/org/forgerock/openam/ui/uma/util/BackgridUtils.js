@@ -25,11 +25,11 @@
 /*global define Backgrid, Backbone, _, $*/
 
 define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
-    "moment",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "backgrid"
-], function (moment, uiUtils, conf, Backgrid) {
+    "org/forgerock/commons/ui/common/main/Router",
+    "backgrid",
+    "moment"
+], function (uiUtils, router, Backgrid, moment) {
     /**
      * @exports org/forgerock/openam/ui/uma/util/BackgridUtils
      */
@@ -87,6 +87,9 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
     });
 
     obj.UriExtCell = Backgrid.UriCell.extend({
+        events: {
+            'click': 'gotoUrl'
+        },
         render: function () {
             this.$el.empty();
             var rawValue = this.model.get(this.column.get("name")),
@@ -98,13 +101,21 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
                 title: this.title || formattedValue
             }).text(formattedValue));
 
-            if (this.column.get("model")) {
-                this.$el.data(this.model.attributes);
+            if (href) {
+                this.$el.data('href', href);
+                this.$el.prop('title', this.title || formattedValue);
             }
 
             this.delegateEvents();
             return this;
+        },
+
+        gotoUrl: function(e){
+            e.preventDefault();
+            var href = $(e.currentTarget).data('href');
+            router.navigate( href, {trigger: true});
         }
+
     });
 
     obj.FilterHeaderCell = Backgrid.HeaderCell.extend({
@@ -149,10 +160,19 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
     };
 
     obj.sync = function(method, model, options){
-        var params = [];
+        var params = [],
+            exculdeList = ['page', 'total_pages', 'total_entries', 'order', 'per_page', 'sort_by'];
+
+        // TODO: Workaround as resourceset endpoind requires a _queryId=* to indicate a blank query,
+        // while the historyAudit endpint requires a _queryFilter=true to indicate a blank query.
+        if (options.data._queryId === '*' && options.data._queryFilter === true){
+            exculdeList.push('_queryFilter');
+        } else {
+            exculdeList.push('_queryId');
+        }
 
         _.forIn(options.data, function(val, key){
-            if(!_.include(['page', 'total_pages', 'total_entries', 'order', 'per_page', 'sort_by'], key)) {
+            if(!_.include(exculdeList, key)) {
                 params.push(key + '=' + val);
             }
         });
@@ -183,8 +203,18 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
         return params;
     };
 
-    obj.getRealm = function() {
-        return (conf.globalData.auth.realm !== '/' ) ? conf.globalData.auth.realm : "";
+    // FIXME: Workaround to fix "Double sort indicators" issue
+    // @see https://github.com/wyuenho/backgrid/issues/453
+    obj.doubleSortFix = function(model) {
+        // No ids so identify model with CID
+        var cid = model.cid,
+            filtered = model.collection.filter(function(model) {
+                return model.cid !== cid;
+            });
+
+        _.each(filtered, function(model) {
+            model.set('direction', null);
+        });
     };
 
     return obj;

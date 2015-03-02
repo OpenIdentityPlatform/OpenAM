@@ -31,9 +31,10 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
+    "org/forgerock/openam/ui/uma/util/UmaUtils",
     "backgrid"
 
-], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, Backgrid) {
+], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, umaUtils, Backgrid) {
     var HistoryView = AbstractView.extend({
         template: "templates/uma/views/history/ListHistory.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
@@ -44,7 +45,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                 collection,
                 grid,
                 paginator,
-                realm = backgridUtils.getRealm();
+                realm = umaUtils.getRealm();
 
             collection = new (Backbone.PageableCollection.extend({
                 url: "/" + constants.context + "/json" + realm + "/users/" + conf.loggedUser.username + '/uma/auditHistory',
@@ -55,7 +56,6 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                 },
                 queryParams: {
                     pageSize: "_pageSize",
-                    // sortKey: "_sortKeys",
                     _sortKeys: backgridUtils.sortKeys,
                     _queryFilter: backgridUtils.queryFilter,
                     _pagedResultsOffset: backgridUtils.pagedResultsOffset
@@ -103,19 +103,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                 collection: collection
             });
 
-            // FIXME: Workaround to fix "Double sort indicators" issue
-            // @see https://github.com/wyuenho/backgrid/issues/453
-            grid.collection.on("backgrid:sort", function(model) {
-                // No ids so identify model with CID
-                var cid = model.cid,
-                    filtered = model.collection.filter(function(model) {
-                        return model.cid !== cid;
-                    });
-
-                _.each(filtered, function(model) {
-                    model.set('direction', null);
-                });
-            });
+            collection.on("backgrid:sort", backgridUtils.doubleSortFix);
 
             paginator = new Backgrid.Extension.Paginator({
                 collection: collection,

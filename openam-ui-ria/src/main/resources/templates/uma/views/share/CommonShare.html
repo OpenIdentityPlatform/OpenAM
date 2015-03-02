@@ -23,13 +23,12 @@
         </div>
 
         <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class="button" disabled/>
+
+        <div id="shareCounter" class="clearfix">
+            <span class="icon-user"></span>
+            <p></p>
+        </div>
+
+
     {{/if}}
 </div>
-
-{{#if notFound}}
-{{else}}
-<div class="policy-footer">
-    <span class="float-left icon-user"></span>
-    <div></div>
-</div>
-{{/if}}

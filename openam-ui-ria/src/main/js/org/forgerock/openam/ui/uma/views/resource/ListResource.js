@@ -31,16 +31,13 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
-    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/uma/util/UmaUtils",
     "backgrid"
-], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, router, Backgrid) {
+], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, umaUtils, Backgrid) {
 
     var ListResource = AbstractView.extend({
         template: "templates/uma/views/resource/ListResource.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
-        events: {
-            'click td.uri-cell': 'openPolicy'
-        },
 
         render: function(args, callback) {
 
@@ -49,22 +46,21 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                 grid,
                 paginator,
                 ResourceSetCollection,
-                realm = backgridUtils.getRealm();
+                realm = umaUtils.getRealm();
 
             ResourceSetCollection = Backbone.PageableCollection.extend({
-                url: "/" + constants.context + "/json" + realm + "/users/" + conf.loggedUser.username + '/uma/policies',
+                url: "/" + constants.context + "/json" + realm + "/users/" + conf.loggedUser.username + '/oauth2/resourcesets',
                 state: {
                     pageSize: 10,
                     sortKey: "name"
                 },
                 queryParams: {
                     pageSize: "_pageSize",
-                    sortKey: "_sortKeys",
-                    _queryFilter: 'resourceServer+eq+"RSClient"'
-                    //_queryFilter: backgridUtils.queryFilter
-                    /* TODO : Temp until endpoint working
-                    // backgridUtils.queryFilter=true,
-                    //_pagedResultsOffset:  backgridUtils.pagedResultsOffset*/
+                    _sortKeys: backgridUtils.sortKeys,
+                    _queryId: "*",
+                    _queryFilter: backgridUtils.queryFilter,
+                    _pagedResultsOffset:  backgridUtils.pagedResultsOffset,
+                    _fields: ['_id', 'icon_uri', 'name', 'resourceServer', 'type']
                 },
 
                 parseState: backgridUtils.parseState,
@@ -79,30 +75,30 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                     cell: backgridUtils.UriExtCell,
                     headerCell: backgridUtils.FilterHeaderCell,
                     href: function(rawValue, formattedValue, model){
-                        return "#uma/resource/" + model.get('policyId');
+                        return "#uma/resources/" + model.get('_id');
                     },
-                    model: true,
-                    editable: false
-                }/*,
-                {
-                    name: "lastModifiedDate",
-                    label: $.t("uma.resources.list.grid.2"),
-                    cell: "datetime",
                     editable: false
                 },
                 {
-                    name: "resources",
-                    label: $.t("uma.resources.list.grid.3"),
-                    editable: false,
+                    name: "resourceServer",
+                    label: $.t("uma.resources.list.grid.1"),
                     cell: backgridUtils.UriExtCell,
+                    headerCell: backgridUtils.FilterHeaderCell,
                     href: function(rawValue, formattedValue, model){
-                        return "#uma/apps/" + formattedValue;
-                    }
-                }*/
-
+                        return "#uma/apps/" + encodeURIComponent(model.get('resourceServer'));
+                    },
+                    editable: false
+                },
+                {
+                    name: "type",
+                    label: $.t("uma.resources.list.grid.2"),
+                    cell: "string",
+                    editable: false
+                }
             ];
 
             self.data.resourceSetCollection = new ResourceSetCollection();
+            self.data.resourceSetCollection.on("backgrid:sort", backgridUtils.doubleSortFix);
 
             grid = new Backgrid.Grid({
                 columns: columns,
@@ -121,17 +117,6 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                 self.data.resourceSetCollection.fetch({reset: true, processData: false});
                 if (callback) { callback();}
             });
-        },
-
-        openPolicy: function(e) {
-            e.preventDefault();
-            var policy = $(e.currentTarget).data();
-            if (policy.policyId) {
-                router.routeTo( router.configuration.routes.editResource, {args: [policy.policyId], trigger: true});
-            } else {
-                // throw an error message
-                console.log(e);
-            }
         }
 
     });

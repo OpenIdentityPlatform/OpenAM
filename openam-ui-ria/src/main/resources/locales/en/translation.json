@@ -412,7 +412,7 @@
             "list": {
                 "title": "Resources",
                 "subtitle": "All your shared resources",
-                "grid": ["Resources", "Modified By", "Last accessed", "Host"]
+                "grid": ["Resources", "Host", "Type"]
             },
             "show": {
                 "subtitle": "Users allowed to access this resource and their permissions",
