@@ -58,18 +58,6 @@
      <secondary>Administrative Files</secondary>
     </indexterm>
     <varlistentry>
-     <term>amAdmin.access</term>
-     <listitem>
-      <para>Contains log data about actions conducted by users logged in as amAdmin</para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>amAdmin.error</term>
-     <listitem>
-      <para>Contains log data about errors encountered for users logged in as amAdmin</para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
      <term>amAuthentication.access</term>
      <listitem>
       <para>Contains log data for when users log into and out of OpenAM, including failed
@@ -178,18 +166,6 @@
      <term>Entitlement.access</term>
      <listitem>
       <para>Contains data about entitlement actions or changes</para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Federation.access</term>
-     <listitem>
-      <para>Contains data about federation events</para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Federation.error</term>
-     <listitem>
-      <para>Contains data on errors encountered while executing actions for federation</para>
      </listitem>
     </varlistentry>
     <varlistentry>
