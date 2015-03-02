@@ -113,6 +113,11 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-restlet</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-scripting</artifactId>
+        </dependency>
+
         <!-- OpenAM core -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>

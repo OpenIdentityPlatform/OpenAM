@@ -51,10 +51,7 @@ import org.forgerock.openam.forgerockrest.entitlements.SubjectAttributesResource
 import org.forgerock.openam.forgerockrest.entitlements.SubjectTypesResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
-import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
-import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
-import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
-import org.forgerock.openam.rest.authz.SessionResourceAuthzModule;
+import org.forgerock.openam.rest.authz.*;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.dashboard.TrustedDevicesResource;
 import org.forgerock.openam.rest.fluent.FluentRealmRouter;
@@ -65,6 +62,7 @@ import org.forgerock.openam.rest.oauth2.ResourceSetResource;
 import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
+import org.forgerock.openam.rest.scripting.ScriptResource;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.ServiceRouter;
 import org.forgerock.openam.rest.uma.UmaPolicyResource;
@@ -259,6 +257,10 @@ public class RestEndpoints {
         rootRealmRouter.route("/tokens")
                 .through(CoreTokenResourceAuthzModule.class, CoreTokenResourceAuthzModule.NAME)
                 .forVersion("1.0").to(CoreTokenResource.class);
+
+        dynamicRealmRouter.route("/scripts")
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(ScriptResource.class);
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
         VersionBehaviourConfigListener.bindToServiceConfigManager(dynamicRealmRouter);
