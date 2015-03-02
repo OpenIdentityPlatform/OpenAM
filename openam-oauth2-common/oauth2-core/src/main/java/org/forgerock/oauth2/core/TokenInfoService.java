@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -39,7 +39,10 @@ public interface TokenInfoService {
      * @return The token's information.
      * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      * @throws ServerException If any internal server error occurs.
-     * @throws NotFoundException If the token cannot be found or is expired.
+     * @throws BadRequestException If the request is malformed.
+     * @throws InvalidGrantException If the given token is not an Access token.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    JsonValue getTokenInfo(OAuth2Request request) throws InvalidRequestException, NotFoundException, ServerException;
+    JsonValue getTokenInfo(OAuth2Request request) throws InvalidTokenException, InvalidRequestException,
+            ExpiredTokenException, ServerException, BadRequestException, InvalidGrantException, NotFoundException;
 }

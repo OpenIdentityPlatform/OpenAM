@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  * Copyright (c) 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -255,7 +255,15 @@ public class OAuth extends AMLoginModule {
                     if (config.isOpenIDConnect()) {
                         idToken = extractToken(ID_TOKEN, tokenSvcResponse);
                         JwtHandler jwtHandler = new JwtHandler(jwtHandlerConfig);
-                        jwtClaims = jwtHandler.validateJwt(idToken);
+                        try {
+                            jwtClaims = jwtHandler.validateJwt(idToken);
+                        } catch (RuntimeException e) {
+                            debug.warning("Cannot validate JWT", e);
+                            throw e;
+                        } catch (AuthLoginException e) {
+                            debug.warning("Cannot validate JWT", e);
+                            throw e;
+                        }
                         if (!JwtHandler.isIntendedForAudience(config.getClientId(), jwtClaims)) {
                             OAuthUtil.debugError("OAuth.process(): ID token is not for this client as audience.");
                             throw new AuthLoginException(BUNDLE_NAME, "audience", null);

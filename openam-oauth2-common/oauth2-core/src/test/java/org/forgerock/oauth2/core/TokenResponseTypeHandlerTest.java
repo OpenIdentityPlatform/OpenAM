@@ -11,12 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -46,7 +45,7 @@ public class TokenResponseTypeHandlerTest {
     }
 
     @Test
-    public void shouldHandle() throws ServerException {
+    public void shouldHandle() throws Exception {
 
         //Given
         String grantType = "token";

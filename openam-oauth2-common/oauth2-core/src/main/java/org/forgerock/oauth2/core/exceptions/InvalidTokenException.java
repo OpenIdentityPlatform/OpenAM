@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core.exceptions;
@@ -27,6 +27,7 @@ public class InvalidTokenException extends OAuth2Exception {
      * Constructs a new InvalidTokenException with the default message.
      */
     public InvalidTokenException() {
-        super(403, "invalid_token", "The access token provided is expired, revoked, malformed, or invalid for other reasons.");
+        super(401, "invalid_token",
+                "The access token provided is expired, revoked, malformed, or invalid for other reasons.");
     }
 }

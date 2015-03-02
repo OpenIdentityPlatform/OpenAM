@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.openidconnect;
@@ -27,7 +27,10 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.ClientBuilder;
@@ -81,8 +84,8 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      */
     @Inject
     OpenAMOpenIdConnectClientRegistrationService(ClientDAO clientDAO,
-            OAuth2ProviderSettingsFactory providerSettingsFactory, AccessTokenVerifier tokenVerifier,
-            TokenStore tokenStore) {
+                                                 OAuth2ProviderSettingsFactory providerSettingsFactory, AccessTokenVerifier tokenVerifier,
+                                                 TokenStore tokenStore) {
         this.clientDAO = clientDAO;
         this.providerSettingsFactory = providerSettingsFactory;
         this.tokenVerifier = tokenVerifier;
@@ -93,7 +96,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      * {@inheritDoc}
      */
     public JsonValue createRegistration(String accessToken, String deploymentUrl, OAuth2Request request)
-            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException {
+            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException, NotFoundException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
@@ -299,7 +302,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      * @return the token id of the generated access token.
      * @throws ServerException if an internal error occurs.
      */
-    private String createRegistrationAccessToken(Client client, OAuth2Request request) throws ServerException {
+    private String createRegistrationAccessToken(Client client, OAuth2Request request) throws ServerException, NotFoundException {
         final AccessToken rat = tokenStore.createAccessToken(
                 null,                           // Grant type
                 "Bearer",                       // Access Token Type
@@ -344,26 +347,27 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      * {@inheritDoc}
      */
     public JsonValue getRegistration(String clientId, String accessToken, OAuth2Request request)
-            throws InvalidRequestException, InvalidClientMetadata {
+            throws InvalidRequestException, InvalidClientMetadata, InvalidTokenException {
         if (clientId != null) {
+            final Client client;
             try {
-                final Client client = clientDAO.read(clientId, request);
-
-                if (!client.getAccessToken().equals(accessToken)) {
-                    //client access token doesn't match the access token supplied in the request
-                    logger.error("ConnectClientRegistration.getClient(): Invalid accessToken");
-                    throw new InvalidRequestException();
-                }
-
-                //remove the client fields that don't need to be reported.
-                client.remove(CLIENT_SECRET.getType());
-                client.remove(REGISTRATION_ACCESS_TOKEN.getType());
-
-                return new JsonValue(client.asMap());
-            } catch (Exception e) {
+                client = clientDAO.read(clientId, request);
+            } catch (UnauthorizedClientException e) {
                 logger.error("ConnectClientRegistration.Validate(): Unable to create client", e);
                 throw new InvalidClientMetadata();
             }
+
+            if (!client.getAccessToken().equals(accessToken)) {
+                //client access token doesn't match the access token supplied in the request
+                logger.error("ConnectClientRegistration.getClient(): Invalid accessToken");
+                throw new InvalidTokenException();
+            }
+
+            //remove the client fields that don't need to be reported.
+            client.remove(CLIENT_SECRET.getType());
+            client.remove(REGISTRATION_ACCESS_TOKEN.getType());
+
+            return new JsonValue(client.asMap());
         } else {
             logger.error("ConnectClientRegistration.readRequest(): No client id sent");
             throw new InvalidRequestException();

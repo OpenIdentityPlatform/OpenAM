@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -19,8 +19,8 @@ package org.forgerock.oauth2.core;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 
@@ -44,7 +44,8 @@ public interface ResourceOwnerSessionValidator {
      *          is not asked to authenticate, but the resource owner does not have a current authenticated session.
      * @throws LoginRequiredException If authenticating the resource owner fails.
      * @throws ServerException If the server is misconfigured.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     ResourceOwner validate(OAuth2Request request) throws ResourceOwnerAuthenticationRequired, AccessDeniedException,
-            BadRequestException, InteractionRequiredException, LoginRequiredException, ServerException;
+            BadRequestException, InteractionRequiredException, LoginRequiredException, ServerException, NotFoundException;
 }

@@ -11,18 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -54,7 +50,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     private OAuth2ProviderSettings providerSettings;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         List<AuthorizationCodeRequestValidator> requestValidators = new ArrayList<AuthorizationCodeRequestValidator>();
         requestValidator = mock(AuthorizationCodeRequestValidator.class);
@@ -72,9 +68,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     }
 
     @Test (expectedExceptions = InvalidRequestException.class)
-    public void handleShouldThrowInvalidRequestExceptionWhenAuthorizationCodeNotFound() throws InvalidGrantException,
-            RedirectUriMismatchException, ClientAuthenticationFailedException, InvalidRequestException,
-            InvalidCodeException, InvalidClientException, ServerException {
+    public void handleShouldThrowInvalidRequestExceptionWhenAuthorizationCodeNotFound() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -94,8 +88,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
     @Test
     public void handleShouldThrowInvalidGrantExceptionWhenAuthorizationCodeHasAlreadyBeenIssued()
-            throws InvalidGrantException, RedirectUriMismatchException, ClientAuthenticationFailedException,
-            InvalidRequestException, InvalidCodeException, InvalidClientException, ServerException {
+            throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -120,9 +113,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     }
 
     @Test (expectedExceptions = InvalidGrantException.class)
-    public void handleShouldThrowInvalidGrantExceptionWhenRedirectUriDontMatch() throws InvalidGrantException,
-            RedirectUriMismatchException, ClientAuthenticationFailedException, InvalidRequestException,
-            InvalidCodeException, InvalidClientException, ServerException {
+    public void handleShouldThrowInvalidGrantExceptionWhenRedirectUriDontMatch() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -144,9 +135,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     }
 
     @Test (expectedExceptions = InvalidGrantException.class)
-    public void handleShouldThrowInvalidGrantExceptionWhenClientDoesNotMatch() throws InvalidGrantException,
-            RedirectUriMismatchException, ClientAuthenticationFailedException, InvalidRequestException,
-            InvalidCodeException, InvalidClientException, ServerException {
+    public void handleShouldThrowInvalidGrantExceptionWhenClientDoesNotMatch() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -170,9 +159,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     }
 
     @Test (expectedExceptions = InvalidCodeException.class)
-    public void handleShouldThrowInvalidCodeExceptionWhenAuthorizationCodeHasExpired() throws InvalidGrantException,
-            RedirectUriMismatchException, ClientAuthenticationFailedException, InvalidRequestException,
-            InvalidCodeException, InvalidClientException, ServerException {
+    public void handleShouldThrowInvalidCodeExceptionWhenAuthorizationCodeHasExpired() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -364,9 +351,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     }
 
     @Test
-    public void shouldHandleAndIncludeScopeInAccessToken() throws InvalidGrantException, RedirectUriMismatchException,
-            ClientAuthenticationFailedException, InvalidRequestException, InvalidCodeException, InvalidClientException,
-            ServerException {
+    public void shouldHandleAndIncludeScopeInAccessToken() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);

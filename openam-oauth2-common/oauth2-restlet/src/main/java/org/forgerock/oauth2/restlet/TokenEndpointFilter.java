@@ -11,13 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
 
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
@@ -38,11 +37,10 @@ public class TokenEndpointFilter extends OAuth2Filter {
     /**
      * Constructs a new TokenEndpointFilter.
      *
-     * @param context The Restlet context.
      * @param resource The Restlet resource.
      */
-    public TokenEndpointFilter(Context context, Restlet resource) {
-        super(context, resource);
+    public TokenEndpointFilter(Restlet resource) {
+        super(resource);
     }
 
     /**

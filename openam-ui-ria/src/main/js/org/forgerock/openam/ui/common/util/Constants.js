@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -35,7 +35,6 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     commonConstants.CONSOLE_PATH = '/' + commonConstants.context + '/console';
     commonConstants.CONSOLE_USERS = ['amadmin']; 
     commonConstants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword";
-    commonConstants.BASE_PATH = "";
-    
+
     return commonConstants;
 });

@@ -2,7 +2,7 @@
 <!--
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright 2012-2014 ForgeRock AS.
+  ~ Copyright 2012-2015 ForgeRock AS.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -51,10 +51,10 @@
   <script type="text/javascript">
     realm = "${(realm!"/")?js_string}";
     less = {
-      rootPath: "../XUI"
+      rootPath: "${baseUrl?js_string}/XUI"
     };
   </script>
-  <script data-main="../XUI/main-authorize" src="../XUI/libs/requirejs-2.1.14-min.js"></script>
+  <script data-main="${baseUrl?html}/XUI/main-authorize" src="${baseUrl?html}/XUI/libs/requirejs-2.1.14-min.js"></script>
 </#if>
 </head>
 <body>
@@ -63,7 +63,7 @@
   <#if xui>
     <div id="header" class="clearfix">
       <div id="logo" class="float-left">
-        <a href="#" title="ForgeRock"><img src="../XUI/images/logo.png" style="width:120px; height:80px;" alt="ForgeRock">
+        <a href="#" title="ForgeRock"><img src="${baseUrl?html}/XUI/images/logo.png" style="width:120px; height:80px;" alt="ForgeRock">
         </a>
       </div>
     </div>

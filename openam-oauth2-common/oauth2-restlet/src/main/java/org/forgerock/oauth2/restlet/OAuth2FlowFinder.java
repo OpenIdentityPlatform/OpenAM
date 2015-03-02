@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -21,7 +21,6 @@ import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedGrantTypeException;
-import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.resource.Finder;
@@ -50,14 +49,12 @@ public class OAuth2FlowFinder extends Finder {
     /**
      * Constructs a new OAuth2FlowFinder.
      *
-     * @param context The Restlet context.
      * @param requestFactory An instance of the OAuth2RequestFactory.
      * @param exceptionHandler An instance of the ExceptionHandler.
      * @param endpointClasses The endpoint handlers for the OAuth2 token endpoints.
      */
-    public OAuth2FlowFinder(Context context, OAuth2RequestFactory<Request> requestFactory,
+    public OAuth2FlowFinder(OAuth2RequestFactory<Request> requestFactory,
             ExceptionHandler exceptionHandler, Map<String, Finder> endpointClasses) {
-        super(context);
         this.requestFactory = requestFactory;
         this.exceptionHandler = exceptionHandler;
         this.endpointClasses = new ConcurrentHashMap<String, Finder>(endpointClasses);

@@ -11,16 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -48,7 +43,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
     private OAuth2ProviderSettings providerSettings;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         clientAuthenticator = mock(ClientAuthenticator.class);
         requestValidator = mock(ClientCredentialsRequestValidator.class);

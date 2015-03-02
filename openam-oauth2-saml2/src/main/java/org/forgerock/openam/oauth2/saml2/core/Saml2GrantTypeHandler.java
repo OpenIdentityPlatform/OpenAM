@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2.saml2.core;
@@ -40,6 +40,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.util.Reject;
 import org.forgerock.util.encode.Base64;
@@ -75,7 +76,7 @@ public class Saml2GrantTypeHandler implements GrantTypeHandler {
     }
 
     public AccessToken handle(OAuth2Request request) throws InvalidGrantException, InvalidClientException,
-            ClientAuthenticationFailedException, InvalidRequestException, ServerException, InvalidScopeException {
+            ClientAuthenticationFailedException, InvalidRequestException, ServerException, InvalidScopeException, NotFoundException {
 
         String clientId = request.getParameter("client_id");
         Reject.ifTrue(isEmpty(clientId), "Missing parameter, 'client_id'");

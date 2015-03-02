@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.service;
@@ -59,7 +59,9 @@ public abstract class ServiceEndpointApplication extends Application {
      */
     @Override
     public Restlet createInboundRoot() {
-        return getRouter(restEndpoints);
+        Restlet router = getRouter(restEndpoints);
+        router.setContext(getContext());
+        return router;
     }
 
     /**
@@ -67,5 +69,5 @@ public abstract class ServiceEndpointApplication extends Application {
      * @param restEndpoints Registry of routers.
      * @return The required router.
      */
-    protected abstract ServiceRouter getRouter(RestEndpoints restEndpoints);
+    protected abstract Restlet getRouter(RestEndpoints restEndpoints);
 }

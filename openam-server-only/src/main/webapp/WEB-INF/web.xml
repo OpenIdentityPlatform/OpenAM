@@ -1068,31 +1068,6 @@
 
     <!-- end of servlet mapping -->
 
-
-    <!-- Servlet to Restlet adapter declaration (Mandatory) -->
-    <servlet>
-        <servlet-name>OAuth2RestletAdapter</servlet-name>
-        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
-
-        <!-- Your application class name (Optional - For mode 3) -->
-        <init-param>
-            <param-name>org.restlet.application</param-name>
-            <param-value>org.forgerock.openidconnect.restlet.OpenIdConnectApplication</param-value>
-        </init-param>
-
-        <!-- List of supported client protocols (Optional - Only in mode 3) -->
-        <init-param>
-            <param-name>org.restlet.clients</param-name>
-            <param-value>RIAP CLAP</param-value>
-        </init-param>
-
-        <!-- Add the Servlet context path to routes (Optional) -->
-        <init-param>
-            <param-name>org.restlet.autoWire</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </servlet>
-
     <servlet>
         <servlet-name>WebFinger</servlet-name>
         <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
@@ -1155,11 +1130,6 @@
     <!-- servlet declaration -->
 
     <servlet-mapping>
-        <servlet-name>OAuth2RestletAdapter</servlet-name>
-        <url-pattern>/oauth2/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
         <servlet-name>WebFinger</servlet-name>
         <url-pattern>/.well-known/*</url-pattern>
     </servlet-mapping>
@@ -1175,6 +1145,10 @@
     <servlet-mapping>
         <servlet-name>ForgeRockRest</servlet-name>
         <url-pattern>/xacml/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ForgeRockRest</servlet-name>
+        <url-pattern>/oauth2/*</url-pattern>
     </servlet-mapping>
 
     <!-- Setup favicon.ico extension type -->

@@ -1,7 +1,7 @@
 /** 
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -45,23 +45,23 @@ define("ThemeManager", [
             $("<link/>", {
                 rel: "stylesheet/less",
                 type: "text/css",
-                href: constants.BASE_PATH + theme.path + "css/styles.less"
+                href: require.toUrl(theme.path + "css/styles.less")
              }).appendTo("head");
 
             $("<link/>", {
                 rel: "icon",
                 type: "image/x-icon",
-                href: constants.BASE_PATH + theme.path + theme.icon
+                href: require.toUrl(theme.path + theme.icon)
              }).appendTo("head");
             
             $("<link/>", {
                 rel: "shortcut icon",
                 type: "image/x-icon",
-                href: constants.BASE_PATH + theme.path + theme.icon
+                href: require.toUrl(theme.path + theme.icon)
              }).appendTo("head");
 
             themeCSSPromise = $.ajax({
-                url: constants.BASE_PATH + constants.LESS_VERSION,
+                url: require.toUrl(constants.LESS_VERSION),
                 dataType: "script",
                 cache:true,
                 error: function (request, status, error) {
@@ -75,7 +75,7 @@ define("ThemeManager", [
     
     obj.loadThemeConfig = function(){
         if (themeConfigPromise === undefined) {
-            themeConfigPromise = $.getJSON(constants.BASE_PATH + constants.THEME_CONFIG_PATH);
+            themeConfigPromise = $.getJSON(require.toUrl(constants.THEME_CONFIG_PATH));
         }
         return themeConfigPromise;
     };

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -19,6 +19,7 @@ package org.forgerock.oauth2.core;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 
 /**
  * Authenticates OAuth2 clients by extracting the client's identifier and secret from the request.
@@ -37,7 +38,8 @@ public interface ClientAuthenticator {
      *          authenticated.
      * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      * @throws ClientAuthenticationFailedException If client authentication fails.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     ClientRegistration authenticate(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
-            ClientAuthenticationFailedException;
+            ClientAuthenticationFailedException, NotFoundException;
 }

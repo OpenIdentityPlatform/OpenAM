@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect.restlet;
@@ -66,8 +66,8 @@ public class OpenIDConnectJWKEndpoint extends ServerResource {
     @Get
     public Representation getJWKSet() throws OAuth2RestletException {
         OAuth2Request request = requestFactory.create(getRequest());
-        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         try {
+            OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
             return new JsonRepresentation(providerSettings.getJWKSet().asMap());
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);

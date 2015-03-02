@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -25,12 +25,12 @@ import org.forgerock.openam.xui.XUIState;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.representation.EmptyRepresentation;
+import org.restlet.routing.Router;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
 
-import static org.fest.assertions.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class AuthorizeResourceTest {
@@ -58,7 +58,7 @@ public class AuthorizeResourceTest {
         when(oauth2RequestFactory.create(request)).thenReturn(o2request);
 
         resource = new AuthorizeResource(oauth2RequestFactory, service, null, representation,
-                CollectionUtils.asSet(hook), xuiState);
+                CollectionUtils.asSet(hook), xuiState, mock(Router.class));
         resource = spy(resource);
         doReturn(request).when(resource).getRequest();
         doReturn(response).when(resource).getResponse();

@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -315,6 +315,7 @@
 
         <!-- OpenAM REST - CORE Module -->
         <module>openam-rest</module>
+        <module>openam-restlet</module>
 
         <module>openam-plugins</module>
 
@@ -651,6 +652,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-entitlements</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-restlet</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

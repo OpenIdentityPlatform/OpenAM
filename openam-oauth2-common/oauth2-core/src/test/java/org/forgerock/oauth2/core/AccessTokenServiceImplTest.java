@@ -11,12 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.mockito.Matchers;
@@ -46,7 +45,7 @@ public class AccessTokenServiceImplTest {
     private OAuth2ProviderSettings providerSettings;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         Map<String, GrantTypeHandler> grantTypeHandlers = new HashMap<String, GrantTypeHandler>();
         grantTypeHandler = mock(GrantTypeHandler.class);

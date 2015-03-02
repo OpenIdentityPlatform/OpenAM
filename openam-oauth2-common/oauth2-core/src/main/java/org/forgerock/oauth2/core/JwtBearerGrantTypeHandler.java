@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -22,6 +22,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
@@ -53,7 +54,7 @@ public class JwtBearerGrantTypeHandler implements GrantTypeHandler {
     @Override
     public AccessToken handle(OAuth2Request request) throws RedirectUriMismatchException, InvalidClientException,
             InvalidRequestException, ClientAuthenticationFailedException, InvalidGrantException, InvalidCodeException,
-            ServerException, UnauthorizedClientException, InvalidScopeException {
+            ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException {
 
         final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request);
 
