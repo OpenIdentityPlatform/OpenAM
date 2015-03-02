@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.upgrade.steps;
 
@@ -88,7 +89,7 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
             findUpgradableProviders();
         } catch (ServiceNotFoundException e) {
             //When upgrading from 10.0.x and before there is no OAuth2 service, so we expect this exception in this case
-            DEBUG.error("OAuth2Provider service not found. Nothing to upgrade", e);
+            DEBUG.message("OAuth2Provider service not found. Nothing to upgrade", e);
         } catch (Exception e) {
             DEBUG.error("An error occurred while trying to create Service Config and Schema Managers.", e);
             throw new UpgradeException("Unable to create Service Config and Schema Managers.", e);

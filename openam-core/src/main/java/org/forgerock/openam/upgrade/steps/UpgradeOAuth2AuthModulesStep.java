@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.upgrade.steps;
@@ -35,6 +36,7 @@ import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceNotFoundException;
 
 /**
  * This upgrade step looks in OAuth2 auth module config for uses of DefaultAccountMapper and DefaultAttributeMapper,
@@ -77,9 +79,12 @@ public class UpgradeOAuth2AuthModulesStep extends AbstractUpgradeStep {
                     check(attributes, ATTRIBUTE_MAPPER_PROPERTY, DEFAULT_ATTRIBUTE_MAPPER, realm, moduleName);
                 }
             }
+        } catch (ServiceNotFoundException e) {
+            // When upgrading from 9.5.x and before there is no OAuth2 auth modules, so we expect this exception in this case
+            DEBUG.message("OAuth2 auth modules not found. Nothing to upgrade", e);
         } catch (Exception ex) {
             DEBUG.error("An error occurred while trying to look for upgradable OAuth2 auth modules", ex);
-            throw new UpgradeException("Unable to retrieve OAuth2 modules", ex);
+            throw new UpgradeException("Unable to retrieve OAuth2 auth modules", ex);
         }
     }
 
