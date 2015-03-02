@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.shared.timeservice;
 
@@ -21,13 +21,13 @@ import org.forgerock.util.time.TimeService;
  * An accelerate timeservice for testing time sensitive features
  * It accelerate the time from a date reference called initial time.
  * Every MS after this reference will be multiplied by a factor
- * <p/>
- * <p/>
+ * </p>
+ * </p>
  * Example :
- * <p/>
+ * </p>
  * //Multiply the time by two from now (16/05/2014 16:20:30)
  * TimeService timeservice = new AccelerateTimeService(System.currentTimeMillis(), 2);
- * <p/>
+ * </p>
  * ... 10 secs later
  * //return a value equivalent to 16/05/2014 16:20:50
  * timeservice.now()
@@ -36,6 +36,7 @@ public class AccelerateTimeService implements TimeService {
 
     private int factor;
     private long initTime;
+    private long systemTimeAtInitialization;
 
     /**
      * Constructor
@@ -46,13 +47,14 @@ public class AccelerateTimeService implements TimeService {
     public AccelerateTimeService(long initTime, int factor) {
         this.initTime = initTime;
         this.factor = factor;
+        this.systemTimeAtInitialization = System.currentTimeMillis();
     }
 
     @Override
     public long now() {
 
         //elapsed time since the beginning
-        long deltaTimeFromInitTime = System.currentTimeMillis() - initTime;
+        long deltaTimeFromInitTime = System.currentTimeMillis() - systemTimeAtInitialization;
 
         //We only accelerate the elapsed time with the factor requested
         return deltaTimeFromInitTime * factor + initTime;

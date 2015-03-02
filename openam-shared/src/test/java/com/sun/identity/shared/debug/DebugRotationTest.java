@@ -24,14 +24,71 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.TimeZone;
 
 public class DebugRotationTest extends DebugTestTemplate {
 
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z");
+
     @Test
-    public void rotation() throws Exception {
+    public void rotationInNormalDate() throws Exception {
+        Calendar calRandomDate = Calendar.getInstance();
+        calRandomDate.set(Calendar.YEAR, 1989);
+        calRandomDate.set(Calendar.MONTH, Calendar.MAY);
+        calRandomDate.set(Calendar.DAY_OF_MONTH, 16);
+
+        calRandomDate.set(Calendar.HOUR_OF_DAY, 0);
+        calRandomDate.set(Calendar.MINUTE, 0);
+        calRandomDate.set(Calendar.SECOND, 0);
+        calRandomDate.set(Calendar.MILLISECOND, 0);
+
+        long fakeInitTime = calRandomDate.getTimeInMillis();
+
+        System.out.println("Test rotation for date : '" + dateFormat.format(calRandomDate.getTime()) + "'");
+        rotation(fakeInitTime);
+    }
+
+    @Test
+    public void rotationInDSTDateMarch() throws Exception {
+        Calendar calDSTMarch = Calendar.getInstance();
+        calDSTMarch.set(Calendar.YEAR, 2015);
+        calDSTMarch.set(Calendar.MONTH, Calendar.MARCH);
+        calDSTMarch.set(Calendar.DAY_OF_MONTH, 29);
+
+        calDSTMarch.set(Calendar.HOUR_OF_DAY, 0);
+        calDSTMarch.set(Calendar.MINUTE, 58);
+        calDSTMarch.set(Calendar.SECOND, 0);
+        calDSTMarch.set(Calendar.MILLISECOND, 0);
+
+        long fakeInitTime = calDSTMarch.getTimeInMillis();
+
+        System.out.println("Test rotation for date : '" + dateFormat.format(calDSTMarch.getTime()) + "'");
+        rotation(fakeInitTime);
+    }
+
+    @Test
+    public void rotationInDSTDateOctober() throws Exception {
+        Calendar calDSTOctober = Calendar.getInstance();
+        calDSTOctober.set(Calendar.YEAR, 2015);
+        calDSTOctober.set(Calendar.MONTH, Calendar.OCTOBER);
+        calDSTOctober.set(Calendar.DAY_OF_MONTH, 26);
+
+        calDSTOctober.set(Calendar.HOUR_OF_DAY, 1);
+        calDSTOctober.set(Calendar.MINUTE, 58);
+        calDSTOctober.set(Calendar.SECOND, 0);
+        calDSTOctober.set(Calendar.MILLISECOND, 0);
+
+        long fakeInitTime = calDSTOctober.getTimeInMillis();
+
+        System.out.println(TimeZone.getDefault().getDisplayName());
+        System.out.println(TimeZone.getDefault().getID());
+        System.out.println("Test rotation for date : '" + dateFormat.format(calDSTOctober.getTime()) + "'");
+
+        rotation(fakeInitTime);
+    }
+
+    private void rotation(long fakeInitTime) throws Exception {
         String DEBUG_CONFIG_FOR_TEST = "/debug_config_test/debugconfigRotation.properties";
 
         initializeProperties();
@@ -42,7 +99,6 @@ public class DebugRotationTest extends DebugTestTemplate {
 
         String debugNameFile = "debugMerge";
 
-
         long initTime = System.currentTimeMillis();
 
         //Accelerate the test timeservice
@@ -51,12 +107,11 @@ public class DebugRotationTest extends DebugTestTemplate {
         int factor = 360;
         int fakeDurationMs = testDurationMs * factor;
 
+
         //In order to have an effective and short in time test, we accelerate the time
-        TimeService accelerateClock = new AccelerateTimeService(initTime, factor);
+        TimeService accelerateClock = new AccelerateTimeService(fakeInitTime, factor);
         debugFileProvider.setClock(accelerateClock);
 
-        //Log history is to avoid the possibility of preemption due to the accelerate time
-        Set<String> logDatesHistory = new HashSet<String>();
 
         // check debugFiles.properties to see the mapping
         IDebug debugTest1MergeToDebugMerge = provider.getInstance("debugTest1MergeToDebugMerge");
@@ -84,16 +139,15 @@ public class DebugRotationTest extends DebugTestTemplate {
         }
 
         //The first writing initialize the log file. So we test that a swift of 1 minute doesn't
-        //create a new file
-        logDatesHistory.add(dateFormat.format(new Date(accelerateClock.now())));
+        //create a new file at the end
         debugTest1MergeToDebugMerge.message("Should appear in log", null);
-        Thread.sleep(1000 * 60 / factor);
+        long currentAccelerateTimeInMin = accelerateClock.now() / (1000 * 60);
 
-        logDatesHistory.add(dateFormat.format(new Date(accelerateClock.now())));
+        while (accelerateClock.now() / (1000 * 60) < currentAccelerateTimeInMin) { Thread.sleep(100); }
         debugTest2MergeToDebugMerge.message("Should appear in log", null);
-        Thread.sleep(1000 * 60 / factor);
 
-        logDatesHistory.add(dateFormat.format(new Date(accelerateClock.now())));
+        currentAccelerateTimeInMin = accelerateClock.now() / (1000 * 60);
+        while (accelerateClock.now() / (1000 * 60) < currentAccelerateTimeInMin) { Thread.sleep(100); }
         debugTest3MergeToDebugMerge.message("Should appear in log", null);
 
         //Start threads
@@ -111,43 +165,26 @@ public class DebugRotationTest extends DebugTestTemplate {
             if (printLogRunnableTest.ex != null) throw printLogRunnableTest.ex;
         }
 
-        //Merge Log dates history
-        //NB : we merge the log dates history from each thread instead of directly insert
-        //to a global set in order to not reduce the performance of each thread by
-        //inserting in a concurrent set.
-        logDatesHistory.addAll(printLogRunnableTest1.getLogDatesHistory());
-        logDatesHistory.addAll(printLogRunnableTest2.getLogDatesHistory());
-        logDatesHistory.addAll(printLogRunnableTest3.getLogDatesHistory());
 
         //Check files creation
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(initTime);
+        Calendar calRandomDate = Calendar.getInstance();
+        calRandomDate.setTimeInMillis(fakeInitTime);
 
         //It's possible that we stored the init time just before the next minute
-        if (!isFileExist(debugNameFile + dateFormat.format(cal.getTime()))) {
-            cal.add(Calendar.MINUTE, 1);
+        if (!isFileExist(debugNameFile + dateFormat.format(calRandomDate.getTime()))) {
+            calRandomDate.add(Calendar.MINUTE, 1);
         }
 
-        while (cal.getTimeInMillis() - initTime < fakeDurationMs) {
+        while (calRandomDate.getTimeInMillis() - fakeInitTime < fakeDurationMs) {
 
-            /*
-                Before each file exist = true, we will check if there is a log in the history
-                if not, it means that the unit test has been preempted at the checked time.
-            */
-            String currentDateInString = dateFormat.format(cal.getTime());
+            checkLogFileStatus(true, debugNameFile + dateFormat.format(calRandomDate.getTime()));
+            calRandomDate.add(Calendar.MINUTE, 1);
 
-            if (!logDatesHistory.contains(currentDateInString)) {
-                cal.add(Calendar.MINUTE, 1);
-                continue;
-            }
-            checkLogFileStatus(true, debugNameFile + dateFormat.format(cal.getTime()));
-            cal.add(Calendar.MINUTE, 1);
+            checkLogFileStatus(false, debugNameFile + dateFormat.format(calRandomDate.getTime()));
+            calRandomDate.add(Calendar.MINUTE, 1);
 
-            checkLogFileStatus(false, debugNameFile + dateFormat.format(cal.getTime()));
-            cal.add(Calendar.MINUTE, 1);
-
-            checkLogFileStatus(false, debugNameFile + dateFormat.format(cal.getTime()));
-            cal.add(Calendar.MINUTE, 1);
+            checkLogFileStatus(false, debugNameFile + dateFormat.format(calRandomDate.getTime()));
+            calRandomDate.add(Calendar.MINUTE, 1);
         }
 
     }
@@ -160,11 +197,9 @@ public class DebugRotationTest extends DebugTestTemplate {
         private IDebug debug;
         private long initTime;
         private int testDuration;
-        private Set<String> logDatesHistory = new HashSet<String>();
         private TimeService accelerateClock;
 
         //Date formats for helping the debugging
-        private SimpleDateFormat dateFormat;
         private SimpleDateFormat dateFormatWithMs;
 
         public Exception ex = null;
@@ -174,7 +209,6 @@ public class DebugRotationTest extends DebugTestTemplate {
             this.initTime = initTime;
             this.testDuration = testDurationMS;
             this.accelerateClock = accelerateClock;
-            this.dateFormat = new SimpleDateFormat("-MM.dd.yyyy-HH.mm");
             this.dateFormatWithMs = new SimpleDateFormat("-MM.dd.yyyy-HH.mm-ss-SSS");
         }
 
@@ -182,19 +216,12 @@ public class DebugRotationTest extends DebugTestTemplate {
             try {
                 while (System.currentTimeMillis() - initTime < testDuration) {
 
-                    String dateInString = dateFormat.format(new Date(accelerateClock.now()));
                     String dateInStringWithMs = dateFormatWithMs.format(new Date(accelerateClock.now()));
-                    logDatesHistory.add(dateInString);
-
                     debug.message("Fake date = " + dateInStringWithMs, null);
                 }
             } catch (Exception e) {
                 this.ex = e;
             }
-        }
-
-        public Set<String> getLogDatesHistory() {
-            return logDatesHistory;
         }
     }
 
