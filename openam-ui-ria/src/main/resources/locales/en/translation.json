@@ -13,6 +13,7 @@
             },
             "CommonMessages" : {
                 "authenticationFailed" : "User name/password combination is invalid.",
+                "authenticationFailedWarning" : "Invalid Password! Warning: Account lockout will occur after next __count__ password failure(s)",
                 "loginFailureLockout" : "Your password has expired. Please contact service desk to reset your password",
                 "maxSessionsLimitOrSessionQuota": "Maximum sessions limit reached or session quota has exhausted.",
                 "serviceUnavailable" : "Service unavailable",

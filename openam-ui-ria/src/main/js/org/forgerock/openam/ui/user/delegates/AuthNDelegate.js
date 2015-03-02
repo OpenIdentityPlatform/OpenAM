@@ -182,7 +182,9 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                     var oldReqs,errorBody,msg,
                         currentStage = requirementList.length,
                         responseMessage = jqXHR.responseJSON.message,
-                        failReason = null;
+                        failReason = null,
+                        countIndex,
+                        warningText = 'Invalid Password!!Warning: Account lockout will occur after next ';
                     if (jqXHR.status === 408) {
                         // we timed out, so let's try again with a fresh session
                         oldReqs = requirementList[0];
@@ -227,6 +229,8 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                                .fail(processFailed);
 
                         } else {
+                            // TODO to refactor this switch soon. Something like a map from error.message to failReason 
+                            // http://sources.forgerock.org/cru/CR-6216#CFR-114597
                             switch (errorBody.message) {
                                 case "User Account Locked":
                                     failReason = "loginFailureLockout";
@@ -238,7 +242,12 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                                     failReason = "loginFailureLockout";
                                 break;
                                 default:
-                                    failReason = "authenticationFailed";
+                                    countIndex = errorBody.message.indexOf(warningText);
+                                    if ( countIndex >= 0 ) {
+                                        failReason = {key: "authenticationFailedWarning", count: errorBody.message.slice(warningText.length, warningText.length + 1)};
+                                    } else {
+                                        failReason = "authenticationFailed";
+                                    }
                             }
 
                             processFailed(failReason);
