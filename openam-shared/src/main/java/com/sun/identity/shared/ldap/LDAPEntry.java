@@ -21,7 +21,8 @@
  */
 
 /*
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.shared.ldap;
 
@@ -218,6 +219,12 @@ public class LDAPEntry implements java.io.Serializable {
                             LDAPAttribute attr = new LDAPAttribute(name);
                             attr.setValues(set.toArray(new Object[0]));
                             attrs.add(attr);
+                        } else {
+                            /*
+                             * In this case, offset[0] and bytesProcessed[0] are not changed. Therefore the following break
+                             * statement is needed to prevent an infinite loop.
+                             */
+                            break;
                         }
                     }
                     if (!attrs.isEmpty()) {
