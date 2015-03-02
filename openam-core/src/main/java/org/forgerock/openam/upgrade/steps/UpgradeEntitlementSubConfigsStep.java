@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade.steps;
@@ -19,6 +19,7 @@ package org.forgerock.openam.upgrade.steps;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
+import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementConfiguration;
@@ -78,6 +79,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     private static final String AUDIT_NEW_TYPE_START = "upgrade.entitlement.new.type.start";
     private static final String AUDIT_NEW_APPLICATION_START = "upgrade.entitlement.new.application.start";
     private static final String AUDIT_MODIFIED_TYPE_START = "upgrade.entitlement.modified.type.start";
+    private static final String AUDIT_MODIFIED_IPAMWAS_START = "upgrade.entitlement.modified.IPAMWAS.start";
     private static final String AUDIT_MODIFIED_SUB_START = "upgrade.entitlement.modified.subjects.start";
     private static final String AUDIT_MODIFIED_CON_START = "upgrade.entitlement.modified.conditions.start";
     private static final String AUDIT_MODIFIED_DES_START = "upgrade.entitlement.modified.description.start";
@@ -306,7 +308,8 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             addMissingApplications();
         }
         if (!missingActions.isEmpty()) {
-            addMissingActions();
+            Map defaultIPAMWASActions = addMissingActionsReturningDefault();
+            addActionsToDefaultIPWAMASApplication(defaultIPAMWASActions);
         }
         if (!changedConditions.isEmpty()) {
             addChangedConditions();
@@ -534,9 +537,11 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     /**
      * Adds the missing actions to their corresponding application type's.
      *
+     * @return Map of the new actions associated with the default IPAMWAS application type.
      * @throws UpgradeException If there was an error while updating the application type.
      */
-    private void addMissingActions() throws UpgradeException {
+    private Map addMissingActionsReturningDefault() throws UpgradeException {
+        Map<String, Boolean> defaultIPAMWASActions = null;
         for (final Map.Entry<String, Map<String, Boolean>> entry : missingActions.entrySet()) {
             final String name = entry.getKey();
             final Map<String, Boolean> actions = entry.getValue();
@@ -549,14 +554,51 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
                 final ApplicationType type = getType(name);
                 type.getActions().putAll(actions);
                 entitlementService.storeApplicationType(type);
+                if (ApplicationTypeManager.URL_APPLICATION_TYPE_NAME.equalsIgnoreCase(name)) {
+                    defaultIPAMWASActions = actions;
+                }
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException ee) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
                 throw new UpgradeException(ee);
             }
         }
+
+        return defaultIPAMWASActions;
     }
 
+    /**
+     * Adds the missing actions to the default ipamwas application.
+     * @param actions a map containing the new actions to be added to the default ipamwas application.
+     *
+     * @throws UpgradeException If there was an error while updating the application type.
+     */
+    private void addActionsToDefaultIPWAMASApplication(Map actions) throws UpgradeException {
+        if (actions == null) {
+            return;
+        }
+
+        try {
+            UpgradeProgress.reportStart(AUDIT_MODIFIED_IPAMWAS_START);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Modifying default IPAMWAS Application; adding actions: " + actions);
+            }
+            Set<Application> appsInRootRealm = entitlementService.getApplications();
+            for (Application app : appsInRootRealm) {
+                if (UpgradeEntitlementsStep.DEFAULT_APP_TYPE.equals(app.getName())) {
+                    Map appActions = app.getActions();
+                    appActions.putAll(actions);
+                    app.setActions(appActions);
+                    entitlementService.storeApplication(app);
+                    break;
+                }
+            }
+            UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
+        } catch (EntitlementException ee) {
+            UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+            throw new UpgradeException(ee);
+        }
+    }
     /**
      * Retrieves the application for the passed application name.
      *
