@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,9 +24,6 @@
 
 /*global $, define, _, location */
 
-/**
- * @author mbilski
- */
 define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
@@ -49,7 +46,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
                 var hostname = location.hostname,
                     fqdn = response.FQDN,
                     currentUrl = uiUtils.getUrl();
-                if (hostname !== fqdn) {
+                if (fqdn !== null && hostname !== fqdn) {
                     location.href = currentUrl.replace(hostname,fqdn);
                 } else {
                     successCallback(response);
