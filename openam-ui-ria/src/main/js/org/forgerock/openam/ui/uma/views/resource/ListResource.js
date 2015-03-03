@@ -30,10 +30,11 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
     "org/forgerock/openam/ui/uma/util/UmaUtils",
     "backgrid"
-], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, umaUtils, Backgrid) {
+], function(AbstractView, conf, eventManager, uiUtils, constants, router, backgridUtils, umaUtils, Backgrid) {
 
     var ListResource = AbstractView.extend({
         template: "templates/uma/views/resource/ListResource.html",
@@ -69,6 +70,25 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
             });
 
             columns = [
+                {
+                    name: "share",
+                    label: "",
+                    cell: Backgrid.Cell.extend({
+                        className: "icon-share",
+                        events: { "click": "share" },
+                        share: function(e) {
+                            eventManager.sendEvent(constants.EVENT_SHOW_DIALOG,{
+                                route: router.configuration.routes.dialogShare,
+                                args: [this.model.get('_id')]
+                            });
+                        },
+                        render: function () {
+                            this.delegateEvents();
+                            return this;
+                        }
+                    }),
+                    editable: false
+                },
                 {
                     name: "name",
                     label: $.t("uma.resources.list.grid.0"),

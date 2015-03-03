@@ -234,7 +234,6 @@ body{
         color: grey;
     }
 
-
     .backgrid{
 
         max-width: none;
@@ -316,7 +315,19 @@ body{
                     text-decoration: none;
                     font-weight:bold;
                 }
+
+                &.icon-share {
+                    font-size:15px;
+                    padding:0 10px;
+
+                    &:hover {
+                        color: lighten(@table-base-color, 45%);
+                        background-color: @table-base-color;
+                    }
+                }
             }
+
+
         }
         .ascending .sort-caret{
             border-bottom: 4px solid @table-base-color;

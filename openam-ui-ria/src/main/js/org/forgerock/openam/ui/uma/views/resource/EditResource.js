@@ -199,7 +199,7 @@ define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
             e.preventDefault();
             eventManager.sendEvent(constants.EVENT_SHOW_DIALOG,{
                 route: router.configuration.routes.dialogShare,
-                args: [this.data.resourceSet.uid]
+                args: [this.data.resourceSet.id]
             });
         }
     });

@@ -44,7 +44,7 @@ define("org/forgerock/openam/ui/uma/util/UmaUtils", [
             newPromise = umaDelegate.getResourceSetFromId(uid);
             $.when(newPromise).done(function(resourceSet){
                 if (resourceSet) {
-                    resourceSet.uid = uid;
+                    resourceSet.id = uid;
                     resourceSet.scopes = obj.processResourceScopes(resourceSet.scopes);
                 }
             });

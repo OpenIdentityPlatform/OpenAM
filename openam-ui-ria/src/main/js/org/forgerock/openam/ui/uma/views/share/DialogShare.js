@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
 ], function(Dialog, CommonShare, editResourceView, router) {
 
     var DialogShare = Dialog.extend({
-        contentTemplate: "templates/uma/views/share/BaseShare.html", //TODO .. need to use a blank base
+        contentTemplate: "templates/common/EmptyTemplate.html", 
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
 
         events: {
@@ -42,6 +42,7 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
 
         render: function(args, callback) {
             $("#dialogs").hide();
+
             this.show(_.bind(function() {
                 $("#dialogs").show();
                 this.shareView = new CommonShare();
@@ -63,9 +64,14 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
         },
 
         saveThenClose: function(e){
-            //TODO :Add save code here.
-            editResourceView.data.userPolicies.fetch({reset: true, processData: false});
-            router.routeTo( router.configuration.routes.editResource, {args: [this.data.resourceSet.uid], trigger: true});
+            //TODO :Add save code here
+            if(editResourceView.data && editResourceView.data.userPolicies){
+                editResourceView.data.userPolicies.fetch({reset: true, processData: false});
+            }
+
+            // TODO :Not sure if removing the route below breaks the reloading of data in the editResourceView.
+            // If so we need to reload the correct parent, which is not always editResourceView.
+            // router.routeTo( router.configuration.routes.editResource, {args: [this.data.resourceSet.id], trigger: true});
 
             this.close(e);
         }
