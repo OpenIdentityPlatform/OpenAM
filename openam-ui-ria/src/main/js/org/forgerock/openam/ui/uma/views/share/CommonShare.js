@@ -83,8 +83,8 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 this.$el.find('input#shareButton').prop('disabled', !model.isValid());
             },
 
-            render: function(args, callback) {
-                this.load(args[0]);
+            render: function(currentResourceSetId, callback) {
+                this.load(currentResourceSetId);
 
                 if(callback) { callback(); }
             },

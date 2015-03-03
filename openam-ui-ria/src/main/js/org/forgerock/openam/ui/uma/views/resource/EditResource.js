@@ -55,6 +55,7 @@ define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
             $.when(resourcesetPromise).done(function(resourceSet){
 
                 self.data.resourceSet = resourceSet;
+                self.data.currentResourceSetId = resourceSet.id;
 
                 var options = [];
                 _.each(resourceSet.scopes, function(option){
@@ -199,7 +200,8 @@ define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
             e.preventDefault();
             eventManager.sendEvent(constants.EVENT_SHOW_DIALOG,{
                 route: router.configuration.routes.dialogShare,
-                args: [this.data.resourceSet.id]
+                // This is required because the dialog will otherwise try to automatically route the window to the base view.
+                noViewChange: true
             });
         }
     });

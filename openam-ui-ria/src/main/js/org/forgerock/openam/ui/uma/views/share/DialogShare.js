@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
 ], function(Dialog, CommonShare, editResourceView, router) {
 
     var DialogShare = Dialog.extend({
-        contentTemplate: "templates/common/EmptyTemplate.html", 
+        contentTemplate: "templates/common/EmptyTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
 
         events: {
@@ -48,7 +48,7 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
                 this.shareView = new CommonShare();
                 this.shareView.baseTemplate= 'templates/common/DefaultBaseTemplate.html';
                 this.shareView.element = '#dialogs .dialogContent';
-                this.shareView.render(args, callback);
+                this.shareView.render(this.data.currentResourceSetId, callback);
 
             }, this));
         },

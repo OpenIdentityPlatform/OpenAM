@@ -77,9 +77,10 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                         className: "icon-share",
                         events: { "click": "share" },
                         share: function(e) {
+                            self.data.currentResourceSetId = this.model.get('_id');
                             eventManager.sendEvent(constants.EVENT_SHOW_DIALOG,{
                                 route: router.configuration.routes.dialogShare,
-                                args: [this.model.get('_id')]
+                                noViewChange: true
                             });
                         },
                         render: function () {

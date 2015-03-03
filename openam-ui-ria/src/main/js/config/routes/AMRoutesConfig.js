@@ -89,15 +89,15 @@ define("config/routes/AMRoutesConfig", [
         "uma": {
             view: "org/forgerock/openam/ui/uma/views/resource/ListResource",
             url: /^uma/,
-            pattern: "uma/resource/",
+            pattern: "uma/resources/",
             role: "ui-user"
         },
         "dialogShare": {
             base: "editResource",
             dialog: "org/forgerock/openam/ui/uma/views/share/DialogShare",
             role: "ui-user",
-            url: /^uma\/resources\/(.+?)\/(share)\//,
-            pattern: "uma/resources/?/share/"
+            url: /^uma\/resources\/$/,
+            pattern: "uma/resources/"
         },
         "editResource": {
             view: "org/forgerock/openam/ui/uma/views/resource/EditResource",
