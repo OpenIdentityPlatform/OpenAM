@@ -105,4 +105,9 @@ public interface OpenAMSettings {
      * @return The SSO Cookie name.
      */
     String getSSOCookieName();
+
+    /**
+     * Whether there is realm config for the service
+     */
+    boolean hasConfig(String realm) throws SSOException, SMSException;
 }

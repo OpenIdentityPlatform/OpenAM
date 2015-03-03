@@ -46,6 +46,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.restlet.RestletOAuth2Request;
 import org.forgerock.openam.oauth2.OAuthProblemException;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.restlet.Request;
@@ -67,6 +68,7 @@ public class UmaProviderSettingsFactory {
     private final RealmNormaliser realmNormaliser;
     private final OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory;
     private final UmaTokenStoreFactory tokenStoreFactory;
+    private final BaseURLProviderFactory baseURLProviderFactory;
 
     /**
      * Contructs a new UmaProviderSettingsFactory.
@@ -77,10 +79,12 @@ public class UmaProviderSettingsFactory {
      */
     @Inject
     UmaProviderSettingsFactory(RealmNormaliser realmNormaliser,
-            OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory, UmaTokenStoreFactory tokenStoreFactory) {
+            OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory, UmaTokenStoreFactory tokenStoreFactory,
+            BaseURLProviderFactory baseURLProviderFactory) {
         this.realmNormaliser = realmNormaliser;
         this.oAuth2ProviderSettingsFactory = oAuth2ProviderSettingsFactory;
         this.tokenStoreFactory = tokenStoreFactory;
+        this.baseURLProviderFactory = baseURLProviderFactory;
     }
 
     /**
@@ -127,12 +131,7 @@ public class UmaProviderSettingsFactory {
             if (providerSettings == null) {
                 OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(request);
                 HttpServletRequest httpReq = ServletUtils.getRequest(request.<Request>getRequest());
-                String contextPath = httpReq.getContextPath();
-                String requestUrl = httpReq.getRequestURL().toString();
-                String baseUrlPattern = requestUrl.substring(0, requestUrl.indexOf(contextPath) + contextPath.length());
-                if (baseUrlPattern.endsWith("/")) {
-                    baseUrlPattern = baseUrlPattern.substring(0, baseUrlPattern.length() - 1);
-                }
+                String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(httpReq);
                 UmaTokenStore tokenStore = tokenStoreFactory.create(realm);
                 providerSettings = new UmaProviderSettingsImpl(realm, baseUrlPattern, tokenStore,
                         oAuth2ProviderSettings);

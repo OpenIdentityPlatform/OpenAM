@@ -29,6 +29,7 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
@@ -45,6 +46,7 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
     private final RealmNormaliser realmNormaliser;
     private final CookieExtractor cookieExtractor;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
+    private final BaseURLProviderFactory baseURLProviderFactory;
 
     /**
      * Contructs a new OpenAMOAuth2ProviderSettingsFactory.
@@ -55,25 +57,21 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
      */
     @Inject
     public OpenAMOAuth2ProviderSettingsFactory(RealmNormaliser realmNormaliser, CookieExtractor cookieExtractor,
-            ResourceSetStoreFactory resourceSetStoreFactory) {
+            ResourceSetStoreFactory resourceSetStoreFactory, BaseURLProviderFactory baseURLProviderFactory) {
         this.realmNormaliser = realmNormaliser;
         this.cookieExtractor = cookieExtractor;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
+        this.baseURLProviderFactory = baseURLProviderFactory;
     }
 
     /**
      * {@inheritDoc}
      */
     public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
-        final String realm = request.getParameter("realm");
+        final String realm = realmNormaliser.normalise(request.<String>getParameter("realm"));
         final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
-        String contextPath = req.getContextPath();
-        String requestUrl = req.getRequestURL().toString();
-        String baseUrlPattern = requestUrl.substring(0, requestUrl.indexOf(contextPath) + contextPath.length());
-        if (baseUrlPattern.endsWith("/")) {
-            baseUrlPattern = baseUrlPattern.substring(0, baseUrlPattern.length() - 1);
-        }
-        return getInstance(realmNormaliser.normalise(realm), baseUrlPattern);
+        String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(req);
+        return getInstance(realm, baseUrlPattern);
     }
 
     /**

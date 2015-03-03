@@ -84,7 +84,7 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
         return attributes.get(attributeName);
     }
 
-    protected boolean hasConfig(String realm) throws SSOException, SMSException {
+    public boolean hasConfig(String realm) throws SSOException, SMSException {
         return getServiceConfig(realm).exists();
     }
 
