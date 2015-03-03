@@ -20,18 +20,18 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Parent Project
-    <parent>
+    <!-- Parent Project -->
+    <!-- <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-documentation</artifactId>
-        <version>11.0.3-SNAPSHOT</version>
-    </parent>-->
+        <version>11.0.x-SNAPSHOT</version>
+    </parent> -->
 
     <parent>
      <groupId>org.forgerock</groupId>
@@ -61,8 +61,8 @@
     <!-- Documentation Module -->
     <!-- Redundant: <groupId>org.forgerock.openam</groupId> -->
     <groupId>org.forgerock.openam</groupId>
-    <artifactId>openam-doc-source</artifactId>
-    <version>3.3.4</version>
+    <artifactId>openam-source-docs</artifactId>
+    <version>11.0.3</version>
 
     <name>OpenAM Core Documentation Sources</name>
 
@@ -132,7 +132,9 @@
     <properties>
         <projectName>OpenAM</projectName>
 
-        <serverDocTargetVersion>11.0.1</serverDocTargetVersion>
+        <frDocPluginVersion>2.1.5</frDocPluginVersion>
+
+        <serverDocTargetVersion>11.0.3</serverDocTargetVersion>
         <agentsDocTargetVersion>3.3.4</agentsDocTargetVersion>
         <webAgentsDocTargetVersion>${agentsDocTargetVersion}</webAgentsDocTargetVersion>
         <javaEEAgentsDocTargetVersion>${agentsDocTargetVersion}</javaEEAgentsDocTargetVersion>
@@ -218,6 +220,7 @@
                 </executions>
             </plugin>
 -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -346,13 +349,14 @@
          <plugin>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-doc-maven-plugin</artifactId>
-                <version>2.1.5</version>
+                <version>${frDocPluginVersion}</version>
                 <configuration>
                     <projectName>${projectName}</projectName>
                     <projectVersion>${serverDocTargetVersion}</projectVersion>
                     <googleAnalyticsId>${gaId}</googleAnalyticsId>
                     <latestJson>http://mcraig.org/fr/latest.php</latestJson><!-- Temporary workaround pending #QOZ-985-23233 -->
                     <!--runLinkTester>false</runLinkTester-->
+                    <overwriteGeneratedSource>true</overwriteGeneratedSource>
                 </configuration>
                 <executions>
                     <execution>

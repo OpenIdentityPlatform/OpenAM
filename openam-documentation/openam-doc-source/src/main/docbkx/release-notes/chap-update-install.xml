@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2014 ForgeRock AS
+  !      Copyright 2014-2015 ForgeRock AS.
   !
 -->
 <chapter xml:id='chap-update-install'
@@ -37,6 +37,12 @@
   If you are installing OpenAM for the first time,
   you can use the same installation instructions as for 11.0.0.
  </para>
+
+ <note>
+  <para>
+   The content of this chapter has not changed since OpenAM 11.0.0.
+  </para>
+ </note>
 
  <procedure xml:id="update-from-earlier-release">
   <title>To Update From OpenAM 11.0</title>

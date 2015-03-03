@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-compatibility'
@@ -45,26 +45,140 @@
   -->
 
   <itemizedlist>
-
    <para>
     These changes are new in OpenAM ${serverDocTargetVersion}.
    </para>
 
-   <listitem><!-- OPENAM-3918 -->
+   <listitem>
     <para>
-     Valid loginURIs are now set using a property that specifies
-     a whitelist for custom login URIs
-     so that the CDCServlet and the Distributed Authentication UI (DAS)
-     can check login URI values against those in the whitelist.
+     <emphasis role="bold">Debug Logging Option to Decrypt SAML Assertions</emphasis>.
+     OpenAM now provides a debug logging option to decrypt SAML assertions when
+     OpenAM runs as a service provider and assertion encryption is enabled.
+    </para>
+    <para>
+     To enable the feature,
+     go to the Debug.jsp page and select the sub page where you want
+     debugging to occur. Then, at the top of the
+     page, click the button to turn decoding on or off.
+     This feature operates independently of the other debug logging options on
+     the page, so you can click cancel or back after pressing the button
+     and the setting is still set.
+    </para>
+    <para>
+     For details, see the explanation in
+     (<link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1631"
+      xlink:show="new"
+      >OPENAM-1631</link>).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <emphasis role="bold">Support for Auth Context Classes Extensibility</emphasis>.
+     OpenAM now supports the extensibility of auth context classes as described
+     in the SAMLv2 specification.
+    </para>
+    <para>
+     Custom contexts are also now shown in console if included in the extended
+     metadata but this change does not include the ability to add new contexts
+     via the console. Custom contexts still need to be loaded via ssoadm/extended
+     metadata.
+     (<link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2238"
+      xlink:show="new"
+      >OPENAM-2238</link>).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <emphasis role="bold">Password Reset Token Validation REST API</emphasis>.
+     OpenAM now supports a REST API to check if the token for password reset is
+     valid or not: <literal>/json/users?_action=confirm</literal>.
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3748"
+     xlink:show="new"
+     >OPENAM-3748</link>).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <emphasis role="bold">Support for OAuth2Provider Debug Log</emphasis>.
+     OpenAM now provides debug logs for OAuth2 OAuth2Provider
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4269"
+     xlink:show="new"
+     >OPENAM-4269</link>).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <emphasis role="bold">Alphabetical List of Agent Properties using ssoadm</emphasis>.
+     The <literal>ssoadm show-agent</literal> and <literal>ssoadm show-agent-grp</literal>
+     are now sorted and alphabeticalized
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4602"
+     xlink:show="new"
+     >OPENAM-4602</link>).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <emphasis role="bold">Default Timelimit using Netscape SDK is Configurable</emphasis>.
+     The default timelimit for LDAP operations performed using the Netscape SDK
+     is now configurable
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5311"
+     xlink:show="new"
+     >OPENAM-5311</link>).
+    </para>
+    <para>
+     To set the property, use <literal>org.forgerock.openam.ldap.default.time=integer</literal>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <emphasis role="bold">DAUI Supports goto URL Validation</emphasis>.
+     The valid goto URL domain setting has been moved to a new service,
+     <literal>validationService</literal> with a new property:
+     <literal>openam-auth-valid-goto-resources</literal>
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1773"
+     xlink:show="new"
+     >OPENAM-1773</link>).
+    </para>
+    <para>
+     Also, a new delegation policy has been created that allows agent accounts
+     to read the <literal>validationService</literal> settings.
+     Upgrade has been updated that migrates existing valid goto domains to the
+     new <literal>validationService</literal> and removes the old domains. This further ensures
+     that the new delegation policy is added to the system.
+    </para>
+    <para>
+     The Goto URL validation logic has been extracted out to a separate class
+     called <literal>RedirectUrlValidator</literal>, which now can be used from
+     both <literal>openam-core</literal> and <literal>openam-federation-library</literal>
+     (for Relaystate evaluations).
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <itemizedlist>
+   <para>
+    The following changes were listed for OpenAM 11.0.1.
+   </para>
+
+   <listitem><!-- OPENAM-1631 -->
+    <para>
+     OpenAM provides a debug logging option to decrypt SAML assertions when
+     OpenAM runs as a service provider and assertion encryption is enabled.
     </para>
 
     <para>
      For details, see the explanation in
-     <link
-      xlink:show="new"
-      xlink:href="release-notes#product-enhancements"
-      xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>Product Enhancements</citetitle></link>.
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1631"
+     xlink:show="new"
+     >OPENAM-1631</link>).
     </para>
    </listitem>
 
@@ -75,7 +189,7 @@
      <link
       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3159"
       xlink:show="new"
-     >OPENAM-3159</link>).
+      >OPENAM-3159</link>).
      In other words, if the request asks for <literal>userName</literal>,
      the response includes <literal>userName</literal>.
      If the request asks for <literal>username</literal>,
@@ -98,15 +212,9 @@
      <link
       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1655"
       xlink:show="new"
-     >OPENAM-1655</link>).
+      >OPENAM-1655</link>).
     </para>
    </listitem>
-  </itemizedlist>
-
-  <itemizedlist>
-   <para>
-    The following changes were listed for OpenAM 11.0.1.
-   </para>
 
    <listitem>
     <para>
@@ -279,11 +387,9 @@
      and the <literal>Object session</literal> argument.
     </para>
    </listitem>
-
   </itemizedlist>
 
   <itemizedlist>
-
    <para>
     The following changes were listed for OpenAM 11.0.0.
    </para>
