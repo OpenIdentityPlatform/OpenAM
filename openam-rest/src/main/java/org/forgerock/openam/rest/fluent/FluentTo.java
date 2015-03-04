@@ -11,18 +11,28 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.rest.fluent;
+
+import static org.apache.commons.lang.ArrayUtils.isNotEmpty;
+import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.forgerock.authz.filter.crest.AuthorizationFilters;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.Filter;
+import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.SingletonResourceProvider;
+import org.forgerock.util.Reject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Used to chain
@@ -31,10 +41,12 @@ public final class FluentTo {
 
     private final FluentRoute route;
     private final String version;
+    private final List<Filter> filters;
 
     FluentTo(FluentRoute route, String version) {
         this.route = route;
         this.version = version;
+        filters = new ArrayList<Filter>();
     }
 
     /**
@@ -45,7 +57,7 @@ public final class FluentTo {
      * @return a FluentRoute to the provider
      */
     public FluentVersion to(Class<? extends CollectionResourceProvider> providerClass) {
-        return to(providerClass, null);
+        return to(get(providerClass));
     }
 
     /**
@@ -57,16 +69,19 @@ public final class FluentTo {
      * @return a FluentRoute to the provider
      */
     public FluentVersion to(Class<? extends CollectionResourceProvider> providerClass, String named) {
+        return to(get(providerClass, named));
+    }
 
-        CollectionResourceProvider provider = get(providerClass, named);
-
-        if (route.getModules().length > 0) {
-            route.addVersion(RoutingMode.STARTS_WITH, version,
-                    AuthorizationFilters.createFilter(provider, route.getModules()));
-        } else {
-            route.addVersion(version, provider);
-        }
-
+    /**
+     * Internal method to route the passed provider.
+     *
+     * @param provider
+     *         the provider instance
+     *
+     * @return a route to the provider
+     */
+    private FluentVersion to(CollectionResourceProvider provider) {
+        handleFiltersAndRoute(RoutingMode.STARTS_WITH, Resources.newCollection(provider));
         return route;
     }
 
@@ -78,13 +93,7 @@ public final class FluentTo {
      * @return a FluentRoute to the provider
      */
     public FluentVersion to(SingletonResourceProvider provider) {
-        if (route.getModules().length > 0) {
-            route.addVersion(RoutingMode.EQUALS, version,
-                    AuthorizationFilters.createFilter(provider, route.getModules()));
-        } else {
-            route.addVersion(version, provider);
-        }
-
+        handleFiltersAndRoute(RoutingMode.EQUALS, Resources.newSingleton(provider));
         return route;
     }
 
@@ -97,23 +106,69 @@ public final class FluentTo {
      * @return a FluentRoute to the provider
      */
     public FluentVersion to(RoutingMode routingMode, RequestHandler requestHandler) {
-        if (route.getModules().length > 0) {
-            route.addVersion(routingMode, version,
-                    AuthorizationFilters.createFilter(requestHandler, route.getModules()));
-        } else {
-            route.addVersion(routingMode, version, requestHandler);
-        }
-
+        handleFiltersAndRoute(routingMode, requestHandler);
         return route;
 
     }
 
-    private <T> T get(Class<T> resourceClass, String named) {
-        if (named == null) {
-            return InjectorHolder.getInstance(resourceClass);
-        } else {
-            return InjectorHolder.getInstance(Key.get(resourceClass, Names.named(named)));
+    /**
+     * Adds a filter to be called prior to the request destination.
+     *
+     * @param filterClass
+     *         the filters class
+     *
+     * @return the linking fluent class
+     */
+    public FluentTo through(Class<? extends Filter> filterClass) {
+        Reject.ifNull(filterClass);
+        filters.add(get(filterClass));
+        return this;
+    }
+
+    /**
+     * Adds a filter to be called prior to the request destination.
+     *
+     * @param filterClass
+     *         the filters class
+     * @param named
+     *         the specific name of the filter
+     *
+     * @return the linking fluent class
+     */
+    public FluentTo through(Class<? extends Filter> filterClass, String named) {
+        Reject.ifNull(filterClass);
+        filters.add(get(filterClass, named));
+        return this;
+    }
+
+    /**
+     * Configures the route and any defined filters.
+     *
+     * @param routingMode
+     *         the routing mode
+     * @param requestHandler
+     *         the requests target
+     */
+    private void handleFiltersAndRoute(final RoutingMode routingMode, final RequestHandler requestHandler) {
+        RequestHandler targetHandler = requestHandler;
+
+        if (isNotEmpty(filters)) {
+            targetHandler = new FilterChain(targetHandler, filters);
         }
+
+        if (isNotEmpty(route.getModules())) {
+            targetHandler = AuthorizationFilters.createFilter(targetHandler, route.getModules());
+        }
+
+        route.addVersion(routingMode, version, targetHandler);
+    }
+
+    private <T> T get(Class<T> objectClass, String named) {
+        return InjectorHolder.getInstance(Key.get(objectClass, Names.named(named)));
+    }
+
+    private <T> T get(Class<T> objectClass) {
+        return InjectorHolder.getInstance(objectClass);
     }
 
 }
