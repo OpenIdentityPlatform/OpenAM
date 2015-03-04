@@ -30,10 +30,9 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
     "org/forgerock/openam/ui/uma/models/UMAPolicy",
     "org/forgerock/openam/ui/uma/models/UMAPolicyPermission",
-    "org/forgerock/openam/ui/uma/models/UMAPolicyPermissionCollection",
     "org/forgerock/openam/ui/uma/models/UMAResourceSet",
     "org/forgerock/openam/ui/uma/models/User"
-], function(AbstractView, Constants, EventManager, UMADelegate, UMAPolicy, UMAPolicyPermission, UMAPolicyPermissionCollection, UMAResourceSet, User) {
+], function(AbstractView, Constants, EventManager, UMADelegate, UMAPolicy, UMAPolicyPermission, UMAResourceSet, User) {
     var CommonShare = AbstractView.extend({
         template: "templates/uma/views/share/CommonShare.html",
         events: {
