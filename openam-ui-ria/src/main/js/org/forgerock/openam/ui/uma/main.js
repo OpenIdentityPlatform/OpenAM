@@ -25,10 +25,10 @@
 /*global define*/
 
 define([
-    "./models/ResourceSet",
     "./models/UMAPolicy",
     "./models/UMAPolicyPermission",
-    "./models/UMAPolicyPermissionCollection",
+    "./models/UMAResourceSet",
+    "./models/UMAResourceSetWithPolicy",
     "./models/User",
 
     "./views/application/ListApplication",

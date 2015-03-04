@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,7 +23,6 @@
  */
 
 /*global define*/
-
 define("org/forgerock/openam/ui/uma/models/User", [
   'backbone'
 ], function(Backbone) {

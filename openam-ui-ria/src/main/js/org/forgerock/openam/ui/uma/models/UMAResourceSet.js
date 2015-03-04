@@ -23,11 +23,19 @@
  */
 
 /*global define*/
-define("org/forgerock/openam/ui/uma/models/UMAPolicyPermissionCollection", [
+define("org/forgerock/openam/ui/uma/models/UMAResourceSet", [
     "backbone",
-    "org/forgerock/openam/ui/uma/models/UMAPolicyPermission"
-], function(Backbone, UMAPolicyPermission) {
-    return Backbone.Collection.extend({
-        model: UMAPolicyPermission
+    "org/forgerock/openam/ui/uma/util/URLHelper"
+], function(Backbone, URLHelper) {
+    return Backbone.Model.extend({
+        idAttribute: "_id",
+        sync: function(method, model, options) {
+            options.beforeSend = function(xhr) {
+                xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
+            };
+
+            return Backbone.Model.prototype.sync.call(this, method, model, options);
+        },
+        urlRoot: URLHelper.substitute("__api__/users/__username__/oauth2/resourcesets")
     });
 });

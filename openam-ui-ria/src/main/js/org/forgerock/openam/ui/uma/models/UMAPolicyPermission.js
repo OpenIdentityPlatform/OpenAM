@@ -23,13 +23,11 @@
  */
 
 /*global define*/
-define("org/forgerock/openam/ui/uma/models/UMAPolicyPermission", [
-    "backbone"
-], function(Backbone) {
-    return Backbone.Model.extend({
-        defaults: {
-            scopes: []
-        },
+define('org/forgerock/openam/ui/uma/models/UMAPolicyPermission', [
+    'backbone',
+    'backboneRelational'
+], function(Backbone, BackboneRelational) {
+    return Backbone.RelationalModel.extend({
         idAttribute: "subject",
         validate: function(attributes, options) {
             if(!attributes.subject) { return "no subject"; }

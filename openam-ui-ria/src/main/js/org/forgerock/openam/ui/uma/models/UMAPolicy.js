@@ -23,29 +23,26 @@
  */
 
 /*global define*/
-define("org/forgerock/openam/ui/uma/models/UMAPolicy", [
-    "backbone",
-    "org/forgerock/openam/ui/uma/util/URLHelper",
-    "org/forgerock/openam/ui/uma/models/UMAPolicyPermissionCollection"
-], function(Backbone, URLHelper, UMAPolicyPermissionCollection) {
-    return Backbone.Model.extend({
+define('org/forgerock/openam/ui/uma/models/UMAPolicy', [
+    'backbone',
+    'backboneRelational',
+    'org/forgerock/openam/ui/uma/models/UMAPolicyPermission',
+    'org/forgerock/openam/ui/uma/util/URLHelper'
+], function(Backbone, BackboneRelational, UMAPolicyPermission, URLHelper) {
+    return Backbone.RelationalModel.extend({
         idAttribute: "policyId",
-        initialize: function() {
-            this.attributes.permissions = new UMAPolicyPermissionCollection();
-        },
-        parse: function(response, options) {
-            if(response.permissions) {
-                this.get("permissions").reset(response.permissions);
-            }
-
-            this.isSaved = true;
-        },
+        relations: [{
+            type: Backbone.HasMany,
+            key: 'permissions',
+            relatedModel: UMAPolicyPermission
+        }],
         sync: function(method, model, options) {
             options.beforeSend = function(xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
             };
 
-            if(method.toLowerCase() === 'update' && !model.isSaved) {
+            // FIXME: Issue due to us having an ID already, workaroud using #fakeCreate ATM
+            if(method.toLowerCase() === 'update' && model.fakeCreate === true) {
                 options = options || {};
                 options.headers = {};
                 options.headers["If-None-Match"] = "*";
@@ -53,9 +50,6 @@ define("org/forgerock/openam/ui/uma/models/UMAPolicy", [
 
             return Backbone.Model.prototype.sync.call(this, method, model, options);
         },
-        urlRoot: function() {
-            // FIXME: Has to be wrapped in a clojure as __username__ can't resolve early on. Race condition
-            return URLHelper.substitute("__api__/users/__username__/uma/policies");
-        }
+        urlRoot: URLHelper.substitute("__api__/users/__username__/uma/policies")
     });
 });

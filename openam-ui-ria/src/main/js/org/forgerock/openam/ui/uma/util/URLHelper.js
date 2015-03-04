@@ -29,12 +29,14 @@ define("org/forgerock/openam/ui/uma/util/URLHelper", [
 ], function(Configuration, Constants) {
     return {
         substitute: function(url) {
-            url = url.replace("__api__", Constants.host + "/" + Constants.context + "/json")
-                     .replace("__host__", Constants.host)
-                     .replace("__context__", Constants.context)
-                     .replace("__username__", Configuration.loggedUser.username);
+            return function() {
+                url = url.replace("__api__", Constants.host + "/" + Constants.context + "/json")
+                         .replace("__host__", Constants.host)
+                         .replace("__context__", Constants.context)
+                         .replace("__username__", Configuration.loggedUser.username);
 
-            return url;
+                return url;
+            };
         }
     };
 });

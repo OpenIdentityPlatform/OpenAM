@@ -48,7 +48,8 @@ require.config({
         "backgrid.paginator" : "libs/backgrid-paginator.min",
         "backgrid.filter"    : "libs/backgrid-filter.min",
         ThemeManager         : "org/forgerock/openam/ui/common/util/ThemeManager",
-        UserDelegate         : "org/forgerock/openam/ui/user/delegates/UserDelegate"
+        UserDelegate         : "org/forgerock/openam/ui/user/delegates/UserDelegate",
+        backboneRelational   : "libs/backbone-relational"
     },
 
     shim: {
@@ -100,6 +101,9 @@ require.config({
         },
         "backgrid.filter": {
             deps: ["backgrid"]
+        },
+        backboneRelational: {
+            deps: ['backbone']
         }
     }
 });

@@ -23,22 +23,27 @@
  */
 
 /*global define*/
-define("org/forgerock/openam/ui/uma/models/ResourceSet", [
-    "backbone",
-    "org/forgerock/openam/ui/uma/util/URLHelper"
-], function(Backbone, URLHelper) {
-    return Backbone.Model.extend({
+define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
+    'backbone',
+    'backboneRelational',
+    'org/forgerock/openam/ui/uma/models/UMAPolicy',
+    'org/forgerock/openam/ui/uma/util/URLHelper'
+], function(Backbone, BackboneRelational, UMAPolicy, URLHelper) {
+    return Backbone.RelationalModel.extend({
         idAttribute: "_id",
-        sync: function(method, model, options) {
-            options.beforeSend = function(xhr) {
-                xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
-            };
+        parse: function(response, options) {
+            // Hardwiring the id across to the UMAPolicy object as the server doesn't provide it
+            if(response.policy) {
+                response.policy.policyId = response._id;
+            }
 
-            return Backbone.Model.prototype.sync.call(this, method, model, options);
+            return response;
         },
-        urlRoot:  function() {
-            // FIXME: Has to be wrapped in a clojure as __username__ can't resolve early on. Race condition
-            return URLHelper.substitute("__api__/users/__username__/oauth2/resourcesets");
-        }
+        relations: [{
+            type: Backbone.HasOne,
+            key: 'policy',
+            relatedModel: UMAPolicy
+        }],
+        urlRoot: URLHelper.substitute("__api__/users/__username__/oauth2/resourcesets")
     });
 });
