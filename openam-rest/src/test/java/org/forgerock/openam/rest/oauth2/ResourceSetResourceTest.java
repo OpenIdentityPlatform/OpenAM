@@ -32,6 +32,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryFilter;
@@ -235,5 +236,69 @@ public class ResourceSetResourceTest {
                         org.forgerock.util.query.QueryFilter.equalTo("name", "NAME"),
                         org.forgerock.util.query.QueryFilter.equalTo("clientId", "myclient")));
         verify(handler).handleResult(any(QueryResult.class));
+    }
+
+    @Test
+    public void shouldRevokeAllUserPolicies() {
+
+        //Given
+        RealmContext realmContext = new RealmContext(new RootContext());
+        realmContext.addDnsAlias("", "REALM");
+        ServerContext context = new ServerContext(realmContext);
+        ActionRequest request = mock(ActionRequest.class);
+        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+
+        given(request.getAction()).willReturn("revokeAll");
+        given(resourceSetService.revokeAllPolicies(context, "REALM"))
+                .willReturn(Promises.<Void, ResourceException>newSuccessfulPromise(null));
+
+        //When
+        resource.actionCollection(context, request, handler);
+
+        //Then
+        ArgumentCaptor<JsonValue> jsonCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler).handleResult(jsonCaptor.capture());
+        verify(handler, never()).handleError(Matchers.<ResourceException>anyObject());
+        assertThat(jsonCaptor.getValue().asMap()).isEmpty();
+    }
+
+    @Test
+    public void revokeAllUserPoliciesActionShouldHandleResourceException() {
+
+        //Given
+        RealmContext realmContext = new RealmContext(new RootContext());
+        realmContext.addDnsAlias("", "REALM");
+        ServerContext context = new ServerContext(realmContext);
+        ActionRequest request = mock(ActionRequest.class);
+        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+
+        given(request.getAction()).willReturn("revokeAll");
+        given(resourceSetService.revokeAllPolicies(context, "REALM"))
+                .willReturn(Promises.<Void, ResourceException>newFailedPromise(new NotFoundException()));
+
+        //When
+        resource.actionCollection(context, request, handler);
+
+        //Then
+        verify(handler).handleError(Matchers.<ResourceException>anyObject());
+        verify(handler, never()).handleResult(Matchers.<JsonValue>anyObject());
+    }
+
+    @Test
+    public void actionCollectionShouldHandleUnsupportedAction() {
+
+        //Given
+        ServerContext context = mock(ServerContext.class);
+        ActionRequest request = mock(ActionRequest.class);
+        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+
+        given(request.getAction()).willReturn("UNSUPPORTED_ACTION");
+
+        //When
+        resource.actionCollection(context, request, handler);
+
+        //Then
+        verify(handler).handleError(Matchers.<NotSupportedException>anyObject());
+        verify(handler, never()).handleResult(Matchers.<JsonValue>anyObject());
     }
 }

@@ -446,4 +446,39 @@ public class ResourceSetServiceTest {
         assertThat(resourceSetTwo.getPolicy()).isNull();
         assertThat(resourceSetThree.getPolicy()).isNull();
     }
+
+    @Test
+    public void shouldRevokeAllResourceSetPolicies() throws Exception {
+
+        //Given
+        ServerContext context = mock(ServerContext.class);
+        String realm = "REALM";
+        Set<ResourceSetDescription> queriedResourceSets = new HashSet<ResourceSetDescription>();
+        ResourceSetDescription resourceSetOne = new ResourceSetDescription("RS_ID_ONE", "CLIENT_ID_ONE",
+                "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
+        ResourceSetDescription resourceSetTwo = new ResourceSetDescription("RS_ID_TWO", "CLIENT_ID_TWO",
+                "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
+        Collection<UmaPolicy> queriedPolicies = new HashSet<UmaPolicy>();
+        Pair<QueryResult, Collection<UmaPolicy>> queriedPoliciesPair = Pair.of(new QueryResult(), queriedPolicies);
+        Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queriedPoliciesPromise
+                = Promises.newSuccessfulPromise(queriedPoliciesPair);
+
+        queriedResourceSets.add(resourceSetOne);
+        queriedResourceSets.add(resourceSetTwo);
+        given(resourceSetStore.query(Matchers.<org.forgerock.util.query.QueryFilter<String>>anyObject()))
+                .willReturn(queriedResourceSets);
+        given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
+                .willReturn(queriedPoliciesPromise);
+        given(policyService.deletePolicy(context, "RS_ID_ONE"))
+                .willReturn(Promises.<Void, ResourceException>newSuccessfulPromise(null));
+        given(policyService.deletePolicy(context, "RS_ID_TWO"))
+                .willReturn(Promises.<Void, ResourceException>newSuccessfulPromise(null));
+
+        //When
+        service.revokeAllPolicies(context, realm).getOrThrowUninterruptibly();
+
+        //Then
+        verify(policyService).deletePolicy(context, "RS_ID_ONE");
+        verify(policyService).deletePolicy(context, "RS_ID_TWO");
+    }
 }

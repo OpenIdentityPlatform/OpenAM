@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.rest.oauth2;
 
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
+
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -162,15 +165,33 @@ public class ResourceSetResource implements CollectionResourceProvider {
     }
 
     /**
-     * Not supported.
+     * "revokeAll" action supported, which will delete all a user's resource set UMA policies.
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      * @param handler {@inheritDoc}
      */
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException());
+    public void actionCollection(ServerContext context, ActionRequest request, final ResultHandler<JsonValue> handler) {
+
+        if ("revokeAll".equalsIgnoreCase(request.getAction())) {
+            String realm = context.asContext(RealmContext.class).getResolvedRealm();
+            resourceSetService.revokeAllPolicies(context, realm)
+                    .onSuccess(new SuccessHandler<Void>() {
+                        @Override
+                        public void handleResult(Void aVoid) {
+                            handler.handleResult(json(object()));
+                        }
+                    })
+                    .onFailure(new FailureHandler<ResourceException>() {
+                        @Override
+                        public void handleError(ResourceException e) {
+                            handler.handleError(e);
+                        }
+                    });
+        } else {
+            handler.handleError(new NotSupportedException("Action " + request.getAction() + " not supported"));
+        }
     }
 
     /**

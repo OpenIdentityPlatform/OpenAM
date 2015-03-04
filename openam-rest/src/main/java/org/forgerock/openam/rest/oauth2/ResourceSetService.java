@@ -235,4 +235,37 @@ public class ResourceSetService {
 
         return resourceSetsById.values();
     }
+
+    /**
+     * Revokes all UMA policies for a user's resource sets.
+     *
+     * @param context The context.
+     * @param realm The realm.
+     * @return A Promise containing {@code null} or a ResourceException.
+     */
+    Promise<Void, ResourceException> revokeAllPolicies(final ServerContext context, String realm) {
+        ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
+        query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.<String>alwaysTrue());
+        return getResourceSets(context, realm, query, false)
+                .thenAsync(new AsyncFunction<Collection<ResourceSetDescription>, Void, ResourceException>() {
+                    @Override
+                    public Promise<Void, ResourceException> apply(Collection<ResourceSetDescription> resourceSets) {
+                        List<Promise<Void, ResourceException>> promises
+                                = new ArrayList<Promise<Void, ResourceException>>();
+                        PromiseImpl<Void, ResourceException> kicker = PromiseImpl.create();
+                        promises.add(kicker);
+                        for (ResourceSetDescription resourceSet : resourceSets) {
+                            promises.add(policyService.deletePolicy(context, resourceSet.getId()));
+                        }
+                        Promise<List<Void>, ResourceException> when = Promises.when(promises);
+                        kicker.handleResult(null);
+                        return when.thenAsync(new AsyncFunction<List<Void>, Void, ResourceException>() {
+                            @Override
+                            public Promise<Void, ResourceException> apply(List<Void> voids) {
+                                return Promises.newSuccessfulPromise(null);
+                            }
+                        });
+                    }
+                });
+    }
 }
