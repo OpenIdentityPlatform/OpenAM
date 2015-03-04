@@ -36,7 +36,8 @@ define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
     "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
     "backgrid"
 ], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, umaUtils, router, umaDelegate, Backgrid) {
-    var EditResource = AbstractView.extend({
+    var URLHelper = require("org/forgerock/openam/ui/uma/util/URLHelper"),
+        EditResource = AbstractView.extend({
         template: "templates/uma/views/resource/EditResource.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
@@ -63,9 +64,9 @@ define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
                 });
 
                 UserPoliciesCollection = Backbone.PageableCollection.extend({
-                    url: "/" + constants.context + "/json/users/" + conf.loggedUser.username + "/uma/policies/" + args[0],
+                    url: URLHelper.substitute("__api__/users/__username__/oauth2/resourcesets/" + args[0]),
                     parseRecords: function (data, options) {
-                        return data.permissions;
+                        return data.policy.permissions;
                     },
                     sync: backgridUtils.sync
                 });
