@@ -347,6 +347,7 @@
 
         <module>openam-ui-policy</module>
         <module>openam-ui-ria</module>
+        <module>openam-ui-scripts</module>
 
         <module>openam-server-only</module>
 
@@ -902,6 +903,13 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-ui-policy</artifactId>
+                <version>${project.version}</version>
+                <classifier>www</classifier>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-ui-scripts</artifactId>
                 <version>${project.version}</version>
                 <classifier>www</classifier>
                 <type>zip</type>

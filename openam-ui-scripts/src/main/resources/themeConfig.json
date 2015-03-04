@@ -1,0 +1,20 @@
+{
+    "icon": "favicon.ico",
+    "settings": {
+        "logo": {
+            "src": "images/logo.png",
+            "title": "ForgeRock",
+            "alt": "ForgeRock"
+        },
+        "loginLogo": {
+            "src": "images/login-logo.png",
+            "title": "ForgeRock",
+            "alt": "ForgeRock",
+            "height": "104px",
+            "width": "156px"
+        },
+        "footer": {
+            "mailto": "info@forgerock.com"
+        }
+    }
+}

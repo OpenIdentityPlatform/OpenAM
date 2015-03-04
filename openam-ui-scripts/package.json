@@ -1,0 +1,14 @@
+{
+    "_comment": "Add any grunt dependencies you need to this file, such as grunt-contrib-requirejs, grunt-contrib-less, etc...",
+    "name": "deploy_to_target",
+    "author": "Jake Feasel <jake.feasel@forgerock.com>",
+    "version": "0.0.1",
+    "devDependencies": {
+        "grunt": "~0.4.5",
+        "grunt-contrib-watch": "~0.6.1",
+        "grunt-sync": "~0.2.2",
+        "grunt-notify": "0.4.1",
+        "grunt-jslint": "1.1.11",
+        "grunt-contrib-qunit": "~0.5.2"
+    }
+}

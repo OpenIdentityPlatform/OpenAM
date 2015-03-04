@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -122,6 +122,15 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.forgerock.openam</groupId>
+                                    <artifactId>openam-ui-scripts</artifactId>
+                                    <classifier>www</classifier>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/scripts</outputDirectory>
+                                    <includes>**/*</includes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.forgerock.openam</groupId>
                                     <artifactId>openam-auth-deviceprint-scripts</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
@@ -225,6 +234,14 @@
                                 <include>**/**</include>
                             </includes>
                             <targetPath>policyEditor</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.build.directory}/scripts/</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>scripts</targetPath>
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
