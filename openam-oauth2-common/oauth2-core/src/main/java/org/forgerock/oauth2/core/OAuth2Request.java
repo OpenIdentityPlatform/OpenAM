@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -31,6 +31,7 @@ import java.util.Locale;
 public abstract class OAuth2Request {
 
     private final ClassToInstanceMap<Token> tokens = MutableClassToInstanceMap.create();
+    private String sessionId;
 
     /**
      * Gets the actual underlying request.
@@ -83,6 +84,14 @@ public abstract class OAuth2Request {
      */
     public <T extends Token> T getToken(Class<T> tokenClass) {
         return tokens.getInstance(tokenClass);
+    }
+
+    public void setSession(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getSession() {
+        return sessionId;
     }
 
     /**

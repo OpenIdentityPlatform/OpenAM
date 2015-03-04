@@ -11,41 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
 
-import com.iplanet.am.sdk.AMHashMap;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.ClientRegistration;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.OAuth2ProviderSettings;
-import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.ScopeValidator;
-import org.forgerock.oauth2.core.Token;
-import org.forgerock.oauth2.core.Utils;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.forgerock.openidconnect.OpenIDTokenIssuer;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.OPENID;
+import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.script.Bindings;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.security.AccessController;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -58,9 +39,42 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
+import com.iplanet.am.sdk.AMHashMap;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.ScopeValidator;
+import org.forgerock.oauth2.core.Token;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openam.oauth2.scripting.ScriptedConfigurator;
+import org.forgerock.openam.scripting.ScriptEvaluator;
+import org.forgerock.openam.scripting.ScriptObject;
+import org.forgerock.openam.scripting.SupportedScriptingLanguage;
+import org.forgerock.openam.utils.OpenAMSettings;
+import org.forgerock.openam.utils.OpenAMSettingsImpl;
+import org.forgerock.openidconnect.OpenIDTokenIssuer;
+import org.restlet.Request;
+import org.restlet.ext.servlet.ServletUtils;
 
 /**
  * Provided as extension points to allow the OpenAM OAuth2 provider to customise the requested scope of authorize,
@@ -79,19 +93,27 @@ public class OpenAMScopeValidator implements ScopeValidator {
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final IdentityManager identityManager;
     private final OpenIDTokenIssuer openIDTokenIssuer;
+    private final OpenAMSettings openAMSettings;
+    private final ScriptEvaluator scriptEvaluator;
 
     /**
      * Constructs a new OpenAMScopeValidator.
      *
      * @param identityManager An instance of the IdentityManager.
      * @param openIDTokenIssuer An instance of the OpenIDTokenIssuer.
+     * @param providerSettingsFactory An instance of the CTSPersistentStore.
+     * @param openAMSettings An instance of the OpenAMSettings.
+     * @param scriptEvaluator An instance of the OIDC Claims ScriptEvaluator.
      */
     @Inject
     public OpenAMScopeValidator(IdentityManager identityManager, OpenIDTokenIssuer openIDTokenIssuer,
-            OAuth2ProviderSettingsFactory providerSettingsFactory) {
+            OAuth2ProviderSettingsFactory providerSettingsFactory, OpenAMSettings openAMSettings,
+            @Named(ScriptedConfigurator.SCRIPT_EVALUATOR_NAME) ScriptEvaluator scriptEvaluator) {
         this.identityManager = identityManager;
         this.openIDTokenIssuer = openIDTokenIssuer;
         this.providerSettingsFactory = providerSettingsFactory;
+        this.openAMSettings = openAMSettings;
+        this.scriptEvaluator = scriptEvaluator;
     }
 
     /**
@@ -149,97 +171,74 @@ public class OpenAMScopeValidator implements ScopeValidator {
 
         Set<String> scopes = token.getScope();
         Map<String,Object> response = new HashMap<String, Object>();
-        AMIdentity id = identityManager.getResourceOwnerIdentity(token.getResourceOwnerId(),
-                ((OpenAMAccessToken) token).getRealm());
+        AMIdentity id = identityManager.getResourceOwnerIdentity(token.getResourceOwnerId(), token.getRealm());
 
         //add the subject identifier to the response
         response.put(OAuth2Constants.JWTTokenParams.SUB, token.getResourceOwnerId());
         response.put(OAuth2Constants.JWTTokenParams.UPDATED_AT, getUpdatedAt(token.getResourceOwnerId(),
-                ((OpenAMAccessToken) token).getRealm(), request));
-        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
-        Map<String, Object> scopeToUserProfileAttributes = providerSettings.getUserProfileScopeMappings();
-        for(String scope: scopes){
+                token.getRealm(), request));
 
-            if (OPENID.equals(scope)) {
-                continue;
-            }
-            //get the attribute associated with the scope
-            Object attributes = scopeToUserProfileAttributes.get(scope);
-            if (attributes == null){
-                logger.error("OpenAMScopeValidator.getUserInfo()::Invalid Scope in token scope=" + scope);
-            } else if (attributes instanceof String){
-                Set<String> attr = null;
-
-                //if the attribute is a string get the attribute
-                try {
-                    attr = id.getAttribute((String)attributes);
-                } catch (IdRepoException e) {
-                    if (logger.warningEnabled()) {
-                        logger.warning("OpenAMScopeValidator.getUserInfo(): Unable to retrieve attribute=" +
-                                attributes, e);
-                    }
-                } catch (SSOException e) {
-                    if (logger.warningEnabled()) {
-                        logger.warning("OpenAMScopeValidator.getUserInfo(): Unable to retrieve attribute=" +
-                                attributes, e);
-                    }
-                }
-
-                //add a single object to the response.
-                if (attr != null && attr.size() == 1){
-                    response.put(scope, attr.iterator().next());
-                } else if (attr != null && attr.size() > 1){ // add a set to the response
-                    response.put(scope, attr);
-                } else {
-                    if (logger.warningEnabled()) {
-                        //attr is null or attr is empty
-                        logger.warning("OpenAMScopeValidator.getUserInfo(): Got an empty result for attribute=" +
-                                attributes + " of scope=" + scope);
-                    }
-                }
-            } else if (attributes instanceof Map){
-
-                //the attribute is a collection of attributes
-                //for example profile can be address, email, etc...
-                if (attributes != null && !((Map<String,String>) attributes).isEmpty()){
-                    for (Map.Entry<String, String> entry: ((Map<String, String>) attributes).entrySet()){
-                        String attribute = null;
-                        attribute = entry.getValue();
-                        Set<String> attr = null;
-
-                        //get the attribute
-                        try {
-                            attr = id.getAttribute(attribute);
-                        } catch (IdRepoException e) {
-                            if (logger.warningEnabled()) {
-                                logger.warning("OpenAMScopeValidator.getUserInfo(): Unable to retrieve attribute=" +
-                                        attributes, e);
-                            }
-                        } catch (SSOException e) {
-                            if (logger.warningEnabled()) {
-                                logger.warning("OpenAMScopeValidator.getUserInfo(): Unable to retrieve attribute=" +
-                                        attributes, e);
-                            }
-                        }
-
-                        //add the attribute value(s) to the response
-                        if (attr != null && attr.size() == 1){
-                            response.put(entry.getKey(), attr.iterator().next());
-                        } else if (attr != null && attr.size() > 1){
-                            response.put(entry.getKey(), attr);
-                        } else {
-                            if (logger.warningEnabled()) {
-                                //attr is null or attr is empty
-                                logger.warning("OpenAMScopeValidator.getUserInfo(): Got an empty result for scope=" +
-                                        scope);
-                            }
-                        }
+        String sessionId = request.getSession();
+        if (sessionId == null) {
+            final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
+            if (req.getCookies() != null) {
+                final String cookieName = openAMSettings.getSSOCookieName();
+                for (final Cookie cookie : req.getCookies()) {
+                    if (cookie.getName().equals(cookieName)) {
+                        sessionId = cookie.getValue();
                     }
                 }
             }
         }
+        SSOToken ssoToken = null;
+        if (sessionId != null) {
+            try {
+                ssoToken = SSOTokenManager.getInstance().createSSOToken(sessionId);
+            } catch (SSOException e) {
+                e.printStackTrace();
+            }
+        }
 
-        return response;
+        Bindings scriptVariables = new SimpleBindings();
+        scriptVariables.put("logger", logger);
+        scriptVariables.put("claims", response);
+        scriptVariables.put("accessToken", token);
+        scriptVariables.put("session", ssoToken);
+        scriptVariables.put("identity", id);
+        scriptVariables.put("scopes", scopes);
+
+        OpenAMSettingsImpl settings = new OpenAMSettingsImpl(OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
+        Map<String, Object> o = new HashMap<String, Object>(response);
+        try {
+            String rawScript = settings.getStringSetting(token.getRealm(), "forgerock-oauth2-provider-oidc-claims-extension-script");
+            SupportedScriptingLanguage scriptType = getScriptType(settings.getStringSetting(token.getRealm(), "forgerock-oauth2-provider-oidc-claims-extension-script-type"));
+            ScriptObject script = new ScriptObject("oidc-claims-script", rawScript, scriptType, null);
+            try {
+                o = scriptEvaluator.evaluateScript(script, scriptVariables);
+
+                int a = 1;
+            } catch (ScriptException e) {
+                e.printStackTrace();
+            }
+        } catch (SSOException e) {
+            e.printStackTrace();
+        } catch (SMSException e) {
+            e.printStackTrace();
+        }
+
+        return o;
+    }
+
+    public static final String JAVA_SCRIPT_LABEL = "JavaScript";
+    public static final String GROOVY_LABEL = "Groovy";
+    private SupportedScriptingLanguage getScriptType(String scriptType) {
+        if (JAVA_SCRIPT_LABEL.equals(scriptType)) {
+            return SupportedScriptingLanguage.JAVASCRIPT;
+        } else if (GROOVY_LABEL.equals(scriptType)) {
+            return SupportedScriptingLanguage.GROOVY;
+        }
+
+        return null;
     }
 
     /**

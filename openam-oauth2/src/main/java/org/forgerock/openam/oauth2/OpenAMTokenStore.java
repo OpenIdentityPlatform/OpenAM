@@ -57,6 +57,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
@@ -207,9 +208,23 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             throw new ServerException("Could not create token in CTS");
         }
 
-        return new OpenAMOpenIdConnectToken(kid, clientSecret, keyPair, algorithm, iss, resourceOwnerId, clientId,
-                authorizationParty, exp, currentTimeInSeconds, currentTimeInSeconds, nonce, opsId, atHash, cHash, acr,
-                amr, realm);
+        OpenAMOpenIdConnectToken oidcToken = new OpenAMOpenIdConnectToken(kid, clientSecret, keyPair, algorithm, iss,
+                resourceOwnerId, clientId, authorizationParty, exp, currentTimeInSeconds, currentTimeInSeconds, nonce,
+                opsId, atHash, cHash, acr, amr, realm);
+        request.setSession(ops);
+
+        try {
+            AccessToken accessToken = request.getToken(AccessToken.class);
+            Map<String, Object> userInfo = providerSettings.getUserInfo(accessToken, request);
+
+            for (Map.Entry<String, Object> claim : userInfo.entrySet()) {
+                oidcToken.put(claim.getKey(), claim.getValue());
+            }
+        } catch (UnauthorizedClientException e) {
+            throw new InvalidClientException(e.getMessage());
+        }
+
+        return oidcToken;
     }
 
     private List<String> getAMRFromAuthModules(OAuth2Request request, OAuth2ProviderSettings providerSettings) throws ServerException {

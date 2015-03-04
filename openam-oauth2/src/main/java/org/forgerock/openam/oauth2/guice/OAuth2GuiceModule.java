@@ -26,6 +26,9 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -89,6 +92,12 @@ import org.forgerock.openam.oauth2.OpenAMResourceOwnerSessionValidator;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.oauth2.resources.OpenAMResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
+import org.forgerock.openam.oauth2.scripting.ScriptedConfigurator;
+import org.forgerock.openam.scripting.ScriptEngineConfiguration;
+import org.forgerock.openam.scripting.ScriptEvaluator;
+import org.forgerock.openam.scripting.StandardScriptEngineManager;
+import org.forgerock.openam.scripting.StandardScriptEvaluator;
+import org.forgerock.openam.scripting.ThreadPoolScriptEvaluator;
 import org.forgerock.openam.sm.datalayer.utils.ThreadSafeTokenIdGenerator;
 import org.forgerock.openam.openidconnect.OpenAMOpenIDConnectProvider;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectClientRegistrationService;
@@ -106,6 +115,7 @@ import org.forgerock.openidconnect.OpenIdResourceOwnerConsentVerifier;
 import org.forgerock.openidconnect.UserInfoService;
 import org.forgerock.openidconnect.UserInfoServiceImpl;
 import org.forgerock.openidconnect.restlet.LoginHintHook;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.restlet.Request;
 import org.restlet.Restlet;
 
@@ -195,6 +205,45 @@ public class OAuth2GuiceModule extends AbstractModule {
                 .addBinding().to(OAuth2TokenIntrospectionHandler.class);
 
         Multibinder.newSetBinder(binder(), ResourceSetRegistrationListener.class);
+    }
+
+    /**
+     * Creates the script evaluator to use for evaluating OIDC claim extension scripts. The
+     * evaluator returned uses a thread pool to evaluate scripts (supporting script interruption),
+     * delegating to a sand-boxed script evaluator.
+     *
+     * @param scriptEngineManager the script engine manager to use.
+     * @param executorServiceFactory the factory for creating managed thread pools for script execution.
+     * @param configurator the service configuration listener.
+     * @return an appropriately configured script evaluator for use with OIDC claims extension scripts.
+     */
+    @Provides
+    @Singleton
+    @Inject
+    @Named(ScriptedConfigurator.SCRIPT_EVALUATOR_NAME)
+    ScriptEvaluator getScriptEvaluator(StandardScriptEngineManager scriptEngineManager,
+            ExecutorServiceFactory executorServiceFactory, ScriptedConfigurator configurator) {
+
+        // Ensure configuration is up to date with service settings
+        configurator.registerServiceListener();
+
+        final ScriptEngineConfiguration configuration = scriptEngineManager.getConfiguration();
+
+        return new ThreadPoolScriptEvaluator(scriptEngineManager,
+                executorServiceFactory.createThreadPool(
+                        configuration.getThreadPoolCoreSize(),
+                        configuration.getThreadPoolMaxSize(),
+                        configuration.getThreadPoolIdleTimeoutSeconds(),
+                        TimeUnit.SECONDS,
+                        getThreadPoolQueue(configuration.getThreadPoolQueueSize())
+                ),
+                new StandardScriptEvaluator(scriptEngineManager));
+    }
+
+    private BlockingQueue<Runnable> getThreadPoolQueue(final int size) {
+        return size == ScriptEngineConfiguration.UNBOUNDED_QUEUE_SIZE
+                ? new LinkedBlockingQueue<Runnable>()
+                : new LinkedBlockingQueue<Runnable>(size);
     }
 
     @Provides

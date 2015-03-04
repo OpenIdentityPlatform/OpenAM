@@ -11,26 +11,28 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.fest.assertions.Assertions.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.mockito.Mockito.*;
 
 public class OpenAMScopeValidatorTest {
 
@@ -46,7 +48,8 @@ public class OpenAMScopeValidatorTest {
         providerSettings = mock(OAuth2ProviderSettings.class);
         OAuth2ProviderSettingsFactory factory = mock(OAuth2ProviderSettingsFactory.class);
         when(factory.get(request)).thenReturn(providerSettings);
-        this.validator = new OpenAMScopeValidator(null, null, factory);
+        ScriptEvaluator scriptEvaluator = mock(ScriptEvaluator.class);
+        this.validator = new OpenAMScopeValidator(null, null, factory, null, scriptEvaluator);
     }
 
     @Test

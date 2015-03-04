@@ -16,7 +16,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  */
 -->
 
@@ -27,6 +27,99 @@
                 i18nFileName="OAuth2Provider"
                 revisionNumber="1"
                 i18nKey="forgerock-oauth2-provider-description">
+            <Global>
+                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-server-timeout"
+                                 type="single" syntax="number_range" rangeStart="0"
+                                 rangeEnd="2147483647" i18nKey="g101">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-core-threads"
+                                 type="single" syntax="number_range" rangeStart="1"
+                                 rangeEnd="2147483647" i18nKey="g102">
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-max-threads"
+                                 type="single" syntax="number_range" rangeStart="1"
+                                 rangeEnd="2147483647" i18nKey="g103">
+                    <DefaultValues>
+                        <Value>50</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-queue-size"
+                                 type="single" syntax="number_range" rangeStart="-1"
+                                 rangeEnd="2147483647" i18nKey="g104">
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-idle-timeout"
+                                 type="single" syntax="number_range" rangeStart="0"
+                                 rangeEnd="2147483647" i18nKey="g105">
+                    <DefaultValues>
+                        <Value>60</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-white-list"
+                                 type="list" syntax="string" i18nKey="g106">
+                    <DefaultValues>
+                        <Value>java.lang.Boolean</Value>
+                        <Value>java.lang.Byte</Value>
+                        <Value>java.lang.Character</Value>
+                        <Value>java.lang.Character$Subset</Value>
+                        <Value>java.lang.Character$UnicodeBlock</Value>
+                        <Value>java.lang.Double</Value>
+                        <Value>java.lang.Float</Value>
+                        <Value>java.lang.Integer</Value>
+                        <Value>java.lang.Long</Value>
+                        <Value>java.lang.Math</Value>
+                        <Value>java.lang.Number</Value>
+                        <Value>java.lang.Object</Value>
+                        <Value>java.lang.Short</Value>
+                        <Value>java.lang.StrictMath</Value>
+                        <Value>java.lang.String</Value>
+                        <Value>java.lang.Void</Value>
+                        <Value>java.util.ArrayList</Value>
+                        <Value>java.util.HashSet</Value>
+                        <Value>java.util.HashMap</Value>
+                        <Value>java.util.HashMap$KeyIterator</Value>
+                        <Value>java.util.LinkedHashMap</Value>
+                        <Value>java.util.LinkedHashSet</Value>
+                        <Value>java.util.LinkedList</Value>
+                        <Value>java.util.TreeMap</Value>
+                        <Value>java.util.TreeSet</Value>
+                        <Value>com.sun.identity.shared.debug.Debug</Value>
+                        <Value>org.forgerock.http.client.*</Value>
+                        <Value>groovy.json.JsonSlurper</Value>
+                        <Value>com.sun.identity.idm.AMIdentity</Value>
+                        <Value>java.util.LinkedHashMap$Entry</Value>
+                        <Value>java.util.LinkedHashMap$LinkedEntrySet</Value>
+                        <Value>org.forgerock.openam.oauth2.OpenAMAccessToken</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-black-list"
+                                 type="list" syntax="string" i18nKey="g107">
+                    <DefaultValues>
+                        <Value>java.security.AccessController</Value>
+                        <Value>java.lang.Class</Value>
+                        <Value>java.lang.reflect.*</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-use-security-manager"
+                                 type="single" syntax="boolean" i18nKey="g108">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global>
+
             <Organization>
                 <AttributeSchema name="forgerock-oauth2-provider-authorization-code-lifetime"
                                  type="single"
@@ -94,43 +187,28 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="org-forgerock-oidc-profile-attribute-mappings"
-                                 type="list"
-                                 syntax="string"
-                                 i18nKey="a104a">
+                <AttributeSchema name="forgerock-oauth2-provider-oidc-claims-extension-script"
+                                 type="single"
+                                 syntax="script"
+                                 validator="ScriptValidator"
+                                 i18nKey="a104aa">
                     <DefaultValues>
-                        <Value>name=cn</Value>
-                        <Value>given_name=givenname</Value>
-                        <Value>family_name=sn</Value>
-                        <Value>locale=preferredlocale</Value>
-                        <Value>zoneinfo=preferredtimezone</Value>
+                        <Value>
+                            ${inject.content.oidc-claims-extension-groovy}
+                        </Value>
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="org-forgerock-oidc-email-attribute-mapping"
-                                 type="single"
+                <AttributeSchema name="forgerock-oauth2-provider-oidc-claims-extension-script-type"
+                                 type="single_choice"
                                  syntax="string"
-                                 i18nKey="a104b">
+                                 i18nKey="a104ab">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="scriptGroovyChoice">Groovy</ChoiceValue>
+                        <ChoiceValue i18nKey="scriptJavaScriptChoice">JavaScript</ChoiceValue>
+                    </ChoiceValues>
                     <DefaultValues>
-                        <Value>mail</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="org-forgerock-oidc-address-attribute-mapping"
-                                 type="single"
-                                 syntax="string"
-                                 i18nKey="a104c">
-                    <DefaultValues>
-                        <Value>postaladdress</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="org-forgerock-oidc-phone-attribute-mapping"
-                                 type="single"
-                                 syntax="string"
-                                 i18nKey="a104d">
-                    <DefaultValues>
-                        <Value>telephonenumber</Value>
+                        <Value>Groovy</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -395,43 +473,28 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="org-forgerock-oidc-profile-attribute-mappings"
-                                     type="list"
-                                     syntax="string"
-                                     i18nKey="a104a">
+                    <AttributeSchema name="forgerock-oauth2-provider-oidc-claims-extension-script"
+                                     type="single"
+                                     syntax="script"
+                                     validator="ScriptValidator"
+                                     i18nKey="a106">
                         <DefaultValues>
-                            <Value>name=cn</Value>
-                            <Value>given_name=givenname</Value>
-                            <Value>family_name=sn</Value>
-                            <Value>locale=preferredlocale</Value>
-                            <Value>zoneinfo=preferredtimezone</Value>
+                            <Value>
+                                ${inject.content.oidc-claims-extension-groovy}
+                            </Value>
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="org-forgerock-oidc-email-attribute-mapping"
-                                     type="single"
+                    <AttributeSchema name="forgerock-oauth2-provider-oidc-claims-extension-script-type"
+                                     type="single_choice"
                                      syntax="string"
-                                     i18nKey="a104b">
+                                     i18nKey="a107">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="choice1">Groovy</ChoiceValue>
+                            <ChoiceValue i18nKey="choice2">JavaScript</ChoiceValue>
+                        </ChoiceValues>
                         <DefaultValues>
-                            <Value>mail</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="org-forgerock-oidc-address-attribute-mapping"
-                                     type="single"
-                                     syntax="string"
-                                     i18nKey="a104c">
-                        <DefaultValues>
-                            <Value>postaladdress</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="org-forgerock-oidc-phone-attribute-mapping"
-                                     type="single"
-                                     syntax="string"
-                                     i18nKey="a104d">
-                        <DefaultValues>
-                            <Value>telephonenumber</Value>
+                            <Value>Groovy</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
