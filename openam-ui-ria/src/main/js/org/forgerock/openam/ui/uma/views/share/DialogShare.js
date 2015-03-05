@@ -36,7 +36,7 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
 
         events: {
-            "click .dialogCloseCross img": "saveThenClose",
+            "click .dialogCloseCross": "saveThenClose",
             "click input[name='close']": "saveThenClose"
         },
 
@@ -65,7 +65,7 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
 
         saveThenClose: function(e){
             //TODO :Add save code here
-            if(editResourceView.data && editResourceView.data.userPolicies){
+            if (editResourceView.data && editResourceView.data.userPolicies) {
                 editResourceView.data.userPolicies.fetch({reset: true, processData: false});
             }
 

@@ -32,9 +32,9 @@ define("org/forgerock/openam/ui/uma/delegates/UmaDelegate", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate"
-], function (conf, constants, AbstractDelegate) {
+], function (Configuration, Constants, AbstractDelegate) {
 
-    var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json");
+    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json");
 
     obj.ERROR_HANDLERS = {
         "Bad Request":              { status: "400" },
@@ -46,9 +46,9 @@ define("org/forgerock/openam/ui/uma/delegates/UmaDelegate", [
     };
 
     obj.serviceCall = function (args) {
-        var realm = conf.globalData.auth.realm;
+        var realm = Configuration.globalData.auth.realm;
         if (realm !== "/" && // prevents urls like /openam/json//applicationtypes
-            _.find(["/policies", "/users", "/groups"], function (w) { // the only endpoints that are currently realm "aware"
+            _.find(["/policies", "/users", "/resourcesets"], function (w) { // the only endpoints that are currently realm "aware"
                 return args.url.indexOf(w) === 0;
             })) {
             args.url = realm + args.url;
@@ -65,21 +65,21 @@ define("org/forgerock/openam/ui/uma/delegates/UmaDelegate", [
 
     obj.getResourceSetFromId = function (uid) {
         return obj.serviceCall({
-            url: "/users/" + conf.loggedUser.username + "/oauth2/resourcesets/" + uid,
+            url: "/users/" + encodeURIComponent(Configuration.loggedUser.username) + "/oauth2/resourcesets/" + uid,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
     obj.getPoliciesById = function (uid) {
         return obj.serviceCall({
-            url: "/users/" + conf.loggedUser.username + "/uma/policies/" + uid,
+            url: "/users/" + encodeURIComponent(Configuration.loggedUser.username) + "/uma/policies/" + uid,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
     obj.createPolicy = function(username, policyId, permissions) {
       return obj.serviceCall({
-          url: "/users/" + username + "/uma/policies?_action=create",
+          url: "/users/" + encodeURIComponent(Configuration.loggedUser.username) + "/uma/policies?_action=create",
           type: "POST",
           data: JSON.stringify({
               policyId: policyId,
@@ -91,7 +91,7 @@ define("org/forgerock/openam/ui/uma/delegates/UmaDelegate", [
 
     obj.getUser = function(username) {
         return obj.serviceCall({
-            url: "/users/" + username,
+            url: "/users/" + encodeURIComponent(username),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=2.0" }
         });
     };
@@ -102,6 +102,16 @@ define("org/forgerock/openam/ui/uma/delegates/UmaDelegate", [
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
+
+    obj.revokeAllResources = function(){
+        return obj.serviceCall({
+            url: "/users/" + encodeURIComponent(Configuration.loggedUser.username) + "/oauth2/resourcesets?_action=revokeAll",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            errorsHandlers: obj.ERROR_HANDLERS,
+            type:'POST'
+        });
+    };
+
 
     return obj;
 });

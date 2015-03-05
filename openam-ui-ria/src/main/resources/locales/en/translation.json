@@ -412,7 +412,9 @@
             "list": {
                 "title": "Resources",
                 "subtitle": "All your shared resources",
-                "grid": ["Resources", "Host", "Type"]
+                "grid": ["Resources", "Host", "Type"],
+                "revokeAllResourcesSuccess" : "All resources successfully revoked",
+                "revokeAllResourcesFail" : "We have been unable revoke access to your resources. Please contact your Administrator"
             },
             "show": {
                 "subtitle": "Users allowed to access this resource and their permissions",
@@ -444,80 +446,6 @@
         "apps": {
             "title": "Apps",
             "subtitle": "..."
-        }
-    },
-    "openidm" : {
-        "ui" : {
-            "common" : {
-                "components" : {
-                    "LineTableView" : {
-                        "seeMoreItems" : "see more",
-                        "noItems" : "No items"
-                    }
-                }
-            },
-            "admin" : {
-                "tasks" : {
-                    "TasksMenuView" : {
-                        "noTasksAssigned" : "You do not have any tasks assigned to you right now.",
-                        "noTasksInGroupQueue" : "You do not have any tasks in your's group's queue now.",
-                        "denyDefaultReason" : "Enter a reason for denying this request",
-                        "acceptanceForm" : {
-                            "for" : "For",
-                            "application" : "Application",
-                            "requested" : "Requested",
-                            "actions" : "Actions"
-                        },
-                        "headers" : {
-                            "initiator" : "Initiator",
-                            "key" : "Key",
-                            "requested" : "Requested",
-                            "inQueue" : "In queue",
-                            "actions" : "Actions"
-                        }
-                    },
-                    "TasksWithMenuView" : {
-                        "chooseTask" : "Choose a task"
-                    },
-                    "StartProcessDashboardView" : {
-                        "chooseProcess" : "Please choose a process to start",
-                        "noProcesses": "No processes",
-                        "noDataRequired": "No data required"
-                    }
-                },
-                "users" : {
-                    "UsersView" : {
-                        "display" : "Display",
-                        "perPage" : "per page"
-                    },
-                    "AdminUserProfileView" : {
-                        "profileOwnership" : "%s' profile",
-                        "profileWillBeDeleted" : "%s account will be deleted."
-                    },
-                    "ChangeUserPasswordDialog" : {
-                        "securityDataChangeForWhom" : "Security data change for %s"
-                    }
-                }
-            },
-            "apps" : {
-                "dashboard" : {
-                    "NotificationsView" : {
-                        "noNotifications" : "You have no notifications right now.",
-                        "seeMoreNotifications" : "see more notifications"
-                    }
-                },
-                "BaseApplicationsView" : {
-                    "noApplicationsHere" : "You have no apps here",
-                    "noDefaultApplications" : "You have no default apps",
-                    "noFrequentlyUsedApplications" : "You have no frequently used apps"
-                },
-                "UsersApplicationsView" : {
-                    "noApplications" : "You have no applications"
-                },
-                "FrequentlyUsedApplicationsView" : {
-                    "clickHereToAdd" : "Click %shere%s to add."
-                }
-            }
         }
     }
 }
