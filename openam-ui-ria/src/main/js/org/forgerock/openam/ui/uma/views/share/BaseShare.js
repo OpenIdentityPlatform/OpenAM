@@ -36,13 +36,13 @@ define("org/forgerock/openam/ui/uma/views/share/BaseShare", [
 
             var self = this;
             self.shareView = new CommonShare();
-            self.shareView.element = "#umaInnerContent";a
+            self.shareView.element = "#umaInnerContent";
             self.shareView.noBaseTemplate = true;
             self.parentRender(function(){
                 self.data.resourceSet = {};
                 self.shareView.render(args, callback);
             }, callback);
-        }
+        } 
 
     });
 
