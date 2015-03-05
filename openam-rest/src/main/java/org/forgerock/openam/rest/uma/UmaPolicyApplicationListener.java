@@ -330,7 +330,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
                 = org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.CLIENT_ID, resourceServerId);
         Set<ResourceSetDescription> results = resourceSetStore.query(queryFilter);
         for (ResourceSetDescription resourceSet : results) {
-            resourceSetStore.delete(resourceSet.getId());
+            resourceSetStore.delete(resourceSet.getId(), resourceSet.getResourceOwnerId());
         }
     }
 

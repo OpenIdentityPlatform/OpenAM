@@ -22,6 +22,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.eq;
 
+import java.util.Collections;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +38,8 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.util.query.QueryFilter;
 import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -99,7 +102,8 @@ public class PermissionRequestEndpointTest {
         ResourceSetDescription resourceSetDescription = new ResourceSetDescription("RESOURCE_SET_ID",
                 "CLIENT_ID", "RESOURCE_OWNER_ID", description.asMap());
 
-        given(resourceSetStore.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
+        given(resourceSetStore.query(QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID")))
+                .willReturn(Collections.singleton(resourceSetDescription));
     }
 
     @Test(expectedExceptions = UmaException.class)
@@ -169,9 +173,13 @@ public class PermissionRequestEndpointTest {
         //Given
         JsonRepresentation entity = mock(JsonRepresentation.class);
         JSONObject requestBody = mock(JSONObject.class);
+        ResourceSetDescription resourceSetDescription = new ResourceSetDescription("RESOURCE_SET_ID",
+                "CLIENT_ID", "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
 
         given(entity.getJsonObject()).willReturn(requestBody);
         given(requestBody.toString()).willReturn("{\"resource_set_id\":\"RESOURCE_SET_ID\"}");
+        given(resourceSetStore.query(QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID")))
+                .willReturn(Collections.singleton(resourceSetDescription));
 
         //When
         try {
@@ -186,14 +194,18 @@ public class PermissionRequestEndpointTest {
     }
 
     @Test(expectedExceptions = UmaException.class)
-    public void shouldThrowInvalidScopexceptionWhenScopeIsNotASetOfStrings() throws Exception {
+    public void shouldThrowInvalidScopExceptionWhenScopeIsNotASetOfStrings() throws Exception {
 
         //Given
         JsonRepresentation entity = mock(JsonRepresentation.class);
         JSONObject requestBody = mock(JSONObject.class);
+        ResourceSetDescription resourceSetDescription = new ResourceSetDescription("RESOURCE_SET_ID",
+                "CLIENT_ID", "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
 
         given(entity.getJsonObject()).willReturn(requestBody);
         given(requestBody.toString()).willReturn("{\"resource_set_id\":\"RESOURCE_SET_ID\", \"scopes\":\"SCOPE\"}");
+        given(resourceSetStore.query(QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID")))
+                .willReturn(Collections.singleton(resourceSetDescription));
 
         //When
         try {
@@ -218,7 +230,8 @@ public class PermissionRequestEndpointTest {
         given(requestBody.toString()).willReturn("{\"resource_set_id\":\"RESOURCE_SET_ID\", "
                 + "\"scopes\":[\"SCOPE_A\", \"SCOPE_C\"]}");
 
-        doThrow(NotFoundException.class).when(resourceSetStore).read("RESOURCE_SET_ID");
+        given(resourceSetStore.query(QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID")))
+                .willReturn(Collections.<ResourceSetDescription>emptySet());
 
         //When
         try {
@@ -242,7 +255,8 @@ public class PermissionRequestEndpointTest {
         given(requestBody.toString()).willReturn("{\"resource_set_id\":\"RESOURCE_SET_ID\", "
                 + "\"scopes\":[\"SCOPE_A\", \"SCOPE_C\"]}");
 
-        doThrow(ServerException.class).when(resourceSetStore).read("RESOURCE_SET_ID");
+        given(resourceSetStore.query(QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID")))
+                .willReturn(Collections.<ResourceSetDescription>emptySet());
 
         //When
         try {

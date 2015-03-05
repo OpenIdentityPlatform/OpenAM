@@ -47,6 +47,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -136,7 +137,12 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         try {
             ResourceSetStore store = oauth2ProviderSettingsFactory.get(requestFactory.create(getRequest()))
                     .getResourceSetStore();
-            resourceName += store.read(resourceSetId).getId();
+            Set<ResourceSetDescription> results = store.query(
+                    org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
+            if (results.size() != 1) {
+                throw new NotFoundException("Could not find Resource Set, " + resourceSetId);
+            }
+            resourceName += results.iterator().next().getId();
         } catch (NotFoundException e) {
             debug.message("Couldn't find resource that permission ticket is registered for", e);
             throw new ServerException("Couldn't find resource that permission ticket is registered for");
@@ -230,12 +236,16 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         }
     }
 
-    private ResourceSetDescription getResourceSet(String resourceSetId, OAuth2ProviderSettings providerSettings) throws UmaException {
+    private ResourceSetDescription getResourceSet(String resourceSetId, OAuth2ProviderSettings providerSettings)
+            throws UmaException {
         try {
             ResourceSetStore store = providerSettings.getResourceSetStore();
-            return store.read(resourceSetId);
-        } catch (NotFoundException e) {
-            throw new UmaException(400, "invalid_resource_set_id", e.getMessage());
+            Set<ResourceSetDescription> results = store.query(
+                    org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
+            if (results.size() != 1) {
+                throw new UmaException(400, "invalid_resource_set_id", "Could not fing Resource Set, " + resourceSetId);
+            }
+            return results.iterator().next();
         } catch (ServerException e) {
             throw new UmaException(400, "invalid_resource_set_id", e.getMessage());
         }

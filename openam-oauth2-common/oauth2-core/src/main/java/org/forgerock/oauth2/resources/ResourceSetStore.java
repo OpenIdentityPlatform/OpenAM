@@ -45,12 +45,13 @@ public interface ResourceSetStore {
     /**
      * Reads a {@code ResourceSetDescription} out of the store using its OpenAM Unique ID.
      *
-     * @param resourceSetUID The OpenAM Unique ID assigned to the resource set.
+     * @param resourceSetId The resource set ID.
+     * @param resourceOwnerId The resource owner id.
      * @return The {@code ResourceSetDescription}.
      * @throws NotFoundException If the resource set is not found.
      * @throws ServerException When the resource set description cannot be loaded.
      */
-    ResourceSetDescription read(String resourceSetUID) throws NotFoundException, ServerException;
+    ResourceSetDescription read(String resourceSetId, String resourceOwnerId) throws NotFoundException, ServerException;
 
     /**
      * Update a given {@code ResourceSetDescription} instance.
@@ -65,9 +66,10 @@ public interface ResourceSetStore {
      * Remove a {@code ResourceSetDescription} with the given ID from the store.
      *
      * @param resourceSetId The identifier of the {@code ResourceSetDescription} being removed.
+     * @param resourceOwnerId The resource owner id.
      * @throws ServerException When an error occurs during removal.
      */
-    void delete(String resourceSetId) throws NotFoundException, ServerException;
+    void delete(String resourceSetId, String resourceOwnerId) throws NotFoundException, ServerException;
 
     /**
      * Query the store for {@code ResourceSetDescription} instances.

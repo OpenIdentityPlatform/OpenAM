@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,13 +32,10 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
-import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
-import org.forgerock.util.query.BaseQueryFilterVisitor;
 import org.forgerock.util.query.QueryFilter;
-import org.forgerock.util.query.QueryFilterVisitor;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
@@ -118,33 +114,18 @@ public class OpenAMResourceSetStoreTest {
                 new ResourceSetDescription("RESOURCE_SET_ID", "CLIENT_ID", "RESOURCE_OWNER_ID",
                         Collections.<String, Object>emptyMap());
 
-        given(dataStore.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
-        resourceSetDescription.setRealm("REALM");
+        given(dataStore.query(
+                QueryFilter.and(
+                        QueryFilter.and(
+                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
+                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID")),
+                        QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM"))))
+                .willReturn(Collections.singleton(resourceSetDescription));
 
         //When
-        ResourceSetDescription readResourceSetDescription = store.read("RESOURCE_SET_ID");
+        ResourceSetDescription readResourceSetDescription = store.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID");
 
         //Then
-        verify(dataStore).read("RESOURCE_SET_ID");
-        assertThat(readResourceSetDescription).isEqualTo(readResourceSetDescription);
-    }
-    
-    @Test
-    public void shouldReadResourceSetTokenWithResourceSetUid() throws Exception {
-
-        //Given
-        ResourceSetDescription resourceSetDescription =
-                new ResourceSetDescription("123", "CLIENT_ID", "RESOURCE_OWNER_ID",
-                        Collections.<String, Object>emptyMap());
-
-        given(dataStore.read("123")).willReturn(resourceSetDescription);
-        resourceSetDescription.setRealm("REALM");
-
-        //When
-        ResourceSetDescription readResourceSetDescription = store.read("123");
-
-        //Then
-        verify(dataStore).read("123");
         assertThat(readResourceSetDescription).isEqualTo(readResourceSetDescription);
     }
 
@@ -155,7 +136,7 @@ public class OpenAMResourceSetStoreTest {
         given(dataStore.read("123")).willThrow(new org.forgerock.openam.sm.datalayer.store.NotFoundException("not found"));
 
         //When
-        store.read("123");
+        store.read("123", "RESOURCE_OWNER_ID");
 
         //Then
         //Excepted NotFoundException
@@ -166,10 +147,17 @@ public class OpenAMResourceSetStoreTest {
 
         //Given
         ResourceSetDescription resourceSetDescription =
-                new ResourceSetDescription("123", "CLIENT_ID", "RESOURCE_OWNER_ID",
+                new ResourceSetDescription("RESOURCE_SET_ID", "CLIENT_ID", "RESOURCE_OWNER_ID",
                         Collections.<String, Object>emptyMap());
 
         resourceSetDescription.setRealm("REALM");
+        given(dataStore.query(
+                QueryFilter.and(
+                        QueryFilter.and(
+                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
+                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID")),
+                        QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM"))))
+                .willReturn(Collections.singleton(resourceSetDescription));
 
         //When
         store.update(resourceSetDescription);
@@ -182,11 +170,9 @@ public class OpenAMResourceSetStoreTest {
     public void shouldNotDeleteResourceSetTokenIfResourceSetNotFound() throws Exception {
 
         //Given
-        given(dataStore.query(Matchers.<QueryFilter<String>>anyObject()))
-                .willReturn(Collections.<ResourceSetDescription>emptySet());
 
         //When
-        store.delete("RESOURCE_SET_ID");
+        store.delete("RESOURCE_SET_ID", "RESOURCE_OWNER_ID");
 
         //Then
         //Excepted NotFoundException
@@ -199,11 +185,18 @@ public class OpenAMResourceSetStoreTest {
         ResourceSetDescription resourceSetDescription = new ResourceSetDescription();
 
         resourceSetDescription.setId("RESOURCE_SET_ID");
+        resourceSetDescription.setResourceOwnerId("RESOURCE_OWNER_ID");
         resourceSetDescription.setRealm("REALM");
-        given(dataStore.read("RESOURCE_SET_ID")).willReturn(resourceSetDescription);
+        given(dataStore.query(
+                QueryFilter.and(
+                        QueryFilter.and(
+                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"),
+                                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID")),
+                        QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM"))))
+                .willReturn(Collections.singleton(resourceSetDescription));
 
         //When
-        store.delete("RESOURCE_SET_ID");
+        store.delete("RESOURCE_SET_ID", "RESOURCE_OWNER_ID");
 
         //Then
         verify(dataStore).delete("RESOURCE_SET_ID");
@@ -215,7 +208,6 @@ public class OpenAMResourceSetStoreTest {
         //Given
         Map<String, Object> queryParameters = new HashMap<String, Object>();
         queryParameters.put(ResourceSetTokenField.CLIENT_ID, "CLIENT_ID");
-        ResourceSetStore.FilterType filterType = ResourceSetStore.FilterType.AND;
         ResourceSetDescription resourceSet1 =
                 new ResourceSetDescription("123", "CLIENT_ID", "RESOURCE_OWNER_ID",
                         Collections.<String, Object>emptyMap());
@@ -229,29 +221,14 @@ public class OpenAMResourceSetStoreTest {
         resourceSet2.setRealm("REALM");
 
         //When
-        QueryFilter<String> query = QueryFilter.<String>alwaysTrue();
+        QueryFilter<String> query = QueryFilter.alwaysTrue();
         Set<ResourceSetDescription> resourceSetDescriptions = store.query(query);
 
         //Then
         assertThat(resourceSetDescriptions).contains(resourceSet1, resourceSet2);
         ArgumentCaptor<QueryFilter> tokenFilterCaptor = ArgumentCaptor.forClass(QueryFilter.class);
         verify(dataStore).query(tokenFilterCaptor.capture());
-        assertThat(tokenFilterCaptor.getValue()).isSameAs(query);
+        assertThat(tokenFilterCaptor.getValue()).isEqualTo(QueryFilter.and(query,
+                QueryFilter.equalTo(ResourceSetTokenField.REALM, "REALM")));
     }
-
-    private static final QueryFilterVisitor<Map<String, String>, Map<String, String>, String> QUERY_PARAMS_EXTRACTOR =
-            new BaseQueryFilterVisitor<Map<String, String>, Map<String, String>, String>() {
-                public Map<String, String> visitAndFilter(Map<String, String> map, List<QueryFilter<String>> list) {
-                    for (QueryFilter<String> subfilter : list) {
-                        subfilter.accept(this, map);
-                    }
-                    return map;
-                }
-
-                public Map<String, String> visitEqualsFilter(Map<String, String> map, String field, Object value) {
-                    map.put(field, value.toString());
-                    return map;
-                }
-            };
-
 }

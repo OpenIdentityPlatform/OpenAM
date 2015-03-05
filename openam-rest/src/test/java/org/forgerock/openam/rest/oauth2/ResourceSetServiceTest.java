@@ -32,10 +32,9 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.RootContext;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.uma.UmaPolicy;
@@ -75,7 +74,9 @@ public class ResourceSetServiceTest {
         boolean augmentWithPolicy = false;
         ResourceSetDescription resourceSetDescription = mock(ResourceSetDescription.class);
 
-        given(resourceSetStore.read(resourceSetId)).willReturn(resourceSetDescription);
+        given(resourceSetStore.query(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId)))
+                .willReturn(Collections.singleton(resourceSetDescription));
 
         //When
         ResourceSetDescription resourceSet = service.getResourceSet(context, realm, resourceSetId, augmentWithPolicy)
@@ -100,7 +101,9 @@ public class ResourceSetServiceTest {
         Promise<UmaPolicy, ResourceException> policyPromise = Promises.newSuccessfulPromise(policy);
         JsonValue policyJson = mock(JsonValue.class);
 
-        given(resourceSetStore.read(resourceSetId)).willReturn(resourceSetDescription);
+        given(resourceSetStore.query(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId)))
+                .willReturn(Collections.singleton(resourceSetDescription));
         given(policyService.readPolicy(context, resourceSetId)).willReturn(policyPromise);
         given(policy.asJson()).willReturn(policyJson);
 
@@ -265,7 +268,9 @@ public class ResourceSetServiceTest {
         given(resourceSetStore.query(resourceSetQuery)).willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
-        given(resourceSetStore.read("RS_ID_THREE")).willReturn(resourceSetThree);
+        given(resourceSetStore.query(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RS_ID_THREE")))
+                .willReturn(Collections.singleton(resourceSetThree));
 
         //When
         Collection<ResourceSetDescription> resourceSets = service.getResourceSets(context, realm, query,
@@ -315,7 +320,9 @@ public class ResourceSetServiceTest {
         given(resourceSetStore.query(resourceSetQuery)).willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
-        given(resourceSetStore.read("RS_ID_THREE")).willReturn(resourceSetThree);
+        given(resourceSetStore.query(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RS_ID_THREE")))
+                .willReturn(Collections.singleton(resourceSetThree));
 
         //When
         Collection<ResourceSetDescription> resourceSets = service.getResourceSets(context, realm, query,
@@ -374,7 +381,9 @@ public class ResourceSetServiceTest {
         given(resourceSetStore.query(resourceSetQuery)).willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
-        given(resourceSetStore.read("RS_ID_THREE")).willReturn(resourceSetThree);
+        given(resourceSetStore.query(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RS_ID_THREE")))
+                .willReturn(Collections.singleton(resourceSetThree));
         given(policyService.readPolicy(context, "RS_ID_ONE")).willReturn(policyOnePromise);
         given(policyService.readPolicy(context, "RS_ID_TWO")).willReturn(policyTwoPromise);
 
@@ -434,7 +443,9 @@ public class ResourceSetServiceTest {
         given(resourceSetStore.query(resourceSetQuery)).willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
-        given(resourceSetStore.read("RS_ID_THREE")).willReturn(resourceSetThree);
+        given(resourceSetStore.query(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RS_ID_THREE")))
+                .willReturn(Collections.singleton(resourceSetThree));
 
         //When
         Collection<ResourceSetDescription> resourceSets = service.getResourceSets(context, realm, query,

@@ -29,6 +29,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -79,13 +80,15 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     }
 
     @Override
-    public ResourceSetDescription read(String resourceSetId) throws NotFoundException, ServerException {
-        try {
-            return delegate.read(resourceSetId);
-        } catch (org.forgerock.openam.sm.datalayer.store.NotFoundException e) {
+    public ResourceSetDescription read(String resourceSetId, String resourceOwnerId) throws NotFoundException,
+            ServerException {
+        Set<ResourceSetDescription> resourceSets = query(QueryFilter.and(
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId),
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, resourceOwnerId)));
+        if (resourceSets.isEmpty()) {
             throw new NotFoundException("Resource set does not exist with id " + resourceSetId);
-        } catch (org.forgerock.openam.sm.datalayer.store.ServerException e) {
-            throw new ServerException(e);
+        } else {
+            return resourceSets.iterator().next();
         }
     }
 
@@ -96,6 +99,7 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
                 throw new ServerException("Could not read token with id, " + resourceSetDescription.getId()
                         + ", in realm, " + realm);
             }
+            read(resourceSetDescription.getId(), resourceSetDescription.getResourceOwnerId());
             delegate.update(resourceSetDescription);
         } catch (org.forgerock.openam.sm.datalayer.store.NotFoundException e) {
             throw new NotFoundException("Resource set does not exist with id " + resourceSetDescription.getId());
@@ -105,15 +109,9 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     }
 
     @Override
-    public void delete(String resourceSetId) throws NotFoundException, ServerException {
+    public void delete(String resourceSetId, String resourceOwnerId) throws NotFoundException, ServerException {
         try {
-            ResourceSetDescription token = read(resourceSetId);
-            if (token == null) {
-                if (logger.errorEnabled()) {
-                    logger.error("Resource set corresponding to id: " + resourceSetId + " not found");
-                }
-                throw new NotFoundException("Resource set corresponding to id: " + resourceSetId + " not found");
-            }
+            ResourceSetDescription token = read(resourceSetId, resourceOwnerId);
             delegate.delete(token.getId());
         } catch (org.forgerock.openam.sm.datalayer.store.NotFoundException e) {
             throw new NotFoundException("Could not find resource set");
@@ -123,20 +121,13 @@ public class OpenAMResourceSetStore implements ResourceSetStore {
     }
 
     @Override
-    public Set<ResourceSetDescription> query(QueryFilter<String> query)
-            throws ServerException {
+    public Set<ResourceSetDescription> query(QueryFilter<String> query) throws ServerException {
         Set<ResourceSetDescription> results;
         try {
-            results = delegate.query(query);
+            results = delegate.query(QueryFilter.and(query,
+                    QueryFilter.equalTo(ResourceSetTokenField.REALM, realm)));
         } catch (org.forgerock.openam.sm.datalayer.store.ServerException e) {
             throw new ServerException(e);
-        }
-        //Ignore tokens in a different realm
-        Iterator<ResourceSetDescription> resourceSets = results.iterator();
-        while(resourceSets.hasNext()) {
-            if (!realm.equals(resourceSets.next().getRealm())) {
-                resourceSets.remove();
-            }
         }
         return results;
     }

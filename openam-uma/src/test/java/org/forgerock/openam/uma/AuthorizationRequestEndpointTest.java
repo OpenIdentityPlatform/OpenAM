@@ -14,7 +14,9 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
+import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mockito.Matchers;
@@ -26,6 +28,7 @@ import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -110,7 +113,8 @@ public class AuthorizationRequestEndpointTest {
         resourceSetStore = mock(ResourceSetStore.class);
         ResourceSetDescription resourceSet = new ResourceSetDescription();
         resourceSet.setId(RS_DESCRIPTION_ID);
-        given(resourceSetStore.read(RS_ID)).willReturn(resourceSet);
+        given(resourceSetStore.query(QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, RS_ID)))
+                .willReturn(Collections.singleton(resourceSet));
 
         umaProviderSettings = mock(UmaProviderSettings.class);
         policyEvaluator = mock(Evaluator.class);

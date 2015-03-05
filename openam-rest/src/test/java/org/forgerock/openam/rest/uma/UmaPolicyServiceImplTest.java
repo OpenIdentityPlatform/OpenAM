@@ -50,6 +50,7 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -90,9 +91,17 @@ public class UmaPolicyServiceImplTest {
         resourceSet.setDescription(json(object(field("name", "NAME"), field("scopes", array("SCOPE_A", "SCOPE_B")))));
 
         given(resourceSetStoreFactory.create(anyString())).willReturn(resourceSetStore);
-        given(resourceSetStore.read("POLICY_ID")).willReturn(resourceSet);
-        doThrow(org.forgerock.oauth2.core.exceptions.NotFoundException.class).when(resourceSetStore).read("OTHER_ID");
-        doThrow(ServerException.class).when(resourceSetStore).read("FAILING_ID");
+        given(resourceSetStore.query(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "POLICY_ID")))
+                .willReturn(Collections.singleton(resourceSet));
+        given(resourceSetStore.query(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "OTHER_ID")))
+                .willReturn(Collections.<ResourceSetDescription>emptySet());
+        given(resourceSetStore.query(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "OTHER_ID")))
+                .willReturn(Collections.<ResourceSetDescription>emptySet());
+        doThrow(ServerException.class).when(resourceSetStore).query(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "FAILING_ID"));
         given(lazyAuditLogger.get()).willReturn(auditLogger);
     }
 

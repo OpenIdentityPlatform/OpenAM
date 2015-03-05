@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.cts.api.fields;
 
-import org.forgerock.openam.tokens.CoreTokenField;
-
 /**
  * The ResourceSetTokenField provides a mapping between known ResourceSetDescription fields and the LDAP Attributes
  * that they map to.
@@ -26,8 +24,10 @@ import org.forgerock.openam.tokens.CoreTokenField;
  * one stage further by mapping ResourceSetDescription attribute names to the corresponding CoreTokenField attributes.
  */
 public final class ResourceSetTokenField {
-    public static final String RESOURCE_SET_ID = CoreTokenField.TOKEN_ID.toString();
+    public static final String RESOURCE_SET_ID = "id";
     public static final String POLICY_URI = "policyUri";
     public static final String CLIENT_ID = "clientId";
+    public static final String RESOURCE_OWNER_ID = "resourceOwnerId";
+    public static final String REALM = "realm";
     public static final String NAME = "name";
 }

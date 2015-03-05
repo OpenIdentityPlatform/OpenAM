@@ -36,7 +36,9 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
@@ -90,7 +92,7 @@ public class PermissionRequestEndpoint extends ServerResource {
         String resourceSetId = getResourceSetId(permissionRequest);
         String clientId = getClientId();
         OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(requestFactory.create(getRequest()));
-        ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, clientId, providerSettings);
+        ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, providerSettings);
         Set<String> scopes = validateScopes(permissionRequest, resourceSetDescription);
         String ticket = umaProviderSettingsFactory.get(getRequest()).getUmaTokenStore()
                 .createPermissionTicket(resourceSetId, scopes, clientId).getId();
@@ -141,12 +143,15 @@ public class PermissionRequestEndpoint extends ServerResource {
         return permissionRequest.get("scopes").asSet(String.class);
     }
 
-    private ResourceSetDescription getResourceSet(String resourceSetId, String clientId, OAuth2ProviderSettings providerSettings) throws UmaException {
+    private ResourceSetDescription getResourceSet(String resourceSetId, OAuth2ProviderSettings providerSettings) throws UmaException {
         try {
             ResourceSetStore store = providerSettings.getResourceSetStore();
-            return store.read(resourceSetId);
-        } catch (NotFoundException e) {
-            throw new UmaException(400, "invalid_resource_set_id", e.getMessage());
+            Set<ResourceSetDescription> results = store.query(
+                    QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
+            if (results.size() != 1) {
+                throw new UmaException(400, "invalid_resource_set_id", "Could not find Resource Set, " + resourceSetId);
+            }
+            return results.iterator().next();
         } catch (ServerException e) {
             throw new UmaException(400, "invalid_resource_set_id", e.getMessage());
         }

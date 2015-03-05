@@ -135,7 +135,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         }
 
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        ResourceSetDescription resourceSetDescription = store.read(getResourceSetId())
+        ResourceSetDescription resourceSetDescription = store.read(getResourceSetId(), getResourceOwnerId())
                 .update(validator.validate(toMap(entity)));
         store.update(resourceSetDescription);
         return createJsonResponse(resourceSetDescription, false, true);
@@ -161,12 +161,14 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
 
     private Representation readResourceSet(String resourceSetId) throws NotFoundException, ServerException {
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        return createJsonResponse(store.read(resourceSetId), true, true);
+        return createJsonResponse(store.read(resourceSetId, getResourceOwnerId()), true, true);
     }
 
     private Representation listResourceSets() throws ServerException, NotFoundException {
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        QueryFilter<String> query = QueryFilter.equalTo(ResourceSetTokenField.CLIENT_ID, getClientId());
+        QueryFilter<String> query = QueryFilter.and(
+                QueryFilter.equalTo(ResourceSetTokenField.CLIENT_ID, getClientId()),
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, getResourceOwnerId()));
         Set<ResourceSetDescription> resourceSetDescriptions = store.query(query);
 
         Set<String> resourceSetIds = new HashSet<String>();
@@ -197,7 +199,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         }
 
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        store.delete(getResourceSetId());
+        store.delete(getResourceSetId(), getResourceOwnerId());
         return createEmptyResponse();
     }
 
@@ -217,10 +219,6 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         return requestFactory.create(getRequest()).getToken(AccessToken.class).getResourceOwnerId();
     }
 
-    private Representation createJsonResponse(ResourceSetDescription resourceSetDescription) {
-        return createJsonResponse(resourceSetDescription, true, false);
-    }
-
     private Representation createJsonResponse(ResourceSetDescription resourceSetDescription, boolean includeResourceSet,
             boolean withPolicyUri) {
         Map<String, Object> response = new HashMap<String, Object>();
@@ -232,12 +230,6 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
             response.put(POLICY_URI_FIELD, resourceSetDescription.getPolicyUri());
         }
         Representation representation = new JacksonRepresentation<Map<String, Object>>(response);
-        representation.setTag(generateETag(resourceSetDescription));
-        return representation;
-    }
-
-    private Representation createEmptyResponse(ResourceSetDescription resourceSetDescription) {
-        Representation representation = createEmptyResponse();
         representation.setTag(generateETag(resourceSetDescription));
         return representation;
     }

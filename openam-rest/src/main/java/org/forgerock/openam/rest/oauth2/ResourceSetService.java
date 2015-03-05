@@ -31,9 +31,9 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.uma.UmaPolicy;
@@ -44,6 +44,7 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.promise.SuccessHandler;
+import org.forgerock.util.query.QueryFilter;
 
 /**
  * Services for getting Resource Sets and optionally augmenting them with an associated UMA policy.
@@ -69,11 +70,14 @@ public class ResourceSetService {
 
     private Promise<ResourceSetDescription, ResourceException> getResourceSet(String realm, String resourceSetId) {
         try {
-            return Promises.newSuccessfulPromise(resourceSetStoreFactory.create(realm).read(resourceSetId));
-        } catch (NotFoundException e) {
-            return Promises.newFailedPromise(
-                    (ResourceException) new org.forgerock.json.resource.NotFoundException("No resource set with id, "
-                            + resourceSetId + ", found."));
+            Set<ResourceSetDescription> results = resourceSetStoreFactory.create(realm).query(
+                    QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
+            if (results.size() != 1) {
+                return Promises.newFailedPromise(
+                        (ResourceException) new org.forgerock.json.resource.NotFoundException(
+                                "No resource set with id, " + resourceSetId + ", found."));
+            }
+            return Promises.newSuccessfulPromise(results.iterator().next());
         } catch (ServerException e) {
             return Promises.newFailedPromise((ResourceException) new InternalServerErrorException(e));
         }
@@ -224,7 +228,8 @@ public class ResourceSetService {
                 } else {
                     RealmContext realmContext = context.asContext(RealmContext.class);
                     resourceSet = resourceSetStoreFactory.create(realmContext.getResolvedRealm())
-                            .read(entry.getKey());
+                            .query(QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, entry.getKey()))
+                            .iterator().next();
                 }
                 if (augmentWithPolicies) {
                     resourceSet.setPolicy(entry.getValue().asJson());

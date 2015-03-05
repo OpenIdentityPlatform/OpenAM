@@ -120,8 +120,8 @@ public class JavaBeanAdapter<T> implements TokenAdapter<T> {
                             throw new IllegalStateException("Non-id values cannot be generated: " + f.toString());
                         }
                         fields.add(field);
-                        fieldsMap.put(pd.getName(), field);
                     }
+                    fieldsMap.put(pd.getName(), field);
                 }
             }
         }

@@ -48,6 +48,7 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.SortKey;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
@@ -349,13 +350,16 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                 });
     }
 
-    private ResourceSetDescription getResourceSetDescription(String resourceSetUid, ServerContext context)
+    private ResourceSetDescription getResourceSetDescription(String resourceSetId, ServerContext context)
             throws ResourceException {
         try {
             RealmContext realmContext = context.asContext(RealmContext.class);
-            return resourceSetStoreFactory.create(realmContext.getResolvedRealm()).read(resourceSetUid);
-        } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
-            throw new BadRequestException("Invalid ResourceSet UID", e);
+            Set<ResourceSetDescription> results = resourceSetStoreFactory.create(realmContext.getResolvedRealm()).query(
+                    org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
+            if (results.size() != 1) {
+                throw new BadRequestException("Invalid ResourceSet UID");
+            }
+            return results.iterator().next();
         } catch (ServerException e) {
             throw new InternalServerErrorException(e.getMessage(), e);
         }
