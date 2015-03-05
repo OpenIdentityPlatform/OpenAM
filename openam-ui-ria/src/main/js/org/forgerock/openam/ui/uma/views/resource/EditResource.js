@@ -36,20 +36,20 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
     var EditResource = AbstractView.extend({
         initialize: function(options) {
             this.model = new UMAResourceSetWithPolicy();
-            this.listenTo(this.model, 'sync', function(model,response) {
-                this.render();
-            });
-            this.listenTo(this.model, 'error', function(model, response) {
-                console.error('Unrecoverable load failure UMAResourceSetWithPolicy. ' +
-                               response.responseJSON.code + ' (' + response.responseJSON.reason + ') ' +
-                               response.responseJSON.message);
-            });
         },
         template: "templates/uma/views/resource/EditResource.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
             'click a#revokeAll': 'onRevokeAll',
             'click a#share': 'onShare'
+        },
+        onModelError: function(model, response) {
+            console.error('Unrecoverable load failure UMAResourceSetWithPolicy. ' +
+                           response.responseJSON.code + ' (' + response.responseJSON.reason + ') ' +
+                           response.responseJSON.message);
+        },
+        onModelSync: function(model, response) {
+            this.render();
         },
         onRevokeAll: function() {
             this.model.get('policy').destroy();
@@ -215,7 +215,16 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
         syncModel: function(id) {
             var syncRequired = id && this.model.id !== id;
 
-            if(syncRequired) { this.model.set('_id', id).fetch(); }
+            if(syncRequired) {
+                this.stopListening(this.model);
+
+                this.model = UMAResourceSetWithPolicy.findOrCreate( { _id: id} );
+
+                this.listenTo(this.model, 'sync', this.onModelSync);
+                this.listenTo(this.model, 'error', this.onModelError);
+
+                this.model.fetch();
+            }
 
             return syncRequired;
         }

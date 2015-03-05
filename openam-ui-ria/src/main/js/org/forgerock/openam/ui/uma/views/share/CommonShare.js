@@ -37,9 +37,6 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
         initialize: function(options) {
             this.model = null;
             this.parentModel = new UMAResourceSetWithPolicy();
-
-            this.listenTo(this.parentModel, 'sync', this.onParentModelSync);
-            this.listenTo(this.parentModel, 'error', this.onParentModelError);
         },
         template: "templates/uma/views/share/CommonShare.html",
         events: {
@@ -66,7 +63,16 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
         syncParentModel: function(id) {
             var syncRequired = id && this.parentModel.id !== id;
 
-            if(syncRequired) { this.parentModel.set('_id', id).fetch(); }
+            if(syncRequired) {
+                this.stopListening(this.parentModel);
+
+                this.parentModel = UMAResourceSetWithPolicy.findOrCreate( { _id: id} );
+
+                this.listenTo(this.parentModel, 'sync', this.onParentModelSync);
+                this.listenTo(this.parentModel, 'error', this.onParentModelError);
+
+                this.parentModel.fetch();
+            }
 
             return syncRequired;
         },
