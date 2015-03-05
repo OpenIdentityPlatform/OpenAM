@@ -28,78 +28,78 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
-    "org/forgerock/openam/ui/uma/models/UMAPolicy",
-    "org/forgerock/openam/ui/uma/models/UMAPolicyPermission",
-    "org/forgerock/openam/ui/uma/models/UMAResourceSet",
+    'org/forgerock/openam/ui/uma/models/UMAPolicy',
+    'org/forgerock/openam/ui/uma/models/UMAPolicyPermission',
+    'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy',
     "org/forgerock/openam/ui/uma/models/User"
-], function(AbstractView, Constants, EventManager, UMADelegate, UMAPolicy, UMAPolicyPermission, UMAResourceSet, User) {
+], function(AbstractView, Constants, EventManager, UMADelegate, UMAPolicy, UMAPolicyPermission, UMAResourceSetWithPolicy, User) {
     var CommonShare = AbstractView.extend({
+        initialize: function(options) {
+            this.model = null;
+            this.parentModel = new UMAResourceSetWithPolicy();
+
+            this.listenTo(this.parentModel, 'sync', this.onParentModelSync);
+            this.listenTo(this.parentModel, 'error', this.onParentModelError);
+        },
         template: "templates/uma/views/share/CommonShare.html",
         events: {
           "click input#shareButton": "save"
         },
+        onParentModelError: function(model, response) {
+            console.error('Unrecoverable load failure UMAResourceSetWithPolicy. ' +
+                           response.responseJSON.code + ' (' + response.responseJSON.reason + ') ' +
+                           response.responseJSON.message);
+        },
+        onParentModelSync: function(model, response) {
+            // Create new UMA Policy object if one does not exist
+            if(!model.has('policy')) { model.set('policy', new UMAPolicy()); }
 
-        load: function(id) {
-            var self = this,
-                policyPromise,
-                resourceSetPromise;
+            // Hardwire the policyID into the policy as it's ID
+            model.get('policy').set('policyId', this.parentModel.id);
 
-            // UMA Policy
-            this.data.policy = new UMAPolicy({
-                policyId: id
-            });
-            policyPromise = this.data.policy.fetch();
-            policyPromise.fail(function() {
-                this.data.policy.fakeCreate = true;
-            });
-
-            // UMA Resource Set
-            this.data.resourceSet = new UMAResourceSet({
-                _id: id
-            });
-            resourceSetPromise = this.data.resourceSet.fetch();
-            resourceSetPromise
-            .done(function() {
-                self.data.notFound = false;
-            })
-            .fail(function() {
-                self.data.notFound = true;
-            });
-
-            this.data.policyPermission = new UMAPolicyPermission();
-            this.listenTo(this.data.policyPermission, 'change', this.onPolicyPermissionChanged);
-
-            // TODO: Should also be catching failure (umaPolicy fails if the policy is new)
-            $.when(policyPromise, resourceSetPromise)
-            .always(function() {
-                self.parentRender(function() {
-                    self.renderUserSelect();
-                    self.renderPermissionSelect();
-                    self.renderInfo();
-                });
-            });
+            this.render();
         },
 
-        onPolicyPermissionChanged: function(model, options) {
-            this.$el.find("#selectPermission select")[0].selectize.setValue(model.get("scopes"));
-            this.$el.find('input#shareButton').prop('disabled', !model.isValid());
+        /**
+         * @returns Boolean whether the parent model required sync'ing
+         */
+        syncParentModel: function(id) {
+            var syncRequired = id && this.parentModel.id !== id;
+
+            if(syncRequired) { this.parentModel.set('_id', id).fetch(); }
+
+            return syncRequired;
         },
 
-        render: function(currentResourceSetId, callback) {
-            this.load(currentResourceSetId);
+        render: function(id, callback) {
+            var self = this;
 
-            if(callback) { callback(); }
+            // FIXME: Resolve unknown issue with id appearing as an Array
+            if(id instanceof Array) { id = id[0]; }
+
+            if(this.syncParentModel(id)) { return; }
+
+            this.data.name = this.parentModel.get('name');
+            this.data.scopes = this.parentModel.get('scopes');
+
+            this.parentRender(function() {
+                self.renderUserOptions();
+                self.renderPermissionOptions();
+                self.renderSharedWith();
+
+                if(callback) { callback(); }
+            });
         },
+        renderSharedWith: function() {
+            var text = $.t("uma.share.info", { context: "none" }),
+                numberofPermissons = this.parentModel.get('policy').get('permissions').length;
 
-        renderInfo: function() {
-            var text = $.t("uma.share.info", { context: "none" });
-            if(this.data.policy.get("permissions").length) {
-                text = $.t("uma.share.info", { count: this.data.policy.get("permissions").length });
+            if(numberofPermissons) {
+                text = $.t("uma.share.info", { count: numberofPermissons });
             }
             this.$el.find("#shareCounter > p").text(text);
         },
-
-        renderPermissionSelect: function() {
+        renderPermissionOptions: function() {
             var self = this;
 
             this.$el.find('#selectPermission select').selectize({
@@ -111,12 +111,12 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 onChange: function(values) {
                     // TODO: This is not ideal, reset from defaults?
                     values = values || [];
-                    self.data.policyPermission.set("scopes", values);
+
+                    if(self.model) { self.model.set('scopes', values); }
                 }
             });
         },
-
-        renderUserSelect: function() {
+        renderUserOptions: function() {
             var self = this;
 
             this.$el.find('#selectUser select').selectize({
@@ -142,45 +142,57 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                     });
                 },
                 onChange: function(value) {
-                    self.data.policyPermission.set("subject", value);
+                    /**
+                     * Instantly set the value on the model. This is so that when there is an empty value
+                     * the change events are fired properly
+                     */
+                    if(self.model) { self.model.set('subject', value); }
 
-                    if(value) {
-                        UMADelegate.getUser(value)
-                        .done(function(data) {
-                            var universalID = data.universalid[0],
-                                existingPolicyPermission = self.data.policy.get("permissions").findWhere({subject: universalID});
+                    if(!value) { return; }
 
-                            self.data.policyPermission.set("subject", universalID);
-                            if(existingPolicyPermission) {
-                                self.data.policyPermission.set("scopes", existingPolicyPermission.get("scopes"));
-                            }
-                        });
-                    }
+                    UMADelegate.getUser(value)
+                    .done(function(data) {
+                        var universalID = data.universalid[0],
+                            existing = self.parentModel.get('policy').get("permissions").findWhere({ subject: universalID }),
+                            model = existing ? existing : new UMAPolicyPermission({ subject: universalID });
+
+                        self.setModel(model);
+                    });
                 }
             });
         },
+        setModel: function(value) {
+            this.stopListening(this.model);
 
+            this.model = value;
+
+            if(value) {
+                this.listenTo(this.model, 'change', this.onModelChange);
+            }
+        },
+        onModelChange: function(model) {
+            this.$el.find("#selectPermission select")[0].selectize.setValue(model.get("scopes"));
+            this.$el.find('input#shareButton').prop('disabled', !model.isValid());
+        },
         reset: function() {
-            this.data.policyPermission.clear().set(this.data.policyPermission.defaults);
+            this.setModel(null);
 
             this.$el.find("#selectUser select")[0].selectize.clear();
             this.$el.find("#selectPermission select")[0].selectize.clear();
             this.$el.find('input#shareButton').prop('disabled', true);
 
-            this.renderInfo();
+            this.renderSharedWith();
         },
-
         save: function() {
             var self = this,
-                existing = this.data.policy.get("permissions").findWhere({subject: self.data.policyPermission.get("subject")});
+                permissions = this.parentModel.get('policy').get("permissions"),
+                existing = permissions.findWhere({ subject: this.model.get('subject') });
 
-            if(existing) {
-                existing.set(self.data.policyPermission.attributes);
-            } else {
-                this.data.policy.get("permissions").add(self.data.policyPermission);
+            if(!existing) {
+                permissions.add(this.model);
             }
 
-            this.data.policy.save()
+            this.parentModel.get('policy').save()
             .done(function(response) {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
 

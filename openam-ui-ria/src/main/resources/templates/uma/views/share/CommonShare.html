@@ -1,5 +1,5 @@
 <div class="policy-header">
-    <h1>{{ resourceSet.attributes.name }}</h1>
+    <h1>{{ name }}</h1>
 </div>
 
 <div class="policy-content clear-fix" id="uma">
@@ -16,7 +16,7 @@
             <label>{{t 'uma.share.permission'}}</label>
             <select multiple class="selectize">
                 <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
-                {{#each resourceSet.attributes.scopes}}
+                {{#each scopes }}
                 <option value="{{this}}">{{this}}</option>
                 {{/each}}
             </select>
@@ -28,7 +28,5 @@
             <span class="icon-user"></span>
             <p></p>
         </div>
-
-
     {{/if}}
 </div>

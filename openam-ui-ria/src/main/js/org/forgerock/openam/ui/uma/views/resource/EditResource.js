@@ -68,11 +68,7 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
             // Get the current id
             if(args && args[0]) { id = args[0]; }
 
-            // Check if we have the correct model
-            if(id && this.model.get('_id') !== id) {
-                this.model.set('_id', id).fetch();
-                return;
-            }
+            if(this.syncModel(id)) { return; }
 
             /**
              * FIXME: Ideally the data needs to the be whole model, but I'm told it's also global so we're
@@ -215,6 +211,13 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                 // FIXME: Re-enable filtering and pagination
                 // self.$el.find("#paginationContainer").append(paginator.render().el);
             });
+        },
+        syncModel: function(id) {
+            var syncRequired = id && this.model.id !== id;
+
+            if(syncRequired) { this.model.set('_id', id).fetch(); }
+
+            return syncRequired;
         }
     });
 
