@@ -11,8 +11,9 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
+
 package org.forgerock.openam.rest.authz;
 
 import com.iplanet.dpro.session.service.SessionService;
@@ -53,7 +54,7 @@ public class CoreTokenResourceAuthzModule extends AdminOnlyAuthzModule {
      * a user with Administrator-level access.
      */
     @Override
-    Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
+    protected Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
 
         if (!enabled) {
             if (debug.messageEnabled()) {

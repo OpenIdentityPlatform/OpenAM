@@ -41,6 +41,7 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
@@ -49,30 +50,33 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.util.promise.FailureHandler;
 import org.forgerock.util.promise.SuccessHandler;
 
 /**
  * <p>Resource Set resource to expose registered Resource Sets for a given user.</p>
  *
- * <p>Only non-modifiable operations allowed. To alter a Resource Set use the OAuth2 Resource Set Registration
- * endpoint.</p>
+ * <p>Only non-modifiable operations allowed. To alter a Resource Set use the OAuth2 Resource Set
+ * Registration endpoint.</p>
  *
  * @since 13.0.0
  */
 public class ResourceSetResource implements CollectionResourceProvider {
 
     private final ResourceSetService resourceSetService;
+    private final ContextHelper contextHelper;
 
     /**
      * Constructs a new ResourceSetResource instance.
      *
      * @param resourceSetService An instance of the ResourceSetService.
+     * @param contextHelper An instance of the ContextHelper.
      */
     @Inject
-    public ResourceSetResource(ResourceSetService resourceSetService) {
+    public ResourceSetResource(ResourceSetService resourceSetService, ContextHelper contextHelper) {
         this.resourceSetService = resourceSetService;
+        this.contextHelper = contextHelper;
     }
 
     /**
@@ -93,10 +97,10 @@ public class ResourceSetResource implements CollectionResourceProvider {
     @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
             final ResultHandler<Resource> handler) {
-        String realm = context.asContext(RealmContext.class).getResolvedRealm();
-        boolean augmentWithPolicies = request.getFields().isEmpty()
-                || request.getFields().contains(new JsonPointer("/policy"));
-        resourceSetService.getResourceSet(context, realm, resourceId, augmentWithPolicies)
+        boolean augmentWithPolicies = augmentWithPolicies(request);
+        String realm = getRealm(context);
+        String resourceOwnerId = getResourceOwnerId(context);
+        resourceSetService.getResourceSet(context, realm, resourceId, resourceOwnerId, augmentWithPolicies)
                 .onSuccess(new SuccessHandler<ResourceSetDescription>() {
                     @Override
                     public void handleResult(ResourceSetDescription result) {
@@ -112,6 +116,103 @@ public class ResourceSetResource implements CollectionResourceProvider {
                 });
     }
 
+    /**
+     * "revokeAll" action supported, which will delete all a user's resource set UMA policies.
+     *
+     * @param context {@inheritDoc}
+     * @param request {@inheritDoc}
+     * @param handler {@inheritDoc}
+     */
+    @Override
+    public void actionCollection(ServerContext context, ActionRequest request, final ResultHandler<JsonValue> handler) {
+
+        if ("revokeAll".equalsIgnoreCase(request.getAction())) {
+            String realm = getRealm(context);
+            String resourceOwnerId = getResourceOwnerId(context);
+            resourceSetService.revokeAllPolicies(context, realm, resourceOwnerId)
+                    .onSuccess(new SuccessHandler<Void>() {
+                        @Override
+                        public void handleResult(Void aVoid) {
+                            handler.handleResult(json(object()));
+                        }
+                    })
+                    .onFailure(new FailureHandler<ResourceException>() {
+                        @Override
+                        public void handleError(ResourceException e) {
+                            handler.handleError(e);
+                        }
+                    });
+        } else {
+            handler.handleError(new NotSupportedException("Action " + request.getAction() + " not supported"));
+        }
+    }
+
+    /**
+     * Support for querying by equals for /name and /resourceServer with AND only.
+     *
+     * @param context {@inheritDoc}
+     * @param request {@inheritDoc}
+     * @param handler {@inheritDoc}
+     */
+    @Override
+    public void queryCollection(final ServerContext context, QueryRequest request, QueryResultHandler handler) {
+
+        final QueryResultHandler queryHandler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+
+        final ResourceSetWithPolicyQuery query;
+        try {
+            if (request.getQueryId() != null && request.getQueryId().equals("*")) {
+                query = new ResourceSetWithPolicyQuery();
+                query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.<String>alwaysTrue());
+            } else if (request.getQueryFilter() != null) {
+                query = request.getQueryFilter().accept(new ResourceSetQueryFilter(), new ResourceSetWithPolicyQuery());
+            } else {
+                handler.handleError(new BadRequestException("Invalid query"));
+                return;
+            }
+        } catch (UnsupportedOperationException e) {
+            handler.handleError(new NotSupportedException(e.getMessage()));
+            return;
+        }
+
+        boolean augmentWithPolicies = augmentWithPolicies(request);
+        String realm = getRealm(context);
+        String resourceOwnerId = getResourceOwnerId(context);
+        resourceSetService.getResourceSets(context, realm, query, resourceOwnerId, augmentWithPolicies)
+                .onSuccess(new SuccessHandler<Collection<ResourceSetDescription>>() {
+                    @Override
+                    public void handleResult(Collection<ResourceSetDescription> resourceSets) {
+                        for (ResourceSetDescription resourceSet : resourceSets) {
+                            queryHandler.handleResource(
+                                    newResource(resourceSet.getId(), getResourceSetJson(resourceSet)));
+                        }
+                        queryHandler.handleResult(new QueryResult());
+                    }
+                })
+                .onFailure(new FailureHandler<ResourceException>() {
+                    @Override
+                    public void handleError(ResourceException e) {
+                        queryHandler.handleError(e);
+                    }
+                });
+    }
+
+    private String getResourceOwnerId(ServerContext context) {
+        return contextHelper.getUserId(context);
+    }
+
+    private String getRealm(ServerContext context) {
+        return contextHelper.getRealm(context);
+    }
+
+    private boolean augmentWithPolicies(Request request) {
+        return request.getFields().isEmpty() || request.getFields().contains(new JsonPointer("/policy"));
+    }
+
+    private Resource newResource(String id, JsonValue content) {
+        return new Resource(id, Long.toString(content.hashCode()), content);
+    }
+
     private JsonValue getResourceSetJson(ResourceSetDescription resourceSet) {
         HashMap<String, Object> content = new HashMap<String, Object>(resourceSet.asMap());
         content.put("_id", resourceSet.getId());
@@ -123,6 +224,165 @@ public class ResourceSetResource implements CollectionResourceProvider {
             content.put("policy", policy.getObject());
         }
         return new JsonValue(content);
+    }
+
+    private static final class ResourceSetQueryFilter
+            implements QueryFilterVisitor<ResourceSetWithPolicyQuery, ResourceSetWithPolicyQuery> {
+
+        private final Map<JsonPointer, String> queryableFields = new HashMap<JsonPointer, String>();
+        private int queryDepth = 0;
+
+        private ResourceSetQueryFilter() {
+            queryableFields.put(new JsonPointer("/name"), ResourceSetTokenField.NAME);
+            queryableFields.put(new JsonPointer("/resourceServer"), ResourceSetTokenField.CLIENT_ID);
+        }
+
+        private void increaseQueryDepth() {
+            queryDepth++;
+        }
+
+        private void decreaseQueryDepth() {
+            queryDepth--;
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitAndFilter(ResourceSetWithPolicyQuery query,
+                List<QueryFilter> subFilters) {
+            increaseQueryDepth();
+            List<org.forgerock.util.query.QueryFilter<String>> childFilters =
+                    new ArrayList<org.forgerock.util.query.QueryFilter<String>>();
+            for (QueryFilter filter : subFilters) {
+                ResourceSetWithPolicyQuery subResourceSetWithPolicyQuery = filter.accept(this, query);
+                if (subResourceSetWithPolicyQuery.getPolicyQuery() != null) {
+                    subResourceSetWithPolicyQuery.setOperator(AggregateQuery.Operator.AND);
+                } else {
+                    childFilters.add(subResourceSetWithPolicyQuery.getResourceSetQuery());
+                }
+            }
+            decreaseQueryDepth();
+            query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.and(childFilters));
+            return query;
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitOrFilter(ResourceSetWithPolicyQuery query, List<QueryFilter> subFilters) {
+            increaseQueryDepth();
+            List<org.forgerock.util.query.QueryFilter<String>> childFilters =
+                    new ArrayList<org.forgerock.util.query.QueryFilter<String>>();
+            for (QueryFilter filter : subFilters) {
+                ResourceSetWithPolicyQuery subResourceSetWithPolicyQuery = filter.accept(this, query);
+                if (subResourceSetWithPolicyQuery.getPolicyQuery() != null) {
+                    subResourceSetWithPolicyQuery.setOperator(AggregateQuery.Operator.OR);
+                } else {
+                    childFilters.add(subResourceSetWithPolicyQuery.getResourceSetQuery());
+                }
+            }
+            decreaseQueryDepth();
+            query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.or(childFilters));
+            return query;
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitEqualsFilter(ResourceSetWithPolicyQuery query, JsonPointer field,
+                Object valueAssertion) {
+            if (new JsonPointer("/policy/permissions/subject").equals(field)) {
+                if (queryDepth > 1) {
+                    throw new UnsupportedOperationException("Cannot nest queries on /policy/permissions/subject field");
+                }
+                query.setPolicyQuery(QueryFilter.equalTo("/permissions/subject", valueAssertion));
+            } else {
+                query.setResourceSetQuery(
+                        org.forgerock.util.query.QueryFilter.equalTo(verifyFieldIsQueryable(field), valueAssertion));
+            }
+            return query;
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitStartsWithFilter(ResourceSetWithPolicyQuery query, JsonPointer field,
+                Object valueAssertion) {
+            if (new JsonPointer("/policy/permissions/subject").equals(field)) {
+                if (queryDepth > 1) {
+                    throw new UnsupportedOperationException("Cannot nest queries on /policy/permissions/subject field");
+                }
+                query.setPolicyQuery(QueryFilter.startsWith("/permissions/subject", valueAssertion));
+            } else {
+                query.setResourceSetQuery(
+                        org.forgerock.util.query.QueryFilter.startsWith(verifyFieldIsQueryable(field), valueAssertion));
+            }
+            return query;
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitContainsFilter(ResourceSetWithPolicyQuery query, JsonPointer field,
+                Object valueAssertion) {
+            if (new JsonPointer("/policy/permissions/subject").equals(field)) {
+                if (queryDepth > 1) {
+                    throw new UnsupportedOperationException("Cannot nest queries on /policy/permissions/subject field");
+                }
+                query.setPolicyQuery(QueryFilter.contains("/permissions/subject", valueAssertion));
+            } else {
+                query.setResourceSetQuery(
+                        org.forgerock.util.query.QueryFilter.contains(verifyFieldIsQueryable(field), valueAssertion));
+            }
+            return query;
+        }
+
+        private String verifyFieldIsQueryable(JsonPointer field) {
+            if (!queryableFields.containsKey(field)) {
+                throw new UnsupportedOperationException("'" + field + "' not queryable");
+            } else {
+                return queryableFields.get(field);
+            }
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitBooleanLiteralFilter(ResourceSetWithPolicyQuery query, boolean value) {
+            throw unsupportedFilterOperation("Boolean Literal");
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitExtendedMatchFilter(ResourceSetWithPolicyQuery query, JsonPointer field,
+                String operator, Object valueAssertion) {
+            throw unsupportedFilterOperation("Extended match");
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitGreaterThanFilter(ResourceSetWithPolicyQuery query, JsonPointer field,
+                Object valueAssertion) {
+            throw unsupportedFilterOperation("Greater than");
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitGreaterThanOrEqualToFilter(ResourceSetWithPolicyQuery query,
+                JsonPointer field, Object valueAssertion) {
+            throw unsupportedFilterOperation("Greater than or equal");
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitLessThanFilter(ResourceSetWithPolicyQuery query, JsonPointer field,
+                Object valueAssertion) {
+            throw unsupportedFilterOperation("Less than");
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitLessThanOrEqualToFilter(ResourceSetWithPolicyQuery query,
+                JsonPointer field, Object valueAssertion) {
+            throw unsupportedFilterOperation("Less than or equal");
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitNotFilter(ResourceSetWithPolicyQuery query, QueryFilter subFilter) {
+            throw unsupportedFilterOperation("Not");
+        }
+
+        @Override
+        public ResourceSetWithPolicyQuery visitPresentFilter(ResourceSetWithPolicyQuery query, JsonPointer field) {
+            throw unsupportedFilterOperation("Present");
+        }
+
+        private UnsupportedOperationException unsupportedFilterOperation(String filterType) {
+            return new UnsupportedOperationException("'" + filterType + "' not supported");
+        }
     }
 
     /**
@@ -165,36 +425,6 @@ public class ResourceSetResource implements CollectionResourceProvider {
     }
 
     /**
-     * "revokeAll" action supported, which will delete all a user's resource set UMA policies.
-     *
-     * @param context {@inheritDoc}
-     * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
-     */
-    @Override
-    public void actionCollection(ServerContext context, ActionRequest request, final ResultHandler<JsonValue> handler) {
-
-        if ("revokeAll".equalsIgnoreCase(request.getAction())) {
-            String realm = context.asContext(RealmContext.class).getResolvedRealm();
-            resourceSetService.revokeAllPolicies(context, realm)
-                    .onSuccess(new SuccessHandler<Void>() {
-                        @Override
-                        public void handleResult(Void aVoid) {
-                            handler.handleResult(json(object()));
-                        }
-                    })
-                    .onFailure(new FailureHandler<ResourceException>() {
-                        @Override
-                        public void handleError(ResourceException e) {
-                            handler.handleError(e);
-                        }
-                    });
-        } else {
-            handler.handleError(new NotSupportedException("Action " + request.getAction() + " not supported"));
-        }
-    }
-
-    /**
      * Not supported.
      *
      * @param context {@inheritDoc}
@@ -205,205 +435,5 @@ public class ResourceSetResource implements CollectionResourceProvider {
     public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
             ResultHandler<JsonValue> handler) {
         handler.handleError(new NotSupportedException());
-    }
-
-    /**
-     * Support for querying by equals for /name and /resourceServer with AND only.
-     *
-     * @param context {@inheritDoc}
-     * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
-     */
-    @Override
-    public void queryCollection(final ServerContext context, QueryRequest request, QueryResultHandler handler) {
-
-        final QueryResultHandler queryHandler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
-
-        final ResourceSetWithPolicyQuery query;
-        try {
-            if (request.getQueryId() != null && request.getQueryId().equals("*")) {
-                query = new ResourceSetWithPolicyQuery();
-                query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.<String>alwaysTrue());
-            } else if (request.getQueryFilter() != null) {
-                query = request.getQueryFilter().accept(new ResourceSetQueryFilter(), new ResourceSetWithPolicyQuery());
-            } else {
-                handler.handleError(new BadRequestException("Invalid query"));
-                return;
-            }
-        } catch (UnsupportedOperationException e) {
-            handler.handleError(new NotSupportedException(e.getMessage()));
-            return;
-        }
-
-        String realm = context.asContext(RealmContext.class).getResolvedRealm();
-        boolean augmentWithPolicies = request.getFields().isEmpty() || request.getFields().contains(new JsonPointer("/policy"));
-        resourceSetService.getResourceSets(context, realm, query, augmentWithPolicies)
-                .onSuccess(new SuccessHandler<Collection<ResourceSetDescription>>() {
-                    @Override
-                    public void handleResult(Collection<ResourceSetDescription> resourceSets) {
-                        for (ResourceSetDescription resourceSet : resourceSets) {
-                            queryHandler.handleResource(newResource(resourceSet.getId(), getResourceSetJson(resourceSet)));
-                        }
-                        queryHandler.handleResult(new QueryResult());
-                    }
-                })
-                .onFailure(new FailureHandler<ResourceException>() {
-                    @Override
-                    public void handleError(ResourceException e) {
-                        queryHandler.handleError(e);
-                    }
-                });
-    }
-
-    private Resource newResource(String id, JsonValue content) {
-        return new Resource(id, Long.toString(content.hashCode()), content);
-    }
-
-    private static final class ResourceSetQueryFilter
-            implements QueryFilterVisitor<ResourceSetWithPolicyQuery, ResourceSetWithPolicyQuery> {
-
-        private final Map<JsonPointer, String> queryableFields = new HashMap<JsonPointer, String>();
-        private int queryDepth = 0;
-
-        private ResourceSetQueryFilter() {
-            queryableFields.put(new JsonPointer("/name"), ResourceSetTokenField.NAME);
-            queryableFields.put(new JsonPointer("/resourceServer"), ResourceSetTokenField.CLIENT_ID);
-        }
-
-        private void increaseQueryDepth() {
-            queryDepth++;
-        }
-
-        private void decreaseQueryDepth() {
-            queryDepth--;
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitAndFilter(ResourceSetWithPolicyQuery resourceSetWithPolicyQuery, List<QueryFilter> subFilters) {
-            increaseQueryDepth();
-            List<org.forgerock.util.query.QueryFilter<String>> childFilters =
-                    new ArrayList<org.forgerock.util.query.QueryFilter<String>>();
-            for (QueryFilter filter : subFilters) {
-                ResourceSetWithPolicyQuery subResourceSetWithPolicyQuery = filter.accept(this, resourceSetWithPolicyQuery);
-                if (subResourceSetWithPolicyQuery.getPolicyQuery() != null) {
-                    subResourceSetWithPolicyQuery.setOperator("AND");
-                } else {
-                    childFilters.add(subResourceSetWithPolicyQuery.getResourceSetQuery());
-                }
-            }
-            decreaseQueryDepth();
-            resourceSetWithPolicyQuery.setResourceSetQuery(org.forgerock.util.query.QueryFilter.and(childFilters));
-            return resourceSetWithPolicyQuery;
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitEqualsFilter(ResourceSetWithPolicyQuery resourceSetWithPolicyQuery, JsonPointer field, Object valueAssertion) {
-            if (new JsonPointer("/policy/permissions/subject").equals(field)) {
-                if (queryDepth > 1) {
-                    throw new UnsupportedOperationException("Cannot nest queries on /policy/permissions/subject field");
-                }
-                resourceSetWithPolicyQuery.setPolicyQuery(QueryFilter.equalTo("/permissions/subject", valueAssertion));
-            } else {
-                resourceSetWithPolicyQuery.setResourceSetQuery(org.forgerock.util.query.QueryFilter.equalTo(verifyFieldIsQueryable(field), valueAssertion));
-            }
-            return resourceSetWithPolicyQuery;
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitStartsWithFilter(ResourceSetWithPolicyQuery query, JsonPointer field, Object valueAssertion) {
-            if (new JsonPointer("/policy/permissions/subject").equals(field)) {
-                if (queryDepth > 1) {
-                    throw new UnsupportedOperationException("Cannot nest queries on /policy/permissions/subject field");
-                }
-                query.setPolicyQuery(QueryFilter.startsWith("/permissions/subject", valueAssertion));
-            } else {
-                query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.startsWith(verifyFieldIsQueryable(field), valueAssertion));
-            }
-            return query;
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitContainsFilter(ResourceSetWithPolicyQuery query, JsonPointer field, Object valueAssertion) {
-            if (new JsonPointer("/policy/permissions/subject").equals(field)) {
-                if (queryDepth > 1) {
-                    throw new UnsupportedOperationException("Cannot nest queries on /policy/permissions/subject field");
-                }
-                query.setPolicyQuery(QueryFilter.contains("/permissions/subject", valueAssertion));
-            } else {
-                query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.contains(verifyFieldIsQueryable(field), valueAssertion));
-            }
-            return query;
-        }
-
-        private String verifyFieldIsQueryable(JsonPointer field) {
-            if (!queryableFields.containsKey(field)) {
-                throw new UnsupportedOperationException("'" + field + "' not queryable");
-            } else {
-                return queryableFields.get(field);
-            }
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitBooleanLiteralFilter(ResourceSetWithPolicyQuery query, boolean value) {
-            throw unsupportedFilterOperation("Boolean Literal");
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitExtendedMatchFilter(ResourceSetWithPolicyQuery query, JsonPointer field, String operator, Object valueAssertion) {
-            throw unsupportedFilterOperation("Extended match");
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitGreaterThanFilter(ResourceSetWithPolicyQuery query, JsonPointer field, Object valueAssertion) {
-            throw unsupportedFilterOperation("Greater than");
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitGreaterThanOrEqualToFilter(ResourceSetWithPolicyQuery query, JsonPointer field, Object valueAssertion) {
-            throw unsupportedFilterOperation("Greater than or equal");
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitLessThanFilter(ResourceSetWithPolicyQuery query, JsonPointer field, Object valueAssertion) {
-            throw unsupportedFilterOperation("Less than");
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitLessThanOrEqualToFilter(ResourceSetWithPolicyQuery query, JsonPointer field, Object valueAssertion) {
-            throw unsupportedFilterOperation("Less than or equal");
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitNotFilter(ResourceSetWithPolicyQuery query, QueryFilter subFilter) {
-            throw unsupportedFilterOperation("Not");
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitOrFilter(ResourceSetWithPolicyQuery query, List<QueryFilter> subFilters) {
-            increaseQueryDepth();
-            List<org.forgerock.util.query.QueryFilter<String>> childFilters =
-                    new ArrayList<org.forgerock.util.query.QueryFilter<String>>();
-            for (QueryFilter filter : subFilters) {
-                ResourceSetWithPolicyQuery subResourceSetWithPolicyQuery = filter.accept(this, query);
-                if (subResourceSetWithPolicyQuery.getPolicyQuery() != null) {
-                    subResourceSetWithPolicyQuery.setOperator("OR");
-                } else {
-                    childFilters.add(subResourceSetWithPolicyQuery.getResourceSetQuery());
-                }
-            }
-            increaseQueryDepth();
-            query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.or(childFilters));
-            return query;
-        }
-
-        @Override
-        public ResourceSetWithPolicyQuery visitPresentFilter(ResourceSetWithPolicyQuery query, JsonPointer field) {
-            throw unsupportedFilterOperation("Present");
-        }
-
-        private UnsupportedOperationException unsupportedFilterOperation(String filterType) {
-            return new UnsupportedOperationException("'" + filterType + "' not supported");
-        }
-
     }
 }

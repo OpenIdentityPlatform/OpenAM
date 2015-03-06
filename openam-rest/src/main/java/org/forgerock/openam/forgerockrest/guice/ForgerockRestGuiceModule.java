@@ -381,6 +381,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             attributes.put("creationDate", new QueryAttribute(TIMESTAMP, Privilege.CREATION_DATE_ATTRIBUTE));
             attributes.put("lastModifiedBy", new QueryAttribute(STRING, Privilege.LAST_MODIFIED_BY_ATTRIBUTE));
             attributes.put("lastModifiedDate", new QueryAttribute(TIMESTAMP, Privilege.LAST_MODIFIED_DATE_ATTRIBUTE));
+            attributes.put("resourceTypeUuid", new QueryAttribute(STRING, Privilege.RESOURCE_TYPE_UUID_ATTRIBUTE));
 
             return attributes;
         }

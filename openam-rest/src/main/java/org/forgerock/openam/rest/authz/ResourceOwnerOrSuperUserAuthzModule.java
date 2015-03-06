@@ -61,7 +61,7 @@ public class ResourceOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
      * @return The authorization result.
      */
     @Override
-    Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
+    protected Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
 
         try {
             String loggedInUserId = getUserId(context);
@@ -89,7 +89,7 @@ public class ResourceOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
         }
     }
 
-    private String getUserIdFromUri(ServerContext context) throws InternalServerErrorException {
+    protected String getUserIdFromUri(ServerContext context) throws InternalServerErrorException {
         String username = context.asContext(RouterContext.class).getUriTemplateVariables().get("user");
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
         return IdUtils.getIdentity(username, realm).getUniversalId();

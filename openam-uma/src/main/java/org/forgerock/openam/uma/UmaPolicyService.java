@@ -17,12 +17,10 @@
 package org.forgerock.openam.uma;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.util.Pair;
@@ -48,29 +46,29 @@ public interface UmaPolicyService {
      * Reads an UMA policy from the backend store.
      *
      * @param context The request context.
-     * @param resourceSetUid The unique ID of the UMA policy.
+     * @param resourceSetId The unique ID of the UMA policy.
      * @return A promise containing the {@code UmaPolicy} or a {@code ResourceException}.
      */
-    Promise<UmaPolicy, ResourceException> readPolicy(ServerContext context, String resourceSetUid);
+    Promise<UmaPolicy, ResourceException> readPolicy(ServerContext context, String resourceSetId);
 
     /**
      * Updates an UMA policy in the backend store.
      *
      * @param context The request context.
-     * @param resourceSetUid The unique ID of the UMA policy.
+     * @param resourceSetId The unique ID of the UMA policy.
      * @param policy The UMA policy to replace the current policy.
      * @return A promise containing the updated {@code UmaPolicy} or a {@code ResourceException}.
      */
-    Promise<UmaPolicy, ResourceException> updatePolicy(ServerContext context, String resourceSetUid, JsonValue policy);
+    Promise<UmaPolicy, ResourceException> updatePolicy(ServerContext context, String resourceSetId, JsonValue policy);
 
     /**
      * Deletes an UMA policy from the backend store.
      *
      * @param context The request context.
-     * @param resourceSetUid The unique ID of the UMA policy.
+     * @param resourceSetId The unique ID of the UMA policy.
      * @return A promise containing {@code null} or a {@code ResourceException}.
      */
-    Promise<Void, ResourceException> deletePolicy(ServerContext context, String resourceSetUid);
+    Promise<Void, ResourceException> deletePolicy(ServerContext context, String resourceSetId);
 
     /**
      *
@@ -81,9 +79,4 @@ public interface UmaPolicyService {
      */
     Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queryPolicies(ServerContext context,
             QueryRequest request);
-
-    /**
-     * Clears the cache of backend policies.
-     */
-    void clearCache();
 }

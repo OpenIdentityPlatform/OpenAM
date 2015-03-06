@@ -16,30 +16,19 @@
 
 package org.forgerock.openam.uma;
 
+import javax.security.auth.Subject;
 import java.net.URI;
-import java.util.Set;
 
-import com.iplanet.sso.SSOException;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
-import com.sun.identity.sm.SMSException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-
-import javax.security.auth.Subject;
 
 /**
  * Models all of the possible settings the UMA provider can have and that can be configured.
  *
  * @since 13.0.0
  */
-public interface UmaProviderSettings {
-
-    /**
-     * Gets the supported version of the UMA specification.
-     *
-     * @return The UMA version.
-     */
-    String getVersion();
+public interface UmaProviderSettings extends UmaSettings {
 
     /**
      * Gets the identifier of this issuer.
@@ -48,59 +37,6 @@ public interface UmaProviderSettings {
      * @throws ServerException If there is a problem reading the configuration.
      */
     URI getIssuer() throws ServerException;
-
-    /**
-     * <p>Gets the supported PAT Profiles.</p>
-     *
-     * <p>NOTE: The "bearer" profile MUST be supported.</p>
-     *
-     * @return The supported PAT profiles.
-     * @throws ServerException If there is a problem reading the configuration.
-     */
-    Set<String> getSupportedPATProfiles() throws ServerException;
-
-    /**
-     * <p>Gets the supported AAT Profiles.</p>
-     *
-     * <p>NOTE: The "bearer" profile MUST be supported.</p>
-     *
-     * @return The supported AAT profiles.
-     * @throws ServerException If there is a problem reading the configuration.
-     */
-    Set<String> getSupportedAATProfiles() throws ServerException;
-
-    /**
-     * <p>Gets the supported RPT Profiles.</p>
-     *
-     * <p>NOTE: The "bearer" profile MUST be supported.</p>
-     *
-     * @return The supported RPT profiles.
-     * @throws ServerException If there is a problem reading the configuration.
-     */
-    Set<String> getSupportedRPTProfiles() throws ServerException;
-
-    /**
-     * <p>Gets the config file to be used to store Uma audit</p>
-     * @return
-     * @throws ServerException
-     */
-    String getAuditLogConfig() throws ServerException, SMSException, SSOException;
-
-    /**
-     * Gets the supported PAT Grant Types.
-     *
-     * @return The supported PAT grant types.
-     * @throws ServerException If there is a problem reading the configuration.
-     */
-    Set<String> getSupportedPATGrantTypes() throws ServerException;
-
-    /**
-     * Gets the supported AAT Grant Types.
-     *
-     * @return The supported AAT grant types.
-     * @throws ServerException If there is a problem reading the configuration.
-     */
-    Set<String> getSupportedAATGrantTypes() throws ServerException;
 
     /**
      * Gets the URI for the OAuth2 token endpoint.
@@ -145,22 +81,6 @@ public interface UmaProviderSettings {
     URI getRPTEndpoint();
 
     /**
-     * Gets the supported claim token profiles.
-     *
-     * @return The supported claim token profiles.
-     * @throws ServerException If there is a problem reading the configuration.
-     */
-    Set<String> getSupportedClaimTokenProfiles() throws ServerException;
-
-    /**
-     * Gets the supported UMA profiles.
-     *
-     * @return The supported UMA profiles.
-     * @throws ServerException If there is a problem reading the configuration.
-     */
-    Set<URI> getSupportedUmaProfiles() throws ServerException;
-
-    /**
      * Gets the Client registration endpoint.
      *
      * @return The Client registration endpoint.
@@ -174,41 +94,7 @@ public interface UmaProviderSettings {
      */
     URI getRequestingPartyClaimsEndpoint();
 
-    /**
-     * Gets the lifetime an RPT will have before it expires.
-     *
-     * @return The lifetime of an RPT in seconds.
-     * @throws ServerException If there is a problem reading the configuration.
-     */
-    long getRPTLifetime() throws ServerException;
-
-    /**
-     * Gets the lifetime an permission ticket will have before it expires.
-     *
-     * @return The lifetime of an permission ticket in seconds.
-     * @throws ServerException If there is a problem reading the configuration.
-     */
-    long getPermissionTicketLifetime() throws ServerException;
-
     Evaluator getPolicyEvaluator(Subject subject) throws EntitlementException;
 
     UmaTokenStore getUmaTokenStore();
-
-    /**
-     * Gets whether a Resource Server's policies should be deleted when the Resource Server OAuth2
-     * agent entry is removed, or the "uma_protection" scope is removed.
-     *
-     * @return {@code true} if the policies should be deleted.
-     * @throws ServerException If there is a problem reading the configuration.
-     */
-    boolean onDeleteResourceServerDeletePolicies() throws ServerException;
-
-    /**
-     * Gets whether a Resource Server's resource sets should be deleted when the Resource Server
-     * OAuth2 agent entry is removed, or the "uma_protection" scope is removed.
-     *
-     * @return {@code true} if the resource sets should be deleted.
-     * @throws ServerException If there is a problem reading the configuration.
-     */
-    boolean onDeleteResourceServerDeleteResourceSets() throws ServerException;
 }

@@ -43,11 +43,10 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.RootContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.mockito.ArgumentCaptor;
@@ -60,21 +59,21 @@ public class ResourceSetResourceTest {
     private ResourceSetResource resource;
 
     private ResourceSetService resourceSetService;
+    private ContextHelper contextHelper;
 
     @BeforeMethod
     public void setup() {
         resourceSetService = mock(ResourceSetService.class);
+        contextHelper = mock(ContextHelper.class);
 
-        resource = new ResourceSetResource(resourceSetService);
+        resource = new ResourceSetResource(resourceSetService, contextHelper);
     }
 
     @Test
     public void shouldReadResourceSet() throws Exception {
 
         //Given
-        RealmContext realmContext = new RealmContext(new RootContext());
-        realmContext.addDnsAlias("", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        ServerContext context = mock(ServerContext.class);
         ReadRequest request = mock(ReadRequest.class);
         given(request.getFields()).willReturn(Arrays.asList(new JsonPointer("/fred")));
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -83,7 +82,9 @@ public class ResourceSetResourceTest {
         Promise<ResourceSetDescription, ResourceException> resourceSetPromise
                 = Promises.newSuccessfulPromise(resourceSet);
 
-        given(resourceSetService.getResourceSet(context, "REALM", "RESOURCE_SET_ID", false))
+        given(contextHelper.getRealm(context)).willReturn("REALM");
+        given(contextHelper.getUserId(context)).willReturn("RESOURCE_OWNER_ID");
+        given(resourceSetService.getResourceSet(context, "REALM", "RESOURCE_SET_ID", "RESOURCE_OWNER_ID", false))
                 .willReturn(resourceSetPromise);
 
         //When
@@ -203,9 +204,7 @@ public class ResourceSetResourceTest {
     public void nameQueryShouldBeSupported() throws Exception {
 
         //Given
-        RealmContext realmContext = new RealmContext(new RootContext());
-        realmContext.addDnsAlias("", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        ServerContext context = mock(ServerContext.class);
         QueryRequest request = mock(QueryRequest.class);
         given(request.getFields()).willReturn(Arrays.asList(new JsonPointer("/fred")));
         QueryResultHandler handler = mock(QueryResultHandler.class);
@@ -217,9 +216,11 @@ public class ResourceSetResourceTest {
         Promise<Collection<ResourceSetDescription>, ResourceException> resourceSetsPromise
                 = Promises.newSuccessfulPromise((Collection<ResourceSetDescription>) asSet(resourceSet));
 
+        given(contextHelper.getRealm(context)).willReturn("REALM");
+        given(contextHelper.getUserId(context)).willReturn("RESOURCE_OWNER_ID");
         given(request.getQueryFilter()).willReturn(queryFilter);
         given(resourceSetService.getResourceSets(eq(context), eq("REALM"),
-                Matchers.<ResourceSetWithPolicyQuery>anyObject(), eq(false))).willReturn(resourceSetsPromise);
+                Matchers.<ResourceSetWithPolicyQuery>anyObject(), eq("RESOURCE_OWNER_ID"), eq(false))).willReturn(resourceSetsPromise);
 
         //When
         resource.queryCollection(context, request, handler);
@@ -227,8 +228,8 @@ public class ResourceSetResourceTest {
         //Then
         ArgumentCaptor<ResourceSetWithPolicyQuery> queryCaptor
                 = ArgumentCaptor.forClass(ResourceSetWithPolicyQuery.class);
-        verify(resourceSetService).getResourceSets(eq(context), eq("REALM"), queryCaptor.capture(), eq(false));
-        assertThat(queryCaptor.getValue().getOperator()).isEqualTo("AND");
+        verify(resourceSetService).getResourceSets(eq(context), eq("REALM"), queryCaptor.capture(), eq("RESOURCE_OWNER_ID"), eq(false));
+        assertThat(queryCaptor.getValue().getOperator()).isEqualTo(AggregateQuery.Operator.AND);
         assertThat(queryCaptor.getValue().getPolicyQuery())
                 .isEqualTo(QueryFilter.equalTo("/permissions/subject", "SUBJECT"));
         assertThat(queryCaptor.getValue().getResourceSetQuery())
@@ -242,14 +243,14 @@ public class ResourceSetResourceTest {
     public void shouldRevokeAllUserPolicies() {
 
         //Given
-        RealmContext realmContext = new RealmContext(new RootContext());
-        realmContext.addDnsAlias("", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        ServerContext context = mock(ServerContext.class);
         ActionRequest request = mock(ActionRequest.class);
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
+        given(contextHelper.getRealm(context)).willReturn("REALM");
+        given(contextHelper.getUserId(context)).willReturn("RESOURCE_OWNER_ID");
         given(request.getAction()).willReturn("revokeAll");
-        given(resourceSetService.revokeAllPolicies(context, "REALM"))
+        given(resourceSetService.revokeAllPolicies(context, "REALM", "RESOURCE_OWNER_ID"))
                 .willReturn(Promises.<Void, ResourceException>newSuccessfulPromise(null));
 
         //When
@@ -266,14 +267,14 @@ public class ResourceSetResourceTest {
     public void revokeAllUserPoliciesActionShouldHandleResourceException() {
 
         //Given
-        RealmContext realmContext = new RealmContext(new RootContext());
-        realmContext.addDnsAlias("", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        ServerContext context = mock(ServerContext.class);
         ActionRequest request = mock(ActionRequest.class);
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
+        given(contextHelper.getRealm(context)).willReturn("REALM");
+        given(contextHelper.getUserId(context)).willReturn("RESOURCE_OWNER_ID");
         given(request.getAction()).willReturn("revokeAll");
-        given(resourceSetService.revokeAllPolicies(context, "REALM"))
+        given(resourceSetService.revokeAllPolicies(context, "REALM", "RESOURCE_OWNER_ID"))
                 .willReturn(Promises.<Void, ResourceException>newFailedPromise(new NotFoundException()));
 
         //When

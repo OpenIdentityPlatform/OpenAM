@@ -96,7 +96,7 @@ public class AdminOnlyAuthzModule implements CrestAuthorizationModule {
     /**
      * Lets through any request which is coming from a verifiable administrator.
      */
-    Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
+    protected Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
 
         try {
             String userId = getUserId(context);
@@ -116,7 +116,7 @@ public class AdminOnlyAuthzModule implements CrestAuthorizationModule {
         }
     }
 
-    String getUserId(ServerContext context) throws ResourceException {
+    protected String getUserId(ServerContext context) throws ResourceException {
         SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
 
         try {
@@ -130,7 +130,7 @@ public class AdminOnlyAuthzModule implements CrestAuthorizationModule {
         }
     }
 
-    boolean isSuperUser(String userId) {
+    protected boolean isSuperUser(String userId) {
         return sessionService.get().isSuperUser(userId);
     }
 }

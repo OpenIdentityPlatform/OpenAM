@@ -16,29 +16,43 @@
 
 package org.forgerock.openam.rest.oauth2;
 
-import org.forgerock.json.resource.QueryFilter;
-
 /**
  * Aggregation of queries against Resource Sets and UMA policies.
  *
  * @since 13.0.0
  */
-final class ResourceSetWithPolicyQuery
-        extends AggregateQuery<org.forgerock.util.query.QueryFilter<String>, QueryFilter> {
+public class AggregateQuery<Q1, Q2> {
 
-    public org.forgerock.util.query.QueryFilter<String> getResourceSetQuery() {
-        return getFirstQuery();
+    public enum Operator {
+        OR,
+        AND
     }
 
-    public void setResourceSetQuery(org.forgerock.util.query.QueryFilter<String> query) {
-        setFirstQuery(query);
+    private Q1 firstQuery;
+    private Q2 secondQuery;
+    private Operator operator = Operator.OR;
+
+    public Q1 getFirstQuery() {
+        return firstQuery;
     }
 
-    public QueryFilter getPolicyQuery() {
-        return getSecondQuery();
+    public void setFirstQuery(Q1 query) {
+        this.firstQuery = query;
     }
 
-    public void setPolicyQuery(QueryFilter query) {
-        setSecondQuery(query);
+    public Q2 getSecondQuery() {
+        return secondQuery;
+    }
+
+    public void setSecondQuery(Q2 query) {
+        this.secondQuery = query;
+    }
+
+    public Operator getOperator() {
+        return operator;
+    }
+
+    public void setOperator(Operator operator) {
+        this.operator = operator;
     }
 }

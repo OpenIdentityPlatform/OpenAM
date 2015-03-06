@@ -31,6 +31,7 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
@@ -68,33 +69,19 @@ public class ResourceSetService {
         this.policyService = policyService;
     }
 
-    private Promise<ResourceSetDescription, ResourceException> getResourceSet(String realm, String resourceSetId) {
-        try {
-            Set<ResourceSetDescription> results = resourceSetStoreFactory.create(realm).query(
-                    QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
-            if (results.size() != 1) {
-                return Promises.newFailedPromise(
-                        (ResourceException) new org.forgerock.json.resource.NotFoundException(
-                                "No resource set with id, " + resourceSetId + ", found."));
-            }
-            return Promises.newSuccessfulPromise(results.iterator().next());
-        } catch (ServerException e) {
-            return Promises.newFailedPromise((ResourceException) new InternalServerErrorException(e));
-        }
-    }
-
     /**
      * Gets a Resource Set, optionally with its associated policy, if one exists.
      *
      * @param context The context.
      * @param realm The realm.
      * @param resourceSetId The resource set Id.
+     * @param resourceOwnerId The resource owner Id.
      * @param augmentWithPolicy {@code true} to pull in UMA policies into the resource set.
      * @return A Promise containing the Resource Set or a ResourceException.
      */
     Promise<ResourceSetDescription, ResourceException> getResourceSet(final ServerContext context,
-            String realm, final String resourceSetId, final boolean augmentWithPolicy) {
-        return getResourceSet(realm, resourceSetId)
+            String realm, final String resourceSetId, String resourceOwnerId, final boolean augmentWithPolicy) {
+        return getResourceSet(realm, resourceSetId, resourceOwnerId)
                 .onSuccess(new SuccessHandler<ResourceSetDescription>() {
                     @Override
                     public void handleResult(ResourceSetDescription resourceSet) {
@@ -105,37 +92,24 @@ public class ResourceSetService {
                 });
     }
 
-    private Promise<ResourceSetDescription, ResourceException> augmentResourceSetWithPolicy(ServerContext context,
-            final String resourceSetId, final ResourceSetDescription resourceSet) {
-        return policyService.readPolicy(context, resourceSetId)
-                .thenAsync(new AsyncFunction<UmaPolicy, ResourceSetDescription, ResourceException>() {
-                    @Override
-                    public Promise<ResourceSetDescription, ResourceException> apply(UmaPolicy result) throws ResourceException {
-                        resourceSet.setPolicy(result.asJson());
-                        return Promises.newSuccessfulPromise(resourceSet);
-                    }
-                }, new AsyncFunction<ResourceException, ResourceSetDescription, ResourceException>() {
-                    @Override
-                    public Promise<ResourceSetDescription, ResourceException> apply(ResourceException e) throws ResourceException {
-                        return Promises.newSuccessfulPromise(resourceSet);
-                    }
-                });
-    }
-
     /**
      * Queries resource sets across the resource set store and UMA policy store.
      *
      * @param context The context.
      * @param realm The realm.
      * @param query The aggregated query.
+     * @param resourceOwnerId The resource owner id.
      * @param augmentWithPolicies {@code true} to pull in UMA policies into the resource set.
      * @return A Promise containing the Resource Sets or a ResourceException.
      */
     Promise<Collection<ResourceSetDescription>, ResourceException> getResourceSets(final ServerContext context,
-            String realm, final ResourceSetWithPolicyQuery query, final boolean augmentWithPolicies) {
+            String realm, final ResourceSetWithPolicyQuery query, final String resourceOwnerId,
+            final boolean augmentWithPolicies) {
         final Set<ResourceSetDescription> resourceSets;
         try {
-            resourceSets = resourceSetStoreFactory.create(realm).query(query.getResourceSetQuery());
+            resourceSets = resourceSetStoreFactory.create(realm).query(QueryFilter.and(
+                    query.getResourceSetQuery(),
+                    QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, resourceOwnerId)));
         } catch (ServerException e) {
             return Promises.newFailedPromise((ResourceException) new InternalServerErrorException(e));
         }
@@ -149,7 +123,7 @@ public class ResourceSetService {
                         public Promise<Collection<ResourceSetDescription>, ResourceException> apply(Pair<QueryResult, Collection<UmaPolicy>> result) throws ResourceException {
                             try {
                                 return Promises.newSuccessfulPromise(combine(context, query, resourceSets,
-                                        result.getSecond(), augmentWithPolicies));
+                                        result.getSecond(), augmentWithPolicies, resourceOwnerId));
                             } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
                                 return Promises.newFailedPromise(
                                         (ResourceException) new InternalServerErrorException(e));
@@ -190,68 +164,19 @@ public class ResourceSetService {
         return resourceSetsPromise;
     }
 
-    private Collection<ResourceSetDescription> combine(ServerContext context,
-            ResourceSetWithPolicyQuery resourceSetWithPolicyQuery, Set<ResourceSetDescription> resourceSets,
-            Collection<UmaPolicy> policies, boolean augmentWithPolicies)
-            throws org.forgerock.oauth2.core.exceptions.NotFoundException, ServerException {
-
-        Map<String, ResourceSetDescription> resourceSetsById = new HashMap<String, ResourceSetDescription>();
-        Map<String, UmaPolicy> policiesById = new HashMap<String, UmaPolicy>();
-
-        for (ResourceSetDescription resourceSet : resourceSets) {
-            resourceSetsById.put(resourceSet.getId(), resourceSet);
-        }
-
-        for (UmaPolicy policy : policies) {
-            policiesById.put(policy.getId(), policy);
-        }
-
-        if ("AND".equals(resourceSetWithPolicyQuery.getOperator())) {
-            resourceSetsById.keySet().retainAll(policiesById.keySet());
-            if (augmentWithPolicies) {
-                for (ResourceSetDescription resourceSet : resourceSetsById.values()) {
-                    resourceSet.setPolicy(policiesById.get(resourceSet.getId()).asJson());
-                }
-            }
-        } else if ("OR".equals(resourceSetWithPolicyQuery.getOperator())) {
-
-            if (augmentWithPolicies) {
-                for (ResourceSetDescription resourceSet : resourceSetsById.values()) {
-                    augmentResourceSetWithPolicy(context, resourceSet.getId(), resourceSet);
-                }
-            }
-
-            for (Map.Entry<String, UmaPolicy> entry : policiesById.entrySet()) {
-                ResourceSetDescription resourceSet;
-                if (resourceSetsById.containsKey(entry.getKey())) {
-                    resourceSet = resourceSetsById.get(entry.getKey());
-                } else {
-                    RealmContext realmContext = context.asContext(RealmContext.class);
-                    resourceSet = resourceSetStoreFactory.create(realmContext.getResolvedRealm())
-                            .query(QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, entry.getKey()))
-                            .iterator().next();
-                }
-                if (augmentWithPolicies) {
-                    resourceSet.setPolicy(entry.getValue().asJson());
-                }
-                resourceSetsById.put(entry.getKey(), resourceSet);
-            }
-        }
-
-        return resourceSetsById.values();
-    }
-
     /**
      * Revokes all UMA policies for a user's resource sets.
      *
      * @param context The context.
      * @param realm The realm.
+     * @param resourceOwnerId The resource owner id.
      * @return A Promise containing {@code null} or a ResourceException.
      */
-    Promise<Void, ResourceException> revokeAllPolicies(final ServerContext context, String realm) {
+    Promise<Void, ResourceException> revokeAllPolicies(final ServerContext context, String realm,
+            String resourceOwnerId) {
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.<String>alwaysTrue());
-        return getResourceSets(context, realm, query, false)
+        return getResourceSets(context, realm, query, resourceOwnerId, false)
                 .thenAsync(new AsyncFunction<Collection<ResourceSetDescription>, Void, ResourceException>() {
                     @Override
                     public Promise<Void, ResourceException> apply(Collection<ResourceSetDescription> resourceSets) {
@@ -272,5 +197,87 @@ public class ResourceSetService {
                         });
                     }
                 });
+    }
+
+    private Promise<ResourceSetDescription, ResourceException> getResourceSet(String realm, String resourceSetId,
+            String resourceOwnerId) {
+        try {
+            ResourceSetDescription resourceSet = resourceSetStoreFactory.create(realm)
+                    .read(resourceSetId, resourceOwnerId);
+            return Promises.newSuccessfulPromise(resourceSet);
+        } catch (NotFoundException e) {
+            return Promises.newFailedPromise(
+                    (ResourceException) new org.forgerock.json.resource.NotFoundException(
+                            "No resource set with id, " + resourceSetId + ", found."));
+        } catch (ServerException e) {
+            return Promises.newFailedPromise((ResourceException) new InternalServerErrorException(e));
+        }
+    }
+
+    private Promise<ResourceSetDescription, ResourceException> augmentResourceSetWithPolicy(ServerContext context,
+            final String resourceSetId, final ResourceSetDescription resourceSet) {
+        return policyService.readPolicy(context, resourceSetId)
+                .thenAsync(new AsyncFunction<UmaPolicy, ResourceSetDescription, ResourceException>() {
+                    @Override
+                    public Promise<ResourceSetDescription, ResourceException> apply(UmaPolicy result) throws ResourceException {
+                        resourceSet.setPolicy(result.asJson());
+                        return Promises.newSuccessfulPromise(resourceSet);
+                    }
+                }, new AsyncFunction<ResourceException, ResourceSetDescription, ResourceException>() {
+                    @Override
+                    public Promise<ResourceSetDescription, ResourceException> apply(ResourceException e) throws ResourceException {
+                        return Promises.newSuccessfulPromise(resourceSet);
+                    }
+                });
+    }
+
+    private Collection<ResourceSetDescription> combine(ServerContext context,
+            ResourceSetWithPolicyQuery resourceSetWithPolicyQuery, Set<ResourceSetDescription> resourceSets,
+            Collection<UmaPolicy> policies, boolean augmentWithPolicies, String resourceOwnerId)
+            throws org.forgerock.oauth2.core.exceptions.NotFoundException, ServerException {
+
+        Map<String, ResourceSetDescription> resourceSetsById = new HashMap<String, ResourceSetDescription>();
+        Map<String, UmaPolicy> policiesById = new HashMap<String, UmaPolicy>();
+
+        for (ResourceSetDescription resourceSet : resourceSets) {
+            resourceSetsById.put(resourceSet.getId(), resourceSet);
+        }
+
+        for (UmaPolicy policy : policies) {
+            policiesById.put(policy.getId(), policy);
+        }
+
+        if (AggregateQuery.Operator.AND.equals(resourceSetWithPolicyQuery.getOperator())) {
+            resourceSetsById.keySet().retainAll(policiesById.keySet());
+            if (augmentWithPolicies) {
+                for (ResourceSetDescription resourceSet : resourceSetsById.values()) {
+                    resourceSet.setPolicy(policiesById.get(resourceSet.getId()).asJson());
+                }
+            }
+        } else if (AggregateQuery.Operator.OR.equals(resourceSetWithPolicyQuery.getOperator())) {
+
+            if (augmentWithPolicies) {
+                for (ResourceSetDescription resourceSet : resourceSetsById.values()) {
+                    augmentResourceSetWithPolicy(context, resourceSet.getId(), resourceSet);
+                }
+            }
+
+            for (Map.Entry<String, UmaPolicy> entry : policiesById.entrySet()) {
+                ResourceSetDescription resourceSet;
+                if (resourceSetsById.containsKey(entry.getKey())) {
+                    resourceSet = resourceSetsById.get(entry.getKey());
+                } else {
+                    RealmContext realmContext = context.asContext(RealmContext.class);
+                    resourceSet = resourceSetStoreFactory.create(realmContext.getResolvedRealm())
+                            .read(entry.getKey(), resourceOwnerId);
+                }
+                if (augmentWithPolicies) {
+                    resourceSet.setPolicy(entry.getValue().asJson());
+                }
+                resourceSetsById.put(entry.getKey(), resourceSet);
+            }
+        }
+
+        return resourceSetsById.values();
     }
 }

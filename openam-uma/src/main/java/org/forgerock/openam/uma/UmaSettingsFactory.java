@@ -14,31 +14,20 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest.oauth2;
-
-import org.forgerock.json.resource.QueryFilter;
+package org.forgerock.openam.uma;
 
 /**
- * Aggregation of queries against Resource Sets and UMA policies.
+ * A factory for retrieving UmaSettings instances.
  *
  * @since 13.0.0
  */
-final class ResourceSetWithPolicyQuery
-        extends AggregateQuery<org.forgerock.util.query.QueryFilter<String>, QueryFilter> {
+public interface UmaSettingsFactory {
 
-    public org.forgerock.util.query.QueryFilter<String> getResourceSetQuery() {
-        return getFirstQuery();
-    }
-
-    public void setResourceSetQuery(org.forgerock.util.query.QueryFilter<String> query) {
-        setFirstQuery(query);
-    }
-
-    public QueryFilter getPolicyQuery() {
-        return getSecondQuery();
-    }
-
-    public void setPolicyQuery(QueryFilter query) {
-        setSecondQuery(query);
-    }
+    /**
+     * Creates an instance of the {@code UmaSettings} for the given realm.
+     *
+     * @param realm The realm.
+     * @return The {@code UmaSettings} instance.
+     */
+    UmaSettings create(String realm);
 }

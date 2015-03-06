@@ -69,7 +69,6 @@ import org.forgerock.openam.rest.resource.PromisedRequestHandler;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.uma.UmaConstants;
-import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.util.Pair;
@@ -94,7 +93,6 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private final ApplicationManagerWrapper applicationManager;
     private final ApplicationTypeManagerWrapper applicationTypeManagerWrapper;
     private final PromisedRequestHandler policyResource;
-    private final UmaPolicyService umaPolicyService;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
 
     /**
@@ -104,7 +102,6 @@ public class UmaPolicyApplicationListener implements IdEventListener {
      * @param applicationManager An instance of the {@code ApplicationManagerWrapper}.
      * @param applicationTypeManagerWrapper An instance of the {@code ApplicationTypeManagerWrapper}.
      * @param policyResource An instance of the policy backend {@code PromisedRequestHandler}.
-     * @param umaPolicyService An instance of the {@code UmaPolicyService}.
      * @param resourceSetStoreFactory An instance of the {@code ResourceSetStoreFactory}.
      */
     @Inject
@@ -112,12 +109,11 @@ public class UmaPolicyApplicationListener implements IdEventListener {
             ApplicationManagerWrapper applicationManager,
             ApplicationTypeManagerWrapper applicationTypeManagerWrapper,
             @Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER) PromisedRequestHandler policyResource,
-            UmaPolicyService umaPolicyService, ResourceSetStoreFactory resourceSetStoreFactory) {
+            ResourceSetStoreFactory resourceSetStoreFactory) {
         this.idRepoFactory = idRepoFactory;
         this.applicationManager = applicationManager;
         this.applicationTypeManagerWrapper = applicationTypeManagerWrapper;
         this.policyResource = policyResource;
-        this.umaPolicyService = umaPolicyService;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
     }
 
@@ -314,12 +310,6 @@ public class UmaPolicyApplicationListener implements IdEventListener {
                     @Override
                     public void handleError(ResourceException error) {
                         logger.error(error.getReason());
-                    }
-                })
-                .thenAlways(new Runnable() {
-                    @Override
-                    public void run() {
-                        umaPolicyService.clearCache();
                     }
                 });
     }

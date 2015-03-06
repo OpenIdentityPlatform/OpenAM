@@ -53,7 +53,9 @@ public class UmaGuiceModule extends AbstractModule {
         Multibinder.newSetBinder(binder(), TokenIntrospectionHandler.class)
                 .addBinding().to(UmaTokenIntrospectionHandler.class);
 
-        bind(UmaPolicyStore.class).to(UmaPolicyStoreImpl.class);
+        install(new FactoryModuleBuilder()
+                .implement(UmaSettings.class, UmaSettingsImpl.class)
+                .build(UmaSettingsFactory.class));
     }
 
     @Provides

@@ -29,19 +29,15 @@ import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.utils.JsonValueBuilder;
-import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.restlet.Request;
-import org.restlet.data.ChallengeResponse;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.json.JsonRepresentation;
@@ -58,23 +54,19 @@ public class PermissionRequestEndpoint extends ServerResource {
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final OAuth2RequestFactory<Request> requestFactory;
-    private final TokenStore oauth2TokenStore;
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
 
     /**
      * Constructs a new PermissionRequestEndpoint instance
      *
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
-     * @param oauth2TokenStore An instance of the Oauth 2.0 TokenStore.
      * @param requestFactory An instance of the OAuth2RequestFactory.
      */
     @Inject
     public PermissionRequestEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            OAuth2RequestFactory<Request> requestFactory, TokenStore oauth2TokenStore,
-            UmaProviderSettingsFactory umaProviderSettingsFactory) {
+            OAuth2RequestFactory<Request> requestFactory, UmaProviderSettingsFactory umaProviderSettingsFactory) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.requestFactory = requestFactory;
-        this.oauth2TokenStore = oauth2TokenStore;
         this.umaProviderSettingsFactory = umaProviderSettingsFactory;
     }
 
@@ -90,9 +82,12 @@ public class PermissionRequestEndpoint extends ServerResource {
             ServerException {
         JsonValue permissionRequest = json(toMap(entity));
         String resourceSetId = getResourceSetId(permissionRequest);
-        String clientId = getClientId();
-        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(requestFactory.create(getRequest()));
-        ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, providerSettings);
+        OAuth2Request oAuth2Request = requestFactory.create(getRequest());
+        String clientId = getClientId(oAuth2Request);
+        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(oAuth2Request);
+        String resourceOwnerId = getResourceOwnerId(oAuth2Request);
+        ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, resourceOwnerId,
+                providerSettings);
         Set<String> scopes = validateScopes(permissionRequest, resourceSetDescription);
         String ticket = umaProviderSettingsFactory.get(getRequest()).getUmaTokenStore()
                 .createPermissionTicket(resourceSetId, scopes, clientId).getId();
@@ -100,18 +95,18 @@ public class PermissionRequestEndpoint extends ServerResource {
     }
 
     private String getResourceSetId(JsonValue permissionRequest) throws UmaException {
-        JsonValue resource_set_id = permissionRequest.get("resource_set_id");
+        JsonValue resourceSetId = permissionRequest.get("resource_set_id");
         try {
-            resource_set_id.required();
+            resourceSetId.required();
         } catch (JsonValueException e) {
             throw new UmaException(400, "invalid_resource_set_id",
                     "Invalid Permission Request. Missing required attribute, 'resource_set_id'.");
         }
-        if (!resource_set_id.isString()) {
+        if (!resourceSetId.isString()) {
             throw new UmaException(400, "invalid_resource_set_id",
                     "Invalid Permission Request. Required attribute, 'resource_set_id', must be a String.");
         }
-        return resource_set_id.asString();
+        return resourceSetId.asString();
     }
 
     private Set<String> validateScopes(JsonValue permissionRequest, ResourceSetDescription resourceSetDescription)
@@ -143,30 +138,23 @@ public class PermissionRequestEndpoint extends ServerResource {
         return permissionRequest.get("scopes").asSet(String.class);
     }
 
-    private ResourceSetDescription getResourceSet(String resourceSetId, OAuth2ProviderSettings providerSettings) throws UmaException {
+    private ResourceSetDescription getResourceSet(String resourceSetId, String resourceOwnerId, OAuth2ProviderSettings providerSettings) throws UmaException {
         try {
             ResourceSetStore store = providerSettings.getResourceSetStore();
-            Set<ResourceSetDescription> results = store.query(
-                    QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
-            if (results.size() != 1) {
-                throw new UmaException(400, "invalid_resource_set_id", "Could not find Resource Set, " + resourceSetId);
-            }
-            return results.iterator().next();
+            return store.read(resourceSetId, resourceOwnerId);
+        } catch (NotFoundException e) {
+            throw new UmaException(400, "invalid_resource_set_id", "Could not find Resource Set, " + resourceSetId);
         } catch (ServerException e) {
             throw new UmaException(400, "invalid_resource_set_id", e.getMessage());
         }
     }
 
-    private String getClientId() throws ServerException {
-        Request req = getRequest();
-        ChallengeResponse challengeResponse = req.getChallengeResponse();
-        try {
-            AccessToken accessToken = oauth2TokenStore.readAccessToken(requestFactory.create(req),
-                    challengeResponse.getRawValue());
-            return accessToken.getClientId();
-        } catch (InvalidGrantException e) {
-            throw new ServerException("Unable to verify client identity.");
-        }
+    private String getClientId(OAuth2Request request) throws ServerException {
+        return request.getToken(AccessToken.class).getClientId();
+    }
+
+    private String getResourceOwnerId(OAuth2Request request) {
+        return request.getToken(AccessToken.class).getResourceOwnerId();
     }
 
     private Representation setResponse(int statusCode, Map<String, Object> entity) {

@@ -109,17 +109,9 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
                 getResourceOwnerId(), validator.validate(toMap(entity)));
         OAuth2Request oAuth2Request = requestFactory.create(getRequest());
         ResourceSetStore store = providerSettingsFactory.get(oAuth2Request).getResourceSetStore();
-        try {
-            store.create(oAuth2Request, resourceSetDescription);
-            for (ResourceSetRegistrationListener listener : listeners) {
-                listener.resourceSetCreated(oAuth2Request.<String>getParameter("realm"), resourceSetDescription);
-            }
-        } catch (ServerException e) {
-            throw e;
-        } catch (BadRequestException e) {
-            throw e;
-        } catch (NotFoundException e) {
-            throw e;
+        store.create(oAuth2Request, resourceSetDescription);
+        for (ResourceSetRegistrationListener listener : listeners) {
+            listener.resourceSetCreated(oAuth2Request.<String>getParameter("realm"), resourceSetDescription);
         }
         getResponse().setStatus(new Status(201));
         return createJsonResponse(resourceSetDescription, false, true);

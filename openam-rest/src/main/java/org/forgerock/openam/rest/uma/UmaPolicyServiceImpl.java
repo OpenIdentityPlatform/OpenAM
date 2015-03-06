@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_APPLICATION_TYPE;
 import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_SCHEME;
 
 import javax.inject.Inject;
@@ -32,32 +31,30 @@ import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import org.forgerock.guava.common.cache.Cache;
+import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.json.resource.QueryFilterVisitor;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.json.resource.SortKey;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
-import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.oauth2.AggregateQuery;
+import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.uma.PolicySearch;
 import org.forgerock.openam.uma.UmaPolicy;
-import org.forgerock.openam.uma.UmaPolicyComparator;
 import org.forgerock.openam.uma.UmaPolicyQueryFilterVisitor;
 import org.forgerock.openam.uma.UmaPolicyService;
-import org.forgerock.openam.uma.UmaPolicyStore;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.openam.utils.Config;
@@ -65,6 +62,7 @@ import org.forgerock.util.Pair;
 import org.forgerock.util.promise.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
+import org.forgerock.util.promise.SuccessHandler;
 
 /**
  * Implementation of the {@code UmaPolicyService}.
@@ -74,25 +72,27 @@ import org.forgerock.util.promise.Promises;
 @Singleton
 public class UmaPolicyServiceImpl implements UmaPolicyService {
 
-    private final UmaPolicyStore umaPolicyStore;
     private final PolicyResourceDelegate policyResourceDelegate;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
     private final Config<UmaAuditLogger> auditLogger;
+    private final ContextHelper contextHelper;
 
     /**
      * Creates an instance of the {@code UmaPolicyServiceImpl}.
      *
-     * @param umaPolicyStore An instance of the {@code UmaPolicyStore}.
      * @param policyResourceDelegate An instance of the {@code PolicyResourceDelegate}.
      * @param resourceSetStoreFactory An instance of the {@code ResourceSetStoreFactory}.
+     * @param auditLogger An instance of the {@code UmaAuditLogger}.
+     * @param contextHelper An instance of the {@code ContextHelper}.
      */
     @Inject
-    public UmaPolicyServiceImpl(UmaPolicyStore umaPolicyStore, PolicyResourceDelegate policyResourceDelegate,
-            ResourceSetStoreFactory resourceSetStoreFactory, Config<UmaAuditLogger> auditLogger) {
-        this.umaPolicyStore = umaPolicyStore;
+    public UmaPolicyServiceImpl(PolicyResourceDelegate policyResourceDelegate,
+            ResourceSetStoreFactory resourceSetStoreFactory, Config<UmaAuditLogger> auditLogger,
+            ContextHelper contextHelper) {
         this.policyResourceDelegate = policyResourceDelegate;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
         this.auditLogger = auditLogger;
+        this.contextHelper = contextHelper;
     }
 
     /**
@@ -101,14 +101,13 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     @Override
     public Promise<UmaPolicy, ResourceException> createPolicy(final ServerContext context, JsonValue policy) {
         UmaPolicy umaPolicy;
-        final String userId;
         final ResourceSetDescription resourceSet;
+        String resourceOwnerId = getResourceOwnerId(context);
         try {
-            resourceSet = getResourceSetDescription(UmaPolicy.idOf(policy), context);
-            userId = getLoggedInUserId(context);
+            resourceSet = getResourceSetDescription(UmaPolicy.idOf(policy), resourceOwnerId, context);
             umaPolicy = UmaPolicy.valueOf(resourceSet, policy);
             validateScopes(resourceSet, umaPolicy.getScopes());
-            verifyPolicyDoesNotAlreadyExist(resourceSet, userId, getRealm(context));
+            verifyPolicyDoesNotAlreadyExist(context, resourceSet);
         } catch (ResourceException e) {
             return Promises.newFailedPromise(e);
         }
@@ -118,7 +117,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                     public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) {
                         try {
                             UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, value);
-                            umaPolicyStore.addToUserCache(userId, getRealm(context), resourceSet.getId(), umaPolicy);
+                            String userId = getLoggedInUserId(context);
                             auditLogger.get().log(resourceSet.getName(), userId, UmaAuditType.POLICY_CREATED,
                                     userId);
                             return Promises.newSuccessfulPromise(umaPolicy);
@@ -134,88 +133,125 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                 });
     }
 
-    private void verifyPolicyDoesNotAlreadyExist(ResourceSetDescription resourceSet, String userId, String realm)
-            throws ConflictException {
-        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId, realm);
-        if (userCache != null && userCache.getIfPresent(resourceSet.getId()) != null) {
+    private void verifyPolicyDoesNotAlreadyExist(ServerContext context, ResourceSetDescription resourceSet)
+            throws ResourceException {
+        try {
+            readPolicy(context, resourceSet.getId()).getOrThrowUninterruptibly();
             throw new ConflictException("Policy already exists for Resource Server, "
                             + resourceSet.getClientId() + ", Resource Set, " + resourceSet.getId());
+        } catch (NotFoundException e) {
+            //If caught then this simply means the policy does not already exist so we can create it
         }
-    }
-
-    private String getRealm(ServerContext context) {
-        RealmContext realmContext = context.asContext(RealmContext.class);
-        return realmContext.getResolvedRealm();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Promise<UmaPolicy, ResourceException> readPolicy(final ServerContext context, final String resourceSetUid) {
-        final String userId;
-        try {
-            userId = getLoggedInUserId(context);
-        } catch (ResourceException e) {
-            return Promises.newFailedPromise(e);
-        }
-        UmaPolicy umaPolicy = localRead(resourceSetUid, userId, getRealm(context));
-        if (umaPolicy != null) {
-            return Promises.newSuccessfulPromise(umaPolicy);
-        }
-        return loadUserUmaPolicies(context)
-                .thenAsync(new AsyncFunction<Void, UmaPolicy, ResourceException>() {
+    public Promise<UmaPolicy, ResourceException> readPolicy(final ServerContext context, final String resourceSetId) {
+        final String resourceOwnerId = getResourceOwnerId(context);
+        String resourceOwnerUid = getResourceOwnerUid(context);
+        QueryRequest request = Requests.newQueryRequest("")
+                .setQueryFilter(QueryFilter.and(
+                        QueryFilter.equalTo("/resourceTypeUuid", resourceSetId),
+                        QueryFilter.equalTo("/createdBy", resourceOwnerUid)));
+        return policyResourceDelegate.queryPolicies(context, request)
+                .thenAsync(new AsyncFunction<Pair<QueryResult, List<Resource>>, UmaPolicy, ResourceException>() {
                     @Override
-                    public Promise<UmaPolicy, ResourceException> apply(Void value) {
-                        UmaPolicy umaPolicy = localRead(resourceSetUid, userId, getRealm(context));
-                        if (umaPolicy != null) {
-                            return Promises.newSuccessfulPromise(umaPolicy);
-                        } else {
-                            return Promises.newFailedPromise((ResourceException) new NotFoundException());
+                    public Promise<UmaPolicy, ResourceException> apply(Pair<QueryResult, List<Resource>> value) {
+                        try {
+                            if (value.getSecond().isEmpty()) {
+                                return Promises.newFailedPromise(
+                                        (ResourceException) new NotFoundException("UMA Policy not found, "
+                                                + resourceSetId));
+                            } else {
+                                ResourceSetDescription resourceSet = getResourceSetDescription(resourceSetId, resourceOwnerId, context);
+                                return Promises.newSuccessfulPromise(UmaPolicy.fromUnderlyingPolicies(resourceSet, value.getSecond()));
+                            }
+                        } catch (ResourceException e) {
+                            return Promises.newFailedPromise(e);
                         }
                     }
                 });
     }
 
-    private UmaPolicy localRead(String resourceSetUid, String userId, String realm) {
-        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId, realm);
-        if (userCache != null) {
-            return userCache.getIfPresent(resourceSetUid);
-        } else {
-            return null;
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public Promise<UmaPolicy, ResourceException> updatePolicy(final ServerContext context, final String resourceSetUid,
+    public Promise<UmaPolicy, ResourceException> updatePolicy(final ServerContext context, final String resourceSetId, //TODO need to check if need to delete backend policies
             JsonValue policy) {
-        final UmaPolicy umaPolicy;
-        final String userId;
+        final UmaPolicy updatedUmaPolicy;
         final ResourceSetDescription resourceSet;
+        final String resourceOwnerId = getResourceOwnerId(context);
+        final String resourceOwnerUid = getResourceOwnerUid(context);
         try {
-            userId = getLoggedInUserId(context);
-            resourceSet = getResourceSetDescription(resourceSetUid, context);
-            umaPolicy = UmaPolicy.valueOf(resourceSet, policy);
-            validateScopes(resourceSet, umaPolicy.getScopes());
+            resourceSet = getResourceSetDescription(resourceSetId, resourceOwnerId, context);
+            updatedUmaPolicy = UmaPolicy.valueOf(resourceSet, policy);
+            validateScopes(resourceSet, updatedUmaPolicy.getScopes());
         } catch (ResourceException e) {
             return Promises.newFailedPromise(e);
         }
-        return policyResourceDelegate.updatePolicies(context, umaPolicy.asUnderlyingPolicies())
-                .thenAsync(new AsyncFunction<List<Resource>, UmaPolicy, ResourceException>() {
+        return readPolicy(context, resourceSetId)
+                .onSuccess(new SuccessHandler<UmaPolicy>() {
                     @Override
-                    public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) throws ResourceException {
-                        umaPolicyStore.addToUserCache(userId, getRealm(context), resourceSet.getId(),
-                                UmaPolicy.fromUnderlyingPolicies(resourceSet, value));
-                        auditLogger.get().log(resourceSet.getName(), userId, UmaAuditType.POLICY_UPDATED, userId);
-                        return Promises.newSuccessfulPromise(umaPolicy);
+                    public void handleResult(UmaPolicy currentUmaPolicy) {
+                        Set<String> modifiedScopes = new HashSet<String>(updatedUmaPolicy.getScopes());
+                        modifiedScopes.retainAll(currentUmaPolicy.getScopes());
+                        Set<String> removedScopes = new HashSet<String>(currentUmaPolicy.getScopes());
+                        removedScopes.removeAll(modifiedScopes);
+                        for (JsonValue policy : currentUmaPolicy.asUnderlyingPolicies()) {
+                            for (String scope : removedScopes) {
+                                if (policy.get("actionValues").isDefined(scope)) {
+                                    policyResourceDelegate.queryPolicies(context, Requests.newQueryRequest("")
+                                            .setQueryFilter(QueryFilter.and(
+                                                    QueryFilter.equalTo("/createdBy", resourceOwnerUid),
+                                                    QueryFilter.equalTo("/name", policy.get("name").asString()))))
+                                            .thenAsync(new AsyncFunction<Pair<QueryResult, List<Resource>>, Void, ResourceException>() {
+                                                @Override
+                                                public Promise<Void, ResourceException> apply(Pair<QueryResult, List<Resource>> result) {
+                                                    for (Resource resource : result.getSecond()) {
+                                                        policyResourceDelegate.deletePolicies(context, Collections.singleton(resource.getId()));
+                                                    }
+                                                    return Promises.newSuccessfulPromise(null);
+                                                }
+                                            });
+                                }
+                            }
+                        }
                     }
-                }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {
+                }).onSuccess(new SuccessHandler<UmaPolicy>() {
                     @Override
-                    public Promise<UmaPolicy, ResourceException> apply(ResourceException error)  {
-                        return Promises.newFailedPromise(error);
+                    public void handleResult(UmaPolicy currentUmaPolicy) {
+                        Set<String> modifiedScopes = new HashSet<String>(currentUmaPolicy.getScopes());
+                        modifiedScopes.retainAll(updatedUmaPolicy.getScopes());
+                        Set<String> deletedScopes = new HashSet<String>(updatedUmaPolicy.getScopes());
+                        deletedScopes.removeAll(modifiedScopes);
+                        for (JsonValue policy : updatedUmaPolicy.asUnderlyingPolicies()) {
+                            for (String scope : deletedScopes) {
+                                if (policy.get("actionValues").isDefined(scope)) {
+                                    policyResourceDelegate.createPolicies(context, Collections.singleton(policy));
+                                }
+                            }
+                        }
+                    }
+                }).thenAsync(new AsyncFunction<UmaPolicy, UmaPolicy, ResourceException>() {
+                    @Override
+                    public Promise<UmaPolicy, ResourceException> apply(UmaPolicy umaPolicy) throws ResourceException {
+                        return policyResourceDelegate.updatePolicies(context, updatedUmaPolicy.asUnderlyingPolicies())
+                                .thenAsync(new AsyncFunction<List<Resource>, UmaPolicy, ResourceException>() {
+                                    @Override
+                                    public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) throws ResourceException {
+                                        String userId = getLoggedInUserId(context);
+                                        auditLogger.get().log(resourceSet.getName(), userId, UmaAuditType.POLICY_UPDATED, userId);
+                                        return Promises.newSuccessfulPromise(updatedUmaPolicy);
+                                    }
+                                }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {
+                                    @Override
+                                    public Promise<UmaPolicy, ResourceException> apply(ResourceException error) {
+                                        return Promises.newFailedPromise(error);
+                                    }
+                                });
                     }
                 });
     }
@@ -224,14 +260,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * {@inheritDoc}
      */
     @Override
-    public Promise<Void, ResourceException> deletePolicy(final ServerContext context, final String resourceSetUid) {
-        final String userId;
-        try {
-            userId = getLoggedInUserId(context);
-        } catch (ResourceException e) {
-            return Promises.newFailedPromise(e);
-        }
-        return readPolicy(context, resourceSetUid)
+    public Promise<Void, ResourceException> deletePolicy(final ServerContext context, final String resourceSetId) {
+        return readPolicy(context, resourceSetId)
                 .thenAsync(new AsyncFunction<UmaPolicy, List<Resource>, ResourceException>() {
                     @Override
                     public Promise<List<Resource>, ResourceException> apply(UmaPolicy value) {
@@ -241,10 +271,6 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                 .thenAsync(new AsyncFunction<List<Resource>, Void, ResourceException>() {
                     @Override
                     public Promise<Void, ResourceException> apply(List<Resource> value) {
-                        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId, getRealm(context));
-                        if (userCache != null) {
-                            userCache.invalidate(resourceSetUid);
-                        }
                         return Promises.newSuccessfulPromise(null);
                     }
                 });
@@ -257,67 +283,27 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     public Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queryPolicies(final ServerContext context,
             final QueryRequest umaQueryRequest) {
 
-        final String userId;
-        try {
-            userId = getLoggedInUserId(context);
-        } catch (ResourceException e) {
-            return Promises.newFailedPromise(e);
+
+        if (umaQueryRequest.getQueryExpression() != null) {
+            return Promises.newFailedPromise((ResourceException) new BadRequestException("Query expressions not supported"));
+        } else if (umaQueryRequest.getQueryId() != null) {
+            return Promises.newFailedPromise((ResourceException) new BadRequestException("Query expressions not supported"));
         }
-        return loadUserUmaPolicies(context)
-                .thenAsync(new AsyncFunction<Void, Pair<QueryResult, Collection<UmaPolicy>>, ResourceException>() {
-                    @Override
-                    public Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> apply(Void value) {
-                        Collection<UmaPolicy> umaPolicies;
-                        Cache<String, UmaPolicy> userCache = umaPolicyStore.getUserCache(userId, getRealm(context));
-                        if (userCache != null) {
-                            umaPolicies = userCache.asMap().values();
-                        } else {
-                            umaPolicies = new HashSet<UmaPolicy>();
-                        }
 
-                        try {
-                            QueryFilter queryFilter = umaQueryRequest.getQueryFilter();
-                            if (queryFilter == null) {
-                                queryFilter = QueryFilter.alwaysTrue();
-                            }
-                            PolicySearch policySearch = queryFilter.accept(
-                                    new UmaPolicyQueryFilterVisitor(), new PolicySearch(umaPolicies));
-                            List<UmaPolicy> sortedPolicies = new ArrayList<UmaPolicy>(policySearch.getPolicies());
-                            for (SortKey key : umaQueryRequest.getSortKeys()) {
-                                Collections.sort(sortedPolicies, new UmaPolicyComparator(key));
-                            }
-                            return Promises.newSuccessfulPromise(
-                                    Pair.of(new QueryResult(), (Collection<UmaPolicy>) sortedPolicies));
-                        } catch (UnsupportedOperationException e) {
-                            return Promises.newFailedPromise(
-                                    (ResourceException) new BadRequestException(e.getMessage(), e));
-                        }
-                    }
-                });
-    }
+        final AggregateQuery<QueryFilter, QueryFilter> filter = umaQueryRequest.getQueryFilter()
+                .accept(new AggregateUmaPolicyQueryFilter(), new AggregateQuery<QueryFilter, QueryFilter>());
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clearCache() {
-        umaPolicyStore.clearCache();
-    }
-
-    private Promise<Void, ResourceException> loadUserUmaPolicies(final ServerContext context) {
-        QueryRequest request;
-        final String userId;
-        try {
-            userId = getLoggedInUserId(context);
-            request = createQueryRequest(userId);
-        } catch (ResourceException e) {
-            return Promises.newFailedPromise(e);
+        String resourceOwnerUid = getResourceOwnerUid(context);
+        QueryRequest request = Requests.newQueryRequest("");
+        if (filter.getFirstQuery() == null) {
+            request.setQueryFilter(QueryFilter.equalTo("/createdBy", resourceOwnerUid));
+        } else {
+            request.setQueryFilter(QueryFilter.and(QueryFilter.equalTo("/createdBy", resourceOwnerUid), filter.getFirstQuery()));
         }
         return policyResourceDelegate.queryPolicies(context, request)
-                .thenAsync(new AsyncFunction<Pair<QueryResult, List<Resource>>, Void, ResourceException>() {
+                .thenAsync(new AsyncFunction<Pair<QueryResult, List<Resource>>, Collection<UmaPolicy>, ResourceException>() {
                     @Override
-                    public Promise<Void, ResourceException> apply(Pair<QueryResult, List<Resource>> value) {
-
+                    public Promise<Collection<UmaPolicy>, ResourceException> apply(Pair<QueryResult, List<Resource>> value) {
                         Map<String, Set<Resource>> policyMapping = new HashMap<String, Set<Resource>>();
                         for (Resource policy : value.getSecond()) {
 
@@ -337,29 +323,206 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         }
 
                         try {
+                            Collection<UmaPolicy> umaPolicies = new HashSet<UmaPolicy>();
+                            String resourceOwnerId = getResourceOwnerId(context);
                             for (Map.Entry<String, Set<Resource>> entry : policyMapping.entrySet()) {
-                                ResourceSetDescription resourceSet = getResourceSetDescription(entry.getKey(), context);
-                                umaPolicyStore.addToUserCache(userId, getRealm(context), resourceSet.getId(),
-                                        UmaPolicy.fromUnderlyingPolicies(resourceSet, entry.getValue()));
+                                ResourceSetDescription resourceSet = getResourceSetDescription(entry.getKey(), resourceOwnerId, context);
+                                umaPolicies.add(UmaPolicy.fromUnderlyingPolicies(resourceSet, entry.getValue()));
                             }
-                            return Promises.newSuccessfulPromise(null);
+                            return Promises.newSuccessfulPromise(umaPolicies);
                         } catch (ResourceException e) {
                             return Promises.newFailedPromise(e);
                         }
                     }
+                })
+                .thenAsync(new AsyncFunction<Collection<UmaPolicy>, Pair<QueryResult, Collection<UmaPolicy>>, ResourceException>() {
+                    @Override
+                    public Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> apply(Collection<UmaPolicy> policies) {
+                        Collection<UmaPolicy> results = policies;
+                        if (filter.getSecondQuery() != null) {
+                            PolicySearch search = filter.getSecondQuery().accept(new UmaPolicyQueryFilterVisitor(), new PolicySearch(policies));
+                            if (AggregateQuery.Operator.AND.equals(filter.getOperator())) {
+                                results.retainAll(search.getPolicies());
+                            }
+                        }
+
+                        int pageSize = umaQueryRequest.getPageSize();
+                        String pagedResultsCookie = umaQueryRequest.getPagedResultsCookie();
+                        int pagedResultsOffset = umaQueryRequest.getPagedResultsOffset();
+
+                        Collection<UmaPolicy> pagedPolicies = new HashSet<UmaPolicy>();
+                        int count = 0;
+                        for (UmaPolicy policy : results) {
+                            if (count >= pagedResultsOffset * pageSize) {
+                                pagedPolicies.add(policy);
+                            }
+                            count++;
+                        }
+                        int remainingPagedResults = results.size() - pagedPolicies.size();
+                        if (pageSize > 0) {
+                            remainingPagedResults /= pageSize;
+                        }
+
+                        return Promises.newSuccessfulPromise(Pair.of(
+                                new QueryResult(pagedResultsCookie, remainingPagedResults), pagedPolicies));
+                    }
                 });
     }
 
-    private ResourceSetDescription getResourceSetDescription(String resourceSetId, ServerContext context)
-            throws ResourceException {
-        try {
-            RealmContext realmContext = context.asContext(RealmContext.class);
-            Set<ResourceSetDescription> results = resourceSetStoreFactory.create(realmContext.getResolvedRealm()).query(
-                    org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
-            if (results.size() != 1) {
-                throw new BadRequestException("Invalid ResourceSet UID");
+    private static final class AggregateUmaPolicyQueryFilter
+            implements QueryFilterVisitor<AggregateQuery<QueryFilter, QueryFilter>, AggregateQuery<QueryFilter, QueryFilter>> {
+
+        private int queryDepth = 0;
+
+        private static final Map<JsonPointer, JsonPointer> queryableFields = new HashMap<JsonPointer, JsonPointer>();
+        static {
+            queryableFields.put(new JsonPointer("/resourceServer"), new JsonPointer("applicationName"));
+        }
+
+        private JsonPointer verifyFieldIsQueryable(JsonPointer field) {
+            if (!queryableFields.containsKey(field)) {
+                throw new UnsupportedOperationException("'" + field + "' not queryable");
+            } else {
+                return queryableFields.get(field);
             }
-            return results.iterator().next();
+        }
+
+        private void increaseQueryDepth() {
+            queryDepth++;
+        }
+
+        private void decreaseQueryDepth() {
+            queryDepth--;
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitAndFilter(AggregateQuery<QueryFilter, QueryFilter> query, List<QueryFilter> subFilters) {
+            increaseQueryDepth();
+            List<QueryFilter> childFilters = new ArrayList<QueryFilter>();
+            for (QueryFilter filter : subFilters) {
+                AggregateQuery<QueryFilter, QueryFilter> subAggregateQuery = filter.accept(this, query);
+                if (subAggregateQuery.getSecondQuery() != null) {
+                    subAggregateQuery.setOperator(AggregateQuery.Operator.AND);
+                } else {
+                    childFilters.add(subAggregateQuery.getFirstQuery());
+                }
+            }
+            decreaseQueryDepth();
+            query.setFirstQuery(QueryFilter.and(childFilters));
+            return query;
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitEqualsFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+            if (new JsonPointer("/permissions/subject").equals(field)) {
+                if (queryDepth > 1) {
+                    throw new UnsupportedOperationException("Cannot nest queries on /permissions/subject field");
+                }
+                query.setSecondQuery(QueryFilter.equalTo("/permissions/subject", valueAssertion));
+            } else {
+                query.setFirstQuery(QueryFilter.equalTo(verifyFieldIsQueryable(field), valueAssertion));
+            }
+            return query;
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitStartsWithFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+            if (new JsonPointer("/permissions/subject").equals(field)) {
+                if (queryDepth > 1) {
+                    throw new UnsupportedOperationException("Cannot nest queries on /permissions/subject field");
+                }
+                query.setSecondQuery(QueryFilter.startsWith("/permissions/subject", valueAssertion));
+            } else {
+                query.setFirstQuery(QueryFilter.startsWith(verifyFieldIsQueryable(field), valueAssertion));
+            }
+            return query;
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitContainsFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+            if (new JsonPointer("/permissions/subject").equals(field)) {
+                if (queryDepth > 1) {
+                    throw new UnsupportedOperationException("Cannot nest queries on /permissions/subject field");
+                }
+                query.setSecondQuery(QueryFilter.contains("/permissions/subject", valueAssertion));
+            } else {
+                query.setFirstQuery(QueryFilter.contains(verifyFieldIsQueryable(field), valueAssertion));
+            }
+            return query;
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitBooleanLiteralFilter(AggregateQuery<QueryFilter, QueryFilter> query, boolean value) {
+            if (value) {
+                return query;
+            }
+            throw unsupportedFilterOperation("Boolean Literal, false,");
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitExtendedMatchFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, String operator, Object valueAssertion) {
+            throw unsupportedFilterOperation("Extended match");
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitGreaterThanFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+            throw unsupportedFilterOperation("Greater than");
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitGreaterThanOrEqualToFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+            throw unsupportedFilterOperation("Greater than or equal");
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitLessThanFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+            throw unsupportedFilterOperation("Less than");
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitLessThanOrEqualToFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+            throw unsupportedFilterOperation("Less than or equal");
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitNotFilter(AggregateQuery<QueryFilter, QueryFilter> query, QueryFilter subFilter) {
+            throw unsupportedFilterOperation("Not");
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitOrFilter(AggregateQuery<QueryFilter, QueryFilter> query, List<QueryFilter> subFilters) {
+            increaseQueryDepth();
+            List<QueryFilter> childFilters = new ArrayList<QueryFilter>();
+            for (QueryFilter filter : subFilters) {
+                AggregateQuery<QueryFilter, QueryFilter> subAggregateQuery = filter.accept(this, query);
+                if (subAggregateQuery.getSecondQuery() != null) {
+                    subAggregateQuery.setOperator(AggregateQuery.Operator.OR);
+                } else {
+                    childFilters.add(subAggregateQuery.getFirstQuery());
+                }
+            }
+            increaseQueryDepth();
+            query.setFirstQuery(QueryFilter.or(childFilters));
+            return query;
+        }
+
+        @Override
+        public AggregateQuery<QueryFilter, QueryFilter> visitPresentFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field) {
+            throw unsupportedFilterOperation("Present");
+        }
+
+        private UnsupportedOperationException unsupportedFilterOperation(String filterType) {
+            return new UnsupportedOperationException("'" + filterType + "' not supported");
+        }
+    }
+
+    private ResourceSetDescription getResourceSetDescription(String resourceSetId, String resourceOwnerId,
+            ServerContext context) throws ResourceException {
+        try {
+            String realm = getRealm(context);
+            return resourceSetStoreFactory.create(realm).read(resourceSetId, resourceOwnerId);
+        } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
+            throw new BadRequestException("Invalid ResourceSet UID");
         } catch (ServerException e) {
             throw new InternalServerErrorException(e.getMessage(), e);
         }
@@ -384,9 +547,15 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
     }
 
-    private QueryRequest createQueryRequest(String userId) {
-        return Requests.newQueryRequest("")
-                .setQueryFilter(QueryFilter.and(QueryFilter.equalTo("/createdBy", userId),
-                        QueryFilter.equalTo("/applicationName", UMA_POLICY_APPLICATION_TYPE)));
+    private String getResourceOwnerUid(ServerContext context) {
+        return contextHelper.getUserUid(context);
+    }
+
+    private String getResourceOwnerId(ServerContext context) {
+        return contextHelper.getUserId(context);
+    }
+
+    private String getRealm(ServerContext context) {
+        return contextHelper.getRealm(context);
     }
 }

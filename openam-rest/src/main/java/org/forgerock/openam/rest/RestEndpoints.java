@@ -65,7 +65,9 @@ import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
 import org.forgerock.openam.rest.scripting.ScriptResource;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.ServiceRouter;
+import org.forgerock.openam.rest.uma.UmaConfigurationResource;
 import org.forgerock.openam.rest.uma.UmaPolicyResource;
+import org.forgerock.openam.rest.uma.UmaPolicyResourceAuthzFilter;
 import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaExceptionFilter;
 import org.forgerock.openam.uma.UmaWellKnownConfigurationEndpoint;
@@ -183,6 +185,9 @@ public class RestEndpoints {
         dynamicRealmRouter.route("/serverinfo")
                 .forVersion("1.1").to(ServerInfoResource.class);
 
+        dynamicRealmRouter.route("/serverinfo/uma")
+                .forVersion("1.0").to(InjectorHolder.getInstance(UmaConfigurationResource.class));
+
         dynamicRealmRouter.route("/users")
                 .forVersion("1.1").to(IdentityResourceV1.class, "UsersResource")
                 .forVersion("2.0").to(IdentityResourceV2.class, "UsersResource");
@@ -203,10 +208,11 @@ public class RestEndpoints {
                 .forVersion("1.0").to(ResourceSetResource.class);
 
         dynamicRealmRouter.route("/users/{user}/uma/policies")
-                .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
+                .through(UmaPolicyResourceAuthzFilter.class, UmaPolicyResourceAuthzFilter.NAME)
                 .forVersion("1.0").to(UmaPolicyResource.class);
 
         dynamicRealmRouter.route("/users/{user}/uma/auditHistory")
+                .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
                 .forVersion("1.0").to(AuditHistory.class);
 
         //protected
