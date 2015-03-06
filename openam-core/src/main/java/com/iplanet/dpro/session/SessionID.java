@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011, 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
@@ -39,15 +39,18 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -371,28 +374,8 @@ public class SessionID implements Serializable {
             tail = outer.substring(tailIndex + 1);
 
             if (tailIndex != -1) {
-
-                // TODO implement lazy parsing of the exceptions
                 extensionPart = outer.substring(0, tailIndex);
-
-                DataInputStream extensionStr = new DataInputStream(
-                        new ByteArrayInputStream(Base64.decode(extensionPart)));
-
-                Map extMap = new HashMap();
-
-                // expected syntax is a sequence of pairs of UTF-encoded strings
-                // (name, value)
-                while (true) {
-                    String extName;
-                    try {
-                        extName = extensionStr.readUTF();
-                    } catch (EOFException e) {
-                        break;
-                    }
-                    String extValue = extensionStr.readUTF();
-                    extMap.put(extName, extValue);
-                }
-                extensions = extMap;
+                extensions = readExtensions(extensionPart);
             }
 
             serverID = (String) extensions.get(SITE_ID);
@@ -406,6 +389,57 @@ public class SessionID implements Serializable {
         }
         isParsed = true;
     }
+
+    /**
+     * Optimised alternative to DataInputStream#readUTF (which is very slow).
+     *
+     * @param extensionPart the extension map part of the session id
+     * @return the parsed extension map
+     * @throws IOException if there is an error decoding the extensions
+     */
+    @VisibleForTesting
+    static Map<String, String> readExtensions(String extensionPart) throws IOException {
+        // The bytes are actually written via DataOutputStream#writeUTF which uses "modified UTF-8". We decode this
+        // as normal UTF-8. This should only cause an issue with 'null' characters (\u0000), which should never
+        // appear anyway.
+        final CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder()
+                .onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT);
+        final Map<String, String> extMap = new HashMap<String, String>();
+        final byte[] bytes = Base64.decode(extensionPart);
+
+        if (bytes == null) {
+            debug.message("SessionID.readExtensions: Invalid extension data {}", extensionPart);
+            throw new IllegalArgumentException("Invalid Base64-encoded data");
+        }
+
+        for (int i = 0; i < bytes.length;) {
+            // Data is encoded as a 2-byte unsigned short length, followed by 'length' bytes of UTF-8
+            int length = parseUnsignedShort(bytes, i);
+            i += 2;
+            String key = decoder.decode(ByteBuffer.wrap(bytes, i, length)).toString();
+            i += length;
+            length = parseUnsignedShort(bytes, i);
+            i += 2;
+            String val = decoder.decode(ByteBuffer.wrap(bytes, i, length)).toString();
+            i += length;
+            extMap.put(key, val);
+        }
+        return extMap;
+    }
+
+    /**
+     * Parses the next two bytes from the given byte array as an unsigned short value. As Java does not support
+     * unsigned types, we return the value as the least-significant bits of a signed integer. The most-significant
+     * 16 bits of the result will always be 0. Assumes Big-Endian format as in DataInput#readUnsignedShort.
+     *
+     * @param bytes the byte array to read the unsigned short from.
+     * @param i the offset into the byte array of the start of the unsigned short.
+     * @return the unsigned short as a (positive) signed integer.
+     */
+    private static int parseUnsignedShort(final byte[] bytes, final int i) {
+        return ((bytes[i] & 0xFF) << 8) | (bytes[i+1] & 0xFF);
+    }
+
 
     /**
      * Sets the server info by making a naming request by passing
