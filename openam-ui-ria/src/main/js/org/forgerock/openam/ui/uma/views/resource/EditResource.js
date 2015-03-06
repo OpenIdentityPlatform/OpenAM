@@ -189,22 +189,18 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                     editable: false
                 },
                 {
-                    name: "lastModifiedBy",
-                    label: $.t("uma.resources.show.grid.1"),
-                    cell: BackgridUtils.DatetimeAgoCell,
-                    editable: false
-                },
-                {
                     name: "permissions",
                     label: $.t("uma.resources.show.grid.2"),
                     cell: SelectizeCell,
-                    editable: false
+                    editable: false,
+                    sortable: false
                 },
                 {
                     name: "edit",
                     label: "",
                     cell: RevokeCell,
-                    editable: false
+                    editable: false,
+                    sortable: false
                 }],
                 collection: collection,
                 emptyText: $.t("uma.all.grid.empty")
