@@ -28,9 +28,8 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
         "org/forgerock/commons/ui/common/components/Dialog",
         "org/forgerock/openam/ui/uma/views/share/CommonShare",
         "org/forgerock/openam/ui/uma/views/resource/EditResource",
-        "org/forgerock/commons/ui/common/main/Router",
-        "org/forgerock/openam/ui/uma/views/share/FooterShare"
-], function(Dialog, CommonShare, editResourceView, router, FooterShare) {
+        "org/forgerock/commons/ui/common/main/Router"
+], function(Dialog, CommonShare, editResourceView, router) {
 
     var DialogShare = Dialog.extend({
         contentTemplate: "templates/common/EmptyTemplate.html",
