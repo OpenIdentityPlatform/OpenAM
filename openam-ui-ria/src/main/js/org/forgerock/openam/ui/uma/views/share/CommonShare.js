@@ -36,7 +36,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     var CommonShare = AbstractView.extend({
         initialize: function(options) {
             this.model = null;
-            this.parentModel = new UMAResourceSetWithPolicy();
+            this.parentModel = null;
         },
         template: "templates/uma/views/share/CommonShare.html",
         events: {
@@ -62,7 +62,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
          * @returns Boolean whether the parent model required sync'ing
          */
         syncParentModel: function(id) {
-            var syncRequired = id && this.parentModel.id !== id;
+            var syncRequired = !this.parentModel || (id && this.parentModel.id !== id);
 
             if(syncRequired) {
                 this.stopListening(this.parentModel);
@@ -90,7 +90,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             if (this.syncParentModel(args)) { return; }
 
             this.data.name = this.parentModel.get('name');
-            this.data.scopes = this.parentModel.get('scopes');
+            this.data.scopes = this.parentModel.get('scopes').toJSON();
             this.data.shareCount = self.getShareCount(); // returns null (not 0) if empty.
             this.data.shareInfo = self.getShareInfo(this.data.shareCount);
 
@@ -172,7 +172,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                     .done(function(data) {
                         var universalID = data.universalid[0],
                             existing = self.parentModel.get('policy').get("permissions").findWhere({ subject: universalID }),
-                            model = existing ? existing : new UMAPolicyPermission({ subject: universalID });
+                            model = existing ? existing : UMAPolicyPermission.findOrCreate( { subject: universalID } );
 
                         self.setModel(model);
                     });

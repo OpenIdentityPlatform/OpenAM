@@ -22,13 +22,14 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define*/
+/*global _, define*/
 define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
     'backbone',
     'backboneRelational',
     'org/forgerock/openam/ui/uma/models/UMAPolicy',
+    'org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope',
     'org/forgerock/openam/ui/uma/util/URLHelper'
-], function(Backbone, BackboneRelational, UMAPolicy, URLHelper) {
+], function(Backbone, BackboneRelational, UMAPolicy, UMAPolicyPermissionScope, URLHelper) {
     return Backbone.RelationalModel.extend({
         idAttribute: "_id",
         parse: function(response, options) {
@@ -37,12 +38,21 @@ define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
                 response.policy.policyId = response._id;
             }
 
+            response.scopes = _.map(response.scopes, function(scope) {
+                return { id: scope };
+            });
+
             return response;
         },
         relations: [{
             type: Backbone.HasOne,
             key: 'policy',
             relatedModel: UMAPolicy
+        }, {
+            type: Backbone.HasMany,
+            key: 'scopes',
+            relatedModel: UMAPolicyPermissionScope,
+            parse: true
         }],
         urlRoot: URLHelper.substitute("__api__/users/__username__/oauth2/resourcesets")
     });

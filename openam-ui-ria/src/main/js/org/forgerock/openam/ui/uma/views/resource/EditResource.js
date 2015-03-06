@@ -35,7 +35,7 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
 ], function(AbstractView, Backgrid, BackgridUtils, Constants, EventManager, Router, UIUtils, UMAResourceSetWithPolicy) {
     var EditResource = AbstractView.extend({
         initialize: function(options) {
-            this.model = new UMAResourceSetWithPolicy();
+            this.model = null;
         },
         template: "templates/uma/views/resource/EditResource.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
@@ -76,10 +76,10 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
              */
             this.data.name = this.model.get('name');
 
-            options = _.map(this.model.get('scopes'), function(scope) {
+            options = this.model.get('scopes').map(function(scope) {
                 return {
-                    text: scope,
-                    value: scope
+                    text: scope.get('name'),
+                    value: scope.get('id')
                 };
             });
 
@@ -213,7 +213,7 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
             });
         },
         syncModel: function(id) {
-            var syncRequired = id && this.model.id !== id;
+            var syncRequired = !this.model || (id && this.model.id !== id);
 
             if(syncRequired) {
                 this.stopListening(this.model);
