@@ -74,11 +74,13 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                     editable: false,
                     sortType: "toggle"
                 }, {
-                    name: "resourceSetId",
+                    name: "resourceSetName",
                     label: $.t("uma.history.grid.header.1"),
                     headerCell: backgridUtils.FilterHeaderCell,
                     cell: backgridUtils.UriExtCell,
-                    // TODO: Link this cell through to the Resources page by mapping the resourceSetId to the policy (if possible)
+                    href: function(rawValue, formattedValue, model){
+                        return "#uma/resources/" + encodeURIComponent(model.get('resourceSetId'));
+                    },
                     editable: false,
                     sortType: "toggle"
                 }, {
