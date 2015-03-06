@@ -49,26 +49,6 @@ public class AuditHistory implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
-    }
-
-    @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
-    }
-
-    @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
-    }
-
-    @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
-    }
-
-    @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
         AMIdentity identity = getIdentity(context);
         try {
@@ -92,6 +72,32 @@ public class AuditHistory implements CollectionResourceProvider {
         }
     }
 
+    private AMIdentity getIdentity(ServerContext context) {
+        String realm = context.asContext(RealmContext.class).getResolvedRealm();
+        final String user = context.asContext(RouterContext.class).getUriTemplateVariables().get("user");
+        return IdUtils.getIdentity(user, realm);
+    }
+
+    @Override
+    public void actionInstance(ServerContext context, String resourceId, ActionRequest request, ResultHandler<JsonValue> handler) {
+        handler.handleError(new NotSupportedException("Not supported."));
+    }
+
+    @Override
+    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+        handler.handleError(new NotSupportedException("Not supported."));
+    }
+
+    @Override
+    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request, ResultHandler<Resource> handler) {
+        handler.handleError(new NotSupportedException("Not supported."));
+    }
+
+    @Override
+    public void patchInstance(ServerContext context, String resourceId, PatchRequest request, ResultHandler<Resource> handler) {
+        handler.handleError(new NotSupportedException("Not supported."));
+    }
+
     @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request, ResultHandler<Resource> handler) {
         handler.handleError(new NotSupportedException("Not supported."));
@@ -100,11 +106,5 @@ public class AuditHistory implements CollectionResourceProvider {
     @Override
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request, ResultHandler<Resource> handler) {
         handler.handleError(new NotSupportedException("Not supported."));
-    }
-
-    private AMIdentity getIdentity(ServerContext context) {
-        String realm = context.asContext(RealmContext.class).getResolvedRealm();
-        final String user = context.asContext(RouterContext.class).getUriTemplateVariables().get("user");
-        return IdUtils.getIdentity(user, realm);
     }
 }

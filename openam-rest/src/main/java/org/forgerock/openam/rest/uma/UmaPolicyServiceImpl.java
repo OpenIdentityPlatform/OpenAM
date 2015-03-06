@@ -118,8 +118,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         try {
                             UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, value);
                             String userId = getLoggedInUserId(context);
-                            auditLogger.get().log(resourceSet.getName(), userId, UmaAuditType.POLICY_CREATED,
-                                    userId);
+                            auditLogger.get().log(resourceSet.getId(), resourceSet.getName(), userId,
+                                    UmaAuditType.POLICY_CREATED, userId);
                             return Promises.newSuccessfulPromise(umaPolicy);
                         } catch (ResourceException e) {
                             return Promises.newFailedPromise(e);
@@ -243,7 +243,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                                     @Override
                                     public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) throws ResourceException {
                                         String userId = getLoggedInUserId(context);
-                                        auditLogger.get().log(resourceSet.getName(), userId, UmaAuditType.POLICY_UPDATED, userId);
+                                        auditLogger.get().log(resourceSetId, resourceSet.getName(), userId, UmaAuditType.POLICY_UPDATED, userId);
                                         return Promises.newSuccessfulPromise(updatedUmaPolicy);
                                     }
                                 }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {

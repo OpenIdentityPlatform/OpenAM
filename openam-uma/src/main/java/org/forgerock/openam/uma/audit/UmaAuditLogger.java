@@ -61,9 +61,10 @@ public class UmaAuditLogger {
         this.oauth2ProviderSettingsFactory = oauth2ProviderSettingsFactory;
     }
 
-    public void log(String resourceSetId, String resourceOwnerId, UmaAuditType message, Request request, String requestingPartyId) {
+    public void log(String resourceSetId, String resourceOwnerId, UmaAuditType message, Request request,
+            String requestingPartyId) {
         try {
-            log(getResourceName(resourceSetId, request), resourceOwnerId, message, requestingPartyId);
+            log(resourceSetId, getResourceName(resourceSetId, request), resourceOwnerId, message, requestingPartyId);
         } catch (UmaException e) {
             logger.warning("Error writing to UMA audit log", e);
         } catch (NotFoundException e) {
@@ -73,10 +74,12 @@ public class UmaAuditLogger {
         }
     }
 
-    public void log(String resourceSetId, String resourceOwnerId, UmaAuditType message, String requestingPartyId) {
+    public void log(String resourceSetId, String resourceSetName, String resourceOwnerId, UmaAuditType message,
+            String requestingPartyId) {
         final UmaAuditEntry umaAuditEntry;
         try {
-            umaAuditEntry = new UmaAuditEntry(resourceSetId, resourceOwnerId, message.toString(), requestingPartyId);
+            umaAuditEntry = new UmaAuditEntry(resourceSetId, resourceSetName, resourceOwnerId, message.toString(),
+                    requestingPartyId);
             delegate.create(umaAuditEntry);
         } catch (ServerException e) {
             logger.warning("Error writing to UMA audit log", e);
@@ -84,7 +87,8 @@ public class UmaAuditLogger {
     }
 
     public Set<UmaAuditEntry> getEntireHistory(AMIdentity identity) throws ServerException {
-        return delegate.query(QueryFilter.equalTo("resourceOwnerId", identity.getName()).accept(new UmaAuditQueryFilterVisitor(), null));
+        return delegate.query(QueryFilter.equalTo("resourceOwnerId", identity.getUniversalId())
+                .accept(new UmaAuditQueryFilterVisitor(), null));
     }
 
     public Set<UmaAuditEntry> getHistory(AMIdentity identity, QueryRequest request) throws ServerException {
@@ -92,17 +96,19 @@ public class UmaAuditLogger {
     }
 
     private org.forgerock.util.query.QueryFilter<String> getQueryFilters(AMIdentity identity, QueryRequest request) {
-        return QueryFilter.and(request.getQueryFilter(), QueryFilter.equalTo("resourceOwnerId", identity.getName())).accept(new
-                UmaAuditQueryFilterVisitor(), null);
+        return QueryFilter.and(request.getQueryFilter(), QueryFilter.equalTo("resourceOwnerId", identity.getUniversalId()))
+                .accept(new UmaAuditQueryFilterVisitor(), null);
     }
 
-    private String getResourceName(String resourceSetId, Request request) throws NotFoundException, UmaException, org.forgerock.oauth2.core.exceptions.ServerException {
+    private String getResourceName(String resourceSetId, Request request) throws NotFoundException, UmaException,
+            org.forgerock.oauth2.core.exceptions.ServerException {
         OAuth2ProviderSettings providerSettings = oauth2ProviderSettingsFactory.get(requestFactory.create(request));
         ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, providerSettings);
         return resourceSetDescription.getName();
     }
 
-    private ResourceSetDescription getResourceSet(String resourceSetId, OAuth2ProviderSettings providerSettings) throws UmaException {
+    private ResourceSetDescription getResourceSet(String resourceSetId, OAuth2ProviderSettings providerSettings)
+            throws UmaException {
         try {
             ResourceSetStore store = providerSettings.getResourceSetStore();
             Set<ResourceSetDescription> results = store.query(

@@ -33,10 +33,12 @@ public class UmaAuditEntry {
     @Field(field = CoreTokenField.STRING_ONE)
     private String resourceSetId;
     @Field(field = CoreTokenField.STRING_TWO)
-    private String requestingPartyId;
+    private String resourceSetName;
     @Field(field = CoreTokenField.STRING_THREE)
-    private String type;
+    private String requestingPartyId;
     @Field(field = CoreTokenField.STRING_FOUR)
+    private String type;
+    @Field(field = CoreTokenField.STRING_FIVE)
     private String resourceOwnerId;
     @Field(field = CoreTokenField.DATE_ONE)
     private Calendar eventTime;
@@ -44,8 +46,10 @@ public class UmaAuditEntry {
     public UmaAuditEntry() {
     }
 
-    public UmaAuditEntry(String resourceSetId, String resourceOwnerId, String type, String requestingPartyId) {
+    public UmaAuditEntry(String resourceSetId, String resourceSetName, String resourceOwnerId, String type,
+            String requestingPartyId) {
         this.resourceSetId = resourceSetId;
+        this.resourceSetName = resourceSetName;
         this.resourceOwnerId = resourceOwnerId;
         this.type = type;
         this.requestingPartyId = requestingPartyId;
@@ -66,6 +70,14 @@ public class UmaAuditEntry {
 
     public void setResourceSetId(String resourceSetId) {
         this.resourceSetId = resourceSetId;
+    }
+
+    public String getResourceSetName() {
+        return resourceSetName;
+    }
+
+    public void setResourceSetName(String resourceSetName) {
+        this.resourceSetName = resourceSetName;
     }
 
     public String getRequestingPartyId() {
@@ -102,6 +114,7 @@ public class UmaAuditEntry {
     public JsonValue asJson() {
         JsonValue auditEntry = json(object(
                 field("resourceSetId", resourceSetId),
+                field("resourceSetName", resourceSetName),
                 field("requestingPartyId", requestingPartyId),
                 field("type", type),
                 field("eventTime", eventTime)));
