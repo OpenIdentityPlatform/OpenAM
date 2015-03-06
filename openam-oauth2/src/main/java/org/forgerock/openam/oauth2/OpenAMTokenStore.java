@@ -14,6 +14,10 @@
  * Copyright 2014-2015 ForgeRock AS.
  */
 
+/*
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ */
+
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.fluent.JsonValue.*;
@@ -168,7 +172,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final long currentTimeInSeconds = System.currentTimeMillis() / 1000;
         final long tokenLifetimeInSeconds = providerSettings.getOpenIdTokenLifetime();
-        final long exp = (currentTimeInSeconds + tokenLifetimeInSeconds) * 1000;
+        final long exp = currentTimeInSeconds + tokenLifetimeInSeconds;
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
 
