@@ -90,7 +90,6 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4943" xlink:show="new">OPENAM-4943</link>: amUtilMsgs resource bundle missing from Fedlet distribution</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5040" xlink:show="new">OPENAM-5040</link>: ClusterStateService.checkServerUp() should get Input stream from connection</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5237" xlink:show="new">OPENAM-5237</link>: OAuth2 authorization consent page uses absolute URL in FORM tag</para></listitem>
-   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5388" xlink:show="new">OPENAM-5388</link>: Missing policy actions after upgrading to OpenAM 12?</para></listitem>
   </itemizedlist>
  </section>
 
