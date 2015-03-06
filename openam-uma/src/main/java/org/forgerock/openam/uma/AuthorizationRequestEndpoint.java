@@ -99,6 +99,9 @@ public class AuthorizationRequestEndpoint extends ServerResource {
             throw new UmaException(400, UmaConstants.EXPIRED_TICKET_ERROR_CODE, "The permission ticket has expired");
         }
 
+        //Remove permission ticket so it cannot be re-used
+        umaProviderSettings.getUmaTokenStore().deletePermissionTicket(permissionTicket.getId());
+
         final String requestingUserId = authorisationApiToken.getResourceOwnerId();
         final String resourceSetId = permissionTicket.getResourceSetId();
         final Request request = getRequest();
