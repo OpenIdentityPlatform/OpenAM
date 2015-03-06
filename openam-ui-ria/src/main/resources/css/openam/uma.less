@@ -202,7 +202,7 @@ body{
         transition: background-color 200ms linear;
     }
 
-    margin-bottom: 40px;
+    //margin-bottom: 40px;
 
     .policy-content {
         min-height:100px;
@@ -431,24 +431,38 @@ body{
         border-top: 8px solid @table-base-color;
     }
 
+    #footerShare{
+        margin-top:30px;
 
-    #shareCounter {
-        color: grey;
-        margin: 35px 0 0 0;
+        #footerNav{
 
-        span {
-            margin-right: 6px;
-            vertical-align: text-bottom;
-            display:inline-block;
-            cursor:auto;
-        }
+            margin: 20px 10px 0 ;
+            font-size: 13px;
+            line-height: 13px;
+            a {
+                text-decoration:none
+            }
 
-        p {
-            display:inline-block;
-            font-style: italic;
+            #shareCounter {
+                display: inline-block;
+                color: grey;
+                border-left: 2px solid grey;
+                padding-left: 11px;
+                margin-left: 10px;
+
+                #shareInfo {
+
+                    //font-style: italic;
+                }
+            }
+
+            .icon-user, .icon-cog{
+                font-size:13px;
+                padding-right:3px;
+                cursor:auto;
+            }
         }
     }
-
 }
 
 

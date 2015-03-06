@@ -44,7 +44,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
         },
         onRevokeAll: function() {
             EventManager.sendEvent(Constants.EVENT_SHOW_DIALOG,{
-                route: Router.configuration.routes.dialogRevokeAll,
+                route: Router.configuration.routes.dialogRevokeAllResources,
                 noViewChange: true
             });
         },

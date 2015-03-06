@@ -40,7 +40,8 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
         },
         template: "templates/uma/views/share/CommonShare.html",
         events: {
-          "click input#shareButton": "save"
+          "click input#shareButton": "save",
+          "click #toggleAdvanced": "onToggleAdvanced"
         },
         onParentModelError: function(model, response) {
             console.error('Unrecoverable load failure UMAResourceSetWithPolicy. ' +
@@ -77,34 +78,45 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             return syncRequired;
         },
 
-        render: function(id, callback) {
+        render: function(args, callback) {
             var self = this;
 
-            // FIXME: Resolve unknown issue with id appearing as an Array
-            if(id instanceof Array) { id = id[0]; }
+            // FIXME: Resolve unknown issue with args appearing as an Array
+            if(args instanceof Array) {
+                this.data.dialog = args[1]; // This needs a tidyup. I am passing in true as the second args[1] to indicate the parent is a dialog
+                args = args[0];
+            }
 
-            if(this.syncParentModel(id)) { return; }
+            if (this.syncParentModel(args)) { return; }
 
             this.data.name = this.parentModel.get('name');
             this.data.scopes = this.parentModel.get('scopes');
+            this.data.shareCount = self.getShareCount(); // returns null (not 0) if empty.
+            this.data.shareInfo = self.getShareInfo(this.data.shareCount);
 
             this.parentRender(function() {
                 self.renderUserOptions();
                 self.renderPermissionOptions();
-                self.renderSharedWith();
-
-                if(callback) { callback(); }
             });
         },
-        renderSharedWith: function() {
-            var text = $.t("uma.share.info", { context: "none" }),
-                numberofPermissons = this.parentModel.get('policy').get('permissions').length;
 
-            if(numberofPermissons) {
-                text = $.t("uma.share.info", { count: numberofPermissons });
+        getShareCount: function() {
+            var count,
+                policy = this.parentModel.get('policy');
+            if (policy && policy.get('permissions')){
+                count =  policy.get('permissions').length;
             }
-            this.$el.find("#shareCounter > p").text(text);
+            return count;
         },
+
+        getShareInfo: function(count) {
+            var shareInfo = $.t("uma.share.info", { context : "none" } );
+            if (count){
+                shareInfo =  $.t("uma.share.info", { count: count });
+            }
+            return shareInfo;
+        },
+
         renderPermissionOptions: function() {
             var self = this;
 
@@ -201,12 +213,16 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             this.parentModel.get('policy').save()
             .done(function(response) {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
-
                 self.reset();
             })
             .fail(function() {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedFail");
             });
+        },
+
+        onToggleAdvanced: function(e) {
+            e.preventDefault();
+            console.log('onToggleAdvanced');
         }
     });
 

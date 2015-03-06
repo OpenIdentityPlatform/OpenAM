@@ -2,12 +2,14 @@
     <h1>{{ name }}</h1>
 </div>
 
-<div class="policy-content clear-fix" id="uma">
-    {{#if notFound}}
+<div id="uma">
+
+    <div class="policy-content clearfix" >
+        {{#if notFound}}
         <div class="striped-list" id="resourceList">
             <ul><li class="highlight-warning">{{t 'uma.share.notSpecifiedResource'}}</li></ul>
         </div>
-    {{else}}
+        {{else}}
         <div id="selectUser" class="float-left">
             <label>{{t 'uma.share.people'}}</label>
             <select placeholder="{{t 'common.form.startTypingToSearch'}}"></select>
@@ -22,11 +24,29 @@
             </select>
         </div>
 
-        <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class="button" disabled/>
+        <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class="button float-left" disabled/>
 
-        <div id="shareCounter" class="clearfix">
-            <span class="icon-user"></span>
-            <p></p>
+        {{/if}}
+    </div>
+
+
+    <div id="footerShare">
+
+        {{#if dialog}}
+        <div id="footerActions" class="float-right">
+            <a class="button" href="#" id="done" >{{t 'common.form.done'}}</a>
         </div>
-    {{/if}}
+        {{/if}}
+
+        <div id="footerNav" class="float-left">
+            <a href="#" id="toggleAdvanced" ><span class="icon-cog"></span>{{t 'uma.share.advanced'}}</a>
+
+            <div id="shareCounter">
+                <span class="icon-{{#if shareCount}}users{{else}}user{{/if}}"></span>
+                <span id="shareInfo">{{shareInfo}}</span>
+            </div>
+        </div>
+
+    </div>
+
 </div>

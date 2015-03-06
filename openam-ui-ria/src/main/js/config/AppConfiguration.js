@@ -49,7 +49,7 @@ define("config/AppConfiguration", [
                         ChangeSecurityDataDialog : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
                         ConfirmPasswordDialog : "org/forgerock/commons/ui/user/profile/ConfirmPasswordDialog",
                         DialogShare : "org/forgerock/openam/ui/uma/views/share/DialogShare",
-                        DialogRevokeAll : "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAll"
+                        DialogRevokeAllResources : "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources"
                     }
                 },
                 {

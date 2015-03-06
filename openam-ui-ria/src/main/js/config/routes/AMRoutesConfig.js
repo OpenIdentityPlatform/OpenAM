@@ -100,9 +100,9 @@ define("config/routes/AMRoutesConfig", [
             pattern: "uma/resources/"
         },
 
-        "dialogRevokeAll": {
+        "dialogRevokeAllResources": {
             base: "listResource",
-            dialog: "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAll",
+            dialog: "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources",
             role: "ui-user",
             url: /^uma\/resources\/$/,
             pattern: "uma/resources/"

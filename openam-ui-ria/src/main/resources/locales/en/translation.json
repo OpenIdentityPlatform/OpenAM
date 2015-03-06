@@ -227,6 +227,7 @@
             "actions" : "Actions",
             "complete" : "Complete",
             "revoke" : "Revoke",
+            "done" : "Done",
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS, all rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
@@ -401,7 +402,8 @@
                 "success": "Resource successfully shared",
                 "fail": "Failed to share resource"
             },
-            "notSpecifiedResource": "You have not specified a resource to share."
+            "notSpecifiedResource": "You have not specified a resource to share.",
+            "advanced" : "Advanced"
         },
         "resources": {
             "all": {

@@ -24,7 +24,7 @@
 
 /*global define, $, _ */
 
-define("org/forgerock/openam/ui/uma/views/share/BaseShare", [
+define( "org/forgerock/openam/ui/uma/views/share/BaseShare", [
         "org/forgerock/commons/ui/common/main/AbstractView",
         "org/forgerock/openam/ui/uma/views/share/CommonShare"
 ], function(AbstractView, CommonShare) {
@@ -36,13 +36,13 @@ define("org/forgerock/openam/ui/uma/views/share/BaseShare", [
 
             var self = this;
             self.shareView = new CommonShare();
-            self.shareView.element = "#umaInnerContent";
+            self.shareView.element = "#commonShare";
             self.shareView.noBaseTemplate = true;
             self.parentRender(function(){
                 self.data.resourceSet = {};
-                self.shareView.render(args, callback);
+                self.shareView.render([args], callback);
             }, callback);
-        } 
+        }
 
     });
 

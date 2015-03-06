@@ -24,7 +24,7 @@
 
 /*global define, $, _ */
 
-define( "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAll", [
+define( "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources", [
         "org/forgerock/commons/ui/common/components/Dialog",
         "org/forgerock/openam/ui/uma/views/share/CommonShare",
         "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
@@ -34,9 +34,9 @@ define( "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAll", [
         "org/forgerock/commons/ui/common/util/Constants"
 ], function(Dialog, CommonShare, UmaDelegate, Router, Configuration, EventManager, Constants) {
 
-    var DialogRevokeAll = Dialog.extend({
+    var DialogRevokeAllResources = Dialog.extend({
         baseTemplate:    "templates/common/DefaultBaseTemplate.html",
-        contentTemplate: "templates/uma/views/resource/DialogRevokeAll.html",
+        contentTemplate: "templates/uma/views/resource/DialogRevokeAllResources.html",
 
         events: {
             "click #revokeConfirm": "onRevokeConfirm",
@@ -69,5 +69,5 @@ define( "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAll", [
         }
     });
 
-    return new DialogRevokeAll();
+    return new DialogRevokeAllResources();
 });

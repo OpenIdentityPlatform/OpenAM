@@ -28,8 +28,9 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
         "org/forgerock/commons/ui/common/components/Dialog",
         "org/forgerock/openam/ui/uma/views/share/CommonShare",
         "org/forgerock/openam/ui/uma/views/resource/EditResource",
-        "org/forgerock/commons/ui/common/main/Router"
-], function(Dialog, CommonShare, editResourceView, router) {
+        "org/forgerock/commons/ui/common/main/Router",
+        "org/forgerock/openam/ui/uma/views/share/FooterShare"
+], function(Dialog, CommonShare, editResourceView, router, FooterShare) {
 
     var DialogShare = Dialog.extend({
         contentTemplate: "templates/common/EmptyTemplate.html",
@@ -37,8 +38,10 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
 
         events: {
             "click .dialogCloseCross": "saveThenClose",
-            "click input[name='close']": "saveThenClose"
+            "click #done": "saveThenClose"
         },
+
+        actions: [],
 
         render: function(args, callback) {
             $("#dialogs").hide();
@@ -47,8 +50,9 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
                 $("#dialogs").show();
                 this.shareView = new CommonShare();
                 this.shareView.baseTemplate= 'templates/common/DefaultBaseTemplate.html';
+                this.shareView.mode = 'append';
                 this.shareView.element = '#dialogs .dialogContent';
-                this.shareView.render(this.data.currentResourceSetId, callback);
+                this.shareView.render([this.data.currentResourceSetId, true], callback);
 
             }, this));
         },
@@ -75,6 +79,7 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
 
             this.close(e);
         }
+
     });
 
     return new DialogShare();
