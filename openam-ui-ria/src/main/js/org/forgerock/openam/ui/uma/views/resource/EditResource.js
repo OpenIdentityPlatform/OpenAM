@@ -56,6 +56,8 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
         },
         onShare: function(event) {
             event.preventDefault();
+            this.data.currentResourceSetId = this.model.id;
+
             EventManager.sendEvent(Constants.EVENT_SHOW_DIALOG,{
                 route: Router.configuration.routes.dialogShare,
                 // This is required because the dialog will otherwise try to automatically route the window to the base view
@@ -68,6 +70,14 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
             // Get the current id
             if(args && args[0]) { id = args[0]; }
 
+            /**
+             * Guard clause to check if model requires sync'ing/updating
+             * Reason: We do not know the id of the data we need until the render function is called with args,
+             * thus we can only check at this point if we have the correct model to render this view (the model
+             * might already contain the correct data).
+             * Behaviour: If the model does require sync'ing then we abort this render via the return and render
+             * will it invoked again when the model is updated
+             */
             if(this.syncModel(id)) { return; }
 
             /**

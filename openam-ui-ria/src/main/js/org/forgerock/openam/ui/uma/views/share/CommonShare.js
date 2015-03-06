@@ -50,7 +50,10 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
         },
         onParentModelSync: function(model, response) {
             // Create new UMA Policy object if one does not exist
-            if(!model.has('policy')) { model.set('policy', new UMAPolicy()); }
+            if(!model.has('policy')) {
+                model.set('policy', new UMAPolicy());
+                model.get('policy').createRequired = true;
+            }
 
             // Hardwire the policyID into the policy as it's ID
             model.get('policy').set('policyId', this.parentModel.id);
@@ -87,6 +90,14 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 args = args[0];
             }
 
+            /**
+             * Guard clause to check if model requires sync'ing/updating
+             * Reason: We do not know the id of the data we need until the render function is called with args,
+             * thus we can only check at this point if we have the correct model to render this view (the model
+             * might already contain the correct data).
+             * Behaviour: If the model does require sync'ing then we abort this render via the return and render
+             * will it invoked again when the model is updated
+             */
             if (this.syncParentModel(args)) { return; }
 
             this.data.name = this.parentModel.get('name');
@@ -199,7 +210,11 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             this.$el.find("#selectPermission select")[0].selectize.clear();
             this.$el.find('input#shareButton').prop('disabled', true);
 
-            this.renderSharedWith();
+            /**
+             * Just update the message, not the icon, because we're always adding shares and thus
+             * we're not going to be going back to the 'no shares' state
+             */
+            this.$el.find("span#shareInfo")[0].innerHTML = this.getShareInfo(this.getShareCount());
         },
         save: function() {
             var self = this,
@@ -213,6 +228,9 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             this.parentModel.get('policy').save()
             .done(function(response) {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
+
+                self.parentModel.get('policy').createRequired = false;
+
                 self.reset();
             })
             .fail(function() {

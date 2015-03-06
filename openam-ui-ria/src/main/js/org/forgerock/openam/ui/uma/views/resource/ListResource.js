@@ -50,7 +50,6 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
         },
 
         render: function(args, callback) {
-
             var self = this,
                 columns,
                 grid,
@@ -87,6 +86,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                         events: { "click": "share" },
                         share: function(e) {
                             self.data.currentResourceSetId = this.model.get('_id');
+
                             EventManager.sendEvent(Constants.EVENT_SHOW_DIALOG,{
                                 route: Router.configuration.routes.dialogShare,
                                 noViewChange: true

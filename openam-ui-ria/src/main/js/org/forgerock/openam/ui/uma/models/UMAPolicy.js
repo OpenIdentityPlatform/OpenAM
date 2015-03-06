@@ -41,8 +41,8 @@ define('org/forgerock/openam/ui/uma/models/UMAPolicy', [
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
             };
 
-            // FIXME: Issue due to us having an ID already, workaroud using #fakeCreate ATM
-            if(method.toLowerCase() === 'update' && model.fakeCreate === true) {
+            // FIXME: Issue due to us having an ID already, workaroud using #createRequired ATM
+            if(method.toLowerCase() === 'update' && model.createRequired === true) {
                 options = options || {};
                 options.headers = {};
                 options.headers["If-None-Match"] = "*";
