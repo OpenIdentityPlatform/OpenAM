@@ -90,6 +90,7 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4943" xlink:show="new">OPENAM-4943</link>: amUtilMsgs resource bundle missing from Fedlet distribution</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5040" xlink:show="new">OPENAM-5040</link>: ClusterStateService.checkServerUp() should get Input stream from connection</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5237" xlink:show="new">OPENAM-5237</link>: OAuth2 authorization consent page uses absolute URL in FORM tag</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5388" xlink:show="new">OPENAM-5388</link>: Missing policy actions after upgrading to OpenAM 12?</para></listitem>
   </itemizedlist>
  </section>
 
@@ -238,6 +239,9 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4340" xlink:show="new">OPENAM-4340</link>: Configurator is unable to handle special characters in passwords</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4346" xlink:show="new">OPENAM-4346</link>: Invalidating session on console in a multiserver setup fails if SFO is enabled</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4430" xlink:show="new">OPENAM-4430</link>: Upgrade wizard is out of date for other languages than EN</para></listitem>
+
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4432" xlink:show="new">OPENAM-4432</link>: OpenAM upgrade fails when there is IP address/DNS condition set in policy</para></listitem>
+
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4473" xlink:show="new">OPENAM-4473</link>: Couldn't find subschema errors in debug/Configuration</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4495" xlink:show="new">OPENAM-4495</link>: Agent profile attribute mapping does not allow to map the same profile attribute to different header names</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4496" xlink:show="new">OPENAM-4496</link>: REST sessions logout returns HTTP-403 Forbidden</para></listitem>
@@ -256,7 +260,9 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5237" xlink:show="new">OPENAM-5237</link>: OAuth2 authorization consent page uses absolute URL in FORM tag</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5243" xlink:show="new">OPENAM-5243</link>: REST HTTP codes are different for some actions in AM 11.0.2 and AM 12</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5321" xlink:show="new">OPENAM-5321</link>: Cross realm session upgrade not handled properly by XUI</para></listitem>
-   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5388" xlink:show="new">OPENAM-5388</link>: Missing policy actions after upgrading to OpenAM 12?</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5562" xlink:show="new">OPENAM-5562</link>: Users can't change password via XUI/REST API after OPENAM-3877 when using embedded</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5575" xlink:show="new">OPENAM-5575</link>: OpenAM install/upgrade page contains old year "Copyright © 2008-2014"</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5584" xlink:show="new">OPENAM-5584</link>: Proper function of session failover is disrupted by exceptions and browser refresh is needed</para></listitem>
   </itemizedlist>
  </section>
 </chapter>
