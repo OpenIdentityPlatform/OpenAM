@@ -313,7 +313,7 @@ public class ResourceSetRegistrationEndpointTest {
         verify(store).query(queryParametersCaptor.capture());
         QueryFilter<String> query = queryParametersCaptor.getValue();
         Map<String, String> params = query.accept(QUERY_PARAMS_EXTRACTOR, new HashMap<String, String>());
-        assertThat(params).containsExactly(
+        assertThat(params).contains(
                 entry(ResourceSetTokenField.CLIENT_ID, "CLIENT_ID"),
                 entry(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"));
 
