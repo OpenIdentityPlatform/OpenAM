@@ -33,48 +33,6 @@ define("org/forgerock/openam/ui/uma/util/UmaUtils", [
      */
     var obj = {};
 
-    obj.getResourceSet = function(uid, curResourceSet){
-
-        var promise = $.Deferred,
-            newPromise = $.Deferred;
-
-        if (curResourceSet && curResourceSet.uid === uid) {
-             return promise.apply().resolve(curResourceSet);
-        } else {
-            newPromise = umaDelegate.getResourceSetFromId(uid);
-            $.when(newPromise).done(function(resourceSet){
-                if (resourceSet) {
-                    resourceSet.id = uid;
-                    resourceSet.scopes = obj.processResourceScopes(resourceSet.scopes);
-                }
-            });
-        }
-
-        return newPromise;
-    };
-
-    obj.processResourceScopes = function(data){
-
-        var obj, scopes = [], temp;
-        _.each(data, function(scope){
-            obj = {};
-            if (_.isUrl(scope)){
-                // TODO: This should be a promise hitting the url not this string manipulation
-                temp = scope.split('/');
-                obj = {
-                    "displayName": temp[temp.length-1],
-                    "name" : scope,
-                    "icon_uri" : "http://www.example.com/icons/reading-glasses"
-                };
-            } else {
-                obj.name = scope;
-            }
-            scopes.push(obj);
-        });
-
-        return scopes;
-    };
-
     obj.getRealm = function() {
         return (conf.globalData.auth.realm !== '/' ) ? conf.globalData.auth.realm : "";
     };

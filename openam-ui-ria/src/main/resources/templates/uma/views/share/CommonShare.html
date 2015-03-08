@@ -5,6 +5,9 @@
 <div id="uma">
 
     <div class="policy-content clearfix" >
+
+        <div id="advancedView"></div>
+
         {{#if notFound}}
         <div class="striped-list" id="resourceList">
             <ul><li class="highlight-warning">{{t 'uma.share.notSpecifiedResource'}}</li></ul>
@@ -24,29 +27,14 @@
             </select>
         </div>
 
+        <!--<div id="selectAuthentication" class="float-left">
+            <label>Authentication method</label>
+        </div>-->
+
         <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class="button float-left" disabled/>
-
         {{/if}}
     </div>
 
-
-    <div id="footerShare">
-
-        {{#if dialog}}
-        <div id="footerActions" class="float-right">
-            <a class="button" href="#" id="done" >{{t 'common.form.done'}}</a>
-        </div>
-        {{/if}}
-
-        <div id="footerNav" class="float-left">
-            <a href="#" id="toggleAdvanced" ><span class="icon-cog"></span>{{t 'uma.share.advanced'}}</a>
-
-            <div id="shareCounter">
-                <span class="icon-{{#if shareCount}}users{{else}}user{{/if}}"></span>
-                <span id="shareInfo">{{shareInfo}}</span>
-            </div>
-        </div>
-
-    </div>
+    <div id="footerShare"></div>
 
 </div>

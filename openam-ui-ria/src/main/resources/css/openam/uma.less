@@ -450,22 +450,50 @@ body{
                 border-left: 2px solid grey;
                 padding-left: 11px;
                 margin-left: 10px;
-
-                #shareInfo {
-
-                    //font-style: italic;
-                }
             }
 
-            .icon-user, .icon-cog{
+            .icon-users, .icon-user, .icon-cog, .icon-lock{
                 font-size:13px;
                 padding-right:3px;
                 cursor:auto;
             }
         }
     }
-}
 
+    #advancedView {
+        overflow:hidden;
+        max-height:0;
+        opacity:0;
+        transition:max-height 500ms ease-out, opacity 500ms ease-in-out ;
+        margin-bottom:30px;
+        border: 1px solid lighten(@table-base-color, 45%);
+        border-bottom:none;
+    }
+
+    #selectAuthentication{
+        width:200px;
+        background-color:#ddd;
+        display:none;
+        margin-right:20px;
+        height:59px;
+    }
+
+    &.advanced-mode{
+
+        #advancedView{
+            max-height:500px;
+            opacity:1;
+            transition:max-height 500ms ease-out, opacity 500ms ease-in-out ;
+        }
+
+        #selectAuthentication{
+            display:block;
+            clear:left;
+        }
+
+    }
+
+}
 
 /* new submenu style */
 .menubar {

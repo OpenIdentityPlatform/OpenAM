@@ -38,5 +38,6 @@ define([
     "./views/resource/DialogRevokeAllResources",
     "./views/share/BaseShare",
     "./views/share/CommonShare",
-    "./views/share/DialogShare"
+    "./views/share/DialogShare",
+    "./views/share/FooterShare"
 ]);

@@ -31,8 +31,11 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     'org/forgerock/openam/ui/uma/models/UMAPolicy',
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermission',
     'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy',
-    "org/forgerock/openam/ui/uma/models/User"
-], function(AbstractView, Constants, EventManager, UMADelegate, UMAPolicy, UMAPolicyPermission, UMAResourceSetWithPolicy, User) {
+    "org/forgerock/openam/ui/uma/models/User",
+    "org/forgerock/openam/ui/uma/util/BackgridUtils",
+    "org/forgerock/openam/ui/uma/views/share/FooterShare",
+    "backgrid"
+], function(AbstractView, Constants, EventManager, UMADelegate, UMAPolicy, UMAPolicyPermission, UMAResourceSetWithPolicy, User, BackgridUtils, FooterShare, Backgrid) {
     var CommonShare = AbstractView.extend({
         initialize: function(options) {
             this.model = null;
@@ -71,10 +74,8 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 this.stopListening(this.parentModel);
 
                 this.parentModel = UMAResourceSetWithPolicy.findOrCreate( { _id: id} );
-
                 this.listenTo(this.parentModel, 'sync', this.onParentModelSync);
                 this.listenTo(this.parentModel, 'error', this.onParentModelError);
-
                 this.parentModel.fetch();
             }
 
@@ -82,7 +83,9 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
         },
 
         render: function(args, callback) {
-            var self = this;
+            var self = this,
+                collection,
+                grid;
 
             // FIXME: Resolve unknown issue with args appearing as an Array
             if(args instanceof Array) {
@@ -102,32 +105,50 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
 
             this.data.name = this.parentModel.get('name');
             this.data.scopes = this.parentModel.get('scopes').toJSON();
-            this.data.shareCount = self.getShareCount(); // returns null (not 0) if empty.
-            this.data.shareInfo = self.getShareInfo(this.data.shareCount);
+            
+            collection = this.parentModel.get('policy').get('permissions');
+            grid = new Backgrid.Grid({
+                columns: [
+                {
+                    name: "subject",
+                    label: $.t("uma.resources.show.grid.0"),
+                    cell: BackgridUtils.UnversalIdToUsername,
+                    editable: false
+                },
+                {
+                    name: "scopes",
+                    label: $.t("uma.resources.show.grid.2"),
+                    cell: Backgrid.Cell.extend({
+                        render:function(){
+                            var formatted = this.model.get("scopes").join(', ');
+                            this.$el.empty();
+                            this.$el.append(formatted);
+                            this.delegateEvents();
+                            return this;
+                        }
+
+                    }),
+                    editable: false
+                }],
+                collection: collection,
+                emptyText: $.t("uma.all.grid.empty")
+            });
+
+            // FIXME: Re-enable filtering and pagination
+            // paginator = new Backgrid.Extension.Paginator({
+            //     collection: this.model.get('policy').get('permissions'),
+            //     windowSize: 3
+            // });
 
             this.parentRender(function() {
                 self.renderUserOptions();
                 self.renderPermissionOptions();
+                self.renderShareFooter(callback);
+                self.$el.find("#advancedView").append(grid.render().el);
+                // FIXME: Re-enable filtering and pagination
+                // self.$el.find("#paginationContainer").append(paginator.render().el);
             });
         },
-
-        getShareCount: function() {
-            var count,
-                policy = this.parentModel.get('policy');
-            if (policy && policy.get('permissions')){
-                count =  policy.get('permissions').length;
-            }
-            return count;
-        },
-
-        getShareInfo: function(count) {
-            var shareInfo = $.t("uma.share.info", { context : "none" } );
-            if (count){
-                shareInfo =  $.t("uma.share.info", { count: count });
-            }
-            return shareInfo;
-        },
-
         renderPermissionOptions: function() {
             var self = this;
 
@@ -140,7 +161,6 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 onChange: function(values) {
                     // TODO: This is not ideal, reset from defaults?
                     values = values || [];
-
                     if(self.model) { self.model.set('scopes', values); }
                 }
             });
@@ -210,11 +230,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             this.$el.find("#selectPermission select")[0].selectize.clear();
             this.$el.find('input#shareButton').prop('disabled', true);
 
-            /**
-             * Just update the message, not the icon, because we're always adding shares and thus
-             * we're not going to be going back to the 'no shares' state
-             */
-            this.$el.find("span#shareInfo")[0].innerHTML = this.getShareInfo(this.getShareCount());
+            this.renderShareFooter();
         },
         save: function() {
             var self = this,
@@ -230,7 +246,6 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
 
                 self.parentModel.get('policy').createRequired = false;
-
                 self.reset();
             })
             .fail(function() {
@@ -238,9 +253,16 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             });
         },
 
+        renderShareFooter: function(callback){
+            var policy = this.parentModel.get('policy'),
+                permissionCount = policy ? policy.get('permissions').length : 0;
+            FooterShare.render(permissionCount, callback);
+        },
+
         onToggleAdvanced: function(e) {
             e.preventDefault();
-            console.log('onToggleAdvanced');
+            this.$el.find('#uma').toggleClass("advanced-mode");
+            this.$el.find('#toggleAdvanced').blur();
         }
     });
 

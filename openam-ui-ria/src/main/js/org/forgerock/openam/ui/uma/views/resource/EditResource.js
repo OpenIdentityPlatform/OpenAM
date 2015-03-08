@@ -52,7 +52,10 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
             this.render();
         },
         onRevokeAll: function() {
-            this.model.get('policy').destroy();
+            var policy = this.model.get('policy');
+            if (policy){
+                policy.destroy();
+            }
         },
         onShare: function(event) {
             event.preventDefault();
