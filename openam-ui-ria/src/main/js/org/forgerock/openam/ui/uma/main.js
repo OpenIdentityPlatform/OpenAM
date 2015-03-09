@@ -40,5 +40,5 @@ define([
     "./views/share/BaseShare",
     "./views/share/CommonShare",
     "./views/share/DialogShare",
-    "./views/share/FooterShare"
+    "./views/share/ShareCounter"
 ]);

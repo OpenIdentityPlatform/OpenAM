@@ -32,7 +32,7 @@ define( "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources", [
         "org/forgerock/commons/ui/common/main/Configuration",
         "org/forgerock/commons/ui/common/main/EventManager",
         "org/forgerock/commons/ui/common/util/Constants"
-], function(Dialog, CommonShare, UmaDelegate, Router, Configuration, EventManager, Constants) {
+], function(Dialog) {
 
     var DialogRevokeAllResources = Dialog.extend({
         baseTemplate:    "templates/common/DefaultBaseTemplate.html",
@@ -43,12 +43,14 @@ define( "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources", [
             "click #revokeCancel":  "close"
         },
 
-        actions: [
-            { type: "button", name: "Yes", id: "revokeConfirm"},
-            { type: "button", name: "No",  id: "revokeCancel"}
-        ],
+        render: function(confirmCallback, callback) {
 
-        render: function(args, callback) {
+            this.actions =  [
+                { type: "button", name: $.t("common.form.ok"), id: "revokeConfirm"},
+                { type: "button", name: $.t("common.form.cancel"),  id: "revokeCancel"}
+            ];
+
+            this.confirmCallback = confirmCallback;
             $("#dialogs").hide();
             this.show(_.bind(function() {
                 $("#dialogs").show();
@@ -56,17 +58,10 @@ define( "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources", [
             }, this));
         },
 
-        // Override Dialog method
-        onRevokeConfirm: function(e) {
-            var self = this, msg = {};
-            UmaDelegate.revokeAllResources().done(function(){
-                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllResourcesSuccess");
-                self.close();
-            }).fail(function(error){
-                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllResourcesFail");
-                self.close();
-            });
-        }
+        onRevokeConfirm: function(e){
+            this.close(e);
+            this.confirmCallback();
+        }
     });
 
     return new DialogRevokeAllResources();

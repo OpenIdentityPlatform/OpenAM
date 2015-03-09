@@ -228,6 +228,7 @@
             "complete" : "Complete",
             "revoke" : "Revoke",
             "done" : "Done",
+            "ok" : "OK",
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS, all rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
@@ -428,7 +429,8 @@
                 "revokeAllPoliciesSuccess" : "All access successfully revoked for your resource",
                 "revokeAllPoliciesFail" : "We have been unable revoke all access to your resource. Please contact your Administrator",
                 "revokePolicySuccess" : "Access successfully revoked for your resource",
-                "revokePolicyFail" : "We have been unable revoke access to your resource. Please contact your Administrator"
+                "revokePolicyFail" : "We have been unable revoke access to your resource. Please contact your Administrator",
+                "revokeAllResourcesMessage": "Are you sure you want to revoke all access? Selecting OK will not remove your resources, but will remove all the shares within your resources."
             }
         },
         "history": {

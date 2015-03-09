@@ -38,9 +38,9 @@ define("org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllPolicies", [
             "click #revokeCancel":  "close"
         },
         render: function(id, callback) {
-            this.action = [
-                { type: "button", name: $.t("common.form.cancel"),  id: "revokeCancel"},
-                { type: "button", name: $.t("common.form.ok"), id: "revokeConfirm"}
+            this.actions = [
+                { type: "button", name: $.t("common.form.ok"), id: "revokeConfirm"},
+                { type: "button", name: $.t("common.form.cancel"),  id: "revokeCancel"}
             ];
             $("#dialogs").hide();
             this.show(_.bind(function() {
@@ -65,4 +65,3 @@ define("org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllPolicies", [
 
     return new DialogRevokeAllPolicies();
 });
-

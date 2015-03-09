@@ -23,14 +23,14 @@
  */
 
 /*global $, _, define*/
-define("org/forgerock/openam/ui/uma/views/share/FooterShare", [
+define("org/forgerock/openam/ui/uma/views/share/ShareCounter", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/Constants"
 ], function(AbstractView, Constants) {
-    var FooterShare = AbstractView.extend({
+    var ShareCounter = AbstractView.extend({
 
-        template: "templates/uma/views/share/FooterShare.html",
-        element: "#footerShare",
+        template: "templates/uma/views/share/ShareCounter.html",
+        element: "#shareCounter",
 
         render: function(count, callback) {
 
@@ -45,11 +45,8 @@ define("org/forgerock/openam/ui/uma/views/share/FooterShare", [
 
 
         getShareInfo: function(count) {
-            var shareInfo = $.t("uma.share.info", { context : "none" } );
-            if (count){
-                shareInfo =  $.t("uma.share.info", { count: count });
-            }
-            return shareInfo;
+            var options = count ? { count: count } : { context: "none" };
+            return $.t("uma.share.info", options);
         },
 
         getShareIcon: function(count) {
@@ -63,5 +60,5 @@ define("org/forgerock/openam/ui/uma/views/share/FooterShare", [
         }
     });
 
-    return new FooterShare();
+    return new ShareCounter();
 });

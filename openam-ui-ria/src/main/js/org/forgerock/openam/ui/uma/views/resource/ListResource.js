@@ -25,15 +25,18 @@
 /*global define, $, _, Backgrid, Backbone*/
 
 define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/uma/delegates/UMADelegate",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
     "org/forgerock/openam/ui/uma/util/UmaUtils",
+    "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources",
     "backgrid"
-], function(AbstractView, Configuration, EventManager, Constants, Router, BackgridUtils, UmaUtils, Backgrid) {
+], function(MessageManager, AbstractView, Configuration, EventManager, Router, Constants, UMADelegate, BackgridUtils, UMAUtils, DialogRevokeAllResources, Backgrid) {
 
     var ListResource = AbstractView.extend({
         template: "templates/uma/views/resource/ListResource.html",
@@ -43,10 +46,17 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
             'click a#revokeAll': 'onRevokeAll'
         },
         onRevokeAll: function() {
-            EventManager.sendEvent(Constants.EVENT_SHOW_DIALOG,{
-                route: Router.configuration.routes.dialogRevokeAllResources,
-                noViewChange: true
-            });
+
+            var confirmCallBack = function(){
+                UMADelegate.revokeAllResources().done(function(){
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllResourcesSuccess");
+                    }).fail(function(error){
+                        MessageManager.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
+                    });
+                };
+
+            DialogRevokeAllResources.render(confirmCallBack);
+
         },
 
         render: function(args, callback) {
@@ -55,7 +65,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                 grid,
                 paginator,
                 ResourceSetCollection,
-                realm = UmaUtils.getRealm();
+                realm = UMAUtils.getRealm();
 
             ResourceSetCollection = Backbone.PageableCollection.extend({
                 url: "/" + Constants.context + "/json" + realm + "/users/" + Configuration.loggedUser.username + '/oauth2/resourcesets',

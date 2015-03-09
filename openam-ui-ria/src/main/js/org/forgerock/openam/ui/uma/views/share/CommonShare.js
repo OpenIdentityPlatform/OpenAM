@@ -25,17 +25,17 @@
 /*global $, _, define*/
 define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
     'org/forgerock/openam/ui/uma/models/UMAPolicy',
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermission',
     'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy',
     "org/forgerock/openam/ui/uma/models/User",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
-    "org/forgerock/openam/ui/uma/views/share/FooterShare",
+    "org/forgerock/openam/ui/uma/views/share/ShareCounter",
     "backgrid"
-], function(AbstractView, Constants, EventManager, UMADelegate, UMAPolicy, UMAPolicyPermission, UMAResourceSetWithPolicy, User, BackgridUtils, FooterShare, Backgrid) {
+], function(AbstractView, EventManager, Constants, UMADelegate, UMAPolicy, UMAPolicyPermission, UMAResourceSetWithPolicy, User, BackgridUtils, ShareCounter, Backgrid) {
     var CommonShare = AbstractView.extend({
         initialize: function(options) {
             this.model = null;
@@ -145,7 +145,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             this.parentRender(function() {
                 self.renderUserOptions();
                 self.renderPermissionOptions();
-                self.renderShareFooter(callback);
+                self.renderShareCounter(callback);
                 self.$el.find("#advancedView").append(grid.render().el);
                 // FIXME: Re-enable filtering and pagination
                 // self.$el.find("#paginationContainer").append(paginator.render().el);
@@ -240,7 +240,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             this.$el.find("#selectPermission select")[0].selectize.clear();
             this.$el.find('input#shareButton').prop('disabled', true);
 
-            this.renderShareFooter();
+            this.renderShareCounter();
         },
         save: function() {
             var self = this,
@@ -254,7 +254,6 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             this.parentModel.get('policy').save()
             .done(function(response) {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
-
                 self.parentModel.get('policy').createRequired = false;
                 self.reset();
             })
@@ -263,10 +262,10 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             });
         },
 
-        renderShareFooter: function(callback){
+        renderShareCounter: function(callback){
             var policy = this.parentModel.get('policy'),
                 permissionCount = policy ? policy.get('permissions').length : 0;
-            FooterShare.render(permissionCount, callback);
+                ShareCounter.render(permissionCount, callback);
         },
 
         onToggleAdvanced: function(e) {

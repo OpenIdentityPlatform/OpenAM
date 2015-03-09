@@ -27,14 +27,12 @@
 define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
     "org/forgerock/openam/ui/uma/util/UmaUtils",
     "backgrid"
 
-], function(AbstractView, conf, eventManager, uiUtils, constants, backgridUtils, umaUtils, Backgrid) {
+], function(AbstractView, Configuration, Constants, BackgridUtils, UMAUtils, Backgrid) {
     var HistoryView = AbstractView.extend({
         template: "templates/uma/views/history/ListHistory.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
@@ -45,10 +43,10 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                 collection,
                 grid,
                 paginator,
-                realm = umaUtils.getRealm();
+                realm = UMAUtils.getRealm();
 
             collection = new (Backbone.PageableCollection.extend({
-                url: "/" + constants.context + "/json" + realm + "/users/" + conf.loggedUser.username + '/uma/auditHistory',
+                url: "/" + Constants.context + "/json" + realm + "/users/" + Configuration.loggedUser.username + '/uma/auditHistory',
                 state: {
                     pageSize: 10,
                     sortKey: "eventTime",
@@ -56,28 +54,28 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                 },
                 queryParams: {
                     pageSize: "_pageSize",
-                    _sortKeys: backgridUtils.sortKeys,
-                    _queryFilter: backgridUtils.queryFilter,
-                    _pagedResultsOffset: backgridUtils.pagedResultsOffset
+                    _sortKeys: BackgridUtils.sortKeys,
+                    _queryFilter: BackgridUtils.queryFilter,
+                    _pagedResultsOffset: BackgridUtils.pagedResultsOffset
                 },
-                parseState: backgridUtils.parseState,
-                parseRecords: backgridUtils.parseRecords,
-                sync: backgridUtils.sync
+                parseState: BackgridUtils.parseState,
+                parseRecords: BackgridUtils.parseRecords,
+                sync: BackgridUtils.sync
             }))();
 
             grid = new Backgrid.Grid({
                 columns: [{
                     name: "requestingPartyId",
                     label: $.t("uma.history.grid.header.0"),
-                    headerCell: backgridUtils.FilterHeaderCell,
+                    headerCell: BackgridUtils.FilterHeaderCell,
                     cell: 'string',
                     editable: false,
                     sortType: "toggle"
                 }, {
                     name: "resourceSetName",
                     label: $.t("uma.history.grid.header.1"),
-                    headerCell: backgridUtils.FilterHeaderCell,
-                    cell: backgridUtils.UriExtCell,
+                    headerCell: BackgridUtils.FilterHeaderCell,
+                    cell: BackgridUtils.UriExtCell,
                     href: function(rawValue, formattedValue, model){
                         return "#uma/resources/" + encodeURIComponent(model.get('resourceSetId'));
                     },
@@ -97,7 +95,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                 }, {
                     name: "eventTime",
                     label: $.t("uma.history.grid.header.3"),
-                    cell: backgridUtils.DatetimeAgoCell,
+                    cell: BackgridUtils.DatetimeAgoCell,
                     editable: false,
                     sortType: "toggle"
                 }],
@@ -105,7 +103,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                 collection: collection
             });
 
-            collection.on("backgrid:sort", backgridUtils.doubleSortFix);
+            collection.on("backgrid:sort", BackgridUtils.doubleSortFix);
 
             paginator = new Backgrid.Extension.Paginator({
                 collection: collection,

@@ -307,8 +307,6 @@ body{
             }
 
             td {
-                // Required for tooltips
-                overflow:visible;
                 border-bottom: 1px solid lighten(@table-base-color, 45%);
 
                 a {
@@ -529,6 +527,16 @@ body{
 
 #dialog-background.show {
     opacity: 0.5;
+}
+
+.uma-dialog {
+
+    max-width:300px;
+
+    h1 {
+        font-weight: normal;
+        padding: 0 0 10px;
+    }
 }
 
 /* enable responsive layout*/

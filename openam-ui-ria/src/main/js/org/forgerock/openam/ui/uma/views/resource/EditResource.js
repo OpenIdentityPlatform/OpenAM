@@ -61,7 +61,6 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
         onShare: function(event) {
             event.preventDefault();
             this.data.currentResourceSetId = this.model.id;
-
             EventManager.sendEvent(Constants.EVENT_SHOW_DIALOG,{
                 route: Router.configuration.routes.dialogShare,
                 // This is required because the dialog will otherwise try to automatically route the window to the base view
@@ -230,12 +229,9 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
 
             if(syncRequired) {
                 this.stopListening(this.model);
-
                 this.model = UMAResourceSetWithPolicy.findOrCreate( { _id: id} );
-
                 this.listenTo(this.model, 'sync', this.onModelSync);
                 this.listenTo(this.model, 'error', this.onModelError);
-
                 this.model.fetch();
             }
 
