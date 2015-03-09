@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -30,8 +30,9 @@
 
 define("config/process/AMConfig", [
     "org/forgerock/openam/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/EventManager"
-], function(constants, eventManager) {
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function(constants, eventManager, uiUtils) {
     var obj = [
         {
             startEvent: constants.EVENT_LOGOUT,
@@ -43,16 +44,28 @@ define("config/process/AMConfig", [
                 "org/forgerock/commons/ui/common/main/SessionManager"
             ],
             processDescription: function(event, router, conf, sessionManager) {
+                var argsURLFragment = event ? (event.args ? event.args[0] : '') : '',
+                    urlParams = uiUtils.convertQueryParametersToJSON(argsURLFragment),
+                    gotoURL = urlParams.goto;
+
                 sessionManager.logout(function() {
                     conf.setProperty('loggedUser', null);
-                    eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.loggedOut });
                     eventManager.sendEvent(constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
                     delete conf.gotoURL;
+                    if (gotoURL) {
+                        uiUtils.setUrl(decodeURIComponent(gotoURL));
+                    } else {
+                        eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.loggedOut });
+                    }
                 }, function(){
                     conf.setProperty('loggedUser', null);
                     eventManager.sendEvent(constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unauthorized");
-                    eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.login });
+                    if (gotoURL) {
+                        uiUtils.setUrl(decodeURIComponent(gotoURL));
+                    } else {
+                        eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.login });
+                    }
                 });
             }
         },
