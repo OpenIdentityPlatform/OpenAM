@@ -25,13 +25,8 @@
 /*global define, $, _ */
 
 define("org/forgerock/openam/ui/uma/views/subject/ListSubjects", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/uma/delegates/UmaDelegate"
-], function(AbstractView, conf, eventManager, uiUtils, constants, umaDelegate) {
+    "org/forgerock/commons/ui/common/main/AbstractView"
+], function(AbstractView) {
 
     var ListSubjects = AbstractView.extend({
         template: "templates/uma/views/subject/ListSubects.html",

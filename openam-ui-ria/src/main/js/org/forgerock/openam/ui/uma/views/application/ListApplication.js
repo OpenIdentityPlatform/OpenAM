@@ -25,21 +25,17 @@
 /*global define, $, _ */
 
 define("org/forgerock/openam/ui/uma/views/application/ListApplication", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/uma/delegates/UmaDelegate"
-], function(AbstractView, conf, eventManager, uiUtils, constants, umaDelegate) {
+    "org/forgerock/commons/ui/common/main/AbstractView"
+], function(AbstractView) {
 
     var ListApplication = AbstractView.extend({
         template: "templates/uma/views/application/ListApplication.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: { },
         render: function(args, callback) {
-            var self = this;
-            self.parentRender();
+            this.parentRender(function(){
+                if(callback){callback();}
+            });
         }
 
     });

@@ -30,8 +30,8 @@ define('org/forgerock/openam/ui/uma/models/UMAPolicyPermission', [
     return Backbone.RelationalModel.extend({
         idAttribute: "subject",
         validate: function(attributes, options) {
-            if(!attributes.subject) { return "no subject"; }
-            if(!attributes.scopes || !attributes.scopes.length) { return "no scopes"; }
+            if (!attributes.subject) { return "no subject"; }
+            if (!attributes.scopes || !attributes.scopes.length) { return "no scopes"; }
         }
     });
 });

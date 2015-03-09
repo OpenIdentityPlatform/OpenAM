@@ -27,7 +27,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
+    "org/forgerock/openam/ui/uma/delegates/UMADelegate",
     'org/forgerock/openam/ui/uma/models/UMAPolicy',
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermission',
     'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy',

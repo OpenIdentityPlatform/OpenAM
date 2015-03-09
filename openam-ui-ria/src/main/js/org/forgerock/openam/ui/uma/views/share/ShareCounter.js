@@ -24,9 +24,8 @@
 
 /*global $, _, define*/
 define("org/forgerock/openam/ui/uma/views/share/ShareCounter", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/util/Constants"
-], function(AbstractView, Constants) {
+    "org/forgerock/commons/ui/common/main/AbstractView"
+], function(AbstractView) {
     var ShareCounter = AbstractView.extend({
 
         template: "templates/uma/views/share/ShareCounter.html",

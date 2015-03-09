@@ -25,11 +25,11 @@
 /*global define Backgrid, Backbone, _, $*/
 
 define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/main/Router",
     "backgrid",
-    "moment"
-], function (uiUtils, router, Backgrid, moment) {
+    "moment",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function (Backgrid, moment, Router, UIUtils) {
     /**
      * @exports org/forgerock/openam/ui/uma/util/BackgridUtils
      */
@@ -79,7 +79,7 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
     obj.TemplateCell = Backgrid.Cell.extend({
         className: 'template-cell',
         render: function () {
-            uiUtils.renderTemplate(this.template, this.$el);
+            UIUtils.renderTemplate(this.template, this.$el);
             this.delegateEvents();
 
             return this;
@@ -113,7 +113,7 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
         gotoUrl: function(e){
             e.preventDefault();
             var href = $(e.currentTarget).data('href');
-            router.navigate( href, {trigger: true});
+            Router.navigate( href, {trigger: true});
         }
 
     });

@@ -42,7 +42,7 @@ define('org/forgerock/openam/ui/uma/models/UMAPolicy', [
             };
 
             // FIXME: Issue due to us having an ID already, workaroud using #createRequired ATM
-            if(method.toLowerCase() === 'update' && model.createRequired === true) {
+            if (method.toLowerCase() === 'update' && model.createRequired === true) {
                 options = options || {};
                 options.headers = {};
                 options.headers["If-None-Match"] = "*";

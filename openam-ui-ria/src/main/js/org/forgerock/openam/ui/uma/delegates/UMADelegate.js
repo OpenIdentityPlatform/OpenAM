@@ -28,11 +28,11 @@
 
 /*global define, _*/
 
-define("org/forgerock/openam/ui/uma/delegates/UmaDelegate", [
+define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
+    "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/AbstractDelegate"
-], function (Configuration, Constants, AbstractDelegate) {
+    "org/forgerock/commons/ui/common/util/Constants"
+], function (AbstractDelegate, Configuration, Constants) {
 
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json");
 

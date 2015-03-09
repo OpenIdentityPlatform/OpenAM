@@ -24,17 +24,16 @@
 
 /*global define Backgrid Backbone _ $*/
 
-define("org/forgerock/openam/ui/uma/util/UmaUtils", [
-  "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
+define("org/forgerock/openam/ui/uma/util/UMAUtils", [
   "org/forgerock/commons/ui/common/main/Configuration"
-], function (umaDelegate, conf) {
+], function (Configuration) {
     /**
      * @exports org/forgerock/openam/ui/uma/util/UmaUtils
      */
     var obj = {};
 
     obj.getRealm = function() {
-        return (conf.globalData.auth.realm !== '/' ) ? conf.globalData.auth.realm : "";
+        return (Configuration.globalData.auth.realm !== '/' ) ? Configuration.globalData.auth.realm : "";
     };
 
     return obj;

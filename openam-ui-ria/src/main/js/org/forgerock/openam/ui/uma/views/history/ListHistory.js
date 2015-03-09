@@ -29,7 +29,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
-    "org/forgerock/openam/ui/uma/util/UmaUtils",
+    "org/forgerock/openam/ui/uma/util/UMAUtils",
     "backgrid"
 
 ], function(AbstractView, Configuration, Constants, BackgridUtils, UMAUtils, Backgrid) {

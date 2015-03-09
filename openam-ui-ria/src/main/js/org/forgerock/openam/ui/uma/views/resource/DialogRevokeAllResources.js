@@ -27,7 +27,7 @@
 define( "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources", [
         "org/forgerock/commons/ui/common/components/Dialog",
         "org/forgerock/openam/ui/uma/views/share/CommonShare",
-        "org/forgerock/openam/ui/uma/delegates/UmaDelegate",
+        "org/forgerock/openam/ui/uma/delegates/UMADelegate",
         "org/forgerock/commons/ui/common/main/Router",
         "org/forgerock/commons/ui/common/main/Configuration",
         "org/forgerock/commons/ui/common/main/EventManager",

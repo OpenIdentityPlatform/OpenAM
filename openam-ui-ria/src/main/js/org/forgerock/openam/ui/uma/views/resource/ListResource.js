@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
-    "org/forgerock/openam/ui/uma/util/UmaUtils",
+    "org/forgerock/openam/ui/uma/util/UMAUtils",
     "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources",
     "backgrid"
 ], function(MessageManager, AbstractView, Configuration, EventManager, Router, Constants, UMADelegate, BackgridUtils, UMAUtils, DialogRevokeAllResources, Backgrid) {
@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
 
         events: {
-            'click a#revokeAll': 'onRevokeAll'
+            'click a#revokeAll': 'onRevokeAll:not(.disabled)'
         },
         onRevokeAll: function() {
 
@@ -83,7 +83,14 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                 },
 
                 parseState: BackgridUtils.parseState,
-                parseRecords: BackgridUtils.parseRecords,
+                parseRecords: function(data, options){
+                    if(data.result.length === 0){
+                        self.$el.find("a#revokeAll").addClass("disabled");
+                    } else {
+                        self.$el.find("a#revokeAll").removeClass("disabled");
+                    }
+                    return data.result;
+                },
                 sync: BackgridUtils.sync
             });
 

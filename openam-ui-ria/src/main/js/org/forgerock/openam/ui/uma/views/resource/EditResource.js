@@ -108,19 +108,11 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
             RevokeCell = BackgridUtils.TemplateCell.extend({
                 template: "templates/uma/backgrid/cell/RevokeCell.html",
                 events: {
-                    "click #revoke": "revoke",
-                    "click #save":   "save",
-                    "click #cancel": "cancel"
+                    "click #revoke": "revoke"
                 },
                 revoke: function(event) {
                     self.model.get('policy').get('permissions').remove(this.model);
                     self.model.get('policy').save();
-                },
-                save: function(event) {
-                    // TODO: Might not be needed as the view is changing for the new wireframes
-                },
-                cancel: function(event) {
-                    // TODO: Might not be needed as the view is changing for the new wireframes
                 }
             });
 

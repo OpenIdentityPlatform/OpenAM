@@ -27,9 +27,8 @@
 define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
         "org/forgerock/commons/ui/common/components/Dialog",
         "org/forgerock/openam/ui/uma/views/share/CommonShare",
-        "org/forgerock/openam/ui/uma/views/resource/EditResource",
-        "org/forgerock/commons/ui/common/main/Router"
-], function(Dialog, CommonShare, editResourceView, router) {
+        "org/forgerock/openam/ui/uma/views/resource/EditResource"
+], function(Dialog, CommonShare, EditResource) {
 
     var DialogShare = Dialog.extend({
         contentTemplate: "templates/common/EmptyTemplate.html",
@@ -70,12 +69,12 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
 
         saveThenClose: function(e){
             //TODO :Add save code here
-            if (editResourceView.data && editResourceView.data.userPolicies) {
-                editResourceView.data.userPolicies.fetch({reset: true, processData: false});
+            if (EditResource.data && EditResource.data.userPolicies) {
+                EditResource.data.userPolicies.fetch({reset: true, processData: false});
             }
 
-            // TODO :Not sure if removing the route below breaks the reloading of data in the editResourceView.
-            // If so we need to reload the correct parent, which is not always editResourceView.
+            // TODO :Not sure if removing the route below breaks the reloading of data in the EditResource.
+            // If so we need to reload the correct parent, which is not always EditResource.
             // router.routeTo( router.configuration.routes.editResource, {args: [this.data.resourceSet.id], trigger: true});
 
             this.close(e);
