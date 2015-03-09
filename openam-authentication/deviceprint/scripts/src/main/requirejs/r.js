@@ -5,6 +5,13 @@
  */
 
 /*
+ * This file has been modified by ForgeRock to fix the now missing, previously deprecated,
+ * path.existsSync in nodejs.
+ *
+ * Portions Copyright 2015 ForgeRock AS.
+ */
+
+/*
  * This is a bootstrap script to allow running RequireJS in the command line
  * in either a Java/Rhino or Node environment. It is modified by the top-level
  * dist.js file to inject other files to completely enable this file. It is
@@ -2253,7 +2260,7 @@ var requirejs, require, define;
         //Indicate a the module is in process of loading.
         context.scriptCount += 1;
 
-        if (path.existsSync(url)) {
+        if (fs.existsSync ? fs.existsSync(url) : path.existsSync(url)) {
             contents = fs.readFileSync(url, 'utf8');
 
             contents = req.makeNodeWrapper(contents);
