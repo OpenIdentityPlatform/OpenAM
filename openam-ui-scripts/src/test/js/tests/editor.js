@@ -25,7 +25,7 @@
 /*global require, define, QUnit, $ */
 
 define([
-    "org/forgerock/openam/ui/editor/ScriptListView"
+    "org/forgerock/openam/ui/editor/views/ScriptListView"
 ], function (scriptListView) {
     return {
         executeAll: function () {
@@ -35,7 +35,7 @@ define([
                 $('qunit-fixture').append(scriptListView.$el);
 
                 scriptListView.render([], function () {
-                    equal(scriptListView.$el.find('.container').text().trim(), 'List All Scripts', 'Tests work');
+                    equal(scriptListView.$el.find('.backgrid').length, 1, 'Backgrid renders');
                     start();
                 });
             });

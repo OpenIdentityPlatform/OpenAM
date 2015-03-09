@@ -220,6 +220,16 @@
         }
     },
     "scripts": {
+        "grid": {
+            "filterBy": "Filter by __value__",
+            "noResults": "No results to display"
+        },
 
+        "list": {
+            "title": "Scripts List",
+            "addNew": "Add New Script",
+            "deleteSelected": "Delete Selected",
+            "grid": ["Name", "Context", "Language", "Script"]
+        }
     }
 }

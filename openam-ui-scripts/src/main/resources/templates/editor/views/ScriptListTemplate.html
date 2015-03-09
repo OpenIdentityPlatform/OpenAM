@@ -1,0 +1,24 @@
+<div class="container">
+    <div class="page-header">
+        <h1>{{t "scripts.list.title"}}</h1>
+    </div>
+
+    <div class="btn-toolbar" role="toolbar" aria-label="toolbar">
+
+        <div class="btn-group" role="group" aria-label="add script">
+            <a href="#edit/">
+                <button type="button" class="btn btn-primary"><span class="fa fa-plus"></span>{{t "scripts.list.addNew"}}</button>
+            </a>
+        </div>
+
+        <div class="btn-group" role="group" aria-label="delete script">
+            <a href="#list/">
+                <button type="button" class="btn btn-danger" disabled><span class="fa fa-close"></span>{{t "scripts.list.deleteSelected"}}</button>
+            </a>
+        </div>
+
+    </div>
+
+    <div id="backgridContainer"></div>
+    <div id="paginationContainer"></div>
+</div>

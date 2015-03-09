@@ -32,5 +32,7 @@ define([
     "./login/LoginHelper",
     "./login/SessionDelegate",
 
-    "./ScriptListView"
+    "./util/BackgridUtils",
+
+    "./views/ScriptListView"
 ]);

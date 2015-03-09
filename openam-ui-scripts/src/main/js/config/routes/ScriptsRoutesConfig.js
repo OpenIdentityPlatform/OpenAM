@@ -27,7 +27,7 @@
 define("config/routes/ScriptsRoutesConfig", [], function () {
     return {
         "listScripts": {
-            view: "org/forgerock/openam/ui/editor/ScriptListView",
+            view: "org/forgerock/openam/ui/editor/views/ScriptListView",
             url: "list",
             role: "ui-admin"
         }

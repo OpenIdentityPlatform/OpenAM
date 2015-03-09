@@ -27,31 +27,8 @@ module.exports = function (grunt) {
         destination: process.env.OPENAM_HOME,
         forgerockui: process.env.FORGEROCK_UI_SRC,
         sync: {
-            editor: {
+            source_to_test: {
                 files: [
-                    // copy source files to tomcat
-                    {
-                        cwd: '<%= forgerockui %>/forgerock-ui-commons/src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/scripts'
-                    },
-                    {
-                        cwd: '<%= forgerockui %>/forgerock-ui-commons/src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/scripts'
-                    },
-                    {
-                        cwd: 'src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/scripts'
-                    },
-                    {
-                        cwd: 'src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/scripts'
-                    },
-
-                    // copy source files to test folders
                     {
                         cwd: 'target/dependency',
                         src: ['**'],
@@ -84,8 +61,56 @@ module.exports = function (grunt) {
                     }
                 ],
                 verbose: true
+            },
+
+            source_css_to_test: {
+                files: [
+                    {
+                        cwd: 'target/www',
+                        src: ['css/**/*.css'],
+                        dest: 'target/test'
+                    }
+                ],
+                verbose: true
+            },
+
+            source_to_tomcat: {
+                files: [
+                    {
+                        cwd: '<%= forgerockui %>/forgerock-ui-commons/src/main/js',
+                        src: ['**/*'],
+                        dest: '<%= destination %>/scripts'
+                    },
+                    {
+                        cwd: '<%= forgerockui %>/forgerock-ui-commons/src/main/resources',
+                        src: ['**/*'],
+                        dest: '<%= destination %>/scripts'
+                    },
+                    {
+                        cwd: 'src/main/resources',
+                        src: ['**/*'],
+                        dest: '<%= destination %>/scripts'
+                    },
+                    {
+                        cwd: 'src/main/js',
+                        src: ['**/*'],
+                        dest: '<%= destination %>/scripts'
+                    },
+                    {
+                        cwd: 'target/test',
+                        src: ['**'],
+                        dest: '<%= destination %>/../test'
+                    },
+                    {
+                        cwd: 'target/www',
+                        src: ['**'],
+                        dest: '<%= destination %>/../www'
+                    }
+                ],
+                verbose: true
             }
         },
+
         watch: {
             editor: {
                 files: [
@@ -118,5 +143,11 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-sync');
 
     grunt.task.run('notify_hooks');
-    grunt.registerTask('default', ['sync', 'qunit', 'watch']);
+
+    grunt.registerTask('default', [
+        'sync:source_to_test',
+        'sync:source_css_to_test',
+        'sync:source_to_tomcat',
+        'qunit',
+        'watch']);
 };

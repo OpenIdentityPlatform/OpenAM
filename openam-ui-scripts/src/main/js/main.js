@@ -29,6 +29,7 @@ require.config({
         i18next: "libs/i18next-1.7.3-min",
         i18nGrid: "libs/i18n/grid.locale-en",
         backbone: "libs/backbone-1.1.2-min",
+        "backbone.paginator": "libs/backbone-paginator.min",
         underscore: "libs/lodash-2.4.1-min",
         jquery: "libs/jquery-2.1.1-min",
         handlebars: "libs/handlebars-1.3.0-min",
@@ -38,6 +39,9 @@ require.config({
         jsonEditor: "libs/jsoneditor-0.7.9-min",
         bootstrap: "libs/bootstrap.min",
         "bootstrap-dialog": "libs/bootstrap-dialog.min",
+        backgrid: "libs/backgrid.min",
+        "backgrid.paginator": "libs/backgrid-paginator.min",
+        "backgrid.filter": "libs/backgrid-filter.min",
         ThemeManager: "org/forgerock/openam/ui/common/util/ThemeManager"
     },
 
@@ -48,6 +52,9 @@ require.config({
         backbone: {
             deps: ["underscore"],
             exports: "Backbone"
+        },
+        "backbone.paginator": {
+            deps: ["backbone"]
         },
         handlebars: {
             exports: "Handlebars"
@@ -73,6 +80,16 @@ require.config({
         },
         'bootstrap-dialog': {
             deps: ["jquery", "underscore", "backbone", "bootstrap"]
+        },
+        backgrid: {
+            deps: ["jquery", "underscore", "backbone"],
+            exports: "Backgrid"
+        },
+        "backgrid.paginator": {
+            deps: ["backgrid", "backbone.paginator"]
+        },
+        "backgrid.filter": {
+            deps: ["backgrid"]
         }
     }
 });
@@ -94,7 +111,10 @@ require([
     "org/forgerock/openam/ui/common/main",
     "org/forgerock/openam/ui/editor/main",
     "ThemeManager",
-    "config/main"
+    "config/main",
+    "backbone.paginator",
+    "backgrid.paginator",
+    "backgrid.filter"
 ], function ($, _, Backbone, Handlebars, i18n, spin, xdate, moment, jsonEditor, i18nManager, constants, eventManager) {
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
