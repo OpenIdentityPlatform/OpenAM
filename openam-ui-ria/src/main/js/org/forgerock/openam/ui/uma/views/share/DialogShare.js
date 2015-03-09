@@ -47,7 +47,9 @@ define("org/forgerock/openam/ui/uma/views/share/DialogShare", [
 
             this.show(_.bind(function() {
                 $("#dialogs").show();
-                if(!this.shareView) { this.shareView = new CommonShare(); }
+                if(!this.shareView) {
+                    this.shareView = new CommonShare();
+                }
                 this.shareView.baseTemplate= 'templates/common/DefaultBaseTemplate.html';
                 this.shareView.mode = 'append';
                 this.shareView.element = '#dialogs .dialogContent';
