@@ -24,7 +24,7 @@
  *
  * $Id: Step4.java,v 1.20 2009/10/27 05:31:45 hengming Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
@@ -120,8 +120,7 @@ public class Step4 extends ProtectedPage {
 
             ctx.setSessionAttribute(SessionAttributeNames.EXT_DATA_STORE,
                 "true");
-            ctx.setSessionAttribute(SessionAttributeNames.USER_STORE_TYPE,
-                "LDAPv3ForODSEE");
+            ctx.setSessionAttribute(SessionAttributeNames.USER_STORE_TYPE, "LDAPv3ForOpenDS");
         }
 
         String smsType = getAttribute(SetupConstants.CONFIG_VAR_DATA_STORE,
@@ -162,7 +161,7 @@ public class Step4 extends ProtectedPage {
             val);
         addModel("userStoreRootSuffix", val);
 
-        val = getAttribute(SetupConstants.USER_STORE_TYPE, "LDAPv3ForODSEE");
+        val = getAttribute(SetupConstants.USER_STORE_TYPE, "LDAPv3ForOpenDS");
         if (val.equals("LDAPv3ForAD")) {
             addModel("selectLDAPv3ad", "checked=\"checked\"");
             addModel("selectLDAPv3addc", "");
