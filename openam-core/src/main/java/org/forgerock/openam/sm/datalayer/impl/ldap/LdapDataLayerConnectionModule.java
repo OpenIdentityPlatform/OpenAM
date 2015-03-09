@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
+import java.util.concurrent.Semaphore;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -23,7 +25,9 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
 import org.forgerock.openam.sm.ConnectionConfig;
+import org.forgerock.openam.sm.ConnectionConfigFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConnectionModule;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
@@ -32,13 +36,17 @@ import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
+import org.forgerock.openam.sm.datalayer.impl.SimpleTaskExecutor;
+import org.forgerock.openam.sm.datalayer.impl.SimpleTaskExecutorFactory;
 import org.forgerock.openam.sm.datalayer.providers.ConnectionFactoryProvider;
 import org.forgerock.openam.sm.datalayer.providers.DataLayerConnectionFactoryCache;
 import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
+import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
 
 import com.google.inject.Key;
 import com.google.inject.PrivateBinder;
 import com.google.inject.Provider;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 
@@ -47,16 +55,12 @@ import com.google.inject.name.Names;
  */
 public abstract class LdapDataLayerConnectionModule extends DataLayerConnectionModule {
 
-    private final Class<? extends TaskExecutor> executorType;
-
     protected LdapDataLayerConnectionModule(Class<? extends TaskExecutor> executorType, boolean exposesQueueConfiguration) {
-        super(executorType != null, exposesQueueConfiguration);
-        this.executorType = executorType;
+        super(executorType, LdapAdapter.class, exposesQueueConfiguration);
     }
 
     protected LdapDataLayerConnectionModule() {
-        super(true, false);
-        this.executorType = PooledTaskExecutor.class;
+        this(PooledTaskExecutor.class, false);
     }
 
     @Override
@@ -94,14 +98,6 @@ public abstract class LdapDataLayerConnectionModule extends DataLayerConnectionM
      */
     protected Class<? extends javax.inject.Provider<ConnectionFactory>> getConnectionFactoryProviderType() {
         return DataLayerConnectionFactoryCache.class;
-    }
-
-    @Override
-    protected void configureTaskExecutor(PrivateBinder binder) {
-        if (executorType != null) {
-            binder.bind(TokenStorageAdapter.class).to(LdapAdapter.class);
-            binder.bind(TaskExecutor.class).to(executorType);
-        }
     }
 
     private static final class ExternalConnectionConfigProvider implements Provider<ConnectionConfig> {

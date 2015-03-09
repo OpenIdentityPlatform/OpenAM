@@ -17,8 +17,13 @@
 package org.forgerock.openam.sm.datalayer.impl;
 
 import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.*;
 
-import java.io.Closeable;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.LockSupport;
+
+import javax.inject.Provider;
 
 import org.forgerock.openam.sm.ConnectionConfig;
 import org.forgerock.openam.sm.ConnectionConfigFactory;
@@ -40,13 +45,6 @@ public class PooledTaskExecutorTest {
     @Test
     public void testExecute() throws Exception {
         // Given
-        Closeable connection = mock(Closeable.class);
-        ConnectionFactory<Closeable> connectionFactory = mock(ConnectionFactory.class);
-        when(connectionFactory.create()).thenReturn(connection);
-        when(connectionFactory.isValid(connection)).thenReturn(true);
-
-        TokenStorageAdapter adapter = mock(TokenStorageAdapter.class);
-
         ConnectionCount connectionCount = mock(ConnectionCount.class);
         when(connectionCount.getConnectionCount(2, ConnectionType.RESOURCE_SETS)).thenReturn(2);
 
@@ -64,41 +62,58 @@ public class PooledTaskExecutorTest {
             }
         }).when(debug).message(anyString());
 
+        Provider<SimpleTaskExecutor> simpleTaskExecutorProvider = mock(Provider.class);
+        when(simpleTaskExecutorProvider.get()).thenAnswer(new Answer<SimpleTaskExecutor<?>>() {
+            public SimpleTaskExecutor<?> answer(InvocationOnMock invocation) throws Throwable {
+                return new SimpleTaskExecutor<Object>(mock(ConnectionFactory.class), null, null);
+            }
+        });
+
+        Semaphore semaphore = new Semaphore(2, true);
+
         // When
-        final TaskExecutor executor = new PooledTaskExecutor(connectionFactory, debug, adapter,
-                ConnectionType.RESOURCE_SETS, connectionCount, configFactory);
-        TaskThread task1 = new TaskThread(1, executor, new LongTask());
-        TaskThread task2 = new TaskThread(2, executor, new LongTask());
+        final TaskExecutor executor = new PooledTaskExecutor(simpleTaskExecutorProvider, debug,
+                ConnectionType.RESOURCE_SETS, connectionCount, configFactory, semaphore);
+        LongTask longTask1 = new LongTask();
+        TaskThread task1 = new TaskThread(1, executor, longTask1);
+        LongTask longTask2 = new LongTask();
+        TaskThread task2 = new TaskThread(2, executor, longTask2);
         TaskThread task3 = new TaskThread(3, executor, mock(Task.class));
 
         task1.start();
         task2.start();
 
-        while (!(task1.running && task2.running)) {
+        while (semaphore.availablePermits() > 0) {
             Thread.sleep(50);
         }
 
         task3.start();
-        Thread.sleep(200);
+
+        long timeout = System.currentTimeMillis() + 5000;
+        while (!semaphore.hasQueuedThreads()) {
+            Thread.sleep(50);
+            if (System.currentTimeMillis() > timeout) {
+                fail("Where did my thread go?");
+            }
+        }
 
         // Then
         verifyZeroInteractions(task3.task);
-        ((LongTask) task2.task).run = true;
-        ((LongTask) task1.task).run = true;
 
-        Thread.sleep(200);
-
-        verify(task3.task).execute(connection, adapter);
+        longTask2.unblock();
+        longTask1.unblock();
 
         task1.join();
         task2.join();
         task3.join();
+
+        verify(task3.task).execute(null, null);
+        verify(simpleTaskExecutorProvider, times(2)).get();
     }
 
     private static class TaskThread extends Thread {
         private TaskExecutor executor;
         private Task task;
-        private volatile boolean running = false;
 
         TaskThread(int taskId, TaskExecutor executor, Task task) {
             this.executor = executor;
@@ -107,7 +122,6 @@ public class PooledTaskExecutorTest {
         }
 
         public void run() {
-            running = true;
             try {
                 executor.execute(null, task);
             } catch (DataLayerException e) {
@@ -118,18 +132,24 @@ public class PooledTaskExecutorTest {
 
     private static class LongTask implements Task {
 
-        private volatile boolean run = false;
+        private AtomicBoolean locked = new AtomicBoolean(false);
+        private Thread executingThread;
 
         @Override
         public <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException {
-            while (!run) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            this.executingThread = Thread.currentThread();
+            locked.set(true);
+            while (!locked.compareAndSet(false, true)) {
+                LockSupport.park(this);
             }
         }
 
+        public void unblock() {
+            locked.set(false);
+            LockSupport.unpark(executingThread);
+        }
+
     }
+
+
 }
