@@ -101,11 +101,13 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
              * Behaviour: If the model does require sync'ing then we abort this render via the return and render
              * will it invoked again when the model is updated
              */
-            if (this.syncParentModel(args)) { return; }
+            if (this.syncParentModel(args)) {
+                return;
+            }
 
             this.data.name = this.parentModel.get('name');
             this.data.scopes = this.parentModel.get('scopes').toJSON();
-            
+
             collection = this.parentModel.get('policy').get('permissions');
             grid = new Backgrid.Grid({
                 columns: [
@@ -161,7 +163,9 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 onChange: function(values) {
                     // TODO: This is not ideal, reset from defaults?
                     values = values || [];
-                    if(self.model) { self.model.set('scopes', values); }
+                    if(self.model) {
+                        self.model.set('scopes', values);
+                    }
                 }
             });
         },
@@ -174,7 +178,9 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 searchField: 'username',
                 create: false,
                 load: function(query, callback) {
-                    if (query.length < self.MIN_QUERY_LENGTH) { return callback(); }
+                    if (query.length < self.MIN_QUERY_LENGTH) {
+                        return callback();
+                    }
 
                     UMADelegate.searchUsers(query)
                     .then(function(data) {
@@ -195,9 +201,13 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                      * Instantly set the value on the model. This is so that when there is an empty value
                      * the change events are fired properly
                      */
-                    if(self.model) { self.model.set('subject', value); }
+                    if(self.model) {
+                        self.model.set('subject', value);
+                    }
 
-                    if(!value) { return; }
+                    if(!value) {
+                        return;
+                    }
 
                     UMADelegate.getUser(value)
                     .done(function(data) {
