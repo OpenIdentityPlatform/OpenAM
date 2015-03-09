@@ -99,10 +99,16 @@ define("config/routes/AMRoutesConfig", [
             url: /^uma\/resources\/$/,
             pattern: "uma/resources/"
         },
-
         "dialogRevokeAllResources": {
             base: "listResource",
             dialog: "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources",
+            role: "ui-user",
+            url: /^uma\/resources\/$/,
+            pattern: "uma/resources/"
+        },
+        "dialogRevokeAllPolicies": {
+            base: "editResource",
+            dialog: "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllPolicies",
             role: "ui-user",
             url: /^uma\/resources\/$/,
             pattern: "uma/resources/"

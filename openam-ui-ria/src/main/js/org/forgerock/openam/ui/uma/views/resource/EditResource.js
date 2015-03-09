@@ -40,7 +40,7 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
         template: "templates/uma/views/resource/EditResource.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
-            'click a#revokeAll': 'onRevokeAll',
+            'click a#revokeAll:not(.disabled)': 'onRevokeAll',
             'click a#share': 'onShare'
         },
         onModelError: function(model, response) {
@@ -51,11 +51,12 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
         onModelSync: function(model, response) {
             this.render();
         },
-        onRevokeAll: function() {
-            var policy = this.model.get('policy');
-            if (policy){
-                policy.destroy();
-            }
+        onRevokeAll: function(event) {
+            event.preventDefault();
+            EventManager.sendEvent(Constants.EVENT_SHOW_DIALOG,{
+                route: Router.configuration.routes.dialogRevokeAllPolicies,
+                noViewChange: true
+            });
         },
         onShare: function(event) {
             event.preventDefault();
@@ -216,6 +217,9 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
             // });
 
             this.parentRender(function() {
+                if (!self.model.get('policy')){
+                    self.$el.find("a#revokeAll").addClass("disabled");
+                }
                 self.$el.find("#backgridContainer").append(grid.render().el);
                 // FIXME: Re-enable filtering and pagination
                 // self.$el.find("#paginationContainer").append(paginator.render().el);

@@ -36,6 +36,7 @@ define([
     "./views/resource/EditResource",
     "./views/resource/ListResource",
     "./views/resource/DialogRevokeAllResources",
+    "./views/resource/DialogRevokeAllPolicies",
     "./views/share/BaseShare",
     "./views/share/CommonShare",
     "./views/share/DialogShare",

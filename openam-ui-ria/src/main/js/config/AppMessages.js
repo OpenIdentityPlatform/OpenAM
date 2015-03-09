@@ -50,6 +50,22 @@ define("config/AppMessages", [
         "revokeAllResourcesFail": {
             msg: "uma.resources.list.revokeAllResourcesFail",
             type: "error"
+        },
+        "revokeAllPoliciesSuccess": {
+            msg: "uma.resources.show.revokeAllPoliciesSuccess",
+            type: "info"
+        },
+        "revokeAllPoliciesFail": {
+            msg: "uma.resources.show.revokeAllPoliciesFail",
+            type: "error"
+        },
+        "revokePolicySuccess": {
+            msg: "uma.resources.show.revokePolicySuccess",
+            type: "info"
+        },
+        "revokePolicyFail": {
+            msg: "uma.resources.show.revokePolicyFail",
+            type: "error"
         }
     };
 });

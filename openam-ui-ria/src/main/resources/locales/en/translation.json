@@ -424,7 +424,11 @@
                 "share": "Share",
                 "revokeAll": "Revoke All",
                 "revokeAllMessage": "Are you sure you want to revoke all access?",
-                "resource" : "Resource"
+                "resource" : "Resource",
+                "revokeAllPoliciesSuccess" : "All access successfully revoked for your resource",
+                "revokeAllPoliciesFail" : "We have been unable revoke all access to your resource. Please contact your Administrator",
+                "revokePolicySuccess" : "Access successfully revoked for your resource",
+                "revokePolicyFail" : "We have been unable revoke access to your resource. Please contact your Administrator"
             }
         },
         "history": {
