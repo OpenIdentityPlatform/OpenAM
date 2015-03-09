@@ -102,6 +102,30 @@ public class CollectionUtils {
     }
 
     /**
+     * Creates a new Map which contains the entries of the provided map but with keys and values exchanged.
+     *
+     * @param map
+     *          the non-null original map.
+     * @param <K>
+     *         the type of keys in the provided map; the type of the values in the returned map.
+     * @param <V>
+     *         the type of values in the provided map; the type of the keys in the returned map.
+     *
+     * @return a new map with inverted key-value mapping.
+     */
+    public static <K, V> Map<V, K> invertMap(final Map<K, V> map) {
+
+        Reject.ifNull(map);
+        final Map<V, K> newMap = new HashMap<V, K>(map.size());
+
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            newMap.put(entry.getValue(), entry.getKey());
+        }
+
+        return newMap;
+    }
+
+    /**
      * Maps the values of a non-null map from one type to another type using a non-null mapper function.
      *
      * @param map

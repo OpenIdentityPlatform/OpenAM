@@ -17,7 +17,6 @@ package org.forgerock.openam.cts.adapters;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -69,7 +68,7 @@ public class SessionAdapterTest {
 
         String userId = "ferret";
         String sessionId = "badger";
-        String sessionHandle = SessionService.SHANDLE_SCHEME_PREFIX + "weasel";
+        String sessionHandle = SessionID.SHANDLE_SCHEME_PREFIX + "weasel";
         byte[] mockByteData = {};
 
         InternalSession session = mock(InternalSession.class);
@@ -148,7 +147,7 @@ public class SessionAdapterTest {
 
         InternalSession mockSession = mock(InternalSession.class);
         SessionID mockSessionID = mock(SessionID.class);
-        String sessionHandle = SessionService.SHANDLE_SCHEME_PREFIX + "ferret";
+        String sessionHandle = SessionID.SHANDLE_SCHEME_PREFIX + "ferret";
 
         given(mockSessionID.toString()).willReturn("badger");
         given(jsonSerialisation.deserialise(anyString(), any(Class.class))).willReturn(mockSession);
@@ -176,7 +175,7 @@ public class SessionAdapterTest {
         SessionID mockSessionID = mock(SessionID.class);
 
         String sessionId = "badger";
-        String sessionHandle = SessionService.SHANDLE_SCHEME_PREFIX + "ferret";
+        String sessionHandle = SessionID.SHANDLE_SCHEME_PREFIX + "ferret";
         given(mockSessionID.toString()).willReturn(sessionId);
         given(jsonSerialisation.deserialise(anyString(), any(Class.class))).willReturn(mockSession);
         given(mockSession.getExpirationTime()).willReturn(timestamp);
@@ -202,7 +201,7 @@ public class SessionAdapterTest {
         SessionID mockSessionID = mock(SessionID.class);
 
         String sessionId = "badger";
-        String sessionHandle = SessionService.SHANDLE_SCHEME_PREFIX + "ferret";
+        String sessionHandle = SessionID.SHANDLE_SCHEME_PREFIX + "ferret";
         given(mockSessionID.toString()).willReturn(sessionId);
         given(jsonSerialisation.deserialise(anyString(), any(Class.class))).willReturn(mockSession);
         given(mockSession.getExpirationTime()).willReturn(timestamp);

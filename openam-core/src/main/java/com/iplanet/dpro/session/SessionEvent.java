@@ -28,6 +28,8 @@
 
 package com.iplanet.dpro.session;
 
+import org.forgerock.util.Reject;
+
 /**
  * The <code>SessionEvent</code> class represents a session event. If this is
  * a new session, the session event contains all session information of this new
@@ -77,10 +79,8 @@ public class SessionEvent {
     /** Session quota exhausted */
     public static final int QUOTA_EXHAUSTED = 7;
 
-    /**
-     * No public constructor.
-     */
-    SessionEvent(Session sess, int type, long time) {
+
+    public SessionEvent(Session sess, int type, long time) {
         session = sess;
         eventType = type;
         eventTime = time;
@@ -118,5 +118,18 @@ public class SessionEvent {
      */
     public long getTime() {
         return eventTime;
+    }
+
+    /**
+     * Invokes all listeners on the Session associated with the event.
+     *
+     * @param evt Non null Session Event.
+     */
+    public static void invokeListeners(SessionEvent evt) {
+        Reject.ifNull(evt, evt.getSession());
+        final Session session = evt.getSession();
+        for (SessionListener listener : session.getLocalSessionEventListeners()) {
+            listener.sessionChanged(evt);
+        }
     }
 }

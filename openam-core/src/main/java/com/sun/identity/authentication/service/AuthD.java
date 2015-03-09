@@ -24,7 +24,7 @@
  *
  * $Id: AuthD.java,v 1.23 2009/11/25 12:02:02 manish_rustagi Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
 
@@ -50,25 +50,31 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.log.Logger;
 import com.sun.identity.log.LogConstants;
-import com.sun.identity.log.messageid.MessageProviderFactory;
+import com.sun.identity.log.Logger;
 import com.sun.identity.log.messageid.LogMessageProviderBase;
+import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.ServiceConfig;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -76,12 +82,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import com.sun.identity.shared.ldap.util.DN;
-import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.guice.core.InjectorHolder;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -92,173 +95,136 @@ import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
  */
 public class AuthD  {
     /**
-     * Debug instance for error / message logging
-     */
-    public static Debug debug;
-    private static Map bundles = new HashMap();
-    private static AuthD authInstance;
-    private static boolean authInitFailed = false;
-    
-    private static String superAdmin = DNUtils.normalizeDN(
-        SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER,""));
-    private static AMIdentity superUserIdentity = null;
-    private static String specialUser =
-        SystemProperties.get(Constants.AUTHENTICATION_SPECIAL_USERS,"");
-
-    // Admin Console properties
-    private static final String consoleProto =
-    SystemProperties.get(Constants.AM_CONSOLE_PROTOCOL,"http");
-    private static final String consoleHost =
-    SystemProperties.get(Constants.AM_CONSOLE_HOST);
-    private static final String consolePort =
-    SystemProperties.get(Constants.AM_CONSOLE_PORT);
-    private static final boolean isConsoleRemote =
-    Boolean.valueOf(SystemProperties.get(
-    Constants.AM_CONSOLE_REMOTE)).booleanValue();
-    
-    /**
-     * Default auth level for auth module
-     */  
-    public static final String DEFAULT_AUTH_LEVEL = "0";
-    /**
-     * Configured value for access logging
-     */  
-    public static final int LOG_ACCESS = 0;
-    /**
-     * Configured value for error logging
-     */  
-    public static final int LOG_ERROR  = 1;
-
-    /**
-     * supported Auth Modules cache - lw
-     */
-    public static Hashtable sAuth;
-
-    /**
-     * Flag to force to use JAAS thread.
-     * Default is false.
-     */
-    public static boolean enforceJAASThread = false;
-    /**
-     * Configured directory server host name for auth
-     */
-    public static String directoryHostName =
-    SystemProperties.get(Constants.AM_DIRECTORY_HOST);
-    /**
-     * Configured directory server port number for auth
-     */
-    public static int directoryPort;
-
-    /**
-     * Configured revisionNumber for auth service
-     */
-    public static int revisionNumber;
-    private static HashMap idRepoMap = new HashMap();
-    private static HashMap orgMap   = new HashMap();
-
-    /**
      * Configured bundle name for auth service
      */
     public static final String BUNDLE_NAME = ISAuthConstants.AUTH_BUNDLE_NAME;
 
-    private String defaultOrg;
+    /**
+     * Debug instance for error / message logging
+     */
+    public static final Debug debug = Debug.getInstance(BUNDLE_NAME);
+
+    private static final ConcurrentMap<String, ResourceBundle> bundles =
+            new ConcurrentHashMap<String, ResourceBundle>();
+
+    /**
+     * Lazy initialisation holder idiom for the singleton instance.
+     */
+    private static final class SingletonHolder {
+        private static final AuthD INSTANCE = new AuthD();
+    }
+
+    /**
+     * Lazy initialisation holder idiom for other lazily-loaded configuration.
+     */
+    private static final class LazyConfig {
+        private static final AMIdentity superUserIdentity = new AMIdentity(
+                AccessController.doPrivileged(AdminTokenAction.getInstance()),
+                superAdmin,
+                IdType.USER,
+                "/",
+                null);
+    }
+
+    private static final String superAdmin = DNUtils.normalizeDN(
+            SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER, ""));
+    private static final String specialUser =
+            SystemProperties.get(Constants.AUTHENTICATION_SPECIAL_USERS, "");
+
+    // Admin Console properties
+    private static final String consoleProto =
+            SystemProperties.get(Constants.AM_CONSOLE_PROTOCOL, "http");
+    private static final String consoleHost =
+            SystemProperties.get(Constants.AM_CONSOLE_HOST);
+    private static final String consolePort =
+            SystemProperties.get(Constants.AM_CONSOLE_PORT);
+    private static final boolean isConsoleRemote =
+            SystemProperties.getAsBoolean(Constants.AM_CONSOLE_REMOTE);
+
+    /**
+     * Default auth level for auth module
+     */  
+    private static final String DEFAULT_AUTH_LEVEL = "0";
+    /**
+     * Configured value for access logging
+     */  
+    static final int LOG_ACCESS = 0;
+    /**
+     * Configured value for error logging
+     */  
+    static final int LOG_ERROR  = 1;
+
+    private static final boolean enforceJAASThread = SystemProperties.getAsBoolean(Constants.ENFORCE_JAAS_THREAD);
+    /**
+     * Configured directory server host name for auth
+     */
+    public static final String directoryHostName = SystemProperties.get(Constants.AM_DIRECTORY_HOST);
+    /**
+     * Configured directory server port number for auth
+     */
+    public static final int directoryPort = SystemProperties.getAsInt(Constants.AM_DIRECTORY_PORT, 0);
+
+    private static final boolean logStatus = "ACTIVE".equalsIgnoreCase(SystemProperties.get(Constants.AM_LOGSTATUS,
+            "INACTIVE"));
+    /**
+     * Configured revisionNumber for auth service
+     */
+    public static int revisionNumber;
+
+    private final ConcurrentMap<String, AMIdentityRepository> idRepoMap =
+            new ConcurrentHashMap<String, AMIdentityRepository>();
+    private final ConcurrentMap<String, OrganizationConfigManager> orgMap =
+            new ConcurrentHashMap<String, OrganizationConfigManager>();
+
+
+    private final String defaultOrg;
     private String platformLocale;
-    private String platformCharset;
+    private final String platformCharset;
     /**
      * ResourceBundle for auth service
      */
-    public  ResourceBundle bundle = null;
+    final ResourceBundle bundle;
 
-    private SSOToken ssoAuthSession = null;
-    private Session authSession = null;
+    private final SSOToken ssoAuthSession;
     private AMStoreConnection dpStore = null;
-    
-    
-    //  client detection and client type variable
-    String clientDetectionClass = null;
-    
-    /**
-     *  locale read from AMConfig.properties used for
-     *  remote client auth.
-     */
-    public static String platLocale = SystemProperties.get(Constants.AM_LOCALE);
-    
-    // auth default locale defined in iPlanetAMAuthService
-    private String defaultAuthLocale;
-    
-    // platform service schema
-    ServiceSchema platformSchema;
+
     // session service schema
-    ServiceSchema sessionSchema;
-    
-    // table for service templates
-    private static boolean logStatus = false;
-    /**
-     * Set of default URLs for login success
-     */
-    public Set defaultSuccessURLSet = null;
-    /**
-     * Current default URLs for login success
-     */
-    public String defaultSuccessURL = null;
-    /**
-     * Set of default URLs for login failure
-     */
-    public Set defaultFailureURLSet = null;
-    /**
-     * Current default URLs for login failure
-     */
-    public String defaultFailureURL = null;
-    /**
-     * Set of default URLs for service success
-     */
-    public Set defaultServiceSuccessURLSet = null;
-    /**
-     * Set of default URLs for service failure
-     */
-    public Set defaultServiceFailureURLSet = null;
+    private ServiceSchema sessionSchema;
+
+    private Set defaultSuccessURLSet = null;
+    private String defaultSuccessURL = null;
+    private Set defaultFailureURLSet = null;
+    private String defaultFailureURL = null;
+    private Set defaultServiceSuccessURLSet = null;
+    private Set defaultServiceFailureURLSet = null;
     private String adminAuthModule;
     /**
      * Default auth level for module
      */
     public String defaultAuthLevel;
-    private Hashtable authMethods = new Hashtable();
+    private final ConcurrentMap<String, String> authMethods = new ConcurrentHashMap<String, String>();
     private long defaultSleepTime = 300; /* 5 minutes */
     private static final RedirectUrlValidator<String> REDIRECT_URL_VALIDATOR =
             new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
     
     private ServletContext servletContext;
-    
+
+    private final String rootSuffix;
+
     static {
-        String status = SystemProperties.get(Constants.AM_LOGSTATUS,
-            "INACTIVE");
-        if ("ACTIVE".equalsIgnoreCase(status)) {
-            logStatus = true;
-        }
-        
-        // Get Directory Port value
-        try {
-            directoryPort = 
-                Integer.parseInt(SystemProperties.get(
-                    Constants.AM_DIRECTORY_PORT));
-        } catch (java.lang.NumberFormatException nfex) {
-            directoryPort = 0;
-        }
-        
-        debug = Debug.getInstance(BUNDLE_NAME);
         if (debug.messageEnabled()) {
             debug.message("Directory Host: "+ directoryHostName +
             "\nDirectory PORT : "+ directoryPort);
         }
     }
     
-    String rootSuffix = null;
-    
+
     private AuthD() {
         debug.message("AuthD initializing");
         try {
             rootSuffix = defaultOrg = ServiceManager.getBaseDN();
-            initAuthSessions();
+            final Session authSession = initAuthSession();
+            ssoAuthSession = initSsoAuthSession(authSession);
             initAuthServiceGlobalSettings();
             initPlatformServiceGlobalSettings();
             initSessionServiceDynamicSettings();
@@ -274,19 +240,9 @@ public class AuthD  {
             // Initialize AuthXMLHandler so that AdminTokenAction can
             // generate DPro Session's SSOToken
             new com.sun.identity.authentication.server.AuthXMLHandler();
-            authInitFailed = false;
         } catch (Exception ex) {
             debug.error("AuthD init()", ex);
-            authInitFailed = true;
-        }
-        try {
-            enforceJAASThread = Boolean.valueOf(SystemProperties.get(
-            Constants.ENFORCE_JAAS_THREAD)).booleanValue();
-        } catch (Exception e) {
-            if (debug.messageEnabled()) {
-                debug.message("Wrong format of " +
-                Constants.ENFORCE_JAAS_THREAD);
-            }
+            throw new IllegalStateException("Unable to initialize AuthD", ex);
         }
     }
 
@@ -296,13 +252,11 @@ public class AuthD  {
      * @throws SSOException if admin <code>SSOToken</code> is not valid 
      * @throws Exception
      */
-    private void initAuthServiceGlobalSettings()
-    throws SMSException, SSOException, Exception {
-        ServiceSchemaManager scm = new ServiceSchemaManager(
-        ISAuthConstants.AUTH_SERVICE_NAME, ssoAuthSession);
+    private void initAuthServiceGlobalSettings() throws Exception {
+        ServiceSchemaManager scm = new ServiceSchemaManager(ISAuthConstants.AUTH_SERVICE_NAME, ssoAuthSession);
         revisionNumber = scm.getRevisionNumber();
         if (debug.messageEnabled()) {
-            debug.message("revision number = " + revisionNumber); 
+            debug.message("revision number = " + revisionNumber);
         }
         updateAuthServiceGlobals(scm);
         new AuthConfigMonitor(scm);
@@ -315,8 +269,7 @@ public class AuthD  {
      * @throws SMSException if it fails to update auth service
      * @throws Exception
      */
-    synchronized void updateAuthServiceGlobals(ServiceSchemaManager scm)
-    throws SMSException, Exception {
+    synchronized void updateAuthServiceGlobals(ServiceSchemaManager scm) throws Exception {
         
         ServiceSchema schema = scm.getOrganizationSchema();
         Map attrs = schema.getAttributeDefaults();
@@ -329,24 +282,20 @@ public class AuthD  {
             debug.message("attrs : " + attrs);
         }
         
-        defaultAuthLocale = CollectionHelper.getMapAttr(
-            attrs, ISAuthConstants.AUTH_LOCALE_ATTR);
         adminAuthModule = CollectionHelper.getMapAttr(
             attrs, ISAuthConstants.ADMIN_AUTH_MODULE);
         defaultAuthLevel = CollectionHelper.getMapAttr(
             attrs, ISAuthConstants.DEFAULT_AUTH_LEVEL,DEFAULT_AUTH_LEVEL);
         
         Set s = (Set)attrs.get(ISAuthConstants.AUTHENTICATORS);
-        Iterator iter = s.iterator();
-        while(iter.hasNext()) {
-            String name = (String)iter.next();
+        for (final Object value : s) {
+            String name = (String) value;
             int dot = name.lastIndexOf('.');
             if (dot > -1) {
                 String tmp = name.substring(dot + 1, name.length());
-                authMethods.put(tmp,name);
-            }
-            else {
-                authMethods.put(name,name);
+                authMethods.put(tmp, name);
+            } else {
+                authMethods.put(name, name);
             }
         }
         if (debug.messageEnabled()) {
@@ -375,8 +324,7 @@ public class AuthD  {
      * @throws SSOException if admin <code>SSOToken</code> is not valid 
      * @throws Exception
      */
-    private void initAuthConfigGlobalSettings() throws SMSException,
-    SSOException, Exception {
+    private void initAuthConfigGlobalSettings() throws Exception {
         
         ServiceSchemaManager scm = new ServiceSchemaManager(
         ISAuthConstants.AUTHCONFIG_SERVICE_NAME, ssoAuthSession);
@@ -432,7 +380,7 @@ public class AuthD  {
      */
     synchronized void updatePlatformServiceGlobals(ServiceSchemaManager scm)
     throws SMSException {
-        platformSchema = scm.getGlobalSchema();
+        ServiceSchema platformSchema = scm.getGlobalSchema();
         Map attrs = platformSchema.getAttributeDefaults();
         
         platformLocale = CollectionHelper.getMapAttr(
@@ -538,17 +486,7 @@ public class AuthD  {
      * @return Authenticator singleton instance.
      */
     public static AuthD getAuth() {
-        if (authInstance == null) {
-            synchronized(AuthD.class) {
-                if (authInstance == null) {
-                    authInstance = new AuthD();
-                    if (authInitFailed) {
-                        authInstance = null;
-                    }
-                }
-            }
-        }
-        return authInstance;
+        return SingletonHolder.INSTANCE;
     }
     
     /**
@@ -556,15 +494,7 @@ public class AuthD  {
      * @param sid <code>SessionID</code> to be destroyed
      */
     public void destroySession(SessionID sid) {
-        getSS().destroyInternalSession(sid);
-    }
-    
-    /**
-     * Logout sessionfor given <code>SessionID</code>
-     * @param sid <code>SessionID</code> to be logout
-     */
-    public void logoutSession(SessionID sid) {
-        getSS().logoutInternalSession(sid);
+        getSessionService().destroyInternalSession(sid);
     }
     
     /**
@@ -579,7 +509,7 @@ public class AuthD  {
         HttpSession httpSession) {
         InternalSession is = null;
         try {
-            is = getSS().newInternalSession(domain, httpSession);
+            is = getSessionService().newInternalSession(domain, httpSession);
         } catch (Exception ex) {
             ex.printStackTrace();
             debug.error("Error creating session: ", ex);
@@ -617,7 +547,7 @@ public class AuthD  {
     public static InternalSession getSession(SessionID sid) {
         InternalSession is = null;
         if (sid != null) {
-            is = getSS().getInternalSession(sid);
+            is = getSessionService().getInternalSession(sid);
         } 
         return is;
     }
@@ -646,19 +576,7 @@ public class AuthD  {
      * @return Authenticator for a specific module name.
      */
     public String getAuthenticatorForName(String moduleName) {
-        return (String)authMethods.get(moduleName);
-    }
-    
-    /**
-     * Returns <code>true</code> if the specified module is one of the
-     * authenticators.
-     *
-     * @param module Module name example <code>LDAP</code>.
-     * @return <code>true</code> if the specified module is one of the
-     * authenticators.
-     */
-    public boolean containsAuthenticator(String module) {
-        return authMethods.containsKey(module);
+        return authMethods.get(moduleName);
     }
     
     /**
@@ -670,68 +588,27 @@ public class AuthD  {
     }
     
     /**
-     * Return number configured Authenticators
-     * @return number configured Authenticators
-     */
-    public int getAuthenticatorCount() {
-        return authMethods.size();
-    }
-    
-    /**
-     * Return configured PlatformCharset
-     * @return configured PlatformCharset
-     */
-    public String getPlatformCharset() {
-        return platformCharset;
-    }
-    
-    /**
      * Return configured PlatformLocale
      * @return configured PlatformLocale
      */
     public String getPlatformLocale() {
         return platformLocale;
     }
-    
-    /**
-     * Return configured <code>Locale</code> for auth service
-     * @return configured <code>Locale</code> for auth service
-     */
-    public String getCoreAuthLocaleFromAuthService() {
-        /* Method used by LoginState to find out core
-         * auth locale is defined or not
-         */
-        return defaultAuthLocale;
-    }
-    
-    /**
-     * Return default <code>Locale</code> for auth service
-     * @return default <code>Locale</code> for auth service
-     */
-    public String getDefaultAuthLocale() {
-        /* Since this method returned a fallback locale "en_US"
-         * and is a public method,
-         * It is configured to return en_US in case defaultAuthLocale == null
-         */
-        if (defaultAuthLocale == null || defaultAuthLocale.length()==0)
-            return "en_US";
-        return defaultAuthLocale;
-    }
+
     /**
      * Log Logout status 
      */
     public void logLogout(SSOToken ssot){
         try {
             String logLogout = bundle.getString("logout");
-            List dataList = new ArrayList();
+            List<String> dataList = new ArrayList<String>();
             dataList.add(logLogout);
             StringBuilder messageId = new StringBuilder();
             messageId.append("LOGOUT");
             String indexType = ssot.getProperty(ISAuthConstants.INDEX_TYPE);
             if (indexType != null) {
-                messageId.append("_").append(indexType.toString()
-                .toUpperCase());
-                dataList.add(indexType.toString());
+                messageId.append("_").append(indexType.toUpperCase());
+                dataList.add(indexType);
                 if (indexType.equals(AuthContext.IndexType.USER.toString())) { 
                     dataList.add(ssot.getProperty(ISAuthConstants.PRINCIPAL));
                 } else if (indexType.equals(
@@ -750,7 +627,7 @@ public class AuthD  {
                 }
             }
             
-            Hashtable props = new Hashtable();
+            Hashtable<String, String> props = new Hashtable<String, String>();
             String client = ssot.getProperty(ISAuthConstants.HOST);
             if (client != null) {
                 props.put(LogConstants.IP_ADDR, client);
@@ -775,22 +652,19 @@ public class AuthD  {
             props.put(LogConstants.LOGIN_ID_SID, ssot.getTokenID()
                 .toString());
 
-            String[] data = (String[])dataList.toArray(new String[0]);
-            this.logIt(data,this.LOG_ACCESS, messageId.toString(), props);
+            String[] data = dataList.toArray(new String[dataList.size()]);
+            this.logIt(data, LOG_ACCESS, messageId.toString(), props);
         } catch (SSOException ssoExp) {
             debug.error("AuthD.logLogout: SSO Error", ssoExp);
         } catch (Exception e) {
             debug.error("AuthD.logLogout: Error " , e);
         }
     }
-    
-    
-    
+
     ////////////////////////////////////////////////////////////////
     //  Other utilities
     ////////////////////////////////////////////////////////////////
-    com.sun.identity.log.Logger logger=null;
-    
+
     /**
       * Writes a log record.
       *
@@ -815,8 +689,7 @@ public class AuthD  {
 
                 com.sun.identity.log.LogRecord lr = null;
                 
-                SSOToken ssot = (SSOToken) AccessController.doPrivileged(
-                    AdminTokenAction.getInstance());
+                SSOToken ssot = AccessController.doPrivileged(AdminTokenAction.getInstance());
                 if(ssoProperties == null) {
                     lr = provider.createLogRecord(messageName, s, ssot);
                 } else {
@@ -824,6 +697,7 @@ public class AuthD  {
                         ssoProperties);
                 }
 
+                com.sun.identity.log.Logger logger;
                 switch (type) {
                     case LOG_ACCESS:
                         logger = (com.sun.identity.log.Logger)
@@ -885,28 +759,12 @@ public class AuthD  {
         }
     }
     
-    static SessionService getSS() {
-        SessionService ss = SessionService.getSessionService();
-        if (ss == null) {
+    static SessionService getSessionService() {
+        SessionService sessionService = InjectorHolder.getInstance(SessionService.class);
+        if (sessionService == null) {
             debug.error("AuthD failed to get session service instance");
         }
-        return ss;
-    }
-
-    /**
-     * Return default organization
-     * @return default organization
-     */
-    public String getDefaultOrg() {
-        return defaultOrg;
-    }
-
-    /**
-     * Return current session for auth
-     * @return current session for auth
-     */
-    public Session getAuthSession()  {
-        return authSession;
+        return sessionService;
     }
 
     /**
@@ -916,33 +774,33 @@ public class AuthD  {
     public SSOToken getSSOAuthSession()  {
         return ssoAuthSession;
     }
-    
-    private void initAuthSessions() throws SSOException, SessionException {
+
+    private Session initAuthSession() throws SSOException, SessionException {
+        final Session authSession = getSessionService().getAuthenticationSession(defaultOrg, null);
         if (authSession == null) {
-            authSession = getSS().getAuthenticationSession(defaultOrg, null);
-            if (authSession == null) {
-                debug.error("AuthD failed to get auth session");
-                throw new SessionException(BUNDLE_NAME,
-                    "gettingSessionFailed", null);
-            }
-            
-            String clientID = authSession.getClientID();
-            authSession.setProperty("Principal", clientID);
-            authSession.setProperty("Organization", defaultOrg);
-            authSession.setProperty("Host",
-                authSession.getID().getSessionServer());
-            DN dn = new DN(clientID);
-            if (dn.isDN()) {
-                String[] tokens = dn.explodeDN(true);
-                String id = "id=" + tokens[0] + ",ou=user," + 
-                    ServiceManager.getBaseDN();
-                authSession.setProperty(Constants.UNIVERSAL_IDENTIFIER,
-                    id);
-            }
-            SSOTokenManager ssoManager = SSOTokenManager.getInstance();
-            ssoAuthSession = ssoManager.createSSOToken(
-                authSession.getID().toString());
+            debug.error("AuthD failed to get auth session");
+            throw new SessionException(BUNDLE_NAME, "gettingSessionFailed", null);
         }
+
+        String clientID = authSession.getClientID();
+        authSession.setProperty("Principal", clientID);
+        authSession.setProperty("Organization", defaultOrg);
+        authSession.setProperty("Host",
+                authSession.getID().getSessionServer());
+        DN dn = new DN(clientID);
+
+        if (dn.isDN()) {
+            String[] tokens = dn.explodeDN(true);
+            String id = "id=" + tokens[0] + ",ou=user," + ServiceManager.getBaseDN();
+            authSession.setProperty(Constants.UNIVERSAL_IDENTIFIER, id);
+        }
+
+        return authSession;
+    }
+    
+    private SSOToken initSsoAuthSession(Session authSession) throws SSOException, SessionException {
+        SSOTokenManager ssoManager = SSOTokenManager.getInstance();
+        return ssoManager.createSSOToken(authSession.getID().toString());
     }
     
     /**
@@ -995,15 +853,7 @@ public class AuthD  {
      * @return <code>true</code> if the user is an admin user.
      */
     public boolean isSuperUser(String dn) {
-        if (superUserIdentity == null) {
-            superUserIdentity = new AMIdentity(
-                    AccessController.doPrivileged(AdminTokenAction.getInstance()),
-                    superAdmin,
-                    IdType.USER,
-                    "/",
-                    null);
-        }
-        return superUserIdentity.getUniversalId().equalsIgnoreCase(dn);
+        return LazyConfig.superUserIdentity.getUniversalId().equalsIgnoreCase(dn);
     }
 
     /**
@@ -1020,7 +870,7 @@ public class AuthD  {
         if ((nDN != null) && (specialUser != null)) {
             StringTokenizer st = new StringTokenizer(specialUser,"|");
             while (st.hasMoreTokens()) {
-                 String specialAdminDN = (String)st.nextToken();
+                 String specialAdminDN = st.nextToken();
                  if (specialAdminDN != null) {
                     String normSpecialAdmin = 
                         DNUtils.normalizeDN(specialAdminDN);
@@ -1053,10 +903,9 @@ public class AuthD  {
             return bundle;
         }
         
-        ResourceBundle rb = (ResourceBundle)bundles.get(locale);
+        ResourceBundle rb = bundles.get(locale);
         if (rb == null) {
-            rb = com.sun.identity.shared.locale.Locale.getResourceBundle(
-                BUNDLE_NAME, locale);
+            rb = com.sun.identity.shared.locale.Locale.getResourceBundle(BUNDLE_NAME, locale);
 
             if (rb == null) {
                 rb = bundle;
@@ -1148,7 +997,7 @@ public class AuthD  {
     private String processDynamicVariables(
         String rawURL,
         HttpServletRequest servletRequest) {
-        if (rawURL.indexOf("%") != -1) {
+        if (rawURL.contains("%")) {
             int index;
             StringBuilder sb = new StringBuilder(200);
             // protocol processing
@@ -1237,15 +1086,13 @@ public class AuthD  {
     public AMIdentityRepository getAMIdentityRepository(String orgDN) {
         AMIdentityRepository amIdentityRepository = null;
         try {
-            if ((idRepoMap != null) && (!idRepoMap.isEmpty())) {
-                amIdentityRepository =
-                    (AMIdentityRepository)idRepoMap.get(orgDN);
-            }
+            amIdentityRepository = idRepoMap.get(orgDN);
             if (amIdentityRepository == null) {
-                amIdentityRepository =
-                    new AMIdentityRepository(ssoAuthSession,orgDN);
-                synchronized (idRepoMap) {
-                    idRepoMap.put(orgDN,amIdentityRepository);
+                amIdentityRepository = new AMIdentityRepository(ssoAuthSession, orgDN);
+                AMIdentityRepository winner = idRepoMap.putIfAbsent(orgDN, amIdentityRepository);
+                if (winner != null) {
+                    // We lost the race
+                    amIdentityRepository = winner;
                 }
             }
         } catch (Exception id) {
@@ -1265,14 +1112,13 @@ public class AuthD  {
     public OrganizationConfigManager getOrgConfigManager(String orgDN) {
         OrganizationConfigManager orgConfigMgr = null;
         try {
-            if ((orgMap != null) && (!orgMap.isEmpty())) {
-                orgConfigMgr = (OrganizationConfigManager) orgMap.get(orgDN);
-            }
-            synchronized (orgMap) {
-                if (orgConfigMgr == null) {
-                    orgConfigMgr = new OrganizationConfigManager(
-                        ssoAuthSession, orgDN);
-                    orgMap.put(orgDN,orgConfigMgr);
+            orgConfigMgr = orgMap.get(orgDN);
+            if (orgConfigMgr == null) {
+                orgConfigMgr = new OrganizationConfigManager(ssoAuthSession, orgDN);
+                OrganizationConfigManager winner = orgMap.putIfAbsent(orgDN, orgConfigMgr);
+                if (winner != null) {
+                    // We lost the race
+                    orgConfigMgr = winner;
                 }
             }
         } catch (Exception id) {
@@ -1380,15 +1226,6 @@ public class AuthD  {
         
         return amIdentity;
     }
-    
-    /**
-     * Returns the Super Admin user Name.
-     *
-     * @return super admin user name.
-     */
-    public String getSuperUserName() {
-        return superAdmin;
-    }
 
     /**
      * Returns the authentication service or chain configured for the
@@ -1424,5 +1261,64 @@ public class AuthD  {
      */
     public boolean isGotoUrlValid(String url, String orgDN) {
         return REDIRECT_URL_VALIDATOR.isRedirectUrlValid(url, orgDN);
+    }
+
+    /**
+     * Set of default URLs for login success
+     */
+    Set getDefaultSuccessURLSet() {
+        return defaultSuccessURLSet;
+    }
+
+    /**
+     * Current default URL for login success
+     */
+    String getDefaultSuccessURL() {
+        return defaultSuccessURL;
+    }
+
+    void setDefaultSuccessURL(final String defaultSuccessURL) {
+        this.defaultSuccessURL = defaultSuccessURL;
+    }
+
+    /**
+     * Set of default URLs for login failure
+     */
+    Set getDefaultFailureURLSet() {
+        return defaultFailureURLSet;
+    }
+
+    /**
+     * Current default URLs for login failure
+     */
+    String getDefaultFailureURL() {
+        return defaultFailureURL;
+    }
+
+    void setDefaultFailureURL(final String defaultFailureURL) {
+        this.defaultFailureURL = defaultFailureURL;
+    }
+
+    /**
+     * Set of default URLs for service success
+     */
+    Set getDefaultServiceSuccessURLSet() {
+        return defaultServiceSuccessURLSet;
+    }
+
+    /**
+     * Set of default URLs for service failure
+     */
+    Set getDefaultServiceFailureURLSet() {
+        return defaultServiceFailureURLSet;
+    }
+
+
+    /**
+     * Flag to force to use JAAS thread.
+     * Default is false.
+     */
+    static boolean isEnforceJAASThread() {
+        return enforceJAASThread;
     }
 }

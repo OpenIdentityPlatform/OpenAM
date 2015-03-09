@@ -82,7 +82,7 @@ public interface SMProfileModel
      *
      * @param cache Session cache.
      */
-    public void setSessionCache(SMSessionCache cache);
+    public void setSmSessionCache(SMSessionCache cache);
 
     /**
      * Returns map of server names.

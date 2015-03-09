@@ -32,9 +32,6 @@ package com.sun.identity.idm.remote;
 
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.sdk.AMSDKBundle;
-import com.iplanet.dpro.session.Session;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.xml.XMLUtils;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -43,27 +40,31 @@ import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
-import com.sun.identity.idm.IdServices;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchOpModifier;
 import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdServices;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.jaxrpc.SMSJAXRPCObject;
+import org.forgerock.openam.session.SessionCookies;
+
+import javax.security.auth.callback.Callback;
 import java.rmi.RemoteException;
 import java.security.AccessController;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.callback.Callback;
 
 /*
  * Class that implements the remote services that are needed for IdRepo.
@@ -85,6 +86,8 @@ public class IdRemoteServicesImpl implements IdServices {
     private static boolean sendRestrictionContext;
 
     private static IdServices instance;
+
+    private final SessionCookies sessionCookies;
     
     protected IdRemoteServicesImpl() {
         /*
@@ -132,6 +135,7 @@ public class IdRemoteServicesImpl implements IdServices {
        
        // Initialize JAX-RPC SOAP client
        client = new SOAPClient(SDK_SERVICE);
+        this.sessionCookies = SessionCookies.getInstance();
    }
 
     protected static synchronized IdServices getInstance() {
@@ -194,8 +198,8 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token), type.getName(),
                     name, attrMap, amOrgName };
             univid = (String) client.send(client.encodeMessage(
-                    "create_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    "create_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
         } catch (Exception ex) {
             processException(ex);
         }
@@ -209,8 +213,8 @@ public class IdRemoteServicesImpl implements IdServices {
         try {
             Object[] objs = { getTokenString(token), type.getName(),
                     name, orgName, amsdkDN };
-            client.send(client.encodeMessage("delete_idrepo", objs), 
-        	    Session.getLBCookie(token.getTokenID().toString()), null);
+            client.send(client.encodeMessage("delete_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
         } catch (Exception ex) {
             processException(ex);
         }
@@ -224,7 +228,7 @@ public class IdRemoteServicesImpl implements IdServices {
             try {
                 Object[] objs = {getTokenString(token), type.getName(), name, attrNames, amOrgName, amsdkDN};
                 res = (Map<String, Set<String>>) client.send(client.encodeMessage("getAttributes1_idrepo", objs),
-                        Session.getLBCookie(token.getTokenID().toString()), null);
+                        sessionCookies.getLBCookie(token.getTokenID().toString()), null);
                 if (res != null) {
                     Map<String, Set<String>> res2 = new AMHashMap();
                     for (Map.Entry<String, Set<String>> entry : res.entrySet()) {
@@ -253,7 +257,7 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = {getTokenString(token), type.getName(), name, attrNames, amOrgName, amsdkDN};
             Map<String, Set<String>> encodedAttributes = (Map<String, Set<String>>) client.send(
                     client.encodeMessage("getBinaryAttributes_idrepo", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
             if (encodedAttributes != null) {
 
                 for (Map.Entry<String, Set<String>> entry : encodedAttributes.entrySet()) {
@@ -283,8 +287,8 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token), type.getName(),
                     name, amOrgName, amsdkDN };
             res = ((Map) client.send(client.encodeMessage(
-                    "getAttributes2_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    "getAttributes2_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
             if (res != null) {
                 Map res2 = new AMHashMap();
                 Iterator it = res.keySet().iterator();
@@ -310,7 +314,7 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token), type.getName(),
                     name, attrNames, amOrgName, amsdkDN };
             client.send(client.encodeMessage("removeAttributes_idrepo", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
         } catch (Exception ex) {
             processException(ex);
         }
@@ -338,8 +342,8 @@ public class IdRemoteServicesImpl implements IdServices {
                     new Integer(filterOp), avMap,
                     Boolean.valueOf(ctrl.isRecursive()), amOrgName };
             idResults = ((Map) client.send(client.encodeMessage(
-                    "search2_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    "search2_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
         } catch (Exception ex) {
             processException(ex);
         }
@@ -355,7 +359,7 @@ public class IdRemoteServicesImpl implements IdServices {
                     name, attributes, Boolean.valueOf(isAdd), amOrgName, 
                     amsdkDN, Boolean.valueOf(isString) };
             client.send(client.encodeMessage("setAttributes2_idrepo", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
 
         } catch (Exception ex) {
             processException(ex);
@@ -370,7 +374,7 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token), type.getName(),
                     name, oldPassword, newPassword, amOrgName, amsdkDN };
             client.send(client.encodeMessage("changePassword_idrepo", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
 
         } catch (Exception ex) {
             processException(ex);
@@ -386,7 +390,7 @@ public class IdRemoteServicesImpl implements IdServices {
                     name, serviceName, stype.getType(), attrMap, amOrgName,
                     amsdkDN };
             client.send(client.encodeMessage("assignService_idrepo", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
 
         } catch (Exception ex) {
             processException(ex);
@@ -403,8 +407,8 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token), type.getName(),
                     name, mapOfServiceNamesAndOCs, amOrgName, amsdkDN };
             resultSet = ((Set) client.send(client.encodeMessage(
-                    "getAssignedServices_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    "getAssignedServices_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
 
         } catch (Exception ex) {
             processException(ex);
@@ -430,8 +434,8 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token), type.getName(),
                     name, serviceName, attrNames, amOrgName, amsdkDN };
             resultMap = ((Map) client.send(client.encodeMessage(
-                    "getServiceAttributes_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    "getServiceAttributes_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
 
         } catch (Exception ex) {
             processException(ex);
@@ -457,8 +461,8 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { token.getTokenID().toString(), type.getName(),
                    name, serviceName, attrNames, amOrgName, amsdkDN};
             resultMap = ((Map)client.send(client.encodeMessage(
-                    "getBinaryServiceAttributes_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    "getBinaryServiceAttributes_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
 
         } catch (RemoteException rex) {
             DEBUG.error(
@@ -507,8 +511,7 @@ public class IdRemoteServicesImpl implements IdServices {
             resultMap = ((Map)client.send(
                     client.encodeMessage(
                         "getServiceAttributesAscending_idrepo", objs),
-                        Session.getLBCookie(
-                            token.getTokenID().toString()), null));
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
 
         } catch (Exception ex) {
             processException(ex);
@@ -525,7 +528,7 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token), type.getName(),
                     name, serviceName, attrMap, amOrgName, amsdkDN };
             client.send(client.encodeMessage("unassignService_idrepo", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
 
         } catch (Exception ex) {
             processException(ex);
@@ -548,7 +551,7 @@ public class IdRemoteServicesImpl implements IdServices {
                     name, serviceName, stype.getType(), attrMap, amOrgName,
                     amsdkDN };
             client.send(client.encodeMessage("modifyService_idrepo", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
 
         } catch (Exception ex) {
             processException(ex);
@@ -563,8 +566,8 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token), type.getName(),
                     name, amOrgName, membersType.getName(), amsdkDN };
             Set res = (Set) client.send(client.encodeMessage(
-                    "getMembers_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    "getMembers_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
             idResults = new HashSet();
             if (res != null) {
                 Iterator it = res.iterator();
@@ -591,8 +594,8 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token), type.getName(),
                     name, membershipType.getName(), amOrgName, amsdkDN };
             Set res = (Set) client.send(client.encodeMessage(
-                    "getMemberships_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    "getMemberships_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
             
             idResults = new HashSet();
             
@@ -620,7 +623,7 @@ public class IdRemoteServicesImpl implements IdServices {
                     name, members, membersType.getName(),
                     new Integer(operation), amOrgName };
             client.send(client.encodeMessage("modifyMemberShip_idrepo", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
 
         } catch (Exception ex) {
             processException(ex);
@@ -635,8 +638,8 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token), type.getName(),
                     amOrgName };
             Set ops = (Set) client.send(client.encodeMessage(
-                    "getSupportedOperations_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    "getSupportedOperations_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
             results = new HashSet();
             if (ops != null) {
                 Iterator it = ops.iterator();
@@ -661,8 +664,8 @@ public class IdRemoteServicesImpl implements IdServices {
         try {
             Object[] objs = { getTokenString(token), amOrgName };
             Set types = (Set) client.send(client.encodeMessage(
-                    "getSupportedTypes_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    "getSupportedTypes_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
             results = new HashSet();
             if (types != null) {
                 Iterator it = types.iterator();
@@ -690,7 +693,7 @@ public class IdRemoteServicesImpl implements IdServices {
             isExists =
                 ((Boolean) client
                     .send(client.encodeMessage("isExists_idrepo", objs),
-                            Session.getLBCookie(token.getTokenID().toString()), 
+                            sessionCookies.getLBCookie(token.getTokenID().toString()),
                             null));
             
         } catch (Exception ex) {
@@ -709,8 +712,8 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token), type.getName(),
                     name, amOrgName, amsdkDN };
             isActive = ((Boolean) client.send(client.encodeMessage(
-                    "isActive_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    "isActive_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
             
         } catch (Exception ex) {
             processException(ex);
@@ -728,7 +731,7 @@ public class IdRemoteServicesImpl implements IdServices {
                     name, amOrgName, amsdkDN, Boolean.valueOf(active)};
             client.send(
                     client.encodeMessage("setActiveStatus_idrepo", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
 
         } catch (Exception ex) {
             processException(ex);
@@ -759,8 +762,8 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = { getTokenString(token),
                 type.getName(), name, org };
             Set set = (Set) client.send(client.encodeMessage(
-                "getFullyQualifiedNames_idrepo", objs), 
-                Session.getLBCookie(token.getTokenID().toString()), null);
+                "getFullyQualifiedNames_idrepo", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
             if (set != null) {
                 // Convert to CaseInsensitiveHashSet
                 answer = new CaseInsensitiveHashSet(set);
@@ -834,7 +837,7 @@ public class IdRemoteServicesImpl implements IdServices {
             Object[] objs = {getTokenString(token), type.getName(), orgName};
             res = ((Map)client.send(client.encodeMessage(
                     "getSpecialIdentities_idrepo", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
 
         } catch (Exception ex) {
             processException(ex);

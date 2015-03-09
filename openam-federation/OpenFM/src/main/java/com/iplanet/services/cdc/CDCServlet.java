@@ -24,7 +24,7 @@
  *
  * $Id: CDCServlet.java,v 1.13 2009/11/13 23:43:17 dknab Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.iplanet.services.cdc;
@@ -70,6 +70,7 @@ import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.sm.SMSEntry;
+import org.forgerock.guice.core.InjectorHolder;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -179,7 +180,7 @@ public class CDCServlet extends HttpServlet {
         
         try {
             tokenManager = SSOTokenManager.getInstance();
-            sessionService = SessionService.getSessionService();
+            sessionService = InjectorHolder.getInstance(SessionService.class);
             spValidator = new LdapSPValidator();
             
             DNSAddress = SystemConfigurationUtil.getProperty(

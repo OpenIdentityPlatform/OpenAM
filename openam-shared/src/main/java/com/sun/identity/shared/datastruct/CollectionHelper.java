@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS
  */
 package com.sun.identity.shared.datastruct;
 
@@ -143,10 +143,12 @@ public class CollectionHelper {
      * @return the long value of the attribute or the defaultValue if not set/not a long.
      */
     public static long getLongMapAttr(Map<String, Set<String>> config, String name, long defaultValue, Debug debug) {
+        String valueString = null;
         try {
-            return Long.parseLong(getMapAttr(config, name));
+            valueString = getMapAttr(config, name);
+            return Long.parseLong(valueString);
         } catch (NumberFormatException nfe) {
-            debug.error("CollectionHelper.getLongMapAttr", nfe);
+            debug.error("Unable to parse " + name + "=" + valueString, nfe);
             return defaultValue;
         }
     }

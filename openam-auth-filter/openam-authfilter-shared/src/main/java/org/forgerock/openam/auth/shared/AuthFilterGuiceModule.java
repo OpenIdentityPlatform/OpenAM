@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.auth.shared;
@@ -21,8 +21,6 @@ import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
@@ -56,16 +54,6 @@ public class AuthFilterGuiceModule extends AbstractModule {
 
             public String get() {
                 return SystemProperties.get(SSO_TOKEN_COOKIE_NAME_PROPERTY);
-            }
-        });
-        bind(SSOTokenManager.class)
-                 .toProvider(new Provider<SSOTokenManager>() {
-            public SSOTokenManager get() {
-                try {
-                    return SSOTokenManager.getInstance();
-                } catch (SSOException e) {
-                    throw new IllegalStateException(e);
-                }
             }
         });
         bind(new TypeLiteral<Config<TokenStore>>() {}).toInstance(new Config<TokenStore>() {

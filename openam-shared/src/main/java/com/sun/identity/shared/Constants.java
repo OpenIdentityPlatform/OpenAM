@@ -323,6 +323,24 @@ public interface Constants {
     static final String AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD =
             "com.iplanet.am.session.failover.cluster.stateCheck.period";
 
+    static final String AM_SESSION_ENABLE_SESSION_CONSTRAINT =
+            "iplanet-am-session-enable-session-constraint";
+
+    static final String AM_SESSION_DENY_LOGIN_IF_DB_IS_DOWN =
+            "iplanet-am-session-deny-login-if-db-is-down";
+
+    static final String AM_SESSION_CONSTRAINT_HANDLER =
+            "iplanet-am-session-constraint-handler";
+
+    static final String AM_SESSION_SESSION_LIST_RETRIEVAL_TIMEOUT =
+            "iplanet-am-session-session-list-retrieval-timeout";
+
+    static final String AM_SESSION_MAX_SESSION_LIST_SIZE =
+            "iplanet-am-session-max-session-list-size";
+
+    static final String AM_SESSION_CONSTRAINT_MAX_WAIT_TIME =
+            "iplanet-am-session-constraint-max-wait-time";
+
     /**
      * Property string for max number of sessions
      */

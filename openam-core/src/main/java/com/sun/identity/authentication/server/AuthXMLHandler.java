@@ -32,9 +32,8 @@
 package com.sun.identity.authentication.server;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.comm.server.RequestHandler;
 import com.iplanet.services.comm.share.Request;
@@ -44,24 +43,21 @@ import com.iplanet.services.comm.share.ResponseSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.service.LoginState;
-import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.authentication.share.AuthXMLTags;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.L10NMessage;
-import org.forgerock.openam.utils.ClientUtils;
-
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -74,7 +70,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
-
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ChoiceCallback;
@@ -83,6 +78,9 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.utils.ClientUtils;
 
 
 /**
@@ -100,7 +98,9 @@ public class AuthXMLHandler implements RequestHandler {
     private static String serviceURI;
     private static boolean messageEnabled = false;
     private boolean security = false;
-    
+    private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE
+            = InjectorHolder.getInstance(SessionServiceURLService.class);
+
     static {
         debug = com.sun.identity.shared.debug.Debug.getInstance("amXMLHandler");
         messageEnabled = debug.messageEnabled();
@@ -176,8 +176,7 @@ public class AuthXMLHandler implements RequestHandler {
             if (!authIdentifier.equals("0")) {
                 try {
                     SessionID sessionID = new SessionID(authIdentifier);
-                    URL sessionServerURL = Session.getSessionServiceURL(
-                        sessionID);
+                    URL sessionServerURL = SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(sessionID);
                     StringBuilder srtBuff = new StringBuilder(100);
                     srtBuff.append(sessionServerURL.getProtocol()).append("://")
                         .append(sessionServerURL.getHost()).append(":")

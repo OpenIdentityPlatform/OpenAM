@@ -28,22 +28,20 @@
  */
 package com.sun.identity.console.session.model;
 
+import static org.forgerock.openam.session.SessionConstants.*;
+
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.SearchResults;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.SMSException;
-
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,6 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCache;
 
 /* - LOG COMPLETE - */
 
@@ -62,15 +62,10 @@ import javax.servlet.http.HttpServletRequest;
 public class SMProfileModelImpl extends AMModelBase
     implements SMProfileModel
 {
-    private static SSOToken adminSSOToken =
-            (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-
-    private final static String SERVER_LIST = 
-        "iplanet-am-platform-server-list";
-
     public  final static String USER_ID = "UserId";
 
-    private SMSessionCache sessionCache;
+    private SMSessionCache smSessionCache;
+    private SessionCache sessionCache;
     private static String DELIMITER = "|";
     private Map serverNamesMap = null;
     private String serverName = null;
@@ -84,6 +79,7 @@ public class SMProfileModelImpl extends AMModelBase
      */
     public SMProfileModelImpl(HttpServletRequest request, Map map) {
         super(request, map);
+        this.sessionCache = InjectorHolder.getInstance(SessionCache.class);
     }
 
     /**
@@ -109,14 +105,14 @@ public class SMProfileModelImpl extends AMModelBase
         logEvent("ATTEMPT_GET_CURRENT_SESSIONS", params);
 
         try {
-            Session session = Session.getSession(
-                new SessionID(getUserSSOToken().getTokenID().toString()));
+            Session session = sessionCache.getSession(
+                    new SessionID(getUserSSOToken().getTokenID().toString()));
             SearchResults result = session.getValidSessions(
                 serverName, pattern);
             Map<String, Session> sessions = (Map<String, Session>) result.getResultAttributes();
             String errorMessage =
                 AMAdminUtils.getSearchResultWarningMessage(result, this);
-            sessionCache = new SMSessionCache(
+            smSessionCache = new SMSessionCache(
                 sessions.values(), errorMessage, this);
             logEvent("SUCCEED_GET_CURRENT_SESSIONS", params);
         } catch (SessionException se) {
@@ -130,10 +126,10 @@ public class SMProfileModelImpl extends AMModelBase
     private Session getCurrentSession()
         throws AMConsoleException
     {
-        Session session = null;
+        Session session;
 
         try {
-            session = Session.getSession(
+            session = sessionCache.getSession(
                 new SessionID(getUserSSOToken().getTokenID().toString()));
         } catch (SessionException se) {
             throw new AMConsoleException(getErrorString(se));
@@ -178,7 +174,7 @@ public class SMProfileModelImpl extends AMModelBase
 
                 try {
                     currentSessionHandler =
-                        session.getProperty(Session.SESSION_HANDLE_PROP);
+                        session.getProperty(SESSION_HANDLE_PROP);
                 } catch (SessionException se) {
                     throw new AMConsoleException(getErrorString(se));
                 }
@@ -195,7 +191,7 @@ public class SMProfileModelImpl extends AMModelBase
                     boolean isCurrentSession = false;
 
                     try {
-                        isCurrentSession = currentSessionHandler.equals(s.getProperty(Session.SESSION_HANDLE_PROP));
+                        isCurrentSession = currentSessionHandler.equals(s.getProperty(SESSION_HANDLE_PROP));
                     } catch (SessionException se) {
                         logEvent("SESSION_EXCEPTION_INVALIDATE_SESSIONS",
                                 params);
@@ -263,11 +259,11 @@ public class SMProfileModelImpl extends AMModelBase
     public SMSessionCache getSessionCache(String pattern) 
         throws AMConsoleException
     {
-        if (sessionCache == null) {
+        if (smSessionCache == null) {
             initSessionsList(pattern);
         }
 
-        return sessionCache;
+        return smSessionCache;
     }
 
     /**
@@ -275,8 +271,8 @@ public class SMProfileModelImpl extends AMModelBase
      *
      * @param cache Session cache.
      */
-    public void setSessionCache(SMSessionCache cache) {
-        sessionCache = cache;
+    public void setSmSessionCache(SMSessionCache cache) {
+        smSessionCache = cache;
     }
 
     /**

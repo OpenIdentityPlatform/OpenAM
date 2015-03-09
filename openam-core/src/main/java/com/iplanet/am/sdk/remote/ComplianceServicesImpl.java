@@ -31,12 +31,13 @@ package com.iplanet.am.sdk.remote;
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMSDKBundle;
 import com.iplanet.am.sdk.common.IComplianceServices;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
 import java.rmi.RemoteException;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCookies;
 
 public class ComplianceServicesImpl implements IComplianceServices {
 
@@ -44,8 +45,11 @@ public class ComplianceServicesImpl implements IComplianceServices {
 
     private static Debug debug = RemoteServicesImpl.getDebug();
 
+    private final SessionCookies sessionCookies;
+
     public ComplianceServicesImpl(SOAPClient soapClient) {
         client = soapClient;
+        this.sessionCookies = InjectorHolder.getInstance(SessionCookies.class);
     }
 
     public boolean isAncestorOrgDeleted(SSOToken token, String dn,
@@ -56,7 +60,7 @@ public class ComplianceServicesImpl implements IComplianceServices {
                     new Integer(profileType) };
             Boolean res = ((Boolean) client.send(client.encodeMessage(
                     "isAncestorOrgDeleted", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
             return res.booleanValue();
 
         } catch (AMRemoteException amrex) {
@@ -79,7 +83,7 @@ public class ComplianceServicesImpl implements IComplianceServices {
         try {
             Object[] objs = { token.getTokenID().toString(), profileDN };
             client.send(client.encodeMessage("verifyAndDeleteObject", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
         } catch (AMRemoteException amrex) {
             debug.error("ComplianceServicesImpl.verifyAndDeleteObject()- "
                     + "encountered exception=", amrex);

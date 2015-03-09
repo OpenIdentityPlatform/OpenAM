@@ -27,10 +27,30 @@
  */
 
 /*
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock, Inc.
  */
 package com.sun.identity.session.util;
 
+import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.share.SessionBundle;
+import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.services.util.Crypt;
+import com.iplanet.services.util.I18n;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.iplanet.ums.IUMSConstants;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.security.EncodeAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -44,28 +64,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
-
 import javax.servlet.http.HttpServletRequest;
 
-import com.sun.identity.shared.debug.Debug;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.dpro.session.share.SessionBundle;
-import com.iplanet.services.naming.WebtopNaming;
-import com.iplanet.services.util.Crypt;
-import com.iplanet.services.util.I18n;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenID;
-import com.iplanet.sso.SSOTokenManager;
-import com.iplanet.ums.IUMSConstants;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.security.EncodeAction;
+import org.forgerock.guice.core.InjectorHolder;
 
 /**
  * This class Implements utility methods for handling HTTP Session.
@@ -75,25 +76,25 @@ import com.sun.identity.security.EncodeAction;
 public class SessionUtils {
 
     /** The QUERY encoding scheme*/
-     public static final short QUERY = 0;
+    public static final short QUERY = 0;
 
     /** The SLASH encoding scheme*/
-     public static final short SLASH = 1;
+    public static final short SLASH = 1;
 
     /** The SEMICOLON encoding scheme*/
-     public static final short SEMICOLON = 2;
+    public static final short SEMICOLON = 2;
 
-    static Debug debug = Debug.getInstance("amSessionUtils");
+    private static Debug debug = Debug.getInstance("amSessionUtils");
 
     /** Set of trusted Inetaddresses */
-     private static Set trustedSources = null;
+    private static Set trustedSources = null;
 
     /** The HTTPClient IPHeader */
-     private static final String httpClientIPHeader = SystemProperties.get(
+    private static final String httpClientIPHeader = SystemProperties.get(
             Constants.CLIENT_IP_ADDR_HEADER, "proxy-ip");
 
     /** The SESSION_ENCRYPTION to check if this is encrypted session */
-      private static final boolean SESSION_ENCRYPTION = Boolean.valueOf(
+    private static final boolean SESSION_ENCRYPTION = Boolean.valueOf(
             SystemProperties.get(Constants.SESSION_REPOSITORY_ENCRYPTION,
                     "false")).booleanValue();
 
@@ -117,131 +118,14 @@ public class SessionUtils {
     }
 
     /**
-     * Returns URL encoded with the cookie Value (SSOToken ID) if cookies are
-     * not support. Throws an SSOException in case of an error.
-     * 
-     * <p>
-     * The cookie Value is written in the URL based on the encodingScheme
-     * specified. The Cookie Value could be written as path info separated by
-     * either a "/" OR ";" or as a query string.
-     * 
-     * <p>
-     * If the encoding scheme is SLASH then the cookie value would be written in
-     * the URL as extra path info in the following format:
-     * <pre>
-     * protocol://server:port/servletpath/&lt;cookieName>=&lt;cookieValue>?
-     *     queryString
-     * </pre>
-     * <p>
-     * Note that this format works only if the path is a servlet, if a a jsp
-     * file is specified then webcontainers return with "File Not found" error.
-     * To rewrite links which are JSP files with cookie value use the SEMICOLON
-     * OR QUERY encoding scheme.
-     * 
-     * <p>
-     * If the encoding scheme is SEMICOLON then the cookie value would be
-     * written in the URL as extra path info in the following format:
-     * <pre>
-     * protocol://server:port/path;&lt;cookieName=cookieValue>?queryString
-     * </pre>
-     * Note that this is not supported in the servlet specification and some web
-     * containers do not support this.
-     * 
-     * <p>
-     * If the encoding scheme is QUERY then the cookie value would be written in
-     * the URL in the following format:
-     * <pre>
-     * protocol://server:port/path?&lt;cookieName>=&lt;cookieValue>
-     * protocol://server:port/path?queryString&amp;
-     *       &lt;cookieName>=&lt;cookieValue>
-     * </pre>
-     * <p>
-     * This is the default and OpenAM always encodes in this format
-     * unless otherwise specified. If the URL passed in has query parameter then
-     * entity escaping of ampersand will be done before appending the cookie if
-     * the escape is true.Only the ampersand before appending cookie parameter
-     * will be entity escaped.
-     * <p>
-     * 
-     * @param ssoToken Single Sign Token which contains the session string.
-     * @param url the URL to be encoded
-     * @param encodingScheme possible values are <code>QUERY</code>,
-     *        <code>SLASH</code>, <code>SEMICOLON</code>.
-     * @param escape <code>true</code> to escape ampersand when appending the
-     *        Single Sign On Token ID to request query string.
-     * @return encoded URL with cookie value (session ID) based on the encoding
-     *         scheme.
-     * @exception SSOException if URL cannot be encoded.
+     * Returns the remote IP address of the client
+     *
+     * @param servletRequest The HttpServletRequest object which contains the
+     *        session string.
+     * @return InetAddress the client address
+     * @exception Exception
      */
-    public static String encodeURL(SSOToken ssoToken, String url,
-            short encodingScheme, boolean escape) throws SSOException {
-        String encodedURL = url;
-        try {
-            SSOTokenID ssoTokenId = ssoToken.getTokenID();
-            SessionID sessionID = new SessionID(ssoTokenId.toString());
-            Session session = Session.getSession(sessionID);
-            encodedURL = session.encodeURL(url, encodingScheme, escape);
-        } catch (Exception e) {
-            debug.message("Exception encoding URL ", e);
-            throw new SSOException(e);
-        }
-        return encodedURL;
-    }
-
-    /**
-     * Returns URL encoded with the cookie Value (SSOToken ID) if cookies are
-     * not supported.
-     * 
-     * This method assumes default encoding scheme which is QUERY. The cookie
-     * value would be written in the URL in the following format:
-     * <pre>
-     * protocol://server:port/path?&lt;cookieName>=&lt;cookieValue>
-     * protocol://server:port/path?queryString&amp;
-     *        &lt;cookieName>=&lt;cookieValue>
-     * </pre>
-     * <p>
-     * 
-     * This is the default and OpenAM always encodes in this format
-     * unless otherwise specified. If the URL passed in has query parameter then
-     * entity escaping of ampersand will be done before appending the cookie if
-     * the escape is true. Only the ampersand before appending cookie parameter
-     * will be entity escaped.
-     * <p>
-     * 
-     * @param ssoToken Single Sign Token which contains the session string.
-     * @param url the URL to be encoded.
-     * @param escape <code>true</code> to escape ampersand when appending the
-     *        Single Sign On Token ID to request query string.
-     * @return URL encoded with cookie Value in the query string.
-     * @exception SSOException if URL cannot be encoded.
-     */
-    public static String encodeURL(
-        SSOToken ssoToken,
-        String url,
-        boolean escape
-    ) throws SSOException 
-    {
-        String encodedURL = url;
-        try {
-            encodedURL = encodeURL(ssoToken, url, QUERY, escape);
-        } catch (Exception e) {
-            debug.message("Exception encoding url", e);
-            throw new SSOException(e);
-        }
-        return encodedURL;
-    }
-
-   /**
-    * Returns the remote IP address of the client
-    * 
-    * @param servletRequest The HttpServletRequest object which contains the
-    *        session string.
-    * @return InetAddress the client address
-    * @exception Exception
-    */
-   public static InetAddress getClientAddress(
-            HttpServletRequest servletRequest) throws Exception 
-    {
+    public static InetAddress getClientAddress(HttpServletRequest servletRequest) throws Exception {
 
         InetAddress remoteClient = InetAddress.getByName(servletRequest
                 .getRemoteAddr());
@@ -289,15 +173,14 @@ public class SessionUtils {
         return result;
     }
 
-   /**
-    * Returns the remote IP address of the client is a trusted source
-    * 
-    * @param source the InetAddress of the remote client
-    * @return a <code>true </code> if is a trusted source.<code>false> otherwise
-    * @exception Exception
-    */
-   public static boolean isTrustedSource(InetAddress source)
-            throws SessionException {
+    /**
+     * Returns the remote IP address of the client is a trusted source
+     *
+     * @param source the InetAddress of the remote client
+     * @return a <code>true </code> if is a trusted source.<code>false> otherwise
+     * @exception Exception
+     */
+    public static boolean isTrustedSource(InetAddress source) throws SessionException {
         if (trustedSources == null) {
             trustedSources = getTrustedSourceList();
         }
@@ -369,14 +252,12 @@ public class SessionUtils {
      * @throws Exception
      *             if anything goes wrong
      */
-    public static String getEncryptedStorageKey(SessionID sessionID)
-            throws Exception {
+    public static String getEncryptedStorageKey(SessionID sessionID) throws Exception {
 
         String sKey = sessionID.getExtension(SessionID.STORAGE_KEY);
         if (SESSION_ENCRYPTION) {
-            String strEncrypted = (String) AccessController
-                    .doPrivileged(new EncodeAction(sKey, Crypt
-                            .getHardcodedKeyEncryptor()));
+            String strEncrypted = AccessController.doPrivileged(
+                    new EncodeAction(sKey, Crypt.getHardcodedKeyEncryptor()));
             return strEncrypted;
         }
         return sKey;
@@ -389,9 +270,8 @@ public class SessionUtils {
      *
      * @return SSOToken of super admin.
      */
-    public static SSOToken getAdminToken() throws SSOException{
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
+    public static SSOToken getAdminToken() throws SSOException {
+        SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
         if (adminToken == null) {
             I18n i18n = I18n.getInstance(IUMSConstants.UMS_PKG);
             String rbName = i18n.getResBundleName();
@@ -422,8 +302,8 @@ public class SessionUtils {
 
         boolean result = false;
 
-        String usrName = null;
-        String admName = null;
+        String usrName;
+        String admName;
 
         try {
             usrName = usrToken.getPrincipal().getName();
@@ -463,13 +343,16 @@ public class SessionUtils {
      * @param value Property value.
      * @throws SessionException if the key is protected property.
      */
-    public static void checkPermissionToSetProperty(SSOToken clientToken,
-        String key, String value) throws SessionException {
+    public static void checkPermissionToSetProperty(SSOToken clientToken, String key, String value)
+            throws SessionException {
+
+        Debug sessionDebug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
+
         if (InternalSession.isProtectedProperty(key)) {
             if (clientToken == null) {
                 // Throw Ex. Client should identify itself.
-                if (SessionService.sessionDebug.warningEnabled()) {
-                    SessionService.sessionDebug.warning(
+                if (sessionDebug.warningEnabled()) {
+                    sessionDebug.warning(
                         "SessionUtils.checkPermissionToSetProperty(): "
                         + "Attempt to set protected property without client "
                         + "token [" + key + "=" + value + "]");
@@ -484,7 +367,7 @@ public class SessionUtils {
                 ssoTokenManager = SSOTokenManager.getInstance();
             } catch (SSOException ssoEx) {
                 // Throw Ex. Not able to get SSOTokenManager instance.
-                SessionService.sessionDebug.error(
+                sessionDebug.error(
                     "SessionUtils.checkPermissionToSetProperty(): "
                     + "Cannot get instance of SSOTokenManager.");
                 throw new SessionException(
@@ -494,8 +377,8 @@ public class SessionUtils {
 
             if (!ssoTokenManager.isValidToken(clientToken)) {
                 // Throw Ex. Client should identify itself.
-                if (SessionService.sessionDebug.warningEnabled()) {
-                    SessionService.sessionDebug.warning(
+                if (sessionDebug.warningEnabled()) {
+                    sessionDebug.warning(
                         "SessionUtils.checkPermissionToSetProperty(): "
                         + "Attempt to set protected property with invalid client"
                         + " token [" + key + "=" + value + "]");
@@ -510,7 +393,7 @@ public class SessionUtils {
                 admToken = SessionUtils.getAdminToken();
             } catch (SSOException ssoEx) {
                 // Throw Ex. Server not able to get Admin Token.
-                SessionService.sessionDebug.error(
+                sessionDebug.error(
                     "SessionUtils.checkPermissionToSetProperty(): "
                     + "Cannot get Admin Token for validation to set protected "
                     + "property [" + key + "=" + value + "]");
@@ -520,7 +403,7 @@ public class SessionUtils {
             }
             if (!SessionUtils.isAdmin(admToken, clientToken)) {
                 // Throw Ex. Client not authorized to set this property.
-                SessionService.sessionDebug.error(
+                sessionDebug.error(
                     "SessionUtils.checkPermissionToSetProperty(): "
                     + "Client does not have permission to set protected "
                     + "property" + key + "=" + value + "]");

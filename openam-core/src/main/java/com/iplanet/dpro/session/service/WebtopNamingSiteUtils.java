@@ -20,14 +20,14 @@ import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.forgerock.openam.session.SessionConstants;
 
 /**
  * Responsible for providing supporting functions for the {@link WebtopNaming} service.

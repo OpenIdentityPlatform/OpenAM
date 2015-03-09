@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.monitoring.session;
 
@@ -20,6 +20,7 @@ import com.iplanet.dpro.session.monitoring.SessionMonitorType;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.management.snmp.SnmpStatusException;
 import com.sun.management.snmp.agent.SnmpMib;
+import org.forgerock.guice.core.InjectorHolder;
 
 /**
  * Implementation for hooking the SNMP {@link RemoteSessions} class in to OpenAM to report on our stats.
@@ -65,7 +66,7 @@ public class RemoteSessionsImpl extends RemoteSessions {
      * Getter for the "SumRemoteSessions" variable.
      */
     public Long getSumRemoteSessions() throws SnmpStatusException {
-        return (long) SessionService.getSessionService().getRemoteSessionCount();
+        return (long) InjectorHolder.getInstance(SessionService.class).getRemoteSessionCount();
     }
 
 }

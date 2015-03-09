@@ -116,7 +116,7 @@ public class ServerSessionOperationStrategyTest {
         given(mockNamingQuery.isSite(anyString())).willReturn(true);
 
         // The Site is down.
-        given(mockSessionService.checkSiteUp(anyString())).willReturn(false);
+        given(mockSessionService.isSiteUp(anyString())).willReturn(false);
 
         // And Session is in CTS
         given(mockCTS.hasSession(mockSession)).willReturn(true);

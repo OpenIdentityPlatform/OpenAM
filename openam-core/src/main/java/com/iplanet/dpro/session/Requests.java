@@ -1,6 +1,4 @@
-/**
- * Copyright 2014 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,19 +10,23 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
  */
+
 package com.iplanet.dpro.session;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
-
-import javax.inject.Inject;
 import java.net.URL;
 import java.security.AccessController;
+import javax.inject.Inject;
+import org.forgerock.openam.session.SessionPLLSender;
 
 /**
  * Responsible for performing the Session based logic of sending a request.
@@ -40,11 +42,14 @@ import java.security.AccessController;
  * the Session code base.
  */
 public class Requests {
+
     private final SessionService service;
+    private final SessionPLLSender pllSender;
 
     @Inject
-    public Requests(SessionService service) {
+    public Requests(SessionService service, SessionPLLSender pllSender) {
         this.service = service;
+        this.pllSender = pllSender;
     }
 
     /**
@@ -59,13 +64,13 @@ public class Requests {
      */
     public SessionResponse sendRequestWithRetry(URL svcurl, SessionRequest sreq, Session session)
             throws SessionException {
-        if (Session.isServerMode() && SessionService.getUseInternalRequestRouting()) {
+        if (SystemProperties.isServerMode() && service.getUseInternalRequestRouting()) {
+
             try {
                 return getSessionResponseWithRetry(svcurl, sreq, session);
             } catch (SessionException e) {
                 // attempt retry if appropriate
-                String hostServer = service
-                        .getCurrentHostServer(session.getID());
+                String hostServer = service.getCurrentHostServer(session.getID());
                 if (!service.checkServerUp(hostServer)) {
                     // proceed with retry
                     // Note that there is a small risk of repeating request
@@ -100,23 +105,22 @@ public class Requests {
         Object context = RestrictedTokenContext.getCurrent();
 
         SSOToken appSSOToken = null;
-        if (!Session.isServerMode() && !(session.getID().getComingFromAuth())) {
-            appSSOToken = AccessController.doPrivileged(
-                    AdminTokenAction.getInstance());
+        if (!SystemProperties.isServerMode() && !(session.getID().getComingFromAuth())) {
+            appSSOToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             session.createContext(appSSOToken);
         }
         try {
             if (context != null) {
                 sreq.setRequester(RestrictedTokenContext.marshal(context));
             }
-            sres = Session.sendPLLRequest(svcurl, sreq);
+            sres = pllSender.sendPLLRequest(svcurl, sreq);
             while (sres.getException() != null) {
                 session.processSessionResponseException(sres, appSSOToken);
                 if (context != null) {
                     sreq.setRequester(RestrictedTokenContext.marshal(context));
                 }
                 // send request again
-                sres = Session.sendPLLRequest(svcurl, sreq);
+                sres = pllSender.sendPLLRequest(svcurl, sreq);
             }
         } catch (Exception e) {
             throw new SessionException(e);

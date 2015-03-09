@@ -27,13 +27,13 @@
  */
 
 /**
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS
  */
 package com.sun.identity.authentication;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
@@ -51,12 +51,24 @@ import com.sun.identity.authentication.share.AuthXMLTags;
 import com.sun.identity.authentication.share.AuthXMLUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.AMSecurityPropertiesException;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
+import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
+import org.forgerock.openam.session.SessionCache;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -71,20 +83,10 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
-import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * The <code>AuthContext</code> provides the implementation for
@@ -182,6 +184,8 @@ public class AuthContext extends Object implements java.io.Serializable {
 
     private HttpServletRequest remoteRequest = null;
     private HttpServletResponse remoteResponse = null;
+
+    private final SessionCache sessionCache = SessionCache.getInstance();
     
     /**
      * Constructs an instance of <code>AuthContext</code> for a given
@@ -644,8 +648,7 @@ public class AuthContext extends Object implements java.io.Serializable {
                 organizationName = ssoToken.getProperty(
                     ISAuthConstants.ORGANIZATION);
                 ssoTokenID = ssoToken.getTokenID().toString();
-                authURL = Session.getSession(
-                    new SessionID(ssoTokenID)).getSessionServiceURL();
+                authURL = sessionCache.getSession(new SessionID(ssoTokenID)).getSessionServiceURL();
             } catch (Exception e) {
                 throw new AuthLoginException(e);
             }
@@ -1421,8 +1424,7 @@ public class AuthContext extends Object implements java.io.Serializable {
                 organizationName = ssoToken.getProperty(
                     ISAuthConstants.ORGANIZATION);
                 ssoTokenID = ssoToken.getTokenID().toString();
-                authURL = Session.getSession(
-                    new SessionID(ssoTokenID)).getSessionServiceURL();
+                authURL = sessionCache.getSession(new SessionID(ssoTokenID)).getSessionServiceURL();
             } catch (Exception e) {
                 throw new AuthLoginException(e);
             }
@@ -2414,9 +2416,7 @@ public class AuthContext extends Object implements java.io.Serializable {
                 ssoTokenID = ssoToken.getTokenID().toString();
                 
             } else {
-                com.iplanet.dpro.session.service.SessionService.
-                   getSessionService().destroyInternalSession
-                   (oldSess.getID());
+                InjectorHolder.getInstance(SessionService.class).destroyInternalSession(oldSess.getID());
             }
         }
         localSessionChecked = true;

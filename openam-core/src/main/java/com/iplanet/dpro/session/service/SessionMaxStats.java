@@ -27,45 +27,57 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock, AS.
  */
 package com.iplanet.dpro.session.service;
 
-import java.util.Hashtable;
-
+import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.shared.stats.StatsListener;
 
-/** 
+/**
  * <code>SessionMaxStats</code> implements the <code>StatsListener</code>
  * and provides the information of the total number of sessions in the session 
  * table and the number of active sessions in the table.
  */
 public class SessionMaxStats implements StatsListener {
 
-    private Hashtable sessionTable;
+    private final InternalSessionCache internalSessionCache;
+    private final MonitoringOperations monitoringOperations;
+    private final SessionNotificationSender sessionNotificationSender;
+    private final Stats stats;
     private int peakSessions = 0;
     private int peakActiveSessions = 0;
     private int peakNotificationQueue = 0;
 
-
    /**
     * Creates a new SessionMaxStats
-    * @param table session table
+    * @param internalSessionCache session internalSessionCache
+    * @param monitoringOperations
+    * @param sessionNotificationSender
+    * @param stats
     */
-   public SessionMaxStats(Hashtable table) {
-        sessionTable = table;
-    }
+   public SessionMaxStats(
+           InternalSessionCache internalSessionCache,
+           MonitoringOperations monitoringOperations,
+           SessionNotificationSender sessionNotificationSender,
+           Stats stats) {
+
+       this.internalSessionCache = internalSessionCache;
+       this.monitoringOperations = monitoringOperations;
+       this.sessionNotificationSender = sessionNotificationSender;
+       this.stats = stats;
+   }
 
     /**
      * Prints the session statistics for the given session table.
      *
      */
    public void printStats() {
-       if (!sessionTable.isEmpty() ) {
+       if (!internalSessionCache.isEmpty()) {
            
-           int maxSessions = sessionTable.size();
-           int maxActiveSessions = SessionService.getActiveSessions();
-           int notificationQueue = SessionService.getNotificationQueueSize();
+           int maxSessions = internalSessionCache.size();
+           int maxActiveSessions = monitoringOperations.getActiveSessions();
+           int notificationQueue = sessionNotificationSender.getNotificationQueueSize();
            
            if (maxSessions > peakSessions) {
                peakSessions = maxSessions;
@@ -76,17 +88,17 @@ public class SessionMaxStats implements StatsListener {
            if (notificationQueue > peakNotificationQueue) {
                peakNotificationQueue = notificationQueue;
            }
-           
-           SessionService.stats.record(
-                 "Max sessions in session table Current/Peak:" + 
-                     maxSessions + "/" + peakSessions + "\n" +
-                 "Max active sessions Current/Peak:" + 
-                     maxActiveSessions + "/" + peakActiveSessions + "\n" +
-                 "Session Notifications in Queue Current/Peak:" 
-                     + notificationQueue + "/" + peakNotificationQueue);
+
+           stats.record(
+                   "Max sessions in session table Current/Peak:" +
+                           maxSessions + "/" + peakSessions + "\n" +
+                           "Max active sessions Current/Peak:" +
+                           maxActiveSessions + "/" + peakActiveSessions + "\n" +
+                           "Session Notifications in Queue Current/Peak:"
+                           + notificationQueue + "/" + peakNotificationQueue);
        } 
        else {
-         SessionService.stats.record("No sessions found in session table"); 
+           stats.record("No sessions found in session table");
        }
    }
 }

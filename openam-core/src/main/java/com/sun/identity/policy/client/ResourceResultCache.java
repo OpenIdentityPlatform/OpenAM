@@ -29,41 +29,39 @@
 
 package com.sun.identity.policy.client;
 
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.JSONUtils;
+import com.iplanet.am.util.Cache;
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.am.util.Cache;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOTokenEvent;
-import com.iplanet.sso.SSOTokenListener;
 import com.iplanet.services.comm.client.AlreadyRegisteredException;
 import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.comm.client.SendRequestException;
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
 import com.iplanet.services.comm.share.Response;
-import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.naming.URLNotFoundException;
+import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenEvent;
+import com.iplanet.sso.SSOTokenListener;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.HttpURLConnectionManager;
-
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.policy.ActionDecision;
 import com.sun.identity.policy.PolicyDecision;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyUtils;
+import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.policy.ResourceMatch;
 import com.sun.identity.policy.ResourceResult;
 import com.sun.identity.policy.interfaces.ResourceName;
 import com.sun.identity.policy.remote.AdvicesHandleableByAMRequest;
 import com.sun.identity.policy.remote.AdvicesHandleableByAMResponse;
 import com.sun.identity.policy.remote.PolicyChangeNotification;
-import com.sun.identity.policy.remote.PolicyEvaluationException; 
+import com.sun.identity.policy.remote.PolicyEvaluationException;
 import com.sun.identity.policy.remote.PolicyListenerRequest;
 import com.sun.identity.policy.remote.PolicyNotification;
 import com.sun.identity.policy.remote.PolicyRequest;
@@ -71,30 +69,31 @@ import com.sun.identity.policy.remote.PolicyResponse;
 import com.sun.identity.policy.remote.PolicyService;
 import com.sun.identity.policy.remote.RemoveListenerRequest;
 import com.sun.identity.policy.remote.ResourceResultRequest;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-import java.util.Set;
-import com.sun.identity.policy.ResBundleUtils;
-
-
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.JSONUtils;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.SessionCookies;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * Singleton class that implements client side policy decision cache.
@@ -146,6 +145,9 @@ class ResourceResultCache implements SSOTokenListener {
     private static final String GET_RESPONSE_ATTRIBUTES 
             = "Get_Response_Attributes";
 
+    private static final SessionCache sessionCache = SessionCache.getInstance();
+    private static final SessionCookies sessionCookies = SessionCookies.getInstance();
+
     private static long requestID = 0;
     private static String REQUEST_ID_LOCK = "REQUEST_ID_LOCK";
     private static String SECRET_MASK = "*********";
@@ -164,7 +166,7 @@ class ResourceResultCache implements SSOTokenListener {
         notificationHandler = new PolicyNotificationHandler(this);
         cacheTtl = policyProperties.getCacheTtl();
 
-        if(policyProperties.notificationEnabled()){
+        if (policyProperties.notificationEnabled()){
             //register notification handler with PLLClient
             registerHandlerWithPLLClient(notificationHandler);
             if (debug.messageEnabled()) {
@@ -1175,7 +1177,7 @@ class ResourceResultCache implements SSOTokenListener {
         try {
             String ssoTokenID = token.getTokenID().toString();
             SessionID sid = new SessionID(ssoTokenID);
-            Session session = Session.getSession(sid);
+            Session session = sessionCache.getSession(sid);
             URL sessionServiceURL = session.getSessionServiceURL();
             String protocol =  sessionServiceURL.getProtocol();
             String host = sessionServiceURL.getHost();
@@ -1610,17 +1612,17 @@ class ResourceResultCache implements SSOTokenListener {
     
     /**
      * Returns lbcookie value for the Session
-     * @param  a policy request
+     * @param  preq policy request
      * @return lbcookie name and value pair
      * @throws Exception if session in request is invalid
      */
     public static String getLBCookie(PolicyRequest preq) throws Exception{
-       String lbcookie = null;
+       String lbcookie;
        ResourceResultRequest rrReq = preq.getResourceResultRequest();
        if(rrReq !=null ) {
-           lbcookie = Session.getLBCookie(rrReq.getUserSSOToken());
+           lbcookie = sessionCookies.getLBCookie(rrReq.getUserSSOToken());
        } else {
-           lbcookie = Session.getLBCookie(preq.getAppSSOToken());
+           lbcookie = sessionCookies.getLBCookie(preq.getAppSSOToken());
        }
        return lbcookie;
     }

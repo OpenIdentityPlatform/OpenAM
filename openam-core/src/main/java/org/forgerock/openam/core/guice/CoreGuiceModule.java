@@ -16,15 +16,6 @@
 
 package org.forgerock.openam.core.guice;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
@@ -37,11 +28,13 @@ import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.service.SessionConstants;
+import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.delegation.DelegationManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
@@ -54,6 +47,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSEntry;
@@ -104,6 +98,11 @@ import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.session.SessionPollerPool;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.session.SessionURL;
 import org.forgerock.openam.sm.SMSConfigurationFactory;
 import org.forgerock.openam.sm.ServerGroupConfiguration;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
@@ -116,6 +115,15 @@ import org.forgerock.opendj.ldap.SearchResultHandler;
 import org.forgerock.util.promise.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.thread.ExecutorServiceFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -152,6 +160,16 @@ public class CoreGuiceModule extends AbstractModule {
                 try {
                     return DSConfigMgr.getDSConfigMgr();
                 } catch (LDAPServiceException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        }).in(Singleton.class);
+
+        bind(SSOTokenManager.class).toProvider(new Provider<SSOTokenManager>() {
+            public SSOTokenManager get() {
+                try {
+                    return SSOTokenManager.getInstance();
+                } catch (SSOException e) {
                     throw new IllegalStateException(e);
                 }
             }
@@ -217,11 +235,7 @@ public class CoreGuiceModule extends AbstractModule {
          * Session related dependencies.
          */
         bind(SessionOperationStrategy.class).to(ServerSessionOperationStrategy.class);
-        bind(SessionService.class).toProvider(new Provider<SessionService>() {
-            public SessionService get() {
-                return SessionService.getSessionService();
-            }
-        }).in(Singleton.class);
+        // TODO: Investigate whether or not this lazy-loading "Config<SessionService>" wrapper is still needed
         bind(new TypeLiteral<Config<SessionService>>() {}).toInstance(new Config<SessionService>() {
             @Override
             public boolean isReady() {
@@ -230,7 +244,7 @@ public class CoreGuiceModule extends AbstractModule {
 
             @Override
             public SessionService get() {
-                return SessionService.getSessionService();
+                return InjectorHolder.getInstance(SessionService.class);
             }
         });
 
@@ -254,6 +268,16 @@ public class CoreGuiceModule extends AbstractModule {
                 .build(AMIdentityRepositoryFactory.class));
 
         Multibinder.newSetBinder(binder(), IdRepoCreationListener.class);
+
+        bind(Stats.class)
+                .annotatedWith(Names.named(SessionConstants.STATS_MASTER_TABLE))
+                .toInstance(Stats.getInstance(SessionConstants.STATS_MASTER_TABLE));
+
+        bind(SessionCache.class).toInstance(SessionCache.getInstance());
+        bind(SessionPollerPool.class).toInstance(SessionPollerPool.getInstance());
+        bind(SessionCookies.class).toInstance(SessionCookies.getInstance());
+        bind(SessionURL.class).toInstance(SessionURL.getInstance());
+        bind(SessionServiceURLService.class).toInstance(SessionServiceURLService.getInstance());
     }
 
     @Provides @Inject @Named(PolicyMonitorImpl.EXECUTOR_BINDING_NAME)
@@ -435,6 +459,11 @@ public class CoreGuiceModule extends AbstractModule {
             // Provider used over bind(..).getInstance(..) to enforce a lazy loading approach.
             return AdminTokenAction.getInstance();
         }
+    }
+
+    @Provides @Named(SessionConstants.PRIMARY_SERVER_URL) @Inject @Singleton
+    String getPrimaryServerURL(SessionServerConfig serverConfig) {
+        return serverConfig.getPrimaryServerURL().toString();
     }
 
     /**

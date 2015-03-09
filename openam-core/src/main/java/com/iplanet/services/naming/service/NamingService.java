@@ -27,29 +27,28 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS
  */
 
 package com.iplanet.services.naming.service;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.comm.server.RequestHandler;
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.Response;
 import com.iplanet.services.comm.share.ResponseSet;
-import com.iplanet.services.naming.share.NamingRequest;
-import com.iplanet.services.naming.share.NamingResponse;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.services.naming.share.NamingRequest;
+import com.iplanet.services.naming.share.NamingResponse;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.internal.AuthPrincipal;
+import com.sun.identity.common.FQDNUtils;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
-import com.sun.identity.common.FQDNUtils;
 import com.sun.identity.security.AdminDNAction;
 import com.sun.identity.security.AdminPasswordAction;
 import com.sun.identity.shared.Constants;
@@ -77,6 +76,8 @@ import java.util.StringTokenizer;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCookies;
 
 public class NamingService implements RequestHandler, ServiceListener {
 
@@ -113,6 +114,8 @@ public class NamingService implements RequestHandler, ServiceListener {
     private static Set sessionConfig = null;
 
     private static String delimiter = "|";
+
+    private final SessionCookies sessionCookies;
 
     /*
      * Initialize SSO, schema managers statically, and add listener for schema
@@ -168,7 +171,7 @@ public class NamingService implements RequestHandler, ServiceListener {
     }
 
     public NamingService() {
-
+        this.sessionCookies = InjectorHolder.getInstance(SessionCookies.class);
     }
 
     /**
@@ -437,8 +440,8 @@ public class NamingService implements RequestHandler, ServiceListener {
                 } else {
                     nres.setNamingTable(replacedTable);
                 }
-                nres.setAttribute(Constants.NAMING_AM_LB_COOKIE, 
-                        Session.getLBCookie(sessionId));
+                nres.setAttribute(Constants.NAMING_AM_LB_COOKIE,
+                        sessionCookies.getLBCookie(sessionId));
             }
         } catch (Exception e) {
             String errorMsg = "Failed to process naming request";
@@ -594,9 +597,9 @@ public class NamingService implements RequestHandler, ServiceListener {
         }
         try {
             updateNamingTable();
-            SessionService ss = SessionService.getSessionService();
+            SessionService ss = InjectorHolder.getInstance(SessionService.class);
             if ((ss != null) && ss.isSessionFailoverEnabled()) {
-                ss.ReInitClusterMemberMap();
+                ss.reinitializeClusterMemberMap();
             }
         } catch (Exception ex) {
             namingDebug.error("Error occured in updating naming table", ex);

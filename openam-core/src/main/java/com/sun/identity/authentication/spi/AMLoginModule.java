@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock Inc
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.spi;
@@ -1729,14 +1729,14 @@ public abstract class AMLoginModule implements LoginModule {
     public Set getNewUserIDs(Map attributes, int num)
             throws AuthLoginException {
         boolean enabled = getLoginState(
-        "getNewUserIDs(Map, int)").userIDGeneratorEnabled;
+                "getNewUserIDs(Map, int)").isUserIDGeneratorEnabled();
         
         if (!enabled) {
             return null;
         }
         
         String className = getLoginState(
-        "getNewUserIDs(Map, int)").userIDGeneratorClassName;
+                "getNewUserIDs(Map, int)").getUserIDGeneratorClassName();
         String orgDN = getLoginState("getNewUserIDs(Map, int)").getOrgDN();
         
         // if className is null or empty, use the default user ID
@@ -2583,10 +2583,10 @@ public abstract class AMLoginModule implements LoginModule {
                         debug.message("AMLoginModule.authenticateToDatastore:: "
                         + " user is : " + userName);
                         debug.message("AMLoginModule.authenticateToDatastore:: "
-                        + " Internal users : " + LoginState.internalUsers);
+                        + " Internal users : " + LoginState.INTERNAL_USERS);
                     }
                     
-                    if (LoginState.internalUsers.contains(
+                    if (LoginState.INTERNAL_USERS.contains(
                             userName.toLowerCase())) {
                         needToCheck = true;
                     } else {

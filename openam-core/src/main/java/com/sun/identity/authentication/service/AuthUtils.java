@@ -24,9 +24,11 @@
  *
  * $Id: AuthUtils.java,v 1.33 2009/12/15 16:39:47 qcheng Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
+
+import static org.forgerock.openam.session.SessionConstants.*;
 
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
@@ -68,15 +70,6 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
-import org.forgerock.util.Reject;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.net.URL;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -89,6 +82,17 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.login.AppConfigurationEntry;
+import javax.security.auth.login.Configuration;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.util.Reject;
 
 public class AuthUtils extends AuthClientUtils {
     
@@ -120,6 +124,9 @@ public class AuthUtils extends AuthClientUtils {
     static Debug utilDebug = Debug.getInstance("amAuthUtils");    
     private static String serviceURI = SystemProperties.get(
         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR) + "/UI/Login";
+
+    private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE = InjectorHolder.getInstance(SessionServiceURLService.class);
+    private static final SessionCache sessionCache = InjectorHolder.getInstance(SessionCache.class);
 
     /*
      * Private constructor to prevent any instances being created
@@ -213,8 +220,7 @@ public class AuthUtils extends AuthClientUtils {
                     String cookieURL = null;
                     try {
                         SessionID sessionID = new SessionID(authCookieValue);
-                        URL sessionServerURL = 
-                            Session.getSessionServiceURL(sessionID);
+                        URL sessionServerURL = SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(sessionID);
                         cookieURL = sessionServerURL.getProtocol()
                             + "://" + sessionServerURL.getHost() + ":"
                             + Integer.toString(sessionServerURL.getPort()) 
@@ -286,7 +292,7 @@ public class AuthUtils extends AuthClientUtils {
                 authContext = processAuthContext(authContext,request,
 				response,dataHash,sid);
 				loginState = getLoginState(authContext);
-				loginState.setRequestType(false);
+				loginState.setNewRequest(false);
             }
             
         } catch (Exception ee) {
@@ -548,7 +554,7 @@ public class AuthUtils extends AuthClientUtils {
         String successURL = null;
         LoginState loginState = getLoginState(authContext);
         if (loginState == null) {
-            successURL = AuthD.getAuth().defaultSuccessURL;
+            successURL = AuthD.getAuth().getDefaultSuccessURL();
         } else {
             successURL = getLoginState(authContext).getSuccessLoginURL();
         }
@@ -561,7 +567,7 @@ public class AuthUtils extends AuthClientUtils {
         try {
             LoginState loginState = getLoginState(authContext);
             if (loginState == null) {
-                return AuthD.getAuth().defaultFailureURL;
+                return AuthD.getAuth().getDefaultFailureURL();
             }
             String loginFailedURL=loginState.getFailureLoginURL();
             if (utilDebug.messageEnabled()) {
@@ -1054,7 +1060,7 @@ public class AuthUtils extends AuthClientUtils {
                         utilDebug.message("sid from sess is : " + sess.getID());
                         utilDebug.message("sess is : " + sessionState);
                     }
-                    if (!((sessionState == Session.INVALID)  || (isLogout))) {
+                    if (!((sessionState == INVALID)  || (isLogout))) {
                         ssot = AuthUtils.
                             getExistingValidSSOToken(sid);
                         if ((indexType != null) && (indexName != null)) {
@@ -1135,7 +1141,7 @@ public class AuthUtils extends AuthClientUtils {
                     loginState = getLoginState(authContext);
                     if (loginState != null) {
                         loginState.setSession(requestSess);
-                        loginState.setRequestType(false);
+                        loginState.setNewRequest(false);
                     }
                 } catch (Exception ae) {
                     utilDebug.message("Error Retrieving AuthContextLocal" );
@@ -1215,7 +1221,7 @@ public class AuthUtils extends AuthClientUtils {
                 return null;
             } else {
                 int status = sess.getState();
-                if (status == Session.INVALID){
+                if (status == INVALID){
                     return null;
                 }
                 return authContext;
@@ -1236,7 +1242,7 @@ public class AuthUtils extends AuthClientUtils {
             }
             boolean sessionValid = false;
             if (sess != null) {
-                if (sess.getState() == Session.VALID) {
+                if (sess.getState() == VALID) {
                     sessionValid = true;
                 }
                 if (utilDebug.messageEnabled()) {
@@ -1478,7 +1484,7 @@ public class AuthUtils extends AuthClientUtils {
     String configName, AMLoginContext amlc)
     throws AuthLoginException {
         
-        if (AuthD.enforceJAASThread) {
+        if (AuthD.isEnforceJAASThread()) {
             return 1;
         }
         int returnValue = -1;
@@ -2120,7 +2126,7 @@ public class AuthUtils extends AuthClientUtils {
             
             if ((token != null) && isTokenValid) {
                 AuthD.getAuth().logLogout(token);
-                Session session = Session.getSession(new SessionID(token.getTokenID().toString()));
+                Session session = sessionCache.getSession(new SessionID(token.getTokenID().toString()));
                 session.logout();
                 
                 if (utilDebug.messageEnabled()) {

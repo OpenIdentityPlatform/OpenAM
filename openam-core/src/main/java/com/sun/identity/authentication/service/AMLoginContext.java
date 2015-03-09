@@ -24,6 +24,12 @@
  *
  * $Id: AMLoginContext.java,v 1.24 2009/12/23 20:03:04 mrudul_uchil Exp $
  *
+<<<<<<< HEAD
+=======
+ */
+
+/**
+>>>>>>> stateless
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
@@ -824,7 +830,7 @@ public class AMLoginContext {
                 }
             }
             loginState.logLogout();
-            loginState.postProcess(indexType, indexName, LoginState.POSTPROCESS_LOGOUT);
+            loginState.postProcess(indexType, indexName, LoginState.PostProcessEvent.LOGOUT);
             destroySession();
             loginStatus.setStatus(LoginStatus.AUTH_COMPLETED);
         } catch (AuthLoginException le) {
@@ -1626,7 +1632,7 @@ public class AMLoginContext {
         }
 
         for (String moduleName : moduleSet) {
-            int authLevel = levelManager.getLevelForModule(moduleName, orgDN, loginState.defaultAuthLevel);
+            int authLevel = levelManager.getLevelForModule(moduleName, orgDN, loginState.getDefaultAuthLevel());
             if (authLevel > maxLevel)  {
                 maxLevel = authLevel;
             }
@@ -1979,7 +1985,7 @@ public class AMLoginContext {
                 debug.message("postProcessOnFail ");
             }
             //setErrorMsgAndTemplate();
-            loginState.postProcess(indexType, indexName, LoginState.POSTPROCESS_FAILURE);
+            loginState.postProcess(indexType, indexName, LoginState.PostProcessEvent.FAILURE);
             loginState.setFailureLoginURL(indexType, indexName);
             processDone = true;
         }
@@ -1995,7 +2001,7 @@ public class AMLoginContext {
             if (debug.messageEnabled()) {
                 debug.message("postProcessOnSuccess ");
             }
-            loginState.postProcess(indexType, indexName, LoginState.POSTPROCESS_SUCCESS);
+            loginState.postProcess(indexType, indexName, LoginState.PostProcessEvent.SUCCESS);
             processDone = true;
         }
     }
@@ -2091,6 +2097,5 @@ public class AMLoginContext {
         moduleSet = null;
         entries = null;
         recdCallback = null;
-        loginState.nullifyUsedVars();
     }
 }

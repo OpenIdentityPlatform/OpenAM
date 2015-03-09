@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013-2015 ForgeRock, Inc.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,9 +15,11 @@
  */
 package org.forgerock.openam.forgerockrest.session.query.impl;
 
-import com.iplanet.dpro.session.Session;
+import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
@@ -25,14 +27,17 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.forgerockrest.session.query.SessionQueryType;
-
 import java.net.URL;
 import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import org.forgerock.guice.core.InjectorHolder;
+
+import org.forgerock.openam.forgerockrest.session.query.SessionQueryType;
+import org.forgerock.openam.session.SessionPLLSender;
+import org.forgerock.openam.session.SessionServiceURLService;
 
 /**
  * Provides an implementation of the SessionQueryType that is suitable for use against Remote OpenAM instances.
@@ -43,7 +48,11 @@ import java.util.List;
 public class RemoteSessionQuery implements SessionQueryType {
 
     private String serverId;
-    private static Debug debug = SessionService.sessionDebug;
+    private static Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
+    private final SessionServiceURLService sessionServiceUrlService =
+            InjectorHolder.getInstance(SessionServiceURLService.class);
+    private final SessionPLLSender sessionPllSender =
+            InjectorHolder.getInstance(SessionPLLSender.class);
 
     /**
      * Creates an instance which is configured to query the given server.
@@ -65,7 +74,7 @@ public class RemoteSessionQuery implements SessionQueryType {
         List<SessionInfo> sessions = new LinkedList<SessionInfo>();
 
         try {
-            URL svcurl = Session.getSessionServiceURL(serverId);
+            URL svcurl = sessionServiceUrlService.getSessionServiceURL(serverId);
             SSOToken adminToken = getAdminToken();
             String sid = adminToken.getTokenID().toString();
 
@@ -107,7 +116,7 @@ public class RemoteSessionQuery implements SessionQueryType {
                 sreq.setRequester(RestrictedTokenContext.marshal(context));
             }
 
-            SessionResponse sres = Session.sendPLLRequest(svcurl, sreq);
+            SessionResponse sres = sessionPllSender.sendPLLRequest(svcurl, sreq);
             if (sres.getException() != null) {
                 throw new SessionException(sres.getException());
             }

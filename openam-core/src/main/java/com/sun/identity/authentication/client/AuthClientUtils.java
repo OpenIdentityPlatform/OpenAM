@@ -30,7 +30,6 @@ package com.sun.identity.authentication.client;
 
 import com.iplanet.am.util.AMClientDetector;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.share.SessionEncodeURL;
@@ -70,6 +69,15 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.utils.ClientUtils;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -95,13 +103,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
-import org.forgerock.openam.utils.ClientUtils;
 
 public class AuthClientUtils {
 
@@ -133,6 +134,8 @@ public class AuthClientUtils {
     private static final String rootSuffix = SMSEntry.getRootSuffix();
     protected static final RedirectUrlValidator<String> REDIRECT_URL_VALIDATOR =
             new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
+
+    private static SessionServiceURLService sessionServiceURLService = SessionServiceURLService.getInstance();
 
     // dsame version
     private static String dsameVersion =
@@ -992,7 +995,7 @@ public class AuthClientUtils {
     public static String getCookieURL(SessionID sessionID) {
         String cookieURL = null;
         try {
-            URL sessionServerURL = Session.getSessionServiceURL(sessionID);
+            URL sessionServerURL = sessionServiceURLService.getSessionServiceURL(sessionID);
             cookieURL = sessionServerURL.getProtocol()
                     + "://" + sessionServerURL.getHost() + ":"
                     + Integer.toString(sessionServerURL.getPort()) + serviceURI;

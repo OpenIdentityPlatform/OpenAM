@@ -27,11 +27,16 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 
 package com.iplanet.dpro.session.service;
 
+import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
+import static org.forgerock.openam.session.SessionConstants.*;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -44,22 +49,32 @@ import com.iplanet.services.comm.server.RequestHandler;
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.Response;
 import com.iplanet.services.comm.share.ResponseSet;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.session.util.SessionUtils;
-import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.Constants;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.session.SessionPLLSender;
+import org.forgerock.openam.session.SessionServiceURLService;
 
 public class SessionRequestHandler implements RequestHandler {
-    private SessionService sessionService = null;
+
+    private final SessionService sessionService;
+    private final Debug sessionDebug;
+    private final SessionServerConfig serverConfig;
+    private final SessionServiceConfig serviceConfig;
 
     /*
      * Added this property to block registration of the global notification
@@ -67,9 +82,19 @@ public class SessionRequestHandler implements RequestHandler {
      */
     private static Boolean enableAddListenerOnAllSessions = null;
     private SSOToken clientToken = null;
+
+    private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE
+            = InjectorHolder.getInstance(SessionServiceURLService.class);
+    private static final SessionCookies sessionCookies
+            = InjectorHolder.getInstance(SessionCookies.class);
+    private static final SessionCache sessionCache = InjectorHolder.getInstance(SessionCache.class);
+    private static final SessionPLLSender sessionPLLSender = InjectorHolder.getInstance(SessionPLLSender.class);
     
     public SessionRequestHandler() {
-        sessionService = SessionService.getSessionService();
+        sessionService = InjectorHolder.getInstance(SessionService.class);
+        sessionDebug =  InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
+        serverConfig = InjectorHolder.getInstance(SessionServerConfig.class);
+        serviceConfig = InjectorHolder.getInstance(SessionServiceConfig.class);
     }
 
     public ResponseSet process(List<Request> requests,
@@ -115,8 +140,8 @@ public class SessionRequestHandler implements RequestHandler {
                         this.clientToken = (SSOToken)context;
                     }
                 } catch (Exception ex) {
-                    if (SessionService.sessionDebug.warningEnabled()) {
-                         SessionService.sessionDebug.warning(
+                    if (sessionDebug.warningEnabled()) {
+                        sessionDebug.warning(
                              "SessionRequestHandler.processRequest:"
                              + "app token invalid, sending Session response"
                              +" with Exception");
@@ -138,8 +163,7 @@ public class SessionRequestHandler implements RequestHandler {
                         }
                     });
         } catch (Exception ex) {
-            SessionService.sessionDebug.error(
-                    "SessionRequestHandler encounterd exception", ex);
+            sessionDebug.error("SessionRequestHandler encounterd exception", ex);
             sres.setException(ex.getMessage());
         }
         
@@ -172,11 +196,11 @@ public class SessionRequestHandler implements RequestHandler {
                  * authentication of the caller (which can also be used as a
                  * filter for the operation scope!)
                  */
-                requesterSession = Session.getSession(sid);
+                requesterSession = sessionCache.getSession(sid);
                 /*
                  * also check that sid is not a restricted token
                  */
-                if (requesterSession.getProperty(Session.TOKEN_RESTRICTION_PROP) != null) {
+                if (requesterSession.getProperty(TOKEN_RESTRICTION_PROP) != null) {
                     res.setException(sid + " " + SessionBundle.getString("noPrivilege"));
                     return res;
                 }
@@ -200,12 +224,11 @@ public class SessionRequestHandler implements RequestHandler {
                      * the authentication of the caller (which can also be used
                      * as a filter for the operation scope!)
                      */                  
-                    requesterSession = Session.getSession(sid);            
+                    requesterSession = sessionCache.getSession(sid);
                     /*
                      * also check that sid is not a restricted token
                      */
-                    if (requesterSession.getProperty(
-                        Session.TOKEN_RESTRICTION_PROP)!= null) { 
+                    if (requesterSession.getProperty(TOKEN_RESTRICTION_PROP) != null) {
                         res.setException(sid + " " + SessionBundle.getString("noPrivilege"));
                         return res;
                     }
@@ -222,8 +245,8 @@ public class SessionRequestHandler implements RequestHandler {
                                     this.clientToken, req.getPropertyName(),
                                     req.getPropertyValue());
                     } catch (SessionException se) {
-                        if (SessionService.sessionDebug.warningEnabled()) {
-                            SessionService.sessionDebug.warning(
+                        if (sessionDebug.warningEnabled()) {
+                            sessionDebug.warning(
                                 "SessionRequestHandler.processRequest:"
                                 + "Client does not have permission to set"
                                 + " - property key = " + req.getPropertyName()
@@ -235,16 +258,16 @@ public class SessionRequestHandler implements RequestHandler {
                     }
                 }
                 
-                if (!sessionService.isSessionFailoverEnabled()) {
+                if (!serviceConfig.isSessionFailoverEnabled()) {
                     // TODO check how this behaves in non-session failover case
-                    URL originService = Session.getSessionServiceURL(sid);
+                    URL originService = SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(sid);
                     
-                    if (!sessionService.isLocalSessionService(originService)) {                        
-                        if (!sessionService.isSiteEnabled()) {
+                    if (!serverConfig.isLocalSessionService(originService)) {
+                        if (!serverConfig.isSiteEnabled()) {
                             String siteID = sid.getExtension(SessionID.SITE_ID);
                             if (siteID != null) {
                                 String primaryID = sid.getExtension(SessionID.PRIMARY_ID);
-                                String localServerID = sessionService.getLocalServerID();
+                                String localServerID = serverConfig.getLocalServerID();
                                 if ( (primaryID != null) && (localServerID != null) )
                                 {
                                     if (primaryID.equals(localServerID)) {
@@ -257,20 +280,18 @@ public class SessionRequestHandler implements RequestHandler {
                         }
                     }
                 } else {
-                    if (SessionService.getUseInternalRequestRouting()) {
+                    if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
                         // first try
-                        String hostServerID = sessionService
-                                .getCurrentHostServer(sid);
+                        String hostServerID = sessionService.getCurrentHostServer(sid);
 
-                        if (!sessionService.isLocalServer(hostServerID)) {
+                        if (!serverConfig.isLocalServer(hostServerID)) {
                             try {
-                                return forward(Session.getSessionServiceURL(hostServerID), req);
+                                return forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(hostServerID), req);
                             } catch (SessionException se) {
                                 // attempt retry
                                 if (!sessionService.checkServerUp(hostServerID)) {
                                     // proceed with failover
-                                    String retryHostServerID = sessionService
-                                            .getCurrentHostServer(sid);
+                                    String retryHostServerID = sessionService.getCurrentHostServer(sid);
                                     if (retryHostServerID.equals(hostServerID)) {
                                         throw se;
                                     } else {
@@ -278,8 +299,8 @@ public class SessionRequestHandler implements RequestHandler {
                                         // if it is remote, forward it
                                         // otherwise treat it as a case of local
                                         // case
-                                        if (!sessionService.isLocalServer(retryHostServerID)) {
-                                            return forward(Session.getSessionServiceURL(retryHostServerID), req);
+                                        if (!serverConfig.isLocalServer(retryHostServerID)) {
+                                            return forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(retryHostServerID), req);
                                         }
                                     }
                                 } else {
@@ -296,16 +317,17 @@ public class SessionRequestHandler implements RequestHandler {
                         // assume that request was misrouted and correct it by forwarding via LB with all 
                         // cookies enclosed
                         String isSessionCookie = 
-                                CookieUtils.getCookieValueFromReq(servletRequest, Session.getCookieName());
-                        String httpCookie = 
-                                CookieUtils.getCookieValueFromReq(servletRequest, SessionService.getHttpSessionTrackingCookieName());
+                                CookieUtils.getCookieValueFromReq(servletRequest, sessionCookies.getCookieName());
+                        String httpCookie = CookieUtils.getCookieValueFromReq(
+                                servletRequest,
+                                serviceConfig.getHttpSessionTrackingCookieName());
 
                         if (!sessionService.isSessionPresent(sid) 
                                 && (isSessionCookie == null
                                 || !isSessionCookie.equals(sid.toString())
                                 || httpCookie == null 
                                 || !httpCookie.equals(sid.getTail()))) {
-                            return forward(Session.getSessionServiceURL(sid), req);
+                            return forward(SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(sid), req);
                         }
                     }
                     
@@ -391,8 +413,7 @@ public class SessionRequestHandler implements RequestHandler {
                 break;
 
             case SessionRequest.SetProperty:
-                sessionService.setExternalProperty(this.clientToken, sid, 
-                        req.getPropertyName(), req.getPropertyValue());
+                sessionService.setExternalProperty(this.clientToken, sid, req.getPropertyName(), req.getPropertyValue());
                 break;
 
             case SessionRequest.GetSessionCount:
@@ -424,7 +445,7 @@ public class SessionRequestHandler implements RequestHandler {
                 sreq.setRequester(RestrictedTokenContext.marshal(context));
             }
 
-            SessionResponse sres = Session.sendPLLRequest(svcurl, sreq);
+            SessionResponse sres = sessionPLLSender.sendPLLRequest(svcurl, sreq);
             
             if (sres.getException() != null) {
                 throw new SessionException(sres.getException());

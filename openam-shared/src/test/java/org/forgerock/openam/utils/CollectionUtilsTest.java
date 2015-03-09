@@ -160,6 +160,43 @@ public class CollectionUtilsTest {
         assertThat(CollectionUtils.getFirstItem(aList, "xyz")).isEqualTo("xyz");
     }
 
+    @Test
+    public void canInvertMap() {
+        // Given...
+        Map<Integer, String> numbers = new HashMap<Integer, String>();
+        numbers.put(1, "one");
+        numbers.put(2, "two");
+        numbers.put(3, "three");
+
+        // When...
+        Map<String, Integer> invertedNumbers = CollectionUtils.invertMap(numbers);
+
+        // Then...
+        assertThat(invertedNumbers).isNotSameAs(numbers);
+        assertThat(invertedNumbers.size()).isEqualTo(3);
+        assertThat(invertedNumbers.get("one")).isEqualTo(1);
+        assertThat(invertedNumbers.get("two")).isEqualTo(2);
+        assertThat(invertedNumbers.get("three")).isEqualTo(3);
+    }
+
+    @Test
+    public void canInvertEmptyMap() {
+        // Given...
+        Map<Integer, String> emptyMap = Collections.emptyMap();
+
+        // When...
+        Map<String, Integer> invertedNumbers = CollectionUtils.invertMap(emptyMap);
+
+        // Then...
+        assertThat(invertedNumbers).isNotSameAs(emptyMap);
+        assertThat(invertedNumbers.isEmpty()).isTrue();
+    }
+
+    @Test(expectedExceptions = NullPointerException.class)
+    public void canInvertMapRequiresNonNullMap() {
+        CollectionUtils.invertMap(null);
+    }
+
     /**
      * Mapper that maps a list of strings to a set of strings.
      */

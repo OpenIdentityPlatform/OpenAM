@@ -32,20 +32,22 @@ import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMSDKBundle;
 import com.iplanet.am.sdk.common.DCTreeServicesHelper;
 import com.iplanet.am.sdk.common.IDCTreeServices;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
+import org.forgerock.openam.session.SessionCookies;
+
 import java.rmi.RemoteException;
 
 public class DCTreeServicesImpl extends DCTreeServicesHelper implements
         IDCTreeServices {
     private SOAPClient client;
-
+    private final SessionCookies sessionCookies;
     private static Debug debug = RemoteServicesImpl.getDebug();
 
     public DCTreeServicesImpl(SOAPClient soapClient) {
         client = soapClient;
+        this.sessionCookies = SessionCookies.getInstance();
     }
 
     public String getOrganizationDN(SSOToken token, String domainName)
@@ -54,7 +56,7 @@ public class DCTreeServicesImpl extends DCTreeServicesHelper implements
             Object[] objs = { token.getTokenID().toString(), domainName }; 
             return ((String) client.send(client.encodeMessage(
                   "getOrgDNFromDomain", objs), 
-                  Session.getLBCookie(token.getTokenID().toString()), null));
+                  sessionCookies.getLBCookie(token.getTokenID().toString()), null));
         } catch (AMRemoteException amrex) {
             debug.error("DCTreeServicesImpl.getOrganizationDN()- "
                     + "encountered exception=", amrex);

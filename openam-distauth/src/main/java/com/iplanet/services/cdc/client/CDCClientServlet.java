@@ -29,21 +29,18 @@
 
 package com.iplanet.services.cdc.client;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-
-import com.sun.identity.shared.encode.URLEncDec;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionException;
-import com.sun.identity.shared.encode.CookieUtils;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.HttpURLConnectionManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.encode.URLEncDec;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -52,11 +49,20 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.StringTokenizer;
 import java.util.Enumeration;
-import com.sun.identity.shared.Constants;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.StringTokenizer;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionServiceURLService;
 
 /**
  * The <code>CDCClientServlet</code> is the heart of the Cross Domain Single Signon mechanism of OpenAM in the DMZ
@@ -119,7 +125,10 @@ public class CDCClientServlet extends HttpServlet {
         "false"))).booleanValue();
     private static boolean cookieEncoding =
             SystemProperties.getAsBoolean(Constants.AM_COOKIE_ENCODE);
-    
+
+    private final SessionServiceURLService sessionServiceUrl
+            = InjectorHolder.getInstance(SessionServiceURLService.class);
+
     /**
      * @param config the ServletConfig object that contains configutation
      *               information for this servlet.
@@ -267,7 +276,7 @@ public class CDCClientServlet extends HttpServlet {
         URL CDCServletURL = null;
         URL sessionServiceURL = null;
         try {
-            sessionServiceURL = Session.getSessionServiceURL(sessid);
+            sessionServiceURL = sessionServiceUrl.getSessionServiceURL(sessid);
         } catch (SessionException se) {
             debug.error("CDCClientServlet.sendAuthnRequest: Cannot locate"
                 +" OpenAM instance to forward to.", se);

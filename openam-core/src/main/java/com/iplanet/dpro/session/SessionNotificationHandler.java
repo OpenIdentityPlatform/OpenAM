@@ -34,6 +34,9 @@ import com.iplanet.dpro.session.share.SessionNotification;
 import com.iplanet.services.comm.client.NotificationHandler;
 import com.iplanet.services.comm.share.Notification;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 import java.util.Vector;
 
@@ -48,10 +51,20 @@ public class SessionNotificationHandler implements NotificationHandler {
 
     public static Debug sessionDebug = null;
 
+    private final SessionCache sessionCache;
+
+    public SessionNotificationHandler() {
+        sessionCache = InjectorHolder.getInstance(SessionCache.class);
+    }
+
+    @VisibleForTesting
+    SessionNotificationHandler(SessionCache sessionCache) {
+        this.sessionCache = sessionCache;
+    }
+
     static {
         sessionDebug = Debug.getInstance("amSession");
     }
-
 
     /**
      * Process the notification.
@@ -97,32 +110,29 @@ public class SessionNotificationHandler implements NotificationHandler {
 
         if (!info.state.equals("valid")) {
             if (isLocal) {
-                Session.removeLocalSID(info);
+                sessionCache.removeLocalSID(info);
             } else {
-                Session.removeRemoteSID(info);
+                sessionCache.removeRemoteSID(info);
             }
             return;
         }
 
         SessionID sid = new SessionID(info.sid);
-        Session session = Session.readSession(sid);
+        Session session = sessionCache.readSession(sid);
         try {
             if (session == null) {
                 // a new session is created
-                if (Session.getAllSessionEventListeners().isEmpty()) {
-                    return;
-                }
-                session = new Session(sid);
+                return;
             }
             session.update(info);
         } catch (Exception e) {
             sessionDebug.error(
                     "SessionNotificationHandler:processNotification : ", e);
-            Session.removeSID(sid);
+            sessionCache.removeSID(sid);
             return;
         }
         SessionEvent evt = new SessionEvent(session, snot.getNotificationType(), snot.getNotificationTime());
-        Session.invokeListeners(evt);
+        SessionEvent.invokeListeners(evt);
     }
 
 }

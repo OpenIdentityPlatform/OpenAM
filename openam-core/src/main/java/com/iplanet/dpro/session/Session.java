@@ -24,30 +24,24 @@
  *
  * $Id: Session.java,v 1.25 2009/08/14 17:53:35 weisun2 Exp $
  *
- * Portions copyright 2010-2014 ForgeRock AS.
+ * Portions copyright 2010-2015 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.am.util.ThreadPool;
 import com.iplanet.am.util.ThreadPoolException;
 import com.iplanet.dpro.session.operations.RemoteSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
-import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionBundle;
-import com.iplanet.dpro.session.share.SessionEncodeURL;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
 import com.iplanet.services.comm.client.PLLClient;
-import com.iplanet.services.comm.share.Request;
-import com.iplanet.services.comm.share.RequestSet;
-import com.iplanet.services.comm.share.Response;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -57,16 +51,18 @@ import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
-import com.sun.identity.session.util.SessionUtils;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.util.Reject;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.openam.session.SessionMeta;
+import org.forgerock.openam.session.SessionPLLSender;
+import org.forgerock.openam.session.SessionPollerPool;
+import org.forgerock.openam.session.SessionPollerSender;
+import org.forgerock.openam.session.SessionServiceURLService;
 
-import javax.servlet.http.HttpServletResponse;
 import java.net.URL;
 import java.security.AccessController;
 import java.util.Date;
@@ -76,8 +72,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.forgerock.openam.session.SessionConstants.*;
 
 /**
  * The <code>Session</code> class represents a session. It contains session
@@ -116,12 +113,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 public class Session extends GeneralTaskRunnable {
-
-    private final SessionOperationStrategy sessionStrategy;
-    /**
-     * Used for uniquely referencing this Session object.
-     */
-    private final SessionID sessionID;
 
     /**
      * Defines the type of Session that has been created. Where 0 for User
@@ -184,10 +175,10 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * This is the time value (computed as System.currentTimeMillis()) when a DESTROYED
-     * session should be removed from the {@link #sessionTable}.
+     * session should be removed from the {@link SessionCache#sessionTable}.
      *
-     * It will be set to {@link SessionService#getReducedCrosstalkPurgeDelay() } minutes after the time
-     * {@link #removeRemoteSID } is called.
+     * It will be set to {@link com.iplanet.dpro.session.service.SessionService#getReducedCrosstalkPurgeDelay() }
+     * minutes after the time {@link org.forgerock.openam.session.SessionCache#removeRemoteSID } is called.
      *
      * Value zero means the session has not been destroyed or cross-talk is not being reduced.
      */
@@ -199,6 +190,7 @@ public class Session extends GeneralTaskRunnable {
      * to session listeners.
      */
     private AtomicBoolean removed = new AtomicBoolean(false);
+
 
     /**
      * All session related properties are stored as key-value pair in this
@@ -223,50 +215,15 @@ public class Session extends GeneralTaskRunnable {
     private volatile long latestRefreshTime;
 
     /**
-     * Session Tracking Cookie Name
-     */
-    private static final String httpSessionTrackingCookieName =
-            SystemProperties.get(Constants.AM_SESSION_HTTP_SESSION_TRACKING_COOKIE_NAME, "JSESSIONID");
-
-    /**
      * Indicates whether the latest access time need to be reset on the session.
      */
     volatile boolean needToReset = false;
 
-    private SessionService sessionService = null;
-
-    /*
-     * indicates whether to use local or remote calls to Session Service
-     *
+    /**
+     * Indicates whether to use local or remote calls to Session Service
      */
     private boolean sessionIsLocal = false;
 
-    public static final int INVALID = 0;
-
-    public static final int VALID = 1;
-
-    public static final int INACTIVE = 2;
-
-    public static final int DESTROYED = 3;
-
-    public static final int USER_SESSION = 0;
-
-    public static final int APPLICATION_SESSION = 1;
-
-    public static final String SESSION_HANDLE_PROP = "SessionHandle";
-
-    public static final String TOKEN_RESTRICTION_PROP = "TokenRestriction";
-
-    public static final String SESSION_SERVICE = "session";
-
-    private static String cookieName =
-	        SystemProperties.get("com.iplanet.am.cookie.name");
-
-    public static String lbCookieName =
-            SystemProperties.get(Constants.AM_LB_COOKIE_NAME,"amlbcookie");
-
-    private static final boolean resetLBCookie =
-            SystemProperties.getAsBoolean("com.sun.identity.session.resetLBCookie", false);
 
     private String cookieStr;
 
@@ -276,52 +233,13 @@ public class Session extends GeneralTaskRunnable {
 
     private Object context = null;
 
-    /**
-     * This is the maximum extra time for which the timed out sessions can live
-     * in the session server
-     */
-    private static long purgeDelay;
-
     // Debug instance
     private static Debug sessionDebug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
     /**
-     * Indicates whether session to use polling or notifications to clear the
-     * client cache
-     */
-    private static boolean pollingEnabled = false;
-
-    private static boolean pollerPoolInitialized = false;
-
-    private static final String ENABLE_POLLING_PROPERTY =
-        "com.iplanet.am.session.client.polling.enable";
-
-    /**
-     * Indicates whether to enable or disable the session cleanup thread.
-     */
-    private static boolean sessionCleanupEnabled =
-            SystemProperties.getAsBoolean("com.iplanet.am.session.client.cleanup.enable", true);
-
-    /**
-     * The session table indexed by Session ID objects.
-     */
-    private static Hashtable<SessionID, Session> sessionTable = new Hashtable<SessionID, Session>();
-
-    /**
-     * The session service URL table indexed by server address contained in the
-     * Session ID object.
-     */
-    private static Hashtable<String, URL> sessionServiceURLTable = new Hashtable<String, URL>();
-
-    /**
      * Set of session event listeners for THIS session only
      */
-    private Set<SessionListener> sessionEventListeners = new HashSet<SessionListener>();
-
-    /**
-     * Set of session event listeners for ALL sessions
-     */
-    private static Set<SessionListener> allSessionEventListeners = new HashSet<SessionListener>();
+    private Set<SessionListener> localSessionEventListeners = new HashSet<SessionListener>();
 
     /**
      * This is used only in polling mode to find the polling state of this
@@ -329,40 +247,95 @@ public class Session extends GeneralTaskRunnable {
      */
     private volatile boolean isPolling = false;
 
-    private static ThreadPool threadPool = null;
-    private static final int DEFAULT_POOL_SIZE = 5;
-    private static final int DEFAULT_THRESHOLD = 10000;
-    private static boolean cacheBasedPolling =
-            SystemProperties.getAsBoolean("com.iplanet.am.session.client.polling.cacheBased", false);
-
-    private static long appSSOTokenRefreshTime;
-
     private SessionPollerSender sender = null;
-
-    static {
-        purgeDelay = SystemProperties.getAsLong("com.iplanet.am.session.purgedelay", 120);
-        appSSOTokenRefreshTime = SystemProperties.getAsLong("com.iplanet.am.client.appssotoken.refreshtime", 3);
-    }
 
     private Requests requests;
 
-    static private String getAMServerID() {
-        String serverid = null;
+    private final SessionCookies sessionCookies;
+    private final SessionPollerPool sessionPollerPool;
+    private final SessionCache sessionCache;
+    private final SessionPLLSender sessionPLLSender;
+    private final SessionServiceURLService sessionServiceURLService;
+    private final SessionOperationStrategy sessionOperationStrategy;
+    private final SessionService sessionService;
 
-        try {
-            serverid = WebtopNaming.getAMServerID();
-        } catch (Exception le) {
-            serverid = null;
+    private SessionID sessionID;
+
+    /**
+     * Constructor used by this package only.
+     *
+     * ClientSDK: This code has to operate both on the serer and the client. It needs
+     * to be able to resolve dependencies in an appropriate way in both conditions.
+     */
+    public Session(SessionID sid) {
+        sessionID = sid;
+
+        if (SystemProperties.isServerMode()) {
+            // Had to choose, final or @Inject approach. Went final.
+            sessionCookies = InjectorHolder.getInstance(SessionCookies.class);
+            sessionPollerPool = InjectorHolder.getInstance(SessionPollerPool.class);
+            sessionCache = InjectorHolder.getInstance(SessionCache.class);
+            sessionPLLSender = InjectorHolder.getInstance(SessionPLLSender.class);
+            sessionServiceURLService = InjectorHolder.getInstance(SessionServiceURLService.class);
+            sessionService = InjectorHolder.getInstance(SessionService.class);
+            sessionOperationStrategy = InjectorHolder.getInstance(ServerSessionOperationStrategy.class);
+            requests = InjectorHolder.getInstance(Requests.class);
+        } else {
+            sessionService = null; // Intentionally null in client mode.
+            sessionPollerPool = SessionPollerPool.getInstance();
+            sessionCache = SessionCache.getInstance();
+            sessionCookies = SessionCookies.getInstance();
+            sessionPLLSender = new SessionPLLSender(sessionCookies);
+            sessionServiceURLService = SessionServiceURLService.getInstance();
+            requests = new Requests(sessionService, sessionPLLSender);
+            sessionOperationStrategy = new RemoteSessionOperationStrategy(new RemoteOperations(sessionDebug, requests));
         }
+    }
 
-        return serverid;
+    private Session(SessionID sid, boolean sessionIsLocal) {
+        this(sid);
+        this.sessionIsLocal = sessionIsLocal;
+    }
+
+
+    public long getPurgeAt() {
+        return purgeAt;
+    }
+
+    public void setPurgeAt(long purgeAt) {
+        this.purgeAt = purgeAt;
+    }
+
+    public void setSessionIsLocal(boolean sessionIsLocal) {
+        this.sessionIsLocal = sessionIsLocal;
+    }
+
+    public AtomicBoolean getRemoved() {
+        return removed;
+    }
+
+    public SessionID getSessionID() {
+        return sessionID;
+    }
+
+    public String getCookieStr() {
+        return cookieStr;
+    }
+
+    public void setCookieStr(String str) {
+        this.cookieStr = str;
+    }
+
+    //todo: Object...
+    public void setContext(Object context) {
+        this.context = context;
     }
 
     /**
      * Enables the Session Polling
      * @param b if <code>true</code> polling is enabled, disabled otherwise
      */
-    protected void setIsPolling(boolean b) {
+    public void setIsPolling(boolean b) {
         isPolling = b;
     }
 
@@ -372,84 +345,6 @@ public class Session extends GeneralTaskRunnable {
      */
     protected boolean getIsPolling() {
         return isPolling;
-    }
-
-    /**
-     * Checks if Polling is enabled
-     * @return <code> true if polling is enabled , <code>false<code> otherwise
-     */
-    protected static boolean isPollingEnabled(){
-        // This is only a transitional solution before the complete
-        // implementation for making the session properties
-        // hot-swappable is in place
-        if (!isServerMode()) {
-            pollingEnabled = SystemProperties.getAsBoolean(ENABLE_POLLING_PROPERTY, false);
-        }
-        if (sessionDebug.messageEnabled()) {
-            sessionDebug.message("Session.isPollingEnabled is "
-                + pollingEnabled);
-        }
-
-        if(!pollerPoolInitialized){
-            if (pollingEnabled) {
-                int poolSize = SystemProperties.getAsInt(Constants.POLLING_THREADPOOL_SIZE, DEFAULT_POOL_SIZE);
-                int threshold = SystemProperties.getAsInt(Constants.POLLING_THREADPOOL_THRESHOLD, DEFAULT_THRESHOLD);
-                ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
-                threadPool = new ThreadPool("amSessionPoller", poolSize, threshold, true, sessionDebug);
-                shutdownMan.addShutdownListener(
-                    new ShutdownListener() {
-                        public void shutdown() {
-                            threadPool.shutdown();
-                            threadPool = null;
-                            pollerPoolInitialized = false;
-                        }
-                    }
-                );
-                pollerPoolInitialized = true;
-            } else {
-                if (sessionDebug.messageEnabled()) {
-                    sessionDebug.message("Session Cache cleanup is set to "
-                        + sessionCleanupEnabled);
-                }
-            }
-        }
-
-        return pollingEnabled;
-    }
-
-    /*
-     * Used in this package only.
-     */
-    Session(SessionID sid) {
-        sessionID = sid;
-
-        if (isServerMode()) {
-            // Server Mode has Guice
-            sessionService = InjectorHolder.getInstance(SessionService.class);
-            requests = InjectorHolder.getInstance(Requests.class);
-            sessionStrategy = InjectorHolder.getInstance(ServerSessionOperationStrategy.class);
-        } else {
-            /**
-             * Client Mode initialisation.
-             *
-             * We are aware that SessionService is null in client mode, the Requests code handles this condition.
-             */
-            requests = new Requests(null);
-            sessionStrategy = new RemoteSessionOperationStrategy(new RemoteOperations(sessionDebug, requests));
-        }
-    }
-
-    private Session(SessionID sid, boolean sessionIsLocal) {
-        this(sid);
-        this.sessionIsLocal = sessionIsLocal;
-    }
-
-    /**
-     * Returns cookie name for the Session
-     * @return cookie name
-     */
-    public static String getCookieName() {
-        return cookieName;
     }
 
     public boolean addElement(Object obj) {
@@ -469,17 +364,17 @@ public class Session extends GeneralTaskRunnable {
     }
 
     public void run() {
-        if (isPollingEnabled()) {
+        if (sessionPollerPool.isPollingEnabled()) {
             try {
                 if (!getIsPolling()) {
                     long expectedTime;
                     if (willExpire(maxIdleTime)) {
                         expectedTime = (latestRefreshTime + (maxIdleTime * 60)) * 1000;
-                        if (cacheBasedPolling) {
+                        if (sessionPollerPool.getCacheBasedPolling()) {
                             expectedTime = Math.min(expectedTime, (latestRefreshTime + (maxCachingTime * 60)) * 1000);
                         }
                     } else {
-                        expectedTime = (latestRefreshTime + (appSSOTokenRefreshTime * 60)) * 1000;
+                        expectedTime = (latestRefreshTime + (SessionMeta.getAppSSOTokenRefreshTime() * 60)) * 1000;
                     }
                     if (expectedTime > scheduledExecutionTime()) {
                         // Get an instance as required otherwise it causes issues on container restart.
@@ -487,14 +382,14 @@ public class Session extends GeneralTaskRunnable {
                         return;
                     }
                     if (sender == null) {
-                        sender = new SessionPollerSender(this, sessionDebug);
+                        sender = new SessionPollerSender(this);
                     }
                     RestrictedTokenContext.doUsing(getContext(),
                         new RestrictedTokenAction() {
                             public Object run() throws Exception {
                                 try {
                                     setIsPolling(true);
-                                    threadPool.run(sender);
+                                    sessionPollerPool.getThreadPool().run(sender);
                                 } catch (ThreadPoolException e) {
                                     setIsPolling(false);
                                     sessionDebug.error("Send Polling Error: ", e);
@@ -504,7 +399,7 @@ public class Session extends GeneralTaskRunnable {
                     });
                 }
             } catch (SessionException se) {
-                Session.removeSID(sessionID);
+                sessionCache.removeSID(sessionID);
                 sessionDebug.message("session is not in timeout state so clean it", se);
             } catch (Exception ex) {
                 sessionDebug.error("Exception encountered while polling", ex);
@@ -544,7 +439,7 @@ public class Session extends GeneralTaskRunnable {
             }
 
             try {
-                Session.removeSID(sessionID);
+                sessionCache.removeSID(sessionID);
                 if (sessionDebug.messageEnabled()) {
                     sessionDebug.message(sessionRemovalDebugMessage);
                 }
@@ -552,69 +447,6 @@ public class Session extends GeneralTaskRunnable {
                 sessionDebug.error("Exception occured while cleaning up Session Cache", ex);
             }
         }
-    }
-
-    /**
-     * Returns load balancer cookie value for the Session.
-     *
-     * @param sid Session string for load balancer cookie.
-     * @return load balancer cookie value.
-     * @throws SessionException if session is invalid.
-     */
-    public static String getLBCookie(String sid)
-             throws SessionException {
-        return getLBCookie(new SessionID(sid));
-    }
-
-    /**
-     * Returns load balancer cookie value for the Session.
-     * @param  sid Session ID for load balancer cookie.
-     * @return load balancer cookie value.
-     * @throws SessionException if session is invalid.
-     */
-    public static String getLBCookie(SessionID sid)
-             throws SessionException {
-        String cookieValue = null;
-        lbCookieName = SystemProperties.get(Constants.AM_LB_COOKIE_NAME, "amlbcookie");
-        if(sessionDebug.messageEnabled()){
-            sessionDebug.message("Session.getLBCookie()" +
-                "lbCookieName is:" + lbCookieName);
-        }
-
-        if(sid == null || sid.toString() == null ||
-            sid.toString().length() == 0) {
-            throw new SessionException(SessionBundle.rbName,
-        	    "invalidSessionID", null);
-        }
-
-        if(isServerMode() &&
-            !SessionService.getSessionService().isSiteEnabled()) {
-                cookieValue = WebtopNaming.getLBCookieValue(
-                                  sid.getSessionServerID());
-                return lbCookieName + "=" + cookieValue;
-        }
-
-        if(resetLBCookie) {
-            if (isServerMode()) {
-                SessionService ss = SessionService.getSessionService();
-                if (ss.isSessionFailoverEnabled() && ss.isLocalSite(sid)) {
-                    cookieValue = WebtopNaming.getLBCookieValue(
-                        ss.getCurrentHostServer(sid));
-                }
-            } else {
-                Session sess = readSession(sid);
-                if (sess != null) {
-                    cookieValue = sess.getProperty(lbCookieName);
-                }
-            }
-        }
-
-        if(cookieValue == null || cookieValue.length() == 0) {
-            cookieValue = WebtopNaming.getLBCookieValue(
-                sid.getExtension(SessionID.PRIMARY_ID));
-        }
-
-        return lbCookieName + "=" + cookieValue;
     }
 
     /**
@@ -684,7 +516,7 @@ public class Session extends GeneralTaskRunnable {
         if (timedOutAt > 0) {
             return true;
         }
-        if (!cacheBasedPolling && maxCachingTimeReached()){
+        if (!sessionPollerPool.getCacheBasedPolling() && maxCachingTimeReached()){
             try {
                 refresh(false);
             } catch (SessionTimedOutException e) {
@@ -716,7 +548,7 @@ public class Session extends GeneralTaskRunnable {
          * idle/max time out period
          */
         long now = System.currentTimeMillis() / 1000;
-        long left = (timedOutAt + purgeDelay * 60 - now);
+        long left = (timedOutAt + SessionMeta.getPurgeDelay() * 60 - now);
         return (left > 0) ? left : 0;
     }
 
@@ -738,7 +570,7 @@ public class Session extends GeneralTaskRunnable {
      *            during communication with session service.
      */
     public long getIdleTime() throws SessionException {
-        if (!cacheBasedPolling && maxCachingTimeReached()) {
+        if (!sessionPollerPool.getCacheBasedPolling() && maxCachingTimeReached()) {
             refresh(false);
         }
         return sessionIdleTime;
@@ -754,7 +586,7 @@ public class Session extends GeneralTaskRunnable {
      *            service.
      */
     public long getTimeLeft() throws SessionException {
-        if (!cacheBasedPolling && maxCachingTimeReached()) {
+        if (!sessionPollerPool.getCacheBasedPolling() && maxCachingTimeReached()) {
             refresh(false);
         }
         return sessionTimeLeft;
@@ -774,8 +606,7 @@ public class Session extends GeneralTaskRunnable {
      *            service.
      */
     public int getState(boolean reset) throws SessionException {
-        if (!cacheBasedPolling && maxCachingTimeReached()) {
-
+        if (!sessionPollerPool.getCacheBasedPolling() && maxCachingTimeReached()) {
             refresh(reset);
         } else {
             if (reset) {
@@ -785,7 +616,7 @@ public class Session extends GeneralTaskRunnable {
         return sessionState;
     }
 
-    private void setState(int state) {
+    public void setState(int state) {
         sessionState = state;
     }
 
@@ -812,8 +643,8 @@ public class Session extends GeneralTaskRunnable {
      *            service.
      */
     public String getProperty(String name) throws SessionException {
-        if (name == null ? lbCookieName != null : !name.equals(lbCookieName)) {
-            if ((!cacheBasedPolling && maxCachingTimeReached()) ||
+        if (name == null ? sessionCookies.getLBCookieName() != null : !name.equals(sessionCookies.getLBCookieName())) {
+            if ((!sessionPollerPool.getCacheBasedPolling() && maxCachingTimeReached()) ||
                 !sessionProperties.containsKey(name)) {
                 refresh(false);
             }
@@ -832,7 +663,7 @@ public class Session extends GeneralTaskRunnable {
      */
     public String dereferenceRestrictedTokenID(Session s, String restrictedId)
     throws SessionException {
-        String masterSID = null;
+        String masterSID;
 
         try {
             masterSID = sessionService.deferenceRestrictedID(s, restrictedId);
@@ -865,7 +696,7 @@ public class Session extends GeneralTaskRunnable {
      *         when run in the server mode else return null
      */
     public String getPropertyWithoutValidation(String name) {
-        if (isServerMode()) {
+        if (SystemProperties.isServerMode()) {
             return sessionProperties.get(name);
         }
         return null;
@@ -886,7 +717,7 @@ public class Session extends GeneralTaskRunnable {
             throw new SessionException("Session property name/value cannot be null");
         }
         try {
-            SessionOperations operation = sessionStrategy.getOperation(this);
+            SessionOperations operation = sessionOperationStrategy.getOperation(this);
             operation.setProperty(this, name, value);
             sessionProperties.put(name, value);
         } catch (Exception e) {
@@ -897,13 +728,9 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Used to find out if the maximum caching time has reached or not.
      */
-    protected boolean maxCachingTimeReached() {
-        long cachingtime = System.currentTimeMillis() / 1000
-                - latestRefreshTime;
-        if (cachingtime > maxCachingTime * 60)
-            return true;
-        else
-            return false;
+    public boolean maxCachingTimeReached() {
+        long cachingtime = System.currentTimeMillis() / 1000 - latestRefreshTime;
+        return cachingtime > maxCachingTime * 60;
     }
 
     /**
@@ -913,15 +740,15 @@ public class Session extends GeneralTaskRunnable {
      * @exception SessionException when cannot get Session URL.
      */
     public URL getSessionServiceURL() throws SessionException {
-        if (isServerMode()) {
-            return getSessionServiceURL(sessionID);
+        if (SystemProperties.isServerMode()) {
+            return sessionServiceURLService.getSessionServiceURL(sessionID);
         }
 
         // we can cache the result because in client mode
         // session service location does not change
         // dynamically
         if (sessionServiceURL == null) {
-            sessionServiceURL = getSessionServiceURL(sessionID);
+            sessionServiceURL = sessionServiceURLService.getSessionServiceURL(sessionID);
         }
 
         return sessionServiceURL;
@@ -938,13 +765,13 @@ public class Session extends GeneralTaskRunnable {
      */
     public void destroySession(Session session) throws SessionException {
         try {
-            SessionOperations operation = sessionStrategy.getOperation(session);
+            SessionOperations operation = sessionOperationStrategy.getOperation(session);
             operation.destroy(this, session);
         } catch (Exception e) {
             throw new SessionException(e);
         }
         finally {
-            removeSID(session.getID());
+            sessionCache.removeSID(session.getID());
         }
     }
 
@@ -957,125 +784,12 @@ public class Session extends GeneralTaskRunnable {
      */
     public void logout() throws SessionException {
         try {
-            SessionOperations operation = sessionStrategy.getOperation(this);
+            SessionOperations operation = sessionOperationStrategy.getOperation(this);
             operation.logout(this);
-            removeSID(sessionID);
+            sessionCache.removeSID(sessionID);
 
         } catch (Exception e) {
             throw new SessionException(e);
-        }
-    }
-
-    /**
-     * Wrapper method for {@link #removeSID} only to be called when receiving notification of session
-     * destruction that has this server as its home server.
-     *
-     * @param info Current state of session
-     */
-    static void removeLocalSID(SessionInfo info) {
-        SessionID sessionID = new SessionID(info.sid);
-        removeSID(sessionID);
-    }
-
-    /**
-     * Wrapper method for {@link #removeSID} only to be called when receiving notification of session
-     * destruction from the home server.
-     *
-     * This method should only be called when the identified session has another instance
-     * of OpenAM as its home server.
-     *
-     * @param info Current state of session on home server
-     */
-    static void removeRemoteSID(SessionInfo info) {
-        SessionID sessionID = new SessionID(info.sid);
-
-        long purgeDelay = getPurgeDelayForReducedCrosstalk();
-
-        if (purgeDelay > 0) {
-
-            Session session = readSession(sessionID);
-            if (session == null) {
-                /**
-                 * Reduced crosstalk protection.
-                 *
-                 * As the indicated session has not yet been loaded, it will be created and added to the
-                 * {@link #sessionTable} so that it can remain there in a DESTROYED state until it is purged.
-                 */
-                session = new Session(sessionID);
-                try {
-                    session.update(info);
-                    writeSession(session);
-                } catch (SessionException e) {
-                    sessionDebug.error("Exception reading remote SessionInfo", e);
-                }
-            }
-
-            session.purgeAt = System.currentTimeMillis() + (purgeDelay * 60 * 1000);
-            session.cancel();
-            if (!session.isScheduled()) {
-                SystemTimerPool.getTimerPool().schedule(session, new Date(session.purgeAt));
-            } else {
-                sessionDebug.error("Unable to schedule destroyed session for purging");
-            }
-
-        }
-
-        removeSID(sessionID);
-    }
-
-    private static long getPurgeDelayForReducedCrosstalk() {
-        if (isServerMode()) {
-            SessionService ss = InjectorHolder.getInstance(SessionService.class);
-            if (ss.isReducedCrossTalkEnabled()) {
-                return ss.getReducedCrosstalkPurgeDelay();
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * Removes the <code>SessionID</code> from session table.
-     *
-     * @param sid Session ID.
-     */
-    public static void removeSID(SessionID sid) {
-        Session session = readSession(sid);
-        if (session != null) {
-
-            long eventTime = System.currentTimeMillis();
-
-            // remove from sessionTable if there is no purge delay or it has elapsed
-            if (session.purgeAt <= eventTime) {
-                deleteSession(sid);
-                session.cancel();
-            }
-
-            // ensure session has destroyed state and observers are notified (exactly once)
-            if (session.removed.compareAndSet(false, true)) {
-                session.setState(Session.DESTROYED);
-                SessionEvent event = new SessionEvent(session, SessionEvent.DESTROY, eventTime);
-                invokeListeners(event);
-            }
-        }
-    }
-
-    /**
-    * Invokes the Session Listener.
-    * @param evt Session Event.
-    */
-   protected static void invokeListeners(SessionEvent evt) {
-        Session session = evt.getSession();
-        Set<SessionListener> sess_listeners = session.getSessionEventListeners();
-        Set<SessionListener> all_listeners = Session.getAllSessionEventListeners();
-
-        // THIS SESSION FIRST ...
-        for (SessionListener listener : sess_listeners) {
-            listener.sessionChanged(evt);
-        }
-
-        // ALL SESSIONS
-        for (SessionListener listener : all_listeners) {
-            listener.sessionChanged(evt);
         }
     }
 
@@ -1098,123 +812,17 @@ public class Session extends GeneralTaskRunnable {
      * @exception SessionException if the session state is not valid.
      */
     public void addSessionListener(SessionListener listener, boolean force) throws SessionException {
-        if (!force && sessionState != Session.VALID) {
+        if (!force && sessionState != VALID) {
             throw new SessionException(SessionBundle.rbName, "invalidSessionState", null);
         }
-        sessionEventListeners.add(listener);
+        localSessionEventListeners.add(listener);
     }
 
-    /**
-     * Returns a session based on a Session ID object.
-     *
-     * @param sid Session ID.
-     * @return A Session object.
-     * @throws SessionException if the Session ID object does not contain a
-     *         valid session string, or the session string was valid before
-     *         but has been destroyed, or there was an error during
-     *         communication with session service.
-     */
-    public static Session getSession(SessionID sid) throws SessionException {
-        return getSession(sid, false);
-    }
 
-    /**
-     * Returns a Session based on a Session ID object.
-     *
-     * @param sessionID The Session Id.
-     * @param allowInvalidSessions Whether to allow invalid Sessions to be returned.
-     * @return A Session object.
-     * @throws SessionException If the Session ID object does not contain a
-     *         valid session string, or the session string was valid before
-     *         but has been destroyed, or there was an error during
-     *         communication with session service.
-     */
-    public static Session getSession(SessionID sessionID, boolean allowInvalidSessions) throws SessionException {
-        return getSession(sessionID, allowInvalidSessions, true);
-    }
-
-    /**
-     * This function will get a session based on the session id.  It will allow invalid sessions to be returned,
-     * and allow the caller to specify whether the session can be updated (and therefore have the idle time
-     * refreshed).
-     *
-     * @param sessionID The Session id.
-     * @param allowInvalidSessions If true, allow invalid Sessions to be returned.
-     * @param possiblyResetIdleTime If true, the idle time of the session can be reset, if false, it is never reset.
-     * @return A session object.
-     * @throws SessionException If the Session ID object does not contain a
-     *         valid session string, or the session string was valid before
-     *         but has been destroyed, or there was an error during
-     *         communication with session service.
-     */
-    public static Session getSession(SessionID sessionID, boolean allowInvalidSessions, boolean possiblyResetIdleTime)
-        throws SessionException {
-
-        if (sessionID.toString() == null || sessionID.toString().length() == 0) {
-            throw new SessionException(SessionBundle.rbName,
-                    "invalidSessionID", null);
-        }
-
-        Session session = readSession(sessionID);
-        if (session != null) {
-
-            /**
-             * Reduced crosstalk protection.
-             *
-             * When a user logs out, or the Session is destroyed and crosstalk is reduced, it is possible
-             * for a destroyed session to be recovered by accessing it on a remote server. Instead the
-             * session will be left in the {@link #sessionTable} until it is purged. This check will
-             * detect this condition and indicate to the caller their SessionID is invalid.
-             */
-            if (session.getState(false) == DESTROYED && getPurgeDelayForReducedCrosstalk() > 0) {
-                throw new SessionException("Session is in a destroyed state");
-            }
-
-            TokenRestriction restriction = session.getRestriction();
-                    /*
-                     * In cookie hijacking mode...
-                     * After the server remove the agent token id from the
-                     * user token id. server needs to create the agent token
-                     * from this agent token id. Now, the restriction context
-                     * required for session creation is null, so we added it
-                     * to get the agent session created.*/
-
-            try {
-                if (isServerMode()) {
-                    if ((restriction != null)
-                            && !restriction.isSatisfied(
-                            RestrictedTokenContext.getCurrent())) {
-                        throw new SessionException(SessionBundle.rbName,
-                                "restrictionViolation", null);
-                    }
-                }
-            } catch (Exception e) {
-                throw new SessionException(e);
-            }
-            if (!cacheBasedPolling && session.maxCachingTimeReached()) {
-                session.refresh(false);
-            }
-            return session;
-        }
-
-        session = new Session(sessionID);
-
-        if (!allowInvalidSessions) {
-            session.refresh(possiblyResetIdleTime);
-        }
-        session.context = RestrictedTokenContext.getCurrent();
-
-        writeSession(session);
-        if (!isPollingEnabled()) {
-            session.addInternalSessionListener();
-        }
-        return session;
-    }
-
-    private void scheduleToTimerPool() {
-        if (isPollingEnabled()) {
+    public void scheduleToTimerPool() {
+        if (sessionPollerPool.isPollingEnabled()) {
             long timeoutTime = (latestRefreshTime + (maxIdleTime * 60)) * 1000;
-            if (cacheBasedPolling) {
+            if (sessionPollerPool.getCacheBasedPolling()) {
                 timeoutTime = Math.min((latestRefreshTime + (maxCachingTime * 60)) * 1000, timeoutTime);
             }
             if (scheduledExecutionTime() > timeoutTime) {
@@ -1224,7 +832,7 @@ public class Session extends GeneralTaskRunnable {
                 SystemTimerPool.getTimerPool().schedule(this, new Date(timeoutTime));
             }
         } else {
-            if ((sessionCleanupEnabled) && willExpire(maxSessionTime)) {
+            if ((sessionPollerPool.isSessionCleanupEnabled()) && willExpire(maxSessionTime)) {
                 long timeoutTime = (latestRefreshTime + (maxSessionTime * 60)) * 1000;
 
                 if (scheduledExecutionTime() > timeoutTime) {
@@ -1242,40 +850,6 @@ public class Session extends GeneralTaskRunnable {
      */
     private boolean willExpire(long minutes) {
         return minutes < Long.MAX_VALUE / 60;
-    }
-
-    /**
-     * Returns a Session Response object based on the XML document received from
-     * remote Session Server. This is in response to a request that we send to
-     * the session server.
-     *
-     * @param svcurl The URL of the Session Service.
-     * @param sreq The Session Request XML document.
-     * @return a Vector of responses from the remote server
-     * @exception SessionException if there was an error in sending the XML
-     *            document or if the response has multiple components.
-     */
-    public static SessionResponse sendPLLRequest(URL svcurl, SessionRequest sreq) throws SessionException {
-        try {
-
-            String cookies = cookieName + "=" + sreq.getSessionID();
-            if (!isServerMode()) {
-                SessionID sessionID = new SessionID(sreq.getSessionID());
-                cookies = cookies + ";" + Session.getLBCookie(sessionID);
-            }
-
-            Request req = new Request(sreq.toXMLString());
-            RequestSet set = new RequestSet(SESSION_SERVICE);
-            set.addRequest(req);
-            Vector responses = PLLClient.send(svcurl, cookies, set);
-            if (responses.size() != 1) {
-                throw new SessionException(SessionBundle.rbName, "unexpectedResponse", null);
-            }
-            Response res = (Response) responses.elementAt(0);
-            return SessionResponse.parseXML(res.getContent());
-        } catch (Exception e) {
-            throw new SessionException(e);
-        }
     }
 
     /**
@@ -1313,7 +887,7 @@ public class Session extends GeneralTaskRunnable {
             }
         }
 
-        URL svcurl = getSessionServiceURL(protocol, host, port, uri);
+        URL svcurl = sessionServiceURLService.getSessionServiceURL(protocol, host, port, uri);
         return getValidSessions(svcurl, pattern);
     }
 
@@ -1322,119 +896,8 @@ public class Session extends GeneralTaskRunnable {
      *
      * @return SessionEventListener vector
      */
-    Set<SessionListener> getSessionEventListeners() {
-        return sessionEventListeners;
-    }
-
-    /**
-     * Get all the event listeners for all the Sessions.
-     *
-     * @return SessionEventListener vector
-     */
-    static Set<SessionListener> getAllSessionEventListeners() {
-        return allSessionEventListeners;
-    }
-
-    /**
-     * Returns Session Service URL for a Session ID.
-     *
-     * @param sid Session ID
-     * @return Session Service URL.
-     * @exception SessionException
-     */
-    public static URL getSessionServiceURL(SessionID sid)
-            throws SessionException {
-        String primary_id;
-
-        if (isServerMode()) {
-
-            /**
-             * Validate that the SessionID contains valid Server and Site references.
-             * This check is not appropriate for client side code as only the Site
-             * reference is exposed to client code.
-             */
-            validateSessionID(sid);
-
-            SessionService ss = SessionService.getSessionService();
-            if (ss.isSiteEnabled() && ss.isLocalSite(sid)) {
-                if (ss.isSessionFailoverEnabled()) {
-                    return getSessionServiceURL(ss.getCurrentHostServer(sid));
-                } else {
-                    primary_id = sid.getExtension(SessionID.PRIMARY_ID);
-                    return getSessionServiceURL(primary_id);
-                }
-            }
-        } else {
-            primary_id = sid.getExtension(SessionID.PRIMARY_ID);
-            if (primary_id != null) {
-                String secondarysites = WebtopNaming
-                        .getSecondarySites(primary_id);
-
-                String serverID = getAMServerID();
-                if ((secondarysites != null) && (serverID != null)) {
-                    if (secondarysites.indexOf(serverID) != -1) {
-                        return getSessionServiceURL(serverID);
-                    }
-                }
-            }
-        }
-
-        return getSessionServiceURL(sid.getSessionServerProtocol(),
-            sid.getSessionServer(), sid.getSessionServerPort(),
-            sid.getSessionServerURI());
-    }
-
-    /**
-     * Returns Session Service URL.
-     *
-     * @param protocol Session Server protocol.
-     * @param server Session Server host name.
-     * @param port Session Server port.
-     * @param uri Session Server URI.
-     * @return URL Session Service URL.
-     * @exception SessionException
-     */
-    static public URL getSessionServiceURL(
-        String protocol,
-        String server,
-        String port,
-        String uri
-    ) throws SessionException {
-        String key = protocol + "://" + server + ":" + port + uri;
-        URL url = sessionServiceURLTable.get(key);
-        if (url == null) {
-            try {
-                url = WebtopNaming.getServiceURL(SESSION_SERVICE, protocol,
-                    server, port, uri);
-                sessionServiceURLTable.put(key, url);
-                return url;
-            } catch (Exception e) {
-                throw new SessionException(e);
-            }
-        }
-        return url;
-    }
-
-    /**
-     * Returns Session Service URL for a given server ID.
-     *
-     * @param serverID server ID from the platform server list.
-     * @return Session Service URL.
-     * @exception SessionException
-     */
-    static public URL getSessionServiceURL(String serverID)
-            throws SessionException {
-        try {
-            URL parsedServerURL = new URL(WebtopNaming
-                    .getServerFromID(serverID));
-            return getSessionServiceURL(
-                parsedServerURL.getProtocol(),
-                parsedServerURL.getHost(),
-                Integer.toString(parsedServerURL.getPort()),
-                parsedServerURL.getPath());
-        } catch (Exception e) {
-            throw new SessionException(e);
-        }
+    public Set<SessionListener> getLocalSessionEventListeners() {
+        return localSessionEventListeners;
     }
 
     /**
@@ -1494,9 +957,8 @@ public class Session extends GeneralTaskRunnable {
      * @param listener A reference to the Session Listener object.
      * @exception SessionException if there was an error.
      */
-    public void addSessionListenerOnAllSessions(SessionListener listener)
-    throws SessionException {
-        if (!isPollingEnabled()) {
+    public void addSessionListenerOnAllSessions(SessionListener listener) throws SessionException {
+        if (!sessionPollerPool.isPollingEnabled()) {
             try {
                 String url = WebtopNaming.getNotificationURL().toString();
                 if (sessionService != null) {
@@ -1510,7 +972,7 @@ public class Session extends GeneralTaskRunnable {
             }
         }
 
-        allSessionEventListeners.add(listener);
+        localSessionEventListeners.add(listener);
     }
 
     /**
@@ -1549,7 +1011,7 @@ public class Session extends GeneralTaskRunnable {
                     });
 
         } catch (Exception e) {
-            Session.removeSID(sessionID);
+            sessionCache.removeSID(sessionID);
             if (sessionDebug.messageEnabled()) {
                 sessionDebug.message("session.Refresh " + "Removed SID:"
                         + sessionID);
@@ -1566,7 +1028,7 @@ public class Session extends GeneralTaskRunnable {
         boolean flag = reset || needToReset;
         needToReset = false;
 
-       SessionOperations operation = sessionStrategy.getOperation(this);
+       SessionOperations operation = sessionOperationStrategy.getOperation(this);
        SessionInfo info = operation.refresh(this, flag);
 
         long oldMaxCachingTime = maxCachingTime;
@@ -1584,7 +1046,7 @@ public class Session extends GeneralTaskRunnable {
      *
      * @param info Session Information.
      */
-    synchronized void update(SessionInfo info) throws SessionException {
+    public synchronized void update(SessionInfo info) throws SessionException {
         if (info.stype.equals("user"))
             sessionType = USER_SESSION;
         else if (info.stype.equals("application"))
@@ -1661,9 +1123,7 @@ public class Session extends GeneralTaskRunnable {
      * @param sres SessionResponse object holding the exception
      */
 
-    void processSessionResponseException(SessionResponse sres,
-            SSOToken appSSOToken)
-    throws SessionException {
+    void processSessionResponseException(SessionResponse sres, SSOToken appSSOToken) throws SessionException {
         try {
             if (sessionDebug.messageEnabled()) {
                 sessionDebug.message("Session."
@@ -1687,10 +1147,10 @@ public class Session extends GeneralTaskRunnable {
                         + "processSessionResponseException: AppTokenInvalid = TRUE");
                 }
 
-                if (!isServerMode()) {
+                if (!SystemProperties.isServerMode()) {
                     if (sessionDebug.messageEnabled()) {
                         sessionDebug.message("Session."
-                            + "processSessionResponseException: Destorying AppToken");
+                            + "processSessionResponseException: Destroying AppToken");
                     }
 
                     AdminTokenAction.invalid();
@@ -1733,11 +1193,11 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Add listener to Internal Session.
      */
-    private void addInternalSessionListener() {
+    public void addInternalSessionListener() {
         try {
             if (SessionNotificationHandler.handler == null) {
                 SessionNotificationHandler.handler = new SessionNotificationHandler();
-                PLLClient.addNotificationHandler(Session.SESSION_SERVICE,
+                PLLClient.addNotificationHandler(SESSION_SERVICE,
                         SessionNotificationHandler.handler);
             }
             String url = WebtopNaming.getNotificationURL().toString();
@@ -1751,153 +1211,8 @@ public class Session extends GeneralTaskRunnable {
                 requests.sendRequestWithRetry(getSessionServiceURL(), sreq, this);
             }
         } catch (Exception e) {
+            //todo : something! :-D
         }
-    }
-
-    /**
-     * Returns the encoded URL , rewriten to include the session id. cookie will
-     * be rewritten in the URL as a query string with entity escaping of
-     * ampersand before appending session ID if other query parameters exists in
-     * the URL.
-     * <p>
-     *
-     * @param res HTTP Servlet Response.
-     * @param url the URL to be encoded.
-     * @return the encoded URL if cookies are not supported and URL if cookies
-     *         are supported
-     */
-    public String encodeURL(HttpServletResponse res, String url) {
-        return encodeURL(res, url, cookieName);
-    }
-
-    /**
-     * Returns the encoded URL , rewriten to include the session id. cookie will
-     * be rewritten in the URL as a query string with entity escaping of
-     * ampersand before appending session id if other query parameters exists in
-     * the URL.
-     * <p>
-     *
-     * @param res HTTP Servlet Response.
-     * @param url  the URL to be encoded
-     * @param cookieName AM cookie name
-     * @return the encoded URL if cookies are not supported and URL if cookies
-     *         are supported
-     */
-    public String encodeURL(HttpServletResponse res, String url,
-            String cookieName) {
-        String httpEncodeUrl = res.encodeURL(url);
-        return encodeURL(httpEncodeUrl, SessionUtils.QUERY, true, cookieName);
-    }
-
-    /**
-     * Returns the encoded URL , rewritten to include the session id. Cookie
-     * will be written to the URL in as a query string.
-     *
-     * @param url the URL to be encoded.
-     * @param escape true if ampersand entity escaping needs to done
-     *        else false. This parameter is valid only when encoding scheme
-     *        is <code>SessionUtils.QUERY</code>.
-     * @return the encoded URL if cookies are not supported or the URL if
-     *         cookies are supported.
-     */
-    public String encodeURL(String url, boolean escape) {
-        return encodeURL(url, escape, cookieName);
-    }
-
-    /**
-     * Returns the encoded URL , rewritten to include the session id. Cookie
-     * will be written to the URL in as a query string.
-     *
-     * @param url the URL to be encoded
-     * @param escape true if ampersand entity escaping needs to
-     *        done else false.This parameter is valid only when encoding
-     *        scheme is <code>SessionUtils.QUERY</code>.
-     * @param cookieName cookie name.
-     * @return the encoded URL if cookies are not supported or the URL if
-     *         cookies are supported.
-     */
-    public String encodeURL(String url, boolean escape, String cookieName) {
-        return encodeURL(url, SessionUtils.QUERY, escape);
-    }
-
-    /**
-     * Returns the encoded URL , rewritten to include the session id in the
-     * query string with entity escaping
-     *
-     * @param url the URL to be encoded
-     * @return the encoded URL if cookies are not supported or the URL if
-     *         cookies are supported.
-     */
-    public String encodeURL(String url) {
-        return encodeURL(url, cookieName);
-    }
-
-    /**
-     * Returns the encoded URL , rewritten to include the session id in the
-     * query string with entity escaping
-     *
-     * @param url the URL to be encoded.
-     * @param cookieName the cookie name.
-     * @return the encoded URL if cookies are not supported or the URL if
-     *         cookies are supported.
-     */
-    public String encodeURL(String url, String cookieName) {
-        return encodeURL(url, SessionUtils.QUERY, true, cookieName);
-    }
-
-    /**
-     * Returns the encoded URL , rewritten to include the session id.
-     *
-     * @param url the URL to be encoded.
-     * @param encodingScheme the scheme to rewrite the cookie value in URL as
-     *        a Query String or Path Info (Slash or Semicolon separated.
-     *        Allowed values are <code>SessionUtils.QUERY</code>,
-     *        <code>SessionUtils.SLASH</code> and
-     *        <code>SessionUtils.SEMICOLON</code>
-     * @param escape true if ampersand entity escaping needs to done
-     *        else false. This parameter is valid only when encoding scheme
-     *        is <code>SessionUtils.QUERY</code>.
-     * @return the encoded URL if cookies are not supported or the URL if
-     *         cookies are supported.
-     */
-    public String encodeURL(String url, short encodingScheme, boolean escape) {
-        return encodeURL(url, encodingScheme, escape, cookieName);
-    }
-
-    /**
-     * Returns the encoded URL , rewritten to include the session id.
-     *
-     * @param url the URL to be encoded.
-     * @param encodingScheme the scheme to rewrite the cookie value in URL as
-     *        a Query String or Path Info (Slash or Semicolon separated. Allowed
-     *        values are <code>SessionUtils.QUERY</code>,
-     *        <code>SessionUtils.SLASH</code> and
-     *        <code>SessionUtils.SEMICOLON</code>.
-     * @param escape true if ampersand entity escaping needs to done
-     *        else false. This parameter is valid only when encoding scheme
-     *        is <code>SessionUtils.QUERY</code>.
-     * @param cookieName name of the cookie.
-     * @return the encoded URL if cookies are not supported or the URL if
-     *         cookies are supported.
-     */
-    public String encodeURL(String url, short encodingScheme, boolean escape,
-            String cookieName) {
-        String encodedURL = url;
-        if (((url != null) && (url.length() > 0)) && (!getCookieSupport())) {
-            if ((cookieStr != null) && (cookieStr.length() > 0)
-                    && (foundCookieName(cookieStr, cookieName))) {
-                encodedURL = SessionEncodeURL.buildCookieString(url, cookieStr,
-                        encodingScheme, escape);
-            } else { // cookie str not set so call encodeURL
-                if (sessionID != null) {
-                    cookieStr = SessionEncodeURL.createCookieString(cookieName,
-                            sessionID.toString());
-                    encodedURL = SessionEncodeURL.encodeURL(cookieStr, url,
-                            encodingScheme, escape);
-                }
-            }
-        }
-        return encodedURL;
     }
 
     /**
@@ -1909,7 +1224,7 @@ public class Session extends GeneralTaskRunnable {
      * cookie Support value is not determined then the the default "false" is
      * assumed.
      */
-    private boolean getCookieSupport() {
+    public boolean getCookieSupport() {
         boolean cookieSupport = false;
         try {
             Boolean cookieMode = sessionID.getCookieMode();
@@ -1960,33 +1275,20 @@ public class Session extends GeneralTaskRunnable {
     }
 
     /**
-     * Marks session referenced by Session ID as non-local so that remote
-     * invocations of Session Service methods are to be used.
-     *
-     * @param sid session ID.
-     */
-    public static void markNonLocal(SessionID sid) {
-        Session sess = readSession(sid);
-        if (sess != null) {
-            sess.sessionIsLocal = false;
-        }
-    }
-
-    /**
      * Actively checks whether current session should be considered local (so
-     * that local invocations of Session Service methods are to be used)
+     * that local invocations of Session Service methods are to be used).
      *
      * @return true if the session local.
      */
     private boolean checkSessionLocal() throws SessionException {
-        if (isServerMode()) {
+        if (SystemProperties.isServerMode()) {
             return sessionService.checkSessionLocal(sessionID);
         } else {
             return false;
         }
     }
 
-    private TokenRestriction getRestriction() throws SessionException {
+    public TokenRestriction getRestriction() throws SessionException {
         return restriction;
     }
 
@@ -1994,208 +1296,4 @@ public class Session extends GeneralTaskRunnable {
         return context;
     }
 
-    /**
-     * Determines whether session code runs in core server or client SDK
-     * run-time mode
-     *
-     * @return true if running in core server mode, false otherwise
-     */
-    public static boolean isServerMode() {
-        return SystemProperties.isServerMode();
-    }
-
-    /**
-     * This method validates that the received session ID points to an existing server ID, and the site ID also
-     * corresponds to the server ID found in the session. Within this method two "extensions" are of interest: SITE_ID
-     * and PRIMARY_ID. The PRIMARY_ID extension contains the hosting server's ID, but only if the given server belongs
-     * to a site. The SITE_ID extension contains either the primary site's ID (if the hosting server belongs to a site)
-     * or the hosting server's ID. This method will look at the extensions and make sure that they match up with the
-     * naming table of this environment. If there is a problem with the session ID (e.g. the server ID actually points
-     * to a primary or secondary site, or if the server ID doesn't actually correlate with the site ID), then a
-     * SessionException is thrown in order to prevent forwarding of the received session request. A possible scenario
-     * for having such an incorrect session ID would be having multiple OpenAM environments using the same cookie
-     * domain and cookie name settings.
-     *
-     * @param sid The session ID that needs to be validated.
-     * @throws SessionException If the validation failed, possibly because the provided session ID was malformed or not
-     * created within this OpenAM deployment.
-     */
-    private static void validateSessionID(SessionID sid) throws SessionException {
-        String siteID = sid.getExtension(SessionID.SITE_ID);
-        String primaryID = sid.getExtension(SessionID.PRIMARY_ID);
-        String errorMessage = null;
-        if (primaryID == null) {
-            //In this case by definition the server is not assigned to a site, so we want to ensure that the
-            //SITE_ID points to a server
-            if (!WebtopNaming.isServer(siteID)) {
-                errorMessage = "Invalid session ID, Site ID \"" + siteID + "\" either points to a non-existent server,"
-                        + " or to a site";
-            }
-            String realSiteID = WebtopNaming.getSiteID(siteID);
-            if (errorMessage == null && realSiteID != null && !realSiteID.equals(siteID)) {
-                errorMessage = "Invalid session ID, Site ID \"" + siteID + "\" points to a server, but its "
-                        + "corresponding site ID is not present in the session ID";
-            }
-        } else {
-            //PRIMARY_ID is not null, hence this session belongs to a site, we need to verify that the PRIMARY_ID
-            //and the SITE_ID are both correct, and they actually correspond to each other
-            if (!WebtopNaming.isServer(primaryID)) {
-                errorMessage = "Invalid session ID, Primary ID \"" + primaryID + "\" either points to a non-existent "
-                        + "server, or to a site";
-            }
-            String realSiteID = WebtopNaming.getSiteID(primaryID);
-            if (errorMessage == null) {
-                if (realSiteID == null || realSiteID.equals(primaryID)) {
-                    //The server from the session doesn't actually belong to a site
-                    errorMessage = "Invalid session ID, Primary ID \"" + primaryID + "\" server isn't member of Site "
-                            + "ID \"" + siteID + "\"";
-                } else if (!realSiteID.equals(siteID)) {
-                    //The server from the session actually belongs to a different site
-                    errorMessage = "Invalid session ID, Primary ID \"" + primaryID + "\" server doesn't belong"
-                            + " to Site ID \"" + siteID + "\"";
-                }
-            }
-        }
-        if (errorMessage != null) {
-            if (sessionDebug.warningEnabled()) {
-                sessionDebug.warning(errorMessage);
-            }
-            throw new SessionException(errorMessage);
-        }
-    }
-
-    /**
-     * Checks if the cookie name is in the cookie string.
-     *
-     * @param cookieStr cookie string (<code>cookieName=cookieValue</code>).
-     * @param cookieName name of the cookie.
-     * @return true if <code>cookieName</code> is in the <code>cookieStr</code>.
-     */
-    public static boolean foundCookieName(String cookieStr, String cookieName) {
-        boolean foundCookieName = false;
-        String cookieNameInStr = null;
-        if (sessionDebug.messageEnabled()) {
-            sessionDebug.message("CookieNameStr is :" + cookieNameInStr);
-            sessionDebug.message("cookieName is :" + cookieName);
-        }
-        if (cookieStr != null && cookieStr.length() != 0) {
-            cookieNameInStr = cookieStr.substring(0, cookieStr.indexOf("="));
-        }
-        if ((cookieNameInStr != null) && (cookieNameInStr.equals(cookieName))) {
-            foundCookieName = true;
-        }
-        return foundCookieName;
-    }
-
-    class SessionPollerSender implements Runnable {
-        SessionInfo info = null;
-
-        Session session = null;
-
-        SessionID sid = null;
-
-        Debug debug = null;
-
-        public SessionPollerSender(Session sess, Debug sessionDebug) {
-            session = sess;
-            sid = session.getID();
-            debug = sessionDebug;
-        }
-
-        public void run() {
-            try {
-                SessionRequest sreq = new SessionRequest(
-                        SessionRequest.GetSession, sid.toString(), false);
-                SessionResponse sres = Session.sendPLLRequest(session
-                        .getSessionServiceURL(), sreq);
-
-                if (sres.getException() != null) {
-                    Session.removeSID(sid);
-                    return;
-                }
-
-                List<SessionInfo> infos = sres.getSessionInfo();
-
-                if (infos.size() == 1) {
-                    info = infos.get(0);
-                }
-            } catch (Exception ex) {
-                Session.removeSID(sid);
-                if (debug.messageEnabled())
-                    debug.message("Could not connect to the session server"
-                            + ex.getMessage());
-            }
-
-            if (info != null) {
-                if (debug.messageEnabled()) {
-                    debug.message("Updating" + info.toXMLString());
-                }
-                try {
-                    if (info.state.equals("invalid")
-                            || info.state.equals("destroyed")) {
-                        Session.removeSID(sid);
-                    } else {
-                        long oldMaxCachingTime = session.maxCachingTime;
-                        long oldMaxIdleTime = session.maxIdleTime;
-                        long oldMaxSessionTime = session.maxSessionTime;
-                        session.update(info);
-                        if ((!isScheduled()) ||
-                            (oldMaxCachingTime > session.maxCachingTime) ||
-                            (oldMaxIdleTime > session.maxIdleTime) ||
-                            (oldMaxSessionTime > session.maxSessionTime)) {
-                            scheduleToTimerPool();
-                        }
-                    }
-                } catch (SessionException se) {
-                    Session.removeSID(sid);
-                    debug.error("Exception encountered while update in polling",
-                           se);
-                }
-            } else {
-                Session.removeSID(sid);
-            }
-            session.setIsPolling(false);
-        }
-    }
-
-    /**
-     * Checks for a Session in the Session table.
-     * @param sessionID Non null sessionID of the Session to lookup.
-     * @return boolean true indicates Session is present.
-     */
-    private static boolean hasSession(SessionID sessionID) {
-        Reject.ifNull(sessionID);
-        return sessionTable.get(sessionID) != null;
-    }
-
-    /**
-     * Reads a Session from the Session table.
-     * @param sessionID Non null sessionID of the Session to lookup.
-     * @return Null indicates no Session present, otherwise non null.
-     */
-    static Session readSession(SessionID sessionID) {
-        Reject.ifNull(sessionID);
-        return sessionTable.get(sessionID);
-    }
-
-    /**
-     * Store a Session in the table.
-     *
-     * @param session The Session to store. Non null.
-     */
-    private static void writeSession(Session session) {
-        Reject.ifNull(session);
-        Reject.ifNull(session.getID());
-        sessionTable.put(session.getID(), session);
-    }
-
-    /**
-     * Delete the Session from the table.
-     * @param sessionID The SessionID of the Session to delete. Non null.
-     * @return A possibly null Session if none was matched, otherwise non null.
-     */
-    private static Session deleteSession(SessionID sessionID) {
-        Reject.ifNull(sessionID);
-        return sessionTable.remove(sessionID);
-    }
 }

@@ -16,8 +16,9 @@
 
 package org.forgerock.openam.forgerockrest.session;
 
+import static org.forgerock.json.fluent.JsonValue.*;
+
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
@@ -29,6 +30,15 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.AdviceContext;
@@ -51,19 +61,8 @@ import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
+import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.utils.StringUtils;
-
-import javax.inject.Inject;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.forgerock.json.fluent.JsonValue.*;
 
 /**
  * Represents Sessions that can queried via a REST interface.

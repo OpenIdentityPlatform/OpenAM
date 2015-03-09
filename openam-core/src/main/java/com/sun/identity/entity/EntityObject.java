@@ -28,14 +28,14 @@
 
 package com.sun.identity.entity;
 
-import java.rmi.RemoteException;
-import java.util.Map;
-import java.util.Set;
-
-import com.iplanet.dpro.session.Session;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
+import java.rmi.RemoteException;
+import java.util.Map;
+import java.util.Set;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCookies;
 
 public class EntityObject {
 
@@ -50,6 +50,8 @@ public class EntityObject {
 
     protected SOAPClient client = null;
 
+    private final SessionCookies sessionCookies;
+
     public EntityObject(SSOToken token, String entityLocation)
             throws EntityException {
         this.token = token;
@@ -58,6 +60,7 @@ public class EntityObject {
         if (client == null) {
             client = new SOAPClient(SERVICE_NAME);
         }
+        sessionCookies = InjectorHolder.getInstance(SessionCookies.class);
     }
 
     /**
@@ -84,8 +87,8 @@ public class EntityObject {
             Object[] objs = { tokenString, entityName, entityType,
                     entityLocation, attributes };
             return ((Set) client.send(client
-                    .encodeMessage("createEntity", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    .encodeMessage("createEntity", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
 
         } catch (RemoteException rex) {
             EntityUtils.debug.warning(
@@ -117,8 +120,8 @@ public class EntityObject {
         try {
             Object[] objs = { tokenString, entityName, entityType,
                     entityLocation };
-            client.send(client.encodeMessage("deleteEntity", objs), 
-        	    Session.getLBCookie(token.getTokenID().toString()),  null);
+            client.send(client.encodeMessage("deleteEntity", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()),  null);
         } catch (RemoteException rex) {
             EntityUtils.debug.warning(
                     "EntityObject:deleteEntity->RemoteException", rex);
@@ -149,7 +152,7 @@ public class EntityObject {
             Object[] objs = { tokenString, entityName, entityType,
                     entityLocation };
             return ((Map) client.send(client.encodeMessage("getEntity", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
         } catch (RemoteException rex) {
             EntityUtils.debug.warning(
                     "EntityObject:getEntity->RemoteException", rex);
@@ -183,7 +186,7 @@ public class EntityObject {
             Object[] objs = { tokenString, entityType, entityLocation,
                     entityFilter };
             return ((Set) client.send(client.encodeMessage("getEntityNames",
-                    objs), Session.getLBCookie(token.getTokenID().toString()),
+                    objs), sessionCookies.getLBCookie(token.getTokenID().toString()),
                     null));
         } catch (RemoteException rex) {
             EntityUtils.debug.warning(
@@ -217,8 +220,8 @@ public class EntityObject {
         try {
             Object[] objs = { tokenString, entityName, entityType,
                     entityLocation, attributes };
-            client.send(client.encodeMessage("modifyEntity", objs), 
-        	    Session.getLBCookie(token.getTokenID().toString()),  null);
+            client.send(client.encodeMessage("modifyEntity", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()),  null);
         } catch (RemoteException rex) {
             EntityUtils.debug.warning(
                     "EntityObject:modifyEntity->RemoteException", rex);

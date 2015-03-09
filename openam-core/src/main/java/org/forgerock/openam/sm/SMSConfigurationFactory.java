@@ -15,16 +15,14 @@
  */
 package org.forgerock.openam.sm;
 
-import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.services.ldap.LDAPUser;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.sm.exceptions.ConnectionCredentialsNotFound;
-import org.forgerock.openam.sm.exceptions.ServerConfigurationNotFound;
-
+import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.lang.IllegalStateException;
-import java.util.Arrays;
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.sm.exceptions.ConnectionCredentialsNotFound;
+import org.forgerock.openam.sm.exceptions.ServerConfigurationNotFound;
 
 /**
  * Resolves which ServerConfiguration to retrieve from the SMS configuration.

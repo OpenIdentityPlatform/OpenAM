@@ -24,8 +24,8 @@
  *
  * $Id: WebServiceAuthenticatorImpl.java,v 1.4 2008/08/06 17:29:25 exu Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock, AS."
  */
-
 
 package com.sun.identity.liberty.ws.soapbinding; 
 
@@ -61,6 +61,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.liberty.ws.security.SecurityUtils;
+import org.forgerock.guice.core.InjectorHolder;
 
 class WebServiceAuthenticatorImpl implements WebServiceAuthenticator {
     private static final String PRINCIPAL_PROP = "Principal";
@@ -207,8 +208,7 @@ class WebServiceAuthenticatorImpl implements WebServiceAuthenticator {
         
         String authInstant = null;
         try {
-            InternalSession is = SessionService.getSessionService().
-                    newInternalSession(null, null);
+            InternalSession is = InjectorHolder.getInstance(SessionService.class).newInternalSession(null, null);
             is.activate("");
             Map attrs = sessionSchema.getAttributeDefaults();
             is.setMaxSessionTime(CollectionHelper.getIntMapAttr(

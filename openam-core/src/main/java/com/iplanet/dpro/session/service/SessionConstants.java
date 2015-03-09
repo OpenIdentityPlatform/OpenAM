@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -20,4 +20,6 @@ package com.iplanet.dpro.session.service;
  */
 public class SessionConstants {
     public static final String SESSION_DEBUG = "amSession";
+    public static final String PRIMARY_SERVER_URL = "primaryServerURL";
+    public static final String STATS_MASTER_TABLE = "amMasterSessionTableStats";
 }

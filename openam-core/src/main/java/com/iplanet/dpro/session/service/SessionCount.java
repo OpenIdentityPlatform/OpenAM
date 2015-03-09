@@ -32,8 +32,9 @@
 
 package com.iplanet.dpro.session.service;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.share.SessionRequest;
@@ -42,18 +43,23 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.configuration.SiteConfiguration;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
+import org.forgerock.openam.session.SessionPLLSender;
+import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.TimeUtils;
 
 import java.net.URL;
+import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -63,6 +69,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
 
 
 /**
@@ -99,14 +107,21 @@ public class SessionCount {
 
     private static int deploymentMode = 0;
 
-    private static Debug debug = SessionService.sessionDebug;
+    private static Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
 
     private static SSOToken adminToken = null;
 
     private static boolean useLocalSessionsInMultiServerMode = false;
-    
+
+    private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE = InjectorHolder.getInstance(SessionServiceURLService.class);
+    private static final SessionPLLSender sessionPLLSender = InjectorHolder.getInstance(SessionPLLSender.class);
+
     private static boolean caseSensitiveUUID =
         SystemProperties.getAsBoolean(Constants.CASE_SENSITIVE_UUID);
+
+    private static final SessionService sessionService = InjectorHolder.getInstance(SessionService.class);
+    private static final SessionServerConfig serverConfig = InjectorHolder.getInstance(SessionServerConfig.class);
+    private static final SessionServiceConfig serviceConfig = InjectorHolder.getInstance(SessionServiceConfig.class);
 
     static {
         try {
@@ -116,13 +131,13 @@ public class SessionCount {
                     + "SSOTokenManager instance.");
         }
 
-        if (getSS().isSessionFailoverEnabled()) {
+        if (serviceConfig.isSessionFailoverEnabled()) {
             deploymentMode = SFO_MODE;
         } else {
             try {
                 int count = WebtopNaming.getAllServerIDs().size();
                 if (count == 1 || (count == 2
-                        && (getSS().isSiteEnabled()
+                        && (serverConfig.isSiteEnabled()
                         || !SiteConfiguration.getSites(getAdminToken()).isEmpty()))) {
                     deploymentMode = SINGLE_SERVER_MODE;
                 } else {
@@ -144,17 +159,7 @@ public class SessionCount {
     }
 
     static int getDeploymentMode() {
-
         return deploymentMode;
-    }
-
-    static SessionService getSS() {
-        SessionService ss = SessionService.getSessionService();
-        if (ss == null) {
-            debug.error("SessionConstraint: "
-                    + " Failed to get the session service instance");
-        }
-        return ss;
     }
 
     /**
@@ -219,7 +224,7 @@ public class SessionCount {
         if (sessions != null) {
             synchronized (sessions) {
                 for (SessionID sid : sessions) {
-                    InternalSession is = getSS().getInternalSession(sid);
+                    InternalSession is = sessionService.getInternalSession(sid);
                     
                     if (is != null) {
                         retSessions.put(sid.toString(), new Long(is.getExpirationTime()));
@@ -237,7 +242,7 @@ public class SessionCount {
     private static Map getSessionsFromPeerServers(String uuid) {
 
         Map sessions = getSessionsFromLocalServer(uuid);
-        String localServerID = getSS().getLocalServerID();
+        String localServerID = serverConfig.getLocalServerID();
 
         Set serverIDs = null;
         try {
@@ -254,7 +259,7 @@ public class SessionCount {
                 continue;
             }
             try {
-                URL svcurl = Session.getSessionServiceURL(serverID);
+                URL svcurl = SESSION_SERVICE_URL_SERVICE.getSessionServiceURL(serverID);
                 SessionRequest sreq = new SessionRequest(
                         SessionRequest.GetSessionCount, getAdminToken()
                                 .getTokenID().toString(), false);
@@ -273,7 +278,7 @@ public class SessionCount {
 
     private static Map<String, Long> getSessionsFromRepository(String uuid) throws Exception {
 
-        CTSPersistentStore repo = SessionService.getSessionService().getRepository();
+        CTSPersistentStore repo = sessionService.getRepository();
         try {
             // Filter and Query the CTS
             TokenFilter filter = new TokenFilterBuilder()
@@ -375,7 +380,7 @@ public class SessionCount {
                 sreq.setRequester(RestrictedTokenContext.marshal(context));
             }
 
-            SessionResponse sres = Session.sendPLLRequest(svcurl, sreq);
+            SessionResponse sres = sessionPLLSender.sendPLLRequest(svcurl, sreq);
             if (sres.getException() != null) {
                 throw new SessionException(sres.getException());
             }
@@ -395,10 +400,9 @@ public class SessionCount {
 
         if (adminToken == null) {
             try {
-                adminToken = getSS().getSessionServiceToken();
+                adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             } catch (Exception e) {
-                debug.error("Failed to get the admin token for "
-                        + "Session constraint checking.", e);
+                debug.error("Failed to get the admin token for Session constraint checking.", e);
             }
         }
         return adminToken;

@@ -27,10 +27,14 @@
  */
 
 /*
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 package com.iplanet.dpro.session.service;
 
+import static com.iplanet.dpro.session.service.SessionConstants.SESSION_DEBUG;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.idm.AMIdentity;
@@ -40,6 +44,8 @@ import com.sun.identity.sm.ServiceSchemaManager;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.service.DestroyOldestAction;
 
 /**
@@ -78,24 +84,12 @@ public class SessionConstraint {
     private static final String SESSION_QUOTA_ATTR_NAME = 
         "iplanet-am-session-quota-limit";
 
-    private static Debug debug = SessionService.sessionDebug;
+    private static final Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
 
     private static QuotaExhaustionAction quotaExhaustionAction = null;
 
-    /*
-     * Get the session service
-     */
-    static {
-        // FIXME Is this initialization necessary?
-        getSS();
-    }
-
-    static SessionService getSS() {
-        return SessionCount.getSS();
-    }
-
     private static QuotaExhaustionAction getQuotaExhaustionAction() {
-        String clazzName = SessionService.getConstraintHandler();
+        String clazzName = InjectorHolder.getInstance(SessionServiceConfig.class).getConstraintHandler();
         if (quotaExhaustionAction != null
                 && quotaExhaustionAction.getClass().getName().equals(clazzName)) {
             return quotaExhaustionAction;
@@ -151,7 +145,7 @@ public class SessionConstraint {
 	    sessions  =
 		SessionCount.getAllSessionsByUUID(is.getUUID());
 	} catch (Exception e) {
-	    if (getSS().denyLoginIfDBIsDown()) {
+	    if (InjectorHolder.getInstance(SessionServiceConfig.class).isDenyLoginIfDBIsDown()) {
 		if (debug.messageEnabled()) {
 		    debug.message("SessionConstraint." +
                         "checkQuotaAndPerformAction: " +

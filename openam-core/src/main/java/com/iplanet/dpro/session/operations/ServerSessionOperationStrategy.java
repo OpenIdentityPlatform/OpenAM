@@ -1,6 +1,4 @@
-/**
- * Copyright 2014 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,7 +10,10 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
  */
+
 package com.iplanet.dpro.session.operations;
 
 import com.iplanet.dpro.session.Session;
@@ -23,13 +24,12 @@ import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.strategies.CTSOperations;
 import com.iplanet.dpro.session.operations.strategies.LocalOperations;
 import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
-import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.forgerock.openam.session.SessionConstants;
 
 /**
  * Server based SessionOperationStrategy implementation.
@@ -152,7 +152,7 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
             return false;
         }
 
-        return service.checkSiteUp(siteId);
+        return service.isSiteUp(siteId);
     }
 
     /**

@@ -15,13 +15,7 @@
  */
 package org.forgerock.openam.sm.datalayer.providers;
 
-import java.text.MessageFormat;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
@@ -29,7 +23,11 @@ import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import java.text.MessageFormat;
 
 /**
  * Abstraction for the ConnectionFactory provider implementations.

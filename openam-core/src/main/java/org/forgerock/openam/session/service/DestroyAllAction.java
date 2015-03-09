@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,19 +20,24 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
  */
 package org.forgerock.openam.session.service;
 
+import static org.forgerock.openam.session.SessionConstants.*;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.QuotaExhaustionAction;
-import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCache;
 
 /**
  * This action will invalidate all currently existing sessions, but it will
@@ -43,7 +48,18 @@ import java.util.Set;
  */
 public class DestroyAllAction implements QuotaExhaustionAction {
 
-    private static Debug debug = SessionService.sessionDebug;
+    private static Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
+
+    private final SessionCache sessionCache;
+
+    public DestroyAllAction() {
+        this.sessionCache = InjectorHolder.getInstance(SessionCache.class);
+    }
+
+    @Inject
+    public DestroyAllAction(SessionCache sessionCache) {
+        this.sessionCache = sessionCache;
+    }
 
     @Override
     public boolean action(InternalSession is, Map sessions) {
@@ -54,7 +70,7 @@ public class DestroyAllAction implements QuotaExhaustionAction {
                 SessionID sessID = new SessionID(sid);
 
                 try {
-                    Session s = Session.getSession(sessID);
+                    Session s = sessionCache.getSession(sessID);
                     s.destroySession(s);
                     debug.message("Destroy sid " + sessID);
                 } catch (SessionException se) {

@@ -15,18 +15,17 @@
  */
 package com.iplanet.dpro.session.operations.strategies;
 
-import com.google.inject.name.Named;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.operations.SessionOperations;
-import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.shared.debug.Debug;
-
-import javax.inject.Inject;
 import java.text.MessageFormat;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.forgerock.openam.session.SessionConstants;
 
 /**
  * Responsible for applying Session operations on the local Server instance.

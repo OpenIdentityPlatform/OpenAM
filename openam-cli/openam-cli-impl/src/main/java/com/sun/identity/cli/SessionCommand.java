@@ -32,27 +32,31 @@
 
 package com.sun.identity.cli;
 
-
 import com.iplanet.dpro.session.Session;
-import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.common.DisplayUtils;
 import com.sun.identity.common.SearchResults;
+import com.sun.identity.shared.ldap.LDAPDN;
+import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.session.SessionCache;
+
+import javax.inject.Inject;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
-import java.util.Map;
+
+import static org.forgerock.openam.session.SessionConstants.SESSION_HANDLE_PROP;
 
 /**
  * Displays active sessions.
@@ -64,14 +68,22 @@ public class SessionCommand extends AuthenticatedCommand {
 
     private Session curSession;
     private SessionID curSessionID;
+    private final SessionCache sessionCache;
 
-    public void handleRequest(RequestContext rc) 
-        throws CLIException {
+    @Inject
+    public SessionCommand(SessionCache sessionCache) {
+        this.sessionCache = sessionCache;
+    }
+
+    public SessionCommand() {
+        this(SessionCache.getInstance());
+    }
+
+    public void handleRequest(RequestContext rc) throws CLIException {
         super.handleRequest(rc);
         Authenticator auth = Authenticator.getInstance();
         String bindUser = getAdminID();
-        AuthContext lc = auth.sessionBasedLogin(
-            getCommandManager(), bindUser, getAdminPassword());
+        AuthContext lc = auth.sessionBasedLogin(getCommandManager(), bindUser, getAdminPassword());
         try {
             boolean isQuiet = isOptionSet(QUIET_PARAM);
             handleRequest(lc.getSSOToken(), isQuiet);
@@ -79,16 +91,14 @@ public class SessionCommand extends AuthenticatedCommand {
             try {
                 lc.logout();
             } catch (AuthLoginException e) {
-                throw new CLIException(
-                    e, ExitCodes.SESSION_BASED_LOGOUT_FAILED);
+                throw new CLIException(e, ExitCodes.SESSION_BASED_LOGOUT_FAILED);
             }
         } catch (Exception e) {
             throw new CLIException(e, ExitCodes.SESSION_BASED_LOGIN_FAILED);
         }
     }
 
-    private void handleRequest(SSOToken ssoToken, boolean isQuiet)
-        throws CLIException {
+    private void handleRequest(SSOToken ssoToken, boolean isQuiet) throws CLIException {
         IOutput ouputWriter = getOutputWriter();
 
         List sList = displaySessions(ssoToken);
@@ -106,8 +116,7 @@ public class SessionCommand extends AuthenticatedCommand {
         }
     }
 
-    private void promptForInvalidation(IOutput ouputWriter, List sessionList)
-        throws CLIException
+    private void promptForInvalidation(IOutput ouputWriter, List sessionList) throws CLIException
     {
         List snList = new ArrayList(sessionList.size());
         ouputWriter.printlnMessage(getResourceString("session-to-invalidate"));
@@ -128,8 +137,7 @@ public class SessionCommand extends AuthenticatedCommand {
                     if (matched) {
                         snList.add(sn);
                     } else {
-                        ouputWriter.printlnError(getResourceString(
-                            "session-selection-not-in-list"));
+                        ouputWriter.printlnError(getResourceString("session-selection-not-in-list"));
                     }
                 }
 
@@ -138,13 +146,11 @@ public class SessionCommand extends AuthenticatedCommand {
                 }
             }
         } catch (IOException ioe) {
-            ouputWriter.printlnError(getResourceString(
-                "session-io-exception-reading-input") + " " + ioe);
+            ouputWriter.printlnError(getResourceString("session-io-exception-reading-input") + " " + ioe);
         }
     }
 
-    private void destroySession(Session session, SessionData sData)
-        throws CLIException
+    private void destroySession(Session session, SessionData sData) throws CLIException
     {
         try {
             Session sess = sData.session;
@@ -239,7 +245,7 @@ public class SessionCommand extends AuthenticatedCommand {
         }
 
         try {
-            curSession = Session.getSession(curSessionID);
+            curSession = sessionCache.getSession(curSessionID);
             return getSessionList(host, filter);
         } catch (SessionException se) {
             throw new CLIException(se, ExitCodes.SESSION_BASED_LOGIN_FAILED);
@@ -263,7 +269,7 @@ public class SessionCommand extends AuthenticatedCommand {
                                                                                 
         try {
             String currentSessionHandler = curSession.getProperty(
-                Session.SESSION_HANDLE_PROP);
+                SESSION_HANDLE_PROP);
             SearchResults result = curSession.getValidSessions(name, null);
             String warning = getSearchResultWarningMessage(result);
             if (warning.length() > 0) {
@@ -283,7 +289,7 @@ public class SessionCommand extends AuthenticatedCommand {
                 // need to check current session only if we have not found it.
                 if (!isCurrentSession) {
                     try {
-                        isCurr = sess.getProperty(Session.SESSION_HANDLE_PROP)
+                        isCurr = sess.getProperty(SESSION_HANDLE_PROP)
                             .equals(currentSessionHandler);
                     } catch (SessionException se) {
                         throw new CLIException(se,

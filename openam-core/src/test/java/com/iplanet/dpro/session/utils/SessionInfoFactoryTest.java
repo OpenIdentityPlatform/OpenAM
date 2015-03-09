@@ -15,21 +15,20 @@
  */
 package com.iplanet.dpro.session.utils;
 
-import com.iplanet.dpro.session.Session;
+import static org.fest.assertions.Assertions.*;
+import static org.forgerock.openam.session.SessionConstants.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.share.SessionInfo;
+import java.util.Hashtable;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Hashtable;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 
 public class SessionInfoFactoryTest {
 
@@ -50,7 +49,7 @@ public class SessionInfoFactoryTest {
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockSession.getRestrictionForToken(any(SessionID.class))).willReturn(mock(TokenRestriction.class));
 
-        given(mockSession.getState()).willReturn(Session.INVALID);
+        given(mockSession.getState()).willReturn(INVALID);
         // When / Then
         try {
             factory.getSessionInfo(mockSession, mockSessionID);
@@ -64,9 +63,9 @@ public class SessionInfoFactoryTest {
         // Given
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockSession.getRestrictionForToken(any(SessionID.class))).willReturn(mock(TokenRestriction.class));
-        given(mockSession.getState()).willReturn(Session.VALID);
+        given(mockSession.getState()).willReturn(VALID);
 
-        given(mockSession.getState()).willReturn(Session.INVALID);
+        given(mockSession.getState()).willReturn(INVALID);
         given(mockSession.getTimeLeftBeforePurge()).willReturn(1l);
         // When / Then
         try {
@@ -81,7 +80,7 @@ public class SessionInfoFactoryTest {
         // Given
         given(mockSession.getID()).willReturn(mockSessionID);
         given(mockSession.getRestrictionForToken(any(SessionID.class))).willReturn(mock(TokenRestriction.class));
-        given(mockSession.getState()).willReturn(Session.VALID);
+        given(mockSession.getState()).willReturn(VALID);
         given(mockSession.getTimeLeftBeforePurge()).willReturn(0l);
 
         SessionInfo mockSessionInfo = mock(SessionInfo.class);

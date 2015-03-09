@@ -15,7 +15,8 @@
  */
 package com.iplanet.dpro.session.utils;
 
-import com.iplanet.dpro.session.Session;
+import static org.forgerock.openam.session.SessionConstants.*;
+
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionTimedOutException;
@@ -71,7 +72,7 @@ public class SessionInfoFactory {
             throw new IllegalArgumentException("Session id mismatch");
         }
 
-        if (internalSession.getState() != Session.VALID) {
+        if (internalSession.getState() != VALID) {
             if (internalSession.getTimeLeftBeforePurge() > 0) {
                 throw new SessionTimedOutException(MessageFormat.format(ERROR_FORMAT,
                         SessionBundle.getString("sessionTimedOut"),
@@ -102,7 +103,7 @@ public class SessionInfoFactory {
         TokenRestriction restriction = internalSession.getRestrictionForToken(sid);
         if (restriction != null) {
             try {
-                info.properties.put(Session.TOKEN_RESTRICTION_PROP,
+                info.properties.put(TOKEN_RESTRICTION_PROP,
                         TokenRestrictionFactory.marshal(restriction));
             } catch (Exception e) {
                 throw new SessionException(e);

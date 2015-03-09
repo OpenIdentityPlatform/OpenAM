@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2014 ForgeRock Inc
+ * Portions Copyrighted 2011-2015 ForgeRock Inc
  */
 package com.sun.identity.common;
 
@@ -56,6 +56,8 @@ import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.guice.core.InjectorHolder;
+
 import java.security.AccessController;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -118,7 +120,7 @@ public class ConfigMonitoring {
 
         boolean isSessFOEnabled = false;
         try {
-            SessionService ssvc = SessionService.getSessionService();
+            SessionService ssvc = InjectorHolder.getInstance(SessionService.class);
             if (ssvc != null) {
                 isSessFOEnabled = ssvc.isSessionFailoverEnabled();
             } else {

@@ -15,16 +15,10 @@
  */
 package org.forgerock.openam.cts.utils;
 
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
-
-import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.TokenRestriction;
+import com.iplanet.dpro.session.service.InternalSession;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorHolder;
@@ -39,12 +33,15 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.TokenRestriction;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.shared.debug.Debug;
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 
 @GuiceModules({CoreGuiceModule.class, SharedGuiceModule.class, DataLayerGuiceModule.class})
 public class JSONSerialisationTest extends GuiceTestCase {
@@ -176,30 +173,4 @@ public class JSONSerialisationTest extends GuiceTestCase {
         Object obj = field.get(is);
         assertThat(obj).isInstanceOf(ConcurrentHashMap.class);
     }
-
-    /**
-     * Generate an InternalSession with some fields set to random values.
-     *
-     * @return Non null.
-     */
-    private static InternalSession generateSession() {
-        SessionID sid = new SessionID(randomString());
-        InternalSession r = new InternalSession(sid, mock(SessionService.class), mock(Debug.class));
-        // String
-        r.setObject(randomString(), randomString());
-        // Boolean
-        r.setCookieMode(randomBoolean());
-        r.setExpire(randomBoolean());
-        r.setIsSessionUpgrade(randomBoolean());
-        return r;
-    }
-
-    private static String randomString() {
-        return Double.toString(Math.random());
-    }
-
-    private static boolean randomBoolean() {
-        return Math.random() > 0.5d;
-    }
-
 }

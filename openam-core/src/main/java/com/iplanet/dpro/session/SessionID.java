@@ -27,18 +27,26 @@
  */
 
 /**
+<<<<<<< HEAD
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+=======
+ * Portions Copyrighted 2011-2015 ForgeRock, AS.
+>>>>>>> stateless
  */
 
 package com.iplanet.dpro.session;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.share.SessionEncodeURL;
 import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.services.util.Crypt;
+import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
+import org.forgerock.openam.utils.PerThreadCache;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +59,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
+import java.security.AccessController;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -64,33 +75,23 @@ import java.util.Map;
  */
 
 public class SessionID implements Serializable {
+
+    public static final String SHANDLE_SCHEME_PREFIX = "shandle:";
+
     private String encryptedString = "";
     private boolean isParsed = false;
-
     private boolean comingFromAuth = false;
-
     private String sessionServerProtocol = "";
-
     private String sessionServer = "";
-
     private String sessionServerPort = "";
-
     private String sessionServerURI = "";
-
     protected String sessionDomain = "";
-
     private String sessionServerID = "";
-
     private String tail = null;
-
     private String extensionPart = null;
-
     private Map extensions = new HashMap();
-
     private static String cookieName = null;
-
     private static Debug debug;
-
     private Boolean cookieMode = null;
 
     static {
@@ -104,10 +105,24 @@ public class SessionID implements Serializable {
     // prefix "S" is reserved to be used by session framework-specific
     // extensions for session id format
     public static final String PRIMARY_ID = "S1";
-
     public static final String STORAGE_KEY = "SK";
-
     public static final String SITE_ID = "SI";
+
+    private static final PerThreadCache<SecureRandom, RuntimeException> secureRandom =
+            new PerThreadCache<SecureRandom, RuntimeException>(Integer.MAX_VALUE) {
+                @Override
+                protected SecureRandom initialValue() {
+                    try {
+                        try {
+                            return SecureRandom.getInstance("SHA1PRNG", "SUN");
+                        } catch (NoSuchProviderException e) {
+                            return SecureRandom.getInstance("SHA1PRNG");
+                        }
+                    } catch (Exception e) {
+                        throw new IllegalStateException("Need SHA1PRNG algorithm to continue");
+                    }
+                }
+            };
 
     /**
      * Constructs a <code>SessionID</code> object based on a
@@ -118,7 +133,7 @@ public class SessionID implements Serializable {
      *        the encrypted session string.
      */
     public SessionID(HttpServletRequest request) {
-        String cookieValue = null;
+        String cookieValue;
 
         if (cookieName == null) {
             cookieName = SystemProperties.get("com.iplanet.am.cookie.name");
@@ -682,6 +697,142 @@ public class SessionID implements Serializable {
             }
         }
         return new String(chars); 
+    }
+
+    public SessionID generateRelatedSessionID(SessionServerConfig serverConfig) throws SessionException {
+        return new SessionID(SessionID.makeRelatedSessionID(generateEncryptedID(serverConfig), this));
+    }
+
+    /**
+     * @return true if this SessionID actually represents a session handle.
+     */
+    public boolean isSessionHandle() {
+        return toString().startsWith(SHANDLE_SCHEME_PREFIX);
+    }
+
+    public String generateSessionHandle(SessionServerConfig serverConfig) throws SessionException {
+        return SHANDLE_SCHEME_PREFIX + SessionID.makeRelatedSessionID(generateEncryptedID(serverConfig), this);
+    }
+
+    public static String generateAmCtxID(SessionServerConfig serverConfig) {
+        return Long.toHexString(
+                secureRandom.getInstanceForCurrentThread().nextLong()) +
+                serverConfig.getLocalServerID();
+    }
+
+    /**
+     * Generates new encrypted ID string to be used as part of session id
+     *
+     * @return emcrypted ID string
+     */
+    private static String generateEncryptedID(SessionServerConfig serverConfig) {
+        String r = Long.toHexString(secureRandom.getInstanceForCurrentThread().nextLong());
+        // TODO note that this encryptedID string is kept only
+        // to make this compatible with older Java SDK clients
+        // which knew too much about the structure of the session id
+        // newer clients will mostly treat session id as opaque
+        //
+        return AccessController.doPrivileged(new EncodeAction(r + "@"
+                + serverConfig.getPrimaryServerID(), Crypt.getHardcodedKeyEncryptor()));
+    }
+
+    /**
+     * Generates new SessionID
+     *
+     * @param domain      session domain
+     * @return newly generated session id
+     * @throws SessionException
+     */
+    public static SessionID generateSessionID(SessionServerConfig serverConfig, String domain) throws SessionException {
+
+        SessionID sid;
+        String httpSessionId = null;
+        String encryptedID = generateEncryptedID(serverConfig);
+
+        Map ext = new HashMap();
+        ext.put(SessionID.SITE_ID, serverConfig.getPrimaryServerID());
+
+        // AME-129 Required for Automatic Session Failover Persistence
+        if (serverConfig.isSiteEnabled() &&
+                serverConfig.getLocalServerID() != null &&
+                !serverConfig.getLocalServerID().isEmpty()) {
+            ext.put(SessionID.PRIMARY_ID, serverConfig.getLocalServerID());
+        }
+
+        // AME-129, always set a Storage Key regardless of persisting or not.
+        ext.put(SessionID.STORAGE_KEY, String.valueOf(secureRandom.getInstanceForCurrentThread().nextLong()));
+
+        String sessionID = SessionID.makeSessionID(encryptedID, ext, httpSessionId);
+
+        sid = new SessionID(sessionID, serverConfig.getLocalServerID(), domain);
+
+        return sid;
+    }
+
+    private SessionID(String sid, String serverID, String domain) {
+        this(sid);
+        setServerID(serverID);
+        sessionDomain = domain;
+    }
+
+    /**
+     * This method validates that the received session ID points to an existing server ID, and the site ID also
+     * corresponds to the server ID found in the session. Within this method two "extensions" are of interest: SITE_ID
+     * and PRIMARY_ID. The PRIMARY_ID extension contains the hosting server's ID, but only if the given server belongs
+     * to a site. The SITE_ID extension contains either the primary site's ID (if the hosting server belongs to a site)
+     * or the hosting server's ID. This method will look at the extensions and make sure that they match up with the
+     * naming table of this environment. If there is a problem with the session ID (e.g. the server ID actually points
+     * to a primary or secondary site, or if the server ID doesn't actually correlate with the site ID), then a
+     * SessionException is thrown in order to prevent forwarding of the received session request. A possible scenario
+     * for having such an incorrect session ID would be having multiple OpenAM environments using the same cookie
+     * domain and cookie name settings.
+     *
+     * @throws SessionException If the validation failed, possibly because the provided session ID was malformed or not
+     * created within this OpenAM deployment.
+     */
+    public void validate() throws SessionException {
+        String siteID = getExtension(SessionID.SITE_ID);
+        String primaryID = getExtension(SessionID.PRIMARY_ID);
+        String errorMessage = null;
+        if (primaryID == null) {
+            //In this case by definition the server is not assigned to a site, so we want to ensure that the
+            //SITE_ID points to a server
+            if (!WebtopNaming.isServer(siteID)) {
+                errorMessage = "Invalid session ID, Site ID \"" + siteID + "\" either points to a non-existent server,"
+                        + " or to a site";
+            }
+            String realSiteID = WebtopNaming.getSiteID(siteID);
+            if (errorMessage == null && realSiteID != null && !realSiteID.equals(siteID)) {
+                errorMessage = "Invalid session ID, Site ID \"" + siteID + "\" points to a server, but its "
+                        + "corresponding site ID is not present in the session ID";
+            }
+        } else {
+            //PRIMARY_ID is not null, hence this session belongs to a site, we need to verify that the PRIMARY_ID
+            //and the SITE_ID are both correct, and they actually correspond to each other
+            if (!WebtopNaming.isServer(primaryID)) {
+                errorMessage = "Invalid session ID, Primary ID \"" + primaryID + "\" either points to a non-existent "
+                        + "server, or to a site";
+            }
+            String realSiteID = WebtopNaming.getSiteID(primaryID);
+            if (errorMessage == null) {
+                if (realSiteID == null || realSiteID.equals(primaryID)) {
+                    //The server from the session doesn't actually belong to a site
+                    errorMessage = "Invalid session ID, Primary ID \"" + primaryID + "\" server isn't member of Site "
+                            + "ID \"" + siteID + "\"";
+                } else if (!realSiteID.equals(siteID)) {
+                    //The server from the session actually belongs to a different site
+                    errorMessage = "Invalid session ID, Primary ID \"" + primaryID + "\" server doesn't belong"
+                            + " to Site ID \"" + siteID + "\"";
+                }
+            }
+        }
+
+        if (errorMessage != null) {
+            if (debug.warningEnabled()) {
+                debug.warning(errorMessage);
+            }
+            throw new SessionException(errorMessage);
+        }
     }
 
 }

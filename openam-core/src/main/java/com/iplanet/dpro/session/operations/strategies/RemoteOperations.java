@@ -15,13 +15,13 @@
  */
 package com.iplanet.dpro.session.operations.strategies;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Requests;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
@@ -31,11 +31,11 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.debug.Debug;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.text.MessageFormat;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.forgerock.openam.session.SessionConstants;
 
 /**
  * Responsible for providing remote implementations of the SessionOperations. These
@@ -144,7 +144,7 @@ public class RemoteOperations implements SessionOperations {
                 SessionRequest.SetProperty, sessionID.toString(), false);
         sreq.setPropertyName(name);
         sreq.setPropertyValue(value);
-        if ( Session.isServerMode() && InternalSession.isProtectedProperty(name) ) {
+        if (SystemProperties.isServerMode() && InternalSession.isProtectedProperty(name) ) {
             try {
                 SSOToken admSSOToken = SessionUtils.getAdminToken();
                 sreq.setRequester(RestrictedTokenContext.marshal(admSSOToken));

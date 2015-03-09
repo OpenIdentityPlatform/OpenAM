@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -36,6 +36,7 @@ import com.sun.management.snmp.agent.SnmpMib;
 import javax.management.MBeanServer;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.management.snmp.SnmpStatusException;
+import org.forgerock.guice.core.InjectorHolder;
 
 /**
  * This class extends the "SsoServerSessSvc" class.
@@ -108,7 +109,7 @@ public class SsoServerSessSvcImpl extends SsoServerSessSvc {
      * Getter for the "SessionNotifCount" variable.
      */
     public Long getSessionNotifCount() throws SnmpStatusException {
-        return Long.valueOf(SessionService.getNotificationQueueSize());
+        return Long.valueOf(InjectorHolder.getInstance(SessionService.class).getNotificationQueueSize());
     }
 
 }

@@ -17,6 +17,7 @@
  *
  * "Portions copyright [year] [name of copyright owner]".
  *
+ * "Portions copyright [2015] [ForgeRock, AS.]".
  */
 package com.sun.identity.sm.ldap;
 
@@ -34,10 +35,6 @@ import com.sun.identity.shared.ldap.LDAPException;
  */
 public class CTSDataLayer {
 
-    /**
-     * Debug Logging
-     */
-    private static Debug DEBUG = SessionService.sessionDebug;
     /**
      * Singleton Instance.
      */

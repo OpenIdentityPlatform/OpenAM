@@ -27,13 +27,14 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
  */
 
-package com.iplanet.dpro.session.service;
+package com.iplanet.dpro.session.service.cluster;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.shared.Constants;

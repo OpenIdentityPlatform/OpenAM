@@ -27,32 +27,40 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
 
-import com.iplanet.dpro.session.Session;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.TokenRestriction;
+import com.iplanet.dpro.session.TokenRestrictionFactory;
+import com.iplanet.services.naming.WebtopNaming;
+import com.sun.identity.security.DecodeAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.encode.URLEncDec;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.utils.IOUtils;
+
+import javax.inject.Named;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.TokenRestriction;
-import com.iplanet.dpro.session.TokenRestrictionFactory;
-import com.iplanet.services.naming.WebtopNaming;
-import com.sun.identity.shared.encode.CookieUtils;
-import com.sun.identity.security.DecodeAction;
-import com.sun.identity.shared.encode.URLEncDec;
+import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
 
 /**
  * This servlet class is used as a helper to aid SessionService to perform
@@ -94,45 +102,57 @@ public final class GetHttpSession extends HttpServlet {
 
     public static final String DOMAIN = "domain";
 
-    private static final long MAX_TIMESTAMP_DIFF = 10 * 60 * 1000; // 10
-                                                                    // Minutes
+    private static final long MAX_TIMESTAMP_DIFF = TimeUnit.MINUTES.toMillis(10); // 10 Minutes
+
+    private final Debug sessionDebug;
+    private final SessionService sessionService;
+    private final SessionServiceConfig serviceConfig;
+    private final SessionCache sessionCache;
+
+    public GetHttpSession(SessionService sessionService, @Named(SESSION_DEBUG) Debug debug,
+                          SessionServiceConfig serviceConfig, SessionCache sessionCache) {
+        this.sessionService = sessionService;
+        this.sessionDebug = debug;
+        this.serviceConfig = serviceConfig;
+        this.sessionCache = sessionCache;
+
+    }
+
+    public GetHttpSession() {
+        sessionService = InjectorHolder.getInstance(SessionService.class);
+        sessionDebug =  InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
+        serviceConfig = InjectorHolder.getInstance(SessionServiceConfig.class);
+        sessionCache = InjectorHolder.getInstance(SessionCache.class);
+    }
+
 
     private boolean validateRequest(HttpServletRequest servletRequest) {
         try {
             String encryptedCookie = CookieUtils.getCookieValueFromReq(
-                    servletRequest, SessionService.securityCookieName);
+                    servletRequest, serviceConfig.getSecurityCookieName());
             if (encryptedCookie == null) {
-                SessionService.sessionDebug
-                        .error("GetHttpSession.validateRequest: "
-                                + "no Security Cookie in the request");
+                sessionDebug.error("GetHttpSession.validateRequest: no Security Cookie in the request");
                 return false;
             }
-            String decryptedCookie = (String) AccessController
-                    .doPrivileged(new DecodeAction(encryptedCookie));
+            String decryptedCookie = AccessController.doPrivileged(new DecodeAction(encryptedCookie));
             StringTokenizer st = new StringTokenizer(decryptedCookie, "@");
             String serverURL = st.nextToken();
             long requestTimeStamp = Long.parseLong(st.nextToken());
             long currentTime = System.currentTimeMillis();
             if (Math.abs(currentTime - requestTimeStamp) > MAX_TIMESTAMP_DIFF) {
-                SessionService.sessionDebug
-                        .error("GetHttpSession.validateRequest: "
-                                + "Max time elapsed for the Request");
+                sessionDebug.error("GetHttpSession.validateRequest: Max time elapsed for the Request");
                 return false;
             }
             Vector platformServerList = WebtopNaming.getPlatformServerList();
 
             if (!platformServerList.contains(serverURL)) {
-                SessionService.sessionDebug
-                        .error("GetHttpSession.validateRequest: "
-                                + "request host :" + serverURL
-                                + "was not part of the platformServerList");
+                sessionDebug.error("GetHttpSession.validateRequest: request host :" + serverURL
+                        + "was not part of the platformServerList");
             }
             return true;
 
         } catch (Exception e) {
-            SessionService.sessionDebug.error(
-                    "GetHttpSession.validateRequest: "
-                            + "Exception while validating the request ", e);
+            sessionDebug.error("GetHttpSession.validateRequest: Exception while validating the request ", e);
             return false;
         }
 
@@ -149,48 +169,39 @@ public final class GetHttpSession extends HttpServlet {
         if (op.equals(RECOVER_OP)) {
             HttpSession httpSession = request.getSession(false);
             if (httpSession != null) {
-                if (SessionService.sessionDebug.messageEnabled()) {
-                    SessionService.sessionDebug.message(
-                            "GetHttpSession.recover: " +
-                            "Old HttpSession is obtained");
+                if (sessionDebug.messageEnabled()) {
+                    sessionDebug.message("GetHttpSession.recover: Old HttpSession is obtained");
                 }
                 SessionID sid = new SessionID(request);
                 if (!sid.isNull()) {
-                    SessionService.getSessionService().retrieveSession(sid,
-                            httpSession);
+                    sessionService.retrieveSession(sid, httpSession);
                 }
             } else {
-                SessionService.sessionDebug.error(
-                        "GetHttpSession.recover: " +
-                        "Old  HttpSession is not obtained");
+                sessionDebug.error("GetHttpSession.recover: Old  HttpSession is not obtained");
             }
         } else if (op.equals(SAVE_OP)) {
             HttpSession httpSession = request.getSession(false);
             if (httpSession != null) {
-                if (SessionService.sessionDebug.messageEnabled()) {
-                    SessionService.sessionDebug.message(
-                            "GetHttpSession.save: HttpSession is obtained");
+                if (sessionDebug.messageEnabled()) {
+                    sessionDebug.message("GetHttpSession.save: HttpSession is obtained");
                 }
                 SessionID sid = new SessionID(request);
                 if (!sid.isNull()) {
-                    int status = SessionService.getSessionService()
-                            .handleSaveSession(sid, httpSession);
+                    int status = sessionService.handleSaveSession(sid, httpSession);
                     response.setStatus(status);
                 }
             } else {
-                SessionService.sessionDebug.error(
-                        "GetHttpSession.save: HttpSession is not obtained");
+                sessionDebug.error("GetHttpSession.save: HttpSession is not obtained");
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
         } else if (op.equals(CREATE_OP)) {
             HttpSession httpSession = request.getSession(true);
             String domain = request.getParameter(DOMAIN);
-            InternalSession is = SessionService.getSessionService()
-                    .newInternalSession(domain, httpSession);
-            if (SessionService.sessionDebug.messageEnabled()) {
-                SessionService.sessionDebug
-                        .message("GetHttpSession.create: Created new session="
-                                + is.getID());
+
+            InternalSession is = sessionService.newInternalSession(domain, httpSession);
+
+            if (sessionDebug.messageEnabled()) {
+                sessionDebug.message("GetHttpSession.create: Created new session=" + is.getID());
             }
             DataOutputStream out = new DataOutputStream(response
                     .getOutputStream());
@@ -201,46 +212,36 @@ public final class GetHttpSession extends HttpServlet {
 
             HttpSession httpSession = request.getSession(false);
             if (httpSession != null) {
-                if (SessionService.sessionDebug.messageEnabled()) {
-                    SessionService.sessionDebug.message(
-                            "GetHttpSession.invalidate: " +
-                            "HttpSession is obtained");
+                if (sessionDebug.messageEnabled()) {
+                    sessionDebug.message("GetHttpSession.invalidate: HttpSession is obtained");
                 }
 
                 try {
                     httpSession.invalidate();
                 } catch (IllegalStateException ise) {
-                    if (SessionService.sessionDebug.messageEnabled()) {
-                        SessionService.sessionDebug.message(
-                                "Exception:invalidateSession: the web " +
-                                "containers session timeout could be " +
-                                "shorter than the OpenSSO session " +
-                                "timeout", ise);
+                    if (sessionDebug.messageEnabled()) {
+                        sessionDebug.message("Exception:invalidateSession: the web containers session timeout could be "
+                                + "shorter than the OpenSSO session timeout", ise);
                     }
                 }
             } else {
-                if (SessionService.sessionDebug.warningEnabled()) {
-                    SessionService.sessionDebug.warning(
-                            "GetHttpSession.invalidate: session is " +
-                            "not obtained");
+                if (sessionDebug.warningEnabled()) {
+                    sessionDebug.warning("GetHttpSession.invalidate: session is not obtained");
                 }
             }
 
         } else if (op.equals(RELEASE_OP)) {
             SessionID sid = new SessionID(request);
             if (!sid.isNull()) {
-                if (SessionService.sessionDebug.messageEnabled()) {
-                    SessionService.sessionDebug.message(
-                            "GetHttpSession.release: releasing session="
-                                    + sid);
+                if (sessionDebug.messageEnabled()) {
+                    sessionDebug.message("GetHttpSession.release: releasing session=" + sid);
                 }
-                int status = SessionService.getSessionService()
-                        .handleReleaseSession(sid);
+
+                int status = sessionService.handleReleaseSession(sid);
                 response.setStatus(status);
             } else {
-                if (SessionService.sessionDebug.messageEnabled()) {
-                    SessionService.sessionDebug.message(
-                            "GetHttpSession.release: missing session id");
+                if (sessionDebug.messageEnabled()) {
+                    sessionDebug.message("GetHttpSession.release: missing session id");
                 }
             }
         } else if (op.equals(GET_RESTRICTED_TOKEN_OP)) {
@@ -252,35 +253,26 @@ public final class GetHttpSession extends HttpServlet {
 
                 TokenRestriction restriction = TokenRestrictionFactory
                         .unmarshal(in.readUTF());
-                String token = SessionService.getSessionService()
-                        .handleGetRestrictedTokenIdRemotely(sid, restriction);
+                String token = sessionService.handleGetRestrictedTokenIdRemotely(sid, restriction);
 
                 if (token != null) {
-                    if (SessionService.sessionDebug.messageEnabled()) {
-                        SessionService.sessionDebug.message(
-                                "GetHttpSession.get_restricted_token: " +
-                                "Created new session="
-                                        + token);
+                    if (sessionDebug.messageEnabled()) {
+                        sessionDebug.message("GetHttpSession.get_restricted_token: Created new session=" + token);
                     }
                     response.setStatus(HttpServletResponse.SC_OK);
                     out = new DataOutputStream(response.getOutputStream());
                     out.writeUTF(token);
                     out.flush();
                 } else {
-                    SessionService.sessionDebug.error(
-                            "GetHttpSession.get_restricted_token: " +
-                            "failed to create token");
+                    sessionDebug.error("GetHttpSession.get_restricted_token: failed to create token");
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 }
             } catch (Exception ex) {
-                SessionService.sessionDebug.error(
-                        "GetHttpSession.get_restricted_token: " +
-                        "exception occured while create token",
-                                ex);
+                sessionDebug.error("GetHttpSession.get_restricted_token: exception occured while create token", ex);
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             } finally {
-                SessionService.closeStream(in);
-                SessionService.closeStream(out);
+                IOUtils.closeIfNotNull(in);
+                IOUtils.closeIfNotNull(out);
             }
         } else if (op.equals(DEREFERENCE_RESTRICTED_TOKEN_ID)) {
             DataInputStream in = null;
@@ -300,19 +292,18 @@ public final class GetHttpSession extends HttpServlet {
                 String restrictedID = in.readUTF();
 
                 try {
-                    String masterSID = SessionService.getSessionService().deferenceRestrictedID(Session.getSession(sid), restrictedID);
+                    String masterSID = sessionService.deferenceRestrictedID(sessionCache.getSession(sid), restrictedID);
 
                     response.setStatus(HttpServletResponse.SC_OK);
                     out = new DataOutputStream(response.getOutputStream());
                     out.writeUTF(masterSID);
                     out.flush();
 
-                    if (SessionService.sessionDebug.messageEnabled()) {
-                        SessionService.sessionDebug.message(
-                            "GetHttpSession.dereference_restricted_token_id: master sid=" + masterSID);
+                    if (sessionDebug.messageEnabled()) {
+                        sessionDebug.message("GetHttpSession.dereference_restricted_token_id: master sid=" + masterSID);
                     }
                 } catch (SessionException se) {
-                    SessionService.sessionDebug.message(
+                    sessionDebug.message(
                             "GetHttpSession.dereference_restricted_token_id: unable to find master sid", se);
                     response.setStatus(HttpServletResponse.SC_OK);
                     out = new DataOutputStream(response.getOutputStream());
@@ -320,23 +311,20 @@ public final class GetHttpSession extends HttpServlet {
                     out.flush();
                 }
             } catch (Exception ex) {
-                SessionService.sessionDebug.error(
-                    "GetHttpSession.dereference_restricted_token_id: exception occured while finding master sid",
-                    ex);
+                sessionDebug.error(
+                    "GetHttpSession.dereference_restricted_token_id: exception occured while finding master sid", ex);
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             } finally {
-                SessionService.closeStream(in);
-                SessionService.closeStream(out);
+                IOUtils.closeIfNotNull(in);
+                IOUtils.closeIfNotNull(out);
             }
         } else {
-            SessionService.sessionDebug
-                    .error("GetHttpSession: unknown operation requested");
+            sessionDebug.error("GetHttpSession: unknown operation requested");
             response.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
         }
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         doGet(request, response);
     }
 

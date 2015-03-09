@@ -16,23 +16,21 @@
  */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.openam.ldap.LDAPURL;
-import org.forgerock.openam.ldap.LDAPUtils;
-import org.forgerock.openam.sm.ConnectionConfig;
-import org.forgerock.openam.utils.ModifiedProperty;
-
-import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.debug.Debug;
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.openam.ldap.LDAPURL;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.sm.ConnectionConfig;
+import org.forgerock.openam.utils.ModifiedProperty;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Models the external configuration of the LDAP data store.

@@ -28,7 +28,8 @@
 
 package com.sun.identity.session.util;
 
-import com.iplanet.dpro.session.Session;
+import static org.forgerock.openam.session.SessionConstants.*;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -72,6 +73,6 @@ public class RestrictedTokenHelper {
      *             is thrown if the there was an error
      */
     public static boolean isRestricted(SSOToken token) throws SSOException {
-        return token.getProperty(Session.TOKEN_RESTRICTION_PROP) != null;
+        return token.getProperty(TOKEN_RESTRICTION_PROP) != null;
     }
 }

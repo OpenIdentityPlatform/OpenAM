@@ -32,44 +32,42 @@
 
 package com.sun.identity.sm.jaxrpc;
 
-import java.net.URL;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.ModificationItem;
-
-import com.sun.identity.shared.ldap.util.DN;
-
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.services.comm.client.NotificationHandler;
 import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.comm.share.Notification;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.jaxrpc.JAXRPCUtil;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
+import com.sun.identity.shared.ldap.util.DN;
+import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSNotificationManager;
 import com.sun.identity.sm.SMSObject;
 import com.sun.identity.sm.SMSObjectListener;
 import com.sun.identity.sm.SMSSchema;
-import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.sm.SMSDataEntry;
-import com.sun.identity.sm.SMSNotificationManager;
+import org.forgerock.openam.session.SessionCookies;
+
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
+import java.net.URL;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
 
@@ -79,6 +77,8 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
      * JAXRPC Version String variable name.
      */
     public static final String AMJAXRPCVERSIONSTR = "AM_JAXRPC_VERSION";
+
+    private final SessionCookies sessionCookies;
 
     /**
      * JAXRPC Version String.
@@ -93,6 +93,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
     public SMSJAXRPCObject() {
         // Construct the SOAP client
         client = new SOAPClient(JAXRPCUtil.SMS_SERVICE);
+        sessionCookies = SessionCookies.getInstance();
     }
     
     private void initializeNotification() {
@@ -118,8 +119,8 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
             SSOException {
         try {
             String[] objs = { token.getTokenID().toString(), objName };
-            Map attrs = (Map) client.send(client.encodeMessage("read", objs), 
-                Session.getLBCookie(token.getTokenID().toString()), null);
+            Map attrs = (Map) client.send(client.encodeMessage("read", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
             // Return CaseInsesitiveHashMap to be consistent with server side
             return ((attrs == null) ? null : new CaseInsensitiveHashMap(attrs));
         } catch (SSOException ssoe) {
@@ -141,8 +142,8 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
         try {
             Object[] objs = { token.getTokenID().toString(), objName,
                     attributes };
-            client.send(client.encodeMessage("create", objs), 
-                Session.getLBCookie(token.getTokenID().toString()), null);
+            client.send(client.encodeMessage("create", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
         } catch (SSOException ssoe) {
             throw ssoe;
         } catch (SMSException smse) {
@@ -161,8 +162,8 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
         try {
             Object[] objs = { token.getTokenID().toString(), objName,
                     toMods(mods) };
-            client.send(client.encodeMessage("modify", objs), 
-                Session.getLBCookie(token.getTokenID().toString()), null);
+            client.send(client.encodeMessage("modify", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
         } catch (SSOException ssoe) {
             throw ssoe;
         } catch (SMSException smse) {
@@ -180,8 +181,8 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
             SSOException {
         try {
             String[] objs = { token.getTokenID().toString(), objName };
-            client.send(client.encodeMessage("delete", objs), 
-                Session.getLBCookie(token.getTokenID().toString()), null);
+            client.send(client.encodeMessage("delete", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
         } catch (SSOException ssoe) {
             throw ssoe;
         } catch (SMSException smse) {
@@ -207,7 +208,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                     Boolean.valueOf(ascendingOrder), Boolean.valueOf(recursive)
             };
             return ((Set) client.send(client.encodeMessage("searchSubOrgNames",
-                    objs), Session.getLBCookie(token.getTokenID().toString()),
+                    objs), sessionCookies.getLBCookie(token.getTokenID().toString()),
                     null));
         } catch (SSOException ssoe) {
             throw ssoe;
@@ -235,8 +236,8 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                     Boolean.valueOf(ascendingOrder), serviceName, attrName, 
                     values};
             return ((Set) client.send(client.encodeMessage(
-                    "searchOrganizationNames", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    "searchOrganizationNames", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
         } catch (SSOException ssoe) {
             throw ssoe;
         } catch (SMSException smse) {
@@ -260,7 +261,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                     new Integer(numOfEntries), Boolean.valueOf(sortResults),
                     Boolean.valueOf(ascendingOrder) };
             return ((Set) client.send(client.encodeMessage("subEntries", objs),
-                    Session.getLBCookie(token.getTokenID().toString()), null));
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null));
         } catch (SSOException ssoe) {
             throw ssoe;
         } catch (SMSException smse) {
@@ -285,7 +286,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                 Boolean.valueOf(sortResults), 
                 Boolean.valueOf(ascendingOrder) };
             return ((Set) client.send(client.encodeMessage("schemaSubEntries",
-                objs), Session.getLBCookie(token.getTokenID().toString()), 
+                objs), sessionCookies.getLBCookie(token.getTokenID().toString()),
                 null));
         } catch (SSOException ssoe) {
             throw ssoe;
@@ -311,7 +312,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                 Boolean.valueOf(sortResults), Boolean.valueOf(ascendingOrder), excludes };
             
             Set<String> searchResults = ((Set<String>) client.send(client.encodeMessage("search3", objs),
-                    Session.getLBCookie(token.getTokenID().toString()),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()),
                     null));
             
             Iterator result = null;
@@ -348,7 +349,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                 new Integer(numOfEntries), new Integer(timeLimit),
                 Boolean.valueOf(sortResults), Boolean.valueOf(ascendingOrder) };
             return ((Set) client.send(client.encodeMessage("search2", objs),
-                    Session.getLBCookie(token.getTokenID().toString()),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()),
                     null));
         } catch (SSOException ssoe) {
             throw ssoe;
@@ -386,8 +387,8 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
         try {
             String[] objs = { token.getTokenID().toString(), dn };
             Boolean b = (Boolean) client.send(client.encodeMessage(
-                    "entryExists", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null);
+                    "entryExists", objs),
+                    sessionCookies.getLBCookie(token.getTokenID().toString()), null);
             entryExists = b.booleanValue();
         } catch (Exception re) {
             debug.error("SMSJAXRPCObject:entryExists -- Exception:", re);

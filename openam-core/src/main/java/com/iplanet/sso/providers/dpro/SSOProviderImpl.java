@@ -41,12 +41,15 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.sun.identity.common.SearchResults;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.ClientUtils;
+import org.forgerock.util.annotations.VisibleForTesting;
+
+import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * This <code>final</code> class <code>SSOProviderImpl</code> implements
@@ -54,6 +57,8 @@ import javax.servlet.http.HttpServletRequest;
  * to create , destroy , check the validity of a single sign on token.
  *
  * @supported.api
+ *
+ * Note: Used by ClientSDK, therefore must not use Guice for initialisation.
  */
 public final class SSOProviderImpl implements SSOProvider {
 
@@ -69,6 +74,8 @@ public final class SSOProviderImpl implements SSOProvider {
             SystemProperties.get("com.iplanet.am.clientIPCheckEnabled"))
             .booleanValue();
 
+    private final SessionCache sessionCache;
+
     // Initialize debug instance;
     static {
         debug = Debug.getInstance("amSSOProvider");
@@ -81,6 +88,12 @@ public final class SSOProviderImpl implements SSOProvider {
      * @supported.api
      */
     public SSOProviderImpl() throws SSOException {
+        this(SessionCache.getInstance());
+    }
+
+    @VisibleForTesting
+    SSOProviderImpl(SessionCache sessionCache) {
+        this.sessionCache = sessionCache;
     }
 
     /**
@@ -94,7 +107,7 @@ public final class SSOProviderImpl implements SSOProvider {
             throws SSOException {
         try {
             SessionID sid = new SessionID(request);
-            Session session = Session.getSession(sid);
+            Session session = sessionCache.getSession(sid);
             if (sid != null) {
                 Boolean cookieMode = sid.getCookieMode();
                 if (debug.messageEnabled()) {
@@ -134,8 +147,8 @@ public final class SSOProviderImpl implements SSOProvider {
      * code samples can be obtained from the "Authenticating Using
      * OpenAM Java SDK" chapter of the OpenAM Developer's Guide.
      */
-    public SSOToken createSSOToken(java.security.Principal user,
-                                   String password) throws SSOException, UnsupportedOperationException {
+    public SSOToken createSSOToken(java.security.Principal user, String password)
+            throws SSOException, UnsupportedOperationException {
         try {
             SSOTokenImpl ssoToken = new SSOTokenImpl(user, password);
             if (debug.messageEnabled()) {
@@ -189,7 +202,7 @@ public final class SSOProviderImpl implements SSOProvider {
         try {
             SessionID sessionId = new SessionID(tokenId);
             sessionId.setComingFromAuth(invokedByAuth);
-            Session session = Session.getSession(sessionId, false, possiblyResetIdleTime);
+            Session session = sessionCache.getSession(sessionId, false, possiblyResetIdleTime);
             SSOToken ssoToken = new SSOTokenImpl(session);
             return ssoToken;
         } catch (Exception e) {
@@ -238,7 +251,7 @@ public final class SSOProviderImpl implements SSOProvider {
             throws SSOException, UnsupportedOperationException {
         try {
             SessionID sessionId = new SessionID(tokenId);
-            Session session = Session.getSession(sessionId);
+            Session session = sessionCache.getSession(sessionId);
             if (checkIP && !isIPValid(session, clientIP)) {
                 throw new Exception(SSOProviderBundle.getString("invalidIP"));
             }
@@ -326,7 +339,7 @@ public final class SSOProviderImpl implements SSOProvider {
             SSOTokenID tokenid = token.getTokenID();
             String id = tokenid.toString();
             SessionID sessid = new SessionID(id);
-            Session session = Session.getSession(sessid);
+            Session session = sessionCache.getSession(sessid);
             session.destroySession(session);
         } catch (Exception e) {
             if (debug.messageEnabled()) {
@@ -387,7 +400,7 @@ public final class SSOProviderImpl implements SSOProvider {
         try {
             SSOTokenID tokenId = token.getTokenID();
             SessionID sid = new SessionID(tokenId.toString());
-            Session session = Session.getSession(sid);
+            Session session = sessionCache.getSession(sid);
             session.refresh(possiblyResetIdleTime);
         } catch (Exception e) {
             debug.error("Error in refreshing the session from sessions server");

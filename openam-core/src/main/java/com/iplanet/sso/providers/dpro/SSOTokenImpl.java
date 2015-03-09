@@ -42,11 +42,16 @@ import com.iplanet.sso.SSOTokenListener;
 import com.sun.identity.authentication.internal.AuthContext;
 import com.sun.identity.authentication.internal.InvalidAuthContextException;
 import com.sun.identity.shared.Constants;
+import org.forgerock.openam.session.SessionURL;
+
+import javax.security.auth.login.LoginException;
 import java.net.InetAddress;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.HashMap;
-import javax.security.auth.login.LoginException;
+
+import static org.forgerock.openam.session.SessionConstants.INACTIVE;
+import static org.forgerock.openam.session.SessionConstants.VALID;
 
 /**
  * This class <code>SSOTokenImpl</code> implements the interface
@@ -58,8 +63,8 @@ import javax.security.auth.login.LoginException;
 
 class SSOTokenImpl implements SSOToken {
 
-    /** SSOSession */
-     private Session SSOSession;
+    /** session */
+     private Session session;
 
     /** regular LDAP connection for SSOToken, false by default */
      private boolean ldapConnect = false;
@@ -73,15 +78,17 @@ class SSOTokenImpl implements SSOToken {
     /** HashMap for the ldap token property*/
      private HashMap ldapTokenProperty = new HashMap();
 
+    private static final SessionURL sessionURL = SessionURL.getInstance();
+
     /**
      *
      * Creates <code>SSOTokenImpl</code> for a given <code>Session</code>
-     * @param sess
+     * @param session
      * @see com.iplanet.dpro.session.Session
      *
      */
-    SSOTokenImpl(Session sess) {
-        SSOSession = sess;
+    SSOTokenImpl(Session session) {
+        this.session = session;
         ldapConnect = false;
     }
 
@@ -112,9 +119,9 @@ class SSOTokenImpl implements SSOToken {
             /* initialize token variables after successful ldap connection */
             ldapBindDN = authContext.getPrincipal();
             ssoToken = authContext.getSSOToken();
-            SSOSession = null;
+            session = null;
             ldapConnect = true;
-            SecureRandom secureRandom = null;
+            SecureRandom secureRandom;
             try {
                 secureRandom = SecureRandom.getInstance("SHA1PRNG", "SUN");
             } catch (NoSuchProviderException e) {
@@ -123,23 +130,14 @@ class SSOTokenImpl implements SSOToken {
             String amCtxId = Long.toHexString(secureRandom.nextLong());
             setProperty(Constants.AM_CTX_ID, amCtxId);
         } catch (LoginException e) {
-            SSOProviderImpl.debug.error(
-                    "Ldap Authentication failed for the user"
-                            + principal.getName(), e);
-            throw new SSOException(SSOProviderBundle.rbName, "ldapauthfail",
-                    null);
+            SSOProviderImpl.debug.error("Ldap Authentication failed for the user " + principal.getName(), e);
+            throw new SSOException(SSOProviderBundle.rbName, "ldapauthfail", null);
         } catch (InvalidAuthContextException e) {
-            SSOProviderImpl.debug.error(
-                    "Ldap Authentication failed for the user"
-                            + principal.getName(), e);
-            throw new SSOException(SSOProviderBundle.rbName, "ldapauthfail",
-                    null);
+            SSOProviderImpl.debug.error("Ldap Authentication failed for the user " + principal.getName(), e);
+            throw new SSOException(SSOProviderBundle.rbName, "ldapauthfail",  null);
         } catch (Exception e) {
-            SSOProviderImpl.debug.error(
-                    "Failed to create the context id for this token"
-                            + principal.getName(), e);
-            throw new SSOException(SSOProviderBundle.rbName, "ldapauthfail",
-                    null);
+            SSOProviderImpl.debug.error("Failed to create the context id for this token " + principal.getName(), e);
+            throw new SSOException(SSOProviderBundle.rbName, "ldapauthfail", null);
         }
     }
 
@@ -152,10 +150,10 @@ class SSOTokenImpl implements SSOToken {
      */
     public java.security.Principal getPrincipal() throws SSOException {
         try {
-            if (ldapConnect == true) {
+            if (ldapConnect) {
                 return ldapBindDN;
             }
-            String name = SSOSession.getProperty("Principal");
+            String name = session.getProperty("Principal");
             java.security.Principal principal = new SSOPrincipal(name);
             return principal;
         } catch (Exception e) {
@@ -173,14 +171,14 @@ class SSOTokenImpl implements SSOToken {
      */
     public String getAuthType() throws SSOException {
         try {
-            if (ldapConnect == true) {
+            if (ldapConnect) {
                 return ("LDAP");
             }
             // auth type may be a list of auth types separated by "|". This can
             // happen because of session upgrade. The list is assumed to have
             // a format like "Ldap|Cert|Radius" with no space between separator.
             // this method simply returns the first auth method in that list.
-            String types = SSOSession.getProperty("AuthType");
+            String types = session.getProperty("AuthType");
             int index = types.indexOf("|");
             if (index != -1) {
                 return (types.substring(0, index));
@@ -205,7 +203,7 @@ class SSOTokenImpl implements SSOToken {
         checkTokenType("getAuthLevel");
         try {
             // The property AuthLevel may contain realm information, e.g. "/:10". If so, strip this out.
-            String authLevelFull = SSOSession.getProperty("AuthLevel");
+            String authLevelFull = session.getProperty("AuthLevel");
             int indexOfStartOfIntegerPart = authLevelFull.lastIndexOf(":") + 1;
             String authLevelInteger = authLevelFull.substring(indexOfStartOfIntegerPart);
             return Integer.valueOf(authLevelInteger);
@@ -227,7 +225,7 @@ class SSOTokenImpl implements SSOToken {
             if (ldapConnect == true) {
                 return InetAddress.getLocalHost();
             }
-            String host = SSOSession.getProperty("Host");
+            String host = session.getProperty("Host");
             if ((host == null) || (host.length() == 0)) {
                 throw new SSOException(SSOProviderBundle.rbName,
                     "ipaddressnull", null);
@@ -248,10 +246,10 @@ class SSOTokenImpl implements SSOToken {
      */
     public String getHostName() throws SSOException {
         try {
-            if (ldapConnect == true) {
+            if (ldapConnect) {
                 return (InetAddress.getLocalHost()).getHostName();
             }
-            String hostName = SSOSession.getProperty("HostName");
+            String hostName = session.getProperty("HostName");
             if ((hostName == null) || (hostName.length() == 0)) {
                 throw new SSOException(SSOProviderBundle.rbName, "hostnull",
                     null);
@@ -272,7 +270,7 @@ class SSOTokenImpl implements SSOToken {
     public long getTimeLeft() throws SSOException {
         checkTokenType("getTimeLeft");
         try {
-            return SSOSession.getTimeLeft();
+            return session.getTimeLeft();
         } catch (Exception e) {
             SSOProviderImpl.debug.error("Can't get token maximum time");
             throw new SSOException(e);
@@ -289,7 +287,7 @@ class SSOTokenImpl implements SSOToken {
     public long getMaxSessionTime() throws SSOException {
         checkTokenType("getMaxSessionTime");
         try {
-            return SSOSession.getMaxSessionTime();
+            return session.getMaxSessionTime();
         } catch (Exception e) {
             SSOProviderImpl.debug.error("Can't get token maximum time");
             throw new SSOException(e);
@@ -306,7 +304,7 @@ class SSOTokenImpl implements SSOToken {
     public long getIdleTime() throws SSOException {
         checkTokenType("getIdleTime");
         try {
-            return SSOSession.getIdleTime();
+            return session.getIdleTime();
         } catch (Exception e) {
             SSOProviderImpl.debug.error("Can't get token idle time");
             throw new SSOException(e);
@@ -323,7 +321,7 @@ class SSOTokenImpl implements SSOToken {
     public long getMaxIdleTime() throws SSOException {
         checkTokenType("getMaxIdleTime");
         try {
-            return SSOSession.getMaxIdleTime();
+            return session.getMaxIdleTime();
         } catch (Exception e) {
             SSOProviderImpl.debug.error("Can't get token maximum idle time");
             throw new SSOException(e);
@@ -336,13 +334,13 @@ class SSOTokenImpl implements SSOToken {
      * @return SSOTokenID
      */
     public SSOTokenID getTokenID() {
-        if (ldapConnect == true) {
+        if (ldapConnect) {
             if (ssoToken != null) {
                 return (ssoToken.getTokenID());
             }
             return null;
         }
-        return (new SSOTokenIDImpl(SSOSession.getID()));
+        return (new SSOTokenIDImpl(session.getID()));
     }
 
     /**
@@ -355,14 +353,13 @@ class SSOTokenImpl implements SSOToken {
      * @throws SSOException if the SSOToken is not VALID or if
      *         there are errors in setting the property name and value.
      */
-    public void setProperty(String name, String value)
-        throws SSOException {
-        if (ldapConnect == true) {
+    public void setProperty(String name, String value) throws SSOException {
+        if (ldapConnect) {
             ldapTokenProperty.put(name, value);
             return;
         }
         try {
-            SSOSession.setProperty(name, value);
+            session.setProperty(name, value);
         } catch (Exception e) {
             SSOProviderImpl.debug.error("Can't set property:  " + name + " "
                     + value);
@@ -370,8 +367,7 @@ class SSOTokenImpl implements SSOToken {
         }
     }
 
-    private String getPropertyInternal(String name, boolean logError)
-            throws SSOException {
+    private String getPropertyInternal(String name, boolean logError) throws SSOException {
 
         String property = null;
         if (ssoToken != null) {
@@ -382,7 +378,7 @@ class SSOTokenImpl implements SSOToken {
                 property = ((String) ldapTokenProperty.get(name));
             } else {
                 try {
-                    property = SSOSession.getProperty(name);
+                    property = session.getProperty(name);
                 } catch (Exception e) {
                     if(logError){
                 	    SSOProviderImpl.debug.error("Can't get property: " + name);
@@ -408,8 +404,7 @@ class SSOTokenImpl implements SSOToken {
      * @throws SSOException if the SSOToken is not VALID or if
      *         there are errors in getting the property value.
      */
-    public String getProperty(String name)
-            throws SSOException {
+    public String getProperty(String name) throws SSOException {
         return getPropertyInternal(name, true);
     }
 
@@ -424,10 +419,9 @@ class SSOTokenImpl implements SSOToken {
      * @throws SSOException if the SSOToken is not VALID and if
      *         ignoreState is set to false.
      */
-    public String getProperty(String name,boolean ignoreState)
-            throws SSOException {
+    public String getProperty(String name, boolean ignoreState) throws SSOException {
 
-        String property = null;
+        String property;
 		try {
             if (SSOProviderImpl.debug.messageEnabled()) {
                 SSOProviderImpl.debug.message("SSOTokenImpl.getProperty():" +
@@ -437,16 +431,14 @@ class SSOTokenImpl implements SSOToken {
 	    } catch (SSOException e) {
             if(ignoreState) {
                 if (SSOProviderImpl.debug.messageEnabled()) {
-                    SSOProviderImpl.debug.message("SSOTokenImpl.getProperty():"
-                        + " getProperty(name) failed because of:" +
+                    SSOProviderImpl.debug.message("SSOTokenImpl.getProperty():  getProperty(name) failed because of:" +
                             e.getMessage());
                     SSOProviderImpl.debug.message("SSOTokenImpl.getProperty():"
                         + " Falling back to getPropertyWithoutValidation()");
                 }
-                property = SSOSession.getPropertyWithoutValidation(name);
+                property = session.getPropertyWithoutValidation(name);
                 if (SSOProviderImpl.debug.messageEnabled()) {
-                    SSOProviderImpl.debug.message("SSOTokenImpl.getProperty():"
-                        + " Value of " + name + " is: " + property);
+                    SSOProviderImpl.debug.message("SSOTokenImpl.getProperty(): Value of " + name + " is: " + property);
                 }
             } else {
                 throw e;
@@ -468,7 +460,7 @@ class SSOTokenImpl implements SSOToken {
         if (!ldapConnect) {
             try {
                 SessionListener ssoListener = new SSOSessionListener(listener);
-                SSOSession.addSessionListener(ssoListener);
+                session.addSessionListener(ssoListener);
             } catch (Exception e) {
                 SSOProviderImpl.debug.error("Couldn't add listener to the token"
                     + getTokenID().toString());
@@ -497,8 +489,8 @@ class SSOTokenImpl implements SSOToken {
             if (ldapConnect) {
                 return true;
             }
-            int state = SSOSession.getState(possiblyResetIdleTime);
-            return (state == Session.VALID) || (state == Session.INACTIVE);
+            int state = session.getState(possiblyResetIdleTime);
+            return (state == VALID) || (state == INACTIVE);
         } catch (Exception e) {
             return false;
         }
@@ -516,12 +508,9 @@ class SSOTokenImpl implements SSOToken {
             if (ldapConnect) {
                 return;
             }
-            int state = SSOSession.getState(true);
-            if (state == Session.VALID || state == Session.INACTIVE) {
-                return;
-            } else {
-                throw new SSOException(SSOProviderBundle.rbName,
-                        "invalidstate", null);
+            int state = session.getState(true);
+            if (state != VALID && state != INACTIVE) {
+                throw new SSOException(SSOProviderBundle.rbName, "invalidstate", null);
             }
         } catch (Exception e) {
             throw new SSOException(e);
@@ -556,7 +545,7 @@ class SSOTokenImpl implements SSOToken {
      */
     public String encodeURL(String url) {
         checkTokenType("encodeURL");
-        return SSOSession.encodeURL(url);
+        return sessionURL.encodeURL(url, session);
     }
 
     /**
@@ -566,7 +555,7 @@ class SSOTokenImpl implements SSOToken {
      * @param methodName Name of the method calling this check.
      */
     public void checkTokenType(String methodName) {
-        if (ldapConnect == true) {
+        if (ldapConnect) {
             String str = methodName
                     + "is an unsupported operation for tokens created"
                     + "by direct ldap connection";
@@ -581,7 +570,7 @@ class SSOTokenImpl implements SSOToken {
      * @return Session object.
      */
     Session getSession() {
-        return SSOSession;
+        return session;
     }
 
     /**
@@ -592,17 +581,13 @@ class SSOTokenImpl implements SSOToken {
      * @throws SSOException If we are unable to determine if the session is
      *              restricted
      */
-    public boolean isTokenRestricted()
-    throws SSOException {
-        boolean restricted = false;
-
+    public boolean isTokenRestricted() throws SSOException {
         try {
-            restricted = SSOSession.isRestricted();
+            return session.isRestricted();
         } catch (SessionException se) {
             throw new SSOException(se);
         }
 
-        return restricted;
     }
 
     /**
@@ -614,12 +599,11 @@ class SSOTokenImpl implements SSOToken {
      * @return The SSOTokenID string of the master token
      * @throws SSOException If the master token cannot be dereferenced
      */
-    public String  dereferenceRestrictedTokenID(SSOToken requester, String restrictedId)
-    throws SSOException {
-        String masterSID = null;
+    public String  dereferenceRestrictedTokenID(SSOToken requester, String restrictedId) throws SSOException {
+        String masterSID;
 
         try {
-            masterSID = SSOSession.dereferenceRestrictedTokenID(((SSOTokenImpl)requester).getSession(), restrictedId);
+            masterSID = session.dereferenceRestrictedTokenID(((SSOTokenImpl)requester).getSession(), restrictedId);
         } catch (Exception e) {
             SSOProviderImpl.debug.error("Can't dereference master token for id :  " + restrictedId, e);
             throw new SSOException(e);
