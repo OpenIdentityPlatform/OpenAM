@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
 
         events: {
-            'click a#revokeAll': 'onRevokeAll:not(.disabled)'
+            'click a#revokeAll:not(.disabled)': 'onRevokeAll'
         },
         onRevokeAll: function() {
 
