@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.testng.Assert.assertEquals;
@@ -172,7 +173,7 @@ public class OAuthAdapterTest {
         adapter.toToken(mockValue);
     }
 
-    @Test (expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void shouldNotDeserialiseATokenWhichDoesntContainAMap() {
         // Given
         JSONSerialisation serialisation = new JSONSerialisation(new ObjectMapper());
@@ -181,8 +182,11 @@ public class OAuthAdapterTest {
         Token token = new Token("", TokenType.OAUTH);
         token.setBlob(serialisation.serialise("badger").getBytes());
 
-        // When/Then
-        adapter.fromToken(token);
+        // When
+        JsonValue fromToken = adapter.fromToken(token);
+
+        // Then
+        assertThat(fromToken).isNull();
     }
 
 

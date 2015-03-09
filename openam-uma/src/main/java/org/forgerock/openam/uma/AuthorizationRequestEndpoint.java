@@ -152,8 +152,8 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         }
         Subject subject = createSubject(authorisationApiToken.getResourceOwnerId(), realm);
 
-        List<Entitlement> entitlements = umaProviderSettings.getPolicyEvaluator(subject).evaluate(realm, subject,
-                resourceName, null, false);
+        List<Entitlement> entitlements = umaProviderSettings.getPolicyEvaluator(subject, permissionTicket.getClientId().toLowerCase())
+                .evaluate(realm, subject, resourceName, null, false);
 
         Set<String> requestedScopes = permissionTicket.getScopes();
         Set<String> requiredScopes = new HashSet<String>(requestedScopes);

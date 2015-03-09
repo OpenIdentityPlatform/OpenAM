@@ -70,7 +70,7 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
     public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
         final String realm = realmNormaliser.normalise(request.<String>getParameter("realm"));
         final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
-        String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(req);
+        String baseUrlPattern = baseURLProviderFactory.get(req, realm).getURL(req);
         return getInstance(realm, baseUrlPattern);
     }
 

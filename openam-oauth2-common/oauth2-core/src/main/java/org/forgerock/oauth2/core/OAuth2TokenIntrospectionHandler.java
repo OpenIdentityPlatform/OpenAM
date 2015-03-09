@@ -92,7 +92,7 @@ public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandle
                 logger.debug("Couldn't find access token with ID {}", tokenId, e);
             }
         }
-        if (token == null) {
+        if (token == null && (tokenType == null || REFRESH_TOKEN_TYPE.equals(tokenType))) {
             try {
                 token = tokenStore.readRefreshToken(request, tokenId);
             } catch (InvalidGrantException e) {

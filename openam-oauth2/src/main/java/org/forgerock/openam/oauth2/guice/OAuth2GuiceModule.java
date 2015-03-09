@@ -68,6 +68,8 @@ import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.TokenInfoService;
 import org.forgerock.oauth2.core.TokenInfoServiceImpl;
 import org.forgerock.oauth2.core.TokenIntrospectionHandler;
+import org.forgerock.oauth2.core.TokenIntrospectionService;
+import org.forgerock.oauth2.core.TokenIntrospectionServiceImpl;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
@@ -203,6 +205,7 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         Multibinder.newSetBinder(binder(), TokenIntrospectionHandler.class)
                 .addBinding().to(OAuth2TokenIntrospectionHandler.class);
+        bind(TokenIntrospectionService.class).to(TokenIntrospectionServiceImpl.class);
 
         Multibinder.newSetBinder(binder(), ResourceSetRegistrationListener.class);
     }

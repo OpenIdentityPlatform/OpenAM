@@ -117,7 +117,7 @@ public class UmaProviderSettingsFactory {
             if (providerSettings == null) {
                 OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(request);
                 HttpServletRequest httpReq = ServletUtils.getRequest(request.<Request>getRequest());
-                String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(httpReq);
+                String baseUrlPattern = baseURLProviderFactory.get(httpReq, realm).getURL(httpReq);
                 UmaTokenStore tokenStore = tokenStoreFactory.create(realm);
                 providerSettings = new UmaProviderSettingsImpl(realm, baseUrlPattern, tokenStore,
                         oAuth2ProviderSettings);
@@ -216,8 +216,8 @@ public class UmaProviderSettingsFactory {
         }
 
         @Override
-        public Evaluator getPolicyEvaluator(Subject subject) throws EntitlementException {
-            return new Evaluator(subject);
+        public Evaluator getPolicyEvaluator(Subject subject, String clientId) throws EntitlementException {
+            return new Evaluator(subject, clientId);
         }
 
         @Override

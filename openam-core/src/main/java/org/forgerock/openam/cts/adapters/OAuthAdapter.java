@@ -159,7 +159,10 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
             return null;
         }
         String data = blobUtils.getBlobAsString(token);
-        
+        if (data == null) {
+            return null;
+        }
+
         JsonValue r;
         try {
             r = new JsonValue(serialisation.deserialise(data, Map.class));
@@ -170,10 +173,11 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
                 r.remove(key);
                 r.add(key, set);
             }
-        } catch (RuntimeException e) {
-            throw new IllegalArgumentException(
-                    "The CTS usage of the JsonValue depends on the value being of " +
-                    "type Map.");
+        } catch (IllegalStateException e) {
+            // OAuth tokens are expected to be of type Map
+            // but if this may happen if reading a token which isn't an OAuth token
+            // so just return null to ignore this token
+            return null;
         }
 
         return r;

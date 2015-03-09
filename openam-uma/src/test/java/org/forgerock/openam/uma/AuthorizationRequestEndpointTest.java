@@ -118,7 +118,7 @@ public class AuthorizationRequestEndpointTest {
 
         umaProviderSettings = mock(UmaProviderSettings.class);
         policyEvaluator = mock(Evaluator.class);
-        given(umaProviderSettings.getPolicyEvaluator(subject)).willReturn(policyEvaluator);
+        given(umaProviderSettings.getPolicyEvaluator(subject, RS_CLIENT_ID.toLowerCase())).willReturn(policyEvaluator);
         given(umaProviderSettings.getUmaTokenStore()).willReturn(umaTokenStore);
 
         umaProviderSettingsFactory = mock(UmaProviderSettingsFactory.class);
