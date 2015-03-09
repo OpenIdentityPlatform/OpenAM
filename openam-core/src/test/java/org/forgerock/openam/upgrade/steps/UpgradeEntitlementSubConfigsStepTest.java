@@ -28,10 +28,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.utils.CollectionUtils;
 import org.mockito.ArgumentMatcher;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -67,7 +66,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
     private EntitlementConfiguration entitlementService;
     private PrivilegedAction<SSOToken> adminTokenAction;
     private ConnectionFactory connectionFactory;
-    private ResourceTypeService resourceTypeService;
+    private ResourceTypeConfiguration resourceTypeConfiguration;
 
     private Set<ApplicationType> mockTypes;
     private Set<Application> mockApplications;
@@ -102,9 +101,9 @@ public class UpgradeEntitlementSubConfigsStepTest {
         entitlementService = mock(EntitlementConfiguration.class);
         adminTokenAction = mock(PrivilegedAction.class);
         connectionFactory = mock(ConnectionFactory.class);
-        resourceTypeService = mock(ResourceTypeService.class);
+        resourceTypeConfiguration = mock(ResourceTypeConfiguration.class);
         upgradeStep = new SafeUpgradeEntitlementSubConfigsStep(
-                entitlementService, resourceTypeService, adminTokenAction, connectionFactory);
+                entitlementService, resourceTypeConfiguration, adminTokenAction, connectionFactory);
 
         final HashSet<String> conditions = new HashSet<String>();
         conditions.add("condition.entry.1");
@@ -372,10 +371,10 @@ public class UpgradeEntitlementSubConfigsStepTest {
     private static final class SafeUpgradeEntitlementSubConfigsStep extends UpgradeEntitlementSubConfigsStep {
 
         public SafeUpgradeEntitlementSubConfigsStep(final EntitlementConfiguration entitlementService,
-                                                    final ResourceTypeService resourceTypeService,
+                                                    final ResourceTypeConfiguration resourceTypeConfiguration,
                                                     final PrivilegedAction<SSOToken> adminTokenAction,
                                                     final ConnectionFactory connectionFactory) {
-            super(entitlementService, resourceTypeService, adminTokenAction, connectionFactory);
+            super(entitlementService, resourceTypeConfiguration, adminTokenAction, connectionFactory);
         }
 
         @Override

@@ -369,4 +369,32 @@ public class CollectionUtils {
         return collection != null && !collection.isEmpty();
     }
 
+    /**
+     * Given a map determines whether it contains some values.
+     *
+     * @param map map in question
+     *
+     * @return whether the map contains any values
+     */
+    public static boolean isNotEmpty(Map<?, ?> map) {
+        return map != null && !map.isEmpty();
+    }
+
+    /**
+     * See if any of the containers have entries and if so return true.  Any argument which is not a {@code Collection}
+     * or a {@code Map} is ignored.
+     * @param containers a varied list of maps and collections
+     * @return true if any one of the maps and/or collections have entries
+     */
+    public static boolean anyHaveEntries(Object... containers) {
+        for (Object o : containers) {
+            if (o instanceof Collection<?> && isNotEmpty((Collection<?>) o)) {
+                return true;
+            } else if (o instanceof Map<?, ?> && isNotEmpty((Map<?, ?>) o)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

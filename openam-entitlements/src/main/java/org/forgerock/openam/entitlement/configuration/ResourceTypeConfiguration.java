@@ -20,21 +20,11 @@ import org.forgerock.openam.entitlement.ResourceType;
 
 import javax.security.auth.Subject;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Implementations of this interface are responsible for the persistence of the resource type entitlement configuration.
  */
 public interface ResourceTypeConfiguration {
-
-    /**
-     * Create a ResourceType object from a map, mapping strings to sets.
-     * @param realm The realm in which to create the new ResourceType object.
-     * @param uuid The uuid of the created resource type object.
-     * @param data The data map for the object.
-     * @return The newly created ResourceType object.
-     */
-    public ResourceType resourceTypeFromMap(String realm, String uuid, Map<String, Set<String>> data);
 
     /**
      * Retrieve a map of registered resource types, keyed on their uuid.

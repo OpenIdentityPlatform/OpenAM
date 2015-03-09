@@ -56,6 +56,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 
 import java.text.MessageFormat;
@@ -68,12 +69,7 @@ import java.util.logging.Level;
 import javax.security.auth.Subject;
 
 import static com.sun.identity.policy.PolicyEvaluator.REALM_DN;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.createApplication;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.createApplicationType;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActionSet;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActions;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getAdminToken;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getAttribute;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
 
 /**
  *
@@ -85,22 +81,15 @@ public class EntitlementService extends EntitlementConfiguration {
     public static final String SERVICE_NAME = "sunEntitlementService";
     public static final String ATTR_NAME_SUBJECT_ATTR_NAMES = "subjectAttributeNames";
     public static final String ATTR_NAME_META = "meta";
-    public static final String CONFIG_ACTIONS = "actions";
-    public static final String CONFIG_APPLICATION_DESC = "description";
-    public static final String CONFIG_APPLICATIONTYPE = "applicationType";
-    public static final String CONFIG_RESOURCES = "resources";
     public static final String CONFIG_CONDITIONS = "conditions";
     public static final String CONFIG_SUBJECTS = "subjects";
-    public static final String CONFIG_RESOURCE_TYPE_UUIDS = "resourceTypeUuids";
     public static final String CONFIG_ENTITLEMENT_COMBINER = "entitlementCombiner";
     public static final String CONFIG_SEARCH_INDEX_IMPL = "searchIndexImpl";
     public static final String CONFIG_SAVE_INDEX_IMPL = "saveIndexImpl";
     public static final String CONFIG_RESOURCE_COMP_IMPL = "resourceComparator";
     public static final String APPLICATION_CLASSNAME = "applicationClassName";
 
-    private static final String CONFIG_APPLICATIONS = "registeredApplications";
     private static final String SCHEMA_APPLICATIONS = "applications";
-    private static final String CONFIG_APPLICATION_TYPES = "applicationTypes";
     private static final String CONFIG_SUBJECT_ATTRIBUTES_COLLECTORS = "subjectAttributesCollectors";
     private static final String SCHEMA_SUBJECT_ATTRIBUTES_COLLECTORS = "subjectAttributesCollectors";
     private static final String SCHEMA_OPENSSO_SUBJECT_ATTRIBUTES_COLLECTOR = "OpenSSOSubjectAttributesCollector";
@@ -244,7 +233,7 @@ public class EntitlementService extends EntitlementConfiguration {
             SERVICE_NAME, token);
         ServiceConfig globalConfig = mgr.getGlobalConfig(null);
         if (globalConfig != null) {
-            return globalConfig.getSubConfig(CONFIG_APPLICATION_TYPES);
+            return globalConfig.getSubConfig(APPLICATION_TYPES);
         }
         return null;
     }
@@ -337,10 +326,35 @@ public class EntitlementService extends EntitlementConfiguration {
     }
 
     private static String getApplicationSearchBaseDN(String realm) {
-        Object[] args = {CONFIG_APPLICATIONS, DNMapper.orgNameToDN(realm)};
+        Object[] args = {REGISTERED_APPLICATIONS, DNMapper.orgNameToDN(realm)};
         return MessageFormat.format(REALM_DN_TEMPLATE, args);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public Application getApplication(String name) {
+        try {
+            final ServiceConfig appConfig = getApplicationConfiguration(getSSOToken(), realm);
+            final Set<String> names = appConfig.getSubConfigNames();
+            if (appConfig != null && names.contains(name)) {
+                return createApplication(appConfig, name, realm);
+            }
+        } catch (EntitlementException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+        } catch (ClassCastException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+        } catch (InstantiationException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+        } catch (IllegalAccessException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+        } catch (SMSException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+        } catch (SSOException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+        }
+        return null;
+    }
 
     /**
      * Returns a set of registered applications.
@@ -353,68 +367,79 @@ public class EntitlementService extends EntitlementConfiguration {
     }
 
     /**
-     * Returns a set of registered applications.
-     *
-     * @return a set of registered applications.
+     * Get a set of registered application names.
+     * @param token The admin token for access to the Service Config.
+     * @param realm The realm from which to retrieve the application names.
+     * @return a set of registered application names.
      */
-    private Set<Application> getRawApplications(
-        SSOToken token, String curRealm) {
-        Set<Application> results = new HashSet<Application>();
+    private Set<Application> getRawApplications(SSOToken token, String realm) {
+        final Set<Application> results = new HashSet<Application>();
+        try {
+            final ServiceConfig appConfig = getApplicationConfiguration(token, realm);
+            if (appConfig != null) {
+                final Set<String> names = appConfig.getSubConfigNames();
+                for (String name : names) {
+                    results.add(createApplication(appConfig, name, realm));
+                }
+            }
+        } catch (EntitlementException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+        } catch (ClassCastException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+        } catch (InstantiationException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+        } catch (IllegalAccessException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+        } catch (SMSException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+        } catch (SSOException ex) {
+            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+        }
+        return results;
+    }
+
+    /**
+     * Get the service config for registered applications.
+     * @param token The admin token for access to the Service Config.
+     * @param realm The realm from which to retrieve the service config.
+     * @return The application Service Config.
+     */
+    private ServiceConfig getApplicationConfiguration(SSOToken token, String realm) {
         try {
             if (token != null) {
-                if (curRealm.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX) ||
-                    curRealm.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX2)) {
-                    curRealm = "/";
+                if (realm.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX) ||
+                    realm.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX2)) {
+                    realm = "/";
                 } 
                 // TODO. Since applications for the hidden realms have to be
                 // the same as root realm mainly for delegation without any
                 // referrals, the hack is to use root realm for hidden realm.
-                String hackRealm = (DN.isDN(curRealm)) ?
-                    DNMapper.orgNameToRealmName(curRealm) : curRealm;
-                ServiceConfigManager mgr = new ServiceConfigManager(
-                    SERVICE_NAME, token);
-                ServiceConfig orgConfig = mgr.getOrganizationConfig(
-                    hackRealm, null);
+                String hackRealm = (DN.isDN(realm)) ? DNMapper.orgNameToRealmName(realm) : realm;
+                ServiceConfigManager mgr = new ServiceConfigManager(SERVICE_NAME, token);
+                ServiceConfig orgConfig = mgr.getOrganizationConfig(hackRealm, null);
                 if (orgConfig != null) {
-                    ServiceConfig conf = orgConfig.getSubConfig(
-                        CONFIG_APPLICATIONS);
-                    if (conf != null) {
-                        Set<String> names = conf.getSubConfigNames();
-
-                        for (String name : names) {
-                            ServiceConfig applConf = conf.getSubConfig(name);
-                            Map<String, Set<String>> data = applConf.getAttributes();
-                            ApplicationType applicationType = ApplicationTypeManager.getAppplicationType(
-                                    getAdminSubject(), getAttribute(data, CONFIG_APPLICATIONTYPE));
-                            Application app = createApplication(applicationType, curRealm, name, data);
-                            results.add(app);
-                        }
-                    }
+                    return orgConfig.getSubConfig(REGISTERED_APPLICATIONS);
                 }
             } else {
-                PrivilegeManager.debug.error(
-                    "EntitlementService.getApplications, admin token is missing");
+                PrivilegeManager.debug.error("EntitlementService.getApplicationConfiguration, admin token is missing");
             }
-        } catch (EntitlementException ex) {
-            PrivilegeManager.debug.error(
-                "EntitlementService.getApplications", ex);
         } catch (ClassCastException ex) {
-            PrivilegeManager.debug.error(
-                "EntitlementService.getApplications", ex);
-        } catch (InstantiationException ex) {
-            PrivilegeManager.debug.error(
-                "EntitlementService.getApplications", ex);
-        } catch (IllegalAccessException ex) {
-            PrivilegeManager.debug.error(
-                "EntitlementService.getApplications", ex);
+            PrivilegeManager.debug.error("EntitlementService.getApplicationConfiguration", ex);
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error(
-                "EntitlementService.getApplications", ex);
+            PrivilegeManager.debug.error("EntitlementService.getApplicationConfiguration", ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error(
-                "EntitlementService.getApplications", ex);
+            PrivilegeManager.debug.error("EntitlementService.getApplicationConfiguration", ex);
         }
-        return results;
+        return null;
+    }
+
+    private Application createApplication(ServiceConfig conf, String appName, String realm) throws
+            IllegalAccessException, EntitlementException, InstantiationException, SMSException, SSOException {
+
+        final Map<String, Set<String>> data = conf.getSubConfig(appName).getAttributes();
+        final ApplicationType applicationType = ApplicationTypeManager.getAppplicationType(
+                getAdminSubject(), getAttribute(data, APPLICATION_TYPE));
+        return EntitlementUtils.createApplication(applicationType, realm, appName, data);
     }
 
     /**
@@ -526,8 +551,7 @@ public class EntitlementService extends EntitlementConfiguration {
             token);
         ServiceConfig orgConfig = mgr.getOrganizationConfig(realm, null);
         if (orgConfig != null) {
-            ServiceConfig conf = orgConfig.getSubConfig(
-                CONFIG_APPLICATIONS);
+            ServiceConfig conf = orgConfig.getSubConfig(REGISTERED_APPLICATIONS);
             if (conf != null) {
                 applConf = conf.getSubConfig(appName);
             }
@@ -633,7 +657,7 @@ public class EntitlementService extends EntitlementConfiguration {
             token);
         ServiceConfig orgConfig = mgr.getOrganizationConfig(realm, null);
         if (orgConfig != null) {
-            return orgConfig.getSubConfig(CONFIG_APPLICATIONS);
+            return orgConfig.getSubConfig(REGISTERED_APPLICATIONS);
         }
         return null;
     }
@@ -646,13 +670,13 @@ public class EntitlementService extends EntitlementConfiguration {
             token);
         ServiceConfig orgConfig = mgr.getOrganizationConfig(realm, null);
         if (orgConfig != null) {
-            sc = orgConfig.getSubConfig(CONFIG_APPLICATIONS);
+            sc = orgConfig.getSubConfig(REGISTERED_APPLICATIONS);
         }
 
         if (sc == null) {
-            orgConfig.addSubConfig(CONFIG_APPLICATIONS, SCHEMA_APPLICATIONS, 0,
+            orgConfig.addSubConfig(REGISTERED_APPLICATIONS, SCHEMA_APPLICATIONS, 0,
                 Collections.EMPTY_MAP);
-            sc = orgConfig.getSubConfig(CONFIG_APPLICATIONS);
+            sc = orgConfig.getSubConfig(REGISTERED_APPLICATIONS);
         }
         return sc;
     }
@@ -722,8 +746,7 @@ public class EntitlementService extends EntitlementConfiguration {
             if (conf != null) {
                 ServiceConfig sc = conf.getSubConfig(applicationType.getName());
                 if (sc == null) {
-                    conf.addSubConfig(applicationType.getName(),
-                        CONFIG_APPLICATIONTYPE, 0,
+                    conf.addSubConfig(applicationType.getName(), APPLICATION_TYPE, 0,
                         getApplicationTypeData(applicationType));
                 } else {
                     sc.setAttributes(getApplicationTypeData(applicationType));
@@ -777,12 +800,12 @@ public class EntitlementService extends EntitlementConfiguration {
 
         Set<String> data = new HashSet<String>();
         map.put(SMSEntry.ATTR_KEYVAL, data);
-        data.add(CONFIG_APPLICATIONTYPE + '=' +
-            appl.getApplicationType().getName());
+        data.add(APPLICATION_TYPE + '=' +
+                appl.getApplicationType().getName());
         if (appl.getDescription() != null) {
-            data.add(CONFIG_APPLICATION_DESC + "=" + appl.getDescription());
+            data.add(CONFIG_DESCRIPTION + "=" + appl.getDescription());
         } else {
-            data.add(CONFIG_APPLICATION_DESC + "=");
+            data.add(CONFIG_DESCRIPTION + "=");
         }
 
         for (String resourceTypeUuid : appl.getResourceTypeUuids()) {

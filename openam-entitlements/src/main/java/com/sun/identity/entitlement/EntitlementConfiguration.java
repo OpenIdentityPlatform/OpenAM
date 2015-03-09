@@ -102,6 +102,13 @@ public abstract class EntitlementConfiguration {
     }
 
     /**
+     * Returns the application with the specified name.
+     *
+     * @return The application or null if the application could not be found.
+     */
+    public abstract Application getApplication(String name);
+
+    /**
      * Returns a set of registered applications.
      *
      * @return a set of registered applications.

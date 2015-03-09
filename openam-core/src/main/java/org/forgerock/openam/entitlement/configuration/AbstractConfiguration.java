@@ -37,18 +37,6 @@ import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
  */
 public abstract class AbstractConfiguration {
 
-    protected static final String SERVICE_NAME = "sunEntitlementService";
-    protected static final String REALM_DN_TEMPLATE = "ou={0},ou=default,ou=OrganizationConfig,ou=1.0,ou="
-            + SERVICE_NAME + ",ou=services,{1}";
-    protected static final String CONFIG_ACTIONS = "actions";
-    protected static final String CONFIG_DESCRIPTION = "description";
-    protected static final String CONFIG_CREATED_BY = "createdBy";
-    protected static final String CONFIG_CREATION_DATE = "creationDate";
-    protected static final String CONFIG_LAST_MODIFIED_BY = "lastModifiedBy";
-    protected static final String CONFIG_LAST_MODIFIED_DATE = "lastModifiedDate";
-    protected static final String CONFIG_NAME = "name";
-    protected static final String EMPTY = "";
-
     /**
      * Get the organization configuration for the sunEntitlementService service.
      * @param subject The subject used to retrieve the SSO token.

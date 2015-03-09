@@ -48,11 +48,6 @@ import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.*;
  */
 public class ResourceTypeConfigurationImpl extends AbstractConfiguration implements ResourceTypeConfiguration {
 
-    private static final String SCHEMA_RESOURCE_TYPES = "resourceTypes";
-    private static final String CONFIG_RESOURCE_TYPES = "registeredResourceTypes";
-    private static final String CONFIG_PATTERNS = "patterns";
-    private static final String RESOURCE_TYPE = "resourceType";
-
     /**
      * {@inheritDoc}
      */
@@ -79,23 +74,6 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
             throw new EntitlementException(RESOURCE_TYPE_RETRIEVAL_ERROR, ex, realm);
         }
         return resourceTypeMap;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResourceType resourceTypeFromMap(String realm, String uuid, Map<String, Set<String>> data) {
-        return ResourceType.builder(getAttribute(data, CONFIG_NAME), realm)
-                .setUUID(uuid)
-                .setDescription(getAttribute(data, CONFIG_DESCRIPTION, EMPTY))
-                .addPatterns(data.get(CONFIG_PATTERNS))
-                .addActions(getActions(data))
-                .setCreatedBy(getAttribute(data, CONFIG_CREATED_BY, EMPTY))
-                .setCreationDate(getDateAttributeAsLong(data, CONFIG_CREATION_DATE))
-                .setLastModifiedBy(getAttribute(data, CONFIG_LAST_MODIFIED_BY, EMPTY))
-                .setLastModifiedDate(getDateAttributeAsLong(data, CONFIG_LAST_MODIFIED_DATE))
-                .build();
     }
 
     /**

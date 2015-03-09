@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.entitlement.service;
 
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
@@ -25,7 +24,6 @@ import javax.security.auth.Subject;
 import java.security.Principal;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import static com.sun.identity.entitlement.EntitlementException.*;
@@ -41,13 +39,6 @@ public class ResourceTypeServiceImpl implements ResourceTypeService {
     @Inject
     public ResourceTypeServiceImpl( ResourceTypeConfiguration configuration) {
         this.configuration = configuration;
-    }
-
-    @Override
-    public ResourceType saveResourceType(Subject subject, String realm, String uuid, Map<String, Set<String>> data)
-            throws EntitlementException
-    {
-        return saveResourceType(subject, configuration.resourceTypeFromMap(realm, uuid, data));
     }
 
     /**

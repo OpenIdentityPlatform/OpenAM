@@ -17,9 +17,11 @@
 package org.forgerock.openam.upgrade.steps;
 
 import static com.sun.identity.shared.xml.XMLUtils.*;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.resourceTypeFromMap;
 import static org.forgerock.openam.upgrade.UpgradeServices.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
-import java.io.InputStream;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +35,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
@@ -42,8 +44,7 @@ import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.UpgradeUtils;
-import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.upgrade.steps.policy.AbstractEntitlementUpgradeStep;
 import org.forgerock.util.Reject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -64,16 +65,7 @@ import com.sun.identity.sm.SMSUtils;
  * types with newly added actions.
  */
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")
-public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
-
-    private static final String ENTITLEMENTS_XML = "entitlement.xml";
-
-    private static final String ID = "id";
-    private static final String NAME = "name";
-    private static final String APPLICATION = "application";
-    private static final String APPLICATION_TYPE = "applicationType";
-    private static final String RESOURCE_TYPE = "resourceType";
-    private static final String REALM = "/";
+public class UpgradeEntitlementSubConfigsStep extends AbstractEntitlementUpgradeStep {
 
     private static final String AUDIT_REPORT = "upgrade.entitlementapps";
     private static final String AUDIT_NEW_TYPE = "upgrade.entitlement.new.type";
@@ -87,31 +79,30 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     private static final String AUDIT_MODIFIED_CON_START = "upgrade.entitlement.modified.conditions.start";
     private static final String AUDIT_MODIFIED_DES_START = "upgrade.entitlement.modified.description.start";
     private static final String AUDIT_MODIFIED_COM_START = "upgrade.entitlement.modified.combiners.start";
-    private static final String AUDIT_MODIFIED_RES_START = "upgrade.entitlement.modified.resources.start";
-    private static final String AUDIT_UPGRADE_SUCCESS = "upgrade.success";
-    private static final String AUDIT_UPGRADE_FAIL = "upgrade.failed";
+    private static final String AUDIT_MODIFIED_UUID_START = "upgrade.entitlement.modified.resourcetypeuuid.start";
 
     private static final String DEFAULT_COMBINER_SHORTNAME = DenyOverride.class.getSimpleName();
 
     private final EntitlementConfiguration entitlementService;
-    private final ResourceTypeService resourceTypeService;
+    private final ResourceTypeConfiguration resourceTypeConfiguration;
     private final List<Node> missingApplicationTypes;
     private final List<Node> missingApps;
     private final List<Node> missingResourceTypes;
     private final Map<String, Set<String>> changedConditions;
     private final Map<String, String> changedDescriptions;
     private final Map<String, Set<String>> changedSubjects;
+    private final Map<String, Set<String>> changedResourceTypeUUIDs;
     private final Map<String, Map<String, Boolean>> missingActions;
     private final Map<String, String> changedCombiners;
 
     @Inject
     public UpgradeEntitlementSubConfigsStep(final EntitlementConfiguration entitlementService,
-            final ResourceTypeService resourceTypeService,
+            final ResourceTypeConfiguration resourceTypeConfiguration,
             final PrivilegedAction<SSOToken> adminTokenAction,
             @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
         this.entitlementService = entitlementService;
-        this.resourceTypeService = resourceTypeService;
+        this.resourceTypeConfiguration = resourceTypeConfiguration;
         missingApplicationTypes = new ArrayList<Node>();
         missingApps = new ArrayList<Node>();
         missingResourceTypes = new ArrayList<Node>();
@@ -120,6 +111,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         changedDescriptions = new HashMap<String, String>();
         changedSubjects = new HashMap<String, Set<String>>();
         changedCombiners = new HashMap<String, String>();
+        changedResourceTypeUUIDs = new HashMap<String, Set<String>>();
     }
 
     @Override
@@ -127,7 +119,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         DEBUG.message("Initialising the upgrade entitlement sub-config step");
 
         final Set<ApplicationType> existingApplicationTypes = entitlementService.getApplicationTypes();
-        final Set<String> existingResourceTypeUUIDs = getResourceTypeUUIDs(REALM);
+        final Set<String> existingResourceTypeUUIDs = getResourceTypeUUIDs(ROOT_REALM);
         final Set<String> presentTypes = extract(existingApplicationTypes, new TypeNameExtractor());
         final Set<String> presentApps = extract(entitlementService.getApplications(), new AppNameExtractor());
 
@@ -152,8 +144,13 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
                 captureDifferentSet(app == null ? null : app.getSubjects(),
                         EntitlementUtils.getSubjects(subConfigAttrs), changedSubjects, name);
+
                 captureDifferentSet(app == null ? null : app.getConditions(),
                         EntitlementUtils.getConditions(subConfigAttrs), changedConditions, name);
+
+                captureDifferentSet(app == null ? null : app.getResourceTypeUuids(),
+                        EntitlementUtils.getResourceTypeUUIDs(subConfigAttrs), changedResourceTypeUUIDs, name);
+
                 Set<String> configDescriptionSet = EntitlementUtils.getDescription(subConfigAttrs);
                 String configDescription = null;
                 if (configDescriptionSet != null && !configDescriptionSet.isEmpty()) {
@@ -168,6 +165,9 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
                         EntitlementUtils.getCombiner(subConfigAttrs),
                         name);
             } else if (RESOURCE_TYPE.equals(id)) {
+                // note that the name variable actually holds the UUID of the ResourceType
+                // the name is buried in the config.
+                //
                 captureMissingEntry(name, subConfig, existingResourceTypeUUIDs, missingResourceTypes);
             }
         }
@@ -309,67 +309,33 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
     @Override
     public void perform() throws UpgradeException {
-        if (hasEntries(missingApplicationTypes)) {
+        if (isNotEmpty(missingApplicationTypes)) {
             addMissingApplicationTypes();
         }
-        if (hasEntries(missingApps)) {
+        if (isNotEmpty(missingApps)) {
             addMissingApplications();
         }
-        if (hasEntries(missingActions)) {
+        if (isNotEmpty(missingActions)) {
             addMissingActions();
         }
-        if (hasEntries(changedConditions)) {
+        if (isNotEmpty(changedConditions)) {
             addChangedConditions();
         }
-        if (hasEntries(changedDescriptions)) {
+        if (isNotEmpty(changedDescriptions)) {
             addChangedDescription();
         }
-        if (hasEntries(changedSubjects)) {
+        if (isNotEmpty(changedSubjects)) {
             addChangedSubjects();
         }
-        if (hasEntries(changedCombiners)) {
+        if (isNotEmpty(changedCombiners)) {
             addChangedCombiners();
         }
-        if (hasEntries(missingResourceTypes)) {
+        if (isNotEmpty(missingResourceTypes)) {
             addMissingResourceTypes();
         }
-    }
-
-    /**
-     * Use this to replace the uglier !list.isEmpty().
-     * @param list A generic list.
-     * @return true if the list is non null and has entries.
-     */
-    private boolean hasEntries(List<?> list) {
-        return list != null && list.size() > 0;
-    }
-
-    /**
-     * Use this to replace the uglier !mymap.isEmpty().
-     * @param map A generic map.
-     * @return true if the map is non null and has entries.
-     */
-    private boolean hasEntries(Map<?, ?> map) {
-        return map != null && map.size() > 0;
-    }
-
-    /**
-     * See if any of the containers have entries and if so return true.  Any argument which is not a list or a map
-     * is ignored.
-     * @param containers a variadic list of maps and lists
-     * @return true if any one of the maps and/or lists have entries
-     */
-    private boolean anyHaveEntries(Object... containers) {
-        for (Object o : containers) {
-            if (o instanceof List<?> && hasEntries((List<?>) o)) {
-                return true;
-            } else if (o instanceof Map<?, ?> && hasEntries((Map<?, ?>) o)) {
-                return true;
-            } else {
-                DEBUG.error("anyHaveEntries passed unknown type " + o.getClass().getName());
-            }
+        if (isNotEmpty(changedResourceTypeUUIDs)) {
+            addMissingResourceTypeUUIDs();
         }
-        return false;
     }
 
     /**
@@ -453,8 +419,8 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
             try {
                 DEBUG.message("Saving new entitlement application: " + name);
-                entitlementService.storeApplication(EntitlementUtils.createApplication(
-                        applicationType, REALM, name, keyValueMap));
+                entitlementService.storeApplication(EntitlementUtils.createApplication(applicationType, ROOT_REALM,
+                        name, keyValueMap));
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException eE) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
@@ -514,6 +480,36 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
                 }
                 final Application application = getApplication(name);
                 application.setConditions(conditions);
+                entitlementService.storeApplication(application);
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
+            } catch (EntitlementException ee) {
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+                throw new UpgradeException(ee);
+            }
+        }
+    }
+
+    /**
+     * Clears the resourceType UUIDs currently associated with an application, then replaces them with
+     * the new set of resourceType UUIDs defined.
+     *
+     * @throws UpgradeException If there was an error while updating the application.
+     */
+    private void addMissingResourceTypeUUIDs() throws UpgradeException {
+        for (final Map.Entry<String, Set<String>> entry : changedResourceTypeUUIDs.entrySet()) {
+            final String name = entry.getKey();
+            final Set<String> resourceTypeUUIDs = entry.getValue();
+
+            try {
+                UpgradeProgress.reportStart(AUDIT_MODIFIED_UUID_START, name);
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("Modifying application "
+                            + name
+                            + ": adding resourceType UUIDs: "
+                            + resourceTypeUUIDs);
+                }
+                final Application application = getApplication(name);
+                application.addAllResourceTypeUuids(resourceTypeUUIDs);
                 entitlementService.storeApplication(application);
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException ee) {
@@ -586,15 +582,13 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             final Map<String, Set<String>> keyValueMap = parseAttributeValuePairTags(typeNode);
             final String uuid = getNodeAttributeValue(typeNode, NAME);
             final String name = retrieveSingleValue(NAME, keyValueMap);
+            final ResourceType resourceType = resourceTypeFromMap(ROOT_REALM, uuid, keyValueMap);
 
             UpgradeProgress.reportStart(AUDIT_NEW_RESOURCE_TYPE_START, name);
 
             try {
-                DEBUG.message("Saving standard resource type "
-                        + name
-                        + " with UUID "
-                        + uuid);
-                resourceTypeService.saveResourceType(getAdminSubject(), REALM, uuid, keyValueMap);
+                DEBUG.message("Saving standard resource type {} with UUID {}", name, uuid);
+                resourceTypeConfiguration.storeResourceType(getAdminSubject(), resourceType);
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException eE) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
@@ -643,17 +637,17 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     public String getShortReport(final String delimiter) {
         final StringBuilder builder = new StringBuilder();
 
-        if (hasEntries(missingApplicationTypes)) {
+        if (isNotEmpty(missingApplicationTypes)) {
             builder.append(BUNDLE.getString(AUDIT_NEW_TYPE));
             builder.append(delimiter);
         }
 
-        if (hasEntries(missingApps)) {
+        if (isNotEmpty(missingApps)) {
             builder.append(BUNDLE.getString(AUDIT_NEW_APPLICATION));
             builder.append(delimiter);
         }
 
-        if (hasEntries(missingActions)) {
+        if (isNotEmpty(missingActions)) {
             builder.append(BUNDLE.getString(AUDIT_MODIFIED_TYPE));
             builder.append(delimiter);
         }
@@ -666,7 +660,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         final StringBuilder builder = new StringBuilder();
         final Map<String, String> reportEntries = new HashMap<String, String>();
 
-        if (hasEntries(missingApplicationTypes)) {
+        if (isNotEmpty(missingApplicationTypes)) {
             builder.append(BUNDLE.getString(AUDIT_NEW_TYPE));
             builder.append(':');
             builder.append(delimiter);
@@ -677,7 +671,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             builder.append(delimiter);
         }
 
-        if (hasEntries(missingApps)) {
+        if (isNotEmpty(missingApps)) {
             builder.append(BUNDLE.getString(AUDIT_NEW_APPLICATION));
             builder.append(':');
             builder.append(delimiter);
@@ -688,7 +682,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             builder.append(delimiter);
         }
 
-        if (hasEntries(missingActions)) {
+        if (isNotEmpty(missingActions)) {
             builder.append(BUNDLE.getString(AUDIT_MODIFIED_TYPE)).append(": ").append(delimiter);
             for (final Map.Entry<String, Map<String, Boolean>> entry : missingActions.entrySet()) {
                 builder.append(INDENT).append(entry.getKey()).append(delimiter);
@@ -702,29 +696,6 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         reportEntries.put(LF, delimiter);
 
         return UpgradeServices.tagSwapReport(reportEntries, AUDIT_REPORT);
-    }
-
-    /**
-     * Retrieves the XML document for entitlements.
-     *
-     * @return a document instance representing entitlements
-     *
-     * @throws UpgradeException
-     *         should an error occur attempting to read the entitlement xml
-     */
-    protected Document getEntitlementXML() throws UpgradeException {
-        InputStream serviceStream = null;
-        final Document doc;
-
-        try {
-            DEBUG.message("Reading entitlements configuration file: " + ENTITLEMENTS_XML);
-            serviceStream = getClass().getClassLoader().getResourceAsStream(ENTITLEMENTS_XML);
-            doc = UpgradeUtils.parseServiceFile(serviceStream, getAdminToken());
-        } finally {
-            IOUtils.closeIfNotNull(serviceStream);
-        }
-
-        return doc;
     }
 
     /**
@@ -835,9 +806,11 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
         Set<String> result = new HashSet<String>();
         try {
-            Set<ResourceType> resourceTypes = resourceTypeService.getResourceTypes(getAdminSubject(), realm);
-            for (ResourceType resourceType : resourceTypes) {
-                result.add(resourceType.getUUID());
+            Map<String, ResourceType> resourceTypes =
+                    resourceTypeConfiguration.getResourceTypes(getAdminSubject(), realm);
+
+            for (Map.Entry<String, ResourceType> entry : resourceTypes.entrySet()) {
+                result.add(entry.getValue().getUUID());
             }
             return result;
         } catch (EntitlementException ee) {
