@@ -40,7 +40,7 @@ define("org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllPolicies", [
         render: function(id, callback) {
             this.action = [
                 { type: "button", name: $.t("common.form.cancel"),  id: "revokeCancel"},
-                { type: "button", name: $.t("common.form.reset"), id: "revokeConfirm"}
+                { type: "button", name: $.t("common.form.ok"), id: "revokeConfirm"}
             ];
             $("#dialogs").hide();
             this.show(_.bind(function() {
