@@ -192,10 +192,8 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
 
                     if(existing) {
                         scopes = existing.get('scopes').pluck('name');
-                        // required as #selectUser still has focus and selecting the #selectPermission input will initiate both dropdowns
-                        selectPermission.find('.selectize-input').click();
+                        selectPermission[0].selectize.focus();
                         selectPermission[0].selectize.setValue(scopes);
-
                     }
 
                     self.enableOrDisableShareButton();

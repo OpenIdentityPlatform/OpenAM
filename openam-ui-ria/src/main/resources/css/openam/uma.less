@@ -165,6 +165,27 @@ html .selectize-dropdown .optgroup-header{
     }
 }
 
+.backgrid-readonly{
+
+    .selectize-control.multi .selectize-input > div {
+        &:hover, &.active{
+                background: #A4CAE7;
+                color: #095390;
+                border: 1px solid #90A7BA;
+                cursor: auto;
+        }
+    }
+
+    .selectize-control.multi .selectize-input, .selectize-control.single .selectize-input{
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+
+}
+
+
+
 .selectize-control.single .selectize-input{
     padding:6px 5px 2px 5px;
     border-radius: 0;
@@ -263,7 +284,7 @@ body{
             text-align: left;
             background-color: white;
             border-bottom: none;
-            font-weight: normal;
+            font-weight: bold;
             font-size: 15px;
             vertical-align: top;
             a {
@@ -391,12 +412,6 @@ body{
             display: none;
         }
 
-    }
-
-
-
-    .selectize-cell {
-        width: 300px;
     }
 
     .search {

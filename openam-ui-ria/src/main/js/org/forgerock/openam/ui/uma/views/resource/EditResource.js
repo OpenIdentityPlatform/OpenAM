@@ -126,12 +126,13 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                         dropdownParent: '#uma',
                         hideSelected: true,
                         persist: false,
-                        plugins: ["restore_on_backspace"],
                         labelField: 'name',
                         valueField: 'id',
                         items: items,
                         options: options
                     })[0];
+
+                    select.selectize.lock();
 
                     /* This an extention of the original positionDropdown method within Selectize. The override is
                      * required because using the dropdownParent 'body' places the dropdown out of scope of the
