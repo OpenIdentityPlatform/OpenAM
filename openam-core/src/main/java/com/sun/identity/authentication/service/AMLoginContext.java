@@ -24,12 +24,9 @@
  *
  * $Id: AMLoginContext.java,v 1.24 2009/12/23 20:03:04 mrudul_uchil Exp $
  *
-<<<<<<< HEAD
-=======
  */
 
 /**
->>>>>>> stateless
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
@@ -53,21 +50,19 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.spi.MessageLoginException;
 import com.sun.identity.authentication.spi.RedirectCallback;
-import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.authentication.util.AMAuthUtils;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
-import com.sun.identity.sm.DNMapper;
+import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
+import com.sun.identity.monitoring.SsoServerAuthSvcImpl;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
-
-import java.security.Principal;
-import java.text.MessageFormat;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import com.sun.identity.sm.DNMapper;
+import org.forgerock.openam.utils.StringUtils;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -76,14 +71,13 @@ import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
-
-import com.sun.identity.monitoring.Agent;
-import com.sun.identity.monitoring.MonitoringUtil;
-import com.sun.identity.monitoring.SsoServerAuthSvcImpl;
-import com.sun.identity.security.AdminTokenAction;
-import org.forgerock.openam.utils.StringUtils;
-
 import java.security.AccessController;
+import java.security.Principal;
+import java.text.MessageFormat;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * <code>AMLoginContext</code> class is the core layer in the authentication

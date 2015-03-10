@@ -27,11 +27,7 @@
  */
 
 /**
-<<<<<<< HEAD
  * Portions Copyrighted 2011-2015 ForgeRock AS.
-=======
- * Portions Copyrighted 2011-2015 ForgeRock, AS.
->>>>>>> stateless
  */
 
 package com.iplanet.dpro.session;
