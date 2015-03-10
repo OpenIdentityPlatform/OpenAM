@@ -103,20 +103,23 @@
    </listitem>
    <listitem>
     <para>
-     <emphasis role="bold">DAUI Supports goto URL Validation</emphasis>.
-     The valid goto URL domain setting has been moved to a new service,
-     <literal>validationService</literal> with a new property:
-     <literal>openam-auth-valid-goto-resources</literal>
+     <emphasis role="bold">DAS Supports goto URL Validation</emphasis>.
+     DAS now validates <literal>goto</literal> and <literal>gotoOnFail</literal>
+     URLs
      (<link
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1773"
      xlink:show="new"
      >OPENAM-1773</link>).
     </para>
+    <para>
+     When performing an upgrade, the old values are migrated across to the new
+     settings. New installations should use the new settings.
+    </para>
    </listitem>
    <listitem>
     <para>
      <emphasis role="bold">Authentication Context extensibility support</emphasis>.
-     OpenAM now supports extensibility of authentication context classes as described
+     OpenAM supports the extensibility of authentication context classes as described
      in the SAMLv2 specification.
      (<link
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2238"
@@ -127,55 +130,12 @@
    <listitem>
     <para>
      <emphasis role="bold">Password Reset Token Validation REST API</emphasis>.
-     OpenAM now supports a REST API to check if the token for password reset is
-     valid or not
+     OpenAM supports a single REST API action to check if the token for password
+     reset is valid or not
      (<link
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3748"
      xlink:show="new"
      >OPENAM-3748</link>).
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     <emphasis role="bold">Support for OAuth2Provider Debug Log</emphasis>.
-     OpenAM now provides debug logs for OAuth2 OAuth2Provider
-     (<link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4269"
-     xlink:show="new"
-     >OPENAM-4269</link>).
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     <emphasis role="bold">Alphabetical List of Agent Properties using ssoadm</emphasis>.
-     The <literal>ssoadm show-agent</literal> and <literal>ssoadm show-agent-grp</literal>
-     are now sorted and alphabeticalized
-     (<link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4602"
-     xlink:show="new"
-     >OPENAM-4602</link>).
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     <emphasis role="bold">REST JSON Response Set to UTF-8</emphasis>.
-     The character encoding for REST JSON responses is set to UTF-8
-     (<link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4764"
-     xlink:show="new"
-     >OPENAM-4764</link>).
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     <emphasis role="bold">PLLClient Calls getErrorStream() to GET Response Body
-     on IOException</emphasis>. <literal>PLLClient.send()</literal> calls
-     <literal>getErrorStream()</literal> to get response body, if any,
-     on <literal>IOException</literal>, so that Keep-Alive connections are not abandoned.
-     (<link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5065"
-     xlink:show="new"
-     >OPENAM-5065</link>).
     </para>
    </listitem>
    <listitem>

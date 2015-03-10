@@ -75,7 +75,7 @@
    <listitem>
     <para>
      <emphasis role="bold">Support for Auth Context Classes Extensibility</emphasis>.
-     OpenAM now supports the extensibility of auth context classes as described
+     OpenAM supports the extensibility of auth context classes as described
      in the SAMLv2 specification.
     </para>
     <para>
@@ -92,33 +92,12 @@
    <listitem>
     <para>
      <emphasis role="bold">Password Reset Token Validation REST API</emphasis>.
-     OpenAM now supports a REST API to check if the token for password reset is
+     OpenAM supports a single REST API action to check if the token for password reset is
      valid or not: <literal>/json/users?_action=confirm</literal>.
      (<link
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3748"
      xlink:show="new"
      >OPENAM-3748</link>).
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     <emphasis role="bold">Support for OAuth2Provider Debug Log</emphasis>.
-     OpenAM now provides debug logs for OAuth2 OAuth2Provider
-     (<link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4269"
-     xlink:show="new"
-     >OPENAM-4269</link>).
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     <emphasis role="bold">Alphabetical List of Agent Properties using ssoadm</emphasis>.
-     The <literal>ssoadm show-agent</literal> and <literal>ssoadm show-agent-grp</literal>
-     are now sorted and alphabeticalized
-     (<link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4602"
-     xlink:show="new"
-     >OPENAM-4602</link>).
     </para>
    </listitem>
    <listitem>
@@ -132,56 +111,27 @@
      >OPENAM-5311</link>).
     </para>
     <para>
-     To set the property, use <literal>org.forgerock.openam.ldap.default.time=integer</literal>.
+     To set the property, use <literal>org.forgerock.openam.ldap.default.time=
+     &lt;time limit in milliseconds&gt;</literal>.
     </para>
    </listitem>
    <listitem>
     <para>
-     <emphasis role="bold">DAUI Supports goto URL Validation</emphasis>.
-     The valid goto URL domain setting has been moved to a new service,
-     <literal>validationService</literal> with a new property:
-     <literal>openam-auth-valid-goto-resources</literal>
+     <emphasis role="bold">DAS Supports goto URL Validation</emphasis>.
+     DAS now validates <literal>goto</literal> and <literal>gotoOnFail</literal>
+     URLs
      (<link
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1773"
      xlink:show="new"
      >OPENAM-1773</link>).
-    </para>
-    <para>
-     Also, a new delegation policy has been created that allows agent accounts
-     to read the <literal>validationService</literal> settings.
-     Upgrade has been updated that migrates existing valid goto domains to the
-     new <literal>validationService</literal> and removes the old domains. This further ensures
-     that the new delegation policy is added to the system.
-    </para>
-    <para>
-     The Goto URL validation logic has been extracted out to a separate class
-     called <literal>RedirectUrlValidator</literal>, which now can be used from
-     both <literal>openam-core</literal> and <literal>openam-federation-library</literal>
-     (for Relaystate evaluations).
     </para>
    </listitem>
   </itemizedlist>
 
   <itemizedlist>
    <para>
-    The following changes were listed for OpenAM 11.0.1.
+    The following changes were listed for OpenAM 11.0.2
    </para>
-
-   <listitem><!-- OPENAM-1631 -->
-    <para>
-     OpenAM provides a debug logging option to decrypt SAML assertions when
-     OpenAM runs as a service provider and assertion encryption is enabled.
-    </para>
-
-    <para>
-     For details, see the explanation in
-     (<link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1631"
-     xlink:show="new"
-     >OPENAM-1631</link>).
-    </para>
-   </listitem>
-
    <listitem>
     <para>
      Attributes names in responses to REST API calls now
@@ -203,7 +153,6 @@
      to <literal>true</literal>.
     </para>
    </listitem>
-
    <listitem>
     <para>
      The <literal>AttributeQueryUtil</literal> class now uses
@@ -215,6 +164,12 @@
       >OPENAM-1655</link>).
     </para>
    </listitem>
+  </itemizedlist>
+
+  <itemizedlist>
+   <para>
+    The following changes were listed for OpenAM 11.0.1.
+   </para>
 
    <listitem>
     <para>
