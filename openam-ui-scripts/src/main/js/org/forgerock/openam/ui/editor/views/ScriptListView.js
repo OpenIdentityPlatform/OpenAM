@@ -33,7 +33,6 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
     "org/forgerock/commons/ui/common/main/Router",
     "backgrid",
     "org/forgerock/openam/ui/editor/util/BackgridUtils"
-
 ], function (AbstractView, conf, eventManager, uiUtils, constants, router, Backgrid, BackgridUtils) {
 
     var ScriptListView = AbstractView.extend({
@@ -46,6 +45,8 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
                 paginator,
                 Scripts,
                 realm = conf.globalData.auth.realm !== "/" ? conf.globalData.auth.realm : "";
+
+            this.data.selectedUUIDs = [];
 
             Scripts = Backbone.PageableCollection.extend({
                 url: "/" + constants.context + "/json" + realm + "/scripts",
@@ -60,6 +61,11 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
             });
 
             columns = [
+                {
+                    name: "",
+                    cell: "select-row",
+                    headerCell: "select-all"
+                },
                 {
                     name: "name",
                     label: $.t("scripts.list.grid.0"),
@@ -94,6 +100,10 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
 
             self.data.scripts = new Scripts();
 
+            self.data.scripts.on("backgrid:selected", function (model, selected) {
+                self.onRowSelect(model, selected);
+            });
+
             grid = new Backgrid.Grid({
                 columns: columns,
                 collection: self.data.scripts,
@@ -106,14 +116,31 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
             });
 
             this.parentRender(function () {
+                this.renderToolbar();
+
                 this.$el.find("#backgridContainer").append(grid.render().el);
                 this.$el.find("#paginationContainer").append(paginator.render().el);
+
                 this.data.scripts.fetch({reset: true});
 
                 if (callback) {
                     callback();
                 }
             });
+        },
+
+        onRowSelect: function (model, selected) {
+            if (selected) {
+                this.data.selectedUUIDs.push(model.attributes.uuid);
+            } else {
+                this.data.selectedUUIDs = _.without(this.data.selectedUUIDs, model.attributes.uuid);
+            }
+
+            this.renderToolbar();
+        },
+
+        renderToolbar: function () {
+            this.$el.find('#gridToolbar').html(uiUtils.fillTemplateWithData("templates/editor/views/ScriptListBtnToolbarTemplate.html", this.data));
         }
     });
 

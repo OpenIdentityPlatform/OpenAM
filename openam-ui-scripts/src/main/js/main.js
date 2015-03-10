@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -42,6 +42,7 @@ require.config({
         backgrid: "libs/backgrid.min",
         "backgrid.paginator": "libs/backgrid-paginator.min",
         "backgrid.filter": "libs/backgrid-filter.min",
+        "backgrid.selectall": "libs/backgrid-select-all.min",
         ThemeManager: "org/forgerock/openam/ui/common/util/ThemeManager"
     },
 
@@ -90,6 +91,9 @@ require.config({
         },
         "backgrid.filter": {
             deps: ["backgrid"]
+        },
+        "backgrid.selectall": {
+            deps: ["backgrid"]
         }
     }
 });
@@ -114,7 +118,8 @@ require([
     "config/main",
     "backbone.paginator",
     "backgrid.paginator",
-    "backgrid.filter"
+    "backgrid.filter",
+    "backgrid.selectall"
 ], function ($, _, Backbone, Handlebars, i18n, spin, xdate, moment, jsonEditor, i18nManager, constants, eventManager) {
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:

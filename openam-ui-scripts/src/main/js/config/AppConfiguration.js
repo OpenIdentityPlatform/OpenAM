@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -90,7 +90,7 @@ define("config/AppConfiguration", function () {
                 moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
                 configuration: {
                     links: {
-                        "admin" : {
+                        "admin": {
                             "role": "ui-admin",
                             "urls": {
                                 "openAMConsole": {
@@ -108,6 +108,7 @@ define("config/AppConfiguration", function () {
                 moduleClass: "org/forgerock/commons/ui/common/util/UIUtils",
                 configuration: {
                     templateUrls: [
+                        "templates/editor/views/ScriptListBtnToolbarTemplate.html"
                     ]
                 }
             },

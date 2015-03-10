@@ -1,0 +1,15 @@
+<div class="btn-group" role="group" aria-label="add script">
+    <a href="#edit/">
+        <button type="button" class="btn btn-primary">
+            <span class="fa fa-plus"></span>{{t "scripts.list.addNew"}}
+        </button>
+    </a>
+</div>
+
+<div class="btn-group" role="group" aria-label="delete script">
+    <a href="#list/">
+        <button type="button" class="btn btn-danger" {{#unless selectedUUIDs}} disabled {{/unless}}>
+            <span class="fa fa-close"></span>{{t "scripts.list.deleteSelected"}}
+        </button>
+    </a>
+</div>

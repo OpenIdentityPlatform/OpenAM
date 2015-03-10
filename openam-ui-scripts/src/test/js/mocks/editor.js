@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,6 +25,7 @@
 /*global require, define*/
 define([
     "text!templates/editor/views/ScriptListTemplate.html",
+    "text!templates/editor/views/ScriptListBtnToolbarTemplate.html",
     "text!templates/editor/login/LoginDialog.html",
     "text!configuration.json"
 ], function () {
@@ -32,6 +33,7 @@ define([
      yet found a way to fool requirejs into doing dynamic dependencies */
     var staticFiles = [
             "templates/editor/views/ScriptListTemplate.html",
+            "templates/editor/views/ScriptListBtnToolbarTemplate.html",
             "templates/editor/login/LoginDialog.html",
             "configuration.json"
         ],

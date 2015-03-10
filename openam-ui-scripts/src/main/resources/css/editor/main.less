@@ -8,7 +8,6 @@ button .fa {
     thead th {
         vertical-align: top;
         text-align: left;
-        padding: 0 0 10px 0;
 
         .form-search {
             margin: 5px 0 0 0;
@@ -16,11 +15,23 @@ button .fa {
     }
 
     tbody {
-        tr.empty {
-            background-color: #d9edf7;
-            td {
-                display: table-cell;
-                color: #31708f;
+        tr {
+            &.selected {
+                background-color: #d9edf7;
+            }
+
+            &.empty {
+                background-color: #d9edf7;
+                td {
+                    display: table-cell;
+                    color: #31708f;
+                }
+            }
+
+            td.editor {
+                padding: 4px 5px;
+                outline: inherit;
+                background-color: inherit;
             }
         }
     }
