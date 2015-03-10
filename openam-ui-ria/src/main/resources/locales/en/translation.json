@@ -393,7 +393,7 @@
             }
         },
         "share": {
-            "people": "Search for people",
+            "people": "Add or select people to share your resource with",
             "permission": "Select Permission",
             "share": "Share",
             "info": "Shared with __count__ person",

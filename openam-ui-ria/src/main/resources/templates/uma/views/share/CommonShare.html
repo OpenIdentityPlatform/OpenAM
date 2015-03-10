@@ -15,13 +15,18 @@
         {{else}}
         <div id="selectUser" class="float-left">
             <label>{{t 'uma.share.people'}}</label>
-            <select placeholder="{{t 'common.form.startTypingToSearch'}}"></select>
+            <select placeholder="{{t 'common.form.startTypingToSearch'}}">
+                <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
+                {{#each permissions}}
+                <option value="{{subject}}">{{subject}}</option>
+                {{/each}}
+            </select>
         </div>
         <div id="selectPermission" class="float-left">
             <label>{{t 'uma.share.permission'}}</label>
             <select multiple class="selectize">
                 <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
-                {{#each scopes }}
+                {{#each scopes}}
                 <option value="{{id}}">{{name}}</option>
                 {{/each}}
             </select>
@@ -35,7 +40,7 @@
         {{/if}}
     </div>
 
-    <div id="footerShare">
+    <div id="footerShare" class="clearfix">
         {{#if dialog}}
         <div id="footerActions" class="float-right">
             <a class="button" href="#" id="done" >{{t 'common.form.done'}}</a>

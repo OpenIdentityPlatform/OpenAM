@@ -106,8 +106,9 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
 
             this.data.name = this.parentModel.get('name');
             this.data.scopes = this.parentModel.get('scopes').toJSON();
-
             collection = this.parentModel.get('policy').get('permissions');
+            this.data.permissions = collection.toJSON();
+
             grid = new Backgrid.Grid({
                 columns: [
                 {
@@ -184,11 +185,17 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 // },
                 onChange: function(value) {
                     // Look for existing share and populate permissions if there one already exists
+
                     var existing = self.parentModel.get('policy').get("permissions").findWhere({ subject: value }),
-                        scopes = existing.get('scopes').pluck('name');
+                        scopes,
+                        selectPermission = self.$el.find('#selectPermission select');
 
                     if(existing) {
-                        self.$el.find('#selectPermission select')[0].selectize.setValue(scopes);
+                        scopes = existing.get('scopes').pluck('name');
+                        // required as #selectUser still has focus and selecting the #selectPermission input will initiate both dropdowns
+                        selectPermission.find('.selectize-input').click();
+                        selectPermission[0].selectize.setValue(scopes);
+
                     }
 
                     self.enableOrDisableShareButton();
@@ -228,7 +235,6 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             this.parentModel.get('policy').save()
             .done(function(response) {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
-
                 self.reset();
             })
             .fail(function() {

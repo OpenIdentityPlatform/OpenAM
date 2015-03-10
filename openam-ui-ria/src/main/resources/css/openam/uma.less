@@ -1,5 +1,6 @@
 /* VARIABLES */
 @table-base-color: #1f6fb1;
+@cell-hover-color: #F4FFBF;
 
 .webkit-text-rendering-bugfix{
     -webkit-transform: translateZ(0px);
@@ -152,15 +153,15 @@ html .selectize-dropdown .optgroup-header{
     cursor: pointer;
     margin: 0 2px 2px 0;
     padding: 1px 5px 0;
-    background: @table-base-color;
-    color: #d7e9f8;
-    border: 1px solid @table-base-color;
+    background: #A4CAE7;
+    color: #095390;
+    border: 1px solid #90A7BA;
     border-radius: 2px;
 
-    &:hover{
-        background:#d97986;
-        border: 1px solid #ce5162;
-        color: #fff;
+    &:hover, &.active{
+        background: #EFB6BE;
+        border: 1px solid #DD7785;
+        color: #CA3232;
     }
 }
 
@@ -246,9 +247,9 @@ body{
 
         td.uri-cell{
             padding:13px 5px;
-            .transition(background, 0.2s);
+            .transition(background, 0.1s);
             &:hover{
-                background-color: #B0DCFF;
+                background-color: @cell-hover-color;
                 cursor:pointer;
             }
         }
@@ -320,8 +321,7 @@ body{
                     padding:0 10px;
 
                     &:hover {
-                        color: lighten(@table-base-color, 45%);
-                        background-color: @table-base-color;
+                        background-color: @cell-hover-color;
                     }
                 }
             }
@@ -431,11 +431,14 @@ body{
     }
 
     #footerShare{
-        margin-top:30px;
-
+        margin: 15px -10px -20px -10px;
+        border-top: 1px solid rgb(213, 213, 213);
+        padding: 15px;
+        background-color: #eee;
+        border-radius: 0 0 5px 5px;
         #footerNav{
 
-            margin: 20px 10px 0 ;
+            margin: 18px 0 0;
             font-size: 13px;
             line-height: 13px;
             a {
@@ -522,6 +525,10 @@ body{
         border-radius: 0;
         background-color: transparent;
         color: #80b7ab;
+
+        &:focus{
+            box-shadow:none;
+        }
     }
 }
 
@@ -537,6 +544,11 @@ body{
         font-weight: normal;
         padding: 0 0 10px;
     }
+
+
+}
+#dialogs #footerShare {
+    margin: 15px -15px -15px -15px;
 }
 
 /* enable responsive layout*/
