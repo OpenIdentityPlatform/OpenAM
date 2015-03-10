@@ -29,6 +29,7 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import java.security.AccessController;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -267,22 +268,42 @@ public final class EntitlementUtils {
      * @param data The set of actions that needs to be converted.
      * @return The map of actions after the conversion.
      */
-    public static Map<String, Boolean> getActions(Map<String, Set<String>> data) {
-        Map<String, Boolean> results = new HashMap<String, Boolean>();
-        Set<String> actions = data.get(CONFIG_ACTIONS);
-        if (actions != null) {
-            for (String a : actions) {
-                int index = a.indexOf('=');
-                String name = a;
-                Boolean defaultVal = Boolean.TRUE;
+    public static Map<String, Boolean> getActions(final Map<String, Set<String>> data) {
+        Reject.ifNull(data);
 
-                if (index != -1) {
-                    name = a.substring(0, index);
-                    defaultVal = Boolean.parseBoolean(a.substring(index + 1));
-                }
-                results.put(name, defaultVal);
-            }
+        final Set<String> actionStrings = data.get(CONFIG_ACTIONS);
+
+        if (actionStrings == null) {
+            return Collections.emptyMap();
         }
+
+        return getActions(actionStrings);
+    }
+
+    /**
+     * Transforms the set of action strings to its corresponding map of actions to boolean outcomes.
+     *
+     * @param actionStrings
+     *         action strings
+     *
+     * @return action map
+     */
+    public static Map<String, Boolean> getActions(final Set<String> actionStrings) {
+        Reject.ifNull(actionStrings);
+
+        final Map<String, Boolean> results = new HashMap<String, Boolean>();
+
+        for (String actionString : actionStrings) {
+            final String[] parts = actionString.split("=");
+
+            if (parts.length == 1) {
+                results.put(parts[0], true);
+                continue;
+            }
+
+            results.put(parts[0], Boolean.parseBoolean(parts[1]));
+        }
+
         return results;
     }
 

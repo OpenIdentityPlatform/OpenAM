@@ -15,6 +15,34 @@
  */
 package org.forgerock.openam.entitlement.configuration;
 
+import static com.sun.identity.entitlement.EntitlementException.MODIFY_RESOURCE_TYPE_FAIL;
+import static com.sun.identity.entitlement.EntitlementException.REMOVE_RESOURCE_TYPE_FAIL;
+import static com.sun.identity.entitlement.EntitlementException.RESOURCE_TYPE_RETRIEVAL_ERROR;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.LogLevel.ERROR;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.LogLevel.MESSAGE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_ATTEMPT_REMOVE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_ATTEMPT_SAVE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_FAILED_REMOVE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_FAILED_SAVE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_SUCCEEDED_REMOVE;
+import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.RESOURCE_TYPE_SUCCEEDED_SAVE;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_ACTIONS;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_CREATED_BY;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_CREATION_DATE;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_DESCRIPTION;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_LAST_MODIFIED_BY;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_LAST_MODIFIED_DATE;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_NAME;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_PATTERNS;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.CONFIG_RESOURCE_TYPES;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.REALM_DN_TEMPLATE;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.RESOURCE_TYPE;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.SCHEMA_RESOURCE_TYPES;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActionSet;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActions;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getAttribute;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.resourceTypeFromMap;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
@@ -22,24 +50,25 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.OpenSSOLogger;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.util.query.QueryFilter;
 
 import javax.security.auth.Subject;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
-import static com.sun.identity.entitlement.EntitlementException.*;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.LogLevel.*;
-import static com.sun.identity.entitlement.opensso.OpenSSOLogger.Message.*;
 
 
 /**
@@ -165,6 +194,60 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
         } catch (SSOException ex) {
             handleSaveException(subject, realm, uuid, ex);
         }
+    }
+
+    @Override
+    public Set<ResourceType> getResourceTypes(final QueryFilter<SmsAttribute> queryFilter,
+                                              final Subject subject, final String realm) throws EntitlementException {
+
+        final SSOToken token = SubjectUtils.getSSOToken(subject);
+        final String dn = getResourceTypeBaseDN(realm);
+        final Filter filter = queryFilter.accept(new SmsQueryFilterVisitor(), null);
+        final Set<ResourceType> resourceTypes = new HashSet<ResourceType>();
+
+        try {
+            @SuppressWarnings("unchecked") // Interaction with legacy service.
+            final Iterator<SMSDataEntry> iterator = (Iterator<SMSDataEntry>)SMSEntry
+                    .search(token, dn, filter.toString(), 0, 0, false, false, Collections.emptySet());
+
+            while (iterator.hasNext()) {
+                final SMSDataEntry entry = iterator.next();
+                final String name = entry.getAttributeValue(CONFIG_NAME);
+                // Extract the resource types UUID from the LDAP DN representation.
+                final String uuid = LDAPUtils.getName(DN.valueOf(entry.getDN()));
+
+                @SuppressWarnings("unchecked") // Interaction with legacy service.
+                final Set<String> actionSet = entry.getAttributeValues(CONFIG_ACTIONS);
+                final Map<String, Boolean> actions = getActions(actionSet);
+
+                @SuppressWarnings("unchecked") // Interaction with legacy service.
+                final Set<String> resources = entry.getAttributeValues(CONFIG_PATTERNS);
+
+                final String description = entry.getAttributeValue(CONFIG_DESCRIPTION);
+                final String createdBy = entry.getAttributeValue(CONFIG_CREATED_BY);
+                final String creationDate = entry.getAttributeValue(CONFIG_CREATION_DATE);
+                final String modifiedBy = entry.getAttributeValue(CONFIG_LAST_MODIFIED_BY);
+                final String modifiedDate = entry.getAttributeValue(CONFIG_LAST_MODIFIED_DATE);
+
+                final ResourceType resourceType = ResourceType
+                        .builder(name, realm)
+                        .setUUID(uuid)
+                        .setActions(actions)
+                        .setPatterns(resources)
+                        .setDescription(description)
+                        .setCreatedBy(createdBy)
+                        .setCreationDate(Long.parseLong(creationDate))
+                        .setLastModifiedBy(modifiedBy)
+                        .setLastModifiedDate(Long.parseLong(modifiedDate))
+                        .build();
+
+                resourceTypes.add(resourceType);
+            }
+        } catch (SMSException smsE) {
+            throw new EntitlementException(RESOURCE_TYPE_RETRIEVAL_ERROR, realm, smsE);
+        }
+
+        return resourceTypes;
     }
 
     /**

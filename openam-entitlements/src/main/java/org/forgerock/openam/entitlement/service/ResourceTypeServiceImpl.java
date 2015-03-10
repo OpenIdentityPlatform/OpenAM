@@ -17,7 +17,9 @@ package org.forgerock.openam.entitlement.service;
 
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.configuration.SmsAttribute;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
+import org.forgerock.util.query.QueryFilter;
 
 import javax.inject.Inject;
 import javax.security.auth.Subject;
@@ -145,4 +147,11 @@ public class ResourceTypeServiceImpl implements ResourceTypeService {
 
         return updatedResourceType;
     }
+
+    @Override
+    public Set<ResourceType> getResourceTypes(QueryFilter<SmsAttribute> filter,
+                                              Subject subject, String realm) throws EntitlementException {
+        return configuration.getResourceTypes(filter, subject, realm);
+    }
+
 }

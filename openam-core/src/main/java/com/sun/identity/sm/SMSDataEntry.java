@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SMSDataEntry.java,v 1.1 2009/04/02 19:40:59 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ *
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 
 package com.sun.identity.sm;
@@ -76,6 +74,10 @@ public class SMSDataEntry {
     }
 
     private void parseAttributeValues(Set raw) {
+        if (raw == null) {
+            return;
+        }
+
         for (Iterator i = raw.iterator(); i.hasNext(); ) {
             String s = (String)i.next();
             int idx = s.indexOf('=');

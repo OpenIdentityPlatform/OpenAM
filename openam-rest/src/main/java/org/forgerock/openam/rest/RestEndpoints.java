@@ -41,6 +41,7 @@ import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationServiceV1;
 import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationServiceV2;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationTypesResource;
+import org.forgerock.openam.forgerockrest.entitlements.ApplicationV1Filter;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationsResource;
 import org.forgerock.openam.forgerockrest.entitlements.ConditionTypesResource;
 import org.forgerock.openam.forgerockrest.entitlements.DecisionCombinersResource;
@@ -234,7 +235,11 @@ public class RestEndpoints {
 
         dynamicRealmRouter.route("/applications")
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
-                .forVersion("1.0").to(ApplicationsResource.class);
+                .forVersion("1.0")
+                    .through(ApplicationV1Filter.class)
+                    .to(ApplicationsResource.class)
+                .forVersion("2.0")
+                    .to(ApplicationsResource.class);
 
         dynamicRealmRouter.route("/subjectattributes")
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)

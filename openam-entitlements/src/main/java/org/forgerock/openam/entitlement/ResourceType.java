@@ -50,6 +50,7 @@ public final class ResourceType {
     private volatile int hashCode = 0;
 
     public static class Builder {
+
         private String uuid;
         private String name;
         private String realm;
@@ -114,6 +115,19 @@ public final class ResourceType {
         }
 
         /**
+         * Overwrites the patterns with the passed resource set.
+         *
+         * @param patterns
+         *         the set of patterns
+         *
+         * @return this builder
+         */
+        public Builder setPatterns(Set<String> patterns) {
+            this.patterns = new HashSet<String>(patterns);
+            return this;
+        }
+
+        /**
          * Add a resource pattern that guides the resource for a policy.
          * @param pattern The resource pattern.
          * @return The ResourceType builder.
@@ -130,6 +144,19 @@ public final class ResourceType {
          */
         public Builder addPatterns(Set<String> patterns) {
             this.patterns.addAll(patterns);
+            return this;
+        }
+
+        /**
+         * Overwrites the actions with the passed action map.
+         *
+         * @param actions
+         *         the map of actions
+         *
+         * @return this builder
+         */
+        public Builder setActions(Map<String, Boolean> actions) {
+            this.actions = new HashMap<String, Boolean>(actions);
             return this;
         }
 
