@@ -11,11 +11,23 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-15 ForgeRock AS.
  */
 
 package org.forgerock.openam.openidconnect;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.oauth2.core.AccessToken;
@@ -39,19 +51,6 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationService;
 import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.*;
 
 /**
  * Service for registering OpenId Connect clients in OpenAM.
@@ -84,8 +83,8 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      */
     @Inject
     OpenAMOpenIdConnectClientRegistrationService(ClientDAO clientDAO,
-                                                 OAuth2ProviderSettingsFactory providerSettingsFactory, AccessTokenVerifier tokenVerifier,
-                                                 TokenStore tokenStore) {
+                                                 OAuth2ProviderSettingsFactory providerSettingsFactory,
+                                                 AccessTokenVerifier tokenVerifier, TokenStore tokenStore) {
         this.clientDAO = clientDAO;
         this.providerSettingsFactory = providerSettingsFactory;
         this.tokenVerifier = tokenVerifier;
@@ -96,7 +95,8 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      * {@inheritDoc}
      */
     public JsonValue createRegistration(String accessToken, String deploymentUrl, OAuth2Request request)
-            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException, NotFoundException {
+            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException,
+            AccessDeniedException, NotFoundException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
@@ -113,11 +113,10 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
         for (String key : inputKeys) {
             OAuth2Constants.ShortClientAttributeNames keyName = fromString(key);
             if (keyName == null) {
-                //input in unknown
-                logger.error("Unknown input given. Key: " + key);
-                throw new InvalidClientMetadata();
+                logger.warn("Unknown input given. Key: " + key);
             }
         }
+
         //create client given input
         ClientBuilder clientBuilder = new ClientBuilder();
         try {
@@ -208,8 +207,9 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
                 clientBuilder.setIdTokenSignedResponseAlgorithm(ID_TOKEN_SIGNED_RESPONSE_ALG_DEFAULT);
             }
 
-            if (input.get(POST_LOGOUT_REDIRECT_URIS.getType()).asString() != null) {
-                clientBuilder.setPostLogoutRedirectionURI(input.get(POST_LOGOUT_REDIRECT_URIS.getType()).asString());
+            if (input.get(POST_LOGOUT_REDIRECT_URIS.getType()).asList() != null) {
+                clientBuilder.setPostLogoutRedirectionURIs(input.get(POST_LOGOUT_REDIRECT_URIS.getType())
+                        .asList(String.class));
             }
 
             if (input.get(REGISTRATION_ACCESS_TOKEN.getType()).asString() != null) {

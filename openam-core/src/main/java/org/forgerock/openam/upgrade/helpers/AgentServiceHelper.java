@@ -15,13 +15,13 @@
  */
 package org.forgerock.openam.upgrade.helpers;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.*;
+
 import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.AttributeSchemaImpl;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.steps.UpgradeOAuth2ClientStep;
-
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG;
 
 /**
  * This service helper implementation ensures that the OAuth2 Client service attributes are using the correct uitype
@@ -47,6 +47,7 @@ public class AgentServiceHelper extends AbstractUpgradeHelper {
     @Override
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
             throws UpgradeException {
+
         if (UpgradeOAuth2ClientStep.CHANGED_PROPERTIES.contains(newAttr.getName())) {
             //we only want to upgrade the attributes if they don't have the unorderedlist uitype yet.
             if (AttributeSchema.UIType.UNORDEREDLIST.equals(oldAttr.getUIType())) {

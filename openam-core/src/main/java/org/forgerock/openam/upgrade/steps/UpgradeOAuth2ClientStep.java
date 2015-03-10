@@ -62,7 +62,7 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
 
     private static final String OAUTH2_DATA = "%OAUTH2_DATA%";
     public static final List<String> CHANGED_PROPERTIES = Arrays.asList(
-            REDIRECT_URI, SCOPES, DEFAULT_SCOPES, NAME, DESCRIPTION);
+            REDIRECT_URI, SCOPES, DEFAULT_SCOPES, NAME, DESCRIPTION, POST_LOGOUT_URI);
     private static final Pattern pattern = Pattern.compile("\\[\\d+\\]=.*");
     private final Map<String, Map<AgentType, Map<String, Set<String>>>> upgradableConfigs =
             new HashMap<String, Map<AgentType, Map<String, Set<String>>>>();

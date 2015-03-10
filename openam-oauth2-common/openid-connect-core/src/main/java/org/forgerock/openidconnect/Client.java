@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. 
+ * Copyright 2014-15 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
@@ -211,7 +211,7 @@ public class Client extends JsonValue {
      * @param clientName The client name of the client.
      * @param subjectType The subject type of the client.
      * @param idTokenSignedResponseAlgorithm The id token signed response algorithm of the client.
-     * @param postLogoutRedirectionURI The post logout redirect uri of the client.
+     * @param postLogoutRedirectionURIs The post logout redirect URIs of the client.
      * @param accessToken The registration access token of the client.
      * @param clientSessionURI The client session uri of the client.
      * @param applicationType The application type of the client.
@@ -222,7 +222,7 @@ public class Client extends JsonValue {
     public Client(String clientID, String clientType, List<String> redirectionURIs, List<String> allowedGrantScopes,
                   List<String> defaultGrantScopes, List<String> displayName, List<String> displayDescription,
                   String clientName, String subjectType, String idTokenSignedResponseAlgorithm,
-                  String postLogoutRedirectionURI, String accessToken, String clientSessionURI, String applicationType,
+                  List<String> postLogoutRedirectionURIs, String accessToken, String clientSessionURI, String applicationType,
                   String clientSecret, List<String> responseTypes, List<String> contacts) {
         super(new HashMap<String, Object>());
         setAccessToken(accessToken);
@@ -236,7 +236,7 @@ public class Client extends JsonValue {
         setClientName(clientName);
         setSubjectType(subjectType);
         setIdTokenSignedResponseAlgorithm(idTokenSignedResponseAlgorithm);
-        setPostLogoutRedirectionURI(postLogoutRedirectionURI);
+        setPostLogoutRedirectionURIs(postLogoutRedirectionURIs);
         setRedirectionURIs(redirectionURIs);
         setApplicationType(applicationType);
         setClientSecret(clientSecret);
@@ -509,19 +509,19 @@ public class Client extends JsonValue {
      *
      * @return The post logout redirection uri.
      */
-    public String getPostLogoutRedirectionURI() {
-        return get(OAuth2Constants.ShortClientAttributeNames.POST_LOGOUT_REDIRECT_URIS.getType()).asString();
+    public List<String> getPostLogoutRedirectionURIs() {
+        return get(OAuth2Constants.ShortClientAttributeNames.POST_LOGOUT_REDIRECT_URIS.getType()).asList(String.class);
     }
 
     /**
      * Sets the post logout redirection uri of the OAuth2Client.
      *
-     * @param postLogoutRedirectionURI The post logout redirection uri.
+     * @param postLogoutRedirectionURIs The post logout redirection uri.
      */
-    public void setPostLogoutRedirectionURI(String postLogoutRedirectionURI) {
-        if (postLogoutRedirectionURI != null && !postLogoutRedirectionURI.isEmpty()) {
+    public void setPostLogoutRedirectionURIs(List<String> postLogoutRedirectionURIs) {
+        if (postLogoutRedirectionURIs != null && !postLogoutRedirectionURIs.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.POST_LOGOUT_REDIRECT_URIS.getType(), 
-                    postLogoutRedirectionURI);
+                    postLogoutRedirectionURIs);
         }
     }
 

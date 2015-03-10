@@ -267,9 +267,9 @@ public class OpenAMClientDAO implements ClientDAO {
             clientAttributeMap.put(OAuth2Constants.OAuth2Client.REDIRECT_URI, formatSet(client.getRedirectionURIsAsString()));
         }
 
-        if (client.getPostLogoutRedirectionURI() != null) {
+        if (client.getPostLogoutRedirectionURIs() != null) {
             temp = new HashSet<String>();
-            temp.add(client.getPostLogoutRedirectionURI());
+            temp.addAll(client.getPostLogoutRedirectionURIs());
             clientAttributeMap.put(OAuth2Constants.OAuth2Client.POST_LOGOUT_URI, temp);
         }
 
@@ -314,7 +314,6 @@ public class OpenAMClientDAO implements ClientDAO {
             throw new UnauthorizedClientException("Client has no attributes");
         }
 
-
         ClientBuilder clientBuilder = new ClientBuilder();
 
         clientBuilder.setAccessToken(getSingleAttribute(clientAttributeMap, OAuth2Constants.OAuth2Client.ACCESS_TOKEN));
@@ -327,7 +326,7 @@ public class OpenAMClientDAO implements ClientDAO {
         clientBuilder.setDisplayName(new ArrayList<String>(getSetAttribute(clientAttributeMap, OAuth2Constants.OAuth2Client.NAME)));
         clientBuilder.setIdTokenSignedResponseAlgorithm(getSingleAttribute(clientAttributeMap, OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG));
         clientBuilder.setRedirectionURIs(new ArrayList<String>(getSetAttribute(clientAttributeMap, OAuth2Constants.OAuth2Client.REDIRECT_URI)));
-        clientBuilder.setPostLogoutRedirectionURI(getSingleAttribute(clientAttributeMap, OAuth2Constants.OAuth2Client.POST_LOGOUT_URI));
+        clientBuilder.setPostLogoutRedirectionURIs(new ArrayList<String>(getSetAttribute(clientAttributeMap, OAuth2Constants.OAuth2Client.POST_LOGOUT_URI)));
         clientBuilder.setResponseTypes(new ArrayList<String>(getSetAttribute(clientAttributeMap, OAuth2Constants.OAuth2Client.RESPONSE_TYPES)));
         clientBuilder.setSubjectType(SUBJECT_TYPE_DEFAULT);
         clientBuilder.setApplicationType(APPLICATION_TYPE_DEFAULT);

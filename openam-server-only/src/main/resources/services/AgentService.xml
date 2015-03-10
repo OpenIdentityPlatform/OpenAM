@@ -378,11 +378,12 @@
                   -->
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.postLogoutRedirectURI"
-                          type="single"
+                          type="list"
                           syntax="string"
-                          i18nKey="a738">
-                      <DefaultValues>
-                          <Value></Value>
+                          i18nKey="a738"
+                          uitype="unorderedlist">
+                  <DefaultValues>
+                          <Value>[0]=</Value>
                       </DefaultValues>
                   </AttributeSchema>
               <!--

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-15 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
@@ -35,7 +35,7 @@ public class ClientBuilder {
     private String clientName;
     private String subjectType;
     private String idTokenSignedResponseAlgorithm;
-    private String postLogoutRedirectionURI;
+    private List<String> postLogoutRedirectionURIs;
     private String accessToken;
     private String clientSessionURI;
     private String applicationType;
@@ -145,12 +145,12 @@ public class ClientBuilder {
     }
 
     /**
-     * Sets the post logout redirection uri of the OAuth2Client.
+     * Sets the post logout redirection URIs of the OAuth2Client.
      *
-     * @param postLogoutRedirectionURI The post logout redirection uri.
+     * @param postLogoutRedirectionURIs The post logout redirection URIs.
      */
-    public ClientBuilder setPostLogoutRedirectionURI(String postLogoutRedirectionURI) {
-        this.postLogoutRedirectionURI = postLogoutRedirectionURI;
+    public ClientBuilder setPostLogoutRedirectionURIs(List<String> postLogoutRedirectionURIs) {
+        this.postLogoutRedirectionURIs = postLogoutRedirectionURIs;
         return this;
     }
 
@@ -221,7 +221,7 @@ public class ClientBuilder {
      */
     public Client createClient() {
         return new Client(clientID, clientType, redirectionURIs, allowedGrantScopes, defaultGrantScopes, displayName,
-                displayDescription, clientName, subjectType, idTokenSignedResponseAlgorithm, postLogoutRedirectionURI,
+                displayDescription, clientName, subjectType, idTokenSignedResponseAlgorithm, postLogoutRedirectionURIs,
                 accessToken, clientSessionURI,applicationType, clientSecret, responseTypes, contacts);
     }
 }
