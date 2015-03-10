@@ -24,10 +24,7 @@
  *
  * $Id: AMAuthLevelManager.java,v 1.3 2008/06/25 05:41:51 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2012-2014 ForgeRock AS
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.config;
 
@@ -430,11 +427,9 @@ public class AMAuthLevelManager implements ServiceListener {
                 supportedModulesMap.remove(orgName);
             }
         }
-           // this listener event should be conditioned only for ADDED and
-        // REMOVED. SM will provide special MODIFIED type for removal of all
-        // attributes(for the default intance)
-        AMAuthenticationManager.buildModuleInstanceForService(orgName, 
-            serviceName);
+        // this listener event should be conditioned only for ADDED and REMOVED. SM will provide special MODIFIED type
+        // for removal of all attributes(for the default instance)
+        AMAuthenticationManager.updateModuleInstanceTable(orgName, serviceName);
         // process auth config updates
         updateAuthConfiguration(serviceName, orgName, serviceComponent); 
     }
