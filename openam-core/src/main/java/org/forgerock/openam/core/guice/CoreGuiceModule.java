@@ -96,6 +96,7 @@ import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.session.SessionCache;
@@ -364,6 +365,20 @@ public class CoreGuiceModule extends AbstractModule {
             throw new IllegalStateException("Failed to retrieve the service config manager for delegation", smsE);
         } catch (SSOException ssoE) {
             throw new IllegalStateException("Failed to retrieve the service config manager for delegation", ssoE);
+        }
+    }
+
+    @Provides
+    @Inject
+    @Named(EntitlementUtils.SERVICE_NAME)
+    ServiceConfigManager getServiceConfigManagerForEntitlements(final PrivilegedAction<SSOToken> adminTokenAction) {
+        try {
+            final SSOToken adminToken = AccessController.doPrivileged(adminTokenAction);
+            return new ServiceConfigManager(EntitlementUtils.SERVICE_NAME, adminToken);
+        } catch (SMSException smsE) {
+            throw new IllegalStateException("Failed to retrieve the service config manager for entitlements", smsE);
+        } catch (SSOException ssoE) {
+            throw new IllegalStateException("Failed to retrieve the service config manager for entitlements", ssoE);
         }
     }
 

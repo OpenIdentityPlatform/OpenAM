@@ -36,6 +36,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -49,6 +50,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -82,6 +84,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
             "(&(ou=application={0})(|(!(ou=resourceTypeUuid=*))(ou=resourceTypeUuid=\\00)))";
 
     private final ResourceTypeService resourceTypeService;
+    private final ServiceConfigManager configManager;
     private final Set<String> defaultApplicationNames;
     private class ResourceTypeState {
         private boolean applicationNeedsResourceType = false;
@@ -96,10 +99,14 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
     private int upgradeablePrivilegeCount = 0;
 
     @Inject
-    public UpgradeResourceTypeStep(final PrivilegedAction<SSOToken> adminTokenAction, final ResourceTypeService
-            resourceTypeService, @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory) {
+    public UpgradeResourceTypeStep(
+            @Named(EntitlementUtils.SERVICE_NAME) final ServiceConfigManager configManager,
+            final ResourceTypeService resourceTypeService,
+            final PrivilegedAction<SSOToken> adminTokenAction,
+            @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
 
+        this.configManager = configManager;
         this.resourceTypeService = resourceTypeService;
         this.defaultApplicationNames = new HashSet<String>();
         this.resourceTypeStatePerRealm = new HashMap<String, Set<ResourceTypeState>>();
@@ -116,7 +123,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
         populateDefaultApplications();
 
         final ServiceConfig appTypesConfig = getApplicationTypesConfig();
-        final Set<String> realms = getRealmNames();
+        final Set<String> realms = getRealmNamesFromParent();
 
         for (String realm : realms) {
             final ServiceConfig appConfig = getApplicationsConfig(realm);
@@ -225,7 +232,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
      * @param realm The realm in which the policy resides.
      * @return The policies that are eligible for upgrade.
      */
-    private Set<String> policiesEligibleForUpgrade(String appName, String realm) throws UpgradeException {
+    protected Set<String> policiesEligibleForUpgrade(String appName, String realm) throws UpgradeException {
         try {
             return DataStore.getInstance()
                     .search(getAdminSubject(), realm, MessageFormat.format(POLICY_SEARCH, appName), 0, false, false);
@@ -354,8 +361,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
 
     private ServiceConfig getApplicationsConfig(String realm) throws UpgradeException {
         try {
-            return new ServiceConfigManager(SERVICE_NAME, getAdminToken()).getOrganizationConfig(realm, null)
-                    .getSubConfig(REGISTERED_APPLICATIONS);
+            return configManager.getOrganizationConfig(realm, null).getSubConfig(REGISTERED_APPLICATIONS);
         } catch (SSOException e) {
             throw new UpgradeException("Failed to retrieve registered applications in realm " + realm, e);
         } catch (SMSException e) {
@@ -384,13 +390,21 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
 
     private ServiceConfig getApplicationTypesConfig() throws UpgradeException {
         try {
-            return new ServiceConfigManager(SERVICE_NAME, getAdminToken()).getGlobalConfig(null)
-                    .getSubConfig(APPLICATION_TYPES);
+            return configManager.getGlobalConfig(null).getSubConfig(APPLICATION_TYPES);
         } catch (SSOException e) {
             throw new UpgradeException("Failed to retrieve global application types", e);
         } catch (SMSException e) {
             throw new UpgradeException("Failed to retrieve global application types", e);
         }
+    }
+
+    /**
+     * The parent method is final and can't be mocked out for testing, which is why this one was introduced.
+     * @return The set of realm names available in OpenAM.
+     * @throws UpgradeException In case retrieving the realm names was not successful.
+     */
+    protected Set<String> getRealmNamesFromParent() throws UpgradeException {
+        return getRealmNames();
     }
 
     /**
