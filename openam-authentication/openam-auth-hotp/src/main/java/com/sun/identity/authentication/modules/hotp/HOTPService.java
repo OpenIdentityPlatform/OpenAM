@@ -24,7 +24,7 @@
  *
  * $Id: HOTP.java,v 1.1 2009/03/24 23:52:12 pluo Exp $
  *
- * Portions Copyrighted 2013-2014 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
@@ -41,6 +41,7 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -50,7 +51,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashMap;
 
 /**
  * Provides the functionality to send OTP codes to a users Telephone and email.
@@ -196,7 +196,7 @@ public class HOTPService {
                     DEBUG.message("HOTP.sendHOTP() searching user identity "
                             + "with alternative attributes " + userSearchAttributes);
                 }
-                final Map<String, Set<String>> searchAVP = toAvPairMap(userSearchAttributes, userName);
+                final Map<String, Set<String>> searchAVP = CollectionUtils.toAvPairMap(userSearchAttributes, userName);
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
                 //workaround as data store always adds 'user-naming-attribute' to searchfilter
                 searchResults = amIdentityRepo.searchIdentities(IdType.USER, "*", idsc);
@@ -392,17 +392,4 @@ public class HOTPService {
         
         return returnAttributes;
     }
-    
-    private Map<String, Set<String>> toAvPairMap(final Set<String> names, final String value) {
-        if (value == null) {
-            return Collections.EMPTY_MAP;
-        }
-        final Map<String, Set<String>> map = new HashMap<String, Set<String>>(names.size());
-        final Set<String> set = new HashSet<String>(1);
-        set.add(value);
-        for (final String name : names) {
-            map.put(name, set);
-        }
-        return map;
-    }    
 }

@@ -37,6 +37,7 @@ import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -2752,5 +2753,27 @@ public abstract class AMLoginModule implements LoginModule {
         }
 
         return sessions;
+    }
+
+    /**
+     * Provides the "Alias Search Attribute Name" list from the Authentication
+     * Service for the realm. If these attributes are not configured it falls
+     * back to the User Naming Attribute for the realm
+     * @return a set containing the attribute names configured
+     */
+    protected Set<String> getUserAliasList() throws AuthLoginException {
+        final Map<String, Set<String>> orgSvc = getOrgServiceTemplate(getRequestOrg(), ISAuthConstants.AUTH_SERVICE_NAME);
+        Set<String> aliasAttrNames = orgSvc.get(ISAuthConstants.AUTH_ALIAS_ATTR);
+        if (debug.messageEnabled()) {
+            debug.message("AMLoginModule.getUserAliasList: from " + ISAuthConstants.AUTH_ALIAS_ATTR + ": "+ aliasAttrNames);
+        }
+        if (aliasAttrNames.isEmpty()) {
+            aliasAttrNames = orgSvc.get(ISAuthConstants.AUTH_NAMING_ATTR);
+            if (debug.messageEnabled()) {
+                debug.message("AMLoginModule.getUserAliasList: from " + ISAuthConstants.AUTH_NAMING_ATTR +": "
+                        + aliasAttrNames);
+            }
+        }
+        return aliasAttrNames;
     }
 }

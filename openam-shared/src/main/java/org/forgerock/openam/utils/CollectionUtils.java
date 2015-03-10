@@ -21,6 +21,7 @@ import org.forgerock.util.promise.Function;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -369,6 +370,32 @@ public class CollectionUtils {
         return collection != null && !collection.isEmpty();
     }
 
+
+    /**
+     * Creates a Hash Map, of names mapped to the provided value. If there is no value, an empty map is returned.
+     *
+     * @param names The set of names to be associated with the provided value.
+     * @param value The value to be mapped to each of the provided names.
+     * @return The map of name / value pairs, otherwise an Empty Map if no value is provided or an empty hashmap if no
+     * names are specified.
+     */
+    public static Map<String, Set<String>> toAvPairMap(final Set<String> names, final String value) {
+        if (value == null) {
+            return Collections.EMPTY_MAP;
+        }
+
+        if (names == null || names.isEmpty()) {
+            return new HashMap();
+        }
+
+        final Map<String, Set<String>> map = new HashMap<String, Set<String>>(names.size());
+        final Set<String> set = new HashSet<String>(1);
+        set.add(value);
+        for (final String name : names) {
+            map.put(name, set);
+        }
+        return map;
+    }
     /**
      * Given a map determines whether it contains some values.
      *
