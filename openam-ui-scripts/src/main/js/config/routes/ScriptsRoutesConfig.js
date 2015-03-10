@@ -30,6 +30,13 @@ define("config/routes/ScriptsRoutesConfig", [], function () {
             view: "org/forgerock/openam/ui/editor/views/ScriptListView",
             url: "list",
             role: "ui-admin"
+        },
+        "editScript": {
+            view: "org/forgerock/openam/ui/editor/views/EditScriptView",
+            url: /^edit\/(.*?)(?:\/){0,1}$/,
+            defaults: [""],
+            role: "ui-admin",
+            pattern: "edit/?"
         }
     };
 });

@@ -224,7 +224,16 @@
             "filterBy": "Filter by __value__",
             "noResults": "No results to display"
         },
-
+        "edit": {
+            "editTitle": "Edit Script",
+            "createTitle": "Create Script",
+            "name": "Name",
+            "language": "Language",
+            "context": "Context",
+            "script": "Script",
+            "upload": "Upload",
+            "validate": "Validate"
+        },
         "list": {
             "title": "Scripts List",
             "addNew": "Add New Script",

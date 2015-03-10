@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,19 +23,24 @@
  */
 
 /*global define*/
+define("org/forgerock/openam/ui/editor/util/URLHelper", [
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/Constants"
+], function(Configuration, Constants) {
+    // TODO: move to common components
+    // TODO: add realm replace
+    //var realm = conf.globalData.auth.realm !== "/" ? conf.globalData.auth.realm : "";
 
-define([
-    "./delegates/SiteConfigurationDelegate",
+    return {
+        substitute: function(url) {
+            return function() {
+                url = url.replace("__api__", Constants.host + "/" + Constants.context + "/json")
+                         .replace("__host__", Constants.host)
+                         .replace("__context__", Constants.context)
+                         .replace("__username__", Configuration.loggedUser.username);
 
-    "./login/LoginView",
-    "./login/LoginDialog",
-    "./login/LoginHelper",
-    "./login/SessionDelegate",
-
-    "./util/BackgridUtils",
-    "./util/URLHelper",
-
-    "./models/Script",
-    "./views/ScriptListView",
-    "./views/EditScriptView"
-]);
+                return url;
+            };
+        }
+    };
+});
