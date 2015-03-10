@@ -55,6 +55,13 @@ define('org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope', [
             });
 
             return resolved;
+        },
+        sync: function(method, model, options) {
+            options.beforeSend = function(xhr) {
+                xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
+            };
+
+            return Backbone.Model.prototype.sync.call(this, method, model, options);
         }
     });
 });

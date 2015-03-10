@@ -27,7 +27,7 @@
 define([
     "./models/UMAPolicy",
     "./models/UMAPolicyPermission",
-    "./models/UMAResourceSet",
+    "./models/UMAPolicyPermissionScope",
     "./models/UMAResourceSetWithPolicy",
     "./models/User",
 

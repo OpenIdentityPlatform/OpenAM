@@ -89,13 +89,6 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
              */
             this.data.name = this.model.get('name');
 
-            options = this.model.get('scopes').map(function(scope) {
-                return {
-                    text: scope.get('name'),
-                    value: scope.get('id')
-                };
-            });
-
             // FIXME: Re-enable filtering and pagination
             //     UserPoliciesCollection = Backbone.PageableCollection.extend({
             //         url: URLHelper.substitute("__api__/users/__username__/oauth2/resourcesets/" + args[0]),
@@ -116,35 +109,36 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                 }
             });
 
+            options = this.model.get('scopes').toJSON();
+
             SelectizeCell = Backgrid.Cell.extend({
                 className: "selectize-cell",
                 template: "templates/uma/backgrid/cell/SelectizeCell.html",
                 render: function() {
-                    var items = this.model.get('scopes'),
-                        $select = null,
-                        opts = {};
+                    var items = this.model.get('scopes').pluck('name'),
+                        select;
 
                     this.$el.html(UIUtils.fillTemplateWithData(this.template));
 
-                    opts = {
+                    select = this.$el.find('select').selectize({
                         create: false,
                         delimiter: ",",
                         dropdownParent: '#uma',
                         hideSelected: true,
                         persist: false,
                         plugins: ["restore_on_backspace"],
+                        labelField: 'name',
+                        valueField: 'id',
                         items: items,
                         options: options
-                    };
-
-                    $select = this.$el.find('select').selectize(opts)[0];
+                    })[0];
 
                     /* This an extention of the original positionDropdown method within Selectize. The override is
                      * required because using the dropdownParent 'body' places the dropdown out of scope of the
                      * containing backbone view. However adding the dropdownParent as any other element, has problems
                      * due the offsets and/positioning being incorrecly calucaluted in orignal positionDropdown method.
                      */
-                    $select.selectize.positionDropdown = function() {
+                    select.selectize.positionDropdown = function() {
                         var $control = this.$control,
                             offset = this.settings.dropdownParent ? $control.offset() : $control.position();
 
@@ -179,7 +173,7 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                 {
                     name: "subject",
                     label: $.t("uma.resources.show.grid.0"),
-                    cell: BackgridUtils.UnversalIdToUsername,
+                    cell: 'string',
                     // headerCell: BackgridUtils.FilterHeaderCell,
                     editable: false
                 },

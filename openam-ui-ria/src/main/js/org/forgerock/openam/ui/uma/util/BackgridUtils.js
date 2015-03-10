@@ -54,14 +54,14 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
         }
     });
 
-    obj.UnversalIdToUsername = Backgrid.Cell.extend({
+    obj.UniversalIdToUsername = Backgrid.Cell.extend({
         formatter: {
             fromRaw: function(rawData, model) {
                 return rawData.substring(3,rawData.indexOf(',ou=user'));
             }
         },
         render: function() {
-            obj.UnversalIdToUsername.__super__.render.apply(this);
+            obj.UniversalIdToUsername.__super__.render.apply(this);
             this.$el.attr('title', this.model.get(this.column.get('name')));
             return this;
         }

@@ -34,9 +34,10 @@ define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
         idAttribute: "_id",
         parse: function(response, options) {
             // Hardwiring the id across to the UMAPolicy object as the server doesn't provide it
-            if(response.policy) {
-                response.policy.policyId = response._id;
+            if(!response.policy) {
+                response.policy = {};
             }
+            response.policy.policyId = response._id;
 
             response.scopes = _.map(response.scopes, function(scope) {
                 return { id: scope };
@@ -47,7 +48,8 @@ define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
         relations: [{
             type: Backbone.HasOne,
             key: 'policy',
-            relatedModel: UMAPolicy
+            relatedModel: UMAPolicy,
+            parse: true
         }, {
             type: Backbone.HasMany,
             key: 'scopes',

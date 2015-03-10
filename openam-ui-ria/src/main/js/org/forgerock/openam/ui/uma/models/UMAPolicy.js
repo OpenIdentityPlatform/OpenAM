@@ -31,21 +31,34 @@ define('org/forgerock/openam/ui/uma/models/UMAPolicy', [
 ], function(Backbone, BackboneRelational, UMAPolicyPermission, URLHelper) {
     return Backbone.RelationalModel.extend({
         idAttribute: "policyId",
+        createRequired: true,
         relations: [{
             type: Backbone.HasMany,
             key: 'permissions',
             relatedModel: UMAPolicyPermission
         }],
+        parse: function(response, options) {
+            if(response.permissions) {
+                this.createRequired = false;
+            }
+
+            return response;
+        },
         sync: function(method, model, options) {
             options.beforeSend = function(xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
             };
 
-            // FIXME: Issue due to us having an ID already, workaroud using #createRequired ATM
-            if (method.toLowerCase() === 'update' && model.createRequired === true) {
+            if(method.toLowerCase() === 'update' && model.createRequired === true) {
+                model.createRequired = false;
+
                 options = options || {};
                 options.headers = {};
                 options.headers["If-None-Match"] = "*";
+            }
+
+            if(!model.get('permissions').length) {
+                model.createRequired = true;
             }
 
             return Backbone.Model.prototype.sync.call(this, method, model, options);
