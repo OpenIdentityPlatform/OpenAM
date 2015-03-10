@@ -24,10 +24,7 @@
  *
  * $Id: AMAuthenticationManager.java,v 1.9 2009/08/05 19:57:27 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.config;
@@ -94,16 +91,14 @@ public class AMAuthenticationManager {
             SMSEntry.validateToken(token);
             this.token = token;
             this.realm = com.sun.identity.sm.DNMapper.orgNameToDN(org);
-            if ((this.realm != null) && ((this.realm).length() != 0)) {
-                this.realm = (this.realm).toLowerCase();
-            }
+
             orgServiceConfig = getOrgServiceConfig();
             if (orgServiceConfig == null) {
                 throw new AMConfigurationException(BUNDLE_NAME, "badRealm",
                 new Object[]{realm});
             }
             synchronized (AMAuthenticationManager.class) {
-                if (MODULE_INSTANCE_TABLE.get(realm) == null) {
+                if (!MODULE_INSTANCE_TABLE.containsKey(realm)) {
                     buildModuleInstanceTable(token, realm);
                 }
             }
@@ -238,7 +233,7 @@ public class AMAuthenticationManager {
      * @param realm The realm in which the operation is processed.
      * @param serviceName the service for which the table is built.
      */
-    public static synchronized void buildModuleInstanceForService(
+    private static synchronized void buildModuleInstanceForService(
         String realm,
         String serviceName) {
         if (DEBUG.messageEnabled()) {
@@ -311,7 +306,21 @@ public class AMAuthenticationManager {
             DEBUG.message("return moduleInstanceTable: " + MODULE_INSTANCE_TABLE);
         }
     }
-    
+
+    /**
+     * Updates the module instance table for the authentication service if the module instance table was already
+     * cached for the provided realm.
+     *
+     * @param realm The realm where the configuration has changed.
+     * @param serviceName The authentication module's service name.
+     */
+    public static synchronized void updateModuleInstanceTable(String realm, String serviceName) {
+        realm = com.sun.identity.sm.DNMapper.orgNameToDN(realm);
+        if (MODULE_INSTANCE_TABLE.containsKey(realm)) {
+            buildModuleInstanceForService(realm, serviceName);
+        }
+    }
+
     // get the module name from its service name.
     private static String getModuleName(String serviceName) {
         for (String moduleName : MODULE_SERVICE_NAMES.keySet()) {
