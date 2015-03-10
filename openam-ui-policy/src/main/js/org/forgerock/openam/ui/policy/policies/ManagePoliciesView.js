@@ -203,6 +203,7 @@ define("org/forgerock/openam/ui/policy/policies/ManagePoliciesView", [
                     height: 230
                 },
                 storageKey: 'PE-mng-pols-sel-' + this.data.appName,
+                apiVersion: 'protocol=1.0,resource=2.0',
                 // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
                 serializeGridData: function (postedData) {
                     var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name');
