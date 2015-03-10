@@ -24,7 +24,7 @@
  *
  * $Id: WindowsDesktopSSO.java,v 1.7 2009/07/28 19:40:45 beomsuk Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.windowsdesktopsso;
@@ -751,29 +751,6 @@ public class WindowsDesktopSSO extends AMLoginModule {
             attr.put(userAttr, addToSet(new HashSet<String>(), value));
         }
         return attr;
-    }
-
-    /**
-     * Provides the "Alias Search Attribute Name" list from the Authentication
-     * Service for the realm. If these attributes are not configured it falls
-     * back to the User Naming Attribute for the realm
-     * @return a set containing the attribute names configured 
-     */
-    private Set<String> getUserAliasList() throws AuthLoginException {
-        Map orgSvc = getOrgServiceTemplate(
-                getRequestOrg(), ISAuthConstants.AUTH_SERVICE_NAME);
-        Set aliasAttrNames = (Set<String>) orgSvc.get(ISAuthConstants.AUTH_ALIAS_ATTR);
-        if (debug.messageEnabled()) {
-            debug.message("WindowsDesktopSSO.getUserAliasList: aliasAttrNames=" + aliasAttrNames);
-        }
-        if (aliasAttrNames.isEmpty()) { 
-            aliasAttrNames = (Set<String>)orgSvc.get(ISAuthConstants.AUTH_NAMING_ATTR);
-            if (debug.messageEnabled()) {
-                debug.message("WindowsDesktopSSO.getUserAliasList trying AUTH_NAMING_ATTR:" +
-                    aliasAttrNames);
-            }
-        }
-        return aliasAttrNames;
     }
 
     private static Set<String> addToSet(Set<String> set, String attribute) {

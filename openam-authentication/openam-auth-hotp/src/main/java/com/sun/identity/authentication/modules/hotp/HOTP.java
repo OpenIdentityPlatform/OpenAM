@@ -24,7 +24,7 @@
  *
  * $Id: HOTP.java,v 1.1 2009/03/24 23:52:12 pluo Exp $
  *
- * Portions Copyrighted 2012-2014 ForgeRock AS.
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
@@ -280,22 +280,4 @@ public class HOTP extends AMLoginModule {
         enteredHOTPCode = null;
         userSearchAttributes = Collections.emptySet();
     }
-    
-    private Set<String> getUserAliasList() throws AuthLoginException {
-        final Map<String, Set<String>> orgSvc = getOrgServiceTemplate(getRequestOrg(), ISAuthConstants.AUTH_SERVICE_NAME);
-        Set<String> aliasAttrNames = orgSvc.get(ISAuthConstants.AUTH_ALIAS_ATTR);
-        if (debug.messageEnabled()) {
-            debug.message("HOTP.getUserAliasList from " + ISAuthConstants.AUTH_ALIAS_ATTR 
-                    + ": "+ aliasAttrNames);
-                   
-        }
-        if (aliasAttrNames.isEmpty()) { 
-            aliasAttrNames = orgSvc.get(ISAuthConstants.AUTH_NAMING_ATTR);
-            if (debug.messageEnabled()) {
-                debug.message("HOTP.getUserAliasList from " + ISAuthConstants.AUTH_NAMING_ATTR 
-                        +": " + aliasAttrNames);
-            }
-        }
-        return aliasAttrNames;
-    }    
 }
