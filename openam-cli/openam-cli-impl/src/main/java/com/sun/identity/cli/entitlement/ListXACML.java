@@ -24,10 +24,9 @@
  *
  * $Id: ListXACML.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.cli.entitlement;
-
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AuthenticatedCommand;
@@ -52,6 +51,7 @@ import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.cli.entitlement.XACMLUtils;
 
 import javax.security.auth.Subject;
 import java.io.FileNotFoundException;
@@ -111,6 +111,15 @@ public class ListXACML extends AuthenticatedCommand {
         }
 
         adminSSOToken = getAdminSSOToken();
+
+        if (!XACMLUtils.hasPermission(realm, adminSSOToken, "READ")) {
+            String errorMessage = MessageFormat.format(getResourceString("permission-denied"), "list-xacml",
+                    getAdminID());
+            String[] args = {realm, "ANY", errorMessage};
+            writeLog(LogWriter.LOG_ERROR, Level.INFO, "FAILED_GET_POLICY_IN_REALM", args);
+            throw new CLIException(errorMessage, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+        }
+
         adminSubject = SubjectUtils.createSubject(adminSSOToken);
         realm = getStringOptionValue(IArgument.REALM_NAME);
         getPolicyNamesOnly = isOptionSet("namesonly");

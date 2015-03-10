@@ -29,6 +29,10 @@
 
 package com.sun.identity.cli.entitlement;
 
+import static com.sun.identity.cli.LogWriter.LOG_ACCESS;
+import static com.sun.identity.cli.LogWriter.LOG_ERROR;
+import static java.util.logging.Level.INFO;
+
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AuthenticatedCommand;
 import com.sun.identity.cli.CLIException;
@@ -48,6 +52,7 @@ import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.cli.entitlement.XACMLUtils;
 import org.forgerock.openam.utils.IOUtils;
 
 import javax.security.auth.Subject;
@@ -59,10 +64,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.List;
-
-import static com.sun.identity.cli.LogWriter.LOG_ACCESS;
-import static com.sun.identity.cli.LogWriter.LOG_ERROR;
-import static java.util.logging.Level.INFO;
 
 /**
  * Converts access policies read from XACML XML into Entitlement Framework Privileges
@@ -99,6 +100,14 @@ public class CreateXACML extends AuthenticatedCommand {
         InputStream xacmlInputStream = getXacmlInputStream(realm);
 
         logStart(realm);
+
+        if (!XACMLUtils.hasPermission(realm, adminSSOToken, "MODIFY")) {
+            String errorMessage = MessageFormat.format(getResourceString("permission-denied"), "create-xacml",
+                    getAdminID());
+            CLIException clie = new CLIException(errorMessage, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+            logException(realm, clie);
+            throw clie;
+        }
 
         List<ImportStep> importSteps;
         try {

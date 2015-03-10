@@ -24,13 +24,12 @@
  *
  * $Id: DeleteXACML.java,v 1.1 2009/11/25 18:54:08 dillidorai Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.entitlement;
 
 import com.iplanet.sso.SSOToken;
-
 import com.sun.identity.cli.AttributeValues;
 import com.sun.identity.cli.AuthenticatedCommand;
 import com.sun.identity.cli.CLIException;
@@ -39,11 +38,11 @@ import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.IOutput;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
-
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import org.forgerock.openam.cli.entitlement.XACMLUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -89,6 +88,14 @@ public class DeleteXACML extends AuthenticatedCommand {
                     "delete-xacml-not-supported-in-legacy-policy-mode"), 
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED,
                 "delete-xacml");
+        }
+
+        if (!XACMLUtils.hasPermission(realm, adminSSOToken, "MODIFY")) {
+            String errorMessage = MessageFormat.format(getResourceString("permission-denied"), "delete-xacml",
+                    getAdminID());
+            String[] args = {realm, "ANY", errorMessage};
+            writeLog(LogWriter.LOG_ERROR, Level.INFO, "FAILED_DELETE_POLICY_IN_REALM", args);
+            throw new CLIException(errorMessage, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
 
         List policyNames = (List)rc.getOption(ARGUMENT_POLICY_NAMES);
