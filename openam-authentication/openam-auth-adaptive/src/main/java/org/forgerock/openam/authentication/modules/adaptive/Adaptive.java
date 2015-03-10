@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -46,6 +46,7 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchOpModifier;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
@@ -57,8 +58,10 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.Hash;
+
 import org.forgerock.openam.utils.ValidateIPaddress;
 import org.forgerock.openam.utils.ClientUtils;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -84,6 +87,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IPRange;
 
 public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterface {
@@ -203,6 +207,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String IP_END = "IPEnd";
     private static final String IP_TYPE = "Type";
 
+    // support for search with alias name
+    private Set<String> userSearchAttributes = Collections.emptySet();
+
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
         postAuthNMap = new HashMap<String, String>();
@@ -212,21 +219,28 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             try {
                 setAuthLevel(Integer.parseInt(authLevel));
             } catch (Exception e) {
-                debug.error("Unable to set auth level " + authLevel, e);
+                debug.error("Adaptive.init : Unable to set auth level " + authLevel, e);
             }
         }
         Locale locale = getLoginLocale();
         initParams(options);
 
-        if (debug.messageEnabled()) {
-            debug.message("Adaptive resbundle locale=" + locale);
-        }
-
         try {
             userName = (String) sharedState.get(getUserKey());
         } catch (Exception e) {
-            debug.error("Adaptive.init() : " + "Unable to set userName : ", e);
+            debug.error("Adaptive.init : " + "Unable to set userName : ", e);
         }
+
+        try {
+            userSearchAttributes = getUserAliasList();
+        } catch (final AuthLoginException ale) {
+            debug.warning("Adaptive.init: unable to retrieve search attributes", ale);
+        }
+
+        if (debug.messageEnabled()) {
+            debug.message("Adaptive.init : resbundle locale=" + locale
+                    + ", user search attributes=" + userSearchAttributes);
+         }
     }
 
     @Override
@@ -867,6 +881,18 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             idsc.setMaxResults(0);
             IdSearchResults searchResults =
                     amIdRepo.searchIdentities(IdType.USER, uName, idsc);
+
+            if (searchResults.getSearchResults().isEmpty() && !userSearchAttributes.isEmpty()) {
+                if (debug.messageEnabled()) {
+                    debug.message(ADAPTIVE + ".getIdentity : searching user identity "
+                            + "with alternative attributes " + userSearchAttributes);
+                }
+                final Map<String, Set<String>> searchAVP = CollectionUtils.toAvPairMap(userSearchAttributes, userName);
+                idsc.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
+                //workaround as data store always adds 'user-naming-attribute' to searchfilter
+                searchResults = amIdRepo.searchIdentities(IdType.USER, "*", idsc);
+            }
+
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }
@@ -1133,6 +1159,8 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         reqHeaderValue = null;
         reqHeaderScore = 1;
         reqHeaderInvert = false;
+
+        userSearchAttributes = Collections.emptySet();
 
     }
 

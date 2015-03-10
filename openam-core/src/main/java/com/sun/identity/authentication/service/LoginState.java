@@ -24,7 +24,7 @@
  *
  * $Id: LoginState.java,v 1.57 2010/01/20 21:30:40 qcheng Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
 
@@ -105,6 +105,7 @@ import com.sun.identity.shared.ldap.util.RDN;
 import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * This class maintains the User's login state information from the time user 
@@ -5751,32 +5752,6 @@ public class LoginState {
     }
     
     /**
-     * Converts a set to a map, keys are the elements in the set, value is
-     * the token. User naming attribute is always added as one of the key.
-     * @param names set of names are used key for map
-     * @param token value for each named key
-     * @return map that is converted from set
-     */
-    private Map toAvPairMap(Set names, String token) {
-        if (token == null) {
-            return Collections.EMPTY_MAP;
-        }
-        Map map = new HashMap();
-        Set set = new HashSet();
-        set.add(token);
-        //map.put(AMStoreConnection.getNamingAttribute(AMObject.USER), set);
-        //map.put(userNamingAttr, set);
-        if (names == null || names.isEmpty()) {
-            return map;
-        }
-        Iterator it = names.iterator();
-        while (it.hasNext()) {
-            map.put((String) it.next(), set);
-        }
-        return map;
-    }
-    
-    /**
      * Sets the <code>failureTokenId</code> - set by modules
      * if this is set the logs will show the user id.
      *
@@ -6368,7 +6343,7 @@ public class LoginState {
                 debug.message("No identity found, try Alias attrname.");
             }
             pattern="*";
-            avPairs= toAvPairMap(aliasAttrNames, userTokenID);
+            avPairs= CollectionUtils.toAvPairMap(aliasAttrNames, userTokenID);
             if (messageEnabled) {
                 debug.message("Search for Filter (avPairs) :" + avPairs);
                 debug.message("userTokenID : " + userTokenID);
@@ -6390,7 +6365,7 @@ public class LoginState {
                 }
                 if ((resultAlias.isEmpty()) && (userDN != null) &&
                     (!userDN.equalsIgnoreCase(userTokenID))) {
-                    avPairs= toAvPairMap(aliasAttrNames, userDN);
+                    avPairs= CollectionUtils.toAvPairMap(aliasAttrNames, userDN);
                     if (messageEnabled) {
                         debug.message("Search for Filter (avPairs) " + 
                         "with userDN : " + avPairs);

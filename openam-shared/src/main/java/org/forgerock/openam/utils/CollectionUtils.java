@@ -11,15 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -76,5 +79,31 @@ public class CollectionUtils {
         } else {
             return new LinkedHashSet<T>(Arrays.asList(values));
         }
+    }
+
+    /**
+     * Creates a Hash Map, of names mapped to the provided value. If there is no value, an empty map is returned.
+     *
+     * @param names The set of names to be associated with the provided value.
+     * @param value The value to be mapped to each of the provided names.
+     * @return The map of name / value pairs, otherwise an Empty Map if no value is provided or an empty hashmap if no
+     * names are specified.
+     */
+    public static Map<String, Set<String>> toAvPairMap(final Set<String> names, final String value) {
+        if (value == null) {
+            return Collections.EMPTY_MAP;
+        }
+
+        if (names == null || names.isEmpty()) {
+            return new HashMap();
+        }
+
+        final Map<String, Set<String>> map = new HashMap<String, Set<String>>(names.size());
+        final Set<String> set = new HashSet<String>(1);
+        set.add(value);
+        for (final String name : names) {
+            map.put(name, set);
+        }
+        return map;
     }
 }

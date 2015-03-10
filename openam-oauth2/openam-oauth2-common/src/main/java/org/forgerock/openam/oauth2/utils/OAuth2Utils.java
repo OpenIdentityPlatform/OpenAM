@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2014 ForgeRock AS All rights reserved.
+ * Copyright (c) 2012-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -63,6 +63,7 @@ import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.impl.OAuth2ProviderSettingsImpl;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -841,7 +842,7 @@ public class OAuth2Utils {
                 results = searchResults.getSearchResults();
             } else {
                 OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(Request.getCurrent());
-                Map<String, Set<String>> avPairs = toAvPairMap(settings.getListOfAttributesTheResourceOwnerIsAuthenticatedOn(),
+                Map<String, Set<String>> avPairs = CollectionUtils.toAvPairMap(settings.getListOfAttributesTheResourceOwnerIsAuthenticatedOn(),
                         uName);
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, avPairs);
                 searchResults =
@@ -869,23 +870,6 @@ public class OAuth2Utils {
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
             throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
         }
-    }
-
-    private static Map toAvPairMap(Set names, String token) {
-        if (token == null) {
-            return Collections.EMPTY_MAP;
-        }
-        Map map = new HashMap();
-        Set set = new HashSet();
-        set.add(token);
-        if (names == null || names.isEmpty()) {
-            return map;
-        }
-        Iterator it = names.iterator();
-        while (it.hasNext()) {
-            map.put((String) it.next(), set);
-        }
-        return map;
     }
 
     public static String decodePassword(String password)  {
