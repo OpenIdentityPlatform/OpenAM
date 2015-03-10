@@ -67,12 +67,6 @@
             <groupId>org.apache.santuario</groupId>
             <artifactId>xmlsec</artifactId>
         </dependency>
-        <!-- Added this for the KeyInfoFactory. The problem is that this pulls in the opensaml dependency, which I
-        probably don't want. Could possibly replace KeyInfoFactory logic with the KeyInfo generation logic in SAML2Token.-->
-        <dependency>
-            <groupId>org.apache.ws.security</groupId>
-            <artifactId>wss4j</artifactId>
-        </dependency>
         <!--
         Necessary because SSOTokenManager is referenced?
         -->

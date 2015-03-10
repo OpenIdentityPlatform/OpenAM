@@ -32,14 +32,14 @@ public interface XmlTokenAuthnContextMapper {
     /**
      * Returns the AuthnContext value corresponding to the TokenType inputToken.
      * @param inputTokenType The TokenType validated as part of the token transformation
-     * @param inputToken The xml representation of the validated token, as presented to the SOAP STS in either 1. the
-     *                   token transformation operation defined by the validate invocation (where TokenType != STATUS)
-     *                   or 2. in the issue operation, in which case the token will correspond to the ProtectionToken
+     * @param inputToken The object representation of the validated token, as presented to the SOAP STS in
+     *                   the issue operation, in which case the token will correspond to the SupportingToken
      *                   mandated by the SecurityPolicy bindings protecting the STS. This state can be used by custom
      *                   implementations of this interface to make more elaborate decisions regarding the returned
-     *                   AuthnContext class reference.
+     *                   AuthnContext class reference. Note that the Object will be an xml Element, or one of the
+     *                   types defined in the org.apache.cxf.ws.security.sts.provider.model.secext package.
      * @return A valid AuthnContext value, as defined here:
      * http://docs.oasis-open.org/security/saml/v2.0/saml-authn-context-2.0-os.pdf
      */
-    String getAuthnContext(TokenType inputTokenType, Element inputToken);
+    String getAuthnContext(TokenType inputTokenType, Object inputToken);
 }

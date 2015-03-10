@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token;
 
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
-import org.apache.ws.security.handler.RequestData;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenValidationException;
 

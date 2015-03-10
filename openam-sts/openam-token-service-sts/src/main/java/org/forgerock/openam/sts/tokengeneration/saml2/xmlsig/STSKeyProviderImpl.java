@@ -16,10 +16,10 @@
 
 package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
@@ -35,7 +35,7 @@ import java.util.Properties;
  * @see org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProvider
  */
 public class STSKeyProviderImpl implements STSKeyProvider {
-    private static final String MERLIN_KEYSTORE_FILE_KEY = "org.apache.ws.security.crypto.merlin.keystore.file";
+    private static final String MERLIN_KEYSTORE_FILE_KEY = "org.apache.wss4j.crypto.merlin.keystore.file";
     private final Crypto crypto;
     private final SAML2Config saml2Config;
     private final Logger logger;
@@ -120,7 +120,7 @@ public class STSKeyProviderImpl implements STSKeyProvider {
          Crypto interface implementation may be the answer.
          */
         properties.put(
-                "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+                "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         String keystorePassword;
         try {
@@ -129,9 +129,9 @@ public class STSKeyProviderImpl implements STSKeyProvider {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Unsupported string encoding for keystore password: " + e);
         }
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", keystorePassword);
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", keystorePassword);
         properties.put(MERLIN_KEYSTORE_FILE_KEY, saml2Config.getKeystoreFileName());
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.type", "jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.type", "jks");
         return properties;
     }
 }

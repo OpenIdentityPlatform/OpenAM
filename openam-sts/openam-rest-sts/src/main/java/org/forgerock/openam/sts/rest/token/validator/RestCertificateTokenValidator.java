@@ -23,8 +23,8 @@ import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.handler.RequestData;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AMSTSRuntimeException;
@@ -129,7 +129,7 @@ public class RestCertificateTokenValidator implements TokenValidator {
     private RequestData makeRequestData(TokenValidatorParameters parameters) {
         STSPropertiesMBean stsProperties = parameters.getStsProperties();
         RequestData requestData = new RequestData();
-        requestData.setSigCrypto(stsProperties.getSignatureCrypto());
+        requestData.setSigVerCrypto(stsProperties.getSignatureCrypto());
         requestData.setCallbackHandler(stsProperties.getCallbackHandler());
         return requestData;
     }

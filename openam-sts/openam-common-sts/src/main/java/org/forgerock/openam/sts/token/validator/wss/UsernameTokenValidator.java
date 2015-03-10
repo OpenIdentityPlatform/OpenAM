@@ -11,15 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.validator.wss;
 
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.slf4j.Logger;
 
 /**
@@ -29,7 +29,7 @@ import org.slf4j.Logger;
  * UsernameToken validation by calling the OpenAM REST interface via bound TokenAuthenticationRequestDispacher<UsernameToken>
  *
  */
-public class UsernameTokenValidator extends org.apache.ws.security.validate.UsernameTokenValidator {
+public class UsernameTokenValidator extends org.apache.wss4j.dom.validate.UsernameTokenValidator {
     private final Logger logger;
     private final AuthenticationHandler<UsernameToken> authenticationHandler;
 
@@ -46,7 +46,7 @@ public class UsernameTokenValidator extends org.apache.ws.security.validate.User
         } catch (Exception e) {
             String message = "Exception caught authenticating UsernameToken with OpenAM: " + e;
             logger.error(message, e);
-            throw new WSSecurityException(message, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, message, e);
         }
     }
 

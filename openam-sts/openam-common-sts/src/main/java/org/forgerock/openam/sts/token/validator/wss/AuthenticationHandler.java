@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.token.validator.wss;
 
-import org.apache.ws.security.handler.RequestData;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.forgerock.openam.sts.TokenValidationException;
 
 /**

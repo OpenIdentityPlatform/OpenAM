@@ -34,7 +34,7 @@ import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 
-import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;

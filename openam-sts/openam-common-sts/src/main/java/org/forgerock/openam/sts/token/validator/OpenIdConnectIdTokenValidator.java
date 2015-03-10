@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.validator;
@@ -21,7 +21,7 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
-import org.apache.ws.security.handler.RequestData;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AMSTSRuntimeException;
@@ -126,7 +126,7 @@ public class OpenIdConnectIdTokenValidator implements TokenValidator {
     private RequestData makeRequestData(TokenValidatorParameters parameters) {
         STSPropertiesMBean stsProperties = parameters.getStsProperties();
         RequestData requestData = new RequestData();
-        requestData.setSigCrypto(stsProperties.getSignatureCrypto());
+        requestData.setSigVerCrypto(stsProperties.getSignatureCrypto());
         requestData.setCallbackHandler(stsProperties.getCallbackHandler());
         return requestData;
     }

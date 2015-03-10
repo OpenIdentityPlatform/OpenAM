@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.config.user;
 
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.forgerock.guava.common.base.Objects;
 import org.forgerock.json.fluent.JsonValue;

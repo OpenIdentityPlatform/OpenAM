@@ -11,13 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.model;
 
-import org.apache.cxf.helpers.XMLUtils;
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -25,11 +24,13 @@ import org.forgerock.openam.sts.JsonMarshaller;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XmlMarshaller;
+import org.forgerock.util.xml.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
@@ -78,7 +79,8 @@ public class OpenAMSessionTokenMarshaller implements JsonMarshaller<OpenAMSessio
         } else {
             String tokenString;
             try {
-                Transformer transformer = XMLUtils.newTransformer();
+                //TODO: optimize, in case this class does not go away as part of AME-5859
+                Transformer transformer = TransformerFactory.newInstance().newTransformer();
                 StreamResult res =  new StreamResult(new ByteArrayOutputStream());
                 transformer.transform(new DOMSource(element), res);
                 tokenString = new String(((ByteArrayOutputStream)res.getOutputStream()).toByteArray());
@@ -95,7 +97,7 @@ public class OpenAMSessionTokenMarshaller implements JsonMarshaller<OpenAMSessio
         Document document;
         final String sessionId = instance.getSessionId();
         try {
-            document = XMLUtils.newDocument();
+            document = XMLUtils.getSafeDocumentBuilder(false).newDocument();
         } catch (ParserConfigurationException e) {
             throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
         }

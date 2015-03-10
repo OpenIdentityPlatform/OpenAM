@@ -25,11 +25,11 @@ import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.TokenCreationException;
@@ -335,8 +335,8 @@ public class SoapSamlTokenProvider implements TokenProvider {
                             "OnBehalfOf tokens found!");
         }
         final TokenType tokenType = parseTokenTypeFromDelegatedReceivedToken(delgatedToken);
-        final Element tokenElement = getDelegatedReceivedTokenElement(delgatedToken);
-        return authnContextMapper.getAuthnContext(tokenType, tokenElement);
+        final Object tokenObject = getDelegatedReceivedTokenObject(delgatedToken);
+        return authnContextMapper.getAuthnContext(tokenType, tokenObject);
     }
 
     /*
@@ -345,19 +345,19 @@ public class SoapSamlTokenProvider implements TokenProvider {
     See org.apache.cxf.sts.request.RequestParser#parseTokenElements for details on how this token is parsed - but it looks
     like only an element will be set straight out of the RST payload.
 
-    This may well be refactored when we migrate to the 2.x version of wss4j.
+    This code will be refactored on an ongoing basis as token set supported by the soap-sts expands.
      */
     private TokenType parseTokenTypeFromDelegatedReceivedToken(ReceivedToken receivedToken) {
         if (receivedToken.isUsernameToken()) {
             return TokenType.USERNAME;
-        } else if (receivedToken.isBinarySecurityToken()) {
+        } else if (receivedToken.isBinarySecurityToken()) { //TODO: it appears that custom tokens are passed as BSTs - refactor as necessary
             return TokenType.X509;
         } else if (receivedToken.isDOMElement()) {
             final Element tokenElement = (Element) receivedToken.getToken();
             String tokenString = xmlUtilities.documentToStringConversion(tokenElement);
             if ((tokenString != null)  && tokenString.contains(QNameConstants.USERNAME_TOKEN.getLocalPart())) {
                 return TokenType.USERNAME;
-            } else if ((tokenString != null)  && tokenString.contains("X509")) { //TODO: clean up - use globally-defined constant, or refactor with wss4j migration
+            } else if ((tokenString != null)  && tokenString.contains("X509")) { //TODO: clean up - use globally-defined constant
                 return TokenType.X509;
             } else {
                 logger.error("Unexpected state in parseTokenTypeFromDelegatedReceivedToken: dealing with a token element, " +
@@ -373,19 +373,21 @@ public class SoapSamlTokenProvider implements TokenProvider {
     }
 
     /*
-    See org.apache.cxf.sts.request.RequestParser#parseTokenElements for details on how ActAs/OnBehalfOf token elements
-    are parsed - an element will be set straight out of the RST payload. This may change during the wss4j 2.x migration.
+    This method is called to obtain the Element corresponding to a delegated token (Act-As and OnBehalfOf), which is
+    then passed to the configured XmlTokenAuthnContextMapper implementation, so the AuthnContextClassRef can be obtained
+    for the invocation of the TokenGenerationService.
 
-     */
-    private Element getDelegatedReceivedTokenElement(ReceivedToken receivedToken) {
-        if (receivedToken.isDOMElement()) {
-            return (Element) receivedToken.getToken();
-        } else {
-            logger.error("Unexpected state in getDelegatedReceivedTokenElement: the ReceivedToken is not an Element. The token class: " +
-                    receivedToken.getToken().getClass().getCanonicalName() + "; toString on the token: " + receivedToken.getToken() +
-                    "; Returning a null token type.");
-            return null;
-        }
+    See org.apache.cxf.sts.request.RequestParser#parseTokenRequirements for details on how ActAs/OnBehalfOf token elements
+    are parsed - an element will be set straight out of the RST payload. It will be either a DOM Element or a
+    JAXBElement. See the org.apache.cxf.sts.request.ReceivedToken ctor for details.
+    TODO: if we are supporting ActAs/OnBehalfOf asserted as x509 or even a OpenAM token, then this method will have to
+    get more sophisticated, if we want to determine unequivocally the type of object returned. For now, I will simply
+    return the Object encapsulated in the ReceivedToken. Note that the objects
+    in the ReceivedTokens appear to be either be DOM Elements, or objects in the org.apache.cxf.ws.security.sts.provider.model.secext
+    package, as these seem to be the objects wrapped in the JAXBElement<?> passed to the ReceivedToken ctor.
+    */
+    private Object getDelegatedReceivedTokenObject(ReceivedToken receivedToken) {
+        return receivedToken.getToken();
     }
 
     /*
@@ -415,7 +417,9 @@ public class SoapSamlTokenProvider implements TokenProvider {
                 final Element supportingTokenElement = parseSupportingTokenElementFromWSSecurityEngineResult(engineResult);
                 if (supportingTokenElement != null) {
                     final TokenType tokenType = parseTokenTypeFromWSSecurityEngineResult(engineResult);
-                    return authnContextMapper.getAuthnContext(tokenType, supportingTokenElement);
+                    if (tokenType != null) {
+                        return authnContextMapper.getAuthnContext(tokenType, supportingTokenElement);
+                    }
                 }
             }
             throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR, "No WSHandlerResult instances to " +
@@ -440,6 +444,7 @@ public class SoapSamlTokenProvider implements TokenProvider {
 
     Note that this method will return null unless it can obtain an Element corresponding to the the SupportingToken asserting
     the client's identity.
+
      */
     private Element parseSupportingTokenElementFromWSSecurityEngineResult(WSSecurityEngineResult engineResult) {
         final Element tokenElement =
@@ -462,7 +467,9 @@ public class SoapSamlTokenProvider implements TokenProvider {
     }
 
     /*
-    TODO: if we are doing OpenAM-based transformations, what would this input token type look like?
+     TODO: if we are doing OpenAM-based transformations, what would this input token type look like? Probably
+     TAG_BINARY_SECURITY_TOKEN - but then I have to determine the valueType to determine if it is an OpenAM token,
+     or some other custom type (OIDC?)
      */
     private TokenType parseTokenTypeFromWSSecurityEngineResult(WSSecurityEngineResult engineResult) {
         if ((engineResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE) != null) ||
@@ -473,9 +480,9 @@ public class SoapSamlTokenProvider implements TokenProvider {
         } else if (engineResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION) != null) {
             return TokenType.SAML2;
         } else {
-            throw new AMSTSRuntimeException(ResourceException.BAD_REQUEST,
-                    "Unknown token type validated by ws-SecurityPolicy interceptors or passed as transform input token type: " +
-                            engineResult.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT)); //TODO: proper logging for this xml element?
+            logger.warn("In SoapSamlTokenProvider#parseTokenTypeFromWSSecurityEngineResult, encountered an unknown token type: " +
+                    engineResult.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT));
+            return null;
         }
     }
 

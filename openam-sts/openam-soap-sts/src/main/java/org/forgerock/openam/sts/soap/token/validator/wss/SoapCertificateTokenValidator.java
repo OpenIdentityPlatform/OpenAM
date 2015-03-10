@@ -17,10 +17,10 @@
 package org.forgerock.openam.sts.soap.token.validator.wss;
 
 import com.google.inject.Inject;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SignatureTrustValidator;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.SignatureTrustValidator;
 
 import java.security.cert.X509Certificate;
 
@@ -67,7 +67,7 @@ public class SoapCertificateTokenValidator extends SignatureTrustValidator {
             return credential;
         } catch (Exception e) {
             logger.error("Exception caught authenticating X509Certificate with OpenAM: " + e, e);
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, e.getMessage());
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e.getMessage());
         }
     }
 }
