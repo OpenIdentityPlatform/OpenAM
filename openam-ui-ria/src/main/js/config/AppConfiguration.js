@@ -155,15 +155,15 @@ define("config/AppConfiguration", [
                                             "listHistory": {
                                                 "url": "#uma/history/",
                                                 "name": "config.AppConfiguration.Navigation.links.umaLinks.history"
-                                            },
-                                            /*"users": {
+                                            }/*,
+                                            "users": {
                                                 "url": "#uma/users/",
                                                 "name": "config.AppConfiguration.Navigation.links.umaLinks.users"
-                                            },*/
+                                            },
                                             "listApplication": {
                                                 "url": "#uma/apps/",
                                                 "name": "config.AppConfiguration.Navigation.links.umaLinks.apps"
-                                            }
+                                            }*/
                                         }
                                     }
                                 }

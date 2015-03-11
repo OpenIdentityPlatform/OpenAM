@@ -1,6 +1,6 @@
 /* VARIABLES */
 @table-base-color: #1f6fb1;
-@cell-hover-color: #F4FFBF;
+@cell-hover-color: #B6D4EA;
 
 .webkit-text-rendering-bugfix{
     -webkit-transform: translateZ(0px);
@@ -225,8 +225,6 @@ body{
         transition: background-color 200ms linear;
     }
 
-    //margin-bottom: 40px;
-
     .policy-content {
         min-height:100px;
     }
@@ -260,7 +258,6 @@ body{
     .backgrid{
 
         max-width: none;
-        //overflow: hidden;
         position: relative;
 
         .string-cell, .uri-cell, .email-cell,  .string-cell.editor input[type=text],  .uri-cell.editor input[type=text], .email-cell.editor input[type=text], .datetime-cell {
@@ -269,10 +266,14 @@ body{
 
         td.uri-cell{
             padding:13px 5px;
+            border-left: 1px solid transparent;
+            border-right: 1px solid transparent;
+
             .transition(background, 0.1s);
             &:hover{
                 background-color: @cell-hover-color;
                 cursor:pointer;
+                border-color: lighten(@table-base-color, 35%);
             }
         }
 
@@ -283,18 +284,13 @@ body{
 
         th {
             text-align: left;
-            background-color: white;
             border-bottom: none;
             font-weight: bold;
             font-size: 15px;
-            vertical-align: top;
+            vertical-align: bottom;
+            background-color: white;
             a {
                 color: #777;
-                margin-bottom:34px;
-            }
-
-            &.filter-header-cell a {
-                margin-bottom:0;
             }
 
             &.sortable a {
@@ -341,6 +337,7 @@ body{
                 &.icon-share {
                     font-size:15px;
                     padding:0 10px;
+                    text-align:center;
 
                     &:hover {
                         background-color: @cell-hover-color;
@@ -372,6 +369,18 @@ body{
                     display:block;
                 }
             }
+        }
+
+        .backgrid-filter input[type="search"]{
+            border-radius: 0;
+            padding-right: 25px;
+            padding-left: 25px;
+        }
+
+        .backgrid-filter .clear{
+            right: 0;
+            padding-right:0;
+            color:#D87482;
         }
     }
 
@@ -417,10 +426,10 @@ body{
 
     .search {
         &:after {
-            background-color: @table-base-color;
+            background-color: lighten(@table-base-color, 30%);
         }
         &:before {
-            border: 3px solid @table-base-color;
+            border: 3px solid lighten(@table-base-color, 30%);
         }
     }
 

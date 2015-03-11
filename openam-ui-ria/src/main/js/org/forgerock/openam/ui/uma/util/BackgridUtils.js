@@ -129,7 +129,7 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
             this.collection.state.filters = this.collection.state.filters ? this.collection.state.filters : [];
             this.collection.state.filters.push(filter);
             obj.FilterHeaderCell.__super__.render.apply(this);
-            this.$el.append(filter.render().el);
+            this.$el.prepend(filter.render().el);
             return this;
         }
     });
