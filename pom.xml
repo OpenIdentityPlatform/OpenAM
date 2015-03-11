@@ -405,7 +405,7 @@
     <repositories>
         <!-- ForgeRock Common Internal Project Repositories -->
         <repository>
-            <id>forgerock-staging-repo</id>
+            <id>forgerock-staging-repository</id>
             <name>ForgeRock Release Repository</name>
             <url>http://maven.forgerock.org/repo/releases</url>
             <snapshots>
@@ -414,7 +414,7 @@
         </repository>
 
         <repository>
-            <id>forgerock-snapshots-repo</id>
+            <id>forgerock-snapshots-repository</id>
             <name>ForgeRock Snapshot Repository</name>
             <url>http://maven.forgerock.org/repo/snapshots</url>
             <releases>
