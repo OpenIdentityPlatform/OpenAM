@@ -118,7 +118,7 @@
 
         <!-- Version Properties -->
         <opendj.server.version>2.6.2</opendj.server.version>
-        <opendj.sdk.version>2.6.9</opendj.sdk.version>
+        <opendj.sdk.version>2.6.10</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.4.0-SNAPSHOT</commons.forgerock-util.version>
         <commons.authfilter.version>1.5.1</commons.authfilter.version>
