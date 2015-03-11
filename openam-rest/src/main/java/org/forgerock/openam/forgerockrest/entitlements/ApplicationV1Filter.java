@@ -19,6 +19,7 @@ import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guava.common.base.Strings;
 import org.forgerock.json.fluent.JsonValue;
@@ -52,6 +53,7 @@ import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.query.QueryFilter;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.security.auth.Subject;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,14 +78,17 @@ public class ApplicationV1Filter implements Filter {
     private final ResourceTypeService resourceTypeService;
     private final ApplicationServiceFactory applicationServiceFactory;
     private final ExceptionMappingHandler<EntitlementException, ResourceException> resourceErrorHandler;
+    private final Debug debug;
 
     @Inject
     public ApplicationV1Filter(final ResourceTypeService resourceTypeService,
                                final ApplicationServiceFactory applicationServiceFactory,
-                               final ExceptionMappingHandler<EntitlementException, ResourceException> resourceErrorHandler) {
+                               final ExceptionMappingHandler<EntitlementException, ResourceException> resourceErrorHandler,
+                               @Named("frRest") final Debug debug) {
         this.resourceTypeService = resourceTypeService;
         this.applicationServiceFactory = applicationServiceFactory;
         this.resourceErrorHandler = resourceErrorHandler;
+        this.debug = debug;
     }
 
     /**
@@ -129,6 +134,7 @@ public class ApplicationV1Filter implements Filter {
             next.handleCreate(context, request, new TransformationHandler(handler, context));
 
         } catch (EntitlementException eE) {
+            debug.error("Error filtering application create CREST request", eE);
             handler.handleError(resourceErrorHandler.handleError(context, request, eE));
         }
     }
@@ -299,6 +305,7 @@ public class ApplicationV1Filter implements Filter {
             jsonValue.put(RESOURCE_TYPE_UUIDS, new HashSet<String>(Arrays.asList(resourceTypeUuid)));
 
         } catch (EntitlementException eE) {
+            debug.error("Error filtering application update CREST request", eE);
             handler.handleError(resourceErrorHandler.handleError(context, request, eE));
             return;
         }
@@ -367,6 +374,7 @@ public class ApplicationV1Filter implements Filter {
                         handler.handleResource(resource);
                     }
                 } catch (EntitlementException eE) {
+                    debug.error("Error filtering application query CREST request", eE);
                     handler.handleError(resourceErrorHandler.handleError(context, request, eE));
                     return;
                 }
@@ -526,6 +534,7 @@ public class ApplicationV1Filter implements Filter {
             try {
                 transformJson(jsonValue, callingSubject, realm);
             } catch (EntitlementException eE) {
+                debug.error("Error filtering application CREST request", eE);
                 delegate.handleError(resourceErrorHandler.handleError(eE));
                 return;
             }
