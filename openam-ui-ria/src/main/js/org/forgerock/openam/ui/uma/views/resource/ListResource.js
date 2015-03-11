@@ -129,8 +129,8 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                 {
                     name: "resourceServer",
                     label: $.t("uma.resources.list.grid.1"),
-                    cell: BackgridUtils.UriExtCell,
-                    /*cheaderCell: BackgridUtils.FilterHeaderCell,
+                    /*cell: BackgridUtils.UriExtCell,
+                    cheaderCell: BackgridUtils.FilterHeaderCell,
                     href: function(rawValue, formattedValue, model){
                         return "#uma/apps/" + encodeURIComponent(model.get('resourceServer'));
                     },*/
