@@ -13,6 +13,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  */
+
+/*
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ */
 package org.forgerock.openam.upgrade.steps;
 
 import static org.forgerock.openam.upgrade.UpgradeServices.*;
@@ -495,9 +499,10 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
 
         if (schemaMods.hasSubSchema()) {
             for (Map.Entry<String, ServiceSchemaModificationWrapper> schema : schemaMods.getSubSchemas().entrySet()) {
+                buffer.append(INDENT).append("* ").append(schema.getKey()).append(delimiter);
                 if (!(schema.getValue().getAttributes().isEmpty())) {
                     for (AttributeSchemaImpl attrs : schema.getValue().getAttributes()) {
-                        buffer.append(INDENT).append(prefix).append(attrs.getName()).append(delimiter);
+                        buffer.append(INDENT).append(INDENT).append(prefix).append(attrs.getName()).append(delimiter);
                     }
                 }
 
