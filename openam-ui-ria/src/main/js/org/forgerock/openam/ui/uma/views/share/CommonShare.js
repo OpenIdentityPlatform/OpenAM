@@ -106,6 +106,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
 
             this.data.name = this.parentModel.get('name');
             this.data.scopes = this.parentModel.get('scopes').toJSON();
+            this.data.icon = this.parentModel.get('icon_uri');
             collection = this.parentModel.get('policy').get('permissions');
             this.data.permissions = collection.toJSON();
 
