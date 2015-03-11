@@ -1,8 +1,8 @@
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
+
    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
-  
+
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
    (the License). You may not use this file except in
@@ -200,6 +200,13 @@
                  tooltip="tab.configuration.reststs.tooltip"
                  status="tab.configuration.reststs.status"
                  permissions="RestSecurityTokenService"/>
+            <tab id="20"
+                 viewbean="com.sun.identity.console.scripts.ScriptsViewBean"
+                 url="../scripts/Scripts"
+                 label="tab.configuration.scripts.label"
+                 tooltip="tab.configuration.scripts.tooltip"
+                 status="tab.configuration.scripts.status"
+                 permissions="iPlanetAMPolicyService"/>
         </profile>
         <profile id="cscGeneral">
             <tab id="421"
