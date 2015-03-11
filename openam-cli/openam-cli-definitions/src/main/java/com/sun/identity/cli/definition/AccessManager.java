@@ -24,9 +24,6 @@
  *
  * $Id: AccessManager.java,v 1.115 2010/01/15 18:10:54 veiming Exp $
  *
- */
-
-/**
  * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
@@ -68,7 +65,8 @@ public class AccessManager {
             "save-index-class-not-found=saveIndexImpl {0} class not found.",
             "save-index-does-not-extend-interface=saveIndexImpl {0} did not implement ISaveIndex interface.",
             "search-index-class-not-found=searchIndexImpl {0} class not found.",
-            "search-index-does-not-extend-interface=searchIndexImpl {0} did not implement ISearchIndex interface."
+            "search-index-does-not-extend-interface=searchIndexImpl {0} did not implement ISearchIndex interface.",
+            "permission-denied=Permission to perform the {0} operation denied to {1}"
         }
     )
     private String resourcestrings;

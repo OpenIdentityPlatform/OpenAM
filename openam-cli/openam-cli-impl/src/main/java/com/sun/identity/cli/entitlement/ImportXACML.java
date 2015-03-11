@@ -51,6 +51,7 @@ import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.cli.entitlement.XACMLUtils;
 import org.forgerock.openam.utils.IOUtils;
 
 import javax.security.auth.Subject;
@@ -98,6 +99,14 @@ public class ImportXACML extends AuthenticatedCommand {
         InputStream xacmlInputStream = getXacmlInputStream(realm);
 
         logStart(realm);
+
+        if (!XACMLUtils.hasPermission(realm, adminSSOToken, "MODIFY")) {
+            String errorMessage = MessageFormat.format(getResourceString("permission-denied"), "create-xacml",
+                    getAdminID());
+            CLIException clie = new CLIException(errorMessage, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+            logException(realm, clie);
+            throw clie;
+        }
 
         List<ImportStep> importSteps;
         try {
