@@ -25,8 +25,9 @@
 /*global require, define, QUnit, $ */
 
 define([
-    "org/forgerock/openam/ui/editor/views/ScriptListView"
-], function (scriptListView) {
+    "org/forgerock/openam/ui/editor/views/ScriptListView",
+    "org/forgerock/openam/ui/editor/views/EditScriptView"
+], function (scriptListView, editScriptView) {
     return {
         executeAll: function () {
 
@@ -36,6 +37,34 @@ define([
 
                 scriptListView.render([], function () {
                     equal(scriptListView.$el.find('.backgrid').length, 1, 'Backgrid renders');
+                    start();
+                });
+            });
+
+            asyncTest('Create Script', function () {
+                editScriptView.element = '<div></div>';
+                $('qunit-fixture').append(editScriptView.$el);
+
+                editScriptView.render([], function () {
+                    var entity = editScriptView.data.entity;
+                    QUnit.ok(editScriptView.$el.find('input[name="cancel"]').length, "Cancel button is available");
+                    QUnit.ok(editScriptView.$el.find('input[name="save"]').length, "Save button is available");
+                    QUnit.ok(editScriptView.$el.find('#scriptName').val() === '', "Name is empty");
+                    QUnit.ok(editScriptView.$el.find('#scriptCode').val() === '', "Script code is empty");
+                    start();
+                });
+            });
+
+            asyncTest('Edit Script', function () {
+                editScriptView.element = '<div></div>';
+                $('qunit-fixture').append(editScriptView.$el);
+
+                editScriptView.render(['53712aa4-0082-4e33-94a4-a6a2475a075f'], function () {
+                    var entity = editScriptView.data.entity;
+                    ok(editScriptView.$el.find('input[name="cancel"]').length, "Cancel button is available");
+                    ok(editScriptView.$el.find('input[name="save"]').length, "Save button is available");
+                    ok(editScriptView.$el.find('#scriptName').val() === entity.name, "Name is set");
+                    ok(editScriptView.$el.find('#scriptCode').val() === (entity.script ? entity.script : ''), "Script code is set");
                     start();
                 });
             });
