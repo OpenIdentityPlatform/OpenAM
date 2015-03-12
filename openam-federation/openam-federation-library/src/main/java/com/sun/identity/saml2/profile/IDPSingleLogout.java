@@ -24,7 +24,7 @@
  *
  * $Id: IDPSingleLogout.java,v 1.28 2009/11/25 01:20:47 madan_ranganath Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
@@ -72,6 +72,7 @@ import com.sun.identity.saml2.protocol.StatusCode;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.utils.StringUtils;
 
 
 /**
@@ -621,7 +622,7 @@ public class IDPSingleLogout {
 
     private static String getResponseLocation(SingleLogoutServiceElement endpoint) {
         String location = endpoint.getResponseLocation();
-        if (location == null) {
+        if (StringUtils.isBlank(location)) {
             location = endpoint.getLocation();
         }
         return location;
