@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -28,8 +28,6 @@ import java.util.Map;
 
 /**
  * Utility class for handling Strings
- *
- * @author Peter Major
  */
 public final class StringUtils {
 
@@ -49,5 +47,13 @@ public final class StringUtils {
 
     public static String insertContent(String original, int position, String content) {
         return original.substring(0, position) + content + original.substring(position);
+    }
+
+    /**
+     * @param s string to test
+     * @return true if the specified string is null or when trimmed is empty (i.e. when trimmed it has zero length)
+     */
+    public static boolean isBlank(final String s) {
+        return (s == null || s.trim().length() == 0);
     }
 }
