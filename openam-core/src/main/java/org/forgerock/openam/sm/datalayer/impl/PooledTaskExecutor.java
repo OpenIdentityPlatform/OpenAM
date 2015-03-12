@@ -18,11 +18,8 @@ package org.forgerock.openam.sm.datalayer.impl;
 
 import java.text.MessageFormat;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -30,13 +27,11 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.forgerock.openam.sm.ConnectionConfigFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
-import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
 
 import com.sun.identity.shared.debug.Debug;
@@ -93,39 +88,37 @@ public class PooledTaskExecutor implements TaskExecutor {
 
     @Override
     public void execute(String tokenId, Task task) throws DataLayerException {
-        SimpleTaskExecutor executor = null;
-        while (executor == null) {
-            try {
-                debug("Polling pool for an executor");
-                semaphore.acquire();
-                if (pool.isEmpty() && executorsCount.get() < maximumPoolSize) {
-                    debug("There's room in the pool - will try and add an executor. Executors: {0}, Max: {1}",
-                            executorsCount, maximumPoolSize);
-                    addExecutor();
-                }
-                executor = pool.remove();
-            } catch (InterruptedException e) {
-                // Interrupted - loop again to try and get semaphore
-            }
+        try {
+            debug("Polling pool for an executor");
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            Thread.interrupted();
+            throw new DataLayerException("Interrupted while waiting for executor - cannot continue", e);
+        }
+        SimpleTaskExecutor executor = pool.poll();
+        if (executor == null) {
+            executor = createExecutor();
         }
         try {
             debug("Got an executor - executing task");
             executor.execute(tokenId, task);
         } finally {
             debug("Returning executor to the pool");
-            pool.add(executor);
-            semaphore.release();
+            if (pool.add(executor)) {
+                semaphore.release();
+            }
         }
     }
 
-    private synchronized void addExecutor() throws DataLayerException {
-        if (executorsCount.get() < maximumPoolSize) {
-            SimpleTaskExecutor executor = simpleTaskExecutorProvider.get();
-            executor.start();
-            pool.add(executor);
-            executorsCount.incrementAndGet();
-            debug("Added executor to pool - now got {0}", executorsCount);
+    private synchronized SimpleTaskExecutor createExecutor() throws DataLayerException {
+        if (executorsCount.get() == maximumPoolSize) {
+            throw new IllegalStateException("Shouldn't be possible, but where is the space in the pool?");
         }
+        SimpleTaskExecutor executor = simpleTaskExecutorProvider.get();
+        executor.start();
+        executorsCount.incrementAndGet();
+        debug("Added executor to pool - now got {0}", executorsCount);
+        return executor;
     }
 
     @Override
