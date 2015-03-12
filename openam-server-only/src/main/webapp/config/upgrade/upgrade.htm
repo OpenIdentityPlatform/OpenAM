@@ -12,6 +12,8 @@
   ~ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
   ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
   ~ information: "Portions copyright [year] [name of copyright owner]".
+  ~ 
+  ~ Portions Copyrighted 2015 Nomura Research Institute, Ltd.
   -->
 
 <script type="text/javascript">
@@ -88,19 +90,16 @@
         <div align="left" style="float:left; margin-left: 23px" class="license">
             <button id="upgrade-accept-license-button" type="button" onclick="upgradeAcceptLicense();" class="buttonblue license" disabled tabindex=2>Continue</button>
         </div>   
-        <div class="summary" style="float:left; margin-left: 23px" >
-            <div style="float: left;" >
+        <div class="summary" style="text-align: center;">
+            <div style="float: left; margin-left: 23px">
                 <button id="upgradeButton" type="button" onclick="doUpgrade()" tabindex=3>$page.getLocalizedString("upgrade.button")</button>
             </div>
-
-            <div style="float:left; margin-left: 23px">
+            <div style="float: right; margin-right: 23px">
+                <button id="cancelButton" type="button" onclick="cancelUpgrade();" tabindex=5>$page.getLocalizedString("cancel.button")</button>
+            </div>
+            <div style="display: inline-block;margin:0 auto;">
                 <button id="saveReportButton" type="button" onclick="saveReport();" class="buttonblue" tabindex=4>$page.getLocalizedString("save.report.button")</button>
             </div>
-            
-         </div>
-
-        <div style="float: right; margin-right: 23px">
-             <button id="cancelButton" type="button" onclick="cancelUpgrade();" tabindex=5>$page.getLocalizedString("cancel.button")</button>
         </div>
     </div>
 
