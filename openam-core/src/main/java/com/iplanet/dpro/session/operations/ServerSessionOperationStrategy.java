@@ -1,6 +1,4 @@
-/**
- * Copyright 2014 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.iplanet.dpro.session.operations;
 
@@ -102,12 +102,13 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
      * @param session Non null Session to use.
      * @return A non null SessionOperations implementation to use.
      */
-    public SessionOperations getOperation(Session session) throws SessionException {
+    @Override
+    public SessionOperations getOperation(Session session) {
         if (isLocalServer(session)) {
             return logAndWrap(session, local, SessionMonitorType.LOCAL);
         }
 
-        if (service.isSessionFailoverEnabled() && cts.hasSession(session)) {
+        if (service.isSessionFailoverEnabled()) {
 
             // If cross talk is reduced... by this point, we know the session is remote.
             // We get CTS to do the legwork for us, knowing that CTSOperations will delegate
