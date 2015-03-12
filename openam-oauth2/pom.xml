@@ -135,7 +135,7 @@
                             <contents>
                                 <content>
                                     <id>oidc-claims-extension-groovy</id>
-                                    <file>${project.build.sourceDirectory}/../js/oidc-claims-extension.groovy</file>
+                                    <file>${project.build.sourceDirectory}/../groovy/oidc-claims-extension.groovy</file>
                                 </content>
                             </contents>
                             <destinationFile>${project.build.outputDirectory}/OAuth2Provider.xml</destinationFile>

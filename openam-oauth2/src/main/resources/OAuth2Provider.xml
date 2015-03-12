@@ -98,6 +98,7 @@
                         <Value>java.util.LinkedHashMap$Entry</Value>
                         <Value>java.util.LinkedHashMap$LinkedEntrySet</Value>
                         <Value>org.forgerock.openam.oauth2.OpenAMAccessToken</Value>
+                        <Value>java.util.HashMap$Node</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-script-black-list"

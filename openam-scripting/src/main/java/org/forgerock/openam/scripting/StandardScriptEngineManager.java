@@ -11,8 +11,9 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
+
 package org.forgerock.openam.scripting;
 
 import org.forgerock.openam.scripting.factories.GroovyEngineFactory;
@@ -40,7 +41,6 @@ import java.util.regex.Pattern;
  * and other listeners. This is used to adjust sandboxing and thread pool implementations in response to application
  * configuration changes.
  */
-@Singleton
 public final class StandardScriptEngineManager extends ScriptEngineManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(StandardScriptEngineManager.class);
 

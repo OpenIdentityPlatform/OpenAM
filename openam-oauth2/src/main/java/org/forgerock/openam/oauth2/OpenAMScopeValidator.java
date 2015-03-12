@@ -86,6 +86,8 @@ import org.restlet.ext.servlet.ServletUtils;
 @Singleton
 public class OpenAMScopeValidator implements ScopeValidator {
 
+    private static final String JAVA_SCRIPT_LABEL = "JavaScript";
+    private static final String GROOVY_LABEL = "Groovy";
     private static final String MULTI_ATTRIBUTE_SEPARATOR = ",";
     private static final String DEFAULT_TIMESTAMP = "0";
     private static final DateFormat TIMESTAMP_DATE_FORMAT = new SimpleDateFormat("yyyyMMddhhmmss");
@@ -170,14 +172,43 @@ public class OpenAMScopeValidator implements ScopeValidator {
             throws UnauthorizedClientException, NotFoundException {
 
         Set<String> scopes = token.getScope();
-        Map<String,Object> response = new HashMap<String, Object>();
+        Map<String, Object> response = new HashMap<String, Object>();
         AMIdentity id = identityManager.getResourceOwnerIdentity(token.getResourceOwnerId(), token.getRealm());
 
-        //add the subject identifier to the response
         response.put(OAuth2Constants.JWTTokenParams.SUB, token.getResourceOwnerId());
         response.put(OAuth2Constants.JWTTokenParams.UPDATED_AT, getUpdatedAt(token.getResourceOwnerId(),
                 token.getRealm(), request));
 
+        Bindings scriptVariables = new SimpleBindings();
+        scriptVariables.put("logger", logger);
+        scriptVariables.put("claims", response);
+        scriptVariables.put("accessToken", token);
+        scriptVariables.put("session", getUsersSession(request));
+        scriptVariables.put("identity", id);
+        scriptVariables.put("scopes", scopes);
+
+        try {
+            ScriptObject script = getOIDCClaimsExtensionScript(token.getRealm());
+            try {
+                return scriptEvaluator.evaluateScript(script, scriptVariables);
+            } catch (ScriptException e) {
+                logger.message("Error running OIDC claims script", e);
+                throw new ServerException("Error running OIDC claims script: " + e.getMessage());
+            }
+        } catch (ServerException e) {
+            //API does not allow ServerExceptions to be thrown!
+            throw new NotFoundException(e.getMessage());
+        }
+    }
+
+    /**
+     * Attempts to get the user's session, which can either be set on the OAuth2Request explicitly
+     * or found as a cookie on the http request.
+     *
+     * @param request The OAuth2Request.
+     * @return The user's SSOToken or {@code null} if no session was found.
+     */
+    private SSOToken getUsersSession(OAuth2Request request) {
         String sessionId = request.getSession();
         if (sessionId == null) {
             final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
@@ -195,49 +226,37 @@ public class OpenAMScopeValidator implements ScopeValidator {
             try {
                 ssoToken = SSOTokenManager.getInstance().createSSOToken(sessionId);
             } catch (SSOException e) {
-                e.printStackTrace();
+                logger.warning("Session Id is not valid");
             }
         }
-
-        Bindings scriptVariables = new SimpleBindings();
-        scriptVariables.put("logger", logger);
-        scriptVariables.put("claims", response);
-        scriptVariables.put("accessToken", token);
-        scriptVariables.put("session", ssoToken);
-        scriptVariables.put("identity", id);
-        scriptVariables.put("scopes", scopes);
-
-        OpenAMSettingsImpl settings = new OpenAMSettingsImpl(OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-        Map<String, Object> o = new HashMap<String, Object>(response);
-        try {
-            String rawScript = settings.getStringSetting(token.getRealm(), "forgerock-oauth2-provider-oidc-claims-extension-script");
-            SupportedScriptingLanguage scriptType = getScriptType(settings.getStringSetting(token.getRealm(), "forgerock-oauth2-provider-oidc-claims-extension-script-type"));
-            ScriptObject script = new ScriptObject("oidc-claims-script", rawScript, scriptType, null);
-            try {
-                o = scriptEvaluator.evaluateScript(script, scriptVariables);
-
-                int a = 1;
-            } catch (ScriptException e) {
-                e.printStackTrace();
-            }
-        } catch (SSOException e) {
-            e.printStackTrace();
-        } catch (SMSException e) {
-            e.printStackTrace();
-        }
-
-        return o;
+        return ssoToken;
     }
 
-    public static final String JAVA_SCRIPT_LABEL = "JavaScript";
-    public static final String GROOVY_LABEL = "Groovy";
+    private ScriptObject getOIDCClaimsExtensionScript(String realm) throws ServerException {
+
+        OpenAMSettingsImpl settings = new OpenAMSettingsImpl(OAuth2Constants.OAuth2ProviderService.NAME,
+                OAuth2Constants.OAuth2ProviderService.VERSION);
+        try {
+            String rawScript = settings.getStringSetting(realm,
+                    OAuth2Constants.OAuth2ProviderService.OIDC_CLAIMS_EXTENSION_SCRIPT);
+            SupportedScriptingLanguage scriptType = getScriptType(settings.getStringSetting(realm,
+                    OAuth2Constants.OAuth2ProviderService.OIDC_CLAIMS_EXTENSION_SCRIPT_TYPE));
+            return new ScriptObject("oidc-claims-script", rawScript, scriptType, null);
+        } catch (SMSException e) {
+            logger.message("Error running OIDC claims script", e);
+            throw new ServerException("Error running OIDC claims script: " + e.getMessage());
+        } catch (SSOException e) {
+            logger.message("Error running OIDC claims script", e);
+            throw new ServerException("Error running OIDC claims script: " + e.getMessage());
+        }
+    }
+
     private SupportedScriptingLanguage getScriptType(String scriptType) {
         if (JAVA_SCRIPT_LABEL.equals(scriptType)) {
             return SupportedScriptingLanguage.JAVASCRIPT;
         } else if (GROOVY_LABEL.equals(scriptType)) {
             return SupportedScriptingLanguage.GROOVY;
         }
-
         return null;
     }
 

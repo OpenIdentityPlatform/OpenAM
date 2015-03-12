@@ -17,6 +17,7 @@
 package org.forgerock.openam.oauth2.scripting;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -40,6 +41,13 @@ import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.scripting.StandardScriptEngineManager;
 import org.forgerock.util.Reject;
 
+/**
+ * Listens for changes in the global configuration for the OAuth2/OIDC Provider and propagates
+ * those changes to the {@link org.forgerock.openam.scripting.StandardScriptEngineManager} so that
+ * individual engines can be configured.
+ *
+ * @since 13.0.0
+ */
 @Singleton
 public class ScriptedConfigurator  implements ServiceListener {
 
@@ -71,14 +79,14 @@ public class ScriptedConfigurator  implements ServiceListener {
      * @param scriptEngineManager the script engine manager to configure. Not null.
      */
     @Inject
-    public ScriptedConfigurator(final StandardScriptEngineManager scriptEngineManager) {
+    public ScriptedConfigurator(@Named(SCRIPT_EVALUATOR_NAME) StandardScriptEngineManager scriptEngineManager) {
         Reject.ifNull(scriptEngineManager);
         this.scriptEngineManager = scriptEngineManager;
     }
 
     /**
      * Registers this configurator with the {@link com.sun.identity.sm.ServiceConfigManager} to receive updates
-     * when the scripted auth module configuration changes.
+     * when the OIDC claims extension script configuration changes.
      *
      * @throws java.lang.IllegalStateException if the configuration listener cannot be registered.
      */
@@ -123,7 +131,7 @@ public class ScriptedConfigurator  implements ServiceListener {
     /**
      * {@inheritDoc}
      * <p/>
-     * Propagates scripted authentication configuration changes to the configured
+     * Propagates OIDC claims extension script configuration changes to the configured
      * {@link org.forgerock.openam.scripting.StandardScriptEngineManager}. Ignores all other changes.
      */
     public void globalConfigChanged(final String serviceName, final String version, final String groupName,
@@ -144,7 +152,7 @@ public class ScriptedConfigurator  implements ServiceListener {
     }
 
     /**
-     * Propagates scripted authentication module global configuration to the script engine manager.
+     * Propagates OIDC claims extension script global configuration to the script engine manager.
      */
     private void updateConfig() {
         @SuppressWarnings("unchecked")

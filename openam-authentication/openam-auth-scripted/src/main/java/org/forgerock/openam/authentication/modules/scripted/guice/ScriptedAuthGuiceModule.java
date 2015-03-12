@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.scripted.guice;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.Provides;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -24,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import com.google.inject.name.Names;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.authentication.modules.scripted.Scripted;
 import org.forgerock.openam.authentication.modules.scripted.ScriptedAuthConfigurator;
@@ -39,9 +42,11 @@ import org.forgerock.util.thread.ExecutorServiceFactory;
  */
 @GuiceModule
 public class ScriptedAuthGuiceModule extends AbstractModule {
+
     @Override
     protected void configure() {
-        bind(ScriptedAuthConfigurator.class).in(Singleton.class);
+        bind(Key.get(StandardScriptEngineManager.class, Names.named(Scripted.SCRIPT_MODULE_NAME)))
+                .toInstance(new StandardScriptEngineManager());
     }
 
     /**
@@ -53,15 +58,18 @@ public class ScriptedAuthGuiceModule extends AbstractModule {
      * @param configurator the service configuration listener.
      * @return an appropriately configured script evaluator for use with scripted authentication.
      */
-    @Provides @Singleton @Inject @Named(Scripted.SCRIPT_MODULE_NAME)
-    public ScriptEvaluator getScriptEvaluator(final StandardScriptEngineManager scriptEngineManager,
-                                              final ExecutorServiceFactory executorServiceFactory,
-                                              final ScriptedAuthConfigurator configurator) {
+    @Provides
+    @Singleton
+    @Inject
+    @Named(Scripted.SCRIPT_MODULE_NAME)
+    ScriptEvaluator getScriptEvaluator(
+            @Named(Scripted.SCRIPT_MODULE_NAME) StandardScriptEngineManager scriptEngineManager,
+            ExecutorServiceFactory executorServiceFactory, ScriptedAuthConfigurator configurator) {
 
         // Ensure configuration is up to date with service settings
         configurator.registerServiceListener();
 
-        final ScriptEngineConfiguration configuration = scriptEngineManager.getConfiguration();
+        ScriptEngineConfiguration configuration = scriptEngineManager.getConfiguration();
 
         return new ThreadPoolScriptEvaluator(scriptEngineManager,
                 executorServiceFactory.createThreadPool(
@@ -74,7 +82,7 @@ public class ScriptedAuthGuiceModule extends AbstractModule {
                 new StandardScriptEvaluator(scriptEngineManager));
     }
 
-    private BlockingQueue<Runnable> getThreadPoolQueue(final int size) {
+    private BlockingQueue<Runnable> getThreadPoolQueue(int size) {
         return size == ScriptEngineConfiguration.UNBOUNDED_QUEUE_SIZE
                 ? new LinkedBlockingQueue<Runnable>()
                 : new LinkedBlockingQueue<Runnable>(size);

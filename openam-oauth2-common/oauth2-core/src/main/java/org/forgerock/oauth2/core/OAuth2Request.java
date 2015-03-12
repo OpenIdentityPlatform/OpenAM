@@ -86,10 +86,20 @@ public abstract class OAuth2Request {
         return tokens.getInstance(tokenClass);
     }
 
+    /**
+     * Sets the user's session for this request.
+     *
+     * @param sessionId The user's session.
+     */
     public void setSession(String sessionId) {
         this.sessionId = sessionId;
     }
 
+    /**
+     * Gets the user's session for this request.
+     *
+     * @return The user's session.
+     */
     public String getSession() {
         return sessionId;
     }

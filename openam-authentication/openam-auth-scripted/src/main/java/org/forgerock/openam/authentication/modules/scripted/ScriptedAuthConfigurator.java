@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.scripted;
@@ -30,6 +30,7 @@ import org.forgerock.openam.scripting.StandardScriptEngineManager;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class ScriptedAuthConfigurator implements ServiceListener {
      * @param scriptEngineManager the script engine manager to configure. Not null.
      */
     @Inject
-    public ScriptedAuthConfigurator(final StandardScriptEngineManager scriptEngineManager) {
+    public ScriptedAuthConfigurator(@Named(Scripted.SCRIPT_MODULE_NAME) StandardScriptEngineManager scriptEngineManager) {
         Reject.ifNull(scriptEngineManager);
 
         this.scriptEngineManager = scriptEngineManager;

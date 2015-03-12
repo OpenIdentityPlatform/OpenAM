@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.scripting.sandbox;
@@ -51,6 +51,9 @@ public final class GroovySandboxValueFilter extends GroovyValueFilter {
     public Object filter(final Object target) {
         if (target == null) {
             return null;
+        }
+        if (target instanceof Closure) {
+            return target;
         }
         // For a static call or constructor then the target will be the class, otherwise it will be an object instance
         Class<?> clazz = target instanceof Class ? (Class<?>) target : target.getClass();

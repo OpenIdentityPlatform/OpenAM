@@ -803,6 +803,8 @@ public class OAuth2Constants {
         public static final String AUTHENITCATION_ATTRIBUTES = "forgerock-oauth2-provider-authentication-attributes";
         public static final String SAVED_CONSENT_ATTRIBUTE = "forgerock-oauth2-provider-saved-consent-attribute";
         public static final String SUPPORTED_SCOPE = "forgerock-oauth2-provider-supported-scopes";
+        public static final String OIDC_CLAIMS_EXTENSION_SCRIPT = "forgerock-oauth2-provider-oidc-claims-extension-script";
+        public static final String OIDC_CLAIMS_EXTENSION_SCRIPT_TYPE = "forgerock-oauth2-provider-oidc-claims-extension-script-type";
         public static final String JKWS_URI = "forgerock-oauth2-provider-jkws-uri";
         public static final String CREATED_TIMESTAMP_ATTRIBUTE_NAME = "forgerock-oauth2-provider-created-attribute-name";
         public static final String MODIFIED_TIMESTAMP_ATTRIBUTE_NAME =

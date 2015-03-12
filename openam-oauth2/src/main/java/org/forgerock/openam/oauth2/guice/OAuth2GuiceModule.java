@@ -31,12 +31,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.oauth2.core.AccessTokenService;
 import org.forgerock.oauth2.core.AccessTokenServiceImpl;
@@ -208,6 +210,9 @@ public class OAuth2GuiceModule extends AbstractModule {
         bind(TokenIntrospectionService.class).to(TokenIntrospectionServiceImpl.class);
 
         Multibinder.newSetBinder(binder(), ResourceSetRegistrationListener.class);
+
+        bind(Key.get(StandardScriptEngineManager.class, Names.named(ScriptedConfigurator.SCRIPT_EVALUATOR_NAME)))
+                .toInstance(new StandardScriptEngineManager());
     }
 
     /**
@@ -224,7 +229,8 @@ public class OAuth2GuiceModule extends AbstractModule {
     @Singleton
     @Inject
     @Named(ScriptedConfigurator.SCRIPT_EVALUATOR_NAME)
-    ScriptEvaluator getScriptEvaluator(StandardScriptEngineManager scriptEngineManager,
+    ScriptEvaluator getScriptEvaluator(
+            @Named(ScriptedConfigurator.SCRIPT_EVALUATOR_NAME) StandardScriptEngineManager scriptEngineManager,
             ExecutorServiceFactory executorServiceFactory, ScriptedConfigurator configurator) {
 
         // Ensure configuration is up to date with service settings
