@@ -1,6 +1,4 @@
-/**
- * Copyright 2013-2014 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,8 +10,16 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package com.iplanet.dpro.session.operations;
+
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -29,13 +35,6 @@ import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 public class ServerSessionOperationStrategyTest {
 
@@ -118,30 +117,11 @@ public class ServerSessionOperationStrategyTest {
         // The Site is down.
         given(mockSessionService.isSiteUp(anyString())).willReturn(false);
 
-        // And Session is in CTS
-        given(mockCTS.hasSession(mockSession)).willReturn(true);
-
         // When
         SessionOperations operation = strategy.getOperation(mockSession);
 
         // Then
         assertThat(operation).isEqualTo(new MonitoredOperations(mockCTS, SessionMonitorType.CTS, mockStore));
-    }
-
-    @Test
-    public void shouldUseRemoteWhenSessionIsNotInCTS() throws SessionException {
-        // Given
-        given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
-        given(mockSessionService.isSessionFailoverEnabled()).willReturn(true);
-
-        // And Session is in CTS
-        given(mockCTS.hasSession(mockSession)).willReturn(false);
-
-        // When
-        SessionOperations operation = strategy.getOperation(mockSession);
-
-        // Then
-        assertThat(operation).isEqualTo(new MonitoredOperations(mockRemote, SessionMonitorType.REMOTE, mockStore));
     }
 
     @Test
@@ -165,9 +145,6 @@ public class ServerSessionOperationStrategyTest {
 
         // Cross talk is disabled.
         given(mockSessionService.isReducedCrossTalkEnabled()).willReturn(true);
-
-        // And Session is in CTS
-        given(mockCTS.hasSession(mockSession)).willReturn(true);
 
         // When
         SessionOperations operation = strategy.getOperation(mockSession);

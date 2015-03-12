@@ -102,12 +102,13 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
      * @param session Non null Session to use.
      * @return A non null SessionOperations implementation to use.
      */
-    public SessionOperations getOperation(Session session) throws SessionException {
+    @Override
+    public SessionOperations getOperation(Session session) {
         if (isLocalServer(session)) {
             return logAndWrap(session, local, SessionMonitorType.LOCAL);
         }
 
-        if (service.isSessionFailoverEnabled() && cts.hasSession(session)) {
+        if (service.isSessionFailoverEnabled()) {
 
             // If cross talk is reduced... by this point, we know the session is remote.
             // We get CTS to do the legwork for us, knowing that CTSOperations will delegate
