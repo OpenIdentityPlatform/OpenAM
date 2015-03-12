@@ -85,6 +85,7 @@
                         <Value>java.util.ArrayList</Value>
                         <Value>java.util.HashSet</Value>
                         <Value>java.util.HashMap</Value>
+                        <Value>java.util.HashMap$Entry</Value>
                         <Value>java.util.HashMap$KeyIterator</Value>
                         <Value>java.util.LinkedHashMap</Value>
                         <Value>java.util.LinkedHashSet</Value>
