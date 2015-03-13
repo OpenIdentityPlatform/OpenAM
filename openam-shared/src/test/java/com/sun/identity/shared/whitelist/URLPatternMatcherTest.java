@@ -11,20 +11,22 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-15 ForgeRock AS.
 */
 package com.sun.identity.shared.whitelist;
 
+import static org.testng.AssertJUnit.*;
+
 import java.net.MalformedURLException;
 import java.util.Collections;
-import static org.testng.AssertJUnit.assertEquals;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 public class URLPatternMatcherTest {
 
     final URLPatternMatcher urlPatternMatcher = new URLPatternMatcher();
 
-    @DataProvider(name = "testdata")
+    @Test(dataProvider = "testdata")
     private void performTestAndAssert(String pattern, String url, boolean result) throws MalformedURLException {
         boolean answer = urlPatternMatcher.match(url, Collections.singleton(pattern), true); //wildcard always enabled
         assertEquals(result, answer);
@@ -322,9 +324,9 @@ public class URLPatternMatcherTest {
             {PATTERN_16, "http://www.good.com", false},
             {PATTERN_16, "http://www.good.com:80", false},
             {PATTERN_16, "http://www.good.com:80/hello/world", false},
-            {PATTERN_16, "http://www.good.com:80/abc/world", true},
-            {PATTERN_16, "http://www.good.com:80/abc", true},
-            {PATTERN_16, "http://www.good.com/abc", true},
+            {PATTERN_16, "http://www.good.com:80/abc/world", false},
+            {PATTERN_16, "http://www.good.com:80/abc", false},
+            {PATTERN_16, "http://www.good.com/abc", false},
             {PATTERN_16, "https://www.good.com", false},
             {PATTERN_16, "https://www.good.com:443", false},
             {PATTERN_16, "http://www.good.com/hello/world", false},
@@ -335,6 +337,9 @@ public class URLPatternMatcherTest {
             {PATTERN_16, "http://www.good.com:80/abc/world?key=value&key2=value2", false},
             {PATTERN_16, "http://www.bad.com:80/hello/world/.good.com:80", false},
             {PATTERN_16, "http://www.bad.com:80/hello/world/.good.com:80/hello/world", false},
+            {PATTERN_16, "/abc", true},
+            {PATTERN_16, "/acb/def/blah", false},
+            {PATTERN_16, "/abc/def/blah", true},
 
                 //wildcard after port
             {PATTERN_17, "http://www.good.com", true},
