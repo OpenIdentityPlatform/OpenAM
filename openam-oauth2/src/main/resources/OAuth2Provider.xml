@@ -93,6 +93,7 @@
                         <Value>java.util.TreeMap</Value>
                         <Value>java.util.TreeSet</Value>
                         <Value>com.sun.identity.shared.debug.Debug</Value>
+                        <Value>com.iplanet.sso.providers.dpro.SSOTokenImpl</Value>
                         <Value>org.forgerock.http.client.*</Value>
                         <Value>groovy.json.JsonSlurper</Value>
                         <Value>com.sun.identity.idm.AMIdentity</Value>
