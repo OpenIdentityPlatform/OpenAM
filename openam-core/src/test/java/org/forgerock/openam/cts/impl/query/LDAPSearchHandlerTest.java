@@ -11,10 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.query;
 
+import static org.mockito.BDDMockito.*;
+
+import com.sun.identity.shared.debug.Debug;
+import java.util.ArrayList;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.opendj.ldap.Connection;
@@ -26,8 +30,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
-
-import static org.mockito.BDDMockito.*;
+import java.util.List;
 
 public class LDAPSearchHandlerTest {
 
@@ -35,14 +38,16 @@ public class LDAPSearchHandlerTest {
     protected Connection mockConnection;
     protected SearchRequest mockRequest;
     protected LDAPSearchHandler handler;
+    private Debug debug;
 
     @BeforeMethod
     public void setUp() throws Exception {
         mockConfig = mock(LDAPConfig.class);
         mockConnection = mock(Connection.class);
         mockRequest = mock(SearchRequest.class);
+        debug = mock(Debug.class);
 
-        handler = new LDAPSearchHandler(mockConfig);
+        handler = new LDAPSearchHandler(mockConfig, debug);
     }
 
     @Test
@@ -50,6 +55,17 @@ public class LDAPSearchHandlerTest {
         handler.performSearch(mockConnection, mockRequest, Collections.<Entry>emptyList());
         verify(mockConnection).search(eq(mockRequest), anyCollection());
     }
+
+    @Test
+    public void shouldNotFailWithExceptionIfEntriesWerePresent() throws Exception {
+        // Given
+        List<Entry> entries = new ArrayList<Entry>();
+        entries.add(null);
+        given(mockConnection.search(mockRequest, entries)).willThrow(ErrorResultException.class);
+
+        // When / Then
+        handler.performSearch(mockConnection, mockRequest, entries);
+     }
 
     @Test (expectedExceptions = QueryFailedException.class)
     public void shouldThrowExceptionOnFailure() throws QueryFailedException, ErrorResultException {

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.query;
 
@@ -253,7 +253,16 @@ public class QueryBuilder {
             try {
                 SimplePagedResultsControl control = result.getControl(
                         SimplePagedResultsControl.DECODER, new DecodeOptions());
-                pagingCookie = control.getCookie();
+                if (control == null) {
+                    if (debug.warningEnabled()) {
+                        debug.warning("There was no paged result control in the search response, it is recommended to "
+                                + "set the CTS user's size-limit at least to " + (pageSize + 1));
+                    }
+                    pagingCookie = getEmptyPagingCookie();
+                } else {
+                    pagingCookie = control.getCookie();
+                }
+
             } catch (DecodeException e) {
                 throw new CoreTokenException("Failed to decode Paging Cookie", e);
             }

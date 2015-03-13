@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.query;
 
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.opendj.ldap.Connection;
@@ -23,8 +25,9 @@ import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 
-import javax.inject.Inject;
 import java.util.Collection;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Performs a search against an LDAP Connection.
@@ -32,10 +35,12 @@ import java.util.Collection;
 public class LDAPSearchHandler {
     // Injected
     private final LDAPConfig ldapConfig;
+    private final Debug debug;
 
     @Inject
-    public LDAPSearchHandler(LDAPConfig ldapConfig) {
+    public LDAPSearchHandler(LDAPConfig ldapConfig, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         this.ldapConfig = ldapConfig;
+        this.debug = debug;
     }
 
     /**
@@ -55,6 +60,12 @@ public class LDAPSearchHandler {
         try {
             return connection.search(request, entries);
         } catch (ErrorResultException e) {
+            if (!entries.isEmpty()) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Partial search result has been received due to the following error:", e);
+                }
+                return e.getResult();
+            }
             throw new QueryFailedException(connection, ldapConfig.getTokenStoreRootSuffix(), request.getFilter(), e);
         }
     }
