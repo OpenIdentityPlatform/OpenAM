@@ -18,9 +18,12 @@ package org.forgerock.openam.sm.datalayer.impl.ldap;
 import java.util.Collection;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.ErrorResultException;
@@ -33,10 +36,13 @@ import org.forgerock.opendj.ldap.responses.Result;
 public class LdapSearchHandler {
     // Injected
     private final LDAPConfig ldapConfig;
+    private final Debug debug;
 
     @Inject
-    public LdapSearchHandler(LdapDataLayerConfiguration ldapConfig) {
+    public LdapSearchHandler(LdapDataLayerConfiguration ldapConfig,
+            @Named(DataLayerConstants.DATA_LAYER_DEBUG) Debug debug) {
         this.ldapConfig = ldapConfig;
+        this.debug = debug;
     }
 
     /**
@@ -56,6 +62,12 @@ public class LdapSearchHandler {
         try {
             return connection.search(request, entries);
         } catch (ErrorResultException e) {
+            if (!entries.isEmpty()) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Partial search result has been received due to the following error:", e);
+                }
+                return e.getResult();
+            }
             throw new QueryFailedException(connection, ldapConfig.getTokenStoreRootSuffix(), request.getFilter(), e);
         }
     }

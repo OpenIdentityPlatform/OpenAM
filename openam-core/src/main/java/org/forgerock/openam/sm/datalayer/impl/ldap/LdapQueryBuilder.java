@@ -112,7 +112,15 @@ public class LdapQueryBuilder extends QueryBuilder<Connection, Filter> {
             try {
                 SimplePagedResultsControl control = result.getControl(
                         SimplePagedResultsControl.DECODER, new DecodeOptions());
-                pagingCookie = control.getCookie();
+                if (control == null) {
+                    if (debug.warningEnabled()) {
+                        debug.warning("There was no paged result control in the search response, it is recommended to "
+                                + "set the CTS user's size-limit at least to " + (pageSize + 1));
+                    }
+                    pagingCookie = getEmptyPagingCookie();
+                } else {
+                    pagingCookie = control.getCookie();
+                }
             } catch (DecodeException e) {
                 throw new CoreTokenException("Failed to decode Paging Cookie", e);
             }
