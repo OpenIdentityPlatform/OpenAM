@@ -51,6 +51,22 @@
 
    <listitem>
     <para>
+     <emphasis role="bold">Agent Group Membership Information</emphasis>.
+     The agent group membership information is now stored in the agent's
+     <literal>agentgroup</literal> attribute. When configuring agents, make sure
+     that the referenced agent group already exists in the configuration.
+    </para>
+    <para>
+     For details, see the explanation in
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-718"
+     xlink:show="new"
+     >OPENAM-718</link>).
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
      <emphasis role="bold">Debug Logging Option to Decrypt SAML Assertions</emphasis>.
      OpenAM now provides a debug logging option to decrypt SAML assertions when
      OpenAM runs as a service provider and assertion encryption is enabled.
@@ -72,6 +88,7 @@
       >OPENAM-1631</link>).
     </para>
    </listitem>
+
    <listitem>
     <para>
      <emphasis role="bold">Support for Auth Context Classes Extensibility</emphasis>.
@@ -89,17 +106,45 @@
       >OPENAM-2238</link>).
     </para>
    </listitem>
+
    <listitem>
     <para>
      <emphasis role="bold">Password Reset Token Validation REST API</emphasis>.
-     OpenAM supports a single REST API action to check if the token for password reset is
-     valid or not: <literal>/json/users?_action=confirm</literal>.
+     OpenAM now allows for the verification of password reset tokens through the
+     REST API using the single REST API action:
+     <literal>/json/users?_action=confirm</literal>.
      (<link
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3748"
      xlink:show="new"
      >OPENAM-3748</link>).
     </para>
    </listitem>
+
+   <listitem>
+    <para>
+     <emphasis role="bold">Proxying Passive SAML Authentication Requests</emphasis>.
+     OpenAM acting as an IdP proxy is now able to proxy passive SAML
+     authentication requests and replay <literal>NoPassive</literal> responses.
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4248"
+     xlink:show="new"
+     >OPENAM-4248</link>).
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <emphasis role="bold">Specifying Trusted Realms using the WindowsDesktopSSO Authentication Module</emphasis>.
+     The WindowsDesktopSSO authentication module now allows you to specify a list
+     of trusted realms. When the setting is specified, Kerberos tokens issued by
+     those realms will only be accepted.
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4248"
+     xlink:show="new"
+     >OPENAM-4248</link>).
+    </para>
+   </listitem>
+
    <listitem>
     <para>
      <emphasis role="bold">Default Timelimit using Netscape SDK is Configurable</emphasis>.

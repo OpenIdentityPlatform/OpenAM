@@ -112,10 +112,14 @@
      >OPENAM-1773</link>).
     </para>
     <para>
-     When performing an upgrade, the old values are migrated across to the new
-     settings. New installations should use the new settings.
+     The list of valid <literal>goto/gotoOnFail</literal> resources has moved to
+     the newly created "Validation Service" under the
+     <literal>openam-auth-valid-goto-resources</literal> property. New installations
+     should use the new setting; for existing deployments, the upgrade wizard
+     ensures the migration of the existing configuration.
     </para>
    </listitem>
+
    <listitem>
     <para>
      <emphasis role="bold">Authentication Context extensibility support</emphasis>.
@@ -130,8 +134,8 @@
    <listitem>
     <para>
      <emphasis role="bold">Password Reset Token Validation REST API</emphasis>.
-     OpenAM supports a single REST API action to check if the token for password
-     reset is valid or not
+     OpenAM now allows for the verification of password reset tokens through the
+     REST API. For more information, see
      (<link
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3748"
      xlink:show="new"
