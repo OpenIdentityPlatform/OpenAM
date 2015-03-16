@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2013-2014 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2013-2015 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -65,6 +65,8 @@
                             <addClasspath>true</addClasspath>
                             <mainClass>com.sun.identity.setup.Main</mainClass>
                             <classpathPrefix>lib/</classpathPrefix>
+                            <classpathLayoutType>custom</classpathLayoutType>
+                            <customClasspathLayout>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</customClasspathLayout>
                         </manifest>
                         <manifestEntries>
                             <Specification-Title>OpenAM Configurator Tool</Specification-Title>
