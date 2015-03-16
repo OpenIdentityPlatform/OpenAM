@@ -31,8 +31,6 @@ package com.sun.identity.saml.xmlsig;
 
 import java.util.*;
 import java.io.*;
-
-import org.apache.xml.security.utils.resolver.ResourceResolverContext;
 import org.w3c.dom.*;
 import org.apache.xml.utils.URI;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
@@ -54,11 +52,11 @@ public class OfflineResolver extends ResourceResolverSpi {
     * @param BaseURI
     * @throws ResourceResolverException
     */
-   private XMLSignatureInput engineResolve(Attr uri, String BaseURI)
+   public XMLSignatureInput engineResolve(Attr uri, String BaseURI)
            throws ResourceResolverException {
-      String URI = null;
+
       try {
-         URI = uri.getNodeValue();
+         String URI = uri.getNodeValue();
 
          String newURI = (String) this._uriMap.get(URI);
          if (newURI != null) {
@@ -74,13 +72,14 @@ public class OfflineResolver extends ResourceResolverSpi {
 
             return result;
          } else {
-            Object exArgs[] = {"The URI " + URI + " is not configured for offline work"};
+            Object exArgs[] = {
+               "The URI " + URI + " is not configured for offline work" };
 
             throw new ResourceResolverException("generic.EmptyMessage", exArgs,
-                                                URI, BaseURI);
+                                                uri, BaseURI);
          }
       } catch (IOException ex) {
-         throw new ResourceResolverException("generic.EmptyMessage", ex, URI,
+         throw new ResourceResolverException("generic.EmptyMessage", ex, uri,
                                              BaseURI);
       }
    }
@@ -91,7 +90,7 @@ public class OfflineResolver extends ResourceResolverSpi {
     * @param uri
     * @param BaseURI
     */
-   private boolean engineCanResolve(Attr uri, String BaseURI) {
+   public boolean engineCanResolve(Attr uri, String BaseURI) {
 
       String uriNodeValue = uri.getNodeValue();
 
@@ -152,14 +151,4 @@ public class OfflineResolver extends ResourceResolverSpi {
          "http://xmldsig.pothole.com/xml-stylesheet.txt",
          "data/com/pothole/xmldsig/xml-stylesheet.txt", "text/xml");
    }
-
-    @Override
-    public XMLSignatureInput engineResolveURI(ResourceResolverContext context) throws ResourceResolverException {
-        return engineResolve(context.attr, context.baseUri);
-    }
-
-    @Override
-    public boolean engineCanResolveURI(ResourceResolverContext context) {
-        return engineCanResolve(context.attr, context.baseUri);
-    }
 }
