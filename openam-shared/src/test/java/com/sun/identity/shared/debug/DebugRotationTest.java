@@ -16,6 +16,7 @@
 package com.sun.identity.shared.debug;
 
 
+import com.sun.identity.shared.debug.file.impl.DebugConfigurationFromProperties;
 import com.sun.identity.shared.timeservice.AccelerateTimeService;
 import org.forgerock.util.time.TimeService;
 import org.testng.annotations.Test;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 public class DebugRotationTest extends DebugTestTemplate {
 
@@ -81,8 +81,6 @@ public class DebugRotationTest extends DebugTestTemplate {
 
         long fakeInitTime = calDSTOctober.getTimeInMillis();
 
-        System.out.println(TimeZone.getDefault().getDisplayName());
-        System.out.println(TimeZone.getDefault().getID());
         System.out.println("Test rotation for date : '" + dateFormat.format(calDSTOctober.getTime()) + "'");
 
         rotation(fakeInitTime);
@@ -91,6 +89,8 @@ public class DebugRotationTest extends DebugTestTemplate {
     private void rotation(long fakeInitTime) throws Exception {
         String DEBUG_CONFIG_FOR_TEST = "/debug_config_test/debugconfigRotation.properties";
 
+        DebugConfigurationFromProperties debugConfigurationFromProperties =
+                new DebugConfigurationFromProperties(DEBUG_CONFIG_FOR_TEST);
         initializeProperties();
         initializeProvider(DEBUG_CONFIG_FOR_TEST);
 
@@ -99,17 +99,15 @@ public class DebugRotationTest extends DebugTestTemplate {
 
         String debugNameFile = "debugMerge";
 
-        long initTime = System.currentTimeMillis();
+        int rotationPeriod = debugConfigurationFromProperties.getRotationInterval();
 
         //Accelerate the test timeservice
-        //2s <=> 12 min = 720sec = 360x
-        int testDurationMs = 2000;
-        int factor = 360;
-        int fakeDurationMs = testDurationMs * factor;
+        // Simulate 1 hours of logs
+        int fakeDurationMs = 60 * 60 * 1000;
 
 
         //In order to have an effective and short in time test, we accelerate the time
-        TimeService accelerateClock = new AccelerateTimeService(fakeInitTime, factor);
+        AccelerateTimeService accelerateClock = new AccelerateTimeService(fakeInitTime);
         debugFileProvider.setClock(accelerateClock);
 
 
@@ -121,16 +119,16 @@ public class DebugRotationTest extends DebugTestTemplate {
         // We will print on logs from threads, for testing the synchronized
         List<PrintLogRunnable> printLogRunnableTests = new ArrayList<PrintLogRunnable>();
 
-        PrintLogRunnable printLogRunnableTest1 = new PrintLogRunnable(debugTest1MergeToDebugMerge, initTime,
-                testDurationMs, accelerateClock);
+        PrintLogRunnable printLogRunnableTest1 = new PrintLogRunnable(debugTest1MergeToDebugMerge, fakeInitTime,
+                fakeDurationMs, accelerateClock);
         printLogRunnableTests.add(printLogRunnableTest1);
 
-        PrintLogRunnable printLogRunnableTest2 = new PrintLogRunnable(debugTest2MergeToDebugMerge, initTime,
-                testDurationMs, accelerateClock);
+        PrintLogRunnable printLogRunnableTest2 = new PrintLogRunnable(debugTest2MergeToDebugMerge, fakeInitTime,
+                fakeDurationMs, accelerateClock);
         printLogRunnableTests.add(printLogRunnableTest2);
 
-        PrintLogRunnable printLogRunnableTest3 = new PrintLogRunnable(debugTest3MergeToDebugMerge, initTime,
-                testDurationMs, accelerateClock);
+        PrintLogRunnable printLogRunnableTest3 = new PrintLogRunnable(debugTest3MergeToDebugMerge, fakeInitTime,
+                fakeDurationMs, accelerateClock);
         printLogRunnableTests.add(printLogRunnableTest3);
 
         List<Thread> threads = new ArrayList<Thread>();
@@ -141,13 +139,11 @@ public class DebugRotationTest extends DebugTestTemplate {
         //The first writing initialize the log file. So we test that a swift of 1 minute doesn't
         //create a new file at the end
         debugTest1MergeToDebugMerge.message("Should appear in log", null);
-        long currentAccelerateTimeInMin = accelerateClock.now() / (1000 * 60);
 
-        while (accelerateClock.now() / (1000 * 60) < currentAccelerateTimeInMin) { Thread.sleep(100); }
+        accelerateClock.incrementTime(1000 * 60 + 10);
         debugTest2MergeToDebugMerge.message("Should appear in log", null);
 
-        currentAccelerateTimeInMin = accelerateClock.now() / (1000 * 60);
-        while (accelerateClock.now() / (1000 * 60) < currentAccelerateTimeInMin) { Thread.sleep(100); }
+        accelerateClock.incrementTime(1000 * 60 + 10);
         debugTest3MergeToDebugMerge.message("Should appear in log", null);
 
         //Start threads
@@ -167,24 +163,21 @@ public class DebugRotationTest extends DebugTestTemplate {
 
 
         //Check files creation
-        Calendar calRandomDate = Calendar.getInstance();
-        calRandomDate.setTimeInMillis(fakeInitTime);
+        Calendar fakeDate = Calendar.getInstance();
+        fakeDate.setTimeInMillis(fakeInitTime);
 
-        //It's possible that we stored the init time just before the next minute
-        if (!isFileExist(debugNameFile + dateFormat.format(calRandomDate.getTime()))) {
-            calRandomDate.add(Calendar.MINUTE, 1);
-        }
+        int currentPeriod = -1;
+        while (fakeDate.getTimeInMillis() - fakeInitTime < fakeDurationMs) {
 
-        while (calRandomDate.getTimeInMillis() - fakeInitTime < fakeDurationMs) {
-
-            checkLogFileStatus(true, debugNameFile + dateFormat.format(calRandomDate.getTime()));
-            calRandomDate.add(Calendar.MINUTE, 1);
-
-            checkLogFileStatus(false, debugNameFile + dateFormat.format(calRandomDate.getTime()));
-            calRandomDate.add(Calendar.MINUTE, 1);
-
-            checkLogFileStatus(false, debugNameFile + dateFormat.format(calRandomDate.getTime()));
-            calRandomDate.add(Calendar.MINUTE, 1);
+            if (isFileExist(debugNameFile + dateFormat.format(fakeDate.getTime()))) {
+                if(currentPeriod != -1 && currentPeriod < rotationPeriod) {
+                    failAndPrintFolderStatusReport("A log rotation file is created before the log rotation ended. " +
+                            "currentPeriod= '" + currentPeriod + "'");
+                }
+                currentPeriod = 0;
+            }
+            currentPeriod++;
+            fakeDate.add(Calendar.MINUTE, 1);
         }
 
     }
@@ -214,7 +207,7 @@ public class DebugRotationTest extends DebugTestTemplate {
 
         public void run() {
             try {
-                while (System.currentTimeMillis() - initTime < testDuration) {
+                while (accelerateClock.now() - initTime < testDuration) {
 
                     String dateInStringWithMs = dateFormatWithMs.format(new Date(accelerateClock.now()));
                     debug.message("Fake date = " + dateInStringWithMs, null);
