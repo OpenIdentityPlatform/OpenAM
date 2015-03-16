@@ -46,6 +46,7 @@ import org.forgerock.openam.forgerockrest.entitlements.ApplicationsResource;
 import org.forgerock.openam.forgerockrest.entitlements.ConditionTypesResource;
 import org.forgerock.openam.forgerockrest.entitlements.DecisionCombinersResource;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyResource;
+import org.forgerock.openam.forgerockrest.entitlements.PolicyV1Filter;
 import org.forgerock.openam.forgerockrest.entitlements.ReferralsResourceV1;
 import org.forgerock.openam.forgerockrest.entitlements.ResourceTypesResource;
 import org.forgerock.openam.forgerockrest.entitlements.SubjectAttributesResourceV1;
@@ -219,7 +220,11 @@ public class RestEndpoints {
         //protected
         dynamicRealmRouter.route("/policies")
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
-                .forVersion("1.0").to(PolicyResource.class);
+                .forVersion("1.0")
+                    .through(PolicyV1Filter.class)
+                    .to(PolicyResource.class)
+                .forVersion("2.0")
+                    .to(PolicyResource.class);
 
         dynamicRealmRouter.route("/referrals")
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)

@@ -123,14 +123,14 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
     obj.getPolicyByName = function (name) {
         return obj.serviceCall({
             url: "/policies/" + encodeURIComponent(name),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"}
         });
     };
 
     obj.updatePolicy = function (name, data) {
         return obj.serviceCall({
             url: "/policies/" + encodeURIComponent(name),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             type: "PUT",
             data: JSON.stringify(data),
             errorsHandlers: obj.ERROR_HANDLERS
@@ -140,7 +140,7 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
     obj.createPolicy = function (data) {
         return obj.serviceCall({
             url: "/policies/" + encodeURIComponent(data.name),
-            headers: { "If-None-Match": "*", "Accept-API-Version": "protocol=1.0,resource=1.0" },
+            headers: { "If-None-Match": "*", "Accept-API-Version": "protocol=1.0,resource=2.0" },
             type: "PUT",
             data: JSON.stringify(data),
             errorsHandlers: obj.ERROR_HANDLERS
@@ -150,7 +150,7 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
     obj.deletePolicy = function (name) {
         return obj.serviceCall({
             url: "/policies/" + encodeURIComponent(name),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             type: "DELETE"
         });
     };

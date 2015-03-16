@@ -20,6 +20,8 @@ import com.sun.identity.idm.IdUtils;
 import org.forgerock.json.resource.RouterContext;
 import org.forgerock.json.resource.ServerContext;
 
+import javax.security.auth.Subject;
+
 /**
  * Helper class to get around the fact that some CREST Contexts are final and have package private
  * constructors, i.e. RouterContext.
@@ -57,4 +59,21 @@ public class ContextHelper {
     public String getRealm(ServerContext context) {
         return context.asContext(RealmContext.class).getResolvedRealm();
     }
+
+    /**
+     * Gets the subject for the user of the accessed resource.
+     *
+     * @param context
+     *         the context
+     *
+     * @return the subject attempting to access the resource
+     */
+    public Subject getSubject(ServerContext context) {
+        if (!context.containsContext(SubjectContext.class)) {
+            return null;
+        }
+
+        return context.asContext(SubjectContext.class).getCallerSubject();
+    }
+
 }
