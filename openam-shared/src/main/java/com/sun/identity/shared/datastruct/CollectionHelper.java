@@ -24,20 +24,18 @@
  *
  * $Id: CollectionHelper.java,v 1.6 2010/01/06 22:31:55 veiming Exp $
  *
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2010-2015 ForgeRock AS
- */
 package com.sun.identity.shared.datastruct;
 
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import com.sun.identity.shared.Constants;
-import java.util.LinkedHashSet;
 
 /**
  * This class contains various Collection manipulation methods.
@@ -205,41 +203,43 @@ public class CollectionHelper {
      * This convenience method is for getting server specific attributes from a
      * list attribute. Server specific is determined by prefixing a list
      * attribute value with DSAME local server name followed by the | character.
-     * If the list has more than one entry but no matching local server prefixes
-     * than an empty Set is returned as this is an invalid configuration for 
-     * these type of attributes. This allows services like authentication to
-     * support a geographic directory configuration.
+     * The priority order of the attributes as follows. 
+     * 1- LDAP Servers belong to current OpenAM Server, localDsameServer is prefixed with the attribute 
+     * 2- LDAP Servers belong to no OpenAM Server, no server prefix  
+     * 3- All other servers - LDAP Servers prefixed with other OpenAM Servers
+     * This allows services like authentication to support a geographic directory configuration.
      *
      * @param map Map of String of Set of String.
      * @param attrName Key of the map entry of interest.
-     * @return attributes belonging to this server, or if there is only one
-     * attribute, then that
+     * @return attributes based on the prioritization. 
      */
     public static Set<String> getServerMapAttrs(Map<String, Set<?>> map, String attrName) {
         Set<String> ret = new LinkedHashSet<String>();
         Set<String> attrValues = (Set<String>) map.get(attrName);
-
-        if (attrValues.size() == 1) {
-            Iterator<String> iter = attrValues.iterator();
-            String strServer = iter.next();
-            if (strServer != null) {
-                strServer = strServer.trim();
-            }
-            ret.add(strServer);
-            return ret;
-        }
+        Set<String> currentServerDefined = new LinkedHashSet<String>();
+        Set<String> otherServerDefined = new LinkedHashSet<String>();
+        Set<String> nonMatchingServers = new LinkedHashSet<String>();
         for (String attr : attrValues) {
             if (attr != null) {
                 attr = attr.trim();
-                if (attr.startsWith(localDsameServer)) {
-                    int index = attr.indexOf("|");
-                    if (index != -1) {
+                int index = attr.indexOf("|");
+                if (index == -1) {
+                    nonMatchingServers.add(attr);
+                } else { 
+                    String currentPrefix = attr.substring(0, index);
+                    if (currentPrefix.equalsIgnoreCase(localDsameServer)) {
                         attr = attr.substring(index + 1);
-                        ret.add(attr);
+                        currentServerDefined.add(attr);
+                    } else { 
+                        attr = attr.substring(index + 1);
+                        otherServerDefined.add(attr);
                     }
                 }
             }
         }
+        ret.addAll(currentServerDefined);
+        ret.addAll(nonMatchingServers);
+        ret.addAll(otherServerDefined);
         return ret;
     }
 }
