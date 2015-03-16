@@ -17,47 +17,52 @@ package com.sun.identity.shared.timeservice;
 
 import org.forgerock.util.time.TimeService;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * An accelerate timeservice for testing time sensitive features
- * It accelerate the time from a date reference called initial time.
- * Every MS after this reference will be multiplied by a factor
- * </p>
- * </p>
+ * It accelerates the time from a date reference called initial time.
+ * <p/>
+ * <p/>
  * Example :
- * </p>
- * //Multiply the time by two from now (16/05/2014 16:20:30)
- * TimeService timeservice = new AccelerateTimeService(System.currentTimeMillis(), 2);
- * </p>
- * ... 10 secs later
- * //return a value equivalent to 16/05/2014 16:20:50
- * timeservice.now()
+ * <p/>
+ * TimeService timeservice = new AccelerateTimeService(System.currentTimeMillis());
  */
 public class AccelerateTimeService implements TimeService {
 
-    private int factor;
-    private long initTime;
-    private long systemTimeAtInitialization;
+    /*
+        The clock is incremented each time the "now" function is called.
+        By this way, we aren't dependent to the system clock anymore.
+        16 is a value fixed by experience and generate log files with a size of 886k, with approximately 3750 logs in
+        each file.
+     */
+    private static final int INCR_TIME_MS = 16;
+
+    private AtomicLong clock;
 
     /**
      * Constructor
      *
      * @param initTime when the time acceleration should started, in MS from epoch
-     * @param factor   acceleration factor
      */
-    public AccelerateTimeService(long initTime, int factor) {
-        this.initTime = initTime;
-        this.factor = factor;
-        this.systemTimeAtInitialization = System.currentTimeMillis();
+    public AccelerateTimeService(long initTime) {
+
+        this.clock = new AtomicLong(initTime);
     }
 
     @Override
     public long now() {
 
-        //elapsed time since the beginning
-        long deltaTimeFromInitTime = System.currentTimeMillis() - systemTimeAtInitialization;
+        // Increment the clock
+        return incrementTime(INCR_TIME_MS);
+    }
 
-        //We only accelerate the elapsed time with the factor requested
-        return deltaTimeFromInitTime * factor + initTime;
+    /**
+     * Increment the accelerate clock
+     * @param deltaTime
+     */
+    public long incrementTime(long deltaTime) {
+        return clock.addAndGet(deltaTime);
     }
 
     @Override

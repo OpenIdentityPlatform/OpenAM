@@ -45,7 +45,7 @@ public class DebugTestTemplate {
     protected static final String DEBUG_FILEMAP_FOR_TEST = "/debug_config_test/debugfiles.properties";
     protected static final String DEBUG_CONFIG_FOR_TEST = "/debug_config_test/debugconfig.properties";
     //use the current test directory. You can modify it for debugging purpose
-    protected static final String DEBUG_BASE_DIRECTORY = "./logs";
+    protected static final String DEBUG_BASE_DIRECTORY = "./target/logs";
 
     protected String debugDirectory;
 
@@ -91,24 +91,30 @@ public class DebugTestTemplate {
         String fullPath = debugDirectory + File.separator + logName;
 
         if (isCreated != isFileExist(logName)) {
-            StringBuilder bugReport = new StringBuilder();
-            bugReport.append("Log '" + fullPath + "' exist != " + isCreated + " !\n");
-            File dir = new File(debugDirectory);
-            File[] files = dir.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    return true;
-                }
-            });
-
-
-            bugReport.append("Logs generated : \n");
-            for (File file : files) {
-                bugReport.append("- '" + file.getName() + "'\n");
-            }
-            Assert.fail(bugReport.toString());
+            failAndPrintFolderStatusReport("Log '" + fullPath + "' exist != " + isCreated + " !\n");
         }
 
+    }
+
+    /**
+     * Assert with a failing message and the content of the logs folder
+     * @param message
+     */
+    protected void failAndPrintFolderStatusReport(String message) {
+        StringBuilder bugReport = new StringBuilder(message);
+        File dir = new File(debugDirectory);
+        File[] files = dir.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return true;
+            }
+        });
+
+        bugReport.append("Logs generated : \n");
+        for (File file : files) {
+            bugReport.append("- '" + file.getName() + "'\n");
+        }
+        Assert.fail(bugReport.toString());
     }
 
     /**
