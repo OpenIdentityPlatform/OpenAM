@@ -16,6 +16,7 @@
 
 package org.forgerock.oauth2.restlet;
 
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.AuthorizationToken;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -31,6 +32,7 @@ import org.forgerock.openam.rest.service.RouterContextResource;
 import org.forgerock.openam.xui.XUIState;
 import org.owasp.esapi.ESAPI;
 import org.restlet.Request;
+import org.restlet.data.Reference;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -153,8 +155,13 @@ public class AuthorizeResource extends RouterContextResource {
     private Map<String, Object> getDataModel(String displayName, String displayDescription, Set<String> displayScope, Request request) {
         Map<String, Object> data = new HashMap<String, Object>(getRequest().getAttributes());
         data.putAll(getQuery().getValuesMap());
-        data.put("target", getRequest().getResourceRef().toString());
-
+        Reference resRef = getRequest().getResourceRef();
+        String target = resRef.getPath();
+        String query = resRef.getQuery();
+        if (!StringUtils.isBlank(query)) {
+            target = target + "?" + query;
+        }
+        data.put("target", target);
         data.put("display_name", ESAPI.encoder().encodeForHTML(displayName));
         data.put("display_description", ESAPI.encoder().encodeForHTML(displayDescription));
         data.put("display_scope", encodeSetForHTML(displayScope));
