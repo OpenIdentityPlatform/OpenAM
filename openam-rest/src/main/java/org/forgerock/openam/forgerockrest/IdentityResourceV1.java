@@ -15,11 +15,13 @@
  */
 package org.forgerock.openam.forgerockrest;
 
+import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
+import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -76,18 +78,13 @@ import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.RealmContext;
-import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
 
 import javax.mail.MessagingException;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
@@ -98,9 +95,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
-import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -115,9 +109,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     public static final String GROUP_TYPE = "group";
     public static final String AGENT_TYPE = "agent";
-    private final static RedirectUrlValidator<String> URL_VALIDATOR =
-            new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
-
 
     // TODO: filters, sorting, paged results.
 
@@ -438,38 +429,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 debug.error(SEND_NOTIF_TAG + error, e);
             }
             throw new InternalServerErrorException(error, e);
-        }
-    }
-
-    /**
-     * Validates the current goto against the list of allowed gotos, and returns either the allowed
-     * goto as sent in, or the server's default goto value.
-     *
-     * @param context Current Server Context
-     * @param request Request from client to confirm registration
-     * @param handler Result handler
-     */
-    private void validateGoto(final ServerContext context, final ActionRequest request,
-                                     final ResultHandler<JsonValue> handler) {
-
-        final JsonValue jVal = request.getContent();
-        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-
-        try {
-            SSOTokenManager mgr = SSOTokenManager.getInstance();
-            SSOToken ssoToken = mgr.createSSOToken(getCookieFromServerContext(context));
-
-            String gotoURL = URL_VALIDATOR.getRedirectUrl(ssoToken.getProperty(ISAuthConstants.ORGANIZATION),
-                    URL_VALIDATOR.getValueFromJson(jVal, RedirectUrlValidator.GOTO),
-                    ssoToken.getProperty("successURL"));
-
-            result.put("successURL", gotoURL);
-            handler.handleResult(result);
-        } catch (SSOException ssoe){
-            if (debug.errorEnabled()) {
-                debug.error("IdentityResource.validateGoto() :: Invalid SSOToken.", ssoe);
-            }
-            handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN, ssoe.getMessage(), ssoe));
         }
     }
 
@@ -1361,51 +1320,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
     }
 
-    private boolean checkValidPassword(String username, char[] password, String realm) throws BadRequestException {
-        if(username == null || password == null ){
-            throw new BadRequestException("Invalid Username or Password");
-        }
-        try {
-            AuthContext lc = new AuthContext(realm);
-            lc.login();
-            while (lc.hasMoreRequirements()) {
-                Callback[] callbacks = lc.getRequirements();
-                ArrayList missing = new ArrayList();
-                // loop through the requires setting the needs..
-                for (int i = 0; i < callbacks.length; i++) {
-                    if (callbacks[i] instanceof NameCallback) {
-                        NameCallback nc = (NameCallback) callbacks[i];
-                        nc.setName(username);
-                    } else if (callbacks[i] instanceof PasswordCallback) {
-                        PasswordCallback pc = (PasswordCallback) callbacks[i];
-                        pc.setPassword(password);
-                    } else {
-                        missing.add(callbacks[i]);
-                    }
-                }
-                // there's missing requirements not filled by this
-                if (missing.size() > 0) {
-                    throw new BadRequestException("Insufficient Requirements");
-                }
-                lc.submitRequirements(callbacks);
-            }
-
-            // validate the password..
-            if (lc.getStatus() == AuthContext.Status.SUCCESS) {
-                lc.logout();
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateInstance(final ServerContext context, final String resourceId, final UpdateRequest request,
             final ResultHandler<Resource> handler) {
@@ -1416,7 +1330,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
 
-        final JsonValue jVal = request.getContent();
+        final JsonValue jsonValue = request.getContent();
         final String rev = request.getRevision();
         IdentityDetails dtls, newDtls;
         IdentityServicesImpl idsvc = new IdentityServicesImpl();
@@ -1424,34 +1338,33 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         try {
             // Retrieve details about user to be updated
             dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
-            // Continue modifying the identity if read success
 
-            newDtls = jsonValueToIdentityDetails(jVal, realm);
+            //check first if the password is modified as part of the update request, so if necessary, the password can
+            //be removed from the IdentityDetails object.
+            if (!isAdmin(context)) {
+                for (String attrName : jsonValue.keys()) {
+                    if ("userpassword".equalsIgnoreCase(attrName)) {
+                        String newPassword = jsonValue.get(attrName).asString();
+                        if (!isNullOrEmpty(newPassword)) {
+                            String oldPassword = RestUtils.getMimeHeaderValue(context, OLD_PASSWORD);
+                            if (isNullOrEmpty(oldPassword)) {
+                                throw new BadRequestException("The old password is missing from the request");
+                            }
+                            //This is an end-user trying to change the password, so let's change the password by
+                            //verifying that the provided old password is correct. We also remove the password from the
+                            //list of attributes to prevent the administrative password reset via the update call.
+                            jsonValue.remove(attrName);
+                            IdentityRestUtils.changePassword(context, realm, resourceId, oldPassword, newPassword);
+                        }
+                        break;
+                    }
+                }
+            }
+            newDtls = jsonValueToIdentityDetails(jsonValue, realm);
             if (newDtls.getName() != null && !resourceId.equalsIgnoreCase(newDtls.getName())) {
                 throw new BadRequestException("id in path does not match id in request body");
             }
             newDtls.setName(resourceId);
-            String userpass = null;
-            for (String attrName : jVal.keys()) {
-                if ("userpassword".equalsIgnoreCase(attrName)) {
-                    userpass = jVal.get(attrName).asString();
-                }
-            }
-            // Check that the attribute userpassword is in the json object
-            if(userpass != null && !userpass.isEmpty()) {
-                // If so password reset attempt
-                if(checkValidPassword(resourceId, userpass.toCharArray(),realm) || isAdmin(context)){
-                    // same password as before, update the attributes
-                } else {
-                    // check header to make sure that oldpassword is there check to see if it's correct
-                    String strPass = RestUtils.getMimeHeaderValue(context, OLD_PASSWORD);
-                    if(strPass != null && !strPass.isEmpty() && checkValidPassword(resourceId, strPass.toCharArray(), realm)){
-                        //continue will allow password change
-                    } else{
-                        throw new BadRequestException("Invalid Password");
-                    }
-                }
-            }
 
             // update resource with new details
             UpdateResponse message = idsvc.update(newDtls, admin);
@@ -1480,10 +1393,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     generalFailure);
             handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
-        } catch (BadRequestException bre){
+        } catch (final ResourceException re){
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! "
-                    + resourceId + ":" + bre);
-            handler.handleError(bre);
+                    + resourceId + ":" + re);
+            handler.handleError(re);
         } catch (final Exception exception) {
             debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     exception);

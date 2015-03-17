@@ -22,15 +22,14 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.DuplicateObject;
 import com.sun.identity.idsvcs.GeneralFailure;
-import com.sun.identity.idsvcs.IdServicesException;
 import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.NeedMoreCredentials;
 import com.sun.identity.idsvcs.ObjectNotFound;
@@ -45,21 +44,6 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.mail.MessagingException;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
@@ -98,8 +82,25 @@ import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
+
+import javax.mail.MessagingException;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -1058,50 +1059,22 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 if (isNullOrEmpty(userPassword)) {
                     throw new BadRequestException("'" + USER_PASSWORD + "' attribute not set in JSON content.");
                 }
-
                 String currentPassword = value.get(CURRENT_PASSWORD).asString();
-                if (isNullOrEmpty(currentPassword)) {
+                if (StringUtils.isBlank(currentPassword)) {
                     throw new BadRequestException("'" + CURRENT_PASSWORD + "' attribute not set in JSON content.");
                 }
 
-                if (!checkValidPassword(resourceId, currentPassword.toCharArray(), realm)) {
-                    throw new BadRequestException("Invalid Password");
+                IdentityRestUtils.changePassword(context, realm, resourceId, currentPassword, userPassword);
+
+                if (debug.messageEnabled()) {
+                    String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+                    debug.message("IdentityResource.actionInstance :: ACTION of change password for " + resourceId
+                            + " in realm " + realm + " performed by " + principalName);
                 }
-
-                IdentityServicesImpl idsvc = new IdentityServicesImpl();
-                Token admin = new Token();
-                admin.setId(getCookieFromServerContext(context));
-                IdentityDetails identityDetails = jsonValueToIdentityDetails(json(object(
-                        field(USER_PASSWORD, userPassword))), realm);
-                identityDetails.setName(resourceId);
-                idsvc.update(identityDetails, admin);
-                String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-                debug.message("IdentityResource.actionInstance :: ACTION of change password for " + resourceId +
-                        " in realm " + realm + " performed by " + principalName);
                 handler.handleResult(json(object()));
-                return;
-
-            } catch (BadRequestException e) {
-                debug.error("Cannot change password! " + resourceId + ":" + e);
-                handler.handleError(e);
-            } catch (GeneralFailure e) {
-                debug.error("Cannot change password: " + e.getMessage());
-                handler.handleError(new BadRequestException(e.getMessage(), e));
-            } catch (ObjectNotFound e) {
-                debug.error("Cannot change password: " + e.getMessage());
-                handler.handleError(new NotFoundException("Resource not found.", e));
-            } catch (NeedMoreCredentials e) {
-                debug.error("Cannot change password: " + e.getMessage());
-                handler.handleError(new ForbiddenException("Token is not authorized", e));
-            } catch (AccessDenied e) {
-                debug.error("Cannot change password: " + e.getMessage());
-                handler.handleError(new ForbiddenException(e.getMessage(), e));
-            } catch (TokenExpired e) {
-                debug.error("Cannot change password: " + e.getMessage());
-                handler.handleError(new PermanentException(401, "Unauthorized", null));
-            } catch (IdServicesException e) {
-                debug.error("Cannot change password: " + e.getMessage());
-                handler.handleError(new BadRequestException(e.getMessage(), e));
+            } catch (ResourceException re) {
+                debug.error("Cannot change password! " + resourceId + ":" + re);
+                handler.handleError(re);
             }
         } else {
             handler.handleError(new NotSupportedException(action + " not supported for resource instances"));
@@ -1345,45 +1318,25 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     }
 
     private boolean checkValidPassword(String username, char[] password, String realm) throws BadRequestException {
-        if(username == null || password == null ){
+        if (username == null || password == null) {
             throw new BadRequestException("Invalid Username or Password");
         }
         try {
-            AuthContext lc = new AuthContext(realm);
-            lc.login();
-            while (lc.hasMoreRequirements()) {
-                Callback[] callbacks = lc.getRequirements();
-                ArrayList missing = new ArrayList();
-                // loop through the requires setting the needs..
-                for (int i = 0; i < callbacks.length; i++) {
-                    if (callbacks[i] instanceof NameCallback) {
-                        NameCallback nc = (NameCallback) callbacks[i];
-                        nc.setName(username);
-                    } else if (callbacks[i] instanceof PasswordCallback) {
-                        PasswordCallback pc = (PasswordCallback) callbacks[i];
-                        pc.setPassword(password);
-                    } else {
-                        missing.add(callbacks[i]);
-                    }
-                }
-                // there's missing requirements not filled by this
-                if (missing.size() > 0) {
-                    throw new BadRequestException("Insufficient Requirements");
-                }
-                lc.submitRequirements(callbacks);
+            Callback[] callbacks = new Callback[2];
+            NameCallback nc = new NameCallback("dummy");
+            nc.setName(username);
+            callbacks[0] = nc;
+            PasswordCallback pc = new PasswordCallback("dummy", false);
+            pc.setPassword(password);
+            callbacks[1] = pc;
+            AMIdentityRepository idRepo = new AMIdentityRepository(null, realm);
+            return idRepo.authenticate(callbacks);
+        } catch (Exception ex) {
+            if (debug.messageEnabled()) {
+                debug.message("Failed to verify password for user: " + username + " due to: " + ex.getMessage());
             }
-
-            // validate the password..
-            if (lc.getStatus() == AuthContext.Status.SUCCESS) {
-                lc.logout();
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-
+            return false;
         }
-        return false;
     }
 
     /**
@@ -1412,7 +1365,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             for (String key : jVal.keys()) {
                 if ("userpassword".equalsIgnoreCase(key)) {
                     handler.handleError(new BadRequestException("Cannot update user password via PUT. "
-                            + "Use POST with _action=forgotPassword."));
+                            + "Use POST with _action=changePassword or _action=forgotPassword."));
                     return;
                 }
             }
@@ -1434,7 +1387,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
             // Make sure user is not admin and check to see if we are requiring a password to change any attributes
             Set<String> protectedUserAttributes = restSecurity.getProtectedUserAttributes();
             if (protectedUserAttributes != null && !isAdmin(context)) {
-                Boolean hasReauthenticated = false;
+                boolean hasReauthenticated = false;
                 for (String protectedAttr : protectedUserAttributes) {
                     JsonValue jValAttr = jVal.get(protectedAttr);
                     if(!jValAttr.isNull()){
