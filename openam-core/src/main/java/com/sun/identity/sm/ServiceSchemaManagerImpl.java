@@ -99,7 +99,8 @@ public class ServiceSchemaManagerImpl implements SMSObjectListener {
     private Map subSchemas;
 
     private Map pluginInterfaces;
-    
+    private String resourceName;
+
     // Private constructor, an instance can obtained only via getInstance
     private ServiceSchemaManagerImpl(SSOToken t, String serviceName,
             String version) throws SMSException, SSOException {
@@ -246,6 +247,20 @@ public class ServiceSchemaManagerImpl implements SMSObjectListener {
     }
 
     /**
+     * The name to use in CREST representation.
+     */
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    void setResourceName(String name) throws SMSException,
+            SSOException {
+        resourceName = name;
+        Node schemaNode = XMLUtils.getRootNode(getDocument(), SMSUtils.SCHEMA);
+        ((Element) schemaNode).setAttribute(SMSUtils.RESOURCE_NAME, name);
+    }
+
+    /**
      * Returns the SchemaTypes available with this service
      */
     Set getSchemaTypes() throws SMSException {
@@ -297,6 +312,7 @@ public class ServiceSchemaManagerImpl implements SMSObjectListener {
         sb.append("\nI18n Jar URL: ").append(getI18NJarURL());
         sb.append("\nService hierarchy: ").append(getServiceHierarchy());
         sb.append("\nProperty View Bean: ").append(getPropertiesViewBeanURL());
+        sb.append("\nResource Name: ").append(getResourceName());
 
         ServiceSchemaImpl ss;
         if ((ss = getSchema(SchemaType.GLOBAL)) != null) {
@@ -481,6 +497,8 @@ public class ServiceSchemaManagerImpl implements SMSObjectListener {
                 SMSUtils.SERVICE_HIERARCHY);
         viewBeanURL = XMLUtils.getNodeAttributeValue(schemaRoot,
                 SMSUtils.PROPERTIES_VIEW_BEAN_URL);
+        resourceName = XMLUtils.getNodeAttributeValue(schemaRoot,
+                SMSUtils.RESOURCE_NAME);
         String revNum = XMLUtils.getNodeAttributeValue(schemaRoot,
                 SMSUtils.REVISION_NUMBER);
         try {

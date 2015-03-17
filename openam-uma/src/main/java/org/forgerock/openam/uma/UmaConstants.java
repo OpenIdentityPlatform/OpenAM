@@ -45,7 +45,6 @@ public final class UmaConstants {
     public static final String DELETE_POLICIES_ON_RESOURCE_SERVER_DELETION = "uma-delete-policies-on-resource-server-deletion";
     public static final String DELETE_RESOURCE_SETS_ON_RESOURCE_SERVER_DELETION
             = "uma-delete-resource-sets-on-resource-server-deletion";
-    static final String BACKEND_POLICIES_CACHE_SIZE = "uma-backend-policy-cache-size";
     static final String SUPPORTED_PAT_PROFILES_ATTR_NAME = "uma-supported-pat-profiles";
     static final String SUPPORTED_AAT_PROFILES_ATTR_NAME = "uma-supported-aat-profiles";
     static final String SUPPORTED_RPT_PROFILES_ATTR_NAME = "uma-supported-rpt-profiles";

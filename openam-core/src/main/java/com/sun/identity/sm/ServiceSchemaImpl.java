@@ -67,6 +67,8 @@ class ServiceSchemaImpl {
 
     String inheritance;
 
+    String resourceName;
+
     // Attribute & sub-schema variables
     Set serviceAttributes;
 
@@ -115,6 +117,13 @@ class ServiceSchemaImpl {
      */
     String getName() {
         return (name);
+    }
+
+    /**
+     * Returns the name of the schema for CREST representation.
+     */
+    String getResourceName() {
+        return resourceName;
     }
 
     /**
@@ -299,6 +308,9 @@ class ServiceSchemaImpl {
         if (getName() != null) {
             sb.append("Schema name: ").append(getName()).append("\n");
         }
+        if (getResourceName() != null) {
+            sb.append("Schema resource name: ").append(getResourceName()).append("\n");
+        }
         // Attributes
         if (attrSchemas.size() > 0) {
             sb.append("Attribute Schemas:\n");
@@ -350,6 +362,8 @@ class ServiceSchemaImpl {
                 SMSUtils.INHERITANCE);
         validate = XMLUtils
                 .getNodeAttributeValue(schemaNode, SMSUtils.VALIDATE);
+        resourceName = XMLUtils
+                .getNodeAttributeValue(schemaNode, SMSUtils.RESOURCE_NAME);
 
         // Update sub-schema's, organization schema and attributes
         Set newServiceAttributes = new HashSet();

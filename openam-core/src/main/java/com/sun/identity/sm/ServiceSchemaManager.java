@@ -214,7 +214,7 @@ public class ServiceSchemaManager {
             throw se;
         }
     }
-    
+
     /**
      * Returns the service's hierarchy.
      *
@@ -226,7 +226,7 @@ public class ServiceSchemaManager {
         validate();
         return (ssm.getServiceHierarchy());
     }
-    
+
     /**
      * Sets the service's hierarchy
      *
@@ -240,7 +240,7 @@ public class ServiceSchemaManager {
      * @supported.api
      */
     public void setServiceHierarchy(String newhierarchy) throws SMSException,
-        SSOException {
+            SSOException {
         SMSEntry.validateToken(token);
         validateServiceSchemaManagerImpl();
         String tmpS = getServiceHierarchy();
@@ -252,7 +252,7 @@ public class ServiceSchemaManager {
             throw e;
         }
     }
-    
+
     /**
      * Returns i18nKey of the schema.
      *
@@ -328,7 +328,42 @@ public class ServiceSchemaManager {
             throw e;
         }
     }
-    
+
+    /**
+     * Returns the service's resource name for CREST representation.
+     * @supported.api
+     */
+    public String getResourceName() {
+        validate();
+        return (ssm.getResourceName());
+    }
+
+    /**
+     * Sets the service's  resource name for CREST representation.
+     *
+     * @param name
+     *             resource name for CREST representation
+     * @throws SMSException
+     *             if an error occurred while trying to perform the operation
+     * @throws SSOException
+     *             if the single sign on token is invalid or expired
+     *
+     * @supported.api
+     */
+    public void setResourceName(String name) throws SMSException,
+            SSOException {
+        SMSEntry.validateToken(token);
+        validateServiceSchemaManagerImpl();
+        String tmpS = getResourceName();
+        ssm.setResourceName(name);
+        try {
+            replaceSchema(ssm.getDocument());
+        } catch (SMSException e) {
+            ssm.setResourceName(tmpS);
+            throw e;
+        }
+    }
+
     /**
      * iPlanet_PUBLIC-METHOD Returns the revision number of the service schema.
      *

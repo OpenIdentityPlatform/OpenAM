@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: ServiceSchema.java,v 1.12 2008/08/30 16:46:47 goodearth Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -246,7 +243,7 @@ public class ServiceSchema {
 
     /**
      * Returns the I18N properties file name for the service schema.
-     * 
+     *
      * @return the I18N properties file name for the service schema
      */
     public String getI18NFileName() {
@@ -255,7 +252,7 @@ public class ServiceSchema {
 
     /**
      * Sets the I18N properties file name for the service schema
-     * 
+     *
      * @param url
      *            properties file name
      * @throws SMSException
@@ -265,6 +262,32 @@ public class ServiceSchema {
      */
     public void setI18NFileName(String url) throws SMSException, SSOException {
         ssm.setI18NFileName(url);
+    }
+
+    /**
+     * Returns the name for the service schema when used in a CREST representation.
+     */
+    public String getResourceName() {
+        return ss.getResourceName();
+    }
+
+    /**
+     * Sets the CREST resource name for the service schema.
+     *
+     * @param name
+     *            resource name.
+     * @throws SMSException
+     *             if an error occurred while trying to perform the operation
+     * @throws SSOException
+     *             if the single sign on token is invalid or expired
+     */
+    public void setResourceName(String name) throws SMSException, SSOException {
+        SMSEntry.validateToken(ssm.getSSOToken());
+        Node sNode = ss.getSchemaNode();
+        ((Element) sNode).setAttribute(SMSUtils.RESOURCE_NAME, name);
+        ssm.replaceSchema((ServiceSchemaManagerImpl.getInstance(ssm.getSSOToken(), ssm.getName(), ssm.getVersion()))
+                        .getDocument());
+        ss.resourceName = name;
     }
 
     /**

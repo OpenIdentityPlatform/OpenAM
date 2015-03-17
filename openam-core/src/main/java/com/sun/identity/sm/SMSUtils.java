@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SMSUtils.java,v 1.5 2008/07/11 01:46:21 arviranga Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -209,6 +206,8 @@ public class SMSUtils {
 
     protected static final String ATTRIBUTE_FALSE_BOOLEAN_ELEMENT =
         "BooleanFalseValue";
+
+    public static final String RESOURCE_NAME = "resourceName";
 
     protected static int counter = 0;
 

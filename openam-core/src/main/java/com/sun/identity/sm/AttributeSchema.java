@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: AttributeSchema.java,v 1.13 2009/01/13 06:56:08 mahesh_prasad_r Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -721,6 +718,27 @@ public class AttributeSchema {
                     + ":" + arg, "sms-invalid-searchable-value");
         }
         updateXMLDocument(SMSUtils.ISSEARCHABLE, value);
+    }
+
+    /**
+     * Returns the name of this attribute when used in a CREST representation.
+     */
+    public String getResourceName() {
+        return as.getResourceName();
+    }
+
+    /**
+     * Sets the CREST representation name for the attribute.
+     *
+     * @param name
+     *            the name of the CREST property.
+     * @throws SMSException
+     *             if an error is encountered when trying to set.
+     * @throws SSOException
+     *             if the single sign on token is invalid or expired.
+     */
+    public void setResourceName(String name) throws SSOException, SMSException {
+        updateXMLDocument(SMSUtils.RESOURCE_NAME, name);
     }
 
     /**

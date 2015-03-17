@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: AttributeSchemaImpl.java,v 1.3 2008/06/25 05:44:03 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -59,6 +56,8 @@ public class AttributeSchemaImpl {
     private String name;
 
     private String key;
+
+    private String resourceName;
 
     private AttributeSchema.Type type;
 
@@ -123,6 +122,13 @@ public class AttributeSchemaImpl {
      */
     public String getName() {
         return (name);
+    }
+
+    /**
+     * Returns the name of the attribute for CREST representation.
+     */
+    public String getResourceName() {
+        return (resourceName);
     }
 
     /**
@@ -460,6 +466,7 @@ public class AttributeSchemaImpl {
         buf.append("\n\tisResourceNameAllowed=").append(isResourceNameAllowed);
         buf.append("\n\tisStatusAttribute=").append(isStatusAttribute);
         buf.append("\n\tisSearchable=").append(isSearchable);
+        buf.append("\n\tresourceName=").append(resourceName);
         buf.append("\n");
         return buf.toString();
     }
@@ -479,6 +486,9 @@ public class AttributeSchemaImpl {
 
         // Get attribute name
         name = XMLUtils.getNodeAttributeValue(n, SMSUtils.NAME);
+
+        // Get json name
+        resourceName = XMLUtils.getNodeAttributeValue(n, SMSUtils.RESOURCE_NAME);
 
         // Get I18N key
         key = XMLUtils.getNodeAttributeValue(n, SMSUtils.I18N_KEY);

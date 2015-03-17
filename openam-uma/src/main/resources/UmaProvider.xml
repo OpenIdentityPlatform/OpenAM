@@ -26,13 +26,15 @@
                 serviceHierarchy="/DSAMEConfig/umaProviderService"
                 i18nFileName="UmaProvider"
                 revisionNumber="1"
-                i18nKey="forgerock-am-uma-service-description">
+                i18nKey="forgerock-am-uma-service-description"
+                resourceName="uma">
             <Organization>
                 <AttributeSchema name="uma-rpt-lifetime"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a101">
+                                 i18nKey="a101"
+                                 resourceName="rptLifetime">
                     <DefaultValues>
                         <Value>3600</Value>
                     </DefaultValues>
@@ -42,7 +44,8 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 resourceName="permissionTicketLifetime">
                     <DefaultValues>
                         <Value>60</Value>
                     </DefaultValues>
@@ -51,7 +54,8 @@
                 <AttributeSchema name="uma-delete-policies-on-resource-server-deletion"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a103">
+                                 i18nKey="a103"
+                                 resourceName="deletePoliciesOnDeleteRS">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -64,7 +68,8 @@
                 <AttributeSchema name="uma-delete-resource-sets-on-resource-server-deletion"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a104">
+                                 i18nKey="a104"
+                                 resourceName="deleteResourceSetsOnDeleteRS">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -74,21 +79,12 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="uma-backend-policy-cache-size"
-                                 type="single"
-                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                 validator="RequiredValueValidator"
-                                 i18nKey="a105">
-                    <DefaultValues>
-                        <Value>1000</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
                 <!-- TODO bearer MUST always be supported so should we just added it always and not have here? or have here as well? -->
                 <AttributeSchema name="uma-supported-pat-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a106">
+                                 i18nKey="a106"
+                                 resourceName="supportedPatProfiles">
                     <DefaultValues>
                         <Value>bearer</Value>
                     </DefaultValues>
@@ -98,7 +94,8 @@
                 <AttributeSchema name="uma-supported-aat-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a107">
+                                 i18nKey="a107"
+                                 resourceName="supportedAatProfiles">
                     <DefaultValues>
                         <Value>bearer</Value>
                     </DefaultValues>
@@ -108,7 +105,8 @@
                 <AttributeSchema name="uma-supported-rpt-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a108">
+                                 i18nKey="a108"
+                                 resourceName="supportedRptProfiles">
                     <DefaultValues>
                         <Value>bearer</Value>
                     </DefaultValues>
@@ -117,7 +115,8 @@
                 <AttributeSchema name="uma-supported-claim-token-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a109">
+                                 i18nKey="a109"
+                                 resourceName="supportedClaimTokenProfiles">
                     <DefaultValues>
                     </DefaultValues>
                 </AttributeSchema>
@@ -125,115 +124,12 @@
                 <AttributeSchema name="uma-supported-uma-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a110">
+                                 i18nKey="a110"
+                                 resourceName="supportedUmaProfiles">
                     <DefaultValues>
                     </DefaultValues>
                 </AttributeSchema>
 
-                <SubSchema name="serverconfig" inheritance="multiple">
-
-                    <AttributeSchema name="uma-rpt-lifetime"
-                                     type="single"
-                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a101">
-                        <DefaultValues>
-                            <Value>3600</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="uma-permission-ticket-lifetime"
-                                     type="single"
-                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a102">
-                        <DefaultValues>
-                            <Value>60</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="uma-delete-policies-on-resource-server-deletion"
-                                     type="single"
-                                     syntax="boolean"
-                                     i18nKey="a103">
-                        <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="uma-delete-resource-sets-on-resource-server-deletion"
-                                     type="single"
-                                     syntax="boolean"
-                                     i18nKey="a104">
-                        <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="uma-backend-policy-cache-size"
-                                     type="single"
-                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a105">
-                        <DefaultValues>
-                            <Value>1000</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <!-- TODO bearer MUST always be supported so should we just added it always and not have here? or have here as well? -->
-                    <AttributeSchema name="uma-supported-pat-profiles"
-                                     type="list"
-                                     syntax="string"
-                                     i18nKey="a106">
-                        <DefaultValues>
-                            <Value>bearer</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <!-- TODO bearer MUST always be supported so should we just added it always and not have here? or have here as well? -->
-                    <AttributeSchema name="uma-supported-aat-profiles"
-                                     type="list"
-                                     syntax="string"
-                                     i18nKey="a107">
-                        <DefaultValues>
-                            <Value>bearer</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <!-- TODO bearer MUST always be supported so should we just added it always and not have here? or have here as well? -->
-                    <AttributeSchema name="uma-supported-rpt-profiles"
-                                     type="list"
-                                     syntax="string"
-                                     i18nKey="a108">
-                        <DefaultValues>
-                            <Value>bearer</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="uma-supported-claim-token-profiles"
-                                     type="list"
-                                     syntax="string"
-                                     i18nKey="a109">
-                        <DefaultValues>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="uma-supported-uma-profiles"
-                                     type="list"
-                                     syntax="string"
-                                     i18nKey="a110">
-                        <DefaultValues>
-                        </DefaultValues>
-                    </AttributeSchema>
-                </SubSchema>
             </Organization>
         </Schema>
     </Service>

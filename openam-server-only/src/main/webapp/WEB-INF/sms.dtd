@@ -24,9 +24,7 @@
   
    $Id: sms.dtd,v 1.8 2008/09/04 23:59:39 veiming Exp $
   
--->
-<!--
-    Portions Copyrighted 2014 ForgeRock AS.
+   Portions Copyrighted 2014-2015 ForgeRock AS.
 -->
 
 <!-- This DTD defines the data structure that will be used by services to define their configuration information and their management tasks.
@@ -60,6 +58,7 @@ Unique Declaration name for DOCTYPE tag:
         serviceHierarchy CDATA #IMPLIED
         propertiesViewBeanURL CDATA #IMPLIED
         revisionNumber NMTOKEN "10"
+        resourceName CDATA #IMPLIED
         %i18nIndex; >
 
 <!-- Global element provides grouping of configuration parameters that are globally applicable to all instances of its service. In the case of services that are grouped, these configuration parameters are global to that group. The schema of the configuration parameters is provided by AttributeSchema, and if there is any necessity to sub-group additional configuration parameters, they can be grouped using the SubSchema element. The attribute validate is by default considered yes, but if it is set to no, then the validation of configuration data against the schema is disabled. This also disables the inheritance of default values from the schema. -->
@@ -114,6 +113,7 @@ Unique Declaration name for DOCTYPE tag:
         validate ( yes | no ) "yes"
         supportsApplicableOrganization ( yes | no ) "no"
         i18nFileName CDATA #IMPLIED
+        resourceName CDATA #IMPLIED
         %i18nIndex;
 >
 
@@ -163,6 +163,7 @@ Unique Declaration name for DOCTYPE tag:
         any CDATA #IMPLIED
         propertiesViewBeanURL CDATA #IMPLIED
         isSearchable ( yes | no ) "no"
+        resourceName CDATA #IMPLIED
         %i18nIndex;
 >
 
