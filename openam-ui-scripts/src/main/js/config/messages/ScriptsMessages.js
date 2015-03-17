@@ -26,6 +26,13 @@
 
 define("config/messages/ScriptsMessages", [], function () {
     return {
-
+        "Created": {
+            msg: "config.messages.ScriptsMessages.scriptCreated",
+            type: "info"
+        },
+        "scriptUpdated": {
+            msg: "config.messages.ScriptsMessages.scriptUpdated",
+            type: "info"
+        }
     };
 });

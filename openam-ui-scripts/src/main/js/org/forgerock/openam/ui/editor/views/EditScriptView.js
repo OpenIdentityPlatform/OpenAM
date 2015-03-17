@@ -26,32 +26,36 @@
 
 define("org/forgerock/openam/ui/editor/views/EditScriptView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/editor/models/Script"
-], function (AbstractView, Script) {
+    "org/forgerock/openam/ui/editor/models/Script",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/EventManager"
+], function (AbstractView, Script, Constants, EventManager) {
 
     var EditScriptView = AbstractView.extend({
         initialize: function(options) {
             this.model = null;
         },
+
         template: "templates/editor/views/EditScriptTemplate.html",
         data: {},
         events: {
             'click input[name=save]': 'submitForm'
         },
+
         onModelError: function(model, response) {
             console.error('Unrecoverable load failure Script. ' +
                 response.status + ' ' + response.statusText);
         },
+
         onModelSync: function(model, response) {
-            this.render();
+            this.renderAfterSyncModel();
         },
 
         render: function (args, callback) {
-            var self = this,
-                uuid = null;
+            var uuid = null;
 
-            // as we interrupt render to update the model, we need to remember callback
-            if (callback) { self.renderCallback = callback; }
+            // As we interrupt render to update the model, we need to remember the callback
+            if (callback) { this.renderCallback = callback; }
 
             // Get the current id
             if(args && args[0]) { uuid = args[0]; }
@@ -66,17 +70,32 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
              */
             if(this.syncModel(uuid)) { return; }
 
-            this.data.entity = _.pick(this.model.attributes, 'uuid', 'name', 'script');
+            this.renderAfterSyncModel();
+        },
 
-            this.data.languages = [ {name: 'Javascript', value: 'JAVASCRIPT'},
-                {name: 'Groovy', value: 'GROOVY'}
+        /**
+         * So the uuid can be omitted to the render function for two reasons:
+         * 1. need to create a new script
+         * 2. the render function is called from the function onModelSync
+         * Then there is a conflict in the function syncModel.
+         * In the first case we should to create a new model, in second case is not create.
+         * So I divided the render function into two parts, so as not to cause a re-check and avoid the second case.
+         */
+        renderAfterSyncModel: function() {
+            var self = this;
+
+            this.data.entity = _.pick(this.model.attributes, 'uuid', 'name', 'language', 'context', 'script');
+
+            this.data.languages = [ {name: 'Groovy', value: 'GROOVY'},
+                 {name: 'Javascript', value: 'JAVASCRIPT'}
             ];
 
             // TODO temporary, until contexts are not implemented on the server side
             this.data.contexts = [ {name: 'General Purpose', value: 'GENERAL_PURPOSE'},
                 {name: 'Authorization', value: 'AUTHORIZATION'},
                 {name: 'Client-side Authentication', value: 'CLIENT_SIDE_AUTHENTICATION'},
-                {name: 'Server-side Authentication', value: 'SERVER_SIDE_AUTHENTICATION'}
+                {name: 'Server-side Authentication', value: 'SERVER_SIDE_AUTHENTICATION'},
+                {name: 'Authorization entitlement condition', value: 'AUTHORIZATION_ENTITLEMENT_CONDITION'}
             ];
 
             this.parentRender(function () {
@@ -86,17 +105,48 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             });
         },
 
+        updateFields: function () {
+            var app = this.data.entity,
+                dataFields = this.$el.find('[data-field]'),
+                dataField;
 
-        // TODO move to Script model
-        validate: function () {
-            return true;
+            _.each(dataFields, function (field, key, list) {
+                dataField = field.getAttribute('data-field');
+
+                if (field.type === 'radio') {
+                    if (field.checked) {
+                        app[dataField] = field.value;
+                    }
+                } else {
+                    app[dataField] = field.value;
+                }
+            });
         },
 
         submitForm: function () {
-            // TODO implement save logic
-//            if (this.validate()) {
-//
-//            }
+            var savePromise;
+
+            this.updateFields();
+            _.extend(this.model.attributes, this.data.entity);
+
+            savePromise = this.model.save();
+            if (savePromise) {
+                if (this.model.id) {
+                    savePromise.done(function (e) {
+                        EventManager.sendEvent(Constants.EVENT_HANDLE_DEFAULT_ROUTE);
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "scriptUpdated");
+                    });
+                } else {
+                    savePromise.done(function (e) {
+                        console.log(e);
+                        EventManager.sendEvent(Constants.EVENT_HANDLE_DEFAULT_ROUTE);
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "scriptCreated");
+                    });
+                }
+            } else {
+                console.log(this.model.validationError);
+                // TODO: implement highlighting for inputs
+            }
         },
 
         syncModel: function(uuid) {
@@ -109,7 +159,7 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                 this.listenTo(this.model, 'sync', this.onModelSync);
                 this.listenTo(this.model, 'error', this.onModelError);
                 this.model.fetch();
-            } else if (syncRequired) {
+            } else if (!uuid) {
                 // create new script, sync is not needed
                 syncRequired = false;
                 this.stopListening(this.model);

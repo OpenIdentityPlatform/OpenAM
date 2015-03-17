@@ -30,7 +30,7 @@
                             {{#each languages}}
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="scriptLanguage" id="{{value}}" value="{{value}}" >
+                                    <input type="radio" name="scriptLanguage" id="{{value}}" value="{{value}}" data-field="language" checked>
                                     {{name}}
                                 </label>
                             </div>
@@ -47,7 +47,7 @@
                             {{#each contexts}}
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="scriptContext" value="{{value}}">
+                                    <input type="radio" name="scriptContext" value="{{value}}" data-field="context" checked>
                                     {{name}}
                                 </label>
                             </div>

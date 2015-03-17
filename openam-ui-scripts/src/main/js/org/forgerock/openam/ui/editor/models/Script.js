@@ -30,17 +30,34 @@ define("org/forgerock/openam/ui/editor/models/Script", [
     return Backbone.Model.extend({
             idAttribute: 'uuid',
             urlRoot: URLHelper.substitute("__api__/scripts"),
-            defaults: {
-                uuid: '',
-                name: '',
-                script: '',
-                language: '',
-                context: ''
+            defaults: function () {
+                return {
+                    uuid: null,
+                    name: '',
+                    script: '',
+                    language: '',
+                    context: ''
+                };
+            },
+            validate: function(attrs, options) {
+                // TODO: add other checks
+                if (!attrs.name) {
+                    return 'There is no name';
+                }
+
+                if (!attrs.script) {
+                    return 'There is no script';
+                }
             },
             sync: function(method, model, options) {
                 options.beforeSend = function(xhr) {
                     xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
                 };
+
+                if(method.toLowerCase() === 'create') {
+                    options = options || {};
+                    options.url = this.urlRoot() + '/?_action=create';
+                }
 
                 return Backbone.Model.prototype.sync.call(this, method, model, options);
             }

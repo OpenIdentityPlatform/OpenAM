@@ -36,6 +36,8 @@
                 "errorFetchingNotifications": "Error fetching notifications."
             },
             "ScriptsMessages": {
+                "scriptCreated": "Script created successfully",
+                "scriptUpdated": "Script updated successfully"
             }
         },
         "AppConfiguration": {
