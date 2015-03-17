@@ -82,8 +82,6 @@ import org.forgerock.openam.rest.uma.UmaIdRepoCreationListener;
 import org.forgerock.openam.rest.uma.UmaPolicyServiceImpl;
 import org.forgerock.openam.rest.uma.UmaResourceSetRegistrationListener;
 import org.forgerock.openam.scripting.ScriptException;
-import org.forgerock.openam.scripting.service.ScriptConfigurationService;
-import org.forgerock.openam.scripting.service.ScriptConfigurationServiceMockImpl;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.Config;
@@ -174,7 +172,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 .addBinding().to(UmaResourceSetRegistrationListener.class);
 
         // Scripting configuration
-        bind(ScriptConfigurationService.class).to(ScriptConfigurationServiceMockImpl.class);
         bind(new TypeLiteral<ExceptionMappingHandler<ScriptException, ResourceException>>() {})
                 .to(ScriptExceptionMappingHandler.class);
     }

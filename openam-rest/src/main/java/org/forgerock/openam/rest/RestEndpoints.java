@@ -274,9 +274,9 @@ public class RestEndpoints {
                 .through(CoreTokenResourceAuthzModule.class, CoreTokenResourceAuthzModule.NAME)
                 .forVersion("1.0").to(CoreTokenResource.class);
 
-        dynamicRealmRouter.route("/scripts")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
-                .forVersion("1.0").to(ScriptResource.class);
+//        dynamicRealmRouter.route("/scripts")
+//                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+//                .forVersion("1.0").to(ScriptResource.class);
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
         VersionBehaviourConfigListener.bindToServiceConfigManager(dynamicRealmRouter);

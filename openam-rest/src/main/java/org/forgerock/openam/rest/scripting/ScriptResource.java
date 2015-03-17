@@ -51,7 +51,7 @@ import java.util.Set;
  */
 public class ScriptResource extends RealmAwareResource {
 
-    private final ScriptConfigurationService scriptConfigService;
+//    private final ScriptConfigurationService scriptConfigService;
     private final ExceptionMappingHandler<ScriptException, ResourceException> exceptionMappingHandler;
 
     /**
@@ -60,10 +60,10 @@ public class ScriptResource extends RealmAwareResource {
      * @param scriptConfigService An instance of the {@code ScriptConfigurationService}.
      * @param exceptionMappingHandler An instance of the {@code ExceptionMappingHandler}.
      */
-    @Inject
+//    @Inject
     public ScriptResource(ScriptConfigurationService scriptConfigService,
                           ExceptionMappingHandler<ScriptException, ResourceException> exceptionMappingHandler) {
-        this.scriptConfigService = scriptConfigService;
+//        this.scriptConfigService = scriptConfigService;
         this.exceptionMappingHandler = exceptionMappingHandler;
     }
 
@@ -98,13 +98,13 @@ public class ScriptResource extends RealmAwareResource {
      */
     @Override
     public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> resultHandler) {
-        try {
-            final ScriptConfiguration sc = scriptConfigService.saveScriptConfiguration(getContextSubject(context),
-                    getRealm(context), fromJson(request.getContent()));
-            resultHandler.handleResult(new Resource(sc.getUuid(), null, asJson(sc)));
-        } catch (ScriptException se) {
-            resultHandler.handleError(exceptionMappingHandler.handleError(se));
-        }
+//        try {
+//            final ScriptConfiguration sc = scriptConfigService.saveScriptConfiguration(getContextSubject(context),
+//                    getRealm(context), fromJson(request.getContent()));
+//            resultHandler.handleResult(new Resource(sc.getUuid(), null, asJson(sc)));
+//        } catch (ScriptException se) {
+//            resultHandler.handleError(exceptionMappingHandler.handleError(se));
+//        }
     }
 
     /**
@@ -114,12 +114,12 @@ public class ScriptResource extends RealmAwareResource {
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                                ResultHandler<Resource> resultHandler) {
 
-        try {
-            scriptConfigService.deleteScriptConfiguration(getContextSubject(context), getRealm(context), resourceId);
-            resultHandler.handleResult(new Resource(resourceId, null, json(object())));
-        } catch (ScriptException se) {
-            resultHandler.handleError(exceptionMappingHandler.handleError(se));
-        }
+//        try {
+//            scriptConfigService.deleteScriptConfiguration(getContextSubject(context), getRealm(context), resourceId);
+//            resultHandler.handleResult(new Resource(resourceId, null, json(object())));
+//        } catch (ScriptException se) {
+//            resultHandler.handleError(exceptionMappingHandler.handleError(se));
+//        }
 
     }
 
@@ -128,26 +128,26 @@ public class ScriptResource extends RealmAwareResource {
      */
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler resultHandler) {
-        resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(resultHandler, request);
-        try {
-            final Set<ScriptConfiguration> configs = scriptConfigService.getScriptConfigurations(
-                    getContextSubject(context), getRealm(context));
-            int remaining = 0;
-            if (configs.size() > 0) {
-                remaining = configs.size();
-                for (ScriptConfiguration sc : configs) {
-                    boolean keepGoing = resultHandler.handleResource(new Resource(sc.getUuid(),
-                            String.valueOf(System.currentTimeMillis()), asJson(sc)));
-                    remaining--;
-                    if (!keepGoing) {
-                        break;
-                    }
-                }
-            }
-            resultHandler.handleResult(new QueryResult(null, remaining));
-        } catch (ScriptException se) {
-            resultHandler.handleError(exceptionMappingHandler.handleError(se));
-        }
+//        resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(resultHandler, request);
+//        try {
+//            final Set<ScriptConfiguration> configs = scriptConfigService.getScriptConfigurations(
+//                    getContextSubject(context), getRealm(context));
+//            int remaining = 0;
+//            if (configs.size() > 0) {
+//                remaining = configs.size();
+//                for (ScriptConfiguration sc : configs) {
+//                    boolean keepGoing = resultHandler.handleResource(new Resource(sc.getUuid(),
+//                            String.valueOf(System.currentTimeMillis()), asJson(sc)));
+//                    remaining--;
+//                    if (!keepGoing) {
+//                        break;
+//                    }
+//                }
+//            }
+//            resultHandler.handleResult(new QueryResult(null, remaining));
+//        } catch (ScriptException se) {
+//            resultHandler.handleError(exceptionMappingHandler.handleError(se));
+//        }
     }
 
     /**
@@ -156,12 +156,12 @@ public class ScriptResource extends RealmAwareResource {
     @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                              ResultHandler<Resource> resultHandler) {
-        try {
-            resultHandler.handleResult(new Resource(resourceId, null, asJson(scriptConfigService.getScriptConfiguration(
-                    getContextSubject(context), getRealm(context), resourceId))));
-        } catch (ScriptException se) {
-            resultHandler.handleError(exceptionMappingHandler.handleError(se));
-        }
+//        try {
+//            resultHandler.handleResult(new Resource(resourceId, null, asJson(scriptConfigService.getScriptConfiguration(
+//                    getContextSubject(context), getRealm(context), resourceId))));
+//        } catch (ScriptException se) {
+//            resultHandler.handleError(exceptionMappingHandler.handleError(se));
+//        }
     }
 
     /**
@@ -170,13 +170,13 @@ public class ScriptResource extends RealmAwareResource {
     @Override
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
                                ResultHandler<Resource> resultHandler) {
-        try {
-            resultHandler.handleResult(new Resource(resourceId, null, asJson(
-                    scriptConfigService.updateScriptConfiguration(getContextSubject(context), getRealm(context),
-                    fromJson(request.getContent(), resourceId)))));
-        } catch (ScriptException se) {
-            resultHandler.handleError(new BadRequestException(se.getLocalizedMessage()));
-        }
+//        try {
+//            resultHandler.handleResult(new Resource(resourceId, null, asJson(
+//                    scriptConfigService.updateScriptConfiguration(getContextSubject(context), getRealm(context),
+//                    fromJson(request.getContent(), resourceId)))));
+//        } catch (ScriptException se) {
+//            resultHandler.handleError(new BadRequestException(se.getLocalizedMessage()));
+//        }
     }
 
     /**
