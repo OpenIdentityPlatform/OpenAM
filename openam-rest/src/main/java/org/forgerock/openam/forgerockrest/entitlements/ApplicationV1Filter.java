@@ -21,7 +21,6 @@ import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.RandomStringUtils;
-import org.forgerock.guava.common.base.Strings;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -39,15 +38,14 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.openam.entitlement.configuration.SmsAttribute;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeSmsAttributes;
+import org.forgerock.openam.entitlement.configuration.SmsAttribute;
 import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.rest.resource.RealmContext;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.util.promise.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.query.QueryFilter;
@@ -78,16 +76,19 @@ public class ApplicationV1Filter implements Filter {
     private final ResourceTypeService resourceTypeService;
     private final ApplicationServiceFactory applicationServiceFactory;
     private final ExceptionMappingHandler<EntitlementException, ResourceException> resourceErrorHandler;
+    private final ContextHelper contextHelper;
     private final Debug debug;
 
     @Inject
     public ApplicationV1Filter(final ResourceTypeService resourceTypeService,
                                final ApplicationServiceFactory applicationServiceFactory,
                                final ExceptionMappingHandler<EntitlementException, ResourceException> resourceErrorHandler,
+                               final ContextHelper contextHelper,
                                @Named("frRest") final Debug debug) {
         this.resourceTypeService = resourceTypeService;
         this.applicationServiceFactory = applicationServiceFactory;
         this.resourceErrorHandler = resourceErrorHandler;
+        this.contextHelper = contextHelper;
         this.debug = debug;
     }
 
@@ -161,8 +162,8 @@ public class ApplicationV1Filter implements Filter {
             final Map<String, Boolean> actions, Set<String> resources,
             final ServerContext context, CreateRequest request) throws EntitlementException {
 
-        final Subject callingSubject = getContextSubject(context);
-        final String realm = getRealm(context);
+        final Subject callingSubject = contextHelper.getSubject(context);
+        final String realm = contextHelper.getRealm(context);
 
         final Set<QueryFilter<SmsAttribute>> actionFilters = transformSet(actions.entrySet(), new ActionsToQuery());
         final Set<QueryFilter<SmsAttribute>> patternFilters = transformSet(resources, new ResourcesToQuery());
@@ -253,8 +254,8 @@ public class ApplicationV1Filter implements Filter {
             return;
         }
 
-        final String realm = getRealm(context);
-        final Subject callingSubject = getContextSubject(context);
+        final Subject callingSubject = contextHelper.getSubject(context);
+        final String realm = contextHelper.getRealm(context);
         final String applicationName = request.getResourceName();
 
         try {
@@ -352,8 +353,8 @@ public class ApplicationV1Filter implements Filter {
     public void filterQuery(final ServerContext context, final QueryRequest request,
                             final QueryResultHandler handler, final RequestHandler next) {
 
-        final Subject callingSubject = getContextSubject(context);
-        final String realm = getRealm(context);
+        final Subject callingSubject = contextHelper.getSubject(context);
+        final String realm = contextHelper.getRealm(context);
 
         final List<Resource> resources = new ArrayList<Resource>();
 
@@ -474,44 +475,6 @@ public class ApplicationV1Filter implements Filter {
     }
 
     /**
-     * Retrieves the subject from the context.
-     *
-     * @param context
-     *         the server context
-     *
-     * @return the calling subject
-     */
-    private Subject getContextSubject(ServerContext context) {
-        if (!context.containsContext(SSOTokenContext.class)) {
-            return null;
-        }
-
-        return context
-                .asContext(SSOTokenContext.class)
-                .getCallerSubject();
-    }
-
-    /**
-     * Retrieves the realm from the context.
-     *
-     * @param context
-     *         the server context
-     *
-     * @return the realm
-     */
-    private String getRealm(ServerContext context) {
-        if (!context.containsContext(RealmContext.class)) {
-            return null;
-        }
-
-        final String realm = context
-                .asContext(RealmContext.class)
-                .getResolvedRealm();
-
-        return Strings.isNullOrEmpty(realm) ? "/" : realm;
-    }
-
-    /**
      * Inner class to handle the appropriate application json transformation.
      */
     private final class TransformationHandler implements ResultHandler<Resource> {
@@ -523,8 +486,8 @@ public class ApplicationV1Filter implements Filter {
         TransformationHandler(
                 final ResultHandler<Resource> delegate, final ServerContext context) {
             this.delegate = delegate;
-            this.callingSubject = getContextSubject(context);
-            this.realm = getRealm(context);
+            this.callingSubject = contextHelper.getSubject(context);
+            this.realm = contextHelper.getRealm(context);
         }
 
         @Override
