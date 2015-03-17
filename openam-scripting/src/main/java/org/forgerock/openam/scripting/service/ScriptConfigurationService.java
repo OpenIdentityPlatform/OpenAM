@@ -15,61 +15,126 @@
  */
 package org.forgerock.openam.scripting.service;
 
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
+import static org.forgerock.openam.scripting.ScriptException.createAndLogDebug;
+import static org.forgerock.openam.scripting.ScriptException.createAndLogError;
+
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.name.Named;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
 import org.forgerock.openam.scripting.ScriptException;
+import org.forgerock.openam.scripting.datastore.ScriptingDataStore;
+import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
+import org.forgerock.util.Reject;
+import org.slf4j.Logger;
 
 import javax.security.auth.Subject;
+import java.util.Date;
 import java.util.Set;
 
 /**
- * The {@code ScriptingService} is responsible for access to the persisted {@code ScriptConfiguration}
- * instances. It is the layer on top of the {@code ScriptingStore}, which is responsible for access
- * to all the persisted scripting related data.
+ * The {@code ScriptConfigurationService} for access to the persisted {@code ScriptConfiguration}
+ * instances. It is the layer on top of the {@code ScriptConfigurationDataStore}.
  *
  * @since 13.0.0
  */
-public interface ScriptConfigurationService {
+public class ScriptConfigurationService implements ScriptingService<ScriptConfiguration> {
+
+    private final Logger logger;
+    private final Subject subject;
+    private final String realm;
+    private final ScriptingDataStore<ScriptConfiguration> dataStore;
 
     /**
-     * Save the script configuration in the data store under the script's realm.
-     * @param subject The subject with privilege to create scripts.
-     * @param realm The realm in which to create the script.
-     * @param config The script configuration to save.
-     * @return The saved script configuration.
+     * Construct a new instance of {@code ScriptConfigurationService}.
+     * @param logger The logger log any error and debug messages to.
+     * @param subject The subject requesting modification to the {@code ScriptConfiguration}.
+     * @param realm The realm in which the {@code ScriptConfiguration} resides in.
+     * @param dataStoreFactory A factory for providing new scripting data store instances.
      */
-    public ScriptConfiguration saveScriptConfiguration(Subject subject, String realm, ScriptConfiguration config)
-            throws ScriptException;
+    @Inject
+    public ScriptConfigurationService(@Named("ScriptLogger") Logger logger,
+                                      @Assisted Subject subject, @Assisted String realm,
+                                      ScriptingDataStoreFactory<ScriptConfiguration> dataStoreFactory) {
+        Reject.ifNull(subject, realm);
+        this.logger = logger;
+        this.subject = subject;
+        this.realm = realm;
+        this.dataStore = dataStoreFactory.create(subject, realm);
+    }
 
-    /**
-     * Delete the script with the given UUID stored under the given realm from the data store.
-     * @param subject The subject with privilege to delete scripts in this realm.
-     * @param realm The realm from which to delete the script.
-     * @param uuid The unique identifier for the script.
-     */
-    public void deleteScriptConfiguration(Subject subject, String realm, String uuid) throws ScriptException;
+    @Override
+    public ScriptConfiguration create(ScriptConfiguration config) throws ScriptException {
+        failIfUuidExists(config.getUuid());
+        failIfNameExists(config.getName());
+        final ScriptConfiguration updatedConfig = setMetaData(config);
+        dataStore.save(updatedConfig);
+        return updatedConfig;
+    }
 
-    /**
-     * Retrieve the scripts stored under the specified realm from the data store.
-     * @param subject The subject with privilege to access the scripts in this realm.
-     * @param realm The realm from which to retrieve the scripts.
-     * @return A set of script configurations.
-     */
-    public Set<ScriptConfiguration> getScriptConfigurations(Subject subject, String realm) throws ScriptException;
+    @Override
+    public void delete(String uuid) throws ScriptException {
+        failIfUuidDoesNotExist(uuid);
+        dataStore.delete(uuid);
+    }
 
-    /**
-     * Retrieve the script stored under the specified realm from the data store.
-     * @param subject The subject with privilege to access the script in this realm.
-     * @param realm The realm from which to retrieve the script.
-     * @return The script with the given UUID or null if it cannot be found.
-     */
-    public ScriptConfiguration getScriptConfiguration(Subject subject, String realm, String uuid) throws ScriptException;
+    @Override
+    public Set<ScriptConfiguration> getAll() throws ScriptException {
+        return dataStore.getAll();
+    }
 
-    /**
-     * Update the given script.
-     * @param subject The subject with privilege to update the script.
-     * @param realm The realm in which to update the script.
-     * @param config The script to update.
-     * @return The updated resource type.
-     */
-    public ScriptConfiguration updateScriptConfiguration(Subject subject, String realm, ScriptConfiguration config)
-            throws ScriptException;
+    @Override
+    public ScriptConfiguration get(String uuid) throws ScriptException {
+        failIfUuidDoesNotExist(uuid);
+        return dataStore.get(uuid);
+    }
+
+    @Override
+    public ScriptConfiguration update(ScriptConfiguration config) throws ScriptException {
+        final ScriptConfiguration oldConfig = get(config.getUuid());
+        if (!oldConfig.getName().equals(config.getName())) {
+            failIfNameExists(config.getName());
+        }
+        final ScriptConfiguration updatedConfig = setMetaData(config);
+        dataStore.save(updatedConfig);
+        return updatedConfig;
+    }
+
+    private void failIfNameExists(String name) throws ScriptException {
+        if (dataStore.containsName(name)) {
+            throw createAndLogDebug(logger, SCRIPT_NAME_EXISTS, name, realm);
+        }
+    }
+
+    private void failIfUuidExists(String uuid) throws ScriptException {
+        if (dataStore.containsUuid(uuid)) {
+            throw createAndLogError(logger, SCRIPT_UUID_EXISTS, uuid, realm);
+        }
+    }
+
+    private void failIfUuidDoesNotExist(String uuid) throws ScriptException {
+        if (!dataStore.containsUuid(uuid)) {
+            throw createAndLogError(logger, SCRIPT_UUID_NOT_FOUND, uuid, realm);
+        }
+    }
+
+    private ScriptConfiguration setMetaData(ScriptConfiguration config) throws ScriptException {
+        final long now = new Date().getTime();
+        final String principalName = SubjectUtils.getPrincipalId(subject);
+        final ScriptConfiguration.Builder builder = config.populatedBuilder();
+
+        if (dataStore.containsUuid(config.getUuid())) {
+            final ScriptConfiguration oldConfig = get(config.getUuid());
+            builder.setCreatedBy(oldConfig.getCreatedBy());
+            builder.setCreationDate(oldConfig.getCreationDate());
+        } else {
+            builder.setCreatedBy(principalName);
+            builder.setCreationDate(now);
+        }
+        builder.setLastModifiedBy(principalName);
+        builder.setLastModifiedDate(now);
+
+        return builder.build();
+    }
 }

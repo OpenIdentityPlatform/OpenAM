@@ -29,9 +29,12 @@
 
 package com.sun.identity.shared.datastruct;
 
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
+import org.slf4j.Logger;
+
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -148,6 +151,25 @@ public class CollectionHelper {
         } catch (NumberFormatException nfe) {
             debug.error("Unable to parse " + name + "=" + valueString, nfe);
             return defaultValue;
+        }
+    }
+
+    /**
+     * Returns the first attribute value for the corresponding name in the config map and parses it to a long.
+     *
+     * @param config The map where the attribute should be retrieved from.
+     * @param name The name of the attribute that should be retrieved from the map.
+     * @return The attribute from the map corresponding to the provided attribute name, parsed to a long.
+     * If the attribute does not exist the current date time will be returned.
+     */
+    public static long getMapAttrAsDateLong(Map<String, Set<String>> config, String name, Logger logger) {
+        String valueString = null;
+        try {
+            valueString = getMapAttr(config, name);
+            return Long.parseLong(valueString);
+        } catch (NumberFormatException nfe) {
+            logger.error("Unable to parse " + name + "=" + valueString, nfe);
+            return new Date().getTime();
         }
     }
 

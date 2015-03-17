@@ -15,7 +15,10 @@
  */
 package org.forgerock.openam.scripting;
 
+import static org.forgerock.openam.scripting.ScriptConstants.*;
+
 import com.sun.identity.shared.locale.L10NMessageImpl;
+import org.slf4j.Logger;
 
 /**
  * General script exception that allows for localised messages.
@@ -24,11 +27,94 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
  */
 public class ScriptException extends L10NMessageImpl {
 
+    private final ScriptErrorCode scriptErrorCode;
+
     /**
-     * Construct a {@code ScriptException} with the given message.
-     * @param message The message describing the error.
+     * Construct a {@code ScriptException}.
+     * @param errorCode The error code to use for the exception message.
+     * @param cause The {@code Throwable} that caused the error.
+     * @param arguments Arguments used in the message associated with the error code.
      */
-    public ScriptException(String message) {
-        super(message);
+    public ScriptException(ScriptErrorCode errorCode, Throwable cause, String... arguments) {
+        super(RESOURCE_BUNDLE, errorCode.getCode(), arguments);
+        initCause(cause);
+        this.scriptErrorCode = errorCode;
+    }
+
+    /**
+     * Construct a {@code ScriptException}.
+     * @param errorCode The error code to use for the exception message.
+     * @param arguments Arguments used in the message associated with the error code.
+     */
+    public ScriptException(ScriptErrorCode errorCode, String... arguments) {
+        this(errorCode, null, arguments);
+    }
+
+    /**
+     * Get the {@code ScriptErrorCode} that describes this error.
+     * @return the script error code.
+     */
+    public ScriptErrorCode getScriptErrorCode() {
+        return scriptErrorCode;
+    }
+
+    /**
+     * Convenience method that will log the message represented by the error code and
+     * construct a new {@code ScriptException}.
+     * @param logger The logger to which the error should be written.
+     * @param errorCode The error code to use for the exception message.
+     * @param cause The {@code Throwable} that caused the error.
+     * @param arguments Arguments used in the message associated with the error code.
+     * @return A new {@code ScriptException}.
+     */
+    public static ScriptException createAndLogError(Logger logger, ScriptErrorCode errorCode, Throwable cause,
+                                                    String... arguments) {
+        final ScriptException exception = new ScriptException(errorCode, cause, arguments);
+        logger.error(exception.getMessage(), cause);
+        return exception;
+    }
+
+    /**
+     * Convenience method that will log the message represented by the error code and
+     * construct a new {@code ScriptException}.
+     * @param logger The logger to which the error should be written.
+     * @param errorCode The error code to use for the exception message.
+     * @param cause The {@code Throwable} that caused the error.
+     * @param arguments Arguments used in the message associated with the error code.
+     * @return A new {@code ScriptException}.
+     */
+    public static ScriptException createAndLogDebug(Logger logger, ScriptErrorCode errorCode, Throwable cause,
+                                                    String... arguments) {
+        final ScriptException exception = new ScriptException(errorCode, cause, arguments);
+        logger.debug(exception.getMessage(), cause);
+        return exception;
+    }
+
+    /**
+     * Convenience method that will log the message represented by the error code and
+     * construct a new {@code ScriptException}.
+     * @param logger The logger to which the error should be written.
+     * @param errorCode The error code to use for the exception message.
+     * @param arguments Arguments used in the message associated with the error code.
+     * @return A new {@code ScriptException}.
+     */
+    public static ScriptException createAndLogError(Logger logger, ScriptErrorCode errorCode, String... arguments) {
+        final ScriptException exception = new ScriptException(errorCode, arguments);
+        logger.error(exception.getMessage());
+        return exception;
+    }
+
+    /**
+     * Convenience method that will log the message represented by the error code and
+     * construct a new {@code ScriptException}.
+     * @param logger The logger to which the error should be written.
+     * @param errorCode The error code to use for the exception message.
+     * @param arguments Arguments used in the message associated with the error code.
+     * @return A new {@code ScriptException}.
+     */
+    public static ScriptException createAndLogDebug(Logger logger, ScriptErrorCode errorCode, String... arguments) {
+        final ScriptException exception = new ScriptException(errorCode, arguments);
+        logger.debug(exception.getMessage());
+        return exception;
     }
 }

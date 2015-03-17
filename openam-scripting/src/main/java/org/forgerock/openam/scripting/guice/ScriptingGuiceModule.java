@@ -17,9 +17,22 @@
 package org.forgerock.openam.scripting.guice;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.name.Names;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.scripting.ScriptValidator;
 import org.forgerock.openam.scripting.StandardScriptValidator;
+import org.forgerock.openam.scripting.datastore.ScriptConfigurationDataStore;
+import org.forgerock.openam.scripting.datastore.ScriptingDataStore;
+import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
+import org.forgerock.openam.scripting.service.ScriptConfiguration;
+import org.forgerock.openam.scripting.service.ScriptConfigurationService;
+import org.forgerock.openam.scripting.service.ScriptingService;
+import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Guice configuration for OpenAM scripting-related components.
@@ -30,6 +43,18 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ScriptValidator.class).to(StandardScriptValidator.class);
+
+        bind(Logger.class).annotatedWith(Names.named("ScriptLogger")).toInstance(LoggerFactory.getLogger("Scripting"));
+
+        install(new FactoryModuleBuilder()
+                .implement(new TypeLiteral<ScriptingService<ScriptConfiguration>>() {},
+                        ScriptConfigurationService.class)
+                .build(new TypeLiteral<ScriptingServiceFactory<ScriptConfiguration>>() {}));
+
+        install(new FactoryModuleBuilder()
+                .implement(new TypeLiteral<ScriptingDataStore<ScriptConfiguration>>() {},
+                        ScriptConfigurationDataStore.class)
+                .build(new TypeLiteral<ScriptingDataStoreFactory<ScriptConfiguration>>() {}));
     }
 
 }
