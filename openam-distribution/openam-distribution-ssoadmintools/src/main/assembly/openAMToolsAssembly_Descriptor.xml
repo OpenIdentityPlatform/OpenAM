@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -60,6 +60,7 @@
                 <include>org.forgerock.openam:openam-scripting</include>
                 <include>javax.inject:javax.inject</include>
                 <include>com.google.inject:guice:jar:no_aop</include>
+                <include>com.google.inject.extensions:guice-assistedinject</include>
                 <include>commons-lang:commons-lang</include>
                 <include>javax.xml:jaxrpc-api</include>
                 <include>external:jaxrpc-impl</include>

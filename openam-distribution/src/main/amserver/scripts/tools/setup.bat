@@ -26,7 +26,7 @@
 : $Id: setup.bat,v 1.13 2009/01/28 05:34:46 ww203982 Exp $
 :
 
-: Portions Copyrighted 2013-2014 ForgeRock AS.
+: Portions Copyrighted 2013-2015 ForgeRock AS.
 
 if not "%JAVA_HOME%" == "" goto checkJavaHome
 echo Please define JAVA_HOME environment variable before running this program
@@ -125,6 +125,7 @@ set CLASSPATH="%CLASSPATH%;lib/openam-license-manager-cli-${project.version}.jar
 set CLASSPATH="%CLASSPATH%;lib/openam-license-core-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/forgerock-guice-core-${forgerock.guice.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/guice-${guice.version}-no_aop.jar"
+set CLASSPATH="%CLASSPATH%;lib/guice-assistedinject-${guice.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/commons-lang-${commons-lang.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/javax.inject-${javax.inject.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/slf4j-api-${slf4j.version}.jar"
