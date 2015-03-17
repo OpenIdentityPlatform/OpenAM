@@ -26,9 +26,7 @@
 
     $Id: amAuthAD.xml,v 1.5 2008/06/25 05:45:41 qcheng Exp $
 
--->
-<!--
-    Portions Copyrighted 2013 ForgeRock AS
+    Portions Copyrighted 2013-2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -120,6 +118,18 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a117">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>                
                 <AttributeSchema name="iplanet-am-auth-ldap-return-user-dn"
                     type="single"
                     syntax="boolean"
@@ -255,6 +265,18 @@
                             <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a117">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>                     
                     <AttributeSchema name="iplanet-am-auth-ldap-return-user-dn"
                         type="single"
                         syntax="boolean"
