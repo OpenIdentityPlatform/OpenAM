@@ -11,7 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.authentication.modules.scripted;
 
@@ -21,13 +22,14 @@ import org.forgerock.openam.scripting.ScriptObject;
 import org.forgerock.openam.scripting.ScriptingLanguage;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 
-import java.util.ResourceBundle;
-import java.util.Map;
-import java.util.HashMap;
+import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * The <code>ScriptValidator</code> is tasked with validating an Authentication script. It will use the validator
@@ -42,8 +44,8 @@ public class ScriptValidator implements DynamicAttributeValidator {
     private ResourceBundle resourceBundle = null;
     private static final String RESOURCE_BUNDLE_NAME = "amAuthScripted";
     private static final String LANGUAGE_NOT_SUPPORTED = "language-not-supported";
-    private static final String SERVER_SIDE_SCRIPT = "a104";
-    private static final String MODULE_DESCRIPTION = "iplanet-am-auth-scripted-service-description";
+    private static final String SCRIPT_ERROR_MESSAGE = "validation-error-message";
+    private static final String SCRIPT_ERROR_DETAIL = "validation-error-detail";
     private static final Map<String, ScriptingLanguage> SUPPORTED_LANGUAGES =
             new HashMap<String, ScriptingLanguage>() {{
         put(Scripted.JAVA_SCRIPT_LABEL, SupportedScriptingLanguage.JAVASCRIPT);
@@ -68,23 +70,12 @@ public class ScriptValidator implements DynamicAttributeValidator {
             final StringBuilder messageBuilder = new StringBuilder();
 
             if (!scriptErrorList.isEmpty()) {
-                messageBuilder.append("Error in ");
-                messageBuilder.append(getMessage(SERVER_SIDE_SCRIPT));
-                messageBuilder.append(" for ");
-                messageBuilder.append(getMessage(MODULE_DESCRIPTION));
-                messageBuilder.append(" ");
-                messageBuilder.append(instanceName);
-                messageBuilder.append(":\n");
+                messageBuilder.append(getMessage(SCRIPT_ERROR_MESSAGE));
             }
 
             for (ScriptError error : scriptErrorList) {
-                messageBuilder.append("Line ");
-                messageBuilder.append(error.getLineNumber());
-                messageBuilder.append(", column ");
-                messageBuilder.append(error.getColumnNumber());
-                messageBuilder.append(": ");
-                messageBuilder.append(error.getMessage());
-                messageBuilder.append("\n");
+                Object[] parameters = {error.getLineNumber(), error.getColumnNumber(), error.getMessage()};
+                messageBuilder.append(MessageFormat.format(getMessage(SCRIPT_ERROR_DETAIL), parameters));
             }
 
             if (messageBuilder.length() > 0) {
