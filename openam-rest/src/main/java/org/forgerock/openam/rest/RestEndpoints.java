@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
@@ -67,6 +68,7 @@ import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
 import org.forgerock.openam.rest.scripting.ScriptResource;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.ServiceRouter;
+import org.forgerock.openam.rest.sms.SmsRequestHandlerFactory;
 import org.forgerock.openam.rest.uma.UmaConfigurationResource;
 import org.forgerock.openam.rest.uma.UmaPolicyResource;
 import org.forgerock.openam.rest.uma.UmaPolicyResourceAuthzFilter;
@@ -84,6 +86,7 @@ import org.restlet.routing.Router;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.sun.identity.sm.InvalidRealmNameManager;
+import com.sun.identity.sm.SchemaType;
 
 /**
  * Singleton class which contains both the routers for CREST resources and Restlet service endpoints.
@@ -101,6 +104,7 @@ public class RestEndpoints {
     private final ServiceRouter xacmlServiceRouter;
     private final Router umaServiceRouter;
     private final Router oauth2ServiceRouter;
+    private final SmsRequestHandlerFactory smsRequestHandlerFactory;
 
     /**
      * Constructs a new RestEndpoints instance.
@@ -109,15 +113,18 @@ public class RestEndpoints {
      * @param versionSelector An instance of the VersionSelector.
      */
     @Inject
-    public RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper) {
-        this(realmValidator, versionSelector, coreWrapper, InvalidRealmNameManager.getInvalidRealmNames());
+    public RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper,
+            SmsRequestHandlerFactory smsRequestHandlerFactory) {
+        this(realmValidator, versionSelector, coreWrapper, InvalidRealmNameManager.getInvalidRealmNames(),
+                smsRequestHandlerFactory);
     }
 
     RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper,
-                  Set<String> invalidRealmNames) {
+                  Set<String> invalidRealmNames, SmsRequestHandlerFactory smsRequestHandlerFactory) {
         this.realmValidator = realmValidator;
         this.versionSelector = versionSelector;
         this.coreWrapper = coreWrapper;
+        this.smsRequestHandlerFactory = smsRequestHandlerFactory;
 
         this.resourceRouter = createResourceRouter(invalidRealmNames);
         this.jsonServiceRouter = createJSONServiceRouter(invalidRealmNames);
@@ -273,6 +280,10 @@ public class RestEndpoints {
         rootRealmRouter.route("/tokens")
                 .through(CoreTokenResourceAuthzModule.class, CoreTokenResourceAuthzModule.NAME)
                 .forVersion("1.0").to(CoreTokenResource.class);
+
+        rootRealmRouter.route("/global-config")
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.GLOBAL));
 
 //        dynamicRealmRouter.route("/scripts")
 //                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)

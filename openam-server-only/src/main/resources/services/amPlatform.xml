@@ -25,6 +25,8 @@
    "Portions Copyrighted [year] [name of copyright owner]"
   
    $Id: amPlatform.xml,v 1.6 2008/06/25 05:46:12 qcheng Exp $
+
+   Portions Copyrighted 2015 ForgeRock AS.
   
 -->
 
@@ -84,7 +86,7 @@
                     </SubSchema>
                 </SubSchema>
                 <SubSchema name="com-sun-identity-servers">
-                    <SubSchema name="server" inheritance="multiple">
+                    <SubSchema name="server" inheritance="multiple" resourceName="servers">
                         <AttributeSchema name="serverid"
                             type="single"
                             syntax="string" />

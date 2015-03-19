@@ -24,6 +24,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
@@ -35,6 +36,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
+import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoCreationListener;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -67,6 +69,7 @@ import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentity;
 import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentityImpl;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentityImpl;
+import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.rest.RestEndpointServlet;
 import org.forgerock.openam.rest.RestEndpoints;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
@@ -78,6 +81,10 @@ import org.forgerock.openam.rest.router.DelegationEvaluatorProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
 import org.forgerock.openam.rest.scripting.ScriptExceptionMappingHandler;
+import org.forgerock.openam.rest.sms.SmsCollectionProvider;
+import org.forgerock.openam.rest.sms.SmsCollectionProviderFactory;
+import org.forgerock.openam.rest.sms.SmsRequestHandler;
+import org.forgerock.openam.rest.sms.SmsRequestHandlerFactory;
 import org.forgerock.openam.rest.uma.UmaIdRepoCreationListener;
 import org.forgerock.openam.rest.uma.UmaPolicyServiceImpl;
 import org.forgerock.openam.rest.uma.UmaResourceSetRegistrationListener;
@@ -174,6 +181,15 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         // Scripting configuration
         bind(new TypeLiteral<ExceptionMappingHandler<ScriptException, ResourceException>>() {})
                 .to(ScriptExceptionMappingHandler.class);
+
+        install(new FactoryModuleBuilder()
+                .implement(SmsRequestHandler.class, SmsRequestHandler.class)
+                .build(SmsRequestHandlerFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(SmsCollectionProvider.class, SmsCollectionProvider.class)
+                .build(SmsCollectionProviderFactory.class));
+
     }
 
     @Provides

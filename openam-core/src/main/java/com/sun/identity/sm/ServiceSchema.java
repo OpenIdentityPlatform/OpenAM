@@ -286,7 +286,7 @@ public class ServiceSchema {
         Node sNode = ss.getSchemaNode();
         ((Element) sNode).setAttribute(SMSUtils.RESOURCE_NAME, name);
         ssm.replaceSchema((ServiceSchemaManagerImpl.getInstance(ssm.getSSOToken(), ssm.getName(), ssm.getVersion()))
-                        .getDocument());
+                .getDocument());
         ss.resourceName = name;
     }
 
@@ -964,5 +964,5 @@ public class ServiceSchema {
                 IUMSConstants.SMS_SMSSchema_no_service_element, null));
     }
 
-    static Debug debug = SMSEntry.debug;
+    static Debug debug = Debug.getInstance("amSMS");
 }
