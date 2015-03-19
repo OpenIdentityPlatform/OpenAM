@@ -91,6 +91,18 @@
 
    <listitem>
     <para>
+     <emphasis role="bold">DAS Supports goto URL Validation</emphasis>.
+     DAS now validates <literal>goto</literal> and <literal>gotoOnFail</literal>
+     URLs
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1773"
+     xlink:show="new"
+     >OPENAM-1773</link>).
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
      <emphasis role="bold">Support for Auth Context Classes Extensibility</emphasis>.
      OpenAM supports the extensibility of auth context classes as described
      in the SAMLv2 specification.
@@ -134,14 +146,26 @@
 
    <listitem>
     <para>
+     <emphasis role="bold">We should no longer redistribute the RSA SecurID library</emphasis>.
+     OpenAM no longer redistributes the RSA SecurID library. This means that if
+     you are upgrading OpenAM, SecurID authentication will fail unless your obtain the library
+     directly from RSA and place it in your classpath.
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4380"
+     xlink:show="new"
+     >OPENAM-4380</link>).
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
      <emphasis role="bold">Specifying Trusted Realms using the WindowsDesktopSSO Authentication Module</emphasis>.
      The WindowsDesktopSSO authentication module now allows you to specify a list
      of trusted realms. When the setting is specified, Kerberos tokens issued by
      those realms will only be accepted.
      (<link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4248"
-     xlink:show="new"
-     >OPENAM-4248</link>).
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4923"
+     xlink:show="new">OPENAM-4923</link>).
     </para>
    </listitem>
 
@@ -160,17 +184,7 @@
      &lt;time limit in milliseconds&gt;</literal>.
     </para>
    </listitem>
-   <listitem>
-    <para>
-     <emphasis role="bold">DAS Supports goto URL Validation</emphasis>.
-     DAS now validates <literal>goto</literal> and <literal>gotoOnFail</literal>
-     URLs
-     (<link
-     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1773"
-     xlink:show="new"
-     >OPENAM-1773</link>).
-    </para>
-   </listitem>
+
   </itemizedlist>
 
   <itemizedlist>

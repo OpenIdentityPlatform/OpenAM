@@ -24,12 +24,12 @@
   !    
 -->
 <chapter xml:id='chap-whats-new'
- xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
- xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>What's New in OpenAM ${serverDocTargetVersion}</title>
 
@@ -48,36 +48,486 @@
   <para>
    Before you install OpenAM or update your existing OpenAM installation,
    read these release notes.
-   Then update or install OpenAM.</para>
+   Then update or install OpenAM.
+  </para>
 
   <listitem>
    <para>
-    If you have already installed OpenAM, see <link
-    xlink:show="new"
-    xlink:href="release-notes#update-from-earlier-release"
-    xlink:role="http://docbook.org/xlink/role/olink"
-    ><citetitle>To Update OpenAM From 11.0</citetitle></link>.
+    If you have already installed OpenAM, see
+    <link
+     xlink:show="new"
+     xlink:href="release-notes#update-from-earlier-release"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     >
+     <citetitle>To Update OpenAM From 11.0</citetitle>
+    </link>
+    .
    </para>
-   
+
    <para>
-    Do <emphasis>not</emphasis> perform an upgrade
+    Do
+    <emphasis>not</emphasis>
+    perform an upgrade
     by deploying the new version
     and then importing an existing configuration
-    by running the <command>ssoadm import-svc-config</command> command.
+    by running the
+    <command>ssoadm import-svc-config</command>
+    command.
     Importing an outdated configuration can result in a corrupted installation.
    </para>
   </listitem>
 
   <listitem>
    <para>
-    If you are installing OpenAM for the first time, see <link
-    xlink:show="new"
-    xlink:href="release-notes#install-fresh"
-    xlink:role="http://docbook.org/xlink/role/olink"
-    ><citetitle>To Install OpenAM</citetitle></link>.
+    If you are installing OpenAM for the first time, see
+    <link
+     xlink:show="new"
+     xlink:href="release-notes#install-fresh"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     >
+     <citetitle>To Install OpenAM</citetitle>
+    </link>
+    .
    </para>
   </listitem>
  </itemizedlist>
+
+ <section xml:id="security-advisories">
+  <title>Security Advisories</title>
+
+  <para>
+   Security advisories have been issued for the OpenAM Core Server
+   and Server Only components and are present in versions of OpenAM
+   including 12.0.0, 11.0.x, 10.1.0-Xpress, 10.0.x, 9.x and possibly previous
+   versions.
+  </para>
+  <para>
+   These advisories provide guidance on how to ensure your deployments can be
+   secured. Workarounds or patches are available for all of the issues, which
+   are also included in the 11.0.3 release.
+  </para>
+
+  <para>
+   The maximum severity of issues in this advisory is "Critical".
+   Deployers should take immediate steps as outlined in the advisory and
+   apply the relevant update(s) at the earliest opportunity.
+  </para>
+  <para>
+   The recommendation is to upgrade to OpenAM 11.0.3 or deploy the relevant
+   patches. Alternatively,
+   patch bundles are available for the following versions:
+  </para>
+  <itemizedlist>
+   <listitem>
+    <para>10.0.2</para>
+   </listitem>
+   <listitem>
+    <para>11.0.2</para>
+   </listitem>
+  </itemizedlist>
+  <para>
+   Customers can obtain these patch bundles from
+   <link xlink:href="https://backstage.forgerock.com/#!/login" xlink:show="new">
+    Backstage</link>.
+   Community members without a current subscription can request patches for
+   <literal>Critical</literal>
+   issues by contacting
+   <link xlink:href="https://info@forgerock.com" xlink:show="new">
+    info@forgerock.com</link>.
+  </para>
+
+  <para>The following security fixes have been included in this release:
+  </para>
+
+  <itemizedlist>
+
+   <!-- #201503-01 Critical -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201503-01: Cross Site Request
+     Forgery</emphasis>.
+     When “Prompt user for old password” feature is disabled (which is the
+     default
+     value) it is possible for a skilled attacker to change the user’s password
+     without their knowledge.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Critical</emphasis>
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://forgerock.org/2015/03/openam-security-advisory-201503/#201503-01"
+      xlink:show="new"
+      >OpenAM Security Advisory #201503-01</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-01 Critical -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-01: Authorization bypass via path
+     traversal</emphasis>.
+     It is possible to gain unauthorized access to policy protected resources if
+     multi-level wildcards (“*”) are being used within policies and certain
+     endpoints are protected with a strong policy and the attacker has access
+     to a less protected resource.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Critical</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-01"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-01</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-02 High/Critical -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-02: XML Signature Wrapping in SAML
+     1.x</emphasis>.
+     It is possible for attackers to construct SAML 1.x protocol messages with
+     arbitrary content that will be considered valid by OpenAM’s XML Signature
+     verification logic. Note that this mainly affects deployments where OpenAM
+     acts as a SAML 1.x Relying Party.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">High or Critical (if OpenAM acts as a Relying
+      Party)
+     </emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-02"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-02</link>.
+    </para>
+   </listitem>
+
+   <!-- #201404-01 Critical -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201404-01: Denial of Service
+     vulnerability – CVE-2014-7246</emphasis>.
+     In environments where more than one OpenAM server has been configured, it
+     is
+     possible that an authenticated attacker can construct and send a single
+     request that triggers an infinite loop, occupying one or more instances in
+     the deployment until the affected instances are restarted.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Critical</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2014/11/openam-security-advisory-201404/#201404-01"
+     xlink:show="new"
+     >OpenAM Security Advisory #201404-01</link>.
+    </para>
+   </listitem>
+
+   <!-- #201503-02 High -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201503-02: Cross Site
+     Scripting</emphasis>.
+     OpenAM is vulnerable to cross-site scripting (XSS) attacks which could lead
+     to session hijacking or phishing.
+     It has been detected that the following endpoint is vulnerable to
+     cross-site scripting attacks:
+    </para>
+    <itemizedlist>
+     <listitem>/openam/oauth/registerconsumer.jsp (Core Server, Server Only)
+     </listitem>
+    </itemizedlist>
+    <para>
+     Severity: <emphasis role="bold">High</emphasis>
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://forgerock.org/2015/03/openam-security-advisory-201503/#201503-02"
+      xlink:show="new"
+      >OpenAM Security Advisory #201503-02</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-03 High -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-03: Authentication bypass in
+     WS-Federation</emphasis>.
+     When OpenAM acts as a WS-Federation Identity Provider and more than one
+     realm
+     has been configured it is possible to obtain access to Relying Parties that
+     have been configured in a different realm than the current session’s realm.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">High</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-03"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-03</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-04 High -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-04: Denial of Service</emphasis>.
+     It is possible to cause a denial of service by accessing a specific OpenAM
+     endpoint.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">High</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-04"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-04</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-05 High -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-05: Authorization bypass in the
+     REST API</emphasis>.
+     When self registration is enabled it is possible to use the sent out
+     <literal>tokenId</literal>
+     and
+     <literal>confirmationId</literal>
+     to register end-users in different
+     realms than originally intended.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">High</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-05"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-05</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-06 High -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-06: Unauthorized access</emphasis>
+     .
+     A bug in the policy evaluation framework makes it possible for an
+     authenticated
+     user to gain unauthorized access to certain resources regardless of the
+     policy evaluation mode (self/subtree).
+     The issue may occur if there is a policy rule defined in the format of
+     <literal>http*://example.com:*/index.html</literal>.
+     In this case the last wildcard may match the URI as well, not just the port
+     number.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">High</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-06"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-06</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-07 High -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-07: Cross Site
+     Scripting</emphasis>.
+     OpenAM is vulnerable to cross-site scripting (XSS) attacks which could lead
+     to session hijacking or phishing.
+    </para>
+    <para>
+     As part of an automated scan it has been detected that the following
+     endpoints are vulnerable against cross-site scripting and/or open redirect
+     attacks:
+    </para>
+    <para>
+     Affecting 9-9.5.5, 10.0.0-10.0.2, 10.1.0-Xpress and 11.0.0-11.0.2:
+    </para>
+    <itemizedlist>
+     <listitem>/openam/WSFederationServlet (Core Server, Server Only)</listitem>
+     <listitem>/openam/task/CreateRemoteIDP (Core Server)</listitem>
+     <listitem>/openam/task/CreateRemoteSP (Core Server)</listitem>
+     <listitem>/openam/federation/ImportEntity (Core Server)</listitem>
+     <listitem>openam/UI/Login (Core Server, Server Only, DAS)</listitem>
+     <listitem>/openam/console/ajax/AjaxProxy.jsp (Core Server)</listitem>
+    </itemizedlist>
+    <para>
+     Severity: <emphasis role="bold">High</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-07"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-07</link>.
+    </para>
+   </listitem>
+
+   <!-- #201503-03 Medium -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201503-03: Password recorded as plain
+     text
+     during install</emphasis>.
+     When performing new installations of OpenAM 11.0.2 and 12.0.0 the
+     installation
+     properties are recorded in the install log at the end of the OpenAM
+     installation
+     process to aid diagnostic analysis. In the case of configuring OpenAM to
+     use
+     an external user store, the user data store’s LDAP password will be stored
+     in plain text in the installation log file.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Medium</emphasis>
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://forgerock.org/2015/03/openam-security-advisory-201503/#201503-03"
+      xlink:show="new"
+      >OpenAM Security Advisory #201503-03</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-08 Medium -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-08: Information leakage</emphasis>.
+     It is possible to obtain information about the deployment by sending well
+     crafted requests to OpenAM.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Medium</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-08"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-08</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-09 Medium -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-09: Insecure password
+     storage</emphasis>.
+     It has been discovered that the following passwords were stored in plain
+     text in the configuration:
+    </para>
+    <itemizedlist>
+     <listitem>com.sun.identity.crl.cache.directory.password</listitem>
+     <listitem>org.forgerock.services.cts.store.password</listitem>
+    </itemizedlist>
+    <para>
+     Severity: <emphasis role="bold">Medium</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-09"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-09</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-10 Medium -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-10: Open Redirect</emphasis>.
+     Due to a bug in the goto URL validation subsystem it was possible to
+     perform
+     Open Redirect attacks by sending the end-users to specifically constructed
+     URLs that were considered valid by the goto URL validator.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Medium</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-10"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-10</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-11 Medium-->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-11: Login CSRF</emphasis>.
+     It is possible to perform login CSRF attacks using the built-in
+     authentication endpoints.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Medium</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-11"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-11</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-12 Medium -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-12: Login CSRF in OAuth2
+     authentication module</emphasis>.
+     The OAuth2 authentication module is vulnerable to Login CSRF attacks.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Medium</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-12"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-12</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-13 Medium -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-13: Business Logic
+     Vulnerability</emphasis>.
+     If more than one realm is configured in OpenAM, it is possible for an
+     end-user
+     in one realm to access an existing OAuth2 access token from a different
+     realm’s end-user who shares the same username.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Medium</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-13"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-13</link>.
+    </para>
+   </listitem>
+
+   <!-- #201502-14 Low -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201502-14: Business Logic
+     Vulnerability</emphasis>.
+     It is possible to perform self registration with existing
+     <literal>tokenId</literal>
+     and
+     <literal>confirmationId</literal>
+     values after self registration has been
+     disabled (as long as the tokens remain valid).
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Low</emphasis>
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://forgerock.org/2015/02/openam-security-advisory-201502/#201502-14"
+     xlink:show="new"
+     >OpenAM Security Advisory #201502-14</link>.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </section>
 
  <section xml:id="product-enhancements">
   <title>Product Enhancements</title>
@@ -92,11 +542,11 @@
     <para>
      <emphasis role="bold">Add option to enable debug logging of decrypted SAML
       assertions</emphasis>.
-      OpenAM now provides a debug logging option to decrypt SAML assertions when
-      OpenAM runs as a service provider and assertion encryption is enabled
-      (<link
-      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1631"
-      xlink:show="new"
+     OpenAM now provides a debug logging option to decrypt SAML assertions when
+     OpenAM runs as a service provider and assertion encryption is enabled
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1631"
+     xlink:show="new"
      >OPENAM-1631</link>).
     </para>
 
@@ -104,7 +554,10 @@
    <listitem>
     <para>
      <emphasis role="bold">DAS Supports goto URL Validation</emphasis>.
-     DAS now validates <literal>goto</literal> and <literal>gotoOnFail</literal>
+     DAS now validates
+     <literal>goto</literal>
+     and
+     <literal>gotoOnFail</literal>
      URLs
      (<link
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1773"
@@ -112,9 +565,12 @@
      >OPENAM-1773</link>).
     </para>
     <para>
-     The list of valid <literal>goto/gotoOnFail</literal> resources has moved to
+     The list of valid
+     <literal>goto/gotoOnFail</literal>
+     resources has moved to
      the newly created "Validation Service" under the
-     <literal>openam-auth-valid-goto-resources</literal> property. New installations
+     <literal>openam-auth-valid-goto-resources</literal>
+     property. New installations
      should use the new setting; for existing deployments, the upgrade wizard
      ensures the migration of the existing configuration.
     </para>
@@ -122,8 +578,10 @@
 
    <listitem>
     <para>
-     <emphasis role="bold">Authentication Context extensibility support</emphasis>.
-     OpenAM supports the extensibility of authentication context classes as described
+     <emphasis role="bold">Authentication Context extensibility
+      support</emphasis>.
+     OpenAM supports the extensibility of authentication context classes as
+     described
      in the SAMLv2 specification.
      (<link
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2238"
@@ -144,7 +602,8 @@
    </listitem>
    <listitem>
     <para>
-     <emphasis role="bold">Default Timelimit using Netscape SDK is Configurable</emphasis>.
+     <emphasis role="bold">Default Timelimit using Netscape SDK is
+      Configurable</emphasis>.
      The default timelimit for LDAP operations performed using the Netscape SDK
      is now configurable
      (<link
@@ -155,65 +614,79 @@
    </listitem>
   </itemizedlist>
  </section>
- 
+
  <section xml:id="product-documentation">
   <title>OpenAM Documentation</title>
 
   <itemizedlist>
+   <para>
+    You can read the following additional
+    <link xlink:show="new"
+          xlink:href="http://docs.forgerock.org/en/openam/11.0.0/"
+     >product documentation for OpenAM 11.0.0
+    </link>
+    online at<link xlink:show="new" xlink:href="http://docs.forgerock.org/"/>.
+   </para>
+
+   <listitem>
     <para>
-     You can read the following additional
-     <link xlink:show="new" xlink:href="http://docs.forgerock.org/en/openam/11.0.0/"
-     >product documentation for OpenAM 11.0.0</link>
-     online at <link xlink:show="new" xlink:href="http://docs.forgerock.org/" />.
+     <link
+      xlink:href="http://docs.forgerock.org/en/openam/11.0.0/release-notes/"
+      xlink:show="new">OpenAM 11.0.0 Release Notes
+     </link>
     </para>
+   </listitem>
 
-    <listitem>
-     <para>
-      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/release-notes/"
-            xlink:show="new">OpenAM 11.0.0 Release Notes</link>
-     </para>
-    </listitem>
-  
-    <listitem>
-     <para>
-      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/install-guide/"
-            xlink:show="new">OpenAM 11.0.0 Installation Guide</link></para>
-    </listitem>
+   <listitem>
+    <para>
+     <link
+      xlink:href="http://docs.forgerock.org/en/openam/11.0.0/install-guide/"
+      xlink:show="new">OpenAM 11.0.0 Installation Guide
+     </link>
+    </para>
+   </listitem>
 
-    <listitem>
-     <para>
-      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/upgrade-guide/"
-            xlink:show="new">OpenAM 11.0.0 Upgrade Guide</link></para>
-    </listitem>
+   <listitem>
+    <para>
+     <link
+      xlink:href="http://docs.forgerock.org/en/openam/11.0.0/upgrade-guide/"
+      xlink:show="new">OpenAM 11.0.0 Upgrade Guide
+     </link>
+    </para>
+   </listitem>
 
-    <listitem>
-     <para>
-      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/admin-guide/"
-            xlink:show="new">OpenAM 11.0.0 Administration Guide</link>
-     </para>
-    </listitem>
-  
-    <listitem>
-     <para>
-      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/dev-guide/"
-            xlink:show="new">OpenAM 11.0.0 Developer's Guide</link>
-     </para>
-    </listitem>
-  
-    <listitem>
-     <para>
-      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/reference/"
-            xlink:show="new">OpenAM 11.0.0 Reference</link>
-     </para>
-    </listitem>
-  
-    <listitem>
-     <para>
-      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/apidocs/"
-            xlink:show="new">OpenAM 11.0.0 Javadoc</link>
-     </para>
-    </listitem>
-   </itemizedlist>
+   <listitem>
+    <para>
+     <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/admin-guide/"
+           xlink:show="new">OpenAM 11.0.0 Administration Guide
+     </link>
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/dev-guide/"
+           xlink:show="new">OpenAM 11.0.0 Developer's Guide
+     </link>
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/reference/"
+           xlink:show="new">OpenAM 11.0.0 Reference
+     </link>
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/apidocs/"
+           xlink:show="new">OpenAM 11.0.0 Javadoc
+     </link>
+    </para>
+   </listitem>
+  </itemizedlist>
  </section>
 
 </chapter>

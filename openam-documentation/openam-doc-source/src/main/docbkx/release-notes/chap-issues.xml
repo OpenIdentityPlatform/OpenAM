@@ -90,6 +90,7 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4262" xlink:show="new">OPENAM-4262</link>: IDP Proxy should set destination depending on the Binding</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4320" xlink:show="new">OPENAM-4320</link>: NotificationServlet does not check for null before closing writer in finally block</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4346" xlink:show="new">OPENAM-4346</link>: Invalidating session on console in a multiserver setup fails if SFO is enabled</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4380" xlink:show="new">OPENAM-4380</link>: We should no longer redistribute the RSA SecurID library</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4413" xlink:show="new">OPENAM-4413</link>: Agent sessions are affected by active session quotas when com.iplanet.am.session.agentSessionIdleTime is used</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4473" xlink:show="new">OPENAM-4473</link>: Couldn't find subschema errors in debug/Configuration</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4505" xlink:show="new">OPENAM-4505</link>: The rest oauth/access_token endpoint does not accept the realm as data in a POST request </para></listitem>
@@ -259,7 +260,6 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4227" xlink:show="new">OPENAM-4227</link>: Set Password as Administrator does not work using AD-LDS (ADAM) User Store</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4229" xlink:show="new">OPENAM-4229</link>: Change Password as User does not work using AD-LDS (ADAM) User Store</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4236" xlink:show="new">OPENAM-4236</link>: CookieUtils.addCookieToResponse only sends Max-Age attribute</para></listitem>
-   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4248" xlink:show="new">OPENAM-4248</link>: Proxying SAML Passive Requests</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4252" xlink:show="new">OPENAM-4252</link>: StatusCode SAML response missing space</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4262" xlink:show="new">OPENAM-4262</link>: IDP Proxy should set destination depending on the Binding</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4264" xlink:show="new">OPENAM-4264</link>: IDPAccountMapper.getNameID() does not receive the SP Entity ID if there is no SPNameQualifier in the SAML request</para></listitem>
@@ -267,9 +267,7 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4340" xlink:show="new">OPENAM-4340</link>: Configurator is unable to handle special characters in passwords</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4346" xlink:show="new">OPENAM-4346</link>: Invalidating session on console in a multiserver setup fails if SFO is enabled</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4430" xlink:show="new">OPENAM-4430</link>: Upgrade wizard is out of date for other languages than EN</para></listitem>
-
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4432" xlink:show="new">OPENAM-4432</link>: OpenAM upgrade fails when there is IP address/DNS condition set in policy</para></listitem>
-
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4473" xlink:show="new">OPENAM-4473</link>: Couldn't find subschema errors in debug/Configuration</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4495" xlink:show="new">OPENAM-4495</link>: Agent profile attribute mapping does not allow to map the same profile attribute to different header names</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4496" xlink:show="new">OPENAM-4496</link>: REST sessions logout returns HTTP-403 Forbidden</para></listitem>
