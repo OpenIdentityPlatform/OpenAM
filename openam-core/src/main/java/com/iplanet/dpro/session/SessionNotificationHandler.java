@@ -108,7 +108,7 @@ public class SessionNotificationHandler implements NotificationHandler {
 
         sessionDebug.message("SESSION NOTIFICATION : " + info.toXMLString());
 
-        if (!info.state.equals("valid")) {
+        if (!info.getState().equals("valid")) {
             if (isLocal) {
                 sessionCache.removeLocalSID(info);
             } else {
@@ -117,7 +117,7 @@ public class SessionNotificationHandler implements NotificationHandler {
             return;
         }
 
-        SessionID sid = new SessionID(info.sid);
+        SessionID sid = new SessionID(info.getSessionID());
         Session session = sessionCache.readSession(sid);
         try {
             if (session == null) {

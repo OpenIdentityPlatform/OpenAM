@@ -30,9 +30,11 @@ import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.strategies.CTSOperations;
 import com.iplanet.dpro.session.operations.strategies.LocalOperations;
 import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
+import com.iplanet.dpro.session.operations.strategies.StatelessOperations;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -42,6 +44,7 @@ public class ServerSessionOperationStrategyTest {
     private SessionService mockSessionService;
     private LocalOperations mockLocal;
     private RemoteOperations mockRemote;
+    private StatelessOperations mockStateless;
     private CTSOperations mockCTS;
     private WebtopNamingQuery mockNamingQuery;
     private Session mockSession;
@@ -56,6 +59,7 @@ public class ServerSessionOperationStrategyTest {
         // Strategies
         mockLocal = mock(LocalOperations.class);
         mockRemote = mock(RemoteOperations.class);
+        mockStateless = mock(StatelessOperations.class);
         mockCTS = mock(CTSOperations.class);
         mockStore = mock(SessionMonitoringStore.class);
 
@@ -65,7 +69,9 @@ public class ServerSessionOperationStrategyTest {
                 mockLocal,
                 mockCTS,
                 mockRemote,
+                mockStateless,
                 mockNamingQuery,
+                mock(StatelessSessionFactory.class),
                 mock(Debug.class));
 
         // test instances

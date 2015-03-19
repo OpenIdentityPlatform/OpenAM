@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.forgerockrest.session;
 
-import static org.forgerock.json.fluent.JsonValue.*;
-
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
@@ -30,15 +28,6 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.AdviceContext;
@@ -63,6 +52,19 @@ import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.utils.StringUtils;
+
+import javax.inject.Inject;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static org.forgerock.json.fluent.JsonValue.*;
 
 /**
  * Represents Sessions that can queried via a REST interface.
@@ -332,8 +334,8 @@ public class SessionResource implements CollectionResourceProvider {
 
             for (SessionInfo session : sessions) {
 
-                int timeleft = convertTimeLeft(session.timeleft);
-                String username = (String) session.properties.get("UserId");
+                long timeleft = TimeUnit.SECONDS.toMinutes(session.getTimeLeft());
+                String username = session.getProperties().get("UserId");
 
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put(HEADER_USER_ID, username);
@@ -388,18 +390,6 @@ public class SessionResource implements CollectionResourceProvider {
      */
     private Collection<String> generateListServers() {
         return getAllServerIds();
-    }
-
-    /**
-     * Internal function for converting time in seconds to minutes.
-     *
-     * @param timeleft Non null string value of time in seconds.
-     * @return The parsed time.
-     */
-    private static int convertTimeLeft(String timeleft) {
-        float seconds = Long.parseLong(timeleft);
-        float mins = seconds / 60;
-        return Math.round(mins);
     }
 
     /**

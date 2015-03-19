@@ -26,7 +26,6 @@
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
-
 package com.sun.identity.shared.datastruct;
 
 import com.sun.identity.shared.Constants;
@@ -45,7 +44,7 @@ import java.util.Set;
  */
 public class CollectionHelper {
     private static final String localDsameServer = SystemPropertiesManager.get(
-        Constants.AM_SERVER_HOST);
+            Constants.AM_SERVER_HOST);
 
     /**
      * Returns String from a map of string of set of string.

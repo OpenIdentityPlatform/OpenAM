@@ -122,7 +122,7 @@
 
         <commons.forgerock-util.version>1.4.0-SNAPSHOT</commons.forgerock-util.version>
         <commons.authfilter.version>1.5.1</commons.authfilter.version>
-        <forgerock.json.version>2.4.2</forgerock.json.version>
+        <forgerock.json.version>2.4.3-SNAPSHOT</forgerock.json.version>
         <forgerock-ui.version>1.1.12-SNAPSHOT</forgerock-ui.version>
         <restlet.version>2.1.7</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -1706,6 +1706,11 @@
                 <groupId>org.forgerock.commons.guava</groupId>
                 <artifactId>forgerock-guava-cache</artifactId>
                 <version>${forgerock.guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.0</version>
             </dependency>
 
             <!-- JASPIC -->

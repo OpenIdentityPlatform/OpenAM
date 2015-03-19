@@ -19,20 +19,25 @@ package com.sun.identity.authentication.service;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 
+import javax.security.auth.Subject;
+
 /**
  * Encapsulates logic for activating a session after successful authentication. Implements a strategy design pattern
  * to separate the details of different session activation strategies (e.g., session upgrade).
  */
 public interface SessionActivator {
     /**
-     * Activates the given session after successful authentication, returning the session.
+     * Activates the given session after successful authentication, returning the an indication of whether activation
+     * was successful. The {@link LoginState} should be updated to reflect the activated session.
      *
-     * @param loginState the login state used for authentication.
+     * @param loginState the login state used for authentication. May be updated by the activator.
      * @param sessionService the session service.
      * @param authSession the session used for authentication.
-     * @return the session that should be used from now on. May be null.
+     * @param subject the authenticated subject.
+     * @param loginContext the login context.
+     * @return whether activation was successful.
      * @throws AuthException if an error occurs that prevents session activation.
      */
-    InternalSession activateSession(LoginState loginState, SessionService sessionService,
-                                    InternalSession authSession) throws AuthException;
+    boolean activateSession(LoginState loginState, SessionService sessionService,
+                            InternalSession authSession, Subject subject, Object loginContext) throws AuthException;
 }

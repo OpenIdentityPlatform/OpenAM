@@ -65,6 +65,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 
@@ -82,7 +83,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import org.forgerock.guice.core.InjectorHolder;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -506,10 +506,11 @@ public class AuthD  {
      */
     public static InternalSession newSession(
         String domain, 
-        HttpSession httpSession) {
+        HttpSession httpSession,
+        boolean stateless) {
         InternalSession is = null;
         try {
-            is = getSessionService().newInternalSession(domain, httpSession);
+            is = getSessionService().newInternalSession(domain, httpSession, stateless);
         } catch (Exception ex) {
             ex.printStackTrace();
             debug.error("Error creating session: ", ex);

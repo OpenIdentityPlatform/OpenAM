@@ -86,7 +86,7 @@ public class SessionInfoFactoryTest {
         SessionInfo mockSessionInfo = mock(SessionInfo.class);
         given(mockSession.toSessionInfo()).willReturn(mockSessionInfo);
         Hashtable mockHashTable = mock(Hashtable.class);
-        mockSessionInfo.properties = mockHashTable;
+        given(mockSessionInfo.getProperties()).willReturn(mockHashTable);
 
         given(mockSession.getRestrictionForToken(any(SessionID.class))).willReturn(new MockTokenRestriction());
 

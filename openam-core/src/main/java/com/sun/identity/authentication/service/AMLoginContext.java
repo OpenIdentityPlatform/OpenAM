@@ -24,9 +24,18 @@
  *
  * $Id: AMLoginContext.java,v 1.24 2009/12/23 20:03:04 mrudul_uchil Exp $
  *
+<<<<<<< .working
  */
 
 /**
+=======
+<<<<<<< HEAD
+=======
+ */
+
+/**
+>>>>>>> stateless
+>>>>>>> .merge-right.r12886
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */

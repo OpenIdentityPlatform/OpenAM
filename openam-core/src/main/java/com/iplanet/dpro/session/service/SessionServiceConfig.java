@@ -45,6 +45,8 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.sso.providers.stateless.JwtSessionMapper;
+import org.forgerock.openam.sso.providers.stateless.JwtSessionMapperConfig;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -158,6 +160,7 @@ public class SessionServiceConfig {
         private static final int DEFAULT_MAX_SESSION_LIST_SIZE = 200;
         private static final int DEFAULT_MAX_WAIT_TIME_FOR_CONSTRAINT = 6000;
 
+        private final JwtSessionMapperConfig jwtSessionMapperConfig;
         private final Set<String> timeoutHandlers;
         private final boolean sessionTrimmingEnabled;
         private final boolean sessionConstraintEnabled;
@@ -173,6 +176,7 @@ public class SessionServiceConfig {
             ServiceSchema schema = ssm.getGlobalSchema();
             Map attrs = schema.getAttributeDefaults();
 
+            jwtSessionMapperConfig = new JwtSessionMapperConfig(attrs);
             sessionRetrievalTimeout = loadSessionRetrievalTimeoutSchemaSetting(attrs);
             maxSessionListSize = loadMaxSessionListSizeSchemaSetting(attrs);
             propertyNotificationEnabled = loadPropertyNotificationEnabledSchemaSetting(attrs);
@@ -653,6 +657,13 @@ public class SessionServiceConfig {
      */
     public boolean isSendPropertyNotification(String key) {
         return hotSwappableSessionServiceConfig.isSendPropertyNotification(key);
+    }
+
+    /**
+     * @return JwtSessionMapper configured according to hot-swappable SMS settings.
+     */
+    public JwtSessionMapper getJwtSessionMapper() {
+        return hotSwappableSessionServiceConfig.jwtSessionMapperConfig.getJwtSessionMapper();
     }
 
     /**

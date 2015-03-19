@@ -181,6 +181,59 @@
                                  syntax="string"
                                  i18nKey="a123">
                 </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-signing-type"
+                                 type="single_choice"
+                                 listOrder="insertion"
+                                 syntax="string"
+                                 i18nKey="a124">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceNONE">NONE</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceHS256">HS256</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceHS384">HS384</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceHS512">HS512</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceRS256">RS256</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>NONE</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-signing-hmac-shared-secret"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a125">
+                    <DefaultValues>
+                        <Value>sharedsecret</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-signing-rsa-certificate-alias"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a126">
+                    <DefaultValues>
+                        <Value>test</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-encryption-type"
+                                 type="single_choice"
+                                 listOrder="insertion"
+                                 syntax="string"
+                                 i18nKey="a127">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceNONE">NONE</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceRSA">RSA</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>NONE</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-encryption-rsa-certificate-alias"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a128">
+                    <DefaultValues>
+                        <Value>test</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="Site" inheritance="multiple" i18nKey="site">
                     <AttributeSchema name="iplanet-am-session-sfo-enabled"
                                      type="single"

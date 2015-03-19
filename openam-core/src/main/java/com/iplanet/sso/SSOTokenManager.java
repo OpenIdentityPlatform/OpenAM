@@ -24,15 +24,24 @@
  *
  * $Id: SSOTokenManager.java,v 1.7 2009/02/18 23:59:36 qcheng Exp $
  *
- * Portions copyright 2014 ForgeRock AS.
+ * Portions copyright 2014-2015 ForgeRock AS.
  */
 
 package com.iplanet.sso;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.services.util.I18n;
 import com.iplanet.sso.providers.dpro.SSOProviderBundle;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+import org.forgerock.openam.utils.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.Set;
 
@@ -75,7 +84,7 @@ import java.util.Set;
 public class SSOTokenManager {
 
     /*
-     * SSOTokenManager is not a real provider but implements SSOProvider for
+     * SSOTokenManager is not a real PROVIDER but implements SSOProvider for
      * consistency in the methods.
      */
 
@@ -85,6 +94,11 @@ public class SSOTokenManager {
      */
     static final String GRAPPA_PROVIDER_PACKAGE =
         "com.sun.identity.authentication.internal";
+
+    /**
+     * Package name of the stateless SSO provider.
+     */
+    private static final String STATELESS_PROVIDER_PACKAGE = StatelessSSOProvider.class.getPackage().getName();
 
     static SSOProvider grappaProvider = null;
 
@@ -97,7 +111,11 @@ public class SSOTokenManager {
     public static Debug debug = Debug.getInstance(IUMSConstants.UMS_DEBUG);
 
     // Singleton instance of SSOTokenManager
-    private static SSOTokenManager instance = null;
+    private static volatile SSOTokenManager instance = null;
+
+    // Guice provided, lazy initialised, Server Mode only, for Stateless Sessions.
+    private static SSOProvider statelessProvider;
+    private static StatelessSessionFactory statelessFactory;
 
     /**
      * Returns the singleton instance of
@@ -146,18 +164,49 @@ public class SSOTokenManager {
     }
 
     /**
+     * Note: SSOTokenManager is initialised early in system sequence. This lazy initialiser is required
+     * to smooth over this issue.
+     * @return Null if client mode, otherwise non null Guice initialised.
+     */
+    private SSOProvider getStatelessProvider() {
+        if (!SystemProperties.isServerMode()) {
+            return null;
+        }
+
+        if (statelessProvider == null) {
+            statelessProvider = InjectorHolder.getInstance(StatelessSSOProvider.class);
+        }
+        return statelessProvider;
+    }
+
+    /**
+     * Note: SSOTokenManager is initialised early in system sequence. This lazy initialiser is required
+     * to smooth over this issue.
+     * @return Null if client mode, otherwise non null Guice initialised.
+     */
+    private StatelessSessionFactory getStatelessFactory() {
+        if (!SystemProperties.isServerMode()) {
+            return null;
+        }
+        if (statelessFactory == null) {
+            statelessFactory = InjectorHolder.getInstance(StatelessSessionFactory.class);
+        }
+        return statelessFactory;
+    }
+
+    /**
      * Since this class is a singleton, the constructor is suppressed. This
-     * constructor will try to find the provider jar files, load them, then find
-     * the provider mainclass, instantiate it and store it in provider.
+     * constructor will try to find the PROVIDER jar files, load them, then find
+     * the PROVIDER mainclass, instantiate it and store it in PROVIDER.
      * Providers can be configured using <code>providerimplclass</code> Java
      * property. This property must be set to the complete (absolute) package
-     * name of the main class of the provider. The main class MUST implement the
+     * name of the main class of the PROVIDER. The main class MUST implement the
      * com.iplanet.sso.SSOProvider interface and MUST have a public no-arg
      * default constructor.
      */
     private SSOTokenManager() throws SSOException {
         Throwable dProException = null;
-        // Obtain the Grappa provider class
+        // Obtain the Grappa PROVIDER class
         try {
             grappaProvider = new
                 com.sun.identity.authentication.internal.AuthSSOProvider();
@@ -165,7 +214,7 @@ public class SSOTokenManager {
                 debug.message("Obtained Grappa SSO Provider");
             }
         } catch (Throwable e) {
-            debug.error("Unable to obtain Grappa SSO provider", e);
+            debug.error("Unable to obtain Grappa SSO PROVIDER", e);
             dProException = e;
         }
 
@@ -199,16 +248,19 @@ public class SSOTokenManager {
     }
 
     /**
-     * Get provider based on SSOToken provided
+     * Get PROVIDER based on SSOToken provided
      * @param token Single signon SSOToken
-     * @exception SSOException in case of erros when getting the provider
+     * @exception SSOException in case of erros when getting the PROVIDER
      */
     private SSOProvider getProvider(SSOToken token) throws SSOException {
         if (token == null) {
             throw new SSOException(SSOProviderBundle.rbName, "ssotokennull", null);
         }
+
         String packageName = token.getClass().getName();
-        if (packageName.startsWith(GRAPPA_PROVIDER_PACKAGE)) {
+        if (packageName.startsWith(STATELESS_PROVIDER_PACKAGE)) {
+            return getStatelessProvider();
+        } else if (packageName.startsWith(GRAPPA_PROVIDER_PACKAGE)) {
             if (grappaProvider == null) {
                 I18n i18n = I18n.getInstance(IUMSConstants.UMS_PKG);
                 throw new SSOException(i18n.getResBundleName(),
@@ -235,6 +287,11 @@ public class SSOTokenManager {
     public SSOToken createSSOToken(
             javax.servlet.http.HttpServletRequest request)
             throws UnsupportedOperationException, SSOException {
+
+        if (containsJwt(request)) {
+            return getStatelessProvider().createSSOToken(request);
+        }
+
         if (dProProvider != null)
             return (dProProvider.createSSOToken(request));
         else
@@ -301,6 +358,11 @@ public class SSOTokenManager {
      */
     public SSOToken createSSOToken(String tokenId)
             throws UnsupportedOperationException, SSOException {
+
+        if (StringUtils.isNotBlank(tokenId) && containsJwt(tokenId)) {
+            return getStatelessProvider().createSSOToken(tokenId);
+        }
+
         if (dProProvider != null)
             return (dProProvider.createSSOToken(tokenId));
         else
@@ -324,6 +386,11 @@ public class SSOTokenManager {
      */
     public SSOToken createSSOToken(String tokenId, String clientIP)
             throws UnsupportedOperationException, SSOException {
+
+        if (containsJwt(tokenId)) {
+            return getStatelessProvider().createSSOToken(tokenId, clientIP);
+        }
+
         if (dProProvider != null)
             return (dProProvider.createSSOToken(tokenId, clientIP));
         else
@@ -340,6 +407,11 @@ public class SSOTokenManager {
      */
     public SSOToken retrieveValidTokenWithoutResettingIdleTime(String tokenId)
             throws UnsupportedOperationException, SSOException {
+
+        if (containsJwt(tokenId)) {
+            return getStatelessProvider().createSSOToken(tokenId, false, false);
+        }
+
         if (dProProvider != null)
             return (dProProvider.createSSOToken(tokenId, false, false));
         else
@@ -489,5 +561,27 @@ public class SSOTokenManager {
     public Set getValidSessions(SSOToken requester, String server)
             throws SSOException {
         return getProvider(requester).getValidSessions(requester, server);
+    }
+
+    /**
+     * Helper function to ensure that JWT based checks are only applied in server mode.
+     * @param object Non null HttpServletRequest, SessionID or TokenID in String format.
+     * @return True if the object contained a JWT.
+     */
+    private boolean containsJwt(Object object) {
+        if (!SystemProperties.isServerMode()) return false;
+
+        try {
+            if (object instanceof HttpServletRequest) {
+                return getStatelessFactory().containsJwt((HttpServletRequest) object);
+            } else if (object instanceof SessionID) {
+                return getStatelessFactory().containsJwt((SessionID) object);
+            }
+            return getStatelessFactory().containsJwt(object.toString());
+        } catch (SessionException e) {
+            debug.message("Failed to determine if {0} contained a JWT:\n{1}",
+                    object.getClass(), object, e);
+            return false;
+        }
     }
 }

@@ -40,7 +40,7 @@ import com.iplanet.sso.SSOTokenID;
  * @see com.iplanet.sso.SSOToken
  */
 
-class SSOTokenIDImpl implements SSOTokenID {
+public class SSOTokenIDImpl implements SSOTokenID {
 
     /** single sign on Session id */
      private com.iplanet.dpro.session.SessionID SSOSessionID;
@@ -53,7 +53,7 @@ class SSOTokenIDImpl implements SSOTokenID {
      * @param sid The SessionID
      * @see com.iplanet.dpro.session.SessionID
      */
-    SSOTokenIDImpl(com.iplanet.dpro.session.SessionID sid) {
+    public SSOTokenIDImpl(com.iplanet.dpro.session.SessionID sid) {
         SSOSessionID = sid;
         hashCode = SSOSessionID.hashCode();
     }

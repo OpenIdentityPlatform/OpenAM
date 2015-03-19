@@ -71,7 +71,7 @@ public class SessionPollerSender implements Runnable {
                 debug.message("Updating" + info.toXMLString());
             }
             try {
-                if (info.state.equals("invalid") || info.state.equals("destroyed")) {
+                if (info.getState().equals("invalid") || info.getState().equals("destroyed")) {
                     sessionCache.removeSID(sid);
                 } else {
                     long oldMaxCachingTime = session.getMaxCachingTime();

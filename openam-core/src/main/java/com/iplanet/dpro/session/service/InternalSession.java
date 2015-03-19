@@ -64,6 +64,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -1077,11 +1078,22 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Changes the state of the session to ACTIVE after creation.
-     * @param userDN 
-     * @return <code> true </code> if the session is successfully activated 
+     * @param userDN
+     * @return <code> true </code> if the session is successfully activated
      *         after creation , <code>false</code> otherwise
      */
     public boolean activate(String userDN) {
+        return activate(userDN, false);
+    }
+
+    /**
+     * Changes the state of the session to ACTIVE after creation.
+     * @param userDN
+     * @param stateless Indicates that the log in session is a stateless session.
+     * @return <code> true </code> if the session is successfully activated 
+     *         after creation , <code>false</code> otherwise
+     */
+    public boolean activate(String userDN, boolean stateless) {
         // throws SessionConstraintException {
 
         if (userDN == null) {
@@ -1106,13 +1118,13 @@ public class InternalSession implements TaskRunnable, Serializable {
         }
         setLatestAccessTime();
         setState(VALID);
-        if (reschedulePossible) {
+        if (reschedulePossible && !stateless) {
             reschedule();
         }
         sessionLogging.logEvent(this, SessionEvent.SESSION_CREATION);
         sessionService.sendEvent(this, SessionEvent.SESSION_CREATION);
-        
-        if (!isAppSession() || serviceConfig.isReturnAppSessionEnabled()) {
+
+        if (!stateless && (!isAppSession() || serviceConfig.isReturnAppSessionEnabled())) {
             sessionService.incrementActiveSessions();
         }
         return true;
@@ -1240,45 +1252,56 @@ public class InternalSession implements TaskRunnable, Serializable {
         sessionService.sendEvent(this, eventType);
     }
 
+    public SessionInfo toSessionInfo() {
+        return toSessionInfo(true);
+    }
+
     /**
      * Transfers the info about the Internal Session to Session Info.
      * @return SessionInfo
      */
-    public SessionInfo toSessionInfo() {
+    public SessionInfo toSessionInfo(boolean withIds) {
         SessionInfo info = new SessionInfo();
-        info.sid = sessionID.toString();
-        if (sessionType == USER_SESSION) {
-            info.stype = "user";
-        } else if (sessionType == APPLICATION_SESSION) {
-            info.stype = "application";
+
+        if (withIds) {
+            info.setSessionID(sessionID.toString());
+        } else {
+            info.setSecret(java.util.UUID.randomUUID().toString());
         }
-        info.cid = clientID;
-        info.cdomain = clientDomain;
-        info.maxtime = Long.toString(getMaxSessionTime());
-        info.maxidle = Long.toString(getMaxIdleTime());
-        info.maxcaching = Long.toString(getMaxCachingTime());
+
+        if (sessionType == USER_SESSION) {
+            info.setSessionType("user");
+        } else if (sessionType == APPLICATION_SESSION) {
+            info.setSessionType("application");
+        }
+        info.setClientID(clientID);
+        info.setClientDomain(clientDomain);
+        info.setMaxTime(getMaxSessionTime());
+        info.setMaxIdle(getMaxIdleTime());
+        info.setMaxCaching(getMaxCachingTime());
         if (willExpireFlag == true) {
-            info.timeidle = Long.toString(getIdleTime());
-            info.timeleft = Long.toString(getTimeLeft());
+            info.setTimeIdle(getIdleTime());
+            info.setTimeLeft(getTimeLeft());
         } else {
             // Sessions such as authentication session will never be destroyed
-            info.timeidle = Long.toString(0);
-            info.timeleft = Long.toString(Long.MAX_VALUE / 60);
+            info.setNeverExpiring(true);
         }
 
         if (isInvalid()) {
-            info.state = "invalid";
+            info.setState("invalid");
         } else if (sessionState == VALID) {
-            info.state = "valid";
+            info.setState("valid");
         } else if (sessionState == INACTIVE) {
-            info.state = "inactive";
+            info.setState("inactive");
         } else if (sessionState == DESTROYED) {
-            info.state = "destroyed";
+            info.setState("destroyed");
         }
 
-        info.properties = (Properties) sessionProperties.clone();
-        //Adding the sessionHandle as a session property, so the sessionHandle is available in Session objects.
-        info.properties.put(SESSION_HANDLE_PROP, sessionHandle);
+        info.setProperties((Hashtable<String, String>) sessionProperties.clone());
+        if (withIds) {
+            //Adding the sessionHandle as a session property, so the sessionHandle is available in Session objects.
+            info.getProperties().put(SESSION_HANDLE_PROP, sessionHandle);
+        }
         return info;
     }
 

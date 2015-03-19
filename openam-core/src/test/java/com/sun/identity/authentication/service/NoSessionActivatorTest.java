@@ -18,7 +18,7 @@ package com.sun.identity.authentication.service;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
@@ -48,15 +48,15 @@ public class NoSessionActivatorTest {
         given(mockSession.getID()).willReturn(sid);
 
         // When
-        NoSessionActivator.INSTANCE.activateSession(null, mockSessionService, mockSession);
+        NoSessionActivator.INSTANCE.activateSession(null, mockSessionService, mockSession, null, null);
 
         // Then
         verify(mockSessionService).destroyInternalSession(sid);
     }
 
     @Test
-    public void shouldAlwaysReturnNull() throws Exception {
-        assertNull(NoSessionActivator.INSTANCE.activateSession(null, mockSessionService, mockSession));
+    public void shouldAlwaysReturnTrue() throws Exception {
+        assertTrue(NoSessionActivator.INSTANCE.activateSession(null, mockSessionService, mockSession, null, null));
     }
 
 }

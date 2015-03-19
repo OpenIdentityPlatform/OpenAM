@@ -305,6 +305,10 @@ public class LoginState {
     private boolean forwardSuccess = false;
     private boolean postProcessInSession = false;
     private boolean modulesInSession = false;
+
+    // Indicates Session is stateless
+    public boolean stateless = false;
+
     /**
      * Indicates if orgnization is active
      */
@@ -437,6 +441,16 @@ public class LoginState {
         } else {
             this.sid = null;
         }
+    }
+
+    /**
+     * Sets the session id, independently of the session. Used by stateless session activation to update the
+     * serialised session id while leaving the InternalSession null.
+     *
+     * @param sid the new session id to set.
+     */
+    void setSessionID(SessionID sid) {
+        this.sid = sid;
     }
 
     /**
@@ -632,6 +646,8 @@ public class LoginState {
                     orgConfigMgr.getServiceConfig(ISAuthConstants.AUTH_SERVICE_NAME);
 
             Map<String, Set<String>> attrs = svcConfig.getAttributes();
+            stateless = CollectionHelper.getBooleanMapAttr(attrs, ISAuthConstants.AUTH_STATELESS_SESSIONS, false);
+
             aliasAttrNames = attrs.get(ISAuthConstants.AUTH_ALIAS_ATTR);
             // NEEDED FOR BACKWARD COMPATIBILITY SUPPORT - OPEN ISSUE
             // TODO: Remove backward compat stuff
@@ -1123,20 +1139,8 @@ public class LoginState {
 
             setSuccessLoginURL(indexType, indexName);
 
-            this.session = getSessionActivator().activateSession(this, LazyConfig.AUTHD.getSessionService(), session);
-            if (session == null) {
-                return isNoSession();
-            }
-
-            this.sid = session.getID();
-            setSubject(addSSOTokenPrincipal(subject));
-
-            if (modulesInSession && loginContext != null) {
-                session.setObject(ISAuthConstants.LOGIN_CONTEXT, loginContext);
-            }
-
-            return session.activate(getUserDN());
-
+            return getSessionActivator().activateSession(this, AuthD.getSessionService(), session, subject,
+                    loginContext);
         } catch (AuthException ae) {
             DEBUG.error("Error setting session properties: ", ae);
             throw ae;
@@ -1151,25 +1155,16 @@ public class LoginState {
             return NoSessionActivator.INSTANCE;
         }
 
+        if (LazyConfig.AUTHD.isSuperUser(getUserDN())) {
+            DEBUG.message("Using stateful session activation for super admin");
+            return DefaultSessionActivator.INSTANCE;
+        }
+
+        if (stateless) {
+            return StatelessSessionActivator.INSTANCE;
+        }
+
         return DefaultSessionActivator.INSTANCE;
-    }
-
-    /* add the SSOTokenPrincipal to the Subject */
-    private Subject addSSOTokenPrincipal(Subject subject) {
-        if (subject == null) {
-            subject = new Subject();
-        }
-        String sidStr = sid.toString();
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("sid string is.. " + sidStr);
-        }
-        Principal ssoTokenPrincipal = new SSOTokenPrincipal(sidStr);
-        subject.getPrincipals().add(ssoTokenPrincipal);
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("Subject is.. :" + subject);
-        }
-
-        return subject;
     }
 
     /**
@@ -1835,8 +1830,9 @@ public class LoginState {
     ) throws AuthException {
         DEBUG.message("LoginState: createSession: Creating new session: ");
         SessionID sid = null;
+
         DEBUG.message("Save authContext in InternalSession");
-        session = LazyConfig.AUTHD.newSession(getOrgDN(), null);
+        session = LazyConfig.AUTHD.newSession(getOrgDN(), null, false);
         //save the AuthContext object in Session
         sid = session.getID();
         session.setObject(ISAuthConstants.AUTH_CONTEXT_OBJ, authContext);
@@ -1856,13 +1852,13 @@ public class LoginState {
      * @throws SSOException
      */
     public SSOToken getSSOToken() throws SSOException {
-        if (session == null || session.getState() == INACTIVE) {
+        if (!stateless && (session == null || session.getState() == INACTIVE)) {
             return null;
         }
 
         try {
             SSOTokenManager ssoManager = SSOTokenManager.getInstance();
-            SSOToken ssoToken = ssoManager.createSSOToken(session.getID().toString());
+            SSOToken ssoToken = ssoManager.createSSOToken(sid.toString());
             return ssoToken;
         } catch (SSOException ex) {
             DEBUG.message("Error retrieving SSOToken :", ex);
@@ -5629,10 +5625,11 @@ public class LoginState {
      * failover is enabled
      */
     void updateSessionForFailover() {
-        if (!isNoSession()) {
-            InternalSession intSess = getSession();
-            intSess.setIsISStored(true);
+        if (!isNoSession() || stateless) {
+            return;
         }
+
+        getSession().setIsISStored(true);
     }
 
     /**
@@ -6441,6 +6438,15 @@ public class LoginState {
 
     public void setLoginLockoutUserWarning(final int loginLockoutUserWarning) {
         this.loginLockoutUserWarning = loginLockoutUserWarning;
+    }
+
+    /**
+     * Whether to keep authentication module instances in the session so that they can be called on logout. This is
+     * useful if the login modules have particular logout callback functionality that must be invoked. See
+     * authentication service setting "sunAMAuthKeepAuthModuleIntances". Not supported for stateless sessions.
+     */
+    boolean isModulesInSessionEnabled() {
+        return modulesInSession;
     }
 
     /**

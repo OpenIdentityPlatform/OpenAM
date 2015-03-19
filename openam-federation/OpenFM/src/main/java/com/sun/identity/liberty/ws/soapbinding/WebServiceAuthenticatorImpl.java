@@ -27,41 +27,34 @@
  * Portions Copyrighted 2015 ForgeRock, AS."
  */
 
-package com.sun.identity.liberty.ws.soapbinding; 
+package com.sun.identity.liberty.ws.soapbinding;
 
-import java.security.AccessController;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import javax.servlet.http.HttpServletRequest;
-import javax.security.auth.Subject;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
+import com.iplanet.am.util.Cache;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.am.util.Cache;
 import com.iplanet.security.x509.CertUtils;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.DateUtils;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.server.AuthContextLocal;
-import com.sun.identity.authentication.service.AuthUtils;
-import com.sun.identity.authentication.service.AuthD;
-import com.sun.identity.shared.DateUtils;
-import com.sun.identity.saml.common.SAMLUtils;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.liberty.ws.security.SecurityUtils;
+import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.guice.core.InjectorHolder;
+
+import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
+import java.security.AccessController;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 class WebServiceAuthenticatorImpl implements WebServiceAuthenticator {
     private static final String PRINCIPAL_PROP = "Principal";
@@ -208,11 +201,11 @@ class WebServiceAuthenticatorImpl implements WebServiceAuthenticator {
         
         String authInstant = null;
         try {
-            InternalSession is = InjectorHolder.getInstance(SessionService.class).newInternalSession(null, null);
+            InternalSession is = InjectorHolder.getInstance(SessionService.class).newInternalSession(null, null, false);
             is.activate("");
             Map attrs = sessionSchema.getAttributeDefaults();
             is.setMaxSessionTime(CollectionHelper.getIntMapAttr(
-                attrs, MAX_SESSION_TIME, DEFAULT_MAX_SESSION_TIME, debug));
+                    attrs, MAX_SESSION_TIME, DEFAULT_MAX_SESSION_TIME, debug));
             is.setMaxIdleTime(CollectionHelper.getIntMapAttr(
                 attrs, IDLE_TIME, DEFAULT_IDLE_TIME, debug));
             is.setMaxCachingTime(CollectionHelper.getIntMapAttr(

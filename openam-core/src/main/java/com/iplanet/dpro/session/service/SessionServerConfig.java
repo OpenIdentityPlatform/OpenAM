@@ -29,8 +29,6 @@
 
 package com.iplanet.dpro.session.service;
 
-import static com.sun.identity.shared.Constants.*;
-
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -39,6 +37,13 @@ import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.URLNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.util.annotations.VisibleForTesting;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
@@ -46,12 +51,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.util.annotations.VisibleForTesting;
+
+import static com.sun.identity.shared.Constants.*;
 
 /**
  * Responsible for collating WebtopNaming configuration state relating to the Session Service.
@@ -94,7 +95,7 @@ public class SessionServerConfig {
      * Initialization success is dependent on {@link WebtopNaming } being ready.
      */
     @Inject
-    SessionServerConfig(@Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
+    public SessionServerConfig(@Named(SessionConstants.SESSION_DEBUG) Debug sessionDebug,
                         SessionServiceURLService sessionServiceURLService) {
 
         try {
@@ -359,7 +360,7 @@ public class SessionServerConfig {
     private String requiredSystemProperty(String key) throws SessionException {
         String value = SystemProperties.get(key);
 
-        if (key == null) {
+        if (value == null) {
             throw new SessionException(SessionBundle.rbName, "propertyMustBeSet", null);
         }
 

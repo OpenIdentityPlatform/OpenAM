@@ -15,8 +15,6 @@
  */
 package com.iplanet.dpro.session.utils;
 
-import static org.forgerock.openam.session.SessionConstants.*;
-
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionTimedOutException;
@@ -27,6 +25,9 @@ import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 
 import java.text.MessageFormat;
+
+import static org.forgerock.openam.session.SessionConstants.TOKEN_RESTRICTION_PROP;
+import static org.forgerock.openam.session.SessionConstants.VALID;
 
 /**
  * Responsible for providing a collection of utility functions for
@@ -103,7 +104,7 @@ public class SessionInfoFactory {
         TokenRestriction restriction = internalSession.getRestrictionForToken(sid);
         if (restriction != null) {
             try {
-                info.properties.put(TOKEN_RESTRICTION_PROP,
+                info.getProperties().put(TOKEN_RESTRICTION_PROP,
                         TokenRestrictionFactory.marshal(restriction));
             } catch (Exception e) {
                 throw new SessionException(e);
@@ -113,7 +114,7 @@ public class SessionInfoFactory {
         }
         // replace master sid with the sid from the request (either master or
         // restricted) in order not to leak the master sid
-        info.sid = sid.toString();
+        info.setSessionID(sid.toString());
         return info;
     }
 }

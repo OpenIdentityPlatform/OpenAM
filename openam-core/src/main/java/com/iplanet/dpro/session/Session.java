@@ -222,7 +222,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Indicates whether to use local or remote calls to Session Service
      */
-    private boolean sessionIsLocal = false;
+    protected boolean sessionIsLocal = false;
 
 
     private String cookieStr;
@@ -935,11 +935,11 @@ public class Session extends GeneralTaskRunnable {
             Session session = null;
 
             for (SessionInfo info : infos) {
-                SessionID sid = new SessionID(info.sid);
+                SessionID sid = new SessionID(info.getSessionID());
                 session = new Session(sid, isLocal);
                 session.sessionServiceURL = svcurl;
                 session.update(info);
-                sessions.put(info.sid, session);
+                sessions.put(info.getSessionID(), session);
             }
 
             return new SearchResults(sessions.size(), sessions.keySet(), status[0], sessions);
@@ -1047,26 +1047,31 @@ public class Session extends GeneralTaskRunnable {
      * @param info Session Information.
      */
     public synchronized void update(SessionInfo info) throws SessionException {
-        if (info.stype.equals("user"))
+        if (info.getSessionType().equals("user")) {
             sessionType = USER_SESSION;
-        else if (info.stype.equals("application"))
+        } else if (info.getSessionType().equals("application")) {
             sessionType = APPLICATION_SESSION;
-        clientID = info.cid;
-        clientDomain = info.cdomain;
-        maxSessionTime = Long.parseLong(info.maxtime);
-        maxIdleTime = Long.parseLong(info.maxidle);
-        maxCachingTime = Long.parseLong(info.maxcaching);
-        sessionIdleTime = Long.parseLong(info.timeidle);
-        sessionTimeLeft = Long.parseLong(info.timeleft);
-        if (info.state.equals("invalid"))
+        }
+        clientID = info.getClientID();
+        clientDomain = info.getClientDomain();
+        maxSessionTime = info.getMaxTime();
+        maxIdleTime = info.getMaxIdle();
+        maxCachingTime = info.getMaxCaching();
+        sessionIdleTime = info.getTimeIdle();
+        sessionTimeLeft = info.getTimeLeft();
+        if (info.getState().equals("invalid")) {
             sessionState = INVALID;
-        else if (info.state.equals("valid"))
+        }
+        else if (info.getState().equals("valid")) {
             sessionState = VALID;
-        else if (info.state.equals("inactive"))
+        }
+        else if (info.getState().equals("inactive")) {
             sessionState = INACTIVE;
-        else if (info.state.equals("destroyed"))
+        }
+        else if (info.getState().equals("destroyed")) {
             sessionState = DESTROYED;
-        sessionProperties = info.properties;
+        }
+        sessionProperties = info.getProperties();
         if (timedOutAt <= 0) {
             String sessionTimedOutProp = sessionProperties.get("SessionTimedOut");
             if (sessionTimedOutProp != null) {
@@ -1085,12 +1090,22 @@ public class Session extends GeneralTaskRunnable {
         String restrictionProp = sessionProperties.get(TOKEN_RESTRICTION_PROP);
         if (restrictionProp != null) {
             try {
-                restriction = TokenRestrictionFactory
-                        .unmarshal(restrictionProp);
+                setRestriction(TokenRestrictionFactory.unmarshal(restrictionProp));
             } catch (Exception e) {
                 throw new SessionException(e);
             }
         }
+    }
+
+    /**
+     * Sets a token restriction on this session. Optional operation - specific sub-classes can throw an exception if
+     * not supported.
+     *
+     * @param restriction the restriction to apply to this session.
+     * @throws UnsupportedOperationException if this session type does not support token restrictions.
+     */
+    protected void setRestriction(TokenRestriction restriction) {
+        this.restriction = restriction;
     }
 
     /**

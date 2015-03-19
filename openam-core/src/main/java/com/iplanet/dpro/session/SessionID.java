@@ -27,7 +27,11 @@
  */
 
 /**
+<<<<<<< HEAD
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+=======
+ * Portions Copyrighted 2011-2015 ForgeRock, AS.
+>>>>>>> stateless
  */
 
 package com.iplanet.dpro.session;
@@ -43,6 +47,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import org.forgerock.openam.utils.PerThreadCache;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import javax.servlet.http.HttpServletRequest;
@@ -371,7 +376,7 @@ public class SessionID implements Serializable {
         try {
             String sidString = encryptedString;
             // sidString would have * if it has been c66 encoded
-            if (sidString.indexOf("*") != -1) {
+            if (sidString.contains("*")) {
                 sidString = c66DecodeCookieString(encryptedString);
             }
             int outerIndex = sidString.lastIndexOf("@");
@@ -450,7 +455,6 @@ public class SessionID implements Serializable {
     private static int parseUnsignedShort(final byte[] bytes, final int i) {
         return ((bytes[i] & 0xFF) << 8) | (bytes[i+1] & 0xFF);
     }
-
 
     /**
      * Sets the server info by making a naming request by passing
@@ -569,7 +573,7 @@ public class SessionID implements Serializable {
      * method is used to generate session handle and restricted token id for a
      * given master session id. Related session IDs must share extensions and
      * tail information in order for session failover to work properly
-     * 
+     *
      * @param encryptedID encrypted ID.
      * @param prototype session ID to copy extensions and tail from
      * @return encoded session id
@@ -735,14 +739,16 @@ public class SessionID implements Serializable {
     /**
      * Generates new SessionID
      *
-     * @param domain      session domain
+     * @param serverConfig Required server configuration
+     * @param domain session domain
+     * @param jwt The JWT to encode as part of Stateless Sessions.
+     *            
      * @return newly generated session id
      * @throws SessionException
      */
-    public static SessionID generateSessionID(SessionServerConfig serverConfig, String domain) throws SessionException {
+    public static SessionID generateSessionID(SessionServerConfig serverConfig, String domain, String jwt) throws SessionException {
 
         SessionID sid;
-        String httpSessionId = null;
         String encryptedID = generateEncryptedID(serverConfig);
 
         Map ext = new HashMap();
@@ -752,13 +758,18 @@ public class SessionID implements Serializable {
         if (serverConfig.isSiteEnabled() &&
                 serverConfig.getLocalServerID() != null &&
                 !serverConfig.getLocalServerID().isEmpty()) {
-            ext.put(SessionID.PRIMARY_ID, serverConfig.getLocalServerID());
+
+            if (StringUtils.isNotBlank(jwt)) {
+                ext.put(SessionID.PRIMARY_ID, serverConfig.getPrimaryServerID());
+            } else {
+                ext.put(SessionID.PRIMARY_ID, serverConfig.getLocalServerID());
+            }
         }
 
         // AME-129, always set a Storage Key regardless of persisting or not.
         ext.put(SessionID.STORAGE_KEY, String.valueOf(secureRandom.getInstanceForCurrentThread().nextLong()));
 
-        String sessionID = SessionID.makeSessionID(encryptedID, ext, httpSessionId);
+        String sessionID = SessionID.makeSessionID(encryptedID, ext, jwt);
 
         sid = new SessionID(sessionID, serverConfig.getLocalServerID(), domain);
 
@@ -830,5 +841,4 @@ public class SessionID implements Serializable {
             throw new SessionException(errorMessage);
         }
     }
-
 }

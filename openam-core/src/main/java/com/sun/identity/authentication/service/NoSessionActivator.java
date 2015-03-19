@@ -19,6 +19,8 @@ package com.sun.identity.authentication.service;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 
+import javax.security.auth.Subject;
+
 /**
  * Session activator that just destroys the old session and does not create any new session. Used for cases where
  * OpenAM is being used for authentication only and not session management.
@@ -35,9 +37,10 @@ enum NoSessionActivator implements SessionActivator {
      * @return {@code null} always
      */
     @Override
-    public InternalSession activateSession(final LoginState loginState, final SessionService sessionService,
-                                           final InternalSession authSession) {
+    public boolean activateSession(final LoginState loginState, final SessionService sessionService,
+                                   final InternalSession authSession, final Subject subject,
+                                   final Object loginContext) {
         sessionService.destroyInternalSession(authSession.getID());
-        return null;
+        return true;
     }
 }

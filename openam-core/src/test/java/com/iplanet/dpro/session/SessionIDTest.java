@@ -16,8 +16,6 @@
 
 package com.iplanet.dpro.session;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.sun.identity.shared.encode.Base64;
 import org.testng.annotations.Test;
 
@@ -26,6 +24,8 @@ import java.io.DataOutputStream;
 import java.nio.charset.MalformedInputException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SessionIDTest {
 

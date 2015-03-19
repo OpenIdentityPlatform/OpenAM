@@ -41,11 +41,11 @@ import com.iplanet.sso.SSOTokenListener;
  * 
  */
 
-class SSOSessionListener implements com.iplanet.dpro.session.SessionListener {
+public class SSOSessionListener implements com.iplanet.dpro.session.SessionListener {
     
     private SSOTokenListener ssoListener;
 
-    SSOSessionListener(SSOTokenListener listener) {
+    public SSOSessionListener(SSOTokenListener listener) {
         ssoListener = listener;
     }
 

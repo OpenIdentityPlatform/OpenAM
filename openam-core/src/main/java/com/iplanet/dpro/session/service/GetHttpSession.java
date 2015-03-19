@@ -198,7 +198,7 @@ public final class GetHttpSession extends HttpServlet {
             HttpSession httpSession = request.getSession(true);
             String domain = request.getParameter(DOMAIN);
 
-            InternalSession is = sessionService.newInternalSession(domain, httpSession);
+            InternalSession is = sessionService.newInternalSession(domain, httpSession, false);
 
             if (sessionDebug.messageEnabled()) {
                 sessionDebug.message("GetHttpSession.create: Created new session=" + is.getID());

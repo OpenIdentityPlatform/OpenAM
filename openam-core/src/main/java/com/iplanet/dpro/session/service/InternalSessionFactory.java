@@ -38,17 +38,18 @@ import com.sun.identity.monitoring.SsoServerSessSvcImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.URLEncDec;
-import java.io.DataInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpSession;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.utils.IOUtils;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.servlet.http.HttpSession;
+import java.io.DataInputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Responsible for creating InternalSession objects.
@@ -92,10 +93,11 @@ public class InternalSessionFactory {
      *
      * @param domain      Authentication Domain
      * @param httpSession Http Session
+     * @param stateless   Indicates whether or not this session should be issued as a stateless session.
      */
-    public InternalSession newInternalSession(String domain, HttpSession httpSession) {
+    public InternalSession newInternalSession(String domain, HttpSession httpSession, boolean stateless) {
         try {
-            return newInternalSession(domain, httpSession, true);
+            return newInternalSession(domain, httpSession, true, stateless);
         } catch (SessionException e) {
             sessionDebug.error("Error creating new session", e);
             return null;
@@ -110,8 +112,10 @@ public class InternalSessionFactory {
      * @param forceHttpSessionCreation in session failover mode if this parameter is true and
      *                                 httpSession is null, it will cause SessionService to create a
      *                                 new Http session for failover purposes
+     * @param stateless   Indicates whether or not this session should be issued as a stateless session.
      */
-    InternalSession newInternalSession(String domain, HttpSession httpSession, boolean forceHttpSessionCreation)
+    InternalSession newInternalSession(String domain, HttpSession httpSession,
+                                       boolean forceHttpSessionCreation, boolean stateless)
             throws SessionException {
 
         if (serviceConfig.isSessionFailoverEnabled() && !serviceConfig.isUseInternalRequestRoutingEnabled()
@@ -119,28 +123,27 @@ public class InternalSessionFactory {
             return createSession(domain);
         }
 
-        InternalSession session = null;
-        SessionID sid = null;
+        SessionID sid = generateSessionId(domain, null);
+        return generateInternalSession(sid, httpSession, stateless);
+    }
 
-        // generate primary id
-        sid = generateSessionId(domain);
+    private InternalSession generateInternalSession(SessionID sid, HttpSession httpSession, boolean stateless) throws SessionException {
 
-        // generate session handle which looks like normal session id
-        // except it is not a valid session id
-        // and can not be used for anything other than destroySession
-        // TODO consider unifying RestrictedTokens and session handle
+        InternalSession session = new InternalSession(sid);
+        session.setHttpSession(httpSession);
 
         String sessionHandle = sid.generateSessionHandle(serverConfig);
-
-        session = new InternalSession(sid);
         session.setSessionHandle(sessionHandle);
-        session.setHttpSession(httpSession);
-        cache.put(session);
-        if (SystemProperties.isServerMode()) {
-            if (MonitoringUtil.isRunning()) {
-                SsoServerSessSvcImpl sessImpl =
-                        Agent.getSessSvcMBean();
-                sessImpl.incCreatedSessionCount();
+
+        if (!stateless) {
+            cache.put(session);
+
+            if (SystemProperties.isServerMode()) {
+                if (MonitoringUtil.isRunning()) {
+                    SsoServerSessSvcImpl sessImpl =
+                            Agent.getSessSvcMBean();
+                    sessImpl.incCreatedSessionCount();
+                }
             }
         }
 
@@ -149,7 +152,9 @@ public class InternalSessionFactory {
         String amCtxId = SessionID.generateAmCtxID(serverConfig);
         session.putProperty(Constants.AM_CTX_ID, amCtxId);
         session.putProperty(sessionCookies.getLBCookieName(), serverConfig.getLBCookieValue());
-        session.reschedule();
+        if (!stateless) {
+            session.reschedule();
+        }
         return session;
     }
 
@@ -201,10 +206,10 @@ public class InternalSessionFactory {
      * @return newly generated session id
      * @throws SessionException
      */
-    private SessionID generateSessionId(String domain) throws SessionException {
+    private SessionID generateSessionId(String domain, String jwt) throws SessionException {
         SessionID sid;
         do {
-            sid = SessionID.generateSessionID(serverConfig, domain);
+            sid = SessionID.generateSessionID(serverConfig, domain, jwt);
         } while (cache.getBySessionID(sid) != null || cache.getByHandle(sid.toString()) != null);
         return sid;
     }

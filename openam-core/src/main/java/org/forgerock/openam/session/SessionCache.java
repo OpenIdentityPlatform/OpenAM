@@ -148,7 +148,7 @@ public class SessionCache {
      * @param info Current state of session
      */
     public void removeLocalSID(SessionInfo info) {
-        SessionID sessionID = new SessionID(info.sid);
+        SessionID sessionID = new SessionID(info.getSessionID());
         removeSID(sessionID);
     }
 
@@ -162,7 +162,7 @@ public class SessionCache {
      * @param info Current state of session on home server
      */
     public void removeRemoteSID(SessionInfo info) {
-        SessionID sessionID = new SessionID(info.sid);
+        SessionID sessionID = new SessionID(info.getSessionID());
 
         long purgeDelay = getPurgeDelayForReducedCrosstalk();
 

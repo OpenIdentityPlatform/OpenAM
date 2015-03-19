@@ -24,12 +24,15 @@ import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.strategies.CTSOperations;
 import com.iplanet.dpro.session.operations.strategies.LocalOperations;
 import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
+import com.iplanet.dpro.session.operations.strategies.StatelessOperations;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
+
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.forgerock.openam.session.SessionConstants;
 
 /**
  * Server based SessionOperationStrategy implementation.
@@ -57,10 +60,12 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
 
     private final SessionOperations local;
     private final SessionOperations remote;
+    private final SessionOperations clientSide;
     private final CTSOperations cts;
     private final WebtopNamingQuery queryUtils;
     private final Debug debug;
     private final SessionMonitoringStore store;
+    private final StatelessSessionFactory statelessSessionFactory;
 
     /**
      * Guice initialised constructor.
@@ -71,6 +76,7 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
      * @param cts Required strategy.
      * @param store The store for session monitoring information.
      * @param queryUtils Required for Server availability decisions.
+     * @param statelessSessionFactory Required for JWT checks.
      * @param debug Required for logging.
      */
     @Inject
@@ -79,7 +85,9 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
             LocalOperations local,
             CTSOperations cts,
             RemoteOperations remote,
+            StatelessOperations clientSide,
             WebtopNamingQuery queryUtils,
+            StatelessSessionFactory statelessSessionFactory,
             @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
 
         this.service = service;
@@ -87,7 +95,9 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
         this.local = local;
         this.remote = remote;
         this.cts = cts;
+        this.clientSide = clientSide;
         this.queryUtils = queryUtils;
+        this.statelessSessionFactory = statelessSessionFactory;
         this.debug = debug;
     }
 
@@ -104,6 +114,10 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
      */
     @Override
     public SessionOperations getOperation(Session session) {
+        if (isClientSide(session)) {
+            return logAndWrap(session, clientSide, SessionMonitorType.STATELESS);
+        }
+
         if (isLocalServer(session)) {
             return logAndWrap(session, local, SessionMonitorType.LOCAL);
         }
@@ -168,6 +182,10 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
         } catch (SessionException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private boolean isClientSide(Session session) {
+        return statelessSessionFactory.containsJwt(session.getID());
     }
 
     /**

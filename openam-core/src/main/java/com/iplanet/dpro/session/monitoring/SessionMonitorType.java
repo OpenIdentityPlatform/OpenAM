@@ -20,6 +20,6 @@ package com.iplanet.dpro.session.monitoring;/*
  */
 public enum SessionMonitorType {
 
-    CTS, LOCAL, REMOTE
+    CTS, LOCAL, REMOTE, STATELESS
 
 }

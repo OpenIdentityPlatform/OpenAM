@@ -357,6 +357,11 @@
             <artifactId>xml-serializer</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+        </dependency>
+
         <!-- Legacy External Libraries for OpenAM -->
         <dependency>
             <groupId>external</groupId>

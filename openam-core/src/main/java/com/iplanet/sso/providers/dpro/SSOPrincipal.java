@@ -34,10 +34,10 @@ package com.iplanet.sso.providers.dpro;
  * service. It implements java.security.Principal interface.
  */
 
-class SSOPrincipal implements java.security.Principal {
+public class SSOPrincipal implements java.security.Principal {
     
     /**Pricipal entity name */
-     private String principal;
+    private String principal;
 
     /**
      * Creates a SSOPrincipal object
@@ -45,7 +45,7 @@ class SSOPrincipal implements java.security.Principal {
      * @param String The name of the principal
      */
 
-    SSOPrincipal(String name) {
+    public SSOPrincipal(String name) {
         principal = name;
     }
 

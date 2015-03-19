@@ -76,6 +76,8 @@ import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.SessionPollerPool;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
+import org.forgerock.openam.sso.providers.stateless.StatelessSession;
+import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
 
@@ -161,6 +163,7 @@ public class SessionService {
     private final SessionCache sessionCache;
     private final SessionCookies sessionCookies;
     private final SessionPollerPool sessionPollerPool;
+    private final StatelessSessionFactory statelessSessionFactory;
 
     /**
      * Private Singleton Session Service.
@@ -185,7 +188,8 @@ public class SessionService {
             final SessionServiceURLService sessionServiceURLService,
             final SessionCache sessionCache,
             final SessionCookies sessionCookies,
-            final SessionPollerPool sessionPollerPool) {
+            final SessionPollerPool sessionPollerPool,
+            final StatelessSessionFactory statelessSessionFactory) {
 
         this.sessionDebug = sessionDebug;
         this.stats = stats;
@@ -201,6 +205,7 @@ public class SessionService {
         this.httpConnectionFactory = httpConnectionFactory;
         this.cache = internalSessionCache;
         this.internalSessionFactory = internalSessionFactory;
+        this.statelessSessionFactory = statelessSessionFactory;
         this.remoteSessionSet = Collections.synchronizedSet(new HashSet());
         this.sessionNotificationSender = sessionNotificationSender;
         this.sessionServiceURLService = sessionServiceURLService;
@@ -289,7 +294,7 @@ public class SessionService {
             // more over creating an HTTP session by making a self-request
             // results in dead-lock if called from within synchronized
             // section in getSessionService()
-            InternalSession session = internalSessionFactory.newInternalSession(domain, httpSession, false);
+            InternalSession session = internalSessionFactory.newInternalSession(domain, httpSession, false, false);
             session.setType(APPLICATION_SESSION);
             session.setClientID(dsameAdminTokenProvider.getDsameAdminDN());
             session.setClientDomain(domain);
@@ -342,8 +347,11 @@ public class SessionService {
     /**
      * This method is expected to only be called for local sessions
      */
-
     String doGetRestrictedTokenId(SessionID masterSid, TokenRestriction restriction) throws SessionException {
+        if (statelessSessionFactory.containsJwt(masterSid)) {
+            // Stateless sessions do not (yet) support restricted tokens
+            throw new UnsupportedOperationException(StatelessSession.RESTRICTED_TOKENS_UNSUPPORTED);
+        }
 
         // locate master session
         InternalSession session = cache.getBySessionID(masterSid);
@@ -368,8 +376,8 @@ public class SessionService {
         return restrictedSid.toString();
     }
 
-    public InternalSession newInternalSession(String domain, HttpSession httpSession) {
-        return internalSessionFactory.newInternalSession(domain, httpSession);
+    public InternalSession newInternalSession(String domain, HttpSession httpSession, boolean stateless) {
+        return internalSessionFactory.newInternalSession(domain, httpSession, stateless);
     }
 
     /**
@@ -750,6 +758,11 @@ public class SessionService {
     public SessionInfo getSessionInfo(SessionID sid, boolean reset)
             throws SessionException {
 
+        if (statelessSessionFactory.containsJwt(sid)) {
+            return statelessSessionFactory.getSessionInfo(sid);
+        }
+        // Session is not stateless, continue through the code...
+
         InternalSession sess = resolveToken(sid);
         SessionInfo info = sessionInfoFactory.getSessionInfo(sess, sid);
         if (reset) {
@@ -792,7 +805,7 @@ public class SessionService {
                     SessionInfo info = sess.toSessionInfo();
                     // replace session id with session handle to prevent from
                     // impersonation
-                    info.sid = sess.getSessionHandle();
+                    info.setSessionID(sess.getSessionHandle());
                     infos.add(info);
                 }
             }
@@ -889,6 +902,11 @@ public class SessionService {
      * @throws SessionException Session is null OR the Session is invalid
      */
     public void addSessionListener(SessionID sid, String url) throws SessionException {
+        // We do not support session listeners for stateless sessions.
+        if (statelessSessionFactory.containsJwt(sid)) {
+            return;
+        }
+
         InternalSession session = resolveToken(sid);
         if (session.getState() == INVALID) {
             throw new SessionException(SessionBundle.getString("invalidSessionState") + sid.toString());

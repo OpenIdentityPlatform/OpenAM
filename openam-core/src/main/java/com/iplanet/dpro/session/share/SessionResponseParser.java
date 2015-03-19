@@ -55,7 +55,7 @@ class SessionResponseParser {
 
     /**
      * Constructs new SessionResponseParser
-     * @param XML response document to be parsed
+     * @param xmlDoc response document to be parsed
      */
     public SessionResponseParser(Document xmlDoc) {
         document = xmlDoc;
@@ -63,8 +63,8 @@ class SessionResponseParser {
 
     /**
      * Constructs new SessionResponseParser
-     * @param XML string representing the response
-     * @exception when the SessionReponse object cannot be parsed
+     * @param xmlString string representing the response
+     * @exception RuntimeException when the SessionReponse object cannot be parsed
      */
     public SessionResponseParser(String xmlString) {
         document = XMLUtils
@@ -255,43 +255,43 @@ class SessionResponseParser {
         // parse Session attributes
         String temp = sess.getAttribute("sid");
         if (temp != null) {
-            sessionInfo.sid = temp;
+            sessionInfo.setSessionID(temp);
         }
         temp = sess.getAttribute("stype");
         if (temp != null) {
-            sessionInfo.stype = temp;
+            sessionInfo.setSessionType(temp);
         }
         temp = sess.getAttribute("cid");
         if (temp != null) {
-            sessionInfo.cid = temp;
+            sessionInfo.setClientID(temp);
         }
         temp = sess.getAttribute("cdomain");
         if (temp != null) {
-            sessionInfo.cdomain = temp;
+            sessionInfo.setClientDomain(temp);
         }
         temp = sess.getAttribute("maxtime");
         if (temp != null) {
-            sessionInfo.maxtime = temp;
+            sessionInfo.setMaxTime(Long.parseLong(temp));
         }
         temp = sess.getAttribute("maxidle");
         if (temp != null) {
-            sessionInfo.maxidle = temp;
+            sessionInfo.setMaxIdle(Long.parseLong(temp));
         }
         temp = sess.getAttribute("maxcaching");
         if (temp != null) {
-            sessionInfo.maxcaching = temp;
+            sessionInfo.setMaxCaching(Long.parseLong(temp));
         }
         temp = sess.getAttribute("timeleft");
         if (temp != null) {
-            sessionInfo.timeleft = temp;
+            sessionInfo.setTimeLeft(Long.parseLong(temp));
         }
         temp = sess.getAttribute("timeidle");
         if (temp != null) {
-            sessionInfo.timeidle = temp;
+            sessionInfo.setTimeIdle(Long.parseLong(temp));
         }
         temp = sess.getAttribute("state");
         if (temp != null) {
-            sessionInfo.state = temp;
+            sessionInfo.setState(temp);
         }
 
         // parse session properties
@@ -305,7 +305,7 @@ class SessionResponseParser {
                 // get property attributes
                 String name = property.getAttribute("name");
                 if (name != null) {
-                    sessionInfo.properties.put(name, property
+                    sessionInfo.getProperties().put(name, property
                             .getAttribute("value"));
                 }
             }

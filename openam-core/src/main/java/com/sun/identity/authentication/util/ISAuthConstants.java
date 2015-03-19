@@ -24,7 +24,7 @@
  *
  * $Id: ISAuthConstants.java,v 1.21 2009/11/25 12:05:07 manish_rustagi Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.util;
@@ -327,6 +327,8 @@ public interface ISAuthConstants {
     public static final String AUTH_ALIAS_ATTR = AUTH_ATTR_PREFIX
             + "alias-attr-name";
 
+    public static final String AUTH_STATELESS_SESSIONS = "openam-auth-stateless-sessions";
+
     public static final String AUTH_USER_CONTAINER = AUTH_ATTR_PREFIX
             + "user-container";
 
@@ -493,6 +495,8 @@ public interface ISAuthConstants {
     public static final String SERVICE = "Service";
 
     public static final String HOST = "Host";
+
+    public static final String HOST_NAME = "HostName";
     
     public static final String USER_PROFILE = "UserProfile";
     
