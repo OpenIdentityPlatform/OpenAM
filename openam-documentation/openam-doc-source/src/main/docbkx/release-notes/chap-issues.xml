@@ -289,6 +289,15 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5562" xlink:show="new">OPENAM-5562</link>: Users can't change password via XUI/REST API after OPENAM-3877 when using embedded</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5575" xlink:show="new">OPENAM-5575</link>: OpenAM install/upgrade page contains old year "Copyright © 2008-2014"</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5584" xlink:show="new">OPENAM-5584</link>: Proper function of session failover is disrupted by exceptions and browser refresh is needed</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5617" xlink:show="new">OPENAM-5617</link>: Debug file rotation doesn't respect the rotation period</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5629" xlink:show="new">OPENAM-5629</link>: openam/oauth/registerconsumer.jsp endpoint returns inconsistent messages</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5638" xlink:show="new">OPENAM-5638</link>: The exceptions catched by the REST API aren't printed in the OpenAM debug logs</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5664" xlink:show="new">OPENAM-5664</link>: WS Federation Entity Provider shows content of Genral tab, but it is marked IDP(SP) tab</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5665" xlink:show="new">OPENAM-5665</link>: RealmSelection page is out of date</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5666" xlink:show="new">OPENAM-5666</link>: SAML 1.x Web SSO generates "Failed to create SSO token." error</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5674" xlink:show="new">OPENAM-5674</link>: Upgrade report for goto migration can be empty</para></listitem>
   </itemizedlist>
+
+
  </section>
 </chapter>
