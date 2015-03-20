@@ -359,6 +359,7 @@ public class DataStore {
 
             Set<String> searchable = new HashSet<String>();
             map.put(SMSEntry.ATTR_XML_KEYVAL, searchable);
+            searchable.add(Privilege.RESOURCE_TYPE_UUID_ATTRIBUTE + "=" + p.getResourceTypeUuid());
 
             if (indexes !=null) {
                 for (String i : indexes.getHostIndexes()) {
@@ -426,8 +427,6 @@ public class DataStore {
                 info.add(data);
                 info.add("|" + data);
             }
-
-            info.add(Privilege.RESOURCE_TYPE_UUID_ATTRIBUTE + "=" + p.getResourceTypeUuid());
 
             Entitlement ent = p.getEntitlement();
             info.add(Privilege.APPLICATION_ATTRIBUTE + "=" +

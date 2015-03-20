@@ -42,6 +42,7 @@ import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActionS
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActions;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getAttribute;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.resourceTypeFromMap;
+import static org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -55,11 +56,13 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.util.query.QueryFilter;
 
+import javax.inject.Inject;
 import javax.security.auth.Subject;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -74,8 +77,20 @@ import java.util.logging.Level;
 /**
  * The implementation for <code>ResourceTypeConfiguration</code> that is responsible for the persistence
  * of the resource type entitlement configuration.
+ *
+ * @since 13.0.0
  */
 public class ResourceTypeConfigurationImpl extends AbstractConfiguration implements ResourceTypeConfiguration {
+
+    private static final String REFERENCE_FILTER =
+            "(|(sunxmlKeyValue=resourceTypeUuid={0})(sunxmlKeyValue=resourceTypeUuids={0}))";
+
+    private final DNWrapper dnHelper;
+
+    @Inject
+    public ResourceTypeConfigurationImpl(DNWrapper dnHelper) {
+        this.dnHelper = dnHelper;
+    }
 
     /**
      * {@inheritDoc}
@@ -162,12 +177,57 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
         try {
             final String[] logParams = {realm, uuid};
             OpenSSOLogger.log(MESSAGE, Level.INFO, RESOURCE_TYPE_ATTEMPT_REMOVE, logParams, subject);
+
+            if (isResourceTypeUsed(subject, realm, uuid)) {
+                throw new EntitlementException(EntitlementException.RESOURCE_TYPE_REFERENCED, uuid);
+            }
+
             getSubOrgConfig(subject, realm, CONFIG_RESOURCE_TYPES).removeSubConfig(uuid);
+
             OpenSSOLogger.log(MESSAGE, Level.INFO, RESOURCE_TYPE_SUCCEEDED_REMOVE, logParams, subject);
         } catch (SMSException e) {
             handleRemoveException(subject, realm, uuid, e);
         } catch (SSOException e) {
             handleRemoveException(subject, realm, uuid, e);
+        }
+    }
+
+    /**
+     * Looks in the realm for applications and policies that may reference the resource type.
+     *
+     * @param uuid
+     *         the resource type uuid
+     *
+     * @return whether the resource type is referenced in the policy model for the realm
+     *
+     * @throws EntitlementException
+     *         should an error occur looking up resource type references
+     */
+    private boolean isResourceTypeUsed(Subject subject, String realm, String uuid) throws EntitlementException {
+        SSOToken token = SubjectUtils.getSSOToken(subject);
+
+        try {
+            String filter = MessageFormat.format(REFERENCE_FILTER, uuid);
+            @SuppressWarnings("unchecked") Set<String> dnEntries =
+                    SMSEntry.search(token, dnHelper.orgNameToDN(realm), filter, 0, 0, false, false);
+
+            for (String dnEntry : dnEntries) {
+
+                if (dnEntry.contains(EntitlementUtils.INDEXES_NAME)) {
+                    // A DN containing the entitlement index service indicates reference by a policy.
+                    return true;
+                }
+
+                if (dnEntry.contains(EntitlementUtils.SERVICE_NAME)) {
+                    // A DN containing the general entitlement service indicates reference by an application.
+                    return true;
+                }
+            }
+
+            return false;
+
+        } catch (SMSException smsE) {
+            throw new EntitlementException(EntitlementException.INTERNAL_ERROR, smsE);
         }
     }
 

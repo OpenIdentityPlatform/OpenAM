@@ -808,10 +808,6 @@ public class EntitlementService extends EntitlementConfiguration {
             data.add(CONFIG_DESCRIPTION + "=");
         }
 
-        for (String resourceTypeUuid : appl.getResourceTypeUuids()) {
-            data.add(CONFIG_RESOURCE_TYPE_UUIDS + "=" + resourceTypeUuid);
-        }
-
         data.add(CONFIG_ENTITLEMENT_COMBINER + "=" +
             appl.getEntitlementCombiner().getClass().getName());
 
@@ -863,6 +859,13 @@ public class EntitlementService extends EntitlementConfiguration {
         for (String m : appl.getMetaData()) {
             data.add(ATTR_NAME_META + "=" + m);
         }
+
+        Set<String> searchableAttributes = new HashSet<String>();
+        for (String resourceTypeUuid : appl.getResourceTypeUuids()) {
+            searchableAttributes.add(CONFIG_RESOURCE_TYPE_UUIDS + "=" + resourceTypeUuid);
+        }
+
+        map.put(SMSEntry.ATTR_XML_KEYVAL, searchableAttributes);
         map.put("ou", getApplicationIndices(appl));
         return map;
     }

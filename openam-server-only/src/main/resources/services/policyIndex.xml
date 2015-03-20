@@ -26,53 +26,56 @@
 
    $Id: policyIndex.xml,v 1.2 2009/08/29 00:56:25 veiming Exp $
 
+   Portions copyright 2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
-    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
-    "jar://com/sun/identity/sm/sms.dtd">
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
 
 <ServicesConfiguration>
     <Service name="sunEntitlementIndexes" version="1.0">
         <Schema i18nFileName="" revisionNumber="10">
             <Organization>
                 <AttributeSchema name="indexCount"
-                    type="single"
-                    syntax="numeric"
-                    i18nKey="" />
+                                 type="single"
+                                 syntax="numeric"
+                                 i18nKey=""/>
                 <AttributeSchema name="referralIndexCount"
-                    type="single"
-                    syntax="numeric"
-                    i18nKey="" />
+                                 type="single"
+                                 syntax="numeric"
+                                 i18nKey=""/>
                 <AttributeSchema name="responseAttributes"
-                    type="list"
-                    syntax="string"
-                    i18nKey="" />
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey=""/>
                 <SubSchema name="type" inheritance="multiple">
                     <SubSchema name="indexes" inheritance="multiple">
+                        <AttributeSchema name="resourceTypeUuid"
+                                         type="single" syntax="string" isSearchable="yes"/>
                         <AttributeSchema name="subjectindex"
-                            type="list"  isSearchable="yes" />
+                                         type="list" isSearchable="yes"/>
                         <AttributeSchema name="hostindex"
-                            type="list"  isSearchable="yes" />
+                                         type="list" isSearchable="yes"/>
                         <AttributeSchema name="pathindex"
-                            type="list"  isSearchable="yes" />
+                                         type="list" isSearchable="yes"/>
                         <AttributeSchema name="pathparentindex"
-                            type="list"  isSearchable="yes" />
+                                         type="list" isSearchable="yes"/>
                         <AttributeSchema name="serializable"
-                            type="single" />
+                                         type="single"/>
                     </SubSchema>
-                 </SubSchema>
+                </SubSchema>
             </Organization>
         </Schema>
 
         <Configuration>
             <OrganizationConfiguration name="/">
                 <AttributeValuePair>
-                    <Attribute name="indexCount" />
-                        <Value>0</Value>
+                    <Attribute name="indexCount"/>
+                    <Value>0</Value>
                 </AttributeValuePair>
-                <SubConfiguration name="default" id="type" />
-                <SubConfiguration name="referrals" id="type" />
+                <SubConfiguration name="default" id="type"/>
+                <SubConfiguration name="referrals" id="type"/>
             </OrganizationConfiguration>
         </Configuration>
     </Service>

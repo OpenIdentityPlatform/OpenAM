@@ -48,6 +48,7 @@ public final class EntitlementUtils {
 
 
     public static final String SERVICE_NAME = "sunEntitlementService";
+    public static final String INDEXES_NAME = "sunEntitlementIndexes";
     public static final String REALM_DN_TEMPLATE = "ou={0},ou=default,ou=OrganizationConfig,ou=1.0,ou="
             + SERVICE_NAME + ",ou=services,{1}";
     public static final String CONFIG_ACTIONS = "actions";

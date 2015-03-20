@@ -183,7 +183,7 @@ class ServiceSchemaImpl {
                                 serviceName.toLowerCase()))) {
                     tmpSet.add((serviceName + "-" + str).toLowerCase());
                 } else {
-                    tmpSet.add(str);
+                    tmpSet.add(str.toLowerCase());
                 }
             }
         }

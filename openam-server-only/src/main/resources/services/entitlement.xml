@@ -217,6 +217,7 @@
                         <AttributeSchema name="name"
                              type="single"
                              syntax="string"
+                             isSearchable="yes"
                              i18nKey="" />
                         <AttributeSchema name="description"
                              type="single"
@@ -225,14 +226,17 @@
                         <AttributeSchema name="patterns"
                              type="list"
                              syntax="string"
+                             isSearchable="yes"
                              i18nKey="" />
                         <AttributeSchema name="actions"
                              type="list"
                              syntax="string"
+                             isSearchable="yes"
                              i18nKey="" />
                         <AttributeSchema name="createdBy"
                              type="single"
                              syntax="string"
+                             isSearchable="yes"
                              i18nKey="" />
                         <AttributeSchema name="creationDate"
                              type="single"
@@ -261,6 +265,7 @@
                         <AttributeSchema name="resourceTypeUuids"
                                          type="list"
                                          syntax="string"
+                                         isSearchable="yes"
                                          i18nKey="" />
                         <AttributeSchema name="subjects"
                             type="list"
