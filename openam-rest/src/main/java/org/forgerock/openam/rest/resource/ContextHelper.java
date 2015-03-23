@@ -41,6 +41,17 @@ public class ContextHelper {
     }
 
     /**
+     * Gets the universal id for the given username.
+     *
+     * @param context The context.
+     * @param username The username.
+     * @return The users UID.
+     */
+    public String getUserUid(ServerContext context, String username) {
+        return IdUtils.getIdentity(username, getRealm(context)).getUniversalId();
+    }
+
+    /**
      * Gets the username for the user of the accessed resource.
      *
      * @param context The context.

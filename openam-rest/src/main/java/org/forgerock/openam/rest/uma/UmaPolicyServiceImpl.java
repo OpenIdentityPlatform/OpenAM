@@ -31,6 +31,8 @@ import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
@@ -95,6 +97,28 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         this.contextHelper = contextHelper;
     }
 
+    private JsonValue resolveUsernameToUID(final ServerContext context, JsonValue policy) {
+        for (JsonValue permission : policy.get("permissions")) {
+            String uuid = contextHelper.getUserUid(context, permission.get("subject").asString());
+            if (uuid != null) {
+                permission.put("subject", uuid);
+            }
+        }
+        return policy;
+    }
+
+    private JsonValue resolveUIDToUsername(JsonValue policy) {
+        for (JsonValue permission : policy.get("permissions")) {
+            try {
+                String username = new AMIdentity(null, permission.get("subject").asString()).getName();
+                permission.put("subject", username);
+            } catch (IdRepoException e) {
+                //Cannot happen in this use case
+            }
+        }
+        return policy;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -105,7 +129,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         String resourceOwnerId = getResourceOwnerId(context);
         try {
             resourceSet = getResourceSetDescription(UmaPolicy.idOf(policy), resourceOwnerId, context);
-            umaPolicy = UmaPolicy.valueOf(resourceSet, policy);
+            umaPolicy = UmaPolicy.valueOf(resourceSet, resolveUsernameToUID(context, policy));
             validateScopes(resourceSet, umaPolicy.getScopes());
             verifyPolicyDoesNotAlreadyExist(context, resourceSet);
         } catch (ResourceException e) {
@@ -166,7 +190,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                                                 + resourceSetId));
                             } else {
                                 ResourceSetDescription resourceSet = getResourceSetDescription(resourceSetId, resourceOwnerId, context);
-                                return Promises.newSuccessfulPromise(UmaPolicy.fromUnderlyingPolicies(resourceSet, value.getSecond()));
+                                UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, value.getSecond());
+                                resolveUIDToUsername(umaPolicy.asJson());
+                                return Promises.newSuccessfulPromise(umaPolicy);
                             }
                         } catch (ResourceException e) {
                             return Promises.newFailedPromise(e);
@@ -187,7 +213,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         final String resourceOwnerUid = getResourceOwnerUid(context);
         try {
             resourceSet = getResourceSetDescription(resourceSetId, resourceOwnerId, context);
-            updatedUmaPolicy = UmaPolicy.valueOf(resourceSet, policy);
+            updatedUmaPolicy = UmaPolicy.valueOf(resourceSet, resolveUsernameToUID(context, policy));
             validateScopes(resourceSet, updatedUmaPolicy.getScopes());
         } catch (ResourceException e) {
             return Promises.newFailedPromise(e);
@@ -244,6 +270,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                                     public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) throws ResourceException {
                                         String userId = getLoggedInUserId(context);
                                         auditLogger.get().log(resourceSetId, resourceSet.getName(), userId, UmaAuditType.POLICY_UPDATED, userId);
+                                        resolveUIDToUsername(updatedUmaPolicy.asJson());
                                         return Promises.newSuccessfulPromise(updatedUmaPolicy);
                                     }
                                 }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {
@@ -327,7 +354,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                             String resourceOwnerId = getResourceOwnerId(context);
                             for (Map.Entry<String, Set<Resource>> entry : policyMapping.entrySet()) {
                                 ResourceSetDescription resourceSet = getResourceSetDescription(entry.getKey(), resourceOwnerId, context);
-                                umaPolicies.add(UmaPolicy.fromUnderlyingPolicies(resourceSet, entry.getValue()));
+                                UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, entry.getValue());
+                                resolveUIDToUsername(umaPolicy.asJson());
+                                umaPolicies.add(umaPolicy);
                             }
                             return Promises.newSuccessfulPromise(umaPolicies);
                         } catch (ResourceException e) {
