@@ -137,6 +137,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         String realm = permissionTicket.getRealm();
         String resourceSetId = permissionTicket.getResourceSetId();
         String resourceName = UmaConstants.UMA_POLICY_SCHEME;
+        Subject resourceOwnerSubject;
         try {
             ResourceSetStore store = oauth2ProviderSettingsFactory.get(requestFactory.create(getRequest()))
                     .getResourceSetStore();
@@ -146,14 +147,21 @@ public class AuthorizationRequestEndpoint extends ServerResource {
                 throw new NotFoundException("Could not find Resource Set, " + resourceSetId);
             }
             resourceName += results.iterator().next().getId();
+            resourceOwnerSubject = createSubject(results.iterator().next().getResourceOwnerId(), realm);
         } catch (NotFoundException e) {
             debug.message("Couldn't find resource that permission ticket is registered for", e);
             throw new ServerException("Couldn't find resource that permission ticket is registered for");
         }
-        Subject subject = createSubject(authorisationApiToken.getResourceOwnerId(), realm);
+        Subject requestingPartySubject = createSubject(authorisationApiToken.getResourceOwnerId(), realm);
 
-        List<Entitlement> entitlements = umaProviderSettings.getPolicyEvaluator(subject, permissionTicket.getClientId().toLowerCase())
-                .evaluate(realm, subject, resourceName, null, false);
+        // Implicitly grant access to the resource owner
+        if (isRequestingPartyResourceOwner(requestingPartySubject, resourceOwnerSubject)) {
+            return true;
+        }
+
+        List<Entitlement> entitlements = umaProviderSettings.getPolicyEvaluator(requestingPartySubject,
+                permissionTicket.getClientId().toLowerCase())
+                .evaluate(realm, requestingPartySubject, resourceName, null, false);
 
         Set<String> requestedScopes = permissionTicket.getScopes();
         Set<String> requiredScopes = new HashSet<String>(requestedScopes);
@@ -167,6 +175,10 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         }
 
         return requiredScopes.isEmpty();
+    }
+
+    private boolean isRequestingPartyResourceOwner(Subject requestingParty, Subject resourceOwner) {
+        return resourceOwner.equals(requestingParty);
     }
 
     protected Subject createSubject(String username, String realm) {

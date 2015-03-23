@@ -1,5 +1,21 @@
 package org.forgerock.openam.uma;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+
+import javax.security.auth.Subject;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
@@ -26,25 +42,11 @@ import org.restlet.ext.json.JsonRepresentation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.security.auth.Subject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-
 public class AuthorizationRequestEndpointTest {
 
     private static final String RS_CLIENT_ID = "RS_CLIENT_ID";
     private static final String RS_ID = "RESOURCE_SET_ID";
+    private static final String RESOURCE_OWNER_ID = "RESOURCE_OWNER_ID";
     private static final String RS_DESCRIPTION_ID = "RESOURCE_SET_DESCRIPTION_ID";
     private static final String RESOURCE_NAME = UmaConstants.UMA_POLICY_SCHEME + RS_DESCRIPTION_ID;
 
@@ -63,7 +65,7 @@ public class AuthorizationRequestEndpointTest {
     private RequestingPartyToken rpt;
     private Response response;
     private ResourceSetStore resourceSetStore;
-    private Subject subject;
+    private Subject subject = new Subject();
     private UmaAuditLogger umaAuditLogger;
 
     private class AuthorizationRequestEndpoint2 extends AuthorizationRequestEndpoint {
@@ -76,8 +78,19 @@ public class AuthorizationRequestEndpointTest {
         }
 
         @Override
-        protected Subject createSubject(String username, String realm) {
-            return new Subject();
+        protected Subject createSubject(final String username, final String realm) {
+            if (!RESOURCE_OWNER_ID.equals(username)) {
+                return subject;
+            } else {
+                final Subject subject = new Subject();
+                subject.getPrincipals().add(new Principal() {
+                    @Override
+                    public String getName() {
+                        return realm + ":" + username;
+                    }
+                });
+                return subject;
+            }
         }
 
         @Override
@@ -96,7 +109,6 @@ public class AuthorizationRequestEndpointTest {
         given(oauth2TokenStore.readAccessToken(Matchers.<OAuth2Request>anyObject(), anyString())).willReturn(accessToken);
         given(accessToken.getClientId()).willReturn(RS_CLIENT_ID);
 
-        subject = new Subject();
         umaAuditLogger = mock(UmaAuditLogger.class);
 
         umaTokenStore = mock(UmaTokenStore.class);
@@ -106,6 +118,7 @@ public class AuthorizationRequestEndpointTest {
         given(permissionTicket.getExpiryTime()).willReturn(System.currentTimeMillis() + 10000);
         given(permissionTicket.getResourceSetId()).willReturn(RS_ID);
         given(permissionTicket.getClientId()).willReturn(RS_CLIENT_ID);
+        given(permissionTicket.getRealm()).willReturn("REALM");
         given(umaTokenStore.readPermissionTicket(anyString())).willReturn(permissionTicket);
         given(umaTokenStore.createRPT(Matchers.<AccessToken>anyObject(), Matchers.<PermissionTicket>anyObject()))
                 .willReturn(rpt);
@@ -113,6 +126,7 @@ public class AuthorizationRequestEndpointTest {
         resourceSetStore = mock(ResourceSetStore.class);
         ResourceSetDescription resourceSet = new ResourceSetDescription();
         resourceSet.setId(RS_DESCRIPTION_ID);
+        resourceSet.setResourceOwnerId(RESOURCE_OWNER_ID);
         given(resourceSetStore.query(QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, RS_ID)))
                 .willReturn(Collections.singleton(resourceSet));
 
@@ -206,7 +220,7 @@ public class AuthorizationRequestEndpointTest {
         given(permissionTicket.getScopes()).willReturn(requestedScopes);
 
         //Then
-        assertThat(endpoint.requestAuthorization(entity) != null);
+        assertThat(endpoint.requestAuthorization(entity)).isNotNull();
     }
 
     @Test
@@ -224,7 +238,7 @@ public class AuthorizationRequestEndpointTest {
         given(permissionTicket.getScopes()).willReturn(requestedScopes);
 
         //Then
-        assertThat(endpoint.requestAuthorization(entity) != null);
+        assertThat(endpoint.requestAuthorization(entity)).isNotNull();
     }
 
     private Entitlement createEntitlement(String action) {
