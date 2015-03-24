@@ -430,8 +430,7 @@ public class LoginState {
         internalUsers.add("amadmin");
         internalUsers.add("dsameuser");
         internalUsers.add("urlaccessagent");
-        internalUsers.add("amldapuser");
-        
+
         // Obtain the secureRandom instance
         try {
             secureRandom = SecureRandom.getInstance("SHA1PRNG");

@@ -24,6 +24,7 @@
  *
  * $Id: EntityMembersViewBean.java,v 1.3 2008/06/25 05:42:59 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.idm;
@@ -165,7 +166,7 @@ public class EntityMembersViewBean
             }
 
             // assignable will contain users which shouldn't be displayed in
-            // the console (amldapuser, dsameuser, etc...)
+            // the console (dsameuser, etc...)
             Set assignable = results.getSearchResults();
             assignable.removeAll(model.getSpecialUsers(curRealm));
 

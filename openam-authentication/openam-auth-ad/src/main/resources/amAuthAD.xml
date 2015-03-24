@@ -68,7 +68,7 @@
                     syntax="dn"
                     i18nKey="a104">
                     <DefaultValues>
-                        <Value>cn=amldapuser,ou=DSAME Users,@UM_NORMALIZED_ORGBASE@</Value>
+                        <Value>@UM_DS_DIRMGRDN@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-bind-passwd"
@@ -215,7 +215,7 @@
                         syntax="dn"
                         i18nKey="a104">
                         <DefaultValues>
-                            <Value>cn=amldapuser,ou=DSAME Users,@UM_NORMALIZED_ORGBASE@</Value>
+                            <Value>@UM_DS_DIRMGRDN@</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-bind-passwd"
