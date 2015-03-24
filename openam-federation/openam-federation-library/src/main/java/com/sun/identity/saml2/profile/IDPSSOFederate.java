@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
@@ -667,8 +667,7 @@ public class IDPSSOFederate {
                     }
 
                     // Let's verify that the realm is the same for the user and the IdP
-                    boolean isValidSessionInRealm = isValidSessionInRealm(
-                            realm, session);
+                    boolean isValidSessionInRealm = IDPSSOUtil.isValidSessionInRealm(realm, session);
                     IDPSession oldIDPSession = null;
                     String sessionIndex = IDPSSOUtil.getSessionIndex(session);
                     boolean sessionUpgrade = false;
@@ -911,7 +910,7 @@ public class IDPSSOFederate {
                 relayState = (String) IDPCache.relayStateCache.get(reqID);
                 
                 // Let's verify if the session belongs to the proper realm
-                boolean isValidSessionInRealm = session != null && isValidSessionInRealm(realm, session);
+                boolean isValidSessionInRealm = session != null && IDPSSOUtil.isValidSessionInRealm(realm, session);
 
                 // There should be a session on the second pass. If this is not the case then provide an error message
                 // If there is a session then it must belong to the proper realm
@@ -1420,43 +1419,6 @@ public class IDPSSOFederate {
         }
     }
 
-       
-    /**
-     * Check that the authenticated session belongs to the same realm where the 
-     * IDP is defined.
-     *
-     *
-     * @param realm the realm where the IdP is defined
-     * @param session The Session object of the authenticated user
-     * @return true if the session was initiated in the same realm as realm
-     */
-    private static boolean isValidSessionInRealm(String realm, Object session) {
-
-        String classMethod = "IDPSSOFederate.isValidSessionInRealm: ";
-        boolean isValidSessionInRealm = false;
-        try {
-            // A user can only be authenticated in one realm
-            String sessionRealm = SessionManager.getProvider().
-                    getProperty(session, SAML2Constants.ORGANIZATION)[0];
-            if (sessionRealm != null && !sessionRealm.isEmpty()) {
-                if (realm.equalsIgnoreCase(sessionRealm)) {
-                    isValidSessionInRealm = true;
-                } else {
-                    if (SAML2Utils.debug.warningEnabled()) {
-                        SAML2Utils.debug.warning(classMethod
-                                + "Invalid realm for the session:" + sessionRealm +
-                                ", while the realm of the IdP is:" + realm);
-                    }
-                }
-            }
-        } catch (SessionException ex) {
-            SAML2Utils.debug.error(classMethod + "Could not retrieve the session"
-                    + " information", ex);
-        }
-        return isValidSessionInRealm;
-    }
-      
-    
     /**
      * clean up the cache created for session upgrade.
      */
