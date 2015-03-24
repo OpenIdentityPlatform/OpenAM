@@ -21,20 +21,8 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
 import static org.forgerock.util.query.QueryFilter.*;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.security.KeyPair;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -42,8 +30,20 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
+import java.security.KeyPair;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.utils.Utils;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthorizationCode;
@@ -59,7 +59,6 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
-import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
 import org.forgerock.openam.utils.RealmNormaliser;
@@ -71,8 +70,6 @@ import org.forgerock.util.encode.Base64url;
 import org.restlet.Request;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
-
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
 /**
  * Implementation of the OpenId Connect Token Store which the OpenId Connect Provider will implement.
  *
@@ -191,11 +188,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final String acr = getAuthenticationContextClassReference(request);
 
-        String kid = null;
-        JsonValue jwks = providerSettings.getJWKSet().get("keys");
-        if (!jwks.isNull() && !jwks.asList().isEmpty()) {
-            kid = jwks.get(0).get("kid").asString();
-        }
+        String kid = generateKid(providerSettings.getJWKSet(), algorithm);
+
         String opsId = UUID.randomUUID().toString();
 
         try {
@@ -225,6 +219,19 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         return oidcToken;
+    }
+
+    private String generateKid(JsonValue jwkSet, String algorithm) {
+
+        final JwsAlgorithm jwsAlgorithm = JwsAlgorithm.valueOf(algorithm);
+        if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())) {
+            JsonValue jwks = jwkSet.get("keys");
+            if (!jwks.isNull() && !jwks.asList().isEmpty()) {
+                return jwks.get(0).get("kid").asString();
+            }
+        }
+
+        return null;
     }
 
     private List<String> getAMRFromAuthModules(OAuth2Request request, OAuth2ProviderSettings providerSettings) throws ServerException {
