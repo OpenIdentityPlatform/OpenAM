@@ -123,8 +123,7 @@ public class LoginState {
      * For these users we would allow authentication only at root realm
      * and require to be authenticated to configuration datastore.
      */
-    public static final Set<String> INTERNAL_USERS = unmodifiableSet(asSet("amadmin", "dsameuser", "urlaccessagent",
-            "amldapuser"));
+    public static final Set<String> INTERNAL_USERS = unmodifiableSet(asSet("amadmin", "dsameuser", "urlaccessagent"));
 
     private static final boolean URL_REWRITE_IN_PATH = SystemProperties.getAsBoolean(Constants.REWRITE_AS_PATH);
     private static final String NO_SESSION_QUERY_PARAM = "noSession";
