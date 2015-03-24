@@ -55,6 +55,15 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
+import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.servlet.ServletContext;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
@@ -116,15 +125,6 @@ import org.forgerock.opendj.ldap.SearchResultHandler;
 import org.forgerock.util.promise.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.thread.ExecutorServiceFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -474,6 +474,12 @@ public class CoreGuiceModule extends AbstractModule {
             // Provider used over bind(..).getInstance(..) to enforce a lazy loading approach.
             return AdminTokenAction.getInstance();
         }
+    }
+
+    // provides our stored servlet context to classes which require it
+    @Provides @Named(ServletContextCache.CONTEXT_REFERENCE)
+    ServletContext getServletContext() {
+        return ServletContextCache.getStoredContext();
     }
 
     @Provides @Named(SessionConstants.PRIMARY_SERVER_URL) @Inject @Singleton

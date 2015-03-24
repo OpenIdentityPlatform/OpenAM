@@ -16,15 +16,6 @@
 
 package org.forgerock.openam.services.baseurl;
 
-import java.security.AccessController;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
-
-import org.forgerock.openam.utils.OpenAMSettingsImpl;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.RequestUtils;
@@ -34,6 +25,15 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
+import java.security.AccessController;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.servlet.ServletContext;
+import org.forgerock.openam.core.guice.ServletContextCache;
+import org.forgerock.openam.utils.OpenAMSettingsImpl;
 
 /**
  * A factory for instances of {@link BaseURLProvider}
@@ -46,30 +46,34 @@ public class BaseURLProviderFactory {
     private static final String PROVIDER_TYPE = "base-url-source";
     private static final String CONTEXT_PATH = "base-url-context-path";
 
+    private final ServletContext servletContext;
+
     private final Debug debug = Debug.getInstance(RequestUtils.debugName);
     private final Map<String, BaseURLProvider> providers = new ConcurrentHashMap<String, BaseURLProvider>();
 
-    public BaseURLProviderFactory() {
+    @Inject
+    public BaseURLProviderFactory(@Named(ServletContextCache.CONTEXT_REFERENCE) ServletContext servletContext) {
+        this.servletContext = servletContext;
         addListener();
     }
 
     /**
      * Get the BaseURLProvider for a realm.
      *
-     * @param request The Http Servlet Request.
      * @param realm The realm.
      * @return The BaseURLProvider.
      */
-    public BaseURLProvider get(HttpServletRequest request, String realm) {
+    public BaseURLProvider get(String realm) {
         String realmDN = DNMapper.orgNameToDN(realm);
         BaseURLProvider cached = providers.get(realmDN);
         if (cached != null) {
             return cached;
         }
-        return create(request, realmDN);
+        return create(realmDN);
     }
 
-    private synchronized BaseURLProvider create(HttpServletRequest request, String realmDN) {
+    private synchronized BaseURLProvider create(String realmDN) {
+
         if (!providers.containsKey(realmDN)) {
             debug.message("Creating base URL provider for realm: {}", realmDN);
             OpenAMSettingsImpl settings = new OpenAMSettingsImpl(SERVICE_NAME, SERVICE_VERSION);
@@ -83,7 +87,7 @@ public class BaseURLProviderFactory {
                     provider.setContextPath(settings.getStringSetting(realmDN, CONTEXT_PATH));
                 } else {
                     provider = new RequestValuesBaseURLProvider();
-                    provider.setContextPath(request.getContextPath());
+                    provider.setContextPath(servletContext.getContextPath());
                 }
 
                 providers.put(realmDN, provider);

@@ -5,6 +5,10 @@
 
     <!-- Initialises the Guice Injector. -->
     <listener>
+        <listener-class>org.forgerock.openam.core.guice.OpenAMServletContextListener</listener-class>
+    </listener>
+
+    <listener>
         <listener-class>org.forgerock.guice.core.GuiceInitialisationFilter</listener-class>
     </listener>
 

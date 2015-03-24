@@ -17,11 +17,18 @@
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.fluent.JsonValue.*;
-import static org.forgerock.oauth2.core.Utils.isEmpty;
-import static org.forgerock.oauth2.core.Utils.joinScope;
+import static org.forgerock.oauth2.core.Utils.*;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
 import java.security.AccessController;
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -31,25 +38,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
-
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdConstants;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceListener;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jwk.KeyUse;
@@ -93,7 +87,6 @@ import org.restlet.ext.servlet.ServletUtils;
 public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements OAuth2ProviderSettings {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
-    private String issuer;
     private final String realm;
     private final String deploymentUrl;
     private final ResourceSetStore resourceSetStore;
@@ -595,6 +588,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             throw new ServerException(e);
         }
     }
+
     /**
      * {@inheritDoc}
      */
@@ -636,32 +630,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public String getIssuer() throws ServerException {
-        if (issuer == null) {
-            synchronized (this) {
-                final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-                try {
-                    OrganizationConfigManager ocm = new OrganizationConfigManager(token, realm);
-                    Map attrs = ocm.getAttributes(IdConstants.REPO_SERVICE);
-                    Set<String> aliases = (Set<String>)attrs.get(IdConstants.ORGANIZATION_ALIAS_ATTR);
-                    aliases = new TreeSet<String>(aliases);
-                    if (aliases.isEmpty()) {
-                        issuer = deploymentUrl;
-                    } else {
-                        Iterator<String> iterator = aliases.iterator();
-                        issuer = iterator.next();
-                        while (!issuer.contains(".") && iterator.hasNext()) {
-                            issuer = iterator.next();
-                        }
-                        if (!issuer.contains(".")) {
-                            issuer = deploymentUrl;
-                        }
-                    }
-                } catch (SMSException e) {
-                    throw new ServerException(e);
-                }
-            }
-        }
-        return issuer;
+        return getOAuth2BaseUrl();
     }
 
     private String getOAuth2BaseUrl() {
