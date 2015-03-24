@@ -26,9 +26,7 @@
 
    $Id: idRepoService.xml,v 1.37 2009/11/10 01:50:57 hengming Exp $
 
--->
-<!--
-   Portions Copyrighted 2012-2014 ForgeRock AS
+   Portions Copyrighted 2012-2015 ForgeRock AS.
 -->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iplanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -4614,17 +4612,6 @@
                         <AttributeValuePair>
                             <Attribute name="telephoneNumber" />
                             <Value></Value>
-                        </AttributeValuePair>
-                    </SubConfiguration>
-                    <SubConfiguration name="amldapuser"
-                        id="user">
-                        <AttributeValuePair>
-                            <Attribute name="userPassword" />
-                            <Value>@HASHLDAPUSERPASSWD@</Value>
-                        </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="dn" />
-                            <Value>cn=amldapuser,ou=DSAME Users,</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="amService-URLAccessAgent"

@@ -24,11 +24,12 @@
  *
  * $Id: IdRepoSampleDeleteId.java,v 1.3 2008/06/25 05:41:13 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;
 
-import java.io.*;
+
 import java.util.*;
 
 import com.iplanet.sso.SSOException;
@@ -107,7 +108,6 @@ public class IdRepoSampleDeleteId {
                 String tmpS = amid.getName().toLowerCase();
                 if (amid.getType().equals(IdType.USER)) {
                     if (tmpS.equals("dsameuser") ||
-                        tmpS.equals("amldapuser") ||
                         tmpS.equals("amadmin") ||
                         tmpS.equals("amservice-urlaccessagent") ||
                         tmpS.equals("anonymous"))

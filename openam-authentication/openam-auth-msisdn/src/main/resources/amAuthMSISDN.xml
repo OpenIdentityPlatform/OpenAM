@@ -26,6 +26,7 @@
 
     $Id: amAuthMSISDN.xml,v 1.5 2008/06/25 05:45:41 qcheng Exp $
 
+    Portions Copyrighted 2011-2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -80,7 +81,7 @@
                     syntax="string"
                     i18nKey="a106">
                         <DefaultValues>
-                         <Value>cn=amldapuser,ou=DSAME Users,@UM_NORMALIZED_ORGBASE@</Value>
+                         <Value>@UM_DS_DIRMGRDN@</Value>
                         </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="sunAMAuthMSISDNPrincipalPasswd"
@@ -175,7 +176,7 @@
                         syntax="string"
                         i18nKey="a106">
                             <DefaultValues>
-                             <Value>cn=amldapuser,ou=DSAME Users,@UM_NORMALIZED_ORGBASE@</Value>
+                             <Value>@UM_DS_DIRMGRDN@</Value>
                             </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="sunAMAuthMSISDNPrincipalPasswd"
