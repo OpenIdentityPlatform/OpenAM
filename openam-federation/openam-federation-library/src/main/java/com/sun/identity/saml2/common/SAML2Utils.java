@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.saml2.common;
@@ -4895,4 +4895,16 @@ public class SAML2Utils extends SAML2SDKUtils {
 
         return result;
     }
-}             
+
+    /**
+     * Returns the first value of the session property.
+     *
+     * @param session The session object.
+     * @param propertyName The property's name that needs to be returned.
+     * @return The property value derived from the session object.
+     * @throws SessionException If there was a problem while retrieving the session property.
+     */
+    public static String getSingleValuedSessionProperty(Object session, String propertyName) throws SessionException {
+        return SessionManager.getProvider().getProperty(session, propertyName)[0];
+    }
+}

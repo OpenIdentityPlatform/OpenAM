@@ -24,7 +24,7 @@
  *
  * $Id: IDPSSOUtil.java,v 1.56 2009/11/24 21:53:28 madan_ranganath Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
@@ -94,6 +94,7 @@ import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.utils.ClientUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -123,6 +124,8 @@ public class IDPSSOUtil {
     // key name for name id format on SSOToken
     public static final String NAMEID_FORMAT = "SAML2NameIDFormat";
     public static final String NULL = "null";
+    private static final String REDIRECTED = "redirected";
+    private static final String REDIRECTED_TRUE = "redirected=true";
     public static SAML2MetaManager metaManager = null;
     public static CircleOfTrustManager cotManager = null;
     static IDPSessionListener sessionListener = new IDPSessionListener();
@@ -281,11 +284,33 @@ public class IDPSSOUtil {
                 relayState,
                 SAML2Constants.IDP_ROLE);
 
-        if ((authnReq == null) && (session == null)) {
+        if (authnReq == null && (session == null || !isValidSessionInRealm(realm, session))) {
             // idp initiated and not logged in yet, need to authenticate
             try {
-                redirectAuthentication(request, response, authnReq,
-                        null, realm, idpEntityID, spEntityID);
+                if (Boolean.parseBoolean(request.getParameter(REDIRECTED))) {
+                    if (session == null) {
+                        String[] data = {idpEntityID};
+                        SAML2Utils.debug.error(classMethod + "The IdP was not able to create a session");
+                        LogUtil.error(Level.INFO, LogUtil.SSO_NOT_FOUND, data, session, null);
+                    } else {
+                        try {
+                            String ipAddress = ClientUtils.getClientIPAddress(request);
+                            String sessionRealm = SAML2Utils.getSingleValuedSessionProperty(session,
+                                    SAML2Constants.ORGANIZATION);
+                            String[] data = {sessionRealm, realm, spEntityID, ipAddress, null};
+                            SAML2Utils.debug.error(classMethod + "The realm of the session (" + sessionRealm
+                                    + ") does not correspond to that of the IdP (" + realm + ")");
+                            LogUtil.error(Level.INFO, LogUtil.INVALID_REALM_FOR_SESSION, data, session, null);
+                        } catch (SessionException se) {
+                            SAML2Utils.debug.error(classMethod + "Failed to retrieve realm from session", se);
+                        }
+                    }
+                    String rbKey = "UnableToDOSSOOrFederation";
+                    SAMLUtils.sendError(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rbKey,
+                            SAML2Utils.bundle.getString(rbKey));
+                } else {
+                    redirectAuthentication(request, response, authnReq, null, realm, idpEntityID, spEntityID);
+                }
             } catch (IOException ioe) {
                 SAML2Utils.debug.error(classMethod +
                         "Unable to redirect to authentication.", ioe);
@@ -2358,15 +2383,16 @@ public class IDPSSOUtil {
 
         String gotoURL = request.getRequestURL().toString();
         String gotoQuery = request.getQueryString();
+
+        //We are appending redirected=true to the goto URL so that we can tell if the user was already redirected
+        //to the login interface for authentication.
         if (gotoQuery != null) {
-            gotoURL += "?" + gotoQuery;
-            if (reqID != null) {
-                gotoURL += "&ReqID=" + reqID;
-            }
+            gotoURL += "?" + gotoQuery + "&" + REDIRECTED_TRUE;
         } else {
-            if (reqID != null) {
-                gotoURL += "?ReqID=" + reqID;
-            }
+            gotoURL += "?" + REDIRECTED_TRUE;
+        }
+        if (reqID != null) {
+            gotoURL += "&ReqID=" + reqID;
         }
 
         if (SAML2Utils.debug.messageEnabled()) {
@@ -3055,4 +3081,32 @@ public class IDPSSOUtil {
         return spSSODescriptor;
     }
 
+    /**
+     * Check that the authenticated session belongs to the same realm where the IDP is defined.
+     *
+     * @param realm The realm where the IdP is defined.
+     * @param session The Session object of the authenticated user.
+     * @return true If the session was initiated in the same realm as the session's realm.
+     */
+    static boolean isValidSessionInRealm(String realm, Object session) {
+        String classMethod = "IDPSSOUtil.isValidSessionInRealm: ";
+        boolean isValidSessionInRealm = false;
+        try {
+            // A user can only be authenticated in one realm
+            String sessionRealm = SAML2Utils.getSingleValuedSessionProperty(session, SAML2Constants.ORGANIZATION);
+            if (sessionRealm != null && !sessionRealm.isEmpty()) {
+                if (realm.equalsIgnoreCase(sessionRealm)) {
+                    isValidSessionInRealm = true;
+                } else {
+                    if (SAML2Utils.debug.warningEnabled()) {
+                        SAML2Utils.debug.warning(classMethod + "Invalid realm for the session:" + sessionRealm
+                                + ", while the realm of the IdP is:" + realm);
+                    }
+                }
+            }
+        } catch (SessionException ex) {
+            SAML2Utils.debug.error(classMethod + "Could not retrieve the session information", ex);
+        }
+        return isValidSessionInRealm;
+    }
 }
