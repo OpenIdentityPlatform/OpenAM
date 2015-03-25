@@ -724,7 +724,8 @@ public class AttributeSchema {
      * Returns the name of this attribute when used in a CREST representation.
      */
     public String getResourceName() {
-        return as.getResourceName();
+        String resourceName = as.getResourceName();
+        return resourceName == null ? getName() : resourceName;
     }
 
     /**

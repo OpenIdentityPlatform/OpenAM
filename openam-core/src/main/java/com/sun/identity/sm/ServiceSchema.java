@@ -268,7 +268,8 @@ public class ServiceSchema {
      * Returns the name for the service schema when used in a CREST representation.
      */
     public String getResourceName() {
-        return ss.getResourceName();
+        String resourceName = ss.getResourceName();
+        return resourceName == null ? getName() : resourceName;
     }
 
     /**

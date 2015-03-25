@@ -42,7 +42,8 @@
             i18nFileName="amPlatform"
             revisionNumber="30"
             i18nKey="iplanet-am-platform-service-description"
-            propertiesViewBeanURL="../service/SCPlatform30">
+            propertiesViewBeanURL="../service/SCPlatform30"
+            resourceName="platform">
             <Global>
                 <AttributeSchema name="serviceObjectClasses"
                     type="list"

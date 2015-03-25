@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: ServiceManager.java,v 1.27 2009/10/28 04:24:26 hengming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012-2013 ForgeRock AS
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -818,6 +815,13 @@ public class ServiceManager {
      */
     public static String getBaseDN() {
         return (SMSEntry.baseDN);
+    }
+
+    /**
+     * Returns the DN beneath the {@link #getBaseDN()} in which service data is stored.
+     */
+    public static String getServiceDN() {
+        return serviceDN;
     }
 
     /**

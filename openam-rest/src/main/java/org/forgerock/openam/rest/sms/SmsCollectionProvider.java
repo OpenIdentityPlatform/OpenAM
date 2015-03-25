@@ -34,6 +34,7 @@ import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -41,6 +42,7 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.RouterContext;
 import org.forgerock.json.resource.ServerContext;
@@ -101,10 +103,16 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                     result = scm.createOrganizationConfig(realmFor(context), attrs);
                 }
             } else {
-                ServiceConfig config = parentSubSchemaFor(context, scm);
+                ServiceConfig config = parentSubConfigFor(context, scm);
                 String name = content.get("name").asString();
+                if (name == null) {
+                    name = request.getNewResourceId();
+                } else if (!name.equals(request.getNewResourceId())) {
+                    handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
+                            "name and URI's resource ID do not match"));
+                }
                 config.addSubConfig(name, lastSchemaNodeName(), 0, attrs);
-                result = config.getSubConfig(name);
+                result = checkedInstanceSubConfig(name, config);
             }
 
             String dn = result.getDN();
@@ -116,6 +124,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+        } catch (NotFoundException e) {
+            handler.handleError(e);
         }
     }
 
@@ -130,7 +140,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                     scm.removeOrganizationConfiguration(realmFor(context), resourceId);
                 }
             } else {
-                ServiceConfig config = parentSubSchemaFor(context, scm);
+                ServiceConfig config = parentSubConfigFor(context, scm);
+                checkedInstanceSubConfig(resourceId, config);
                 config.removeSubConfig(resourceId);
             }
 
@@ -142,6 +153,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+        } catch (NotFoundException e) {
+            handler.handleError(e);
         }
     }
 
@@ -157,18 +170,20 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                     result = scm.getOrganizationConfig(realmFor(context), resourceId);
                 }
             } else {
-                ServiceConfig config = parentSubSchemaFor(context, scm);
-                result = config.getSubConfig(resourceId);
+                ServiceConfig config = parentSubConfigFor(context, scm);
+                result = checkedInstanceSubConfig(resourceId, config);
             }
 
-            handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()),
-                    converter.toJson(result.getAttributes())));
+            JsonValue value = getJsonValue(result);
+            handler.handleResult(new Resource(resourceId, String.valueOf(value.hashCode()), value));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+        } catch (NotFoundException e) {
+            handler.handleError(e);
         }
     }
 
@@ -186,20 +201,21 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                     node = scm.getOrganizationConfig(realmFor(context), resourceId);
                 }
             } else {
-                ServiceConfig config = parentSubSchemaFor(context, scm);
-                node = config.getSubConfig(resourceId);
+                ServiceConfig config = parentSubConfigFor(context, scm);
+                node = checkedInstanceSubConfig(resourceId, config);
             }
 
             node.setAttributes(attrs);
-            Map<String, Object> result = node.getAttributes();
-
-            handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), converter.toJson(result)));
+            JsonValue value = getJsonValue(node);
+            handler.handleResult(new Resource(resourceId, String.valueOf(value.hashCode()), value));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+        } catch (NotFoundException e) {
+            handler.handleError(e);
         }
     }
 
@@ -226,18 +242,16 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                     ServiceConfig config = type == SchemaType.GLOBAL ? scm.getGlobalConfig(instanceName) :
                             scm.getOrganizationConfig(realm, instanceName);
                     if (config != null) {
-                        Map<String, Object> result = config.getAttributes();
-                        handler.handleResource(new Resource(instanceName, String.valueOf(result.hashCode()),
-                                converter.toJson(result)));
+                        JsonValue value = getJsonValue(config);
+                        handler.handleResource(new Resource(instanceName, String.valueOf(value.hashCode()), value));
                     }
                 }
             } else {
-                ServiceConfig config = parentSubSchemaFor(context, scm);
+                ServiceConfig config = parentSubConfigFor(context, scm);
                 Set<String> names = config.getSubConfigNames("*", lastSchemaNodeName());
                 for (String configName : names) {
-                    Map<String, Object> result = config.getSubConfig(configName).getAttributes();
-                    handler.handleResource(new Resource(configName, String.valueOf(result.hashCode()),
-                            converter.toJson(result)));
+                    JsonValue value = getJsonValue(config.getSubConfig(configName));
+                    handler.handleResource(new Resource(configName, String.valueOf(value.hashCode()), value));
                 }
             }
 
@@ -255,7 +269,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         return subSchemaPath.get(subSchemaPath.size() - 1).getName();
     }
 
-    protected ServiceConfig parentSubSchemaFor(ServerContext context, ServiceConfigManager scm)
+    protected ServiceConfig parentSubConfigFor(ServerContext context, ServiceConfigManager scm)
             throws SMSException, SSOException {
         String name = null;
         Map<String, String> uriTemplateVariables = context.asContext(RouterContext.class).getUriTemplateVariables();
@@ -276,6 +290,21 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             config = config.getSubConfig(pathFragment);
         }
         return config;
+    }
+
+    private ServiceConfig checkedInstanceSubConfig(String resourceId, ServiceConfig config)
+            throws SSOException, SMSException, NotFoundException {
+        ServiceConfig subConfig = config.getSubConfig(resourceId);
+        if (subConfig == null || !subConfig.getSchemaID().equals(lastSchemaNodeName())) {
+            throw new NotFoundException();
+        }
+        return subConfig;
+    }
+
+    private JsonValue getJsonValue(ServiceConfig result) {
+        JsonValue value = converter.toJson(result.getAttributes());
+        value.add("name", result.getComponentName());
+        return value;
     }
 
     @Override

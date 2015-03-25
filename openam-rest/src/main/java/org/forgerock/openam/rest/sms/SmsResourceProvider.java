@@ -16,14 +16,12 @@
 
 package org.forgerock.openam.rest.sms;
 
-import static org.forgerock.openam.forgerockrest.RestUtils.*;
-
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
@@ -43,9 +41,8 @@ abstract class SmsResourceProvider {
     }
 
     protected ServiceConfigManager getServiceConfigManager(ServerContext context) throws SSOException, SMSException {
-        SSOTokenManager mgr = SSOTokenManager.getInstance();
-        SSOToken token = mgr.createSSOToken(getCookieFromServerContext(context));
-        return new ServiceConfigManager(token, serviceName, serviceVersion);
+        SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
+        return new ServiceConfigManager(ssoToken, serviceName, serviceVersion);
     }
 
 }

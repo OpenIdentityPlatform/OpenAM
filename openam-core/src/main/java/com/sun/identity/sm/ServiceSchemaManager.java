@@ -335,7 +335,8 @@ public class ServiceSchemaManager {
      */
     public String getResourceName() {
         validate();
-        return (ssm.getResourceName());
+        String resourceName = ssm.getResourceName();
+        return resourceName == null ? getName() : resourceName;
     }
 
     /**

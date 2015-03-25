@@ -285,6 +285,10 @@ public class RestEndpoints {
                 .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
                 .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.GLOBAL));
 
+        dynamicRealmRouter.route("/realm-config")
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.ORGANIZATION));
+
 //        dynamicRealmRouter.route("/scripts")
 //                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
 //                .forVersion("1.0").to(ScriptResource.class);
