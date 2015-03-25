@@ -30,6 +30,7 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.util.Reject;
@@ -38,7 +39,7 @@ import org.slf4j.Logger;
 import javax.security.auth.Subject;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -74,15 +75,15 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
         try {
             createCollectionConfig();
             final Map<String, Set<String>> data = getScriptConfigurationData(config);
-            if (containsUuid(config.getUuid())) {
-                getSubOrgConfig().getSubConfig(config.getUuid()).setAttributes(data);
+            if (containsUuid(config.getId())) {
+                getSubOrgConfig().getSubConfig(config.getId()).setAttributes(data);
             } else {
-                getSubOrgConfig().addSubConfig(config.getUuid(), SCRIPT_CONFIGURATION, 0, data);
+                getSubOrgConfig().addSubConfig(config.getId(), SCRIPT_CONFIGURATION, 0, data);
             }
         } catch (SMSException e) {
-            throw createAndLogError(logger, SAVE_FAILED, e, config.getUuid(), realm);
+            throw createAndLogError(logger, SAVE_FAILED, e, config.getId(), realm);
         } catch (SSOException e) {
-            throw createAndLogError(logger, SAVE_FAILED, e, config.getUuid(), realm);
+            throw createAndLogError(logger, SAVE_FAILED, e, config.getId(), realm);
         }
     }
 
@@ -99,13 +100,13 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
 
     @Override
     public Set<ScriptConfiguration> getAll() throws ScriptException {
-        final Set<ScriptConfiguration> scriptConfigurations = new HashSet<ScriptConfiguration>();
+        final Set<ScriptConfiguration> scriptConfigurations = new LinkedHashSet<ScriptConfiguration>();
         try {
             final ServiceConfig subOrgConfig = getSubOrgConfig();
             final Set<String> uuids = subOrgConfig.getSubConfigNames();
             for (String uuid : uuids) {
                 scriptConfigurations.add(
-                        scriptConfigurationFromMap(uuid, subOrgConfig.getSubConfig(uuid).getAttributes()));
+                        scriptConfigurationFromMap(uuid, subOrgConfig.getSubConfig(uuid).getAttributesForRead()));
             }
         } catch (SMSException e) {
             throw createAndLogError(logger, RETRIEVE_ALL_FAILED, e, realm);
@@ -118,7 +119,7 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
     @Override
     public ScriptConfiguration get(String uuid) throws ScriptException {
         try {
-            return scriptConfigurationFromMap(uuid, getSubOrgConfig().getSubConfig(uuid).getAttributes());
+            return scriptConfigurationFromMap(uuid, getSubOrgConfig().getSubConfig(uuid).getAttributesForRead());
         } catch (SMSException e) {
             throw createAndLogError(logger, RETRIEVE_FAILED, e, uuid, realm);
         } catch (SSOException e) {
@@ -157,6 +158,30 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
         return false;
     }
 
+    @Override
+    public Set<ScriptConfiguration> get(QueryFilter queryFilter) throws ScriptException {
+        final Set<ScriptConfiguration> scriptConfigurations = new LinkedHashSet<ScriptConfiguration>();
+        try {
+            final Map<String, Map<String, Set<String>>> configData = new HashMap<String, Map<String, Set<String>>>();
+            final ServiceConfig subOrgConfig = getSubOrgConfig();
+            final Set<String> uuids = subOrgConfig.getSubConfigNames();
+            for (String uuid : uuids) {
+                configData.put(uuid, subOrgConfig.getSubConfig(uuid).getAttributesForRead());
+            }
+            final Set<String> filterResults = queryFilter.accept(new ScriptingQueryFilterVisitor(), configData);
+            for (String uuid : filterResults) {
+                scriptConfigurations.add(get(uuid));
+            }
+        } catch (SMSException e) {
+            throw createAndLogError(logger, RETRIEVE_ALL_FAILED, e, realm);
+        } catch (SSOException e) {
+            throw createAndLogError(logger, RETRIEVE_ALL_FAILED, e, realm);
+        } catch (UnsupportedOperationException e) {
+            throw createAndLogError(logger, ScriptErrorCode.valueOf(e.getMessage()), e);
+        }
+        return scriptConfigurations;
+    }
+
     /**
      * Add all the script configuration attributes to a map that can be stored in the data store.
      *
@@ -187,7 +212,7 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
             throws ScriptException {
 
         return ScriptConfiguration.builder()
-                .setUuid(uuid)
+                .setId(uuid)
                 .setName(getMapAttr(data, SCRIPT_NAME))
                 .setDescription(getMapAttr(data, SCRIPT_DESCRIPTION))
                 .setContext(getContextFromString(getMapAttr(data, SCRIPT_CONTEXT)))

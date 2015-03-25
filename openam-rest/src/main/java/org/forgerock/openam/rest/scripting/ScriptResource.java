@@ -19,13 +19,15 @@ import static org.forgerock.json.fluent.JsonValue.*;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import com.sun.identity.shared.encode.Base64;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -40,8 +42,10 @@ import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
-import org.forgerock.openam.scripting.service.ScriptConfigurationService;
+import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
+import org.slf4j.Logger;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Set;
 
 /**
@@ -51,7 +55,8 @@ import java.util.Set;
  */
 public class ScriptResource extends RealmAwareResource {
 
-//    private final ScriptConfigurationService scriptConfigService;
+    private final Logger logger;
+    private final ScriptingServiceFactory<ScriptConfiguration> serviceFactory;
     private final ExceptionMappingHandler<ScriptException, ResourceException> exceptionMappingHandler;
 
     /**
@@ -60,123 +65,98 @@ public class ScriptResource extends RealmAwareResource {
      * @param scriptConfigService An instance of the {@code ScriptConfigurationService}.
      * @param exceptionMappingHandler An instance of the {@code ExceptionMappingHandler}.
      */
-//    @Inject
-    public ScriptResource(ScriptConfigurationService scriptConfigService,
+    @Inject
+    public ScriptResource(@Named("ScriptLogger") Logger logger,
+                          ScriptingServiceFactory<ScriptConfiguration> scriptConfigService,
                           ExceptionMappingHandler<ScriptException, ResourceException> exceptionMappingHandler) {
-//        this.scriptConfigService = scriptConfigService;
+        this.logger = logger;
+        this.serviceFactory = scriptConfigService;
         this.exceptionMappingHandler = exceptionMappingHandler;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> resultHandler) {
         resultHandler.handleError(new NotSupportedException());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
                                ResultHandler<JsonValue> resultHandler) {
         resultHandler.handleError(new NotSupportedException());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
                               ResultHandler<Resource> resultHandler) {
         resultHandler.handleError(new NotSupportedException());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> resultHandler) {
-//        try {
-//            final ScriptConfiguration sc = scriptConfigService.saveScriptConfiguration(getContextSubject(context),
-//                    getRealm(context), fromJson(request.getContent()));
-//            resultHandler.handleResult(new Resource(sc.getUuid(), null, asJson(sc)));
-//        } catch (ScriptException se) {
-//            resultHandler.handleError(exceptionMappingHandler.handleError(se));
-//        }
+        try {
+             final ScriptConfiguration sc = serviceFactory
+                    .create(getContextSubject(context), getRealm(context))
+                    .create(fromJson(request.getContent()));
+            resultHandler.handleResult(new Resource(sc.getId(), String.valueOf(sc.hashCode()), asJson(sc)));
+        } catch (ScriptException se) {
+            resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                                ResultHandler<Resource> resultHandler) {
 
-//        try {
-//            scriptConfigService.deleteScriptConfiguration(getContextSubject(context), getRealm(context), resourceId);
-//            resultHandler.handleResult(new Resource(resourceId, null, json(object())));
-//        } catch (ScriptException se) {
-//            resultHandler.handleError(exceptionMappingHandler.handleError(se));
-//        }
+        try {
+            serviceFactory.create(getContextSubject(context), getRealm(context)).delete(resourceId);
+            resultHandler.handleResult(new Resource(resourceId, null, json(object())));
+        } catch (ScriptException se) {
+            resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+        }
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler resultHandler) {
-//        resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(resultHandler, request);
-//        try {
-//            final Set<ScriptConfiguration> configs = scriptConfigService.getScriptConfigurations(
-//                    getContextSubject(context), getRealm(context));
-//            int remaining = 0;
-//            if (configs.size() > 0) {
-//                remaining = configs.size();
-//                for (ScriptConfiguration sc : configs) {
-//                    boolean keepGoing = resultHandler.handleResource(new Resource(sc.getUuid(),
-//                            String.valueOf(System.currentTimeMillis()), asJson(sc)));
-//                    remaining--;
-//                    if (!keepGoing) {
-//                        break;
-//                    }
-//                }
-//            }
-//            resultHandler.handleResult(new QueryResult(null, remaining));
-//        } catch (ScriptException se) {
-//            resultHandler.handleError(exceptionMappingHandler.handleError(se));
-//        }
+        resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(resultHandler, request);
+        final QueryFilter filter = request.getQueryFilter();
+        try {
+            final Set<ScriptConfiguration> configs;
+            if (filter == null) {
+                configs = serviceFactory.create(getContextSubject(context), getRealm(context)).getAll();
+            } else {
+                configs = serviceFactory.create(getContextSubject(context), getRealm(context)).get(filter);
+            }
+            for (ScriptConfiguration sc : configs) {
+                resultHandler.handleResource(new Resource(sc.getId(), String.valueOf(sc.hashCode()), asJson(sc)));
+            }
+            resultHandler.handleResult(new QueryResult());
+        } catch (ScriptException se) {
+            resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                              ResultHandler<Resource> resultHandler) {
-//        try {
-//            resultHandler.handleResult(new Resource(resourceId, null, asJson(scriptConfigService.getScriptConfiguration(
-//                    getContextSubject(context), getRealm(context), resourceId))));
-//        } catch (ScriptException se) {
-//            resultHandler.handleError(exceptionMappingHandler.handleError(se));
-//        }
+        try {
+            resultHandler.handleResult(new Resource(resourceId, null, asJson(
+                    serviceFactory.create(getContextSubject(context), getRealm(context)).get(resourceId))));
+        } catch (ScriptException se) {
+            resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
                                ResultHandler<Resource> resultHandler) {
-//        try {
-//            resultHandler.handleResult(new Resource(resourceId, null, asJson(
-//                    scriptConfigService.updateScriptConfiguration(getContextSubject(context), getRealm(context),
-//                    fromJson(request.getContent(), resourceId)))));
-//        } catch (ScriptException se) {
-//            resultHandler.handleError(new BadRequestException(se.getLocalizedMessage()));
-//        }
+        try {
+            resultHandler.handleResult(new Resource(resourceId, null, asJson(serviceFactory
+                    .create(getContextSubject(context), getRealm(context))
+                    .update(fromJson(request.getContent(), resourceId)))));
+        } catch (ScriptException se) {
+            resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+        }
     }
 
     /**
@@ -184,12 +164,21 @@ public class ScriptResource extends RealmAwareResource {
      * @param scriptConfig The {@code ScriptConfiguration}.
      * @return The {@code JsonValue}.
      */
-    private JsonValue asJson(ScriptConfiguration scriptConfig) {
-        return json(object(field(SCRIPT_UUID, scriptConfig.getUuid()),
-                field(SCRIPT_NAME, scriptConfig.getName()),
-                field(SCRIPT_TEXT, scriptConfig.getScript()),
-                field(SCRIPT_LANGUAGE, scriptConfig.getLanguage().name()),
-                field(SCRIPT_CONTEXT, scriptConfig.getContext().name())));
+    private JsonValue asJson(ScriptConfiguration scriptConfig) throws ScriptException {
+        try {
+            return json(object(field(JSON_UUID, scriptConfig.getId()),
+                    field(SCRIPT_NAME, scriptConfig.getName()),
+                    field(SCRIPT_DESCRIPTION, scriptConfig.getDescription()),
+                    field(SCRIPT_TEXT, Base64.encode(scriptConfig.getScript().getBytes("UTF-8"))),
+                    field(SCRIPT_LANGUAGE, scriptConfig.getLanguage().name()),
+                    field(SCRIPT_CONTEXT, scriptConfig.getContext().name()),
+                    field(SCRIPT_CREATED_BY, scriptConfig.getCreatedBy()),
+                    field(SCRIPT_CREATION_DATE, scriptConfig.getCreationDate()),
+                    field(SCRIPT_LAST_MODIFIED_BY, scriptConfig.getLastModifiedBy()),
+                    field(SCRIPT_LAST_MODIFIED_DATE, scriptConfig.getLastModifiedDate())));
+        } catch (UnsupportedEncodingException e) {
+            throw ScriptException.createAndLogError(logger, ScriptErrorCode.SCRIPT_ENCODING_FAILED, e, "UTF-8");
+        }
     }
 
     /**
@@ -201,14 +190,18 @@ public class ScriptResource extends RealmAwareResource {
      * @throws ScriptException When the given JSON value does not represent a script configuration.
      */
     private ScriptConfiguration fromJson(JsonValue jsonValue, String uuid) throws ScriptException {
+        final String language = jsonValue.get(SCRIPT_LANGUAGE).asString();
+        final String context = jsonValue.get(SCRIPT_CONTEXT).asString();
+        final String script = jsonValue.get(SCRIPT_TEXT).asString();
         final ScriptConfiguration.Builder builder = ScriptConfiguration.builder()
-                .setUuid(uuid)
+                .setId(uuid)
                 .setName(jsonValue.get(SCRIPT_NAME).asString())
-                .setScript(jsonValue.get(SCRIPT_TEXT).asString())
-                .setLanguage(getLanguageFromString(jsonValue.get(SCRIPT_LANGUAGE).asString()))
-                .setContext(getContextFromString(jsonValue.get(SCRIPT_CONTEXT).asString()));
+                .setDescription(jsonValue.get(SCRIPT_DESCRIPTION).asString())
+                .setScript(script == null ? null : Base64.decodeAsUTF8String(script))
+                .setLanguage(language == null ? null : getLanguageFromString(language))
+                .setContext(context == null ? null : getContextFromString(context));
         if (uuid == null) {
-            builder.generateUuid();
+            builder.generateId();
         }
         return builder.build();
     }

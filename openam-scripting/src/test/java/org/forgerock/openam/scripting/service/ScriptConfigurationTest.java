@@ -32,7 +32,7 @@ public class ScriptConfigurationTest {
     public void shouldBuildScriptConfiguration() throws ScriptException {
         //given
         ScriptConfiguration.Builder builder = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -64,7 +64,7 @@ public class ScriptConfigurationTest {
         //given
         String uuid = UUID.randomUUID().toString();
         ScriptConfiguration.Builder builder1 = ScriptConfiguration.builder()
-                .setUuid(uuid)
+                .setId(uuid)
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -75,7 +75,7 @@ public class ScriptConfigurationTest {
                 .setLastModifiedBy("TestUser2")
                 .setLastModifiedDate(1422886484098l);
         ScriptConfiguration.Builder builder2 = ScriptConfiguration.builder()
-                .setUuid(uuid)
+                .setId(uuid)
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -100,7 +100,7 @@ public class ScriptConfigurationTest {
     public void shouldCreateDifferentScriptConfigurations() throws ScriptException {
         //given
         ScriptConfiguration.Builder builder1 = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -111,7 +111,7 @@ public class ScriptConfigurationTest {
                 .setLastModifiedBy("TestUser2")
                 .setLastModifiedDate(1422886484098l);
         ScriptConfiguration.Builder builder2 = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyGroovyScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -136,7 +136,7 @@ public class ScriptConfigurationTest {
     public void shouldCreateEditableBuilderForMetaData() throws ScriptException {
         //given
         ScriptConfiguration rt1 = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -166,7 +166,7 @@ public class ScriptConfigurationTest {
     public void shouldCreateBuilderForClone() throws ScriptException {
         //given
         ScriptConfiguration rt1 = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -204,7 +204,7 @@ public class ScriptConfigurationTest {
     public void shouldNotAllowNullName() throws ScriptException {
         //given
         ScriptConfiguration.Builder builder = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
                 .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION);
@@ -218,7 +218,7 @@ public class ScriptConfigurationTest {
     public void shouldNotAllowNullScript() throws ScriptException {
         //given
         ScriptConfiguration.Builder builder = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setLanguage(JAVASCRIPT)
                 .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION);
@@ -232,7 +232,7 @@ public class ScriptConfigurationTest {
     public void shouldNotAllowNullLanguage() throws ScriptException {
         //given
         ScriptConfiguration.Builder builder = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setScript("var a = 123;var b = 456;")
                 .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION);
@@ -246,7 +246,7 @@ public class ScriptConfigurationTest {
     public void shouldNotAllowNullContext() throws ScriptException {
         //given
         ScriptConfiguration.Builder builder = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT);

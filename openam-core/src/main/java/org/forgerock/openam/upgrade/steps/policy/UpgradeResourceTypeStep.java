@@ -19,7 +19,7 @@ package org.forgerock.openam.upgrade.steps.policy;
 import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;

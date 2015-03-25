@@ -15,11 +15,6 @@
  */
 package org.forgerock.openam.scripting;
 
-import static org.forgerock.openam.scripting.ScriptException.createAndLogDebug;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Constants used for managing scripts.
  *
@@ -37,7 +32,7 @@ public final class ScriptConstants {
     public static final String RESOURCE_BUNDLE = "scripting";
 
     public static final String SCRIPT_NAME = "name";
-    public static final String SCRIPT_UUID = "uuid";
+    public static final String JSON_UUID = "_id";
     public static final String SCRIPT_TEXT = "script";
     public static final String SCRIPT_LANGUAGE = "language";
     public static final String SCRIPT_CONTEXT = "context";
@@ -80,7 +75,17 @@ public final class ScriptConstants {
         MISSING_SCRIPT_CONTEXT("13"),
         SCRIPT_NAME_EXISTS("14"),
         SCRIPT_UUID_EXISTS("15"),
-        SCRIPT_UUID_NOT_FOUND("16");
+        SCRIPT_UUID_NOT_FOUND("16"),
+        FILTER_BOOLEAN_LITERAL_FALSE("17"),
+        FILTER_EXTENDED_MATCH("18"),
+        FILTER_GREATER_THAN("19"),
+        FILTER_GREATER_THAN_OR_EQUAL("20"),
+        FILTER_LESS_THAN("21"),
+        FILTER_LESS_THAN_OR_EQUAL("22"),
+        FILTER_NOT("23"),
+        FILTER_PRESENT("24"),
+        SCRIPT_ENCODING_FAILED("25"),
+        RESOURCE_FILTER_NOT_SUPPORTED("26");
 
         private final String code;
 

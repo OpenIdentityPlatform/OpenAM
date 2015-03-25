@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.scripting.service;
 
+import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.openam.scripting.ScriptException;
 
 import java.util.Set;
@@ -48,6 +49,13 @@ public interface ScriptingService<T> {
      * @throws ScriptException if the operation was not successful
      */
     public Set<T> getAll() throws ScriptException;
+
+    /**
+     * Retrieve the stored configuration.
+     * @return The configuration object with the given UUID or null if it cannot be found.
+     * @throws ScriptException if the operation was not successful
+     */
+    public Set<T> get(QueryFilter queryFilter) throws ScriptException;
 
     /**
      * Retrieve the stored configuration.

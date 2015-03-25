@@ -62,7 +62,7 @@ public class ScriptConfigurationServiceTest {
     public void shouldModifyMetaDataOnCreate() throws ScriptException {
         // given
         ScriptConfiguration sc = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -89,7 +89,7 @@ public class ScriptConfigurationServiceTest {
     public void shouldFailIfNameExistsOnCreate() throws ScriptException {
         // given
         ScriptConfiguration sc = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -113,7 +113,7 @@ public class ScriptConfigurationServiceTest {
     public void shouldFailIfUuidExistsOnCreate() throws ScriptException {
         // given
         ScriptConfiguration sc = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -171,7 +171,7 @@ public class ScriptConfigurationServiceTest {
     public void shouldModifyMetaDataOnUpdate() throws ScriptException {
         // given
         ScriptConfiguration scOld = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -180,7 +180,7 @@ public class ScriptConfigurationServiceTest {
                 .setCreatedBy("TestUser")
                 .setCreationDate(1422886484092l).build();
         ScriptConfiguration scNew = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -208,7 +208,7 @@ public class ScriptConfigurationServiceTest {
     public void shouldFailIfUuidDoesNotExistOnUpdate() throws ScriptException {
         // given
         ScriptConfiguration scNew = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -231,7 +231,7 @@ public class ScriptConfigurationServiceTest {
     public void shouldFailIfNameExistOnUpdate() throws ScriptException {
         // given
         ScriptConfiguration scOld = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
@@ -240,7 +240,7 @@ public class ScriptConfigurationServiceTest {
                 .setCreatedBy("TestUser")
                 .setCreationDate(1422886484092l).build();
         ScriptConfiguration scNew = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("NewNameForMyJavaScript")
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")

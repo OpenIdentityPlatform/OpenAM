@@ -32,7 +32,7 @@ import java.util.UUID;
  */
 public class ScriptConfiguration {
 
-    private final String uuid;
+    private final String id;
     private final String name;
     private final String script;
     private final SupportedScriptingLanguage language;
@@ -49,7 +49,7 @@ public class ScriptConfiguration {
      * Builder for {@code ScriptConfiguration}.
      */
     public static class Builder {
-        private String uuid;
+        private String id;
         private String name;
         private String script;
         private SupportedScriptingLanguage language;
@@ -71,8 +71,8 @@ public class ScriptConfiguration {
          * Generate a universally unique identifier for the {@code ScriptConfiguration}.
          * @return The {@code ScriptConfiguration} builder.
          */
-        public Builder generateUuid() {
-            this.uuid = UUID.randomUUID().toString();
+        public Builder generateId() {
+            this.id = UUID.randomUUID().toString();
             return this;
         }
 
@@ -80,8 +80,8 @@ public class ScriptConfiguration {
          * Set a universally unique identifier for the {@code ScriptConfiguration}.
          * @return The {@code ScriptConfiguration} builder.
          */
-        public Builder setUuid(String uuid) {
-            this.uuid = uuid;
+        public Builder setId(String id) {
+            this.id = id;
             return this;
         }
 
@@ -181,7 +181,7 @@ public class ScriptConfiguration {
          * @throws ScriptException if any of the required parameters are null.
          */
         public ScriptConfiguration build() throws ScriptException {
-            if (uuid == null) {
+            if (id == null) {
                 throw new ScriptException(MISSING_SCRIPT_UUID);
             }
             if (name == null) {
@@ -205,7 +205,7 @@ public class ScriptConfiguration {
      * @param builder The builder that contains the parameters for the {@code ScriptConfiguration}.
      */
     private ScriptConfiguration(Builder builder) {
-        this.uuid = builder.uuid;
+        this.id = builder.id;
         this.name = builder.name;
         this.script = builder.script;
         this.language = builder.language;
@@ -229,8 +229,8 @@ public class ScriptConfiguration {
      * Get the universally unique identifier for the {@code ScriptConfiguration}.
      * @return The UUID.
      */
-    public String getUuid() {
-        return uuid;
+    public String getId() {
+        return id;
     }
 
     /**
@@ -316,7 +316,7 @@ public class ScriptConfiguration {
             return false;
         }
         ScriptConfiguration sc = (ScriptConfiguration)o;
-        return sc.uuid.equals(uuid)
+        return sc.id.equals(id)
                 && sc.name.equals(name)
                 && StringUtils.isEqualTo(sc.script, script)
                 && sc.language.equals(language)
@@ -334,7 +334,7 @@ public class ScriptConfiguration {
         if (result == 0) {
             int prime = 31;
             result = 17;
-            result = prime * result + uuid.hashCode();
+            result = prime * result + id.hashCode();
             result = prime * result + name.hashCode();
             result = prime * result + script.hashCode();
             result = prime * result + language.hashCode();
@@ -354,7 +354,7 @@ public class ScriptConfiguration {
      * @return A populated {@code ScriptConfiguration} builder.
      */
     public Builder populatedBuilder() {
-        return builder().setUuid(uuid).setName(name).setContext(context).setLanguage(language).setScript(script)
+        return builder().setId(id).setName(name).setContext(context).setLanguage(language).setScript(script)
                 .setDescription(description).setCreatedBy(createdBy).setCreationDate(creationDate)
                 .setLastModifiedBy(lastModifiedBy).setLastModifiedDate(lastModifiedDate);
     }

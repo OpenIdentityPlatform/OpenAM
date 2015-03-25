@@ -65,7 +65,7 @@ public class ScriptConfigurationDataStoreTest {
     public void shouldFailIfConfigDoesNotExistOnSave() throws ScriptException {
         // given
         ScriptConfiguration sc = ScriptConfiguration.builder()
-                .generateUuid()
+                .generateId()
                 .setName("MyJavaScript")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)

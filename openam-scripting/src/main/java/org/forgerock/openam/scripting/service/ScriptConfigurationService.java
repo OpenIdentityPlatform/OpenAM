@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.scripting.datastore.ScriptingDataStore;
 import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
@@ -66,7 +67,7 @@ public class ScriptConfigurationService implements ScriptingService<ScriptConfig
 
     @Override
     public ScriptConfiguration create(ScriptConfiguration config) throws ScriptException {
-        failIfUuidExists(config.getUuid());
+        failIfUuidExists(config.getId());
         failIfNameExists(config.getName());
         final ScriptConfiguration updatedConfig = setMetaData(config);
         dataStore.save(updatedConfig);
@@ -85,6 +86,11 @@ public class ScriptConfigurationService implements ScriptingService<ScriptConfig
     }
 
     @Override
+    public Set<ScriptConfiguration> get(QueryFilter queryFilter) throws ScriptException {
+        return dataStore.get(queryFilter);
+    }
+
+    @Override
     public ScriptConfiguration get(String uuid) throws ScriptException {
         failIfUuidDoesNotExist(uuid);
         return dataStore.get(uuid);
@@ -92,7 +98,7 @@ public class ScriptConfigurationService implements ScriptingService<ScriptConfig
 
     @Override
     public ScriptConfiguration update(ScriptConfiguration config) throws ScriptException {
-        final ScriptConfiguration oldConfig = get(config.getUuid());
+        final ScriptConfiguration oldConfig = get(config.getId());
         if (!oldConfig.getName().equals(config.getName())) {
             failIfNameExists(config.getName());
         }
@@ -124,8 +130,8 @@ public class ScriptConfigurationService implements ScriptingService<ScriptConfig
         final String principalName = SubjectUtils.getPrincipalId(subject);
         final ScriptConfiguration.Builder builder = config.populatedBuilder();
 
-        if (dataStore.containsUuid(config.getUuid())) {
-            final ScriptConfiguration oldConfig = get(config.getUuid());
+        if (dataStore.containsUuid(config.getId())) {
+            final ScriptConfiguration oldConfig = get(config.getId());
             builder.setCreatedBy(oldConfig.getCreatedBy());
             builder.setCreationDate(oldConfig.getCreationDate());
         } else {
