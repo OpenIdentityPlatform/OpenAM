@@ -58,7 +58,7 @@ define("org/forgerock/openam/ui/policy/policies/ManagePoliciesView", [
             this.data.realm = conf.globalData.auth.realm;
             this.data.appName = args[0];
             
-            this.data.referralsEnabled = conf.globalData.serverInfo && conf.globalData.serverInfo.referralsEnabled === "true";
+            this.data.referralsEnabled = conf.globalData && conf.globalData.referralsEnabled === "true";
 
             this.parentRender(function () {
                 this.tabs = this.$el.find('.tab-content .tab');
