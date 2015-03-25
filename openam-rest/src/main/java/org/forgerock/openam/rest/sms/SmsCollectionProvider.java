@@ -66,6 +66,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug) {
         super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug);
         Reject.ifTrue(type != SchemaType.GLOBAL && type != SchemaType.ORGANIZATION, "Unsupported type: " + type);
+        Reject.ifTrue(subSchemaPath.isEmpty(), "Root schemas do not support multiple instances");
     }
 
     @Override
@@ -73,35 +74,32 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         // Template resource action will go here.
     }
 
+    /**
+     * Creates a new child instance of config. The parent config referenced by the request path is found, and
+     * new config is created using the provided name property.
+     * {@inheritDoc}
+     */
     @Override
     public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
         JsonValue content = request.getContent();
         Map<String, Object> attrs = converter.fromJson(content);
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
-            ServiceConfig result;
-            if (subSchemaPath.isEmpty()) {
-                if (type == SchemaType.GLOBAL) {
-                    result = scm.createGlobalConfig(attrs);
-                } else {
-                    result = scm.createOrganizationConfig(realmFor(context), attrs);
-                }
-            } else {
-                ServiceConfig config = parentSubConfigFor(context, scm);
-                String name = content.get("name").asString();
-                if (name == null) {
-                    name = request.getNewResourceId();
-                } else if (!name.equals(request.getNewResourceId())) {
-                    handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
-                            "name and URI's resource ID do not match"));
-                }
-                config.addSubConfig(name, lastSchemaNodeName(), 0, attrs);
-                result = checkedInstanceSubConfig(name, config);
+            ServiceConfig config = parentSubConfigFor(context, scm);
+            String name = content.get("_id").asString();
+            if (name == null) {
+                name = request.getNewResourceId();
+            } else if (!name.equals(request.getNewResourceId())) {
+                handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
+                        "name and URI's resource ID do not match"));
             }
+            config.addSubConfig(name, lastSchemaNodeName(), 0, attrs);
+            ServiceConfig created = checkedInstanceSubConfig(name, config);
 
-            String dn = result.getDN();
+            String dn = created.getDN();
+            JsonValue result = getJsonValue(created);
             handler.handleResult(new Resource(dn.substring(dn.lastIndexOf("=") + 1), String.valueOf(result.hashCode()),
-                    converter.toJson(result.getAttributes())));
+                    result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
@@ -113,21 +111,18 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         }
     }
 
+    /**
+     * Deletes a child instance of config. The parent config referenced by the request path is found, and
+     * the config is deleted using the resourceId.
+     * {@inheritDoc}
+     */
     @Override
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request, ResultHandler<Resource> handler) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
-            if (subSchemaPath.isEmpty()) {
-                if (type == SchemaType.GLOBAL) {
-                    scm.removeGlobalConfiguration(resourceId);
-                } else {
-                    scm.removeOrganizationConfiguration(realmFor(context), resourceId);
-                }
-            } else {
-                ServiceConfig config = parentSubConfigFor(context, scm);
-                checkedInstanceSubConfig(resourceId, config);
-                config.removeSubConfig(resourceId);
-            }
+            ServiceConfig config = parentSubConfigFor(context, scm);
+            checkedInstanceSubConfig(resourceId, config);
+            config.removeSubConfig(resourceId);
 
             Resource resource = new Resource(resourceId, "0", json(object(field("success", true))));
             handler.handleResult(resource);
@@ -142,24 +137,20 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         }
     }
 
+    /**
+     * Reads a child instance of config. The parent config referenced by the request path is found, and
+     * the config is read using the resourceId.
+     * {@inheritDoc}
+     */
     @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request, ResultHandler<Resource> handler) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
-            ServiceConfig result;
-            if (subSchemaPath.isEmpty()) {
-                if (type == SchemaType.GLOBAL) {
-                    result = scm.getGlobalConfig(resourceId);
-                } else {
-                    result = scm.getOrganizationConfig(realmFor(context), resourceId);
-                }
-            } else {
-                ServiceConfig config = parentSubConfigFor(context, scm);
-                result = checkedInstanceSubConfig(resourceId, config);
-            }
+            ServiceConfig config = parentSubConfigFor(context, scm);
+            ServiceConfig item = checkedInstanceSubConfig(resourceId, config);
 
-            JsonValue value = getJsonValue(result);
-            handler.handleResult(new Resource(resourceId, String.valueOf(value.hashCode()), value));
+            JsonValue result = getJsonValue(item);
+            handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
@@ -171,27 +162,23 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         }
     }
 
+    /**
+     * Updates a child instance of config. The parent config referenced by the request path is found, and
+     * the config is updated using the resourceId.
+     * {@inheritDoc}
+     */
     @Override
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request, ResultHandler<Resource> handler) {
         JsonValue content = request.getContent();
         Map<String, Object> attrs = converter.fromJson(content);
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
-            ServiceConfig node;
-            if (subSchemaPath.isEmpty()) {
-                if (type == SchemaType.GLOBAL) {
-                    node = scm.getGlobalConfig(resourceId);
-                } else {
-                    node = scm.getOrganizationConfig(realmFor(context), resourceId);
-                }
-            } else {
-                ServiceConfig config = parentSubConfigFor(context, scm);
-                node = checkedInstanceSubConfig(resourceId, config);
-            }
+            ServiceConfig config = parentSubConfigFor(context, scm);
+            ServiceConfig node = checkedInstanceSubConfig(resourceId, config);
 
             node.setAttributes(attrs);
-            JsonValue value = getJsonValue(node);
-            handler.handleResult(new Resource(resourceId, String.valueOf(value.hashCode()), value));
+            JsonValue result = getJsonValue(node);
+            handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
@@ -203,6 +190,14 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         }
     }
 
+    /**
+     * Queries for child instances of config. The parent config referenced by the request path is found, and
+     * all child config for the type is returned.
+     * <p>
+     * Note that only query filter is supported, and only a filter of value {@code true} (i.e. all values).
+     * Sorting and paging are not supported.
+     * {@inheritDoc}
+     */
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
@@ -249,9 +244,13 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         }
     }
 
+    /**
+     * Returns the JsonValue representation of the ServiceConfig using the {@link #converter}. Adds a {@code _id}
+     * property for the name of the config.
+     */
     private JsonValue getJsonValue(ServiceConfig result) {
         JsonValue value = converter.toJson(result.getAttributes());
-        value.add("name", result.getComponentName());
+        value.add("_id", result.getComponentName());
         return value;
     }
 
