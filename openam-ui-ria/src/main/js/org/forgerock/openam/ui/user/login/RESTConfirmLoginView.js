@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -32,11 +32,11 @@ define("org/forgerock/openam/ui/user/login/RESTConfirmLoginView", [
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
     "org/forgerock/commons/ui/common/util/CookieHelper"
 ], function(AbstractView, authNDelegate, conf, restLoginHelper, sessionDelegate, cookieHelper) {
-    
+
     var ConfirmLoginView = AbstractView.extend({
         template: "templates/openam/RESTConfirmLoginTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
-        
+
         data: {},
         events: {
             "click button#continueLogin": "continueLogin",
@@ -49,23 +49,27 @@ define("org/forgerock/openam/ui/user/login/RESTConfirmLoginView", [
             });
         },
         continueLogin: function(){
+            var href = "#login/";
+
             $('#menu').show();
             $('#user-nav').show();
-            location.href = "#login" + conf.globalData.auth.realm;
+
+            if(conf.globalData.auth.subRealm) {
+                href += conf.globalData.auth.subRealm;
+            }
+            location.href = href;
             return false;
         },
         logout: function(){
             var tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
             sessionDelegate.logout(tokenCookie).then(function(){
                 restLoginHelper.removeSessionCookie();
-                var realm = (conf.globalData.auth.passedInRealm) ? conf.globalData.auth.passedInRealm : conf.globalData.auth.realm;
-                location.href = "#login" + realm + restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
+                var realm = (conf.globalData.auth.passedInRealm) ? conf.globalData.auth.passedInRealm : conf.globalData.auth.subRealm;
+                location.href = "#login/" + realm + restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
             });
             return false;
         }
-    }); 
-    
+    });
+
     return new ConfirmLoginView();
 });
-
-

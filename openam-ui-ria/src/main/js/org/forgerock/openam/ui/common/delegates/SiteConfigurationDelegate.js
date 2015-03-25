@@ -31,10 +31,10 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(constants, AbstractDelegate, configuration, eventManager, uiUtils, realmHelper) {
-
+], function(constants, AbstractDelegate, configuration, eventManager, uiUtils, RealmHelper) {
     var obj = new AbstractDelegate(constants.host + "/" + constants.context ),
-        lastKnownRealm = "/";
+        lastKnownSubRealm,
+        lastKnownOverrideRealm;
 
     /**
      * Makes a HTTP request to the server to get its configuration
@@ -42,10 +42,24 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
      * @param {Function} errorCallback   Error callback function
      */
     obj.getConfiguration = function(successCallback, errorCallback) {
-        console.info("Requesting configuration from server");
+        if(!configuration.globalData.auth.subRealm) {
+            try {
+                console.debug("No current SUB REALM was detected. Applying from current URI values...");
+                var subRealm = RealmHelper.getSubRealm();
+                console.debug("Changing SUB REALM to '" + subRealm + "'");
+
+                configuration.globalData.auth.subRealm = RealmHelper.getSubRealm();
+
+                lastKnownSubRealm = RealmHelper.getSubRealm();
+                lastKnownOverrideRealm = RealmHelper.getOverrideRealm();
+            } catch(error) {
+                console.debug("Unable to applying sub realm from URI values");
+            }
+        }
+
         obj.serviceCall({
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
-            url: "/json/serverinfo/*",
+            url: RealmHelper.decorateURIWithRealm("/json/__subrealm__/serverinfo/*"),
             success: function(response) {
                 var hostname = location.hostname,
                     fqdn = response.FQDN;
@@ -61,17 +75,26 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
         });
     };
 
-    obj.checkForDifferences = function(route,params) {
-        var realm = realmHelper.getRealm();
-        if(realm) { configuration.globalData.auth.realm = realm; }
+    /**
+     * Checks for a change of realm
+     */
+    obj.checkForDifferences = function(route, params) {
+        if(lastKnownSubRealm !== RealmHelper.getSubRealm() || lastKnownOverrideRealm !== RealmHelper.getOverrideRealm()) {
+            var currentSubRealm = RealmHelper.getSubRealm(),
+                currentOverrideRealm = RealmHelper.getOverrideRealm();
 
-        if(configuration.globalData.auth.realm && lastKnownRealm !== configuration.globalData.auth.realm) {
-            lastKnownRealm = configuration.globalData.auth.realm === '/' ? '' : configuration.globalData.auth.realm;
+            if(currentSubRealm !== lastKnownSubRealm) {
+                console.debug("Changing SUB REALM from '" + lastKnownSubRealm + "' to '" + currentSubRealm + "'");
+                configuration.globalData.auth.subRealm = currentSubRealm;
+                lastKnownSubRealm = currentSubRealm;
+            }
+
+            lastKnownOverrideRealm = RealmHelper.getOverrideRealm();
 
             return obj.serviceCall({
                 type: "GET",
                 headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
-                url: "/json" + lastKnownRealm + "/serverinfo/*",
+                url: RealmHelper.decorateURIWithRealm("/json/__subrealm__/serverinfo/*"),
                 errorsHandlers: {
                     "unauthorized": { status: "401"},
                     "Bad Request": {

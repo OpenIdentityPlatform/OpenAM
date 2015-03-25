@@ -1,7 +1,7 @@
-/** 
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -31,7 +31,7 @@ define("ThemeManager", [
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration"
 ], function(constants,conf) {
-    
+
     var obj = {},
         themeCSSPromise,
         themeConfigPromise;
@@ -41,7 +41,7 @@ define("ThemeManager", [
         if (themeCSSPromise === undefined) {
             $('head').find('link[href*=less]').remove();
             $('head').find('link[href*=favicon]').remove();
-            
+
             $("<link/>", {
                 rel: "stylesheet/less",
                 type: "text/css",
@@ -53,7 +53,7 @@ define("ThemeManager", [
                 type: "image/x-icon",
                 href: require.toUrl(theme.path + theme.icon)
              }).appendTo("head");
-            
+
             $("<link/>", {
                 rel: "shortcut icon",
                 type: "image/x-icon",
@@ -72,19 +72,20 @@ define("ThemeManager", [
 
         return themeCSSPromise;
     };
-    
+
     obj.loadThemeConfig = function(){
         if (themeConfigPromise === undefined) {
             themeConfigPromise = $.getJSON(require.toUrl(constants.THEME_CONFIG_PATH));
         }
         return themeConfigPromise;
     };
-    
+
     obj.getTheme = function(){
         var theme = {},
             newLessVars = {},
-            themeName, prom, defaultTheme ;
-        
+            realmDefined = typeof conf.globalData.auth.subRealm !== 'undefined',
+            themeName, prom, defaultTheme;
+
         //find out if the theme has changed
         if(conf.globalData.theme && obj.mapRealmToTheme() === conf.globalData.theme.name){
             //no change so use the existing theme
@@ -99,23 +100,25 @@ define("ThemeManager", [
                 themeName = obj.mapRealmToTheme();
 
                 theme = _.reject(obj.data.themes,function(t){return t.name !== themeName;})[0];
-                
+
                 if(theme.name !== 'default' && theme.path === ''){
                     defaultTheme = _.reject(obj.data.themes,function(t){return t.name !== 'default';})[0];
                     theme = $.extend(true,{}, defaultTheme, theme);
                 }
-                
-                //check to see if the realm has been defined yet
-                //if no realm call obj.getTheme() recursively until realm is defined
-                if(conf.globalData.auth.realm){
+
+                /**
+                 * Check to see if the realm has been defined yet.
+                 * If no realm call obj.getTheme() recursively until realm is defined
+                 */
+                if(realmDefined){
                     return obj.loadThemeCSS(theme).then(function(){
                         _.each(theme.settings.lessVars, function (value, key) {
                             newLessVars['@' + key] = value;
                         });
                         less.modifyVars(newLessVars);
-                        
+
                         conf.globalData.theme = theme;
-                        
+
                         return theme;
                     });
                 }
@@ -125,17 +128,17 @@ define("ThemeManager", [
             });
         }
     };
-    
+
     obj.mapRealmToTheme = function(){
-        var testString, 
+        var testString,
             theme = "default";
-        if(conf.globalData.auth.realm && conf.globalData.auth.realm.substring(1).length !== 0){
-            testString = conf.globalData.auth.realm.substring(1);
+        if(conf.globalData.auth.subRealm && conf.globalData.auth.subRealm.substring(1).length !== 0){
+            testString = conf.globalData.auth.subRealm.substring(1);
         }
         else{
             testString = document.domain;
         }
-        
+
         _.each(obj.data.themes,function(t){
             _.each(t.realms,function(r){
                 if(t.regex){
@@ -151,13 +154,13 @@ define("ThemeManager", [
                         return false;
                     }
                 }
-                    
+
             });
         });
-        
+
         return theme;
     };
-    
-    
+
+
     return obj;
 });

@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,60 +22,102 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, _ */
-
-define("org/forgerock/openam/ui/common/util/RealmHelper", [
-    "underscore",
+/*global _ define*/
+define('org/forgerock/openam/ui/common/util/RealmHelper', [
+    'org/forgerock/commons/ui/common/main/Configuration',
     'org/forgerock/commons/ui/common/util/UIUtils'
-], function(_, uiUtils) {
+], function(Configuration, UIUtils) {
     /**
      * @exports org/forgerock/openam/ui/common/util/RealmHelper
      */
     var obj = {};
 
     /**
-     * Cleans a realm string
-     * @param {String} realm The realm
+     * Decorates a URI with an override realm
+     * <p>
+     * Appends a realm override to the query string if an override exists
+     * @param {String} uri A URI to decorate
+     * @returns {String} Decorated URI
      */
-    obj.cleanRealm = function(realm) {
-        if(typeof realm === "string" && realm.charAt(0) !== "/"){
-            realm = "/" + realm;
+    obj.decorateURLWithOverrideRealm = function(uri) {
+        var overrideRealm = obj.getOverrideRealm(),
+            prepend;
+
+        if(overrideRealm) {
+            prepend = uri.indexOf('?') === -1 ? '?' : '&';
+            uri = uri + prepend + 'realm=' + overrideRealm;
         }
-        if((typeof realm !== "string") || realm === "/"){
-            realm = "";
-        }
-        return realm;
+
+        return uri;
     };
 
     /**
-     * Determines the realm from the current URI
+     * Decorates a URI with realm information
      * <p>
-     * As a realm can be specified in more than one section of the URI,
-     * this function will determine (if more than one is specified) they
-     * are consistent and return that consistent realm.
-     * @returns Realm with leading forward slash (e.g. <code>/realmA'</code>) or <code>null</code> if realm was inconsistent
+     * Delegates to #decorateURIWithSubRealm & #decorateURLWithOverrideRealm
+     * @param {String} uri A URI to decorate
+     * @returns {String} Decorated URI
      */
-    obj.getRealm = function() {
-        // If not a realm aware view then return null. Currently the only known realm aware view is 'login'.
-        if ( !_.include( ['login'], uiUtils.getURIFragment().split('/')[0] ) ){
-            return null;
+    obj.decorateURIWithRealm = function(uri) {
+        uri = obj.decorateURIWithSubRealm(uri);
+        uri = obj.decorateURLWithOverrideRealm(uri);
+
+        return uri;
+    };
+
+    /**
+     * Decorates a URI with a sub realm
+     * <p>
+     * Replaces any occurance of '__subrealm__/' in the URI with the sub realm
+     * @param {String} uri A URI to decorate
+     * @returns {String} Decorated URI
+     */
+    obj.decorateURIWithSubRealm = function(uri) {
+        if(Configuration.globalData && Configuration.globalData.auth && typeof Configuration.globalData.auth.subRealm !== 'string') {
+            console.warn('Unable to decorate URI, Configuration.globalData.auth.subRealm not yet set');
         }
 
-        var urlQueryStringRealm = (uiUtils.convertQueryParametersToJSON(uiUtils.getURIQueryString()).realm || '').trim(),
-            fragmentQueryStringRealm = (uiUtils.convertQueryParametersToJSON(uiUtils.getURIFragmentQueryString()).realm || '').trim(),
-            fragmentRealm = ((uiUtils.getURIFragment().split('/')[1] || '').split('&')[0] || '').trim(),
-            realm = '/', // Default to root realm
-            realms = _.compact(_.uniq([urlQueryStringRealm, fragmentRealm, fragmentQueryStringRealm]));
+        var persistedSubRealm = (Configuration.globalData && Configuration.globalData.auth) ? Configuration.globalData.auth.subRealm : '',
+            subRealm = persistedSubRealm ? persistedSubRealm + '/' : '';
 
-        if (realms.length > 1) {
-            return null;
-        } else if(realms.length === 1) {
-            realm = realms[0];
+        uri = uri.replace('__subrealm__/', subRealm);
+
+        return uri;
+    };
+
+    /**
+     * Determines the current override realm from the URI query string and hash fragment query string
+     * @returns Override realm AS IS (no slash modification) (e.g. <code>/</code> or <code>/realm1</code>)
+     */
+    obj.getOverrideRealm = function() {
+        var uri = UIUtils.convertQueryParametersToJSON(UIUtils.getURIQueryString()).realm, // Realm from URI query string
+            fragment = UIUtils.convertQueryParametersToJSON(UIUtils.getURIFragmentQueryString()).realm; // Realm from Fragment query string
+
+        return uri ? uri : fragment;
+    };
+
+    /**
+     * Determines the current sub realm from the URI hash fragment
+     * @returns Sub realm WITHOUT any leading or trailing slash (e.g. <code>realm1/realm2</code>)
+     */
+    obj.getSubRealm = function() {
+        var page,
+            subRealm,
+            subRealmSplit;
+
+        subRealmSplit = UIUtils.getURIFragment().split('/');
+        page = subRealmSplit.shift().split('&')[0];
+
+        if(page && _.include(['login', 'forgotPassword'], page)) {
+            subRealm = subRealmSplit.join('/').split('&')[0];
+        } else if(Configuration.globalData.auth.subRealm) {
+            subRealm = Configuration.globalData.auth.subRealm;
+        } else {
+            console.warn('Unable to determine realm outside of sub realm aware view (login)');
+            subRealm = '';
         }
 
-        if (realm[0] !== '/') { realm = '/' + realm; }
-
-        return realm;
+        return subRealm;
     };
 
     return obj;

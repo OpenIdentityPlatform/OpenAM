@@ -27,10 +27,6 @@
 define("config/AppMessages", [
 ], function() {
     return {
-        "inconsistentRealm": {
-            msg: "config.messages.AppMessages.inconsistentRealm",
-            type: "error"
-        },
         "invalidRealm": {
             msg: "config.messages.AppMessages.invalidRealm",
             type: "error"

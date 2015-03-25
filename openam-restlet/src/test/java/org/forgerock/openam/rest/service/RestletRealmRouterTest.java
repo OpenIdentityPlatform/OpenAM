@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.rest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -175,8 +176,8 @@ public class RestletRealmRouterTest {
         router.doHandle(next, request, response);
 
         //Then
-        assertThat(request.getAttributes()).containsEntry("realm", "/REALM");
-        verify(httpRequest).setAttribute("realm", "/REALM");
+        assertThat(request.getAttributes()).containsEntry("realm", "REALM");
+        verify(httpRequest).setAttribute("realm", "REALM");
     }
 
     private Request setUpRequest(HttpServletRequest httpRequest, SSOToken adminToken) {

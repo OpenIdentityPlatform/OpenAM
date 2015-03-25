@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -34,11 +34,11 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function(AbstractView, validatorsManager, userDelegate, conf, cookieHelper, eventManager, constants, uiUtils) {
-    
+
     var RegisterView = AbstractView.extend({
         template: "templates/openam/RegisterTemplate.html",
         baseTemplate: "templates/common/MediumBaseTemplate.html",
-        
+
         data: {},
         events: {
             "click #continue": "continueProcess",
@@ -47,7 +47,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
             "customValidate": "customValidate",
             "click .cancelButton": "cancel"
         },
-        errorsHandlers: { 
+        errorsHandlers: {
             "Bad Request":  { status: "400" },
             "Not found":    { status: "404" },
             "Conflict":     { status: "409" }
@@ -73,7 +73,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                 },
                 success = function() {
                     _this.$el.find("#emailSent").slideDown();
-                    _this.$el.find("#step1").slideUp();   
+                    _this.$el.find("#step1").slideUp();
                 },
                 error = function(e) {
                     var response = JSON.parse(e.responseText);
@@ -81,13 +81,13 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                     $('#email').prop('readonly', false);
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRegister");
                 };
-            
+
             this.$el.find("input[type=submit]").prop('disabled', true);
             userDelegate.doAction("register",postData,success,error);
         },
         register: function(e) {
             e.preventDefault();
-            
+
             var confirmParams,
             _this = this,
             postData = _.extend(
@@ -97,16 +97,16 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
             success = function() {
 
                 switch(conf.globalData.successfulUserRegistrationDestination){
-                    
+
                     case 'login':
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'afterRegistration');
                         _this.cancel();
-                        
+
                     break;
                     case 'autologin':
-                        eventManager.sendEvent(constants.EVENT_USER_SUCCESSFULLY_REGISTERED, { user: {userName:postData.username, password:postData.password}, autoLogin: true });  
+                        eventManager.sendEvent(constants.EVENT_USER_SUCCESSFULLY_REGISTERED, { user: {userName:postData.username, password:postData.password}, autoLogin: true });
                     break;
-                    default: 
+                    default:
                         _this.$el.find("#step2").slideUp();
                         _this.$el.find("#registerSuccess").fadeIn();
                     break;
@@ -148,8 +148,8 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                 e.preventDefault();
             }
             var loginUrlParams = cookieHelper.getCookie("loginUrlParams");
-            cookieHelper.deleteCookie("loginUrlParams"); 
-            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : conf.globalData.auth.realm);
+            cookieHelper.deleteCookie("loginUrlParams");
+            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "/" + conf.globalData.auth.subRealm);
         },
         customValidate: function () {
             if(validatorsManager.formValidated(this.$el.find("#registration")) || validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {
@@ -159,9 +159,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                 this.$el.find("input[type=submit]").prop('disabled', true);
             }
         }
-    }); 
-    
+    });
+
     return new RegisterView();
 });
-
-

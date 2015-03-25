@@ -34,17 +34,18 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
-    "org/forgerock/commons/ui/common/util/CookieHelper"
-], function (authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf, uiUtils, constants, sessionDelegate, cookieHelper) {
+    "org/forgerock/commons/ui/common/util/CookieHelper",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function (authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf, uiUtils, constants, sessionDelegate, cookieHelper, RealmHelper) {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function(params, successCallback, errorCallback) {
         var _this = this;
         authNDelegate.getRequirements().done(function (requirements) {
-        
+
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
-            
+
             // used in auto login from self registration
             if (params.userName &&  params.password && requirements.stage === "DataStore1"){
                 populatedRequirements.callbacks[0].input[0].value = params.userName;
@@ -74,7 +75,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                                 viewManager.refresh();
                             } else {
                                 // TODO: If using a module chain with autologin the user is currently routed to the first login screen.
-                                location.href = '#login' + conf.globalData.auth.realm;
+                                var href = "#login",
+                                    realm = conf.globalData.auth.subRealm;
+                                if(realm) {
+                                    href += "/" + realm;
+                                }
+                                location.href = href;
                             }
                         }
                     },
@@ -85,18 +91,18 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                         }
                         errorCallback(errorMsg);
                     });
-        
+
         });
     };
 
     obj.getLoggedUser = function(successCallback, errorCallback) {
         try{
             userDelegate.getProfile(function(user) {
-                conf.globalData.auth.realm = user.userid.realm;
-                
+                conf.globalData.auth.subRealm = user.userid.realm.slice(1);
+
                 // keep track of the current realm as a future default value, following logout:
                 router.configuration.routes.login.defaults[0] = user.userid.realm;
-                
+
                 userDelegate.getUserById(user.userid.id, user.userid.realm, successCallback, function(e) {
 
                     if (e.responseJSON.code === 404) {
@@ -109,9 +115,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 // Try to remove any cookie that is lingering, as it is apparently no longer valid
                 obj.removeSessionCookie();
 
-                if (!conf.globalData.auth.realm) {
-                    conf.globalData.auth.realm = router.configuration.routes.login.defaults[0];
-                }
                 errorCallback();
             }, {"serverError": {status: "503"}, "unauthorized": {status: "401"}});
         } catch(e) {
@@ -119,11 +122,11 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
             errorCallback();
         }
     };
-    
+
     obj.getLoginUrlParams = function() {
         var url = conf.globalData.auth.fullLoginURL;
         return uiUtils.convertQueryParametersToJSON(url.substring(url.indexOf('?') + 1));
-       
+
     };
 
     obj.setSuccessURL = function(tokenId) {
@@ -156,17 +159,17 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         }
         return promise;
     };
-    
+
     obj.filterUrlParams = function(params){
         var paramsToSave = ['arg','authIndexType','authIndexValue','goto','gotoOnFail','ForceAuth','locale'],
             filteredParams = {};
-        
+
         _.each(paramsToSave, function(p){
             if(params[p]){
                 filteredParams[p] = params[p];
             }
         });
-        
+
         return (!$.isEmptyObject(filteredParams)) ? '&' + $.param(filteredParams) : '';
     };
 
@@ -215,6 +218,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
             cookieHelper.deleteCookie(conf.globalData.auth.cookieName, "/", location.hostname);
         }
     };
-    
+
     return obj;
 });

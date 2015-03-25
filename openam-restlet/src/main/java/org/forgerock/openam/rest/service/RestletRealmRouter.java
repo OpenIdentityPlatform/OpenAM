@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.service;
@@ -24,7 +24,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.router.RestRealmValidator;
-import org.forgerock.openam.utils.StringUtils;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -49,7 +48,6 @@ public class RestletRealmRouter extends Router {
 
     private final RestRealmValidator realmValidator;
     private final CoreWrapper coreWrapper;
-    private final Delegate delegate;
     private final TemplateRoute delegateRoute;
 
     /**
@@ -62,7 +60,7 @@ public class RestletRealmRouter extends Router {
         this.realmValidator = realmValidator;
         this.coreWrapper = coreWrapper;
 
-        delegate = new Delegate(this);
+        Delegate delegate = new Delegate(this);
         delegateRoute = createRoute("/{subrealm}", delegate, Template.MODE_STARTS_WITH);
         super.setDefaultRoute(delegateRoute);
     }
@@ -90,13 +88,9 @@ public class RestletRealmRouter extends Router {
         }
 
         if (next != delegateRoute) {
-            if (StringUtils.isEmpty((String) request.getAttributes().get("subrealm"))) {
-                String subrealm = getRealmFromQueryString(request);
-                if (realm == null) {
-                    realm = subrealm;
-                } else if (subrealm != null && !subrealm.isEmpty()) {
-                    realm = concatenateSubRealm(realm, subrealm);
-                }
+            String overrideRealm = getRealmFromQueryString(request);
+            if (overrideRealm != null) {
+                realm = overrideRealm;
             }
             request.getAttributes().put(REALM_URL, request.getResourceRef().getBaseRef().toString());
         }
@@ -110,15 +104,6 @@ public class RestletRealmRouter extends Router {
         validateRealm(request, realm);
 
         super.doHandle(next, request, response);
-    }
-
-    private String concatenateSubRealm(String realm, String subrealm) {
-        if (realm.endsWith("/") && subrealm.startsWith("/")) {
-            subrealm = subrealm.substring(1);
-        } else if (!realm.endsWith("/") && !subrealm.startsWith("/")) {
-            subrealm = "/" + subrealm;
-        }
-        return realm + subrealm;
     }
 
     private String getRealmFromURI(Request request) {

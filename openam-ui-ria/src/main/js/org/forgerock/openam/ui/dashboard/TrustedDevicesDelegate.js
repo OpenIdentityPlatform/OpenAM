@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,29 +23,24 @@
  */
 
 /*global $, define, _ */
-
 define("org/forgerock/openam/ui/dashboard/TrustedDevicesDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(constants, configuration, AbstractDelegate, conf, realmHelper) {
-
-    var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json');
+], function(constants, AbstractDelegate, conf, RealmHelper) {
+    var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json/');
 
    obj.getTrustedDevices = function() {
-       var realm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
        return obj.serviceCall({
-            url: realm + '/users/' + conf.loggedUser.uid + '/devices/trusted/?_queryId=*',
+            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" + conf.loggedUser.uid + "/devices/trusted/?_queryId=*"),
             headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
    obj.deleteTrustedDevice = function(id) {
-       var realm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
        return obj.serviceCall({
-           url: realm + '/users/' + conf.loggedUser.uid + '/devices/trusted/' + id,
+           url: RealmHelper.decorateURIWithSubRealm("__subrealm__/users/" + conf.loggedUser.uid + "/devices/trusted/" + id),
            type: "DELETE",
            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
        });
@@ -53,6 +48,3 @@ define("org/forgerock/openam/ui/dashboard/TrustedDevicesDelegate", [
 
     return obj;
 });
-
-
-

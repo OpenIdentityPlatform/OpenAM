@@ -24,6 +24,7 @@
 
 require(['squire'], function(Squire) {
     new Squire()
+    .store('org/forgerock/commons/ui/common/main/Configuration')
     .store('org/forgerock/commons/ui/common/util/UIUtils')
     .require([
         'org/forgerock/openam/ui/common/util/RealmHelper',
@@ -31,60 +32,84 @@ require(['squire'], function(Squire) {
     ], function(subject, mocks) {
         module('org/forgerock/openam/ui/common/util/RealmHelper', {
           beforeEach: function() {
-            // TODO: Don't drop uiUtils into the global namespace
-            uiUtils = mocks.store['org/forgerock/commons/ui/common/util/UIUtils'];
+            // TODO: Don't drop UIUtils into the global namespace
+            UIUtils = mocks.store['org/forgerock/commons/ui/common/util/UIUtils'];
+            Configuration = mocks.store['org/forgerock/commons/ui/common/main/Configuration'];
+
+            Configuration.globalData = {
+                auth: {
+                    subRealm: undefined
+                }
+            };
           }
         });
-        test('#getRealm when realm is not present', sinon.test(function() {
-            this.stub(uiUtils, 'getURIFragment').returns('login');
+        // #decorateURLWithOverrideRealm
+        test('#decorateURLWithOverrideRealm', sinon.test(function() {
+            this.stub(UIUtils, 'getURIQueryString').returns('realm=realm1');
 
-            equal(subject.getRealm(), '/', 'returns root realm');
+            equal(subject.decorateURLWithOverrideRealm('http://www.example.com'), 'http://www.example.com?realm=realm1', 'appends override realm query string parameter');
+        }));
+        test('#decorateURLWithOverrideRealm when a query string is present', sinon.test(function() {
+            this.stub(UIUtils, 'getURIQueryString').returns('realm=realm1');
+
+            equal(subject.decorateURLWithOverrideRealm('http://www.example.com?key=value'), 'http://www.example.com?key=value&realm=realm1', 'appends override realm query string parameter');
         }));
 
-        test('#getRealm when realm is present in fragment', sinon.test(function() {
-            this.stub(uiUtils, 'getURIFragment').returns('login/realmA');
+        // #decorateURIWithRealm
+        test('#decorateURIWithRealm', sinon.test(function() {
+            Configuration.globalData.auth.subRealm = 'realm1';
+            this.stub(UIUtils, 'getURIQueryString').returns('realm=realm2');
 
-            equal(subject.getRealm(), '/realmA', 'returns realm from fragment');
+            equal(subject.decorateURIWithRealm('http://www.example.com/__subrealm__/'), 'http://www.example.com/realm1/?realm=realm2', 'replaces __subrealm__ with sub realm and appends override realm query string parameter');
         }));
 
-        test('#getRealm when realm is present in URI query string', sinon.test(function() {
-            this.stub(uiUtils, 'getURIFragment').returns('login/');
-            this.stub(uiUtils, 'getURIQueryString').returns('realm=realmA');
+        // #decorateURIWithSubRealm
+        test('#decorateURIWithSubRealm', sinon.test(function() {
+            Configuration.globalData.auth.subRealm = 'realm1';
 
-            equal(subject.getRealm(), '/realmA', 'returns realm from URI query string');
+            equal(subject.decorateURIWithSubRealm('http://www.example.com/__subrealm__/'), 'http://www.example.com/realm1/', 'replaces __subrealm__ with sub realm');
+        }));
+        test('#decorateURIWithSubRealm when there is not sub realm', sinon.test(function() {
+            Configuration.globalData.auth.subRealm = '';
+
+            equal(subject.decorateURIWithSubRealm('http://www.example.com/__subrealm__/'), 'http://www.example.com/', 'removes __subrealm__');
         }));
 
-        test('#getRealm when realm is present in fragment query string', sinon.test(function() {
-            this.stub(uiUtils, 'getURIFragment').returns('login/&realm=realmA');
+        // #getOverrideRealm
+        test('#getOverrideRealm when realm override is present in query string', sinon.test(function() {
+            this.stub(UIUtils, 'getURIQueryString').returns('realm=realm1');
 
-            equal(subject.getRealm(), '/realmA', 'returns realm from fragment query string');
+            equal(subject.getOverrideRealm(), 'realm1', 'returns override realm');
+        }));
+        test('#getOverrideRealm when realm override is present in fragment query string', sinon.test(function() {
+            this.stub(UIUtils, 'getURIFragment').returns('login&realm=realm1');
+
+            equal(subject.getOverrideRealm(), 'realm1', 'returns override realm');
+        }));
+        test('#getOverrideRealm when realm override is present in query string and fragment query string', sinon.test(function() {
+            this.stub(UIUtils, 'getURIQueryString').returns('realm=realm1');
+            this.stub(UIUtils, 'getURIFragment').returns('login&realm=realm2');
+
+            equal(subject.getOverrideRealm(), 'realm1', 'returns query string realm');
         }));
 
-        test('#getRealm when realm is inconsistent', sinon.test(function() {
-            this.stub(uiUtils, 'getURIFragment').returns('login/realmB&realm=realmC');
-            this.stub(uiUtils, 'getURIQueryString').returns('realm=realmA');
+        // #getSubRealm
+        test('#getSubRealm when page is login', sinon.test(function() {
+            this.stub(UIUtils, 'getURIFragment').returns('login/realm1');
 
-            equal(subject.getRealm(), null, 'returns null');
+            equal(subject.getSubRealm(), 'realm1', 'returns sub realm');
         }));
+        test('#getSubRealm when page is not login and subRealm is already set', sinon.test(function() {
+            this.stub(UIUtils, 'getURIFragment').returns('other');
+            Configuration.globalData.auth.subRealm = 'realm1';
 
-        test('#getRealm when realm is inconsistent and fragment is not present', sinon.test(function() {
-            this.stub(uiUtils, 'getURIFragment').returns('login/&realm=realmC');
-            this.stub(uiUtils, 'getURIQueryString').returns('realm=realmA');
-
-            equal(subject.getRealm(), null, 'returns null');
+            equal(subject.getSubRealm(), 'realm1', 'returns sub realm');
         }));
+        test('#getSubRealm when page is not login and subRealm is not set', sinon.test(function() {
+            this.stub(UIUtils, 'getURIFragment').returns('other');
+            Configuration.globalData.auth.subRealm = '';
 
-        test('#getRealm when realm is inconsistent and URI query string is not present', sinon.test(function() {
-            this.stub(uiUtils, 'getURIFragment').returns('login/realmB&realm=realmC');
-
-            equal(subject.getRealm(), null, 'returns null');
-        }));
-
-        test('#getRealm when realm is inconsistent and fragment query string is not present', sinon.test(function() {
-            this.stub(uiUtils, 'getURIFragment').returns('login/realmB');
-            this.stub(uiUtils, 'getURIQueryString').returns('realm=realmA');
-
-            equal(subject.getRealm(), null, 'returns null');
+            equal(subject.getSubRealm(), '', 'returns empty string');
         }));
     });
 });

@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -58,13 +58,17 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             //save the login params in a cookie for use with the cancel button on forgotPassword/register page
             //and also the "proceed to login" link once password has been successfully changed or registration is complete
             var expire = new Date(),
-                cookieVal = conf.globalData.auth.realm;
+                cookieVal = "/" + conf.globalData.auth.subRealm,
+                href = e.target.href + "/";
             if(conf.globalData.auth.urlParams){
                 cookieVal += restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
             }
             expire.setDate(expire.getDate() + 1);
             cookieHelper.setCookie("loginUrlParams",cookieVal,expire);
-            location.href = e.target.href + conf.globalData.auth.realm;
+            if(conf.globalData.auth.subRealm) {
+                href += conf.globalData.auth.subRealm;
+            }
+            location.href = href;
         },
         autoLogin: function() {
             var index,
@@ -121,7 +125,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 promise = $.Deferred();
 
             if (args && args.length) {
-                conf.globalData.auth.realm = RealmHelper.getRealm();
                 conf.globalData.auth.additional = args[1]; // may be "undefined"
                 conf.globalData.auth.urlParams = urlParams;
 
@@ -148,10 +151,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     // if simply by asking for the requirements, we end up with a token, then we must have auto-logged-in somehow
                     if (reqs.hasOwnProperty("tokenId") && urlParams.ForceAuth !== 'true') {
                         //set a variable for the realm passed into the browser so there can be a check to make sure it is the same as the current user's realm
-                        conf.globalData.auth.passedInRealm = conf.globalData.auth.realm;
+                        conf.globalData.auth.passedInRealm = conf.globalData.auth.subRealm;
                         // if we have a token, let's see who we are logged in as....
                         sessionManager.getLoggedUser(function(user) {
-                            if(String(conf.globalData.auth.passedInRealm).toLowerCase() === conf.globalData.auth.realm.toLowerCase()){
+                            if(String(conf.globalData.auth.passedInRealm).toLowerCase() === conf.globalData.auth.subRealm.toLowerCase()){
                                 conf.setProperty('loggedUser', user);
                                 delete conf.globalData.auth.passedInRealm;
                                 restLoginHelper.setSuccessURL(reqs.tokenId).then(function() {

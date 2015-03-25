@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.resource;
@@ -29,6 +29,7 @@ public class RealmContext extends ServerContext {
 
     private Pair<String, String> dnsAliasRealm;
     private Pair<String, String> relativeRealmPath = Pair.of("/", "/");
+    private String overrideRealm;
 
     /**
      * Constructs a new empty RealmContext instance.
@@ -44,7 +45,10 @@ public class RealmContext extends ServerContext {
      *
      * @return The resolved realm path.
      */
-    public String getResolvedRealm() {//TODO rename to getAbsoluteRealm or getAbsoluteRealmPath?
+    public String getResolvedRealm() {
+        if (overrideRealm != null) {
+            return overrideRealm;
+        }
         StringBuilder resolvedRealm = new StringBuilder();
         if (dnsAliasRealm != null) {
             final String dnsAlias = dnsAliasRealm.getSecond();
@@ -79,6 +83,10 @@ public class RealmContext extends ServerContext {
         }
     }
 
+    public void setOverrideRealm(String realm) {
+        this.overrideRealm = realm;
+    }
+
     private String getRealm(String realm, String subrealm) {
         if (subrealm == null || subrealm.isEmpty()) {
             return realm;
@@ -101,6 +109,10 @@ public class RealmContext extends ServerContext {
     }
 
     public String getRelativeRealm() {
-        return relativeRealmPath.getSecond();
+       return relativeRealmPath.getSecond();
+    }
+
+    String getOverrideRealm() {
+        return overrideRealm;
     }
 }

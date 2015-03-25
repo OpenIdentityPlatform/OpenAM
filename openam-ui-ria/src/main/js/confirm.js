@@ -23,63 +23,56 @@
  */
 
 /*global require, define, window*/
-
-
-/**
- * @author mkuleshov
- */
-
 require.config({
     paths: {
+        "backbone":   "libs/backbone-1.1.2-min",
+        "doTimeout":  "libs/jquery.ba-dotimeout-1.0-min",
+        "form2js":    "libs/form2js-2.0",
+        "handlebars": "libs/handlebars-1.3.0-min",
+        "jquery":     "libs/jquery-2.1.1-min",
+        "js2form":    "libs/js2form-2.0",
+        "i18next":    "libs/i18next-1.7.3-min",
+        "moment":     "libs/moment-2.8.1-min",
+        "spin":       "libs/spin-2.0.1-min",
+        "underscore": "libs/lodash-2.4.1-min",
+        "xdate":      "libs/xdate-0.8-min",
 
-        i18next: "libs/i18next-1.7.3-min",
-        backbone: "libs/backbone-1.1.2-min",
-        underscore: "libs/lodash-2.4.1-min",
-        js2form: "libs/js2form-2.0",
-        form2js: "libs/form2js-2.0",
-        spin: "libs/spin-2.0.1-min",
-        jquery: "libs/jquery-2.1.1-min",
-        xdate: "libs/xdate-0.8-min",
-        doTimeout: "libs/jquery.ba-dotimeout-1.0-min",
-        handlebars: "libs/handlebars-1.3.0-min",
-        moment: "libs/moment-2.8.1-min",
-        ThemeManager: "org/forgerock/openam/ui/common/util/ThemeManager",
-        UserDelegate: "org/forgerock/openam/ui/user/delegates/UserDelegate"
+        "ThemeManager": "org/forgerock/openam/ui/common/util/ThemeManager",
+        "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate"
     },
-
     shim: {
-        underscore: {
-            exports: "_"
-        },
-        backbone: {
+        "backbone": {
             deps: ["underscore"],
             exports: "Backbone"
         },
-        js2form: {
-            exports: "js2form"
-        },
-        form2js: {
-            exports: "form2js"
-        },
-        spin: {
-            exports: "spin"
-        },
-        xdate: {
-            exports: "xdate"
-        },
-        doTimeout: {
+        "doTimeout": {
             deps: ["jquery"],
             exports: "doTimeout"
         },
-        handlebars: {
+        "form2js": {
+            exports: "form2js"
+        },
+        "handlebars": {
             exports: "handlebars"
         },
-        i18next: {
+        "js2form": {
+            exports: "js2form"
+        },
+        "i18next": {
             deps: ["jquery", "handlebars"],
             exports: "i18next"
         },
-        moment: {
+        "moment": {
             exports: "moment"
+        },
+        "spin": {
+            exports: "spin"
+        },
+        "underscore": {
+            exports: "_"
+        },
+        "xdate": {
+            exports: "xdate"
         }
     }
 });
@@ -98,16 +91,14 @@ require([
     "org/forgerock/commons/ui/user/main",
     "org/forgerock/openam/ui/common/main",
     "org/forgerock/openam/ui/user/main"
-], function($, _, Backbone, constants,serviceInvoker,uiUtils,cookieHelper,realmHelper) {
-
-    var
-        conf = {
+], function($, _, Backbone, Constants, ServiceInvoker, UIUtils, CookieHelper, RealmHelper) {
+    var conf = {
             defaultHeaders: {}
         },
         callParams,
         responseMessage,
-        urlParams = uiUtils.convertCurrentUrlToJSON().params,
-        host = constants.host + "/"+ constants.context + "/json",
+        urlParams = UIUtils.convertCurrentUrlToJSON().params,
+        host = Constants.host + "/"+ Constants.context + "/json/",
         searchParams = window.location.search.substring(1);
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
@@ -117,17 +108,17 @@ require([
 
 
         callParams = {
-            url: host + realmHelper.cleanRealm(urlParams.realm) + '/serverinfo/*',
+            url: host + RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/*"),
             type: "GET",
             headers: {"Cache-Control": "no-cache"},
             success: function() {
-                location.href = uiUtils.getCurrentUrlBasePart() + "/"+ constants.context + '/XUI/#continueRegister/&' + searchParams;
+                location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context + '/XUI/#continueRegister/&' + searchParams;
             },
             error: function(err) {
                 responseMessage = JSON.parse(err.responseText).message;
                 if (responseMessage.indexOf("Invalid realm") > -1) {
 
-                    cookieHelper.cookiesEnabled();
+                    CookieHelper.cookiesEnabled();
                     var
                         expire = new Date(),
                         cookieVal =  {
@@ -136,24 +127,24 @@ require([
                         };
 
                     expire.setDate(expire.getDate() + 1);
-                    cookieHelper.setCookie("invalidRealm",cookieVal,expire);
-                    location.href = uiUtils.getCurrentUrlBasePart() + "/"+ constants.context +'/XUI/#login';
+                    CookieHelper.setCookie("invalidRealm",cookieVal,expire);
+                    location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context +'/XUI/#login';
                 }
             }
         };
 
     if(urlParams.username) {
-        location.href = uiUtils.getCurrentUrlBasePart() + "/"+ constants.context +'/XUI/#forgotPasswordChange/&' + searchParams;
+        location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context +'/XUI/#forgotPasswordChange/&' + searchParams;
     }
     else if(urlParams.realm) {
-        serviceInvoker.configuration = conf;
-        serviceInvoker.restCall(callParams);
+        ServiceInvoker.configuration = conf;
+        ServiceInvoker.restCall(callParams);
     }
     else if (urlParams.email) {
-        location.href = uiUtils.getCurrentUrlBasePart() + "/"+ constants.context + '/XUI/#continueRegister/&' + searchParams;
+        location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context + '/XUI/#continueRegister/&' + searchParams;
     }
     else {
-        location.href = uiUtils.getCurrentUrlBasePart() + "/"+ constants.context + '/XUI/#login';
+        location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context + '/XUI/#login';
     }
 
 });

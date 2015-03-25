@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2014 ForgeRock AS.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,44 +26,39 @@
 
 define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(constants, configuration, AbstractDelegate, conf, realmHelper) {
-
-    var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json');
+], function(constants, AbstractDelegate, RealmHelper) {
+    var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json/');
 
     obj.sortApps = function(apps) {
 
-        var sortedApps = _.map(_.sortBy(_.keys(apps), function (key){ return key; }), function (key) { 
-            var app = {}; 
-            app.id = key; 
+        var sortedApps = _.map(_.sortBy(_.keys(apps), function (key){ return key; }), function (key) {
+            var app = {};
+            app.id = key;
             _.each(apps[key], function (v,k) { app[k] = v[0]; });
-            return app; 
+            return app;
         });
 
         return sortedApps;
     };
 
     obj.getMyApplications = function() {
-        var self = this,
-            realm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
+        var self = this;
         return obj.serviceCall({
-            url: realm + "/dashboard/assigned",
+            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/dashboard/assigned"),
             headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "GET"
         }).then(function(apps) {
             return self.sortApps(apps);
         });
-        
+
     };
 
     obj.getAvailableApplications = function() {
-        var self = this,
-            realm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
+        var self = this;
         return obj.serviceCall({
-            url: realm + "/dashboard/available",
+            url: RealmHelper.decorateURIWithSubRealm("__subrealm__/dashboard/available"),
             headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "GET"
         }).then(function(apps) {
@@ -74,6 +69,3 @@ define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
 
     return obj;
 });
-
-
-

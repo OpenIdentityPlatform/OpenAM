@@ -36,8 +36,9 @@ define("org/forgerock/openam/ui/policy/applications/ManageApplicationsView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate"
-], function (AbstractView, GenericGridView, uiUtils, router, constants, conf, eventManager, policyDelegate) {
+    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
+    "org/forgerock/commons/ui/common/util/RealmHelper"
+], function (AbstractView, GenericGridView, uiUtils, router, constants, conf, eventManager, policyDelegate, RealmHelper) {
     var ManageApplicationsView = AbstractView.extend({
         baseTemplate: 'templates/policy/BaseTemplate.html',
         template: "templates/policy/applications/ManageAppsTemplate.html",
@@ -54,8 +55,6 @@ define("org/forgerock/openam/ui/policy/applications/ManageApplicationsView", [
             this.data.realm = conf.globalData.auth.realm;
 
             this.parentRender(function () {
-                this.subrealm = this.data.realm !== "/" ? this.data.realm : "";
-
                 this.appGridView = new GenericGridView();
                 this.appGridView.render({
                     rowUid: 'name',
@@ -77,7 +76,7 @@ define("org/forgerock/openam/ui/policy/applications/ManageApplicationsView", [
                 datePick = function(elem) { return self.appGridView.datePicker(self.appGridView, elem); };
 
             return {
-                url: '/' + constants.context + '/json' + this.subrealm + '/applications',
+                url: RealmHelper.decorateURLWithOverrideRealm('/' + constants.context + '/json/applications'),
                 colNames: ['', 'Edit', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
                 colModel: [
                     {name: 'iconChB',           width: 40,  sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
@@ -216,7 +215,7 @@ define("org/forgerock/openam/ui/policy/applications/ManageApplicationsView", [
         },
 
         exportPolicies: function () {
-            this.$el.find("#exportPolicies").attr('href', constants.host + "/" + constants.context + "/xacml"  + this.subrealm + "/policies");
+            this.$el.find("#exportPolicies").attr('href', constants.host + "/" + constants.context + "/xacml/policies");
         }
 
     });

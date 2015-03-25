@@ -37,33 +37,19 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
-    "org/forgerock/commons/ui/common/components/Messages"
-], function(constants, AbstractDelegate, conf, eventManager, cookieHelper, router, i18nManager, sessionDelegate, messageManager) {
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function(constants, AbstractDelegate, conf, eventManager, cookieHelper, router, i18nManager, sessionDelegate, messageManager, RealmHelper) {
 
-    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/authenticate"),
+    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/"),
         requirementList = [],
         knownAuth = {}; // to be used to keep track of the attributes associated with whatever requirementList contains
 
     obj.begin = function () {
-
         var url,
             args = {},
             tokenCookie,
-            promise = $.Deferred(),
-            originalRealm;
-
-        if(conf.globalData.auth.realm) {
-            if(conf.globalData.auth.realm !== '/') {
-                args.realm = conf.globalData.auth.realm;
-            }
-        } else {
-            eventManager.sendEvent(constants.EVENT_INCONSISTENT_REALM);
-            return promise.reject();
-        }
-
-        if (conf.globalData.auth.realm !== "/") {
-            args.realm = conf.globalData.auth.realm;
-        }
+            promise = $.Deferred();
 
         knownAuth = _.clone(conf.globalData.auth);
 
@@ -72,10 +58,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
          * conf.globalData.auth.urlParams is fragment query string
          */
         if (conf.globalData.auth.urlParams) {
-            // Realm has been determined from all possible sources already, don't overwrite it
-            originalRealm = args.realm;
             _.extend(args, conf.globalData.auth.urlParams);
-            args.realm = originalRealm;
         }
 
         // In case user has logged in already update session
@@ -84,7 +67,13 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
             args.sessionUpgradeSSOTokenId = tokenCookie;
         }
 
-        url = "?" + $.param(args);
+        url = RealmHelper.decorateURIWithSubRealm("__subrealm__/authenticate");
+
+        if(RealmHelper.getOverrideRealm()) {
+            args.realm = RealmHelper.getOverrideRealm();
+        }
+
+        url = url + "?" + $.param(args);
 
         obj.serviceCall({
                 type: "POST",
@@ -164,13 +153,16 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                     window.location.href = errorBody.detail.failureUrl;
                 }
 
-            };
+            },
+            url;
+
+            url = RealmHelper.decorateURIWithRealm("__subrealm__/authenticate");
 
             obj.serviceCall({
                 type: "POST",
                 headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
                 data: JSON.stringify(requirements),
-                url: "",
+                url: url,
                 errorsHandlers: {
                     "unauthorized": { status: "401"},
                     "timeout": { status: "408" },

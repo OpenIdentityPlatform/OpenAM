@@ -8,8 +8,7 @@
         },
         "messages" : {
             "AppMessages" : {
-                "invalidRealm": "The realm doesn't exist",
-                "inconsistentRealm": "The realm is inconsistent"
+                "invalidRealm": "The realm doesn't exist"
             },
             "CommonMessages" : {
                 "authenticationFailed" : "User name/password combination is invalid.",

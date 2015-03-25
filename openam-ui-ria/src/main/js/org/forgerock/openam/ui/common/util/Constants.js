@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -38,7 +38,6 @@ define("org/forgerock/openam/ui/common/util/Constants", [
 
     // Realm
     commonConstants.EVENT_INVALID_REALM = "main.EVENT_INVALID_REALM";
-    commonConstants.EVENT_INCONSISTENT_REALM = "main.EVENT_INCONSISTENT_REALM";
 
     return commonConstants;
 });
