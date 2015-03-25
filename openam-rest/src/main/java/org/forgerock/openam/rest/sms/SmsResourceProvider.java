@@ -16,12 +16,20 @@
 
 package org.forgerock.openam.rest.sms;
 
+import static org.forgerock.json.fluent.JsonValue.object;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.forgerock.json.fluent.JsonPointer;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.RouterContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.rest.resource.RealmContext;
@@ -30,6 +38,7 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
@@ -51,9 +60,11 @@ abstract class SmsResourceProvider {
     protected final List<String> uriPath;
     protected final SmsJsonConverter converter;
     protected final Debug debug;
+    private final ServiceSchema schema;
 
     SmsResourceProvider(ServiceSchema schema, SchemaType type, List<ServiceSchema> subSchemaPath, String uriPath,
             boolean serviceHasInstanceName, SmsJsonConverter converter, Debug debug) {
+        this.schema = schema;
         this.serviceName = schema.getServiceName();
         this.serviceVersion = schema.getVersion();
         this.type = type;
@@ -141,6 +152,17 @@ abstract class SmsResourceProvider {
      * Gets the name of the last schema node in the {@link #subSchemaPath}.
      */
     protected String lastSchemaNodeName() {
-        return subSchemaPath.get(subSchemaPath.size() - 1).getName();
+        return schema.getName();
     }
+
+    protected void handleAction(ActionRequest request, ResultHandler<JsonValue> handler) {
+        if (request.getAction().equals("template")) {
+            Map attrs = schema.getAttributeDefaults();
+            JsonValue result = converter.toJson(attrs);
+            handler.handleResult(result);
+        } else {
+            handler.handleError(new NotSupportedException("Action not supported: " + request.getAction()));
+        }
+    }
+
 }

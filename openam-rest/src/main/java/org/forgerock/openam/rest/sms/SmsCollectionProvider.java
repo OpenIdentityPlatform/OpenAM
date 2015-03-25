@@ -71,7 +71,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
 
     @Override
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        // Template resource action will go here.
+        handleAction(request, handler);
     }
 
     /**
