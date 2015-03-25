@@ -97,12 +97,22 @@ public class ServiceConfig {
     /**
      * Returns the service component name. It is "/" separated and the root
      * component name is "/".
-     * 
+     *
      * @return service component name
      */
     public String getComponentName() {
         validate();
         return (sc.getComponentName());
+    }
+
+    /**
+     * Returns the service name.
+     *
+     * @return service name
+     */
+    public String getName() {
+        validate();
+        return sc.getName();
     }
 
     /**

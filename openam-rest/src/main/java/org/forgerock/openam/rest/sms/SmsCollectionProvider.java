@@ -250,7 +250,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      */
     private JsonValue getJsonValue(ServiceConfig result) {
         JsonValue value = converter.toJson(result.getAttributes());
-        value.add("_id", result.getComponentName());
+        value.add("_id", result.getName());
         return value;
     }
 

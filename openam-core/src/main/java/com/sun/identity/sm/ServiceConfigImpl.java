@@ -124,6 +124,13 @@ class ServiceConfigImpl implements ServiceListener {
     }
 
     /**
+     * Returns this instance's name
+     */
+    String getName() {
+        return compName;
+    }
+
+    /**
      * Returns the configuration's schema ID
      */
     String getSchemaID() {
