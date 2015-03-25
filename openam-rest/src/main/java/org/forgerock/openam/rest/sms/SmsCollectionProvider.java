@@ -18,8 +18,6 @@ package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.fluent.JsonValue.*;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,7 +42,6 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.RouterContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.util.Reject;
@@ -63,25 +60,12 @@ import com.sun.identity.sm.ServiceSchema;
  */
 public class SmsCollectionProvider extends SmsResourceProvider implements CollectionResourceProvider {
 
-    private final List<ServiceSchema> subSchemaPath;
-    private final SchemaType type;
-    private final boolean hasInstanceName;
-    private final SmsJsonConverter converter;
-    private final Debug debug;
-    private final List<String> uriPath;
-
     @Inject
     SmsCollectionProvider(@Assisted SmsJsonConverter converter, @Assisted ServiceSchema schema,
             @Assisted SchemaType type, @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
             @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug) {
-        super(schema);
+        super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug);
         Reject.ifTrue(type != SchemaType.GLOBAL && type != SchemaType.ORGANIZATION, "Unsupported type: " + type);
-        this.converter = converter;
-        this.type = type;
-        this.subSchemaPath = subSchemaPath;
-        this.uriPath = uriPath == null ? Collections.<String>emptyList() : Arrays.asList(uriPath.split("/"));
-        this.hasInstanceName = serviceHasInstanceName;
-        this.debug = debug;
     }
 
     @Override
@@ -263,42 +247,6 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         }
-    }
-
-    protected String lastSchemaNodeName() {
-        return subSchemaPath.get(subSchemaPath.size() - 1).getName();
-    }
-
-    protected ServiceConfig parentSubConfigFor(ServerContext context, ServiceConfigManager scm)
-            throws SMSException, SSOException {
-        String name = null;
-        Map<String, String> uriTemplateVariables = context.asContext(RouterContext.class).getUriTemplateVariables();
-        if (hasInstanceName) {
-            name = uriTemplateVariables.get("name");
-        }
-        ServiceConfig config = type == SchemaType.GLOBAL ?
-                scm.getGlobalConfig(name) : scm.getOrganizationConfig(realmFor(context), name);
-        for (int i = 0; i < subSchemaPath.size() - 1; i++) {
-            ServiceSchema schema = subSchemaPath.get(i);
-            String pathFragment = schema.getResourceName();
-            if (pathFragment == null) {
-                pathFragment = schema.getName();
-            }
-            if (uriPath.contains("{" + pathFragment + "}")) {
-                pathFragment = uriTemplateVariables.get(pathFragment);
-            }
-            config = config.getSubConfig(pathFragment);
-        }
-        return config;
-    }
-
-    private ServiceConfig checkedInstanceSubConfig(String resourceId, ServiceConfig config)
-            throws SSOException, SMSException, NotFoundException {
-        ServiceConfig subConfig = config.getSubConfig(resourceId);
-        if (subConfig == null || !subConfig.getSchemaID().equals(lastSchemaNodeName())) {
-            throw new NotFoundException();
-        }
-        return subConfig;
     }
 
     private JsonValue getJsonValue(ServiceConfig result) {

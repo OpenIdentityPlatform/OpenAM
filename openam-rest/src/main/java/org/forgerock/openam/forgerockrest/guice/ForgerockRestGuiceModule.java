@@ -85,6 +85,8 @@ import org.forgerock.openam.rest.sms.SmsCollectionProvider;
 import org.forgerock.openam.rest.sms.SmsCollectionProviderFactory;
 import org.forgerock.openam.rest.sms.SmsRequestHandler;
 import org.forgerock.openam.rest.sms.SmsRequestHandlerFactory;
+import org.forgerock.openam.rest.sms.SmsSingletonProvider;
+import org.forgerock.openam.rest.sms.SmsSingletonProviderFactory;
 import org.forgerock.openam.rest.uma.UmaIdRepoCreationListener;
 import org.forgerock.openam.rest.uma.UmaPolicyServiceImpl;
 import org.forgerock.openam.rest.uma.UmaResourceSetRegistrationListener;
@@ -190,6 +192,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 .implement(SmsCollectionProvider.class, SmsCollectionProvider.class)
                 .build(SmsCollectionProviderFactory.class));
 
+        install(new FactoryModuleBuilder()
+                .implement(SmsSingletonProvider.class, SmsSingletonProvider.class)
+                .build(SmsSingletonProviderFactory.class));
     }
 
     @Provides
