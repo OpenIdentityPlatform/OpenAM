@@ -1154,7 +1154,7 @@ public class LoginState {
             return NoSessionActivator.INSTANCE;
         }
 
-        if (LazyConfig.AUTHD.isSuperUser(getUserDN())) {
+        if (LazyConfig.AUTHD.isSuperUser(getUserDN()) || LazyConfig.AUTHD.isSpecialUser(getUserDN())) {
             DEBUG.message("Using stateful session activation for super admin");
             return DefaultSessionActivator.INSTANCE;
         }
