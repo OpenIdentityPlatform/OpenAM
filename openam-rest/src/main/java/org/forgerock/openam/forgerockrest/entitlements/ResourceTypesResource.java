@@ -123,6 +123,7 @@ public class ResourceTypesResource extends RealmAwareResource {
 
         if (METHOD_PUT.equalsIgnoreCase(context.asContext(HttpContext.class).getMethod())) {
             handler.handleError(ResourceException.getException(METHOD_NOT_ALLOWED));
+            return;
         }
 
         String principalName = "unknown";
