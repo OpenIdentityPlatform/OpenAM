@@ -29,10 +29,9 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
-    "org/forgerock/openam/ui/uma/util/UMAUtils",
-    "backgrid"
-
-], function(AbstractView, Configuration, Constants, BackgridUtils, UMAUtils, Backgrid) {
+    "backgrid",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function(AbstractView, Configuration, Constants, BackgridUtils, Backgrid, RealmHelper) {
     var HistoryView = AbstractView.extend({
         template: "templates/uma/views/history/ListHistory.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
@@ -42,11 +41,10 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
             var self = this,
                 collection,
                 grid,
-                paginator,
-                realm = UMAUtils.getRealm();
+                paginator;
 
             collection = new (Backbone.PageableCollection.extend({
-                url: "/" + Constants.context + "/json" + realm + "/users/" + Configuration.loggedUser.username + '/uma/auditHistory',
+                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.username + '/uma/auditHistory'),
                 state: {
                     pageSize: 10,
                     sortKey: "eventTime",

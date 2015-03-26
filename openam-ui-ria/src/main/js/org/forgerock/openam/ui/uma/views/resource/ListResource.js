@@ -33,10 +33,10 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
-    "org/forgerock/openam/ui/uma/util/UMAUtils",
     "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources",
-    "backgrid"
-], function(MessageManager, AbstractView, Configuration, EventManager, Router, Constants, UMADelegate, BackgridUtils, UMAUtils, DialogRevokeAllResources, Backgrid) {
+    "backgrid",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function(MessageManager, AbstractView, Configuration, EventManager, Router, Constants, UMADelegate, BackgridUtils, DialogRevokeAllResources, Backgrid, RealmHelper) {
 
     var ListResource = AbstractView.extend({
         template: "templates/uma/views/resource/ListResource.html",
@@ -64,11 +64,10 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                 columns,
                 grid,
                 paginator,
-                ResourceSetCollection,
-                realm = UMAUtils.getRealm();
+                ResourceSetCollection;
 
             ResourceSetCollection = Backbone.PageableCollection.extend({
-                url: "/" + Constants.context + "/json" + realm + "/users/" + Configuration.loggedUser.username + '/oauth2/resourcesets',
+                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.username + '/oauth2/resourcesets'),
                 state: {
                     pageSize: 10,
                     sortKey: "name"

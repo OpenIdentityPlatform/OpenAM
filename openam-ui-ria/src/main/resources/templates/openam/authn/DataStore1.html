@@ -5,7 +5,7 @@
         <fieldset>
 
             {{#each reqs.callbacks}}
-            
+
             {{#if isSubmit}}
             <div class="field field-checkbox">
                 <label class="align-left"  for="remember">
@@ -14,13 +14,13 @@
                 </label>
             </div>
             {{/if}}
-            
+
             <div class="group-field-block{{#if isSubmit}} float-right{{/if}}">
-                {{callbackRender}}     
+                {{callbackRender}}
             </div>
 
             {{#if isSubmit}}
-            <ul class="link-box float-left">  
+            <ul class="link-box float-left">
                 {{#if ../../showForgotPassword}}<li><a href="#forgotPassword" id="forgotPassword">{{t "common.user.forgotPassword" }}</a></li>{{/if}}
                 {{#if ../../showRegister}}<li><a href="#register" id="register">{{t "common.form.register" }}</a></li>{{/if}}
             </ul>
@@ -32,14 +32,12 @@
                 <div class="authn">
                     <div class="authn-border"></div>
                     <span class="authn-header">or login with:</span>
-                    {{#each socialImplementations}}    
-                        <a href="#login{{../../auth.realm}}&service={{authnChain}}" title="{{displayName}}" ><span><img src="{{iconPath}}" /></span></a>
+                    {{#each socialImplementations}}
+                        <a href="#login/{{../../auth.subRealm}}&service={{authnChain}}" title="{{displayName}}" ><span><img src="{{iconPath}}" /></span></a>
                     {{/each}}
                 </div>
             {{/if}}
-            
+
         </fieldset>
     </form>
-
 </div>
-
