@@ -24,6 +24,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ */
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
@@ -302,7 +305,7 @@ public class OAuth extends AMLoginModule {
                         if (authenticatedUser != null) {
                             if (config.getSaveAttributesToSessionFlag()) {
                                 Map <String, Set<String>> attributes = 
-                                        getAttributesMap(profileSvcResponse, null);
+                                        getAttributesMap(profileSvcResponse, jwtClaims);
                                 saveAttributes(attributes);
                             }
                             OAuthUtil.debugMessage("OAuth.process(): LOGIN_SUCCEED "
@@ -339,7 +342,7 @@ public class OAuth extends AMLoginModule {
                                 + "with user " + authenticatedUser);
                         if (config.getSaveAttributesToSessionFlag()) {
                             Map<String, Set<String>> attributes = getAttributesMap(
-                                    profileSvcResponse, null);
+                                    profileSvcResponse, jwtClaims);
                             saveAttributes(attributes);
                         }
                         return ISAuthConstants.LOGIN_SUCCEED;

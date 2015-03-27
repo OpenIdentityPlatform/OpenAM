@@ -11,7 +11,8 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
+* Portions Copyrighted 2015 Nomura Research Institute, Ltd.
 */
 
 package org.forgerock.openam.authentication.modules.oidc;
@@ -66,6 +67,9 @@ public class JwtAttributeMapper implements AttributeMapper<JwtClaimsSet> {
     public Map<String, Set<String>> getAttributes(Map<String, String> localToJwtAttributeMapping,
                                                                     JwtClaimsSet jwtClaimsSet) {
         Map<String, Set<String>> lookupAttributes = new HashMap<String, Set<String>>();
+        if (localToJwtAttributeMapping == null || jwtClaimsSet == null) {
+            return lookupAttributes;
+        }
         /*
         Go through the localToJwtAttributeMapping entries and see if the jwt attribute is present in the jwt. If
         present, create an entry in the lookupAttributes, and insert an entry corresponding to the value in the jwt.
