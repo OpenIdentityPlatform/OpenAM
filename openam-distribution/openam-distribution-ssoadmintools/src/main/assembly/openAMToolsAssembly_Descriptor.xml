@@ -58,6 +58,7 @@
                 <include>org.forgerock.openam:openam-license-core</include>
                 <include>org.forgerock.openam:openam-auth-scripted</include>
                 <include>org.forgerock.openam:openam-scripting</include>
+                <include>org.forgerock.commons:json-resource</include>
                 <include>javax.inject:javax.inject</include>
                 <include>com.google.inject:guice:jar:no_aop</include>
                 <include>com.google.inject.extensions:guice-assistedinject</include>
@@ -85,6 +86,7 @@
                 <include>org.mozilla:rhino</include>
                 <include>org.codehaus.groovy:groovy-all</include>
                 <include>org.kohsuke:groovy-sandbox</include>
+                <include>org.codehaus.groovy:groovy-jsr223:jar</include>
             </includes>
         </dependencySet>
         <dependencySet>
