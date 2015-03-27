@@ -36,6 +36,7 @@ import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import java.util.Collections;
@@ -51,8 +52,9 @@ import javax.security.auth.Subject;
 public class ListApplicationPrivileges extends ApplicationPrivilegeBase {
 
     @Inject
-    public ListApplicationPrivileges(ResourceTypeService resourceTypeService) {
-        super(resourceTypeService);
+    public ListApplicationPrivileges(ResourceTypeService resourceTypeService,
+                                     ApplicationService applicationService) {
+        super(resourceTypeService, applicationService);
     }
 
     /**

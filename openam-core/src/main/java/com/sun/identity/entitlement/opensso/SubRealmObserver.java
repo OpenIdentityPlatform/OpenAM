@@ -24,14 +24,13 @@
  *
  * $Id: SubRealmObserver.java,v 1.3 2010/01/20 17:01:36 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
@@ -44,6 +43,8 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
+import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
+
 import java.security.AccessController;
 import java.util.Iterator;
 import java.util.Set;
@@ -103,7 +104,7 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
         // Only clear cache and remove referrals if the realm is being removed
         if (type == ServiceListener.REMOVED &&
                 (serviceComponent == null || serviceComponent.trim().isEmpty() || serviceComponent.equals("/"))) {
-            ApplicationManager.clearCache(DNMapper.orgNameToRealmName(orgName));
+            ApplicationServiceHelper.get().clearCache(DNMapper.orgNameToRealmName(orgName));
             try {
                 OpenSSOApplicationPrivilegeManager.removeAllPrivileges(orgName);
             } catch (EntitlementException ex) {
@@ -131,7 +132,7 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
                     "Unable to remove referral privileges", ex);
             }
         } else if (type == ServiceListener.MODIFIED) {
-            ApplicationManager.clearCache(DNMapper.orgNameToRealmName(orgName));
+            ApplicationServiceHelper.get().clearCache(DNMapper.orgNameToRealmName(orgName));
         }
     }
 

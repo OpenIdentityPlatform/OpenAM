@@ -46,7 +46,6 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.configuration.SmsAttribute;
 import org.forgerock.openam.entitlement.service.ApplicationService;
-import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
 import org.forgerock.openam.rest.resource.ContextHelper;
@@ -76,8 +75,6 @@ public class ApplicationV1FilterTest {
 
     @Mock
     private ResourceTypeService resourceTypeService;
-    @Mock
-    private ApplicationServiceFactory applicationServiceFactory;
     @Mock
     private ApplicationService applicationService;
     @Mock
@@ -114,7 +111,7 @@ public class ApplicationV1FilterTest {
                 new EntitlementsExceptionMappingHandler(
                         ForgerockRestGuiceModule.getEntitlementsErrorHandlers());
         filter = new ApplicationV1Filter(resourceTypeService,
-                applicationServiceFactory, resourceErrorHandler, contextHelper, debug);
+                applicationService, resourceErrorHandler, contextHelper, debug);
         subject = new Subject();
     }
 
@@ -279,9 +276,8 @@ public class ApplicationV1FilterTest {
         given(updateRequest.getContent()).willReturn(jsonValue);
         given(updateRequest.getResourceName()).willReturn("testApplication");
 
-        given(applicationServiceFactory.create(subject, "/abc")).willReturn(applicationService);
         Application application = mock(Application.class);
-        given(applicationService.getApplication("testApplication")).willReturn(application);
+        given(applicationService.getApplication(subject, "/abc", "testApplication")).willReturn(application);
 
         Set<String> resourceTypeUUIDs = new HashSet<String>(CollectionUtils.asSet("abc-def-ghi"));
         given(application.getResourceTypeUuids()).willReturn(resourceTypeUUIDs);
@@ -382,8 +378,7 @@ public class ApplicationV1FilterTest {
         given(updateRequest.getContent()).willReturn(jsonValue);
         given(updateRequest.getResourceName()).willReturn("testApplication");
 
-        given(applicationServiceFactory.create(subject, "/abc")).willReturn(applicationService);
-        given(applicationService.getApplication("testApplication")).willReturn(null);
+        given(applicationService.getApplication(subject, "/abc", "testApplication")).willReturn(null);
 
         // When
         filter.filterUpdate(context, updateRequest, resourceResultHandler, requestHandler);
@@ -414,9 +409,8 @@ public class ApplicationV1FilterTest {
         given(updateRequest.getContent()).willReturn(jsonValue);
         given(updateRequest.getResourceName()).willReturn("testApplication");
 
-        given(applicationServiceFactory.create(subject, "/abc")).willReturn(applicationService);
         Application application = mock(Application.class);
-        given(applicationService.getApplication("testApplication")).willReturn(application);
+        given(applicationService.getApplication(subject, "/abc", "testApplication")).willReturn(application);
 
         Set<String> resourceTypeUUIDs = new HashSet<String>(CollectionUtils.asSet("abc-def-ghi", "jkl-mno-qrs"));
         given(application.getResourceTypeUuids()).willReturn(resourceTypeUUIDs);

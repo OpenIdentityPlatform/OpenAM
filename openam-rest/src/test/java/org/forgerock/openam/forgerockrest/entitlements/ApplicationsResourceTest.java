@@ -52,9 +52,9 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.SortKey;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.forgerockrest.entitlements.query.AttributeType;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
-import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
@@ -94,7 +94,7 @@ public class ApplicationsResourceTest {
     private ApplicationsResource applicationsResource;
 
     private Debug debug;
-    private ApplicationManagerWrapper applicationManagerWrapper;
+    private ApplicationService applicationServiceWrapper;
     private ApplicationTypeManagerWrapper applicationTypeManagerWrapper;
     private ResultHandler<Resource> mockResultHandler;
     private ApplicationWrapper applicationWrapper;
@@ -106,7 +106,7 @@ public class ApplicationsResourceTest {
     public void setUp() {
 
         debug = mock(Debug.class);
-        applicationManagerWrapper = mock(ApplicationManagerWrapper.class);
+        applicationServiceWrapper = mock(ApplicationService.class);
         applicationTypeManagerWrapper = mock(ApplicationTypeManagerWrapper.class);
         applicationWrapper = mock(ApplicationWrapper.class);
 
@@ -116,7 +116,7 @@ public class ApplicationsResourceTest {
         queryAttributes.put(DATE_ATTRIBUTE, new QueryAttribute(AttributeType.TIMESTAMP, DATE_ATTRIBUTE));
 
         applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
+                debug, applicationServiceWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
@@ -164,7 +164,7 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
 
         applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
+                debug, applicationServiceWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
@@ -195,7 +195,7 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
 
         applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
+                debug, applicationServiceWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
@@ -256,7 +256,7 @@ public class ApplicationsResourceTest {
 
         given(subjectContext.getCallerSubject()).willReturn(subject);
         given(request.getContent()).willReturn(content);
-        given(applicationManagerWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(application);
+        given(applicationServiceWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(application);
         given(applicationWrapper.getName()).willReturn("APP_NAME");
         given(applicationWrapper.getApplication()).willReturn(newApplication);
         given(newApplication.getRealm()).willReturn("NOT REALM");
@@ -288,7 +288,7 @@ public class ApplicationsResourceTest {
         given(mockApplication.getRealm()).willReturn("/");
         given(mockApplication.getName()).willReturn("newApplication");
         doThrow(new EntitlementException(1)).when
-                (applicationManagerWrapper).saveApplication(any(Subject.class), any(Application.class));
+                (applicationServiceWrapper).saveApplication(any(Subject.class), eq("/"), any(Application.class));
 
         //when
         applicationsResource.createInstance(realmContext, mockCreateRequest, mockResultHandler);
@@ -333,7 +333,7 @@ public class ApplicationsResourceTest {
         Application mockApplication = mock(Application.class);
 
         applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
+                debug, applicationServiceWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
@@ -373,7 +373,7 @@ public class ApplicationsResourceTest {
         Application mockApplication = mock(Application.class);
 
         applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
+                debug, applicationServiceWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
@@ -434,13 +434,13 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
 
         Application mockApplication = mock(Application.class);
-        given(applicationManagerWrapper.getApplication(any(Subject.class), anyString(), anyString())).willReturn(mockApplication);
+        given(applicationServiceWrapper.getApplication(any(Subject.class), anyString(), anyString())).willReturn(mockApplication);
 
         // When
         applicationsResource.readInstance(serverContext, resourceID, null, mockResultHandler);
 
         // Then
-        verify(applicationManagerWrapper).getApplication(any(Subject.class), anyString(), eq(resourceID));
+        verify(applicationServiceWrapper).getApplication(any(Subject.class), anyString(), eq(resourceID));
     }
 
     @Test
@@ -458,13 +458,13 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
 
         Application mockApplication = mock(Application.class);
-        given(applicationManagerWrapper.getApplication(any(Subject.class), anyString(), anyString())).willReturn(mockApplication);
+        given(applicationServiceWrapper.getApplication(any(Subject.class), anyString(), anyString())).willReturn(mockApplication);
 
         // When
         applicationsResource.readInstance(serverContext, resourceID, null, mockResultHandler);
 
         // Then
-        verify(applicationManagerWrapper).getApplication(any(Subject.class), eq(realmID), anyString());
+        verify(applicationServiceWrapper).getApplication(any(Subject.class), eq(realmID), anyString());
     }
 
     @Test
@@ -481,13 +481,13 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
 
         Application mockApplication = mock(Application.class);
-        given(applicationManagerWrapper.getApplication(any(Subject.class), anyString(), anyString())).willReturn(mockApplication);
+        given(applicationServiceWrapper.getApplication(any(Subject.class), anyString(), anyString())).willReturn(mockApplication);
 
         // When
         applicationsResource.readInstance(serverContext, resourceID, null, mockResultHandler);
 
         // Then
-        verify(applicationManagerWrapper).getApplication(eq(subject), anyString(), anyString());
+        verify(applicationServiceWrapper).getApplication(eq(subject), anyString(), anyString());
     }
 
     @Test
@@ -509,7 +509,7 @@ public class ApplicationsResourceTest {
         applicationsResource.deleteInstance(context, resourceId, request, handler);
 
         //Then
-        verify(applicationManagerWrapper, never()).deleteApplication(subject, "REALM", resourceId);
+        verify(applicationServiceWrapper, never()).deleteApplication(subject, "REALM", resourceId);
         ArgumentCaptor<ResourceException> resourceExceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler).handleError(resourceExceptionCaptor.capture());
         ResourceException exception = resourceExceptionCaptor.getValue();
@@ -532,14 +532,14 @@ public class ApplicationsResourceTest {
         Application mockApplication = mock(Application.class);
 
         given(subjectContext.getCallerSubject()).willReturn(subject);
-        given(applicationManagerWrapper
+        given(applicationServiceWrapper
                 .getApplication(any(Subject.class), anyString(), anyString())).willReturn(mockApplication);
 
         //When
         applicationsResource.deleteInstance(context, resourceId, request, handler);
 
         //Then
-        verify(applicationManagerWrapper).deleteApplication(subject, "/REALM", resourceId);
+        verify(applicationServiceWrapper).deleteApplication(subject, "/REALM", resourceId);
         ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
         verify(handler).handleResult(resourceCaptor.capture());
         Resource resource = resourceCaptor.getValue();
@@ -565,7 +565,7 @@ public class ApplicationsResourceTest {
         applicationsResource.deleteInstance(context, resourceId, request, handler);
 
         //Then
-        verify(applicationManagerWrapper, never()).deleteApplication(subject, "REALM", resourceId);
+        verify(applicationServiceWrapper, never()).deleteApplication(subject, "REALM", resourceId);
         ArgumentCaptor<ResourceException> resourceExceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler).handleError(resourceExceptionCaptor.capture());
         ResourceException exception = resourceExceptionCaptor.getValue();
@@ -587,14 +587,14 @@ public class ApplicationsResourceTest {
         Subject subject = new Subject();
 
         given(subjectContext.getCallerSubject()).willReturn(subject);
-        doThrow(EntitlementException.class).when(applicationManagerWrapper)
+        doThrow(EntitlementException.class).when(applicationServiceWrapper)
                 .deleteApplication(subject, "REALM", resourceId);
 
         //When
         applicationsResource.deleteInstance(context, resourceId, request, handler);
 
         //Then
-        verify(applicationManagerWrapper, never()).deleteApplication(subject, "REALM", resourceId);
+        verify(applicationServiceWrapper, never()).deleteApplication(subject, "REALM", resourceId);
         ArgumentCaptor<ResourceException> resourceExceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler).handleError(resourceExceptionCaptor.capture());
         ResourceException exception = resourceExceptionCaptor.getValue();
@@ -621,7 +621,7 @@ public class ApplicationsResourceTest {
 
         given(subjectContext.getCallerSubject()).willReturn(subject);
         given(request.getContent()).willReturn(content);
-        given(applicationManagerWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(application);
+        given(applicationServiceWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(application);
         given(applicationWrapper.getName()).willReturn("APP_NAME");
         given(applicationWrapper.getApplication()).willReturn(newApplication);
         given(newApplication.getLastModifiedDate()).willReturn(1000L);
@@ -632,8 +632,8 @@ public class ApplicationsResourceTest {
         applicationsResource.updateInstance(context, resourceId, request, handler);
 
         //Then
-        verify(applicationManagerWrapper)
-                .updateApplication(application, applicationWrapper.getApplication(), subject);
+        verify(applicationServiceWrapper)
+                .updateApplication(application, applicationWrapper.getApplication(), subject, "/REALM");
         ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
         verify(handler).handleResult(resourceCaptor.capture());
         Resource resource = resourceCaptor.getValue();
@@ -661,9 +661,9 @@ public class ApplicationsResourceTest {
 
         given(subjectContext.getCallerSubject()).willReturn(subject);
         given(request.getContent()).willReturn(content);
-        given(applicationManagerWrapper.getApplication(subject, "/REALM", resourceId))
+        given(applicationServiceWrapper.getApplication(subject, "/REALM", resourceId))
                 .willReturn(application);
-        given(applicationManagerWrapper.getApplication(subject, "/REALM", "APP_NAME"))
+        given(applicationServiceWrapper.getApplication(subject, "/REALM", "APP_NAME"))
                 .willReturn(application);
         given(applicationWrapper.getName()).willReturn("APP_NAME");
         given(applicationWrapper.getApplication()).willReturn(newApplication);
@@ -700,7 +700,7 @@ public class ApplicationsResourceTest {
 
         given(subjectContext.getCallerSubject()).willReturn(subject);
         given(request.getContent()).willReturn(content);
-        given(applicationManagerWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(application);
+        given(applicationServiceWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(application);
         given(applicationWrapper.getName()).willReturn("APP_NAME");
         given(applicationWrapper.getApplication()).willReturn(newApplication);
         given(newApplication.getRealm()).willReturn("/REALM");
@@ -711,8 +711,8 @@ public class ApplicationsResourceTest {
         applicationsResource.updateInstance(context, resourceId, request, handler);
 
         //Then
-        verify(applicationManagerWrapper)
-                .updateApplication(application, applicationWrapper.getApplication(), subject);
+        verify(applicationServiceWrapper)
+                .updateApplication(application, applicationWrapper.getApplication(), subject, "/REALM");
         ArgumentCaptor<ResourceException> resourceExceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler).handleError(resourceExceptionCaptor.capture());
         ResourceException exception = resourceExceptionCaptor.getValue();
@@ -739,9 +739,9 @@ public class ApplicationsResourceTest {
         given(request.getContent()).willReturn(content);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
         given(mockApplication.getRealm()).willReturn("/REALM");
-        given(applicationManagerWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(mockApplication);
-        doThrow(new EntitlementException(326)).when(applicationManagerWrapper)
-                .updateApplication(any(Application.class), any(Application.class), any(Subject.class));
+        given(applicationServiceWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(mockApplication);
+        doThrow(new EntitlementException(326)).when(applicationServiceWrapper)
+                .updateApplication(any(Application.class), any(Application.class), any(Subject.class), eq("/REALM"));
 
         //When
         applicationsResource.updateInstance(context, resourceId, request, handler);
@@ -774,9 +774,9 @@ public class ApplicationsResourceTest {
         given(request.getContent()).willReturn(content);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
         given(mockApplication.getRealm()).willReturn("/REALM");
-        given(applicationManagerWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(mockApplication);
-        doThrow(new EntitlementException(404)).when(applicationManagerWrapper)
-                .updateApplication(any(Application.class), any(Application.class), any(Subject.class));
+        given(applicationServiceWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(mockApplication);
+        doThrow(new EntitlementException(404)).when(applicationServiceWrapper)
+                .updateApplication(any(Application.class), any(Application.class), any(Subject.class), eq("/REALM"));
 
         //When
         applicationsResource.updateInstance(context, resourceId, request, handler);
@@ -806,7 +806,7 @@ public class ApplicationsResourceTest {
 
         given(subjectContext.getCallerSubject()).willReturn(subject);
         given(request.getContent()).willReturn(content);
-        given(applicationManagerWrapper.getApplication(subject, "REALM", resourceId)).willReturn(null);
+        given(applicationServiceWrapper.getApplication(subject, "REALM", resourceId)).willReturn(null);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
         given(mockApplication.getRealm()).willReturn("REALM");
 
@@ -840,7 +840,7 @@ public class ApplicationsResourceTest {
         applicationsResource.updateInstance(context, resourceId, request, handler);
 
         //Then
-        verifyZeroInteractions(applicationManagerWrapper);
+        verifyZeroInteractions(applicationServiceWrapper);
         ArgumentCaptor<ResourceException> resourceExceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler).handleError(resourceExceptionCaptor.capture());
         ResourceException exception = resourceExceptionCaptor.getValue();
@@ -854,7 +854,7 @@ public class ApplicationsResourceTest {
 
         // Override the creation of the application wrapper so to return a mocked version.
         applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
+                debug, applicationServiceWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(
@@ -894,12 +894,12 @@ public class ApplicationsResourceTest {
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
         Set<String> appNames = asSet("app1", "app2", "app3", "app4", "app5", "iPlanetAMWebAgentService");
-        given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(appNames);
+        given(applicationServiceWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(appNames);
 
         for (String appName : appNames) {
             Application app = mock(Application.class);
             given(app.getName()).willReturn(appName);
-            given(applicationManagerWrapper
+            given(applicationServiceWrapper
                     .getApplication(eq(subject), eq("/abc"), eq(appName))).willReturn(app);
         }
 
@@ -907,8 +907,8 @@ public class ApplicationsResourceTest {
         applicationsResource.queryCollection(serverContext, request, handler);
 
         // Then
-        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), any(Set.class));
-        verify(applicationManagerWrapper, times(appNames.size())).getApplication(eq(subject), eq("/abc"), anyString());
+        verify(applicationServiceWrapper).search(eq(subject), eq("/abc"), any(Set.class));
+        verify(applicationServiceWrapper, times(appNames.size())).getApplication(eq(subject), eq("/abc"), anyString());
 
         ArgumentCaptor<Resource> resourceCapture = ArgumentCaptor.forClass(Resource.class);
         verify(handler, times(3)).handleResource(resourceCapture.capture());
@@ -929,7 +929,7 @@ public class ApplicationsResourceTest {
 
         // Override the creation of the application wrapper so to return a mocked version.
         applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
+                debug, applicationServiceWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(
@@ -963,10 +963,10 @@ public class ApplicationsResourceTest {
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
         Set<String> appNames = asSet("iPlanetAMWebAgentService");
-        given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(appNames);
+        given(applicationServiceWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(appNames);
 
         Application app = mock(Application.class);
-        given(applicationManagerWrapper.getApplication(
+        given(applicationServiceWrapper.getApplication(
                 eq(subject), eq("/abc"), eq("iPlanetAMWebAgentService"))).willReturn(app);
         given(app.getName()).willReturn("iPlanetAMWebAgentService");
 
@@ -978,8 +978,8 @@ public class ApplicationsResourceTest {
         applicationsResource.queryCollection(serverContext, request, handler);
 
         // Then...
-        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), any(Set.class));
-        verify(applicationManagerWrapper).getApplication(eq(subject), eq("/abc"), anyString());
+        verify(applicationServiceWrapper).search(eq(subject), eq("/abc"), any(Set.class));
+        verify(applicationServiceWrapper).getApplication(eq(subject), eq("/abc"), anyString());
 
         ArgumentCaptor<Resource> resourceCapture = ArgumentCaptor.forClass(Resource.class);
         verify(handler).handleResource(resourceCapture.capture());
@@ -1008,7 +1008,7 @@ public class ApplicationsResourceTest {
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
         EntitlementException exception = new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR);
-        given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willThrow(exception);
+        given(applicationServiceWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willThrow(exception);
 
         // When
         applicationsResource.queryCollection(serverContext, request, handler);
@@ -1026,7 +1026,7 @@ public class ApplicationsResourceTest {
     public void shouldHandleJsonParsingFailure() throws EntitlementException {
         // Override the creation of the application wrapper so to return a mocked version.
         applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
+                debug, applicationServiceWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(
@@ -1067,12 +1067,12 @@ public class ApplicationsResourceTest {
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
         Set<String> appNames = asOrderedSet("app1", "app2", "app3", "app4", "app5", "iPlanetAMWebAgentService");
-        given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(appNames);
+        given(applicationServiceWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(appNames);
 
         for (String appName : appNames) {
             Application app = mock(Application.class);
             given(app.getName()).willReturn(appName);
-            given(applicationManagerWrapper
+            given(applicationServiceWrapper
                     .getApplication(eq(subject), eq("/abc"), eq(appName))).willReturn(app);
         }
 
@@ -1080,8 +1080,8 @@ public class ApplicationsResourceTest {
         applicationsResource.queryCollection(serverContext, request, handler);
 
         // Then
-        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), any(Set.class));
-        verify(applicationManagerWrapper, times(appNames.size())).getApplication(eq(subject), eq("/abc"), anyString());
+        verify(applicationServiceWrapper).search(eq(subject), eq("/abc"), any(Set.class));
+        verify(applicationServiceWrapper, times(appNames.size())).getApplication(eq(subject), eq("/abc"), anyString());
 
         ArgumentCaptor<ResourceException> exceptionCapture = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler).handleError(exceptionCapture.capture());
@@ -1100,7 +1100,7 @@ public class ApplicationsResourceTest {
         applicationsResource.query(request, subject, "/abc");
 
         // Then
-        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(Collections.<SearchFilter>emptySet()));
+        verify(applicationServiceWrapper).search(eq(subject), eq("/abc"), eq(Collections.<SearchFilter>emptySet()));
     }
 
     @Test
@@ -1110,7 +1110,7 @@ public class ApplicationsResourceTest {
         Subject subject = new Subject();
 
         Set<String> applications = asSet("one", "two", "three");
-        given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(applications);
+        given(applicationServiceWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(applications);
 
         // When
         Set<String> result = applicationsResource.query(request, subject, "/abc");
@@ -1144,7 +1144,7 @@ public class ApplicationsResourceTest {
 
         // Then
         SearchFilter searchFilter = new SearchFilter(STRING_ATTRIBUTE, value);
-        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
+        verify(applicationServiceWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
     }
 
     @DataProvider(name = "SupportedQueryOperators")
@@ -1171,7 +1171,7 @@ public class ApplicationsResourceTest {
 
         // Then
         SearchFilter searchFilter = new SearchFilter(NUMERIC_ATTRIBUTE, value, expectedOperator);
-        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
+        verify(applicationServiceWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
     }
 
     @DataProvider(name = "UnsupportedOperators")
@@ -1222,7 +1222,7 @@ public class ApplicationsResourceTest {
         // Then
         // Date should be converted into a time-stamp long value
         SearchFilter searchFilter = new SearchFilter(DATE_ATTRIBUTE, value.getTime(), expectedOperator);
-        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
+        verify(applicationServiceWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
     }
 
     @Test(expectedExceptions = EntitlementException.class,
@@ -1253,7 +1253,7 @@ public class ApplicationsResourceTest {
         // Then
         SearchFilter searchFilter1 = new SearchFilter(STRING_ATTRIBUTE, value1);
         SearchFilter searchFilter2 = new SearchFilter(STRING_ATTRIBUTE, value2);
-        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter1, searchFilter2)));
+        verify(applicationServiceWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter1, searchFilter2)));
     }
 
     @Test(expectedExceptions = EntitlementException.class,

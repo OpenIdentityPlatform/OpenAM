@@ -48,6 +48,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -88,7 +90,7 @@ public class SubRealmGroupTest {
         // avaliableResources.add(RESOURCE2);
         // appl.addResources(avaliableResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
 
         user1 = IdRepoUtils.createUser("/", USER1_NAME);
         group1 = IdRepoUtils.createGroup("/", GROUP1_NAME);
@@ -162,7 +164,7 @@ public class SubRealmGroupTest {
 
     @AfterClass
     public void cleanup() throws Exception {
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     private void removeOrganization() throws Exception {

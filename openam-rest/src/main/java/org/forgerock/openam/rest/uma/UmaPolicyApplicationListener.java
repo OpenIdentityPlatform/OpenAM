@@ -18,16 +18,6 @@ package org.forgerock.openam.rest.uma;
 
 import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -61,7 +51,7 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
-import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
+import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
@@ -79,6 +69,16 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 import org.forgerock.util.promise.Promises;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Listens for changes to UMA Resource Server (OAuth2 Agent) to create or delete its policy
  * application.
@@ -90,7 +90,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private final Debug logger = Debug.getInstance("UmaProvider");
 
     private final AMIdentityRepositoryFactory idRepoFactory;
-    private final ApplicationManagerWrapper applicationManager;
+    private final ApplicationService applicationService;
     private final ApplicationTypeManagerWrapper applicationTypeManagerWrapper;
     private final PromisedRequestHandler policyResource;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
@@ -99,19 +99,19 @@ public class UmaPolicyApplicationListener implements IdEventListener {
      * Creates an instance of the {@code UmaPolicyApplicationListener}.
      *
      * @param idRepoFactory An instance of the {@code AMIdentityRepositoryFactory}.
-     * @param applicationManager An instance of the {@code ApplicationManagerWrapper}.
+     * @param applicationService An instance of the {@code ApplicationManagerWrapper}.
      * @param applicationTypeManagerWrapper An instance of the {@code ApplicationTypeManagerWrapper}.
      * @param policyResource An instance of the policy backend {@code PromisedRequestHandler}.
      * @param resourceSetStoreFactory An instance of the {@code ResourceSetStoreFactory}.
      */
     @Inject
     public UmaPolicyApplicationListener(final AMIdentityRepositoryFactory idRepoFactory,
-            ApplicationManagerWrapper applicationManager,
+            ApplicationService applicationService,
             ApplicationTypeManagerWrapper applicationTypeManagerWrapper,
             @Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER) PromisedRequestHandler policyResource,
             ResourceSetStoreFactory resourceSetStoreFactory) {
         this.idRepoFactory = idRepoFactory;
-        this.applicationManager = applicationManager;
+        this.applicationService = applicationService;
         this.applicationTypeManagerWrapper = applicationTypeManagerWrapper;
         this.policyResource = policyResource;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
@@ -228,13 +228,13 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private void createApplication(String realm, String resourceServerId) {
         Subject adminSubject = SubjectUtils.createSuperAdminSubject();
         try {
-            Application application = applicationManager.getApplication(adminSubject, realm, resourceServerId);
+            Application application = applicationService.getApplication(adminSubject, realm, resourceServerId);
             if (application == null) {
                 ApplicationType applicationType = applicationTypeManagerWrapper.getApplicationType(adminSubject,
                         UmaConstants.UMA_POLICY_APPLICATION_TYPE);
                 application = new Application(realm, resourceServerId, applicationType);
                 application.setEntitlementCombiner(DenyOverride.class);
-                applicationManager.saveApplication(adminSubject, application);
+                applicationService.saveApplication(adminSubject, realm, application);
             }
         } catch (EntitlementException e) {
             logger.error("Failed to create policy application", e);
@@ -247,8 +247,8 @@ public class UmaPolicyApplicationListener implements IdEventListener {
             deletePolicies(realm, resourceServerId);
             try {
                 Subject adminSubject = SubjectUtils.createSuperAdminSubject();
-                if (applicationManager.getApplication(adminSubject, realm, resourceServerId) != null) {
-                    applicationManager.deleteApplication(adminSubject, realm, resourceServerId);
+                if (applicationService.getApplication(adminSubject, realm, resourceServerId) != null) {
+                    applicationService.deleteApplication(adminSubject, realm, resourceServerId);
                 }
             } catch (EntitlementException e) {
                 logger.error("Failed to remove policy application", e);

@@ -33,6 +33,8 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.AuthUtils;
+import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.testng.annotations.Test;
 import com.sun.identity.entitlement.util.IdRepoUtils;
 import com.sun.identity.idm.AMIdentity;
@@ -96,18 +98,18 @@ public class DelegationPrivilegeIdRepoAccessTest {
 
         createReferral();
         
-        Application appl = ApplicationManager.newApplication(
-            SUB_REALM, APPLICATION_NAME,
-            ApplicationTypeManager.getAppplicationType(
-                PrivilegeManager.superAdminSubject,
-                ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));
+        Application appl = EntitlementUtils.newApplication(
+                SUB_REALM, APPLICATION_NAME,
+                ApplicationTypeManager.getAppplicationType(
+                        PrivilegeManager.superAdminSubject,
+                        ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));
         // Test disabled, unable to make model change.
         // Set<String> resources = new HashSet<String>();
         // resources.add(DELEGATED_RESOURCE);
         // appl.setResources(resources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(
-            SubjectUtils.createSuperAdminSubject(), SUB_REALM, appl);
+        ApplicationServiceHelper.get().saveApplication(
+                SubjectUtils.createSuperAdminSubject(), SUB_REALM, appl);
     }
 
     @AfterTest
@@ -117,9 +119,9 @@ public class DelegationPrivilegeIdRepoAccessTest {
         identities.add(delegatedUser1);
         IdRepoUtils.deleteIdentities(SUB_REALM, identities);
 
-        ApplicationManager.deleteApplication(
-            SubjectUtils.createSuperAdminSubject(), SUB_REALM,
-            APPLICATION_NAME);
+        ApplicationServiceHelper.get().deleteApplication(
+                SubjectUtils.createSuperAdminSubject(), SUB_REALM,
+                APPLICATION_NAME);
 
         ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
             SubjectUtils.createSuperAdminSubject());

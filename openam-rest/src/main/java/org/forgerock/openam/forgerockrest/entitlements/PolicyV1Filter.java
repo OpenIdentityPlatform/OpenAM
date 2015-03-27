@@ -35,7 +35,6 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.service.ApplicationService;
-import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.rest.resource.ContextHelper;
@@ -53,17 +52,17 @@ public class PolicyV1Filter implements Filter {
 
     private static final String RESOURCE_TYPE_UUID = "resourceTypeUuid";
 
-    private final ApplicationServiceFactory applicationServiceFactory;
+    private final ApplicationService applicationService;
     private final ExceptionMappingHandler<EntitlementException, ResourceException> resourceErrorHandler;
     private final ContextHelper contextHelper;
     private final Debug debug;
 
     @Inject
-    public PolicyV1Filter(final ApplicationServiceFactory applicationServiceFactory,
+    public PolicyV1Filter(final ApplicationService applicationService,
                           final ExceptionMappingHandler<EntitlementException, ResourceException> resourceErrorHandler,
                           final ContextHelper contextHelper,
                           @Named("frRest") final Debug debug) {
-        this.applicationServiceFactory = applicationServiceFactory;
+        this.applicationService = applicationService;
         this.resourceErrorHandler = resourceErrorHandler;
         this.contextHelper = contextHelper;
         this.debug = debug;
@@ -119,8 +118,7 @@ public class PolicyV1Filter implements Filter {
         final String realm = contextHelper.getRealm(context);
 
         try {
-            final ApplicationService applicationService = applicationServiceFactory.create(callingSubject, realm);
-            final Application application = applicationService.getApplication(applicationName);
+            final Application application = applicationService.getApplication(callingSubject, realm, applicationName);
 
             if (application == null) {
                 handler.handleError(ResourceException

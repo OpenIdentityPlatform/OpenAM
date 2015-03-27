@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.mockito.Mockito;
 import org.testng.annotations.AfterClass;
@@ -67,6 +69,7 @@ public class TestGroupEvaluator {
     private AMIdentity user1;
     private AMIdentity group1;
     private ResourceTypeService resourceTypeService;
+    private ApplicationService applicationService;
     
 
     @BeforeClass
@@ -76,6 +79,7 @@ public class TestGroupEvaluator {
         }
 
         resourceTypeService = Mockito.mock(ResourceTypeService.class);
+        applicationService = Mockito.mock(ApplicationService.class);
         
         Application appl = new Application("/", APPL_NAME,
             ApplicationTypeManager.getAppplicationType(adminSubject,
@@ -86,9 +90,9 @@ public class TestGroupEvaluator {
         // avaliableResources.add("http://www.testevaluator.com:80/*");
         // appl.addResources(avaliableResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
 
-        PrivilegeManager pm = new PolicyPrivilegeManager(resourceTypeService);
+        PrivilegeManager pm = new PolicyPrivilegeManager(resourceTypeService, applicationService);
         pm.initialize("/", adminSubject);
         Map<String, Boolean> actions = new HashMap<String, Boolean>();
         actions.put("GET", Boolean.TRUE);
@@ -110,7 +114,7 @@ public class TestGroupEvaluator {
         if (!migrated) {
             return;
         }
-        PrivilegeManager pm = new PolicyPrivilegeManager(resourceTypeService);
+        PrivilegeManager pm = new PolicyPrivilegeManager(resourceTypeService, applicationService);
         pm.initialize("/", SubjectUtils.createSubject(adminToken));
         pm.remove(PRIVILEGE1_NAME);
 
@@ -119,7 +123,7 @@ public class TestGroupEvaluator {
         identities.add(group1);
         IdRepoUtils.deleteIdentities("/", identities);
 
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     @Test

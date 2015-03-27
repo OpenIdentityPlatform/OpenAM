@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PrivilegeUtils.java,v 1.4 2010/01/07 00:19:11 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2014 ForgeRock AS
+ *
+ * Portions Copyrighted 2014-2015 ForgeRock AS
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -34,7 +32,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.AndCondition;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
@@ -71,6 +68,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DNMapper;
+import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 
 import java.security.AccessController;
 import java.util.Collections;
@@ -531,8 +529,8 @@ public class PrivilegeUtils {
 
         for (String appName : map.keySet()) {
             Set<String> res = map.get(appName);
-            Application application = ApplicationManager.getApplication(PrivilegeManager.superAdminSubject,
-                                            realmName, appName);
+            Application application = ApplicationServiceHelper.get().getApplication(PrivilegeManager.superAdminSubject,
+                    realmName, appName);
             if (application == null) {
                 Object[] params = {appName, realm};
                 throw new EntitlementException(105, params);
@@ -634,8 +632,8 @@ public class PrivilegeUtils {
 
         String realmName = (DN.isDN(realm)) ? DNMapper.orgNameToRealmName(realm) : realm;
 
-        Application application = ApplicationManager.getApplication(
-            PrivilegeManager.superAdminSubject, realmName, appName);
+        Application application = ApplicationServiceHelper.get().getApplication(
+                PrivilegeManager.superAdminSubject, realmName, appName);
         if (application == null) {
             Object[] params = {appName, realm};
             throw new EntitlementException(105, params);

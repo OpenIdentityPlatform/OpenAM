@@ -31,7 +31,7 @@ package com.sun.identity.entitlement.opensso;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
+import org.forgerock.openam.entitlement.service.ApplicationService;
 import com.sun.identity.entitlement.ApplicationPrivilege;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
@@ -71,6 +71,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
     private PolicyManager pm;
     private static PolicyCache policyCache;
     private static Subject dsameUserSubject;
+    private final ApplicationService applicationService;
 
     static {
         SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
@@ -93,8 +94,9 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
      * Creates instance of <code>PolicyPrivilegeManager</code>
      */
     @Inject
-    public PolicyPrivilegeManager(final ResourceTypeService resourceTypeService) {
+    public PolicyPrivilegeManager(final ResourceTypeService resourceTypeService, final ApplicationService applicationService) {
         super(resourceTypeService);
+        this.applicationService = applicationService;
     }
 
     /**
@@ -397,7 +399,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
 
         if (policyCache != null) {
             // Retrieve the underlying application type to map to the legacy service type model.
-            final Application application = ApplicationManager
+            final Application application = applicationService
                     .getApplication(PrivilegeManager.superAdminSubject, realm, applicationName);
 
             if (application == null) {

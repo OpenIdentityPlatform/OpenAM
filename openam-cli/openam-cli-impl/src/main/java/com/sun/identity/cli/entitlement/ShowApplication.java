@@ -36,15 +36,24 @@ import com.sun.identity.cli.IOutput;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
+import org.forgerock.openam.entitlement.service.ApplicationService;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.log.Level;
+
+import javax.inject.Inject;
 import java.text.MessageFormat;
-import java.util.Map;
 import java.util.Set;
 
 public class ShowApplication extends ApplicationImpl {
+
+    private final ApplicationService applicationService;
+
+    @Inject
+    public ShowApplication(ApplicationService applicationService) {
+        this.applicationService = applicationService;
+    }
+
     /**
      * Services a Commandline Request.
      *
@@ -63,7 +72,7 @@ public class ShowApplication extends ApplicationImpl {
         writeLog(LogWriter.LOG_ACCESS, Level.INFO,
             "ATTEMPT_SHOW_APPLICATION", params);
         try {
-            Application appl = ApplicationManager.getApplication(
+            Application appl = applicationService.getApplication(
                 getAdminSubject(),
                 realm, appName);
             IOutput writer = getOutputWriter();

@@ -42,6 +42,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -105,7 +107,7 @@ public class ReferredResourcesTest {
         // appResources.add("http://www.ReferredResourcesTest.com/*");
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
     }
 
     private void createReferral1(Subject adminSubject)
@@ -150,7 +152,7 @@ public class ReferredResourcesTest {
         mgr = new ReferralPrivilegeManager("/", adminSubject);
         mgr.remove(REFERRAL_NAME1);
 
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
         OrganizationConfigManager ocm = new OrganizationConfigManager(
             adminToken, "/");
         String subRealm = SUB_REALM1.substring(1);
@@ -166,9 +168,9 @@ public class ReferredResourcesTest {
         if (!migrated) {
             return;
         }
-        Set<String> resources = ApplicationManager.getReferredResources(
-            PrivilegeManager.superAdminSubject, SUB_REALM1,
-            ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+        Set<String> resources = ApplicationServiceHelper.get().getReferredResources(
+                PrivilegeManager.superAdminSubject, SUB_REALM1,
+                ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
         if (OpenSSOIndexStore.isOrgAliasMappingResourceEnabled(adminToken)) {
             if (resources.size() != 4) {
                 throw new Exception(

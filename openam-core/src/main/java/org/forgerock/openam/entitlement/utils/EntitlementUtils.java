@@ -19,7 +19,6 @@ import static com.sun.identity.entitlement.opensso.EntitlementService.*;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.DenyOverride;
@@ -28,6 +27,9 @@ import com.sun.identity.entitlement.PrivilegeManager;
 
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.Date;
@@ -115,7 +117,7 @@ public final class EntitlementUtils {
     public static Application createApplication(ApplicationType applicationType, String realm, String name,
             Map<String, Set<String>> data) throws InstantiationException, IllegalAccessException,
         EntitlementException {
-        Application app = ApplicationManager.newApplication(realm, name, applicationType);
+        Application app = newApplication(realm, name, applicationType);
 
         final Set<String> resourceTypeUuids = data.get(CONFIG_RESOURCE_TYPE_UUIDS);
         if (resourceTypeUuids != null) {
@@ -170,6 +172,43 @@ public final class EntitlementUtils {
         }
 
         return app;
+    }
+
+    /**
+     * Creates an application.
+     *
+     * @param realm
+     *         Realm name.
+     * @param name
+     *         Name of application.
+     * @param applicationType
+     *         application type.
+     *
+     * @throws EntitlementException
+     *         if application class is not found.
+     */
+    public static Application newApplication(String realm, String name, ApplicationType applicationType)
+            throws EntitlementException {
+        Class clazz = applicationType.getApplicationClass();
+        Class[] parameterTypes = {String.class, String.class, ApplicationType.class};
+        Constructor constructor;
+        try {
+            constructor = clazz.getConstructor(parameterTypes);
+            Object[] parameters = {realm, name, applicationType};
+            return (Application)constructor.newInstance(parameters);
+        } catch (NoSuchMethodException ex) {
+            throw new EntitlementException(6, ex);
+        } catch (SecurityException ex) {
+            throw new EntitlementException(6, ex);
+        } catch (InstantiationException ex) {
+            throw new EntitlementException(6, ex);
+        } catch (IllegalAccessException ex) {
+            throw new EntitlementException(6, ex);
+        } catch (IllegalArgumentException ex) {
+            throw new EntitlementException(6, ex);
+        } catch (InvocationTargetException ex) {
+            throw new EntitlementException(6, ex);
+        }
     }
 
     /**

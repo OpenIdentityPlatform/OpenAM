@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.mockito.Mockito;
 import org.testng.annotations.AfterClass;
@@ -77,11 +78,13 @@ public class OpenProvisioning {
     private AMIdentity jSmith;
     private AMIdentity johnDoe;
     private ResourceTypeService resourceTypeService;
+    private ApplicationService applicationService;
 
     @BeforeClass
     public void setup()
         throws SSOException, IdRepoException, EntitlementException {
         resourceTypeService = Mockito.mock(ResourceTypeService.class);
+        applicationService = Mockito.mock(ApplicationService.class);
         SSOToken adminToken = (SSOToken)AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
         AMIdentityRepository amir = new AMIdentityRepository(
@@ -97,7 +100,7 @@ public class OpenProvisioning {
 
     private void createPolicy(SSOToken adminToken)
         throws EntitlementException {
-        PrivilegeManager pMgr = new PolicyPrivilegeManager(resourceTypeService);
+        PrivilegeManager pMgr = new PolicyPrivilegeManager(resourceTypeService, applicationService);
         pMgr.initialize("/", SubjectUtils.createSubject(adminToken));
         Map<String, Boolean> actionValues = new HashMap<String, Boolean>();
         actionValues.put("CREATE", Boolean.TRUE);
@@ -134,7 +137,7 @@ public class OpenProvisioning {
         identities.add(branchMgr);
         amir.deleteIdentities(identities);
 
-        PrivilegeManager pMgr = new PolicyPrivilegeManager(resourceTypeService);
+        PrivilegeManager pMgr = new PolicyPrivilegeManager(resourceTypeService, applicationService);
         pMgr.initialize("/", SubjectUtils.createSubject(adminToken));
         pMgr.remove(PRIVILEGE_NAME);
     }

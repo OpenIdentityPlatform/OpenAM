@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: CreateApplication.java,v 1.1 2009/08/19 05:40:31 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.cli.entitlement;
@@ -34,16 +36,27 @@ import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
+import org.forgerock.openam.entitlement.service.ApplicationService;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.log.Level;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
+
+import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class CreateApplication extends ApplicationImpl {
+
+    private final ApplicationService applicationService;
+
+    @Inject
+    public CreateApplication(ApplicationService applicationService) {
+        this.applicationService = applicationService;
+    }
+
     /**
      * Services a Commandline Request.
      *
@@ -74,11 +87,11 @@ public class CreateApplication extends ApplicationImpl {
         writeLog(LogWriter.LOG_ACCESS, Level.INFO,
             "ATTEMPT_CREATE_APPLICATION", params);
         try {
-            Application appl = ApplicationManager.newApplication(realm,
-                appName, applicationType);
+            Application appl = EntitlementUtils.newApplication(realm,
+                    appName, applicationType);
             setApplicationAttributes(appl, attributeValues,
                 true);
-            ApplicationManager.saveApplication(getAdminSubject(), realm, appl);
+            applicationService.saveApplication(getAdminSubject(), realm, appl);
             String[] param = {appName};
             getOutputWriter().printlnMessage(
                 MessageFormat.format(getResourceString(

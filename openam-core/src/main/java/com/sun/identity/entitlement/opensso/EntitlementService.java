@@ -32,7 +32,6 @@ package com.sun.identity.entitlement.opensso;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
@@ -56,6 +55,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 
@@ -465,8 +465,8 @@ public class EntitlementService extends EntitlementConfiguration {
                 throw new EntitlementException(225);
             }
 
-            Application appl = ApplicationManager.getApplication(
-                PrivilegeManager.superAdminSubject, realm, applicationName);
+            Application appl = ApplicationServiceHelper.get().getApplication(
+                    PrivilegeManager.superAdminSubject, realm, applicationName);
             if (appl != null) {
                 appl.addAttributeNames(names);
             }
@@ -918,8 +918,8 @@ public class EntitlementService extends EntitlementConfiguration {
      */
     public Set<String> getSubjectAttributeNames(String application) {
         try {
-            Application app = ApplicationManager.getApplication(
-                PrivilegeManager.superAdminSubject, realm, application);
+            Application app = ApplicationServiceHelper.get().getApplication(
+                    PrivilegeManager.superAdminSubject, realm, application);
             if (app != null) {
                 return app.getAttributeNames();
             }
@@ -1195,7 +1195,7 @@ public class EntitlementService extends EntitlementConfiguration {
         Set<Application> appls = getApplications();
         for (Application a : appls) {
             try {
-                ApplicationManager.saveApplication(getAdminSubject(), realm, a);
+                ApplicationServiceHelper.get().saveApplication(getAdminSubject(), realm, a);
             } catch (EntitlementException ex) {
                 //ignore
             }

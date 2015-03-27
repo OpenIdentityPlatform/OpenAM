@@ -47,6 +47,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -107,8 +109,8 @@ public class ApplicationCacheAfterRealmChangeTest {
         if (!migrated) {
             return;
         }
-        Application appl = ApplicationManager.getApplication(adminSubject,
-            SUB_REALM, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+        Application appl = ApplicationServiceHelper.get().getApplication(adminSubject,
+                SUB_REALM, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
 
         // Test disabled, unable to fix model changes
         // Set<String> resources = appl.getResources();
@@ -130,8 +132,8 @@ public class ApplicationCacheAfterRealmChangeTest {
 
         ocm.setAttributes(IdConstants.REPO_SERVICE, attributes);
 
-        appl = ApplicationManager.getApplication(adminSubject,
-            SUB_REALM, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+        appl = ApplicationServiceHelper.get().getApplication(adminSubject,
+                SUB_REALM, ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
 
         // Test disabled, unable to fix model changes.
         // resources = appl.getResources();

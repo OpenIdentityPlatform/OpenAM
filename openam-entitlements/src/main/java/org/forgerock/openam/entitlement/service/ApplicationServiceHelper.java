@@ -15,25 +15,26 @@
  */
 package org.forgerock.openam.entitlement.service;
 
-import javax.security.auth.Subject;
+import org.forgerock.guice.core.InjectorHolder;
 
 /**
- * Factory to construct application service instances.
+ * Helps to get hold of an application service instance where DI is not possible.
  *
  * @since 13.0.0
  */
-public interface ApplicationServiceFactory {
+public final class ApplicationServiceHelper {
+
+    private ApplicationServiceHelper() {
+        throw new UnsupportedOperationException();
+    }
 
     /**
-     * Creates a new application service instance based on the calling subject for the passed realm.
+     * Retrieves an instance of the application service.
      *
-     * @param subject
-     *         the calling subject
-     * @param realm
-     *         the realm
-     *
-     * @return an application service instance
+     * @return an application service
      */
-    ApplicationService create(Subject subject, String realm);
+    public static ApplicationService get() {
+        return InjectorHolder.getInstance(ApplicationService.class);
+    }
 
 }

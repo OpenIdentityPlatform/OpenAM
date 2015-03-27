@@ -43,6 +43,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
+import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -105,7 +106,7 @@ public class CanBeDeletedAppTest {
         // appResources.add("http://www.CanBeDeletedAppTest.com/*");
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationManager.saveApplication(adminSubject, "/", appl);
+        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
     }
 
     private void createReferral()
@@ -163,7 +164,7 @@ public class CanBeDeletedAppTest {
         // at this point, we have privilege, referral privilege and application
         // privilege, so application cannot be deleted.
         try {
-            ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+            ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
         } catch (EntitlementException e) {
             if (e.getErrorCode() != 404) {
                 throw e;
@@ -177,7 +178,7 @@ public class CanBeDeletedAppTest {
         // at this point, we have referral privilege and application
         // privilege, so application cannot be deleted.
         try {
-            ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+            ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
         } catch (EntitlementException e) {
             if (e.getErrorCode() != 404) {
                 throw e;
@@ -191,7 +192,7 @@ public class CanBeDeletedAppTest {
         // at this point, we still have application privilege, so application
         // still cannot be deleted.
         try {
-            ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+            ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
         } catch (EntitlementException e) {
             if (e.getErrorCode() != 404) {
                 throw e;
@@ -203,6 +204,6 @@ public class CanBeDeletedAppTest {
         apm.removePrivilege(DELEGATE_PRIVILEGE_NAME);
 
         // can delete now
-        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
     }
 }

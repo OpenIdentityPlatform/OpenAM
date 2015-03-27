@@ -16,11 +16,6 @@
 
 package org.forgerock.openam.rest.uma;
 
-import javax.inject.Inject;
-import javax.security.auth.Subject;
-
-import java.util.Collections;
-
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
@@ -28,9 +23,13 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
-import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.uma.UmaConstants;
+
+import javax.inject.Inject;
+import javax.security.auth.Subject;
+import java.util.Collections;
 
 /**
  * Listener implementation for creating a ResourceType for each Resource Set registration.
@@ -41,19 +40,19 @@ public class UmaResourceSetRegistrationListener implements ResourceSetRegistrati
 
     private final Debug logger = Debug.getInstance("UmaProvider");
     private final ResourceTypeService resourceTypeService;
-    private final ApplicationManagerWrapper applicationManager;
+    private final ApplicationService applicationService;
 
     /**
      * Creates a new UmaResourceSetRegistrationListener instance.
      *
      * @param resourceTypeService An instance of the {@code ResourceTypeService}.
-     * @param applicationManager An instance of the {@code ApplicationManagerWrapper}.
+     * @param applicationService An instance of the {@code ApplicationManagerWrapper}.
      */
     @Inject
     public UmaResourceSetRegistrationListener(ResourceTypeService resourceTypeService,
-            ApplicationManagerWrapper applicationManager) {
+            ApplicationService applicationService) {
         this.resourceTypeService = resourceTypeService;
-        this.applicationManager = applicationManager;
+        this.applicationService = applicationService;
     }
 
     /**
@@ -76,10 +75,10 @@ public class UmaResourceSetRegistrationListener implements ResourceSetRegistrati
             }
         }
         try {
-            Application application = applicationManager.getApplication(adminSubject, realm,
+            Application application = applicationService.getApplication(adminSubject, realm,
                     resourceSet.getClientId().toLowerCase());
             application.addAllResourceTypeUuids(Collections.singleton(resourceType.getUUID()));
-            applicationManager.saveApplication(adminSubject, application);
+            applicationService.saveApplication(adminSubject, realm, application);
         } catch (EntitlementException e) {
             if (logger.errorEnabled()) {
                 logger.error("Failed to add Resource Type, " + resourceType.getUUID() + " to application, "

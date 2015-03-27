@@ -16,11 +16,7 @@
 package org.forgerock.openam.entitlement.guice;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.entitlement.service.ApplicationService;
-import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
-import org.forgerock.openam.entitlement.service.ApplicationServiceImpl;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.service.ResourceTypeServiceImpl;
 
@@ -36,10 +32,6 @@ public class EntitlementGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ResourceTypeService.class).to(ResourceTypeServiceImpl.class);
-
-        install(new FactoryModuleBuilder()
-                .implement(ApplicationService.class, ApplicationServiceImpl.class)
-                .build(ApplicationServiceFactory.class));
     }
 
 }
