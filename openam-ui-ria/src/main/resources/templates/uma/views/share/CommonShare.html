@@ -1,4 +1,4 @@
-<div class="policy-header">
+ <div class="page-header">
     {{#if icon}}
         <img title="{{ name }}" src="{{ icon }}" class="float-left border-circle-32"/>
     {{/if}}
@@ -7,17 +7,17 @@
 
 <div id="uma">
 
-    <div class="policy-content clearfix" >
+    <div class="clearfix" >
 
-        <div id="advancedView"></div>
+        <div id="advancedView" class="form-group"></div>
 
         {{#if notFound}}
         <div class="striped-list" id="resourceList">
             <ul><li class="highlight-warning">{{t 'uma.share.notSpecifiedResource'}}</li></ul>
         </div>
         {{else}}
-        <div id="selectUser" class="float-left">
-            <label>{{t 'uma.share.people'}}</label>
+        <div id="selectUser" class="form-group">
+            <span class="help-block">{{t 'uma.share.people'}}</span>
             <select placeholder="{{t 'common.form.startTypingToSearch'}}">
                 <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
                 {{#each permissions}}
@@ -25,8 +25,8 @@
                 {{/each}}
             </select>
         </div>
-        <div id="selectPermission" class="float-left">
-            <label>{{t 'uma.share.permission'}}</label>
+        <div id="selectPermission" class="form-group">
+            <span class="help-block">{{t 'uma.share.permission'}}</span>
             <select multiple class="selectize">
                 <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
                 {{#each scopes}}
@@ -39,18 +39,20 @@
             <label>Authentication method</label>
         </div>-->
 
-        <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class="button float-left" disabled/>
+        <div class="form-group">
+            <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class=" btn btn-primary" disabled/>
+        </div>
         {{/if}}
     </div>
 
-    <div id="footerShare" class="clearfix">
+    <div id="footerShare" class="form-group clearfix">
         {{#if dialog}}
-        <div id="footerActions" class="float-right">
-            <a class="button" href="#" id="done" >{{t 'common.form.done'}}</a>
+        <div id="footerActions" class="form-group">
+            <a class="btn btn-primary" href="#uma/resources/" id="done" >{{t 'common.form.done'}}</a>
         </div>
         {{/if}}
 
-        <div id="footerNav" class="float-left">
+        <div id="footerNav" class="form-group">
             <a href="#" id="toggleAdvanced" ><span class="icon-cog"></span>{{t 'uma.share.advanced'}}</a>
             <div id="shareCounter"></div>
         </div>

@@ -33,30 +33,46 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
-    "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources",
     "backgrid",
+    "bootstrap-dialog",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(MessageManager, AbstractView, Configuration, EventManager, Router, Constants, UMADelegate, BackgridUtils, DialogRevokeAllResources, Backgrid, RealmHelper) {
+], function(MessageManager, AbstractView, Configuration, EventManager, Router, Constants, UMADelegate, BackgridUtils, Backgrid, BootstrapDialog, RealmHelper) {
 
     var ListResource = AbstractView.extend({
         template: "templates/uma/views/resource/ListResource.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
 
         events: {
-            'click a#revokeAll:not(.disabled)': 'onRevokeAll'
+            'click button#revokeAll:not(.disabled)': 'onRevokeAll'
         },
         onRevokeAll: function() {
-
-            var confirmCallBack = function(){
-                UMADelegate.revokeAllResources().done(function(){
+            BootstrapDialog.show({
+                type: BootstrapDialog.TYPE_DANGER,
+                title: $.t("uma.resources.show.revokeAll"),
+                message: $.t("uma.resources.show.revokeAllResourcesMessage"),
+                closable: false,
+                buttons: [{
+                    id: "btn-ok",
+                    label: $.t("common.form.ok"),
+                    cssClass: "btn-primary btn-danger",
+                    action: function(dialog) {
+                        dialog.enableButtons(false);
+                        dialog.getButton("btn-ok").text($.t("common.form.working"));
+                        UMADelegate.revokeAllResources().done(function() {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllResourcesSuccess");
-                    }).fail(function(error){
+                        }).fail(function(error) {
                         MessageManager.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
+                        }).always(function() {
+                            dialog.close();
                     });
-                };
-
-            DialogRevokeAllResources.render(confirmCallBack);
-
+                    }
+                }, {
+                    label: $.t("common.form.cancel"),
+                    action: function(dialog) {
+                        dialog.close();
+                    }
+                }]
+            });
         },
 
         render: function(args, callback) {
@@ -83,11 +99,8 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
 
                 parseState: BackgridUtils.parseState,
                 parseRecords: function(data, options){
-                    if(data.result.length === 0){
-                        self.$el.find("a#revokeAll").addClass("disabled");
-                    } else {
-                        self.$el.find("a#revokeAll").removeClass("disabled");
-                    }
+                    self.$el.find("button#revokeAll").attr("disabled", data.result.length === 0);
+
                     return data.result;
                 },
                 sync: BackgridUtils.sync
@@ -159,6 +172,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
             });
 
             self.parentRender(function() {
+                self.$el.find('[data-toggle="tooltip"]').tooltip();
                 self.$el.find("#backgridContainer").append( grid.render().el );
                 self.$el.find("#paginationContainer").append( paginator.render().el );
                 self.data.resourceSetCollection.fetch({reset: true, processData: false});

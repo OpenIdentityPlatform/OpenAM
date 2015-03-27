@@ -22,19 +22,23 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, _ */
-
+/*global _, $, define*/
 define("org/forgerock/openam/ui/uma/views/application/ListApplication", [
     "org/forgerock/commons/ui/common/main/AbstractView"
 ], function(AbstractView) {
-
     var ListApplication = AbstractView.extend({
         template: "templates/uma/views/application/ListApplication.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
-        events: { },
+        events: {},
         render: function(args, callback) {
-            this.parentRender(function(){
-                if(callback){callback();}
+            var self = this;
+
+            this.parentRender(function() {
+                self.$el.find('[data-toggle="tooltip"]').tooltip();
+
+                if(callback) {
+                    callback();
+                }
             });
         }
 

@@ -21,8 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-
-/*global define, $, form2js, _, js2form, Handlebars, window */
+/*global define, $, form2js, _, js2form, Handlebars, window*/
 
 define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -34,17 +33,16 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function(AbstractView, validatorsManager, userDelegate, conf, cookieHelper, eventManager, constants, uiUtils) {
-
     var ForgottenPasswordView = AbstractView.extend({
         template: "templates/openam/ForgotPasswordTemplate.html",
-        baseTemplate: "templates/common/MediumBaseTemplate.html",
+        baseTemplate: "templates/common/LoginBaseTemplate.html",
         data: {},
         events: {
             "click #continue": "continueProcess",
             "click #changePasswordButton" : "changePassword",
             "onValidate": "onValidate",
             "customValidate": "customValidate",
-            "click .cancelButton": "cancel"
+            "click #cancel": "cancel"
         },
         errorsHandlers: {
             "Bad Request":              { status: "400" },
@@ -56,9 +54,8 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
         render: function(args, callback) {
             this.data.urlParams = uiUtils.convertCurrentUrlToJSON().params;
             this.data.isStageOne = true;
-            if(!_.isEmpty(this.data.urlParams)) {
-                this.data.isStageOne = false;
-            }
+            this.data.isStageOne = _.isEmpty(this.data.urlParams);
+
             this.parentRender(function() {
                validatorsManager.bindValidators(this.$el);
             });
@@ -66,47 +63,48 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
         continueProcess: function(e) {
             e.preventDefault();
             $('#username').prop('readonly', true);
-            var _this = this,
+            var self = this,
             postData = {
                     username: $('#username').val(),
                     subject: $.t("templates.user.ForgottenPasswordTemplate.emailSubject"),
                     message: $.t("templates.user.ForgottenPasswordTemplate.emailMessage")
             },
             success = function() {
-                _this.$el.find("#step1").slideUp();
-                _this.$el.find("#emailSent").slideDown();
+                self.$el.find("#step1").slideUp();
+                self.$el.find("#emailSent").slideDown();
             },
             error = function(e) {
-                _this.$el.find("input[type=submit]").prop('disabled', true);
-                $('#username').prop('readonly', false);
-                _this.displayError(e);
+                self.$el.find("input[type=submit]").prop('disabled', true);
+                self.$el.find('#username').prop('readonly', false).parent().addClass('has-error');
+
+                self.displayError(e);
             };
 
             this.$el.find("input[type=submit]").prop('disabled', true);
-            userDelegate.doAction("forgotPassword",postData,success,error,_this.errorsHandlers);
+
+            userDelegate.doAction("forgotPassword",postData,success,error,self.errorsHandlers);
         },
         changePassword: function(e) {
-
             e.preventDefault();
-            $('#password').prop('readonly', true);
-            $('#passwordConfirm').prop('readonly', true);
+            this.$el.find('#password').prop('readonly', true);
+            this.$el.find('#passwordConfirm').prop('readonly', true);
             this.$el.find("input[type=submit]").prop('disabled', true);
 
-            var _this = this,
+            var self = this,
             postData = {
                 userpassword: $('#password').val()
             },
             success = function() {
-                $("#step2").slideUp();
-                $("#passwordChangeSuccess").fadeIn();
+                self.$el.find("#step2").slideUp();
+                self.$el.find("#passwordChangeSuccess").fadeIn();
             },
             error = function(e) {
-                $('#password').prop('readonly', false);
-                $('#passwordConfirm').prop('readonly', false);
-                _this.displayError(e);
+                self.$el.find('#password').prop('readonly', false);
+                self.$el.find('#passwordConfirm').prop('readonly', false);
+                self.displayError(e);
             };
             _.extend(postData,this.data.urlParams);
-            userDelegate.doAction("forgotPasswordReset",postData,success,error,_this.errorsHandlers);
+            userDelegate.doAction("forgotPasswordReset",postData,success,error,self.errorsHandlers);
         },
         cancel: function(e) {
             e.preventDefault();
@@ -115,10 +113,10 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "/" + conf.globalData.auth.subRealm);
         },
         customValidate: function () {
+            this.$el.find('#username').parent().removeClass('has-error');
             if(validatorsManager.formValidated(this.$el.find("#passwordChange")) || validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {
                 this.$el.find("input[type=submit]").prop('disabled', false);
-            }
-            else {
+            } else {
                 this.$el.find("input[type=submit]").prop('disabled', true);
             }
         },

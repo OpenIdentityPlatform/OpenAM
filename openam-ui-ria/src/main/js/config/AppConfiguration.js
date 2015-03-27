@@ -48,8 +48,7 @@ define("config/AppConfiguration", [
                         RegisterView : "org/forgerock/openam/ui/user/profile/RegisterView",
                         ChangeSecurityDataDialog : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
                         ConfirmPasswordDialog : "org/forgerock/commons/ui/user/profile/ConfirmPasswordDialog",
-                        DialogShare : "org/forgerock/openam/ui/uma/views/share/DialogShare",
-                        DialogRevokeAllResources : "org/forgerock/openam/ui/uma/views/resource/DialogRevokeAllResources"
+                        DialogShare : "org/forgerock/openam/ui/uma/views/share/DialogShare"
                     }
                 },
                 {
@@ -134,18 +133,33 @@ define("config/AppConfiguration", [
                 {
                     moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
                     configuration: {
+                        userBar: [
+                            {
+                                "id": "profileLink",
+                                "href": "#profile/",
+                                "i18nKey": "common.user.profile"
+                            }, {
+                                "id": "changePasswordLink",
+                                "href": "#profile/change_security_data/",
+                                "i18nKey": "common.user.changePassword"
+                            }, {
+                                "id": "logoutLink",
+                                "href": "#logout/",
+                                "i18nKey": "common.form.logout"
+                            }
+                        ],
                         links: {
                             "user" : {
                                 "urls": {
                                     "dashboard": {
                                         "url": "#dashboard/",
                                         "name": "config.AppConfiguration.Navigation.links.dashboard",
-                                        "icon": "glyph-icon-th-list",
+                                        "icon": "fa fa-dashboard",
                                         "inactive": false
                                     },
                                     "uma": {
                                         "url": "#uma/resources/",
-                                        "icon": "glyph-icon-user",
+                                        "icon": "fa fa-user",
                                         "name": "config.AppConfiguration.Navigation.links.uma",
                                         "urls": {
                                             "listResource": {

@@ -1,97 +1,123 @@
-<div class="container-shadow">
+<div class="container">
+
+    <div class="page-header">
+        <h1 class="text-center">{{t "templates.user.UserRegistrationTemplate.registerYourAccount"}}</h1>
+    </div>
+
     {{#if isStageOne}}
-        <form id="forgotPassword" action="" class="form" method="post" onsubmit="return false">
-            <h1>{{t "templates.user.UserRegistrationTemplate.registerYourAccount"}}</h1>
-            <div id="step1">
-                <fieldset>
+    <form id="stageOne" class="form-horizontal">
 
-                    <div class="group-field-row group-field-short">
-                        <label class="light" for="email" >{{t "common.user.emailAddress"}}</label>
-                        <input type="email" id="email" name="email" value="" required autofocus data-validator="required"  data-validator-event="keyup change"/>
-                        <span class="error">x</span>
-                    </div>        
-                     
-                    <div class="group-actions-block float-right">
-                        <input type="submit" id="continue" value="{{t 'common.form.submit'}}" disabled="true" class="button" />
-                        <input type="button" value="{{t "common.form.cancel"}}" class="button cancelButton"/>
-                    </div>
-                            
-                </fieldset>
+        <div id="step1">
+
+            <div class="form-group has-feedback">
+                <label class="col-sm-3 control-label" for="mail">{{t "common.user.emailAddress"}}</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="email" id="mail" name="mail" value="" autofocus data-validator="required" required data-validator-event="keyup change"/>
+                    <div class="validation-message"></div>
+                    <span class="error form-control-feedback"><i class='fa validation-icon'></i></span>
+                </div>
             </div>
-            <div id="emailSent" style="display:none">
+
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <input class="btn btn-primary" type="submit" name="submit" id="continue" value="{{t "common.form.submit"}}" disabled="true" />
+                    <input class="btn btn-default" type="button" name="cancel" id="cancel" value="{{t "common.form.cancel"}}" />
+                </div>
+            </div>
+
+        </div>
+
+        <div id="step2" style="display:none" class="col-sm-offset-2 col-sm-8">
+            <span class="help-block">
                 <p>{{t "templates.user.UserRegistrationTemplate.emailSent"}}</p>
-            </div>
-        </form>
+                <a title='{{t "templates.user.RestLogoutTemplate.returnToLogin"}}' href="#login/" id="gotoLogin">{{t "templates.user.RestLogoutTemplate.returnToLogin"}}</a>
+            </span>
+        </div>
+
+    </form>
+
     {{else}}
-        <form id="registration" action="" class="form" method="post" onsubmit="return false" autocomplete="off">
-            <h1>{{t "templates.user.UserRegistrationTemplate.registerYourAccount"}}</h1>
-         
-            <fieldset id="step2">
+    <form id="stageTwo" class="form-horizontal" onsubmit="return false" autocomplete="off">
 
-                {{#if urlParams.email}}
-                <div class="group-field-row">
-                    <label for="email">{{t "common.user.emailAddress"}}</label>
-                    <input type="email" id="email" name="email" value="{{urlParams.email}}" readonly />
-                    <span class="ok">✔</span>
+        <fieldset id="step3">
+
+            {{#if urlParams.email}}
+            <div class="form-group">
+                <label class="col-sm-3 control-label" for="mail">{{t "common.user.emailAddress"}}</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="email" id="mail" name="mail" value="{{urlParams.email}}" readonly />
                 </div>
-                {{/if}}
+            </div>
+            {{/if}}
 
-                <div class="group-field-row">
-                    <label for="username">{{t "common.user.username"}}</label>
-                    <input type="text" id="username" name="username" value="" autofocus data-validator="required" required data-validator-event="keyup change"/>
-                    <span class="error">x</span>
+            <div class="form-group has-feedback">
+                <label class="col-sm-3 control-label" for="username">{{t "common.user.username"}}</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="text" id="username" name="username" value="" autofocus data-validator="required" required data-validator-event="keyup change"/>
+                    <div class="validation-message"></div>
+                    <span class="error form-control-feedback"><i class='fa validation-icon'></i></span>
                 </div>
-                
-                <div class="group-field-row">
-                    <label for="givenName">{{t "common.user.givenName"}}</label>
-                    <input type="text" id="givenName" name="givenName" value="" />
-                </div>
-                
-                <div class="group-field-row">
-                    <label for="sn">{{t "common.user.familyName"}}</label>
-                    <input type="text" id="sn" name="sn" value=""  data-validator="required" required data-validator-event="keyup change"/>
-                    <span class="error">x</span>
-                </div>
-
-                <div class="group-field-row">
-                    <label for="telephoneNumber">{{t "common.user.phoneNumber"}}</label>
-                    <input type="tel" id="telephoneNumber" name="telephoneNumber" value="" />
-                </div>
-
-                <div class="group-field-row">
-                    <label for="password">{{t "common.user.password"}}</label>
-                    <div class="group-input-span">
-                        <input type="password" id="password" name="password" value="" data-validator="minLength" required data-validation-dependents="passwordConfirm" minLength="8" pattern=".{8,}" data-validator-event="keyup change" data-validation-status="error" />
-                        <div class="field-rule">
-                            <span class="error">x</span> 
-                            <span data-for-validator="minLength">{{t "common.form.validation.atLeast8Characters"}}</span>
-                        </div>
-                    </div>
-                </div> 
-                
-                <div class="group-field-row">
-                    <label for="passwordConfirm">{{t "common.user.confirmPassword"}}</label>
-                    <div class="group-input-span">
-                        <input type="password" id="passwordConfirm" name="passwordConfirm" value="" data-validator="passwordConfirm" data-validator-event="keyup change" required />
-                        <div class="field-rule">
-                        <span class="error">x</span> 
-                        <span data-for-validator="passwordConfirm">{{t "common.form.validation.confirmationMatchesPassword"}}</span>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="group-actions-block float-right">
-                    <input type="submit" id="registerButton" value="{{t "common.form.submit"}}" class="button" disabled="true" />
-                    <input type="button" id="cancel" value="{{t "common.form.cancel"}}" class="button cancelButton"/>
-                </div>    
-                   
-            </fieldset>
-
-            <div id="registerSuccess" style="display:none">
-                <p>{{t "config.messages.UserMessages.afterRegistration"}} <a href="#" class="cancelButton">{{t "templates.user.ForgottenPasswordTemplate.proceedToLogin"}}</a></p>
             </div>
 
-        </form>
+            <div class="form-group">
+                <label class="col-sm-3 control-label" for="givenName">{{t "common.user.givenName"}}</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="text" id="givenName" name="givenName" value="" >
+                </div>
+            </div>
+
+            <div class="form-group has-feedback">
+                <label class="col-sm-3 control-label" for="sn">{{t "common.user.familyName"}}</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="text" id="sn" name="sn" value=""  data-validator="required" required data-validator-event="keyup change">
+                    <div class="validation-message"></div>
+                    <span class="error form-control-feedback"><i class='fa validation-icon'></i></span>
+                </div>
+            </div>
+
+            <div class="form-group has-feedback">
+                <label class="col-sm-3 control-label" for="telephoneNumber">{{t "common.user.phoneNumber"}}</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="tel" id="telephoneNumber" name="telephoneNumber" value="" >
+                    <div class="validation-message"></div>
+                    <span class="form-control-feedback"><i class='fa validation-icon'></i></span>
+                </div>
+            </div>
+
+            <div class="form-group has-feedback">
+                <label class="col-sm-3 control-label" for="password">{{t "common.user.password"}}</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="password" id="password" name="password" value="" data-validator-event="keyup change" required data-validator="minLength" data-validation-dependents="passwordConfirm" minlength="8"  />
+                    <div class="validation-message"></div>
+                    <span class="error form-control-feedback"><i class='fa validation-icon'></i></span>
+                </div>
+            </div>
+
+            <div class="form-group has-feedback">
+                <label class="col-sm-3 control-label" for="passwordConfirm">{{t "common.user.confirmPassword"}}</label>
+                <div class="col-sm-6">
+                    <input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm" value="" data-validator-event="keyup change" data-validator="passwordConfirm"  required/>
+                    <div class="validation-message"></div>
+                    <span class="error form-control-feedback"><i class='fa validation-icon'></i></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <input class="btn btn-primary" type="submit" name="submit" id="submit" value="{{t "common.form.submit"}}" disabled="true" />
+                    <input class="btn btn-default" type="button" name="cancel" id="cancel"  class="button cancelButton" value="{{t "common.form.cancel"}}" />
+                </div>
+            </div>
+
+        </fieldset>
+
+        <div class="col-sm-offset-2 col-sm-8" id="step4" style="display:none">
+            <span class="help-block">
+                <p>{{t "config.messages.UserMessages.afterRegistration"}}</p>
+                <a title='{{t "templates.user.RestLogoutTemplate.returnToLogin"}}' href="#login/" id="gotoLogin">{{t "templates.user.RestLogoutTemplate.returnToLogin"}}</a>
+            </span>
+        </div>
+
+    </form>
     {{/if}}
 </div>

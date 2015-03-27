@@ -90,10 +90,6 @@ span.item-button-panel {
     padding: 20px 10px;
 }
 
-.policy-content {
-    margin: 0 10px;
-}
-
 .policy-header {
     padding:0 0 30px;
     margin: 0 10px;
@@ -215,18 +211,28 @@ body{
     * short ones which do not.
     */
     overflow-y: scroll;
+
+    // To remove the empty space at the bottom of the footer which causes the
+    // scroll bar to always be present.
+    .footer .container {
+        padding-bottom: 0;
+    }
 }
 
+.page-header {
+    h1 {
+        .fa {
+            color: #9AA2A6;
+            font-size: 20px;
+            vertical-align: middle;
+        }
+    }
+}
 
 #uma {
-
     input[type="text"]:invalid:required, input[type="text"].invalid {
         .invalid-background;
         transition: background-color 200ms linear;
-    }
-
-    .policy-content {
-        min-height:100px;
     }
 
     #selectUser {
@@ -269,7 +275,8 @@ body{
             border-left: 1px solid transparent;
             border-right: 1px solid transparent;
 
-            .transition(background, 0.1s);
+            // TODO: BOOTSTRAP: Removed due to build issues. Will need re-adding
+            //.transition(background, 0.1s);
             &:hover{
                 background-color: @cell-hover-color;
                 cursor:pointer;
@@ -395,8 +402,9 @@ body{
     }
 
     .backgrid-filter.form-search {
-        margin: 0 0 5px;
-        .hideSearchCloseBtn;
+        margin: 5px 0 5px;
+        // TODO: BOOTSTRAP: Removed due to build issues. Will need re-adding
+        //.hideSearchCloseBtn;
     }
 
     .backgrid-revoke-cell {
@@ -408,13 +416,15 @@ body{
             padding: 13px 10px 13px 10px;
 
             &:hover, &:focus{
-                color: @color-error;
+                // TODO: BOOTSTRAP: Removed due to build issues. Will need re-adding
+                //color: @color-error;
             }
         }
 
         #save {
             &:hover, &:focus{
-                color: @color-success;
+                // TODO: BOOTSTRAP: Removed due to build issues. Will need re-adding
+                //color: @color-success;
             }
         }
 
@@ -491,7 +501,6 @@ body{
         max-height:0;
         opacity:0;
         transition:max-height 500ms ease-out, opacity 500ms ease-in-out ;
-        margin-bottom:30px;
         border: 1px solid lighten(@table-base-color, 45%);
         border-bottom:none;
     }
@@ -522,10 +531,6 @@ body{
 }
 
 /* new submenu style */
-.menubar {
-    margin: 0 5px 0;
-}
-
 #menu {
     .menu {
         margin:0 0 15px 0;
@@ -561,17 +566,6 @@ body{
     opacity: 0.5;
 }
 
-.uma-dialog {
-
-    max-width:300px;
-
-    h1 {
-        font-weight: normal;
-        padding: 0 0 10px;
-    }
-
-
-}
 #dialogs #footerShare {
     margin: 15px -15px -15px -15px;
 }
@@ -584,58 +578,8 @@ body{
     overflow: hidden;
 }
 
-/* enable responsive layout*/
-#default-base {
-    width:100%;
-    max-width:980px;
-}
-
-@media screen and (max-width: 1000px) {
-    #default-base {
-        width:900px;
-        #userProfileForm .group-field-block {
-            label{
-                text-align: left;
-            }
-            input{
-                width:380px;
-            }
-        }
-    }
-}
-
-
-@media screen and (max-width: 920px) {
-    .col2{
-        width:100%;
-    }
-    #default-base {
-        width:700px;
-        #userProfileForm .group-field-block input{
-            width:440px;
-        }
-    }
-
-}
-
-@media screen and (max-width: 720px) {
-    #default-base {
-        width:500px;
-        #userProfileForm .group-field-block input{
-            width:420px;
-        }
-    }
-}
-
-@media screen and (max-width: 520px) {
-    #default-base {
-        width:360px;
-        #userProfileForm .group-field-block input{
-            width:280px;
-        }
-
-        li:not(.active) .glyph-title {
-            display: none;
-        }
+@media (min-width: 768px) {
+    #subNavBar .nav-subnav > li.active > a:after {
+      border-bottom: 6px solid #eee;
     }
 }

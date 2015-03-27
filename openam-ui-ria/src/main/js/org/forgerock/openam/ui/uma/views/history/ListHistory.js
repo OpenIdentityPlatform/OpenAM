@@ -109,6 +109,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
             });
 
             self.parentRender(function() {
+                self.$el.find('[data-toggle="tooltip"]').tooltip();
                 self.$el.find("#backgridContainer").append( grid.render().el );
                 self.$el.find("#paginationContainer").append( paginator.render().el );
                 collection.fetch({ processData: false, reset: true });

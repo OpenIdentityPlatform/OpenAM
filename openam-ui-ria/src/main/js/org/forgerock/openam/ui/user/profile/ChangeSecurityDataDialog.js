@@ -23,10 +23,6 @@
  */
 
 /*global define, $, _, form2js */
-
-/**
- * @author mbilski
- */
 define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
     "org/forgerock/commons/ui/common/components/Dialog",
     "org/forgerock/commons/ui/common/main/ValidatorsManager",
@@ -38,21 +34,18 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
 ], function(Dialog, validatorsManager, conf, userDelegate, uiUtils, eventManager, constants) {
     var ChangeSecurityDataDialog = Dialog.extend({
         contentTemplate: "templates/openam/ChangeSecurityDataDialogTemplate.html",
-
         data: { },
-
         events: {
             "click input[type=submit]": "formSubmit",
             "onValidate": "onValidate",
             "customValidate": "customValidate",
             "click .dialogCloseCross img": "close",
-            "click input[name='close']": "close"
+            "click input[name='close']": "close",
+            "click .modal-content": "stop"
         },
-
         errorsHandlers: {
             "Bad Request":              { status: "400" }
         },
-
         formSubmit: function(event) {
             var data = {}, _this = this;
 
@@ -85,6 +78,7 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
         },
         render: function() {
             this.actions = [];
+            this.addTitle ($.t("templates.user.ChangeSecurityDataDialogTemplate.securityDataChange"));
             this.addAction($.t("common.form.update"), "submit");
             this.delegate = userDelegate;
 

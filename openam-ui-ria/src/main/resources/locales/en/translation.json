@@ -41,7 +41,7 @@
                 "profileUpdateFailed" : "Problem during profile update",
                 "profileUpdateSuccessful" : "Profile has been updated",
                 "userNameUpdated" : "Username has been modified successfully.",
-                "afterRegistration" : "Your account has been registered successfully",
+                "afterRegistration" : "Your account has been registered successfully.",
                 "siteIdentificationChanged" : "Site identification image has been changed",
                 "userAlreadyExists" : "User already exists",
                 "errorDeletingNotification" : "Error deleting notification.",
@@ -74,7 +74,7 @@
                     "myTasks" : "My tasks",
                     "startProcess" : "Start process",
                     "oauthtokens" : "OAuth 2 Token Manager",
-                    "uma" : "User Managed Access",
+                    "uma" : "Shares",
                     "umaLinks": {
                         "history" : "History",
                         "resources" : "Resources",
@@ -193,6 +193,10 @@
             "issued" : "Issued",
             "realm" : "Realm",
             "tokenInfo": "TokenInfo"
+        },
+        "login" : {
+            "notMember": "Not a member?",
+            "joinNow": "Join now"
         }
     },
     "common" : {
@@ -228,6 +232,7 @@
             "revoke" : "Revoke",
             "done" : "Done",
             "ok" : "OK",
+            "working" : "Working...",
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS, all rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",

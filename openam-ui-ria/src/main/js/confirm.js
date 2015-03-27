@@ -25,17 +25,19 @@
 /*global require, define, window*/
 require.config({
     paths: {
-        "backbone":   "libs/backbone-1.1.2-min",
-        "doTimeout":  "libs/jquery.ba-dotimeout-1.0-min",
-        "form2js":    "libs/form2js-2.0",
-        "handlebars": "libs/handlebars-1.3.0-min",
-        "jquery":     "libs/jquery-2.1.1-min",
-        "js2form":    "libs/js2form-2.0",
-        "i18next":    "libs/i18next-1.7.3-min",
-        "moment":     "libs/moment-2.8.1-min",
-        "spin":       "libs/spin-2.0.1-min",
-        "underscore": "libs/lodash-2.4.1-min",
-        "xdate":      "libs/xdate-0.8-min",
+        "backbone":         "libs/backbone-1.1.2-min",
+        "bootstrap":        "libs/bootstrap.min",
+        "bootstrap-dialog": "libs/bootstrap-dialog.min",
+        "doTimeout":        "libs/jquery.ba-dotimeout-1.0-min",
+        "form2js":          "libs/form2js-2.0",
+        "handlebars":       "libs/handlebars-1.3.0-min",
+        "i18next":          "libs/i18next-1.7.3-min",
+        "jquery":           "libs/jquery-2.1.1-min",
+        "js2form":          "libs/js2form-2.0",
+        "moment":           "libs/moment-2.8.1-min",
+        "spin":             "libs/spin-2.0.1-min",
+        "underscore":       "libs/lodash-2.4.1-min",
+        "xdate":            "libs/xdate-0.8-min",
 
         "ThemeManager": "org/forgerock/openam/ui/common/util/ThemeManager",
         "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate"
@@ -44,6 +46,12 @@ require.config({
         "backbone": {
             deps: ["underscore"],
             exports: "Backbone"
+        },
+        "bootstrap": {
+            deps: ["jquery"]
+        },
+        "bootstrap-dialog": {
+            deps: ["jquery", "underscore", "backbone", "bootstrap"]
         },
         "doTimeout": {
             deps: ["jquery"],
@@ -55,12 +63,12 @@ require.config({
         "handlebars": {
             exports: "handlebars"
         },
-        "js2form": {
-            exports: "js2form"
-        },
         "i18next": {
             deps: ["jquery", "handlebars"],
             exports: "i18next"
+        },
+        "js2form": {
+            exports: "js2form"
         },
         "moment": {
             exports: "moment"
@@ -106,7 +114,6 @@ require([
     window._ = _;
     window.Backbone = Backbone;
 
-
         callParams = {
             url: host + RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/*"),
             type: "GET",
@@ -119,8 +126,7 @@ require([
                 if (responseMessage.indexOf("Invalid realm") > -1) {
 
                     CookieHelper.cookiesEnabled();
-                    var
-                        expire = new Date(),
+                var expire = new Date(),
                         cookieVal =  {
                             realmName : urlParams.realm,
                             valid : false
@@ -136,7 +142,7 @@ require([
     if(urlParams.username) {
         location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context +'/XUI/#forgotPasswordChange/&' + searchParams;
     }
-    else if(urlParams.realm) {
+    else if (urlParams.realm) {
         ServiceInvoker.configuration = conf;
         ServiceInvoker.restCall(callParams);
     }

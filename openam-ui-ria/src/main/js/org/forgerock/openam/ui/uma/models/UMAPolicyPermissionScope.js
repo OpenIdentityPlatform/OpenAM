@@ -25,7 +25,7 @@
  /*global $, _, define*/
 define('org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope', [
     'backbone',
-    'backboneRelational'
+    'backbone-relational'
 ], function(Backbone, BackboneRelational) {
     return Backbone.RelationalModel.extend({
         parse: function(response, options) {

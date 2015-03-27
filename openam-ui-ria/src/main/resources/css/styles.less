@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and Distribution License (the License).
  * You may not use this file except in compliance with the License.
@@ -14,24 +14,25 @@
  * enclosed by brackets [] replaced by your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-/* css basic configuration */
-@import "common/config.less";
-/* helpers, functions, columns */
-@import "common/helpers.less";
-/* header, footer, menu, dialogs, messages, popups, basic buttons & links */
-@import "common/layout.less";
-/* specific css used in specific modules */
-@import "common/forms.less";
-/* specific css used in specific modules */
-@import "openam/dashboard.less";
-/* specific css used in specific modules */
-@import "openam/openam.less";
 
+// CSS Basic Configuration
+@import "Roboto/fontRoboto.less";
+@import "common/forgerock-variables.less";
+@import "common/common.less";
 
+// Library CSS
+@import "common/jquery-ui-1.10.3.custom.css";
+@import "common/bootstrap.min.css";
+@import "common/bootstrap-dialog.css";
+@import "fontawesome/css/font-awesome.min.css";
+@import "fontawesome/less/variables.less";
+
+// Specific CSS
 @import "fonts/icomoon.less";
 @import "common/selectize/selectize.less";
 @import "common/backgrid/backgrid.min.less";
 @import "common/backgrid/backgrid-paginator.min.css";
 @import "common/backgrid/backgrid-filter.min.css";
-/* specific css used in specific modules */
 @import "openam/uma.less";
+@import "openam/dashboard.less";
+@import "openam/openam.less";

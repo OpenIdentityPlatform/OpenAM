@@ -1,29 +1,40 @@
-<div class="container-shadow" id="login-container">
-{{#if reqs.header}}<h1>{{{reqs.header}}}</h1>{{/if}}
+<div class="container">
 
-    <form action="" method="post" class="form small">
+    {{#if reqs.header}}
+    <div class="page-header">
+        <h1 class="text-center">{{reqs.header}}</h1>
+    </div>
+    {{/if}}
+
+    <form action="" method="post" class="form col-sm-6 col-sm-offset-3">
         <fieldset>
 
             {{#each reqs.callbacks}}
 
             {{#if isSubmit}}
-            <div class="field field-checkbox">
-                <label class="align-left"  for="remember">
-                    <input type="checkbox"  id="remember" name="loginRemember" />
-                    {{t "templates.user.LoginTemplate.loginRemember"}}
-                </label>
+            <div class="remember-forgot clearfix">
+
+                {{#if ../../showForgotPassword}}
+                <div class="pull-right">
+                    <a href="#forgotPassword" id="forgotPassword">{{t "common.user.forgotPassword" }}</a>
+                </div>
+                {{/if}}
+
+                <div class="checkbox pull-left">
+                    <label><input type="checkbox" type="checkbox" name="loginRemember" id="remember"> {{t "templates.user.LoginTemplate.loginRemember"}}</label>
+                </div>
             </div>
+
             {{/if}}
 
-            <div class="group-field-block{{#if isSubmit}} float-right{{/if}}">
+            <div class="form-group">
                 {{callbackRender}}
             </div>
 
             {{#if isSubmit}}
-            <ul class="link-box float-left">
-                {{#if ../../showForgotPassword}}<li><a href="#forgotPassword" id="forgotPassword">{{t "common.user.forgotPassword" }}</a></li>{{/if}}
-                {{#if ../../showRegister}}<li><a href="#register" id="register">{{t "common.form.register" }}</a></li>{{/if}}
-            </ul>
+            <div class="text-center">
+                {{#if ../../showRegister}}{{t "templates.login.notMember" }} <a href="#register" id="register">{{t "templates.login.joinNow" }}</a>{{/if}}
+            </div>
             {{/if}}
 
             {{/each}}

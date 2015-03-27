@@ -25,7 +25,7 @@
 /*global define*/
 define('org/forgerock/openam/ui/uma/models/UMAPolicy', [
     'backbone',
-    'backboneRelational',
+    'backbone-relational',
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermission',
     'org/forgerock/openam/ui/uma/util/URLHelper'
 ], function(Backbone, BackboneRelational, UMAPolicyPermission, URLHelper) {

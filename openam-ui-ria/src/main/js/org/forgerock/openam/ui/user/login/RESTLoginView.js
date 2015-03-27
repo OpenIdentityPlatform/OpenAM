@@ -308,7 +308,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 this.$el.find("[name=loginRemember]").attr("checked","true");
                 this.$el.find("[type=password]").focus();
             } else {
-                this.$el.find(":input:first").focus();
+                this.$el.find(":input:not([type='radio']):not([type='checkbox']):not([type='submit']):not([type='button']):first").focus();
             }
         },
         handleUrlParams: function() {
@@ -339,22 +339,23 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     Handlebars.registerHelper("callbackRender", function () {
         var result = "",
             cb = this,
-            prompt,
+            prompt = "",
             options,
-            hideButton;
+            hideButton,
+            defaultOption,
+            btnClass = '';
 
-        prompt = _.find(cb.output, function (o) { return o.name === "prompt"; });
-        if (prompt && prompt.value !== undefined && prompt.value.length) {
-            if (cb.type === "ChoiceCallback") {
-                result = '<label>' + prompt.value + '</label>';
-            } else {
-                result = '<label class="short">' + prompt.value + '</label>';
+
+        _.find(cb.output, function (obj) {
+            if (obj.name === "prompt" && obj.value !== undefined && obj.value.length){
+                prompt = obj.value.replace(/:$/, '');
             }
-        }
+        });
+
 
         switch (cb.type) {
             case "PasswordCallback" :
-                result += '<input type="password" name="callback_' + cb.input.index + '" value="' + cb.input.value + '" data-validator="required" required data-validator-event="keyup" />';
+                result += '<input type="password" name="callback_' + cb.input.index + '" class="form-control input-lg" placeholder="' + prompt + '" value="' + cb.input.value + '" data-validator="required" required data-validator-event="keyup">';
                 break;
 
             case "TextInputCallback" :
@@ -379,22 +380,34 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             case "ConfirmationCallback" :
                 options = _.find(cb.output, function (o) { return o.name === "options"; });
+
                 if (options && options.value !== undefined) {
-                    _.each(options.value, function (option, index) {
-                        result += '<input name="callback_' + cb.input.index + '" type="submit" class="button" index="'+ index +'" value="'+ option +'">';
+                    // if there is only one option then mark it as default.
+                    defaultOption = options.value.length > 1 ? _.find(cb.output, function (o) { return o.name === "defaultOption"; }) : {"value":0} ;
+                    _.each(options.value, function (option, key) {
+                        btnClass = (defaultOption && defaultOption.value === key) ? "btn-primary" : "btn-default";
+                        result += '<input name="callback_' + cb.input.index + '" type="submit" class="btn btn-lg btn-block btn-uppercase ' + btnClass + '" index="'+ key +'" value="'+ option +'">';
                     });
                 }
                 break;
             case "ChoiceCallback" :
                 options = _.find(cb.output, function (o) { return o.name === "choices"; });
+                defaultOption = cb.input.value;
+
                 if (options && options.value !== undefined) {
-                    result += "<ul>";
-                    _.each(options.value, function (option, index) {
-                        var checked = (cb.input.value === index) ? " checked" : "";
-                        result += '<li><label class="short light" for="callback_' + cb.input.index + '_'+ index +'">'+option+': </label><input '+ checked +' id="callback_' + cb.input.index + '_'+ index +'" name="callback_' + cb.input.index + '" type="radio" value="'+ index +'"></li>';
+                    result +=   '<label class="choice-callback">' + prompt + '</label>'+
+                                '<div class="btn-group btn-group-justified" data-toggle="buttons">';
+                    _.each(options.value, function (option, key) {
+                        var checked = (defaultOption === key) ? "checked" : "",
+                            active = checked ? "active" : "";
+
+                        result +=   '<label class="btn btn-default '+ active +'">' +
+                                        ' <input type="radio" name="callback_' + cb.input.index + '" id="callback_' + cb.input.index + '_'+ key +'" autocomplete="off" '+ checked +' value="'+ key +'">' + option +
+                                    '</label>';
                     });
-                    result += "</ul>";
+                    result +=  '</div>';
                 }
+
                 break;
             case "HiddenValueCallback" :
                 result += '<input type="hidden" id="' + cb.input.value + '" name="callback_' + cb.input.index + '" value="" data-validator="required" required data-validator-event="keyup" />';
@@ -403,7 +416,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 result += 'Redirecting...';
                 break;
             default:
-                result += '<input type="text" name="callback_' + cb.input.index + '" value="' + cb.input.value + '" data-validator="required" required data-validator-event="keyup" />';
+                result += '<input type="text" name="callback_' + cb.input.index + '" id="login" value="' + cb.input.value + '" data-validator="required" required data-validator-event="keyup" class="form-control input-lg" placeholder="'+ prompt +'">';
                 break;
         }
 

@@ -43,7 +43,7 @@
             <groupId>org.forgerock.commons.ui</groupId>
             <artifactId>forgerock-ui-commons</artifactId>
             <type>zip</type>
-            <version>${forgerock-ui.version}</version>
+            <version>1.1.12-SNAPSHOT</version>
             <classifier>www</classifier>
         </dependency>
         <dependency>
@@ -157,7 +157,7 @@
                                 <artifactItem>
                                     <groupId>org.forgerock.commons.ui</groupId>
                                     <artifactId>forgerock-ui-commons</artifactId>
-                                    <version>${forgerock-ui.version}</version>
+                                    <version>1.1.12-SNAPSHOT</version>
                                     <type>zip</type>
                                     <classifier>www</classifier>
                                 </artifactItem>

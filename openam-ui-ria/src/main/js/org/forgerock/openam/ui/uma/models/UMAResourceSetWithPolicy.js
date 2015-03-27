@@ -25,7 +25,7 @@
 /*global _, define*/
 define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
     'backbone',
-    'backboneRelational',
+    'backbone-relational',
     'org/forgerock/openam/ui/uma/models/UMAPolicy',
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope',
     'org/forgerock/openam/ui/uma/util/URLHelper'

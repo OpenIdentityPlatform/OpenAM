@@ -31,35 +31,36 @@ define("org/forgerock/openam/ui/user/logout/RESTLogoutView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function(AbstractView, router, conf, constants, eventManager, uiUtils, loginHelper) {
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/commons/ui/common/components/Navigation"
+], function(AbstractView, Router, Configuration, Constants, EventManager, UiUtils, LoginHelper, Navigation) {
 
     var LogoutView = AbstractView.extend({
         template: "templates/openam/RESTLogoutTemplate.html",
-        baseTemplate: "templates/common/MediumBaseTemplate.html",
-
+        baseTemplate: "templates/common/LoginBaseTemplate.html",
         data: {},
         events: {
             "click #gotoLogin": "gotoLoginViewClick"
         },
         render: function(args, callback) {
+
+            //Navigation.reload(callback);
+
             this.parentRender(callback);
         },
-        gotoLoginViewClick: function(event){
-            event.preventDefault();
+        gotoLoginViewClick: function(e){
+            e.preventDefault();
             var urlParams = "";
-            if (conf.globalData.auth.fullLoginURL) {
-                urlParams = loginHelper.filterUrlParams(loginHelper.getLoginUrlParams());
+            if (Configuration.globalData.auth.fullLoginURL) {
+                urlParams = LoginHelper.filterUrlParams(LoginHelper.getLoginUrlParams());
             }
 
-            conf.setProperty('loggedUser', null);
-            delete conf.gotoURL;
-            eventManager.sendEvent(constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
-            router.navigate(router.getLink(router.configuration.routes.login) + urlParams, {trigger: true});
+            Configuration.setProperty('loggedUser', null);
+            delete Configuration.gotoURL;
+            EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
+            Router.navigate(Router.getLink(Router.configuration.routes.login) + urlParams, {trigger: true});
         }
     });
 
     return new LogoutView();
 });
-
-
