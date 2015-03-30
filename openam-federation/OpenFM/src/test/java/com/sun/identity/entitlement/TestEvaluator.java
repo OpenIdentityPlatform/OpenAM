@@ -47,8 +47,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -87,7 +85,7 @@ public class TestEvaluator {
         // avaliableResources.add("http://www.testevaluator.com:80/*");
         // appl.addResources(avaliableResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
+        ApplicationManager.saveApplication(adminSubject, "/", appl);
 
         createReferral(adminToken, adminSubject);
     }
@@ -156,7 +154,7 @@ public class TestEvaluator {
         identities.add(user2);
         IdRepoUtils.deleteIdentities("/", identities);
 
-        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
 
         OrganizationConfigManager orgMgr = new OrganizationConfigManager(
             adminToken, "/");

@@ -24,7 +24,10 @@
  *
  * $Id: PolicyRequestHandler.java,v 1.8 2008/12/04 00:38:52 dillidorai Exp $
  *
- * Portions Copyrighted 2010-2015 ForgeRock AS
+ */
+
+/*
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.policy.remote;
@@ -36,6 +39,7 @@ import com.iplanet.services.comm.share.ResponseSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.AMIdentity;
@@ -55,7 +59,6 @@ import com.sun.identity.session.util.RestrictedTokenHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.forgerock.openam.session.util.AppTokenHandler;
 import org.forgerock.openam.utils.CollectionUtils;
 
@@ -71,6 +74,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * The <code>PolicyRequestHandler</code> class handles the policy
@@ -712,7 +717,7 @@ public class PolicyRequestHandler implements RequestHandler {
                     appAttributes.get(EVALUATION_APPLICATION), serviceTypeName);
 
             final Subject appSubject = SubjectUtils.createSubject(appToken);
-            final Application application = ApplicationServiceHelper.get().getApplication(appSubject, realm, applicationName);
+            final Application application = ApplicationManager.getApplication(appSubject, realm, applicationName);
 
             if (application == null) {
                 throw new PolicyException(

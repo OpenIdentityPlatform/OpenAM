@@ -50,8 +50,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -100,7 +98,7 @@ public class DelegationIsAllowedSubResourceTest {
         // appResources.add(DELEGATED_RESOURCE_BASE);
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
+        ApplicationManager.saveApplication(adminSubject, "/", appl);
 
         user1 = IdRepoUtils.createUser("/", USER1);
         createDelegationPrivilege();
@@ -121,8 +119,8 @@ public class DelegationIsAllowedSubResourceTest {
         apm.removePrivilege(DELEGATE_PRIVILEGE_NAME);
 
         IdRepoUtils.deleteIdentity("/", user1);
-        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/",
-                APPL_NAME);
+        ApplicationManager.deleteApplication(adminSubject, "/",
+            APPL_NAME);
     }
 
     private void createPrivilege() throws EntitlementException {

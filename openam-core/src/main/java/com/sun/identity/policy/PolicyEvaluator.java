@@ -24,7 +24,7 @@
  *
  * $Id: PolicyEvaluator.java,v 1.19 2010/01/14 23:18:35 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.policy;
 
@@ -48,6 +48,7 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.SsoServerPolicySvcImpl;
 import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
@@ -61,8 +62,6 @@ import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.DNMapper;
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
-
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.List;
@@ -571,9 +570,9 @@ public class PolicyEvaluator {
         String realmName = (DN.isDN(realm)) ?
             DNMapper.orgNameToRealmName(realm) : realm;
         try {
-            Application appl = ApplicationServiceHelper.get().getApplication(
-                    PrivilegeManager.superAdminSubject,
-                    realmName, applicationName);
+            Application appl = ApplicationManager.getApplication(
+                PrivilegeManager.superAdminSubject,
+                realmName, applicationName);
             resourceName = appl.getResourceComparator().canonicalize(
                 resourceName);
         } catch (EntitlementException e) {

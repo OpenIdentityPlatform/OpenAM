@@ -11,14 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2014 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.util.SearchFilter;
 import static com.sun.identity.entitlement.util.SearchFilter.Operator.*;
-
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -32,17 +30,10 @@ import static org.forgerock.openam.utils.CollectionUtils.*;
 /**
  * @since 12.0.0
  */
-public class ApplicationServiceTest {
+public class ApplicationManagerTest {
 
     private final boolean MATCH = true;
     private final boolean NO_MATCH = false;
-
-    private ApplicationServiceImpl applicationManager;
-
-    @BeforeMethod
-    public void setUp() {
-        applicationManager = new ApplicationServiceImpl();
-    }
 
     @DataProvider(name = "testMatchData")
     public Object[][] testMatchData() throws IllegalAccessException, InstantiationException {
@@ -100,7 +91,7 @@ public class ApplicationServiceTest {
 
     @Test(dataProvider = "testMatchData")
     public void testMatch(Set<SearchFilter> searchFilters, Application application, boolean expectedMatchResult) {
-        assertThat(applicationManager.match(searchFilters, application)).isEqualTo(expectedMatchResult);
+        assertThat(ApplicationManager.match(searchFilters, application)).isEqualTo(expectedMatchResult);
     }
 
     private Application application(String name) throws IllegalAccessException, InstantiationException {

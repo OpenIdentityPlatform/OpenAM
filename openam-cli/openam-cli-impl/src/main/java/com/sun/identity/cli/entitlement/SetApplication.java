@@ -23,8 +23,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SetApplication.java,v 1.2 2009/11/19 01:02:02 veiming Exp $
- *
- * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.cli.entitlement;
@@ -36,25 +34,16 @@ import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.Application;
-import org.forgerock.openam.entitlement.service.ApplicationService;
+import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.log.Level;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
 import javax.security.auth.Subject;
 
 public class SetApplication extends ApplicationImpl {
-
-    private final ApplicationService applicationService;
-
-    @Inject
-    public SetApplication(ApplicationService applicationService) {
-        this.applicationService = applicationService;
-    }
-
     /**
      * Services a Commandline Request.
      *
@@ -85,7 +74,7 @@ public class SetApplication extends ApplicationImpl {
 
         Subject adminSubject = getAdminSubject();
         try {
-            Application appl = applicationService.getApplication(adminSubject,
+            Application appl = ApplicationManager.getApplication(adminSubject,
                 realm, appName);
             Object[] param = {appName};
 
@@ -96,7 +85,7 @@ public class SetApplication extends ApplicationImpl {
             }
 
             setApplicationAttributes(appl, attributeValues, false);
-            applicationService.saveApplication(getAdminSubject(), realm, appl);
+            ApplicationManager.saveApplication(getAdminSubject(), realm, appl);
             getOutputWriter().printlnMessage(
                 MessageFormat.format(getResourceString(
                 "set-application-modified"), param));

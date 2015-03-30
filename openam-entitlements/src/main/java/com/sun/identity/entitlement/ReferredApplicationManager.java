@@ -28,8 +28,6 @@
  */
 package com.sun.identity.entitlement;
 
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,7 +71,7 @@ public class ReferredApplicationManager {
 
     void clearCache(String realm) {
         mapRealmToReferredAppls.remove(realm);
-        ApplicationServiceHelper.get().clearCache(realm);
+        ApplicationManager.clearCache(realm);
     }
 
     public void clearCache() {
@@ -85,7 +83,7 @@ public class ReferredApplicationManager {
                 String realm = i.next();
                 if (!realm.equals("/")) {
                     i.remove();
-                    ApplicationServiceHelper.get().clearCache(realm);
+                    ApplicationManager.clearCache(realm);
                 }
             }
         }
@@ -134,8 +132,8 @@ public class ReferredApplicationManager {
                 ReferredApplication ra = tmpMap.get(applName);
 
                 if (ra == null) {
-                    Application appl = ApplicationServiceHelper.get().getApplication(
-                            PrivilegeManager.superAdminSubject, r, applName);
+                    Application appl = ApplicationManager.getApplication(
+                        PrivilegeManager.superAdminSubject, r, applName);
                     ra = new ReferredApplication(realm, applName,
                         appl, res);
                     tmpMap.put(applName, ra);
@@ -159,9 +157,9 @@ public class ReferredApplicationManager {
         String applName,
         Set<String> resources
     ) throws EntitlementException {
-        Application appl = ApplicationServiceHelper.get().getApplication(
-                PrivilegeManager.superAdminSubject,
-                parentRealm, applName);
+        Application appl = ApplicationManager.getApplication(
+            PrivilegeManager.superAdminSubject,
+            parentRealm, applName);
         ReferredApplication ra = new ReferredApplication(realm, applName,
             appl, resources);
         Set<ReferredApplication> set = mapRealmToReferredAppls.get(realm);

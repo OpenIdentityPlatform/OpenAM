@@ -43,7 +43,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.security.auth.Subject;
 
 import org.forgerock.openam.entitlement.PrivilegeEvaluatorContext;
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.forgerock.openam.session.util.AppTokenHandler;
 import org.forgerock.openam.utils.CollectionUtils;
 
@@ -384,8 +383,8 @@ class PrivilegeEvaluator {
     private Application getApplication()
         throws EntitlementException {
         if (application == null) {
-            application = ApplicationServiceHelper.get().getApplicationForEvaluation(
-                    realm, applicationName);
+            application = ApplicationManager.getApplicationForEvaluation(
+                realm, applicationName);
             // If application is still null, throw an exception
             if (application == null) {
                 String[] params = { realm };

@@ -39,8 +39,6 @@ import java.security.AccessController;
 import java.util.HashSet;
 import java.util.Set;
 import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 import org.testng.annotations.BeforeClass;
@@ -75,7 +73,7 @@ public class ApplicationMetaData {
         // appResources.add("http://www.applicationmetadata.com");
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
+        ApplicationManager.saveApplication(adminSubject, "/", appl);
     }
 
     @AfterClass
@@ -84,7 +82,7 @@ public class ApplicationMetaData {
             return;
         }
 
-        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     @Test
@@ -92,8 +90,8 @@ public class ApplicationMetaData {
         if (!migrated) {
             return;
         }
-        Application appl = ApplicationServiceHelper.get().getApplication(adminSubject,
-                "/", APPL_NAME);
+        Application appl = ApplicationManager.getApplication(adminSubject,
+            "/", APPL_NAME);
         String createdBy = appl.getCreatedBy();
         long creationTime = appl.getCreationDate();
         long modifiedTime = appl.getLastModifiedDate();
@@ -102,7 +100,7 @@ public class ApplicationMetaData {
             throw new Exception(
                 "ApplicationMetaData.test: modified and creation time diff");
         }
-        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
+        ApplicationManager.saveApplication(adminSubject, "/", appl);
         creationTime = appl.getCreationDate();
         modifiedTime = appl.getLastModifiedDate();
 
@@ -118,8 +116,8 @@ public class ApplicationMetaData {
 
         Set<SearchFilter> filters = new HashSet<SearchFilter>();
         filters.add(new SearchFilter(Application.NAME_ATTRIBUTE, APPL_NAME));
-        Set<String> results = ApplicationServiceHelper.get().search(
-                adminSubject, "/", filters);
+        Set<String> results = ApplicationManager.search(
+            adminSubject, "/", filters);
         if (!results.contains(APPL_NAME)) {
             throw new Exception(
                 "ApplicationMetaData.test: search fails");

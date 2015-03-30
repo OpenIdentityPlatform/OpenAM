@@ -48,8 +48,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -82,7 +80,7 @@ public class SubRealmEvaluationTest {
         // avaliableResources.add("http://www.testevaluator.com:80/*");
         // appl.addResources(avaliableResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
+        ApplicationManager.saveApplication(adminSubject, "/", appl);
 
         createReferral(adminToken, adminSubject);
     }
@@ -134,7 +132,7 @@ public class SubRealmEvaluationTest {
 
     @AfterClass
     public void cleanup() throws EntitlementException {
-        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     private void removeOrganization() throws Exception {

@@ -33,9 +33,9 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import java.security.AccessController;
+import java.util.HashSet;
+import java.util.Set;
 import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -69,7 +69,7 @@ public class ApplicationCreatorNDateTest {
         // appResources.add("http://www.ApplicationCreatorNDateTest.com/*");
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
+        ApplicationManager.saveApplication(adminSubject, "/", appl);
     }
 
     @AfterClass
@@ -78,14 +78,14 @@ public class ApplicationCreatorNDateTest {
             return;
         }
 
-        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/",
-                APPL_NAME);
+        ApplicationManager.deleteApplication(adminSubject, "/",
+            APPL_NAME);
     }
 
     @Test
     public void test() throws Exception {
-        Application appl = ApplicationServiceHelper.get().getApplication(
-                adminSubject, "/", APPL_NAME);
+        Application appl = ApplicationManager.getApplication(
+            adminSubject, "/", APPL_NAME);
 
         long creationDate = appl.getCreationDate();
         String createdBy = appl.getCreatedBy();
@@ -93,10 +93,10 @@ public class ApplicationCreatorNDateTest {
         //reset createdBy and creationDate
         appl.setCreatedBy(null);
         appl.setCreationDate(-1);
-        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
+        ApplicationManager.saveApplication(adminSubject, "/", appl);
 
-        appl = ApplicationServiceHelper.get().getApplication(
-                adminSubject, "/", APPL_NAME);
+        appl = ApplicationManager.getApplication(
+            adminSubject, "/", APPL_NAME);
 
         if (!appl.getCreatedBy().equals(createdBy)) {
             throw new Exception(

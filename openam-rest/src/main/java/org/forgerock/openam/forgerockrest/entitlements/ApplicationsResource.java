@@ -16,7 +16,6 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.ApplicationServiceImpl;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
@@ -47,12 +46,12 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryFilterVisitorAdapter;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
@@ -74,7 +73,7 @@ public class ApplicationsResource extends RealmAwareResource {
     public static final String APPLICATION_QUERY_ATTRIBUTES = "ApplicationQueryAttributes";
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private final ApplicationService appManager;
+    private final ApplicationManagerWrapper appManager;
     private final ApplicationTypeManagerWrapper appTypeManagerWrapper;
     private final Map<String, QueryAttribute> queryAttributes;
     private final Debug debug;
@@ -83,13 +82,13 @@ public class ApplicationsResource extends RealmAwareResource {
 
     /**
      * @param debug Debug instance.
-     * @param appManager Wrapper for the static {@link ApplicationServiceImpl}. Cannot be null.
+     * @param appManager Wrapper for the static {@link com.sun.identity.entitlement.ApplicationManager}. Cannot be null.
      * @param appTypeManagerWrapper instantiable version of the static ApplicationTypeManager class. Cannot be null.
      * @param queryAttributes Definition of Application fields that can be queried
      * @param exceptionMappingHandler Error handler to convert EntitlementExceptions to ResourceExceptions.
      */
     @Inject
-    public ApplicationsResource(@Named("frRest") Debug debug, ApplicationService appManager,
+    public ApplicationsResource(@Named("frRest") Debug debug, ApplicationManagerWrapper appManager,
                                 ApplicationTypeManagerWrapper appTypeManagerWrapper,
                                 @Named(ApplicationsResource.APPLICATION_QUERY_ATTRIBUTES)
                                 Map<String, QueryAttribute> queryAttributes,
@@ -199,7 +198,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 throw new EntitlementException(EntitlementException.APPLICATION_ALREADY_EXISTS);
             }
 
-            appManager.saveApplication(callingSubject, realm, wrapp.getApplication());
+            appManager.saveApplication(callingSubject, wrapp.getApplication());
             Application savedApp = appManager.getApplication(callingSubject, realm, appName);
             ApplicationWrapper savedAppWrapper = createApplicationWrapper(savedApp, appTypeManagerWrapper);
 
@@ -495,19 +494,17 @@ public class ApplicationsResource extends RealmAwareResource {
                 throw new EntitlementException(EntitlementException.NOT_FOUND, new String[] { resourceId });
             }
 
-            String realm = getRealm(context);
-
-            if (!realm.equals(wrapp.getApplication().getRealm())) {
+            if (!getRealm(context).equals(wrapp.getApplication().getRealm())) {
                  throw new EntitlementException(EntitlementException.INVALID_APP_REALM,
                                 new String[] { wrapp.getApplication().getRealm(), getRealm(context) });
             }
 
             if (!resourceId.equals(wrapp.getName()) && //return conflict
-                    appManager.getApplication(mySubject, realm, wrapp.getName()) != null) {
+                    appManager.getApplication(mySubject, getRealm(context), wrapp.getName()) != null) {
                 throw new EntitlementException(EntitlementException.APPLICATION_ALREADY_EXISTS);
             }
 
-            appManager.updateApplication(oldApplication, wrapp.getApplication(), mySubject, realm);
+            appManager.updateApplication(oldApplication, wrapp.getApplication(), mySubject);
 
             final Resource resource = new Resource(wrapp.getName(),
                     Long.toString(wrapp.getApplication().getLastModifiedDate()), wrapp.toJsonValue());
@@ -525,7 +522,7 @@ public class ApplicationsResource extends RealmAwareResource {
     }
 
     /**
-     * Query-based wrapper for the method {@link ApplicationService#search(Subject, String, Set)}.
+     * Query-based wrapper for the method {@link ApplicationManagerWrapper#search(Subject, String, Set)}.
      *
      * @param request the query request.
      * @param subject The subject authorizing the update - will be validated for permission.

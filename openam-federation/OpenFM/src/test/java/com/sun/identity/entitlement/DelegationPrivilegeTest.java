@@ -32,7 +32,6 @@ package com.sun.identity.entitlement;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.Test;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.AuthUtils;
@@ -117,12 +116,12 @@ public class DelegationPrivilegeTest {
         res.add(delResource);
         ap.setApplicationResources(appRes);
         ap.setActionValues(
-                ApplicationPrivilege.PossibleAction.READ_MODIFY_DELEGATE);
+            ApplicationPrivilege.PossibleAction.READ_MODIFY_DELEGATE);
         mgr.addPrivilege(ap);
 
-        Application app = ApplicationServiceHelper.get().getApplication(
-                PrivilegeManager.superAdminSubject, realm,
-                ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+        Application app = ApplicationManager.getApplication(
+            PrivilegeManager.superAdminSubject, realm,
+            ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
 
         // Test disabled, unable to fix model change.
         // if (app.getResources().contains(delResource)) {

@@ -24,7 +24,7 @@
  *
  * $Id: OpenSSOIndexStore.java,v 1.13 2010/01/25 23:48:15 veiming Exp $
  *
- * Portions copyright 2011-2015 ForgeRock, AS
+ * Portions copyright 2011-2014 ForgeRock, AS
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -32,6 +32,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
@@ -61,8 +62,6 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
-
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
@@ -786,8 +785,8 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                     Map<String, Set<String>> map =
                         r.getOriginalMapApplNameToResources();
                     for (String a : map.keySet()) {
-                        Application appl = ApplicationServiceHelper.get().getApplication(
-                                PrivilegeManager.superAdminSubject, realmName, a);
+                        Application appl = ApplicationManager.getApplication(
+                            PrivilegeManager.superAdminSubject, realmName, a);
                         if (appl.getApplicationType().getName().equals(
                             applicationTypeName)) {
                             results.addAll(map.get(a));

@@ -34,6 +34,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.idm.IdUtils;
@@ -42,6 +43,8 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
 import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.ReferralPrivilege;
+import com.sun.identity.entitlement.ReferralPrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
@@ -71,8 +74,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
-
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.forgerock.openam.shared.concurrency.LockFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.Document;
@@ -1288,8 +1289,8 @@ public final class PolicyManager {
         String realmName = (DN.isDN(realm)) ?
             DNMapper.orgNameToRealmName(realm) :realm;
 
-        Application appl = ApplicationServiceHelper.get().getApplication(
-                PrivilegeManager.superAdminSubject, realmName, serviceName);
+        Application appl = ApplicationManager.getApplication(
+            PrivilegeManager.superAdminSubject, realmName, serviceName);
         com.sun.identity.entitlement.interfaces.ResourceName resComp = appl.
             getResourceComparator();
         resourceName = resComp.canonicalize(resourceName);
@@ -1358,9 +1359,9 @@ public final class PolicyManager {
                     if (adminSubject == null) {
                        initialise();
                     }
-                    Set<String> referredResources = ApplicationServiceHelper.get().
+                    Set<String> referredResources = ApplicationManager.
                         getReferredResources(adminSubject,
-                                realm, serviceTypeName);
+                        realm, serviceTypeName);
                     if ((referredResources == null) || referredResources.
                         isEmpty()) {
                         String[] objs = {org};
@@ -1715,8 +1716,8 @@ public final class PolicyManager {
 
         if (isMigratedToEntitlementService()) {
             for (String s : services) {
-                Set<String> res = ApplicationServiceHelper.get().getReferredResources(
-                        adminSubject, realm, s);
+                Set<String> res = ApplicationManager.getReferredResources(
+                    adminSubject, realm, s);
                 if ((res != null) && !res.isEmpty()) {
                     return true;
                 }

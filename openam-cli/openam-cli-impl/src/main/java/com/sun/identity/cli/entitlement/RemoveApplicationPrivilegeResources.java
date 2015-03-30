@@ -38,7 +38,6 @@ import com.sun.identity.entitlement.ApplicationPrivilege;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
-import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import java.text.MessageFormat;
@@ -55,9 +54,8 @@ import javax.security.auth.Subject;
 public class RemoveApplicationPrivilegeResources extends ApplicationPrivilegeBase {
 
     @Inject
-    public RemoveApplicationPrivilegeResources(ResourceTypeService resourceTypeService,
-                                               ApplicationService applicationService) {
-        super(resourceTypeService, applicationService);
+    public RemoveApplicationPrivilegeResources(ResourceTypeService resourceTypeService) {
+        super(resourceTypeService);
     }
 
     /**

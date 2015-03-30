@@ -46,8 +46,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -90,7 +88,7 @@ public class ApplicationFilterTest {
         // appResources.add(DELEGATED_RESOURCE_BASE);
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
+        ApplicationManager.saveApplication(adminSubject, "/", appl);
 
         user1 = IdRepoUtils.createUser("/", USER1);
         createDelegationPrivilege();
@@ -107,8 +105,8 @@ public class ApplicationFilterTest {
         apm.removePrivilege(DELEGATE_PRIVILEGE_NAME);
 
         IdRepoUtils.deleteIdentity("/", user1);
-        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/",
-                APPL_NAME);
+        ApplicationManager.deleteApplication(adminSubject, "/", 
+            APPL_NAME);
     }
 
     private void createDelegationPrivilege()
@@ -143,9 +141,9 @@ public class ApplicationFilterTest {
 
         Set<SearchFilter> filters = new HashSet<SearchFilter>();
         filters.add(new SearchFilter(Application.NAME_ATTRIBUTE,
-                "ApplicationFilterTes*"));
-        Set<String> names = ApplicationServiceHelper.get().search(userSubject, "/",
-                filters);
+            "ApplicationFilterTes*"));
+        Set<String> names = ApplicationManager.search(userSubject, "/",
+            filters);
         if (names.isEmpty()) {
             throw new Exception(
                 "ApplicationFilterTest.test: expect to return one entry");
@@ -154,7 +152,7 @@ public class ApplicationFilterTest {
         filters.clear();
         filters.add(new SearchFilter(Application.NAME_ATTRIBUTE, "4rwrwr*"));
         
-        names = ApplicationServiceHelper.get().search(userSubject, "/", filters);
+        names = ApplicationManager.search(userSubject, "/", filters);
         if (!names.isEmpty()) {
             throw new Exception(
                 "ApplicationFilterTest.test: expect to return no entries");

@@ -50,7 +50,6 @@ import javax.security.auth.Subject;
 
 import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.json.JSONObject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -113,7 +112,7 @@ public class PrivilegeManagerTest {
         // appResources.add(RESOURCE);
         // appl.addResources(appResources);
         appl.setEntitlementCombiner(DenyOverride.class);
-        ApplicationServiceHelper.get().saveApplication(adminSubject, realm, appl);
+        ApplicationManager.saveApplication(adminSubject, realm, appl);
     }
 
     @AfterClass
@@ -130,8 +129,8 @@ public class PrivilegeManagerTest {
 
         PrivilegeManager prm = PrivilegeManager.getInstance("/", SubjectUtils.createSubject(adminToken));
         prm.remove(PRIVILEGE_NAME);
-        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
-        ApplicationServiceHelper.get().deleteApplication(adminSubject, SUB_REALM, APPL_NAME);
+        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationManager.deleteApplication(adminSubject, SUB_REALM, APPL_NAME);
 
         OrganizationConfigManager orgMgr = new OrganizationConfigManager(adminToken, "/");
         orgMgr.deleteSubOrganization(SUB_REALM, true);

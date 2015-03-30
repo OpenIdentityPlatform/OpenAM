@@ -16,15 +16,18 @@
 
 package org.forgerock.openam.upgrade.steps.policy.conditions;
 
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import static org.forgerock.openam.upgrade.UpgradeServices.*;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import org.forgerock.openam.entitlement.service.ApplicationService;
+import java.security.PrivilegedAction;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.security.auth.Subject;
+
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -32,14 +35,12 @@ import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.openam.upgrade.steps.AbstractUpgradeStep;
 
-import javax.inject.Inject;
-import javax.security.auth.Subject;
-import java.security.PrivilegedAction;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.ApplicationManager;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Privilege;
+import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
 
 /**
  * <p>Will attempt to migrate old policy conditions to new entitlement conditions.</p>
@@ -60,7 +61,6 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
     private final Map<String, Set<String>> unUpgradablePolicies = new HashMap<String, Set<String>>();
     private final Map<String, Set<MigrationReport>> migrationReports = new HashMap<String, Set<MigrationReport>>();
     private final PolicyConditionUpgrader conditionUpgrader;
-    private final ApplicationService applicationService;
 
     /**
      * Constructs a new OldPolicyConditionMigrationUpgradeStep instance.
@@ -69,11 +69,10 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
      * @param connectionFactory An instance of a {@code ConnectionFactory}.
      */
     @Inject
-    public OldPolicyConditionMigrationUpgradeStep(ApplicationService applicationService, PrivilegedAction<SSOToken> adminTokenAction,
+    public OldPolicyConditionMigrationUpgradeStep(PrivilegedAction<SSOToken> adminTokenAction,
             @DataLayer(ConnectionType.DATA_LAYER) ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
         this.conditionUpgrader = new PolicyConditionUpgrader(new PolicyConditionUpgradeMap());
-        this.applicationService = applicationService;
     }
 
     private PrivilegeManager getPrivilegeManager(String realm) {
@@ -185,7 +184,7 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
 
         for (Map.Entry<String, Set<Privilege>> entry : privilegesToUpgrade.entrySet()) {
             String realm = entry.getKey();
-            applicationService.clearCache(realm); //ensure reading apps cleanly
+            ApplicationManager.clearCache(realm); //ensure reading apps cleanly
 
             PrivilegeManager privilegeManager = getPrivilegeManager(realm);
 

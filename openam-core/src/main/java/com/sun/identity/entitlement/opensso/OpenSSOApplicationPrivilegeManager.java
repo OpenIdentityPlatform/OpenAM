@@ -33,6 +33,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.DisplayUtils;
 import com.sun.identity.delegation.DelegationManager;
 import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationPrivilege;
 import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.Entitlement;
@@ -61,7 +62,6 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import java.io.UnsupportedEncodingException;
@@ -149,8 +149,8 @@ public class OpenSSOApplicationPrivilegeManager extends
         }
 
         for (String n : applicationNames) {
-            Application application = ApplicationServiceHelper.get().getApplication(
-                    PrivilegeManager.superAdminSubject, realm, n);
+            Application application = ApplicationManager.getApplication(
+                PrivilegeManager.superAdminSubject, realm, n);
             if (application == null) {
                 String[] params = {n};
                 throw new EntitlementException(321, params);
@@ -916,11 +916,11 @@ public class OpenSSOApplicationPrivilegeManager extends
         private Map<String, Set<String>> getAllResourceNamesInAllAppls() 
             throws EntitlementException {
             Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-            Set<String> applNames = ApplicationServiceHelper.get().getApplicationNames(
-                    PrivilegeManager.superAdminSubject, realm);
+            Set<String> applNames = ApplicationManager.getApplicationNames(
+                PrivilegeManager.superAdminSubject, realm);
 
             for (String s : applNames) {
-                Application appl = ApplicationServiceHelper.get().getApplication(PrivilegeManager.superAdminSubject, realm, s);
+                Application appl = ApplicationManager.getApplication(PrivilegeManager.superAdminSubject, realm, s);
                 map.put(s, getAllBaseResource(appl));
             }
             return map;
@@ -1043,8 +1043,8 @@ public class OpenSSOApplicationPrivilegeManager extends
             throws EntitlementException {
             Entitlement ent = privilege.getEntitlement();
             String applName = ent.getApplicationName();
-            Application appl = ApplicationServiceHelper.get().getApplication(
-                    PrivilegeManager.superAdminSubject, realm, applName);
+            Application appl = ApplicationManager.getApplication(
+                PrivilegeManager.superAdminSubject, realm, applName);
             if (appl == null) {
                 return false;
             }
@@ -1071,8 +1071,8 @@ public class OpenSSOApplicationPrivilegeManager extends
 
             Set<String> applicationNames = map.keySet();
             for (String applName : applicationNames) {
-                Application appl = ApplicationServiceHelper.get().getApplication(
-                        PrivilegeManager.superAdminSubject, realm, applName);
+                Application appl = ApplicationManager.getApplication(
+                    PrivilegeManager.superAdminSubject, realm, applName);
                 if (appl == null) {
                     return false;
                 }

@@ -16,11 +16,11 @@
 package org.forgerock.openam.core.guice;
 
 import com.google.inject.AbstractModule;
-import com.sun.identity.entitlement.ApplicationServiceImpl;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfigurationImpl;
-import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.entitlement.service.ResourceTypeServiceImpl;
 
 /**
  * Guice model for defining object bindings for all things related
@@ -34,7 +34,6 @@ public class CoreEntitlementGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ResourceTypeConfiguration.class).to(ResourceTypeConfigurationImpl.class);
-        bind(ApplicationService.class).to(ApplicationServiceImpl.class);
     }
 
 }

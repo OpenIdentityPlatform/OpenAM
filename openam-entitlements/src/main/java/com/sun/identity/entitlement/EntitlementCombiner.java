@@ -29,8 +29,6 @@
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,7 +73,7 @@ public abstract class EntitlementCombiner {
      */
     public void init(String realm, String applicationName, String normalisedResourceName, String requestedResourceName,
                      Set<String> actions, boolean isRecursive) throws EntitlementException {
-        Application application = ApplicationServiceHelper.get().getApplication(
+        Application application = ApplicationManager.getApplication(
                 PrivilegeManager.superAdminSubject, realm, applicationName);
         init(normalisedResourceName, requestedResourceName, actions, isRecursive, application);
     }

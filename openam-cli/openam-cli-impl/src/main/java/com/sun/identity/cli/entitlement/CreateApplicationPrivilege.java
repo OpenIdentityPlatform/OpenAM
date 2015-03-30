@@ -39,7 +39,6 @@ import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.SubjectImplementation;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
-import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import java.text.MessageFormat;
@@ -56,9 +55,8 @@ import javax.security.auth.Subject;
 public class CreateApplicationPrivilege extends ApplicationPrivilegeBase {
 
     @Inject
-    public CreateApplicationPrivilege(ResourceTypeService resourceTypeService,
-                                      ApplicationService applicationService) {
-        super(resourceTypeService, applicationService);
+    public CreateApplicationPrivilege(ResourceTypeService resourceTypeService) {
+        super(resourceTypeService);
     }
 
     /**

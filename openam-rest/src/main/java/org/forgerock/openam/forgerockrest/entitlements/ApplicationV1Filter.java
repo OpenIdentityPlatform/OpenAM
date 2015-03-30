@@ -41,6 +41,7 @@ import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeSmsAttributes;
 import org.forgerock.openam.entitlement.configuration.SmsAttribute;
 import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
@@ -73,19 +74,19 @@ public class ApplicationV1Filter implements Filter {
     private static final String APPLICATION_NAME = "name";
 
     private final ResourceTypeService resourceTypeService;
-    private final ApplicationService applicationService;
+    private final ApplicationServiceFactory applicationServiceFactory;
     private final ExceptionMappingHandler<EntitlementException, ResourceException> resourceErrorHandler;
     private final ContextHelper contextHelper;
     private final Debug debug;
 
     @Inject
     public ApplicationV1Filter(final ResourceTypeService resourceTypeService,
-                               final ApplicationService applicationService,
+                               final ApplicationServiceFactory applicationServiceFactory,
                                final ExceptionMappingHandler<EntitlementException, ResourceException> resourceErrorHandler,
                                final ContextHelper contextHelper,
                                @Named("frRest") final Debug debug) {
         this.resourceTypeService = resourceTypeService;
-        this.applicationService = applicationService;
+        this.applicationServiceFactory = applicationServiceFactory;
         this.resourceErrorHandler = resourceErrorHandler;
         this.contextHelper = contextHelper;
         this.debug = debug;
@@ -258,7 +259,8 @@ public class ApplicationV1Filter implements Filter {
         final String applicationName = request.getResourceName();
 
         try {
-            final Application application = applicationService.getApplication(callingSubject, realm, applicationName);
+            final ApplicationService applicationService = applicationServiceFactory.create(callingSubject, realm);
+            final Application application = applicationService.getApplication(applicationName);
 
             if (application == null) {
                 handler.handleError(ResourceException

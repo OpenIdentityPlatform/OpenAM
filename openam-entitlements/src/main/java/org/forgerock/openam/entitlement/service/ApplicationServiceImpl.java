@@ -15,28 +15,35 @@
  */
 package org.forgerock.openam.entitlement.service;
 
+import com.google.inject.assistedinject.Assisted;
 import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
+import org.forgerock.util.Reject;
+
+import javax.inject.Inject;
+import javax.security.auth.Subject;
 
 /**
- * Application service to handle all things relating to applications.
+ * An application service implementation that delegates to the static calls against {@link ApplicationManager}.
  *
- * @see ApplicationServiceFactory
  * @since 13.0.0
  */
-public interface ApplicationService {
+public class ApplicationServiceImpl implements ApplicationService {
 
-    /**
-     * Retrieves an application instance for the passed name.
-     *
-     * @param applicationName
-     *         the application name
-     *
-     * @return an application instance, null if the application doesn't exist
-     *
-     * @throws EntitlementException
-     *         should some error occur during the application retrieval
-     */
-    Application getApplication(String applicationName) throws EntitlementException;
+    private final Subject subject;
+    private final String realm;
+
+    @Inject
+    public ApplicationServiceImpl(@Assisted final Subject subject, @Assisted final String realm) {
+        Reject.ifNull(subject, realm);
+        this.subject = subject;
+        this.realm = realm;
+    }
+
+    @Override
+    public Application getApplication(String applicationName) throws EntitlementException {
+        return ApplicationManager.getApplication(subject, realm, applicationName);
+    }
 
 }

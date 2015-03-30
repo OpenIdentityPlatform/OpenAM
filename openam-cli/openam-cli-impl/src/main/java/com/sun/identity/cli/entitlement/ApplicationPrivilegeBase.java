@@ -37,6 +37,7 @@ import com.sun.identity.cli.ExitCodes;
 import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.RequestContext;
 import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationPrivilege;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.SubjectImplementation;
@@ -46,16 +47,15 @@ import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdType;
 import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
-import javax.security.auth.Subject;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.security.auth.Subject;
 
 /**
  *
@@ -109,12 +109,9 @@ public abstract class ApplicationPrivilegeBase extends AuthenticatedCommand {
     }
 
     private final ResourceTypeService resourceTypeService;
-    private final ApplicationService applicationService;
 
-    public ApplicationPrivilegeBase(final ResourceTypeService resourceTypeService,
-                                    final ApplicationService applicationService) {
+    public ApplicationPrivilegeBase(final ResourceTypeService resourceTypeService) {
         this.resourceTypeService = resourceTypeService;
-        this.applicationService = applicationService;
     }
 
     /**
@@ -169,8 +166,8 @@ public abstract class ApplicationPrivilegeBase extends AuthenticatedCommand {
         String appName = getStringOptionValue(PARAM_APPL_NAME);
         Subject subject = SubjectUtils.createSubject(getAdminSSOToken());
 
-        Application application = applicationService.getApplication(
-                subject, realm, appName);
+        Application application = ApplicationManager.getApplication(
+            subject, realm, appName);
         if (application == null) {
             String[] param = {appName};
             throw new CLIException(MessageFormat.format(getResourceString("privilege-application-application-invalid"),

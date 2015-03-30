@@ -24,7 +24,7 @@
  *
  * $Id: Evaluator.java,v 1.2 2009/09/10 16:35:38 veiming Exp $
  *
- * Portions copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2013-2014 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -39,7 +39,6 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.monitoring.EntitlementConfigurationWrapper;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitoringType;
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 
 /**
  * The class evaluates entitlement request and provides decisions.
@@ -202,7 +201,7 @@ public class Evaluator {
         long startTime = System.currentTimeMillis();
 
         // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
-        Application application = ApplicationServiceHelper.get()
+        Application application = ApplicationManager
                 .getApplication(PrivilegeManager.superAdminSubject, realm, applicationName);
 
         if (application == null) {

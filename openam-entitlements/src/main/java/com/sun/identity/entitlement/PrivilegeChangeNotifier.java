@@ -24,7 +24,7 @@
  *
  * $Id: PrivilegeChangeNotifier.java,v 1.5 2010/01/07 00:19:11 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -41,8 +41,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -146,8 +144,8 @@ public class PrivilegeChangeNotifier {
                     return true;
                 }
 
-                Application app = ApplicationServiceHelper.get().getApplication(
-                        PrivilegeManager.superAdminSubject, realm, appName);
+                Application app = ApplicationManager.getApplication(
+                    PrivilegeManager.superAdminSubject, realm, appName);
                 ResourceName resourceComp = app.getResourceComparator();
 
                 for (String r : res) {

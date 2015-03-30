@@ -33,11 +33,11 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import java.security.AccessController;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -66,12 +66,12 @@ public class ApplicationTypeTest {
         Set<String> subjects = new HashSet<String>();
         subjects.add("com.sun.identity.admin.model.OrViewSubject");
         appl.setSubjects(subjects);
-        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", appl);
+        ApplicationManager.saveApplication(adminSubject, "/", appl);
     }
 
     @AfterClass
     public void cleanup() throws EntitlementException {
-        ApplicationServiceHelper.get().deleteApplication(adminSubject, "/", APPL_NAME);
+        ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
     }
 
     @Test
@@ -91,8 +91,8 @@ public class ApplicationTypeTest {
     
     @Test
     public void testApplication() throws Exception {
-        Application app = ApplicationServiceHelper.get().getApplication(adminSubject,
-                "/", APPL_NAME);
+        Application app = ApplicationManager.getApplication(adminSubject,
+            "/", APPL_NAME);
         if (app == null) {
             throw new Exception("ApplicationTypeTest.testApplication cannot get application");
         }
@@ -101,10 +101,10 @@ public class ApplicationTypeTest {
         // Map<String, Boolean> actions = new HashMap<String, Boolean>();
         // actions.put("action", true);
         // app.setActions(actions);
-        ApplicationServiceHelper.get().saveApplication(adminSubject, "/", app);
+        ApplicationManager.saveApplication(adminSubject,"/", app);
 
-        app = ApplicationServiceHelper.get().getApplication(adminSubject, "/",
-                APPL_NAME);
+        app = ApplicationManager.getApplication(adminSubject, "/",
+            APPL_NAME);
         if (app == null) {
             throw new Exception("ApplicationTypeTest.testApplication application lost");
         }

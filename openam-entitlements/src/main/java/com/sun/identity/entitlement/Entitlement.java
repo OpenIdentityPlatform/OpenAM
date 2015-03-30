@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 
-import org.forgerock.openam.entitlement.service.ApplicationServiceHelper;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -806,8 +805,8 @@ public class Entitlement {
     public Application getApplication(Subject adminSubject, String realm)
         throws EntitlementException {
         if (application == null) {
-            application = ApplicationServiceHelper.get().getApplication(
-                    PrivilegeManager.superAdminSubject, realm, applicationName);
+            application = ApplicationManager.getApplication(
+                PrivilegeManager.superAdminSubject, realm, applicationName);
         }
         if (application == null) {
             PrivilegeManager.debug.error("Entitlement.getApplication null"

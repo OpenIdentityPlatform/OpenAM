@@ -43,6 +43,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -64,6 +65,8 @@ import java.util.Set;
  */
 public class PolicyV1FilterTest {
 
+    @Mock
+    private ApplicationServiceFactory applicationServiceFactory;
     @Mock
     private ApplicationService applicationService;
     @Mock
@@ -95,7 +98,7 @@ public class PolicyV1FilterTest {
         EntitlementsExceptionMappingHandler resourceErrorHandler =
                 new EntitlementsExceptionMappingHandler(
                         ForgerockRestGuiceModule.getEntitlementsErrorHandlers());
-        filter = new PolicyV1Filter(applicationService, resourceErrorHandler, contextHelper, debug);
+        filter = new PolicyV1Filter(applicationServiceFactory, resourceErrorHandler, contextHelper, debug);
         subject = new Subject();
     }
 
@@ -127,8 +130,9 @@ public class PolicyV1FilterTest {
         JsonValue jsonValue = json(object(field("applicationName", "testApp")));
         given(createRequest.getContent()).willReturn(jsonValue);
 
+        given(applicationServiceFactory.create(subject, "/abc")).willReturn(applicationService);
         Application application = mock(Application.class);
-        given(applicationService.getApplication(subject, "/abc", "testApp")).willReturn(application);
+        given(applicationService.getApplication("testApp")).willReturn(application);
 
         Set<String> resourceTypeUUIDs = new HashSet<String>(CollectionUtils.asSet("abc-def-hij"));
         given(application.getResourceTypeUuids()).willReturn(resourceTypeUUIDs);
@@ -137,7 +141,8 @@ public class PolicyV1FilterTest {
         filter.filterCreate(context, createRequest, resourceResultHandler, requestHandler);
 
         // Then
-        verify(applicationService).getApplication(subject, "/abc", "testApp");
+        verify(applicationServiceFactory).create(subject, "/abc");
+        verify(applicationService).getApplication("testApp");
         verify(requestHandler).handleCreate(eq(context), eq(createRequest), resourceResultHandlerCaptor.capture());
         assertThat(jsonValue.get("resourceTypeUuid").asString()).isEqualTo("abc-def-hij");
 
@@ -176,13 +181,15 @@ public class PolicyV1FilterTest {
         JsonValue jsonValue = json(object(field("applicationName", "testApp")));
         given(createRequest.getContent()).willReturn(jsonValue);
 
-        given(applicationService.getApplication(subject, "/abc", "testApp")).willReturn(null);
+        given(applicationServiceFactory.create(subject, "/abc")).willReturn(applicationService);
+        given(applicationService.getApplication("testApp")).willReturn(null);
 
         // When
         filter.filterCreate(context, createRequest, resourceResultHandler, requestHandler);
 
         // Then
-        verify(applicationService).getApplication(subject, "/abc", "testApp");
+        verify(applicationServiceFactory).create(subject, "/abc");
+        verify(applicationService).getApplication("testApp");
         verify(resourceResultHandler).handleError(isNotNull(ResourceException.class));
         // Request should not be forwarded.
         verifyNoMoreInteractions(requestHandler);
@@ -201,8 +208,9 @@ public class PolicyV1FilterTest {
         JsonValue jsonValue = json(object(field("applicationName", "testApp")));
         given(createRequest.getContent()).willReturn(jsonValue);
 
+        given(applicationServiceFactory.create(subject, "/abc")).willReturn(applicationService);
         Application application = mock(Application.class);
-        given(applicationService.getApplication(subject, "/abc", "testApp")).willReturn(application);
+        given(applicationService.getApplication("testApp")).willReturn(application);
 
         Set<String> resourceTypeUUIDs = new HashSet<String>(CollectionUtils.asSet("abc-def-hij", "123-456-789"));
         given(application.getResourceTypeUuids()).willReturn(resourceTypeUUIDs);
@@ -211,7 +219,8 @@ public class PolicyV1FilterTest {
         filter.filterCreate(context, createRequest, resourceResultHandler, requestHandler);
 
         // Then
-        verify(applicationService).getApplication(subject, "/abc", "testApp");
+        verify(applicationServiceFactory).create(subject, "/abc");
+        verify(applicationService).getApplication("testApp");
         verify(resourceResultHandler).handleError(isNotNull(ResourceException.class));
         // Request should not be forwarded.
         verifyNoMoreInteractions(requestHandler);
