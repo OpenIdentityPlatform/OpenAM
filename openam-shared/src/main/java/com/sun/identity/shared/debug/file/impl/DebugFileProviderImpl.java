@@ -46,7 +46,7 @@ public class DebugFileProviderImpl implements DebugFileProvider {
 
         } catch (InvalidDebugConfigurationException e) {
             StdDebugFile.printError("DebugConfiguration", "'" + DebugConstants.CONFIG_DEBUG_PROPERTIES +
-                    "isn't valid, the default configuration will be used instead.", e);
+                    "' isn't valid, the default configuration will be used instead: " + e.getMessage(), null);
             this.configuration = DefaultDebugConfiguration.getInstance();
         }
     }
