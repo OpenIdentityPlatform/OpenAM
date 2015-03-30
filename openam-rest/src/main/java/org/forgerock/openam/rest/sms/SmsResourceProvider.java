@@ -16,15 +16,11 @@
 
 package org.forgerock.openam.rest.sms;
 
-import static org.forgerock.json.fluent.JsonValue.object;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.NotFoundException;
@@ -38,7 +34,6 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;

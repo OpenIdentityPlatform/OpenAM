@@ -69,6 +69,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
  * Instances of this class also register themselves as listeners with the
  * {@link SMSNotificationManager} and when schemas are added/modified/removed, the URI structure
  * and resource providers are updated accordingly.
+ * @since 13.0.0
  */
 public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
 

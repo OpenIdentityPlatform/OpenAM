@@ -57,6 +57,7 @@ import com.sun.identity.sm.ServiceSchema;
 
 /**
  * A CREST collection provider for SMS schema config.
+ * @since 13.0.0
  */
 public class SmsCollectionProvider extends SmsResourceProvider implements CollectionResourceProvider {
 

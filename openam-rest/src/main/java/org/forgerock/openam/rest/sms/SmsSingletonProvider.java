@@ -39,7 +39,6 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.util.Reject;
 
@@ -47,7 +46,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -158,7 +156,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
                 }
             } else {
                 ServiceConfig parent = parentSubConfigFor(serverContext, scm);
-                parent.addSubConfig(lastSchemaNodeName(), lastSchemaNodeName(), -1, attrs);
+                parent.addSubConfig(resourceId(), lastSchemaNodeName(), -1, attrs);
                 config = parent.getSubConfig(lastSchemaNodeName());
             }
             JsonValue result = converter.toJson(config.getAttributes());
