@@ -104,6 +104,9 @@
           <#if nonce??>
             <input type="hidden" name="nonce" value="${nonce?html}"/>
           </#if>
+          <#if acr??>
+            <input type="hidden" name="acr" value="${acr?html}"/>
+          </#if>
           <!-- Required parameters -->
           <input type="hidden" name="response_type" value="${response_type}"/>
           <input type="hidden" name="client_id" value="${client_id}"/>

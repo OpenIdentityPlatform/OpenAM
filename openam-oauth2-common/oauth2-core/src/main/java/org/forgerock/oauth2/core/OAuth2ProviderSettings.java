@@ -225,12 +225,28 @@ public interface OAuth2ProviderSettings {
     Set<String> getResourceOwnerAuthenticatedAttributes() throws ServerException;
 
     /**
-     * Gets the OpenID connect claims with the OAuth2 provider supports.
+     * Gets the supported claims for this provider.
      *
      * @return A {@code Set} of the supported claims.
      * @throws ServerException If any internal server error occurs.
      */
     Set<String> getSupportedClaims() throws ServerException;
+
+    /**
+     * Gets the supported scopes for this provider.
+     *
+     * @return A {@code Set} of the supported scopes.
+     * @throws ServerException If any internal server error occurs.
+     */
+    Set<String> getSupportedScopes() throws ServerException;
+
+    /**
+     * Gets the default set of scopes to give a client registering with this provider.
+     *
+     * @return A {@code Set} of the default scopes.
+     * @throws ServerException If any internal server error occurs.
+     */
+    Set<String> getDefaultScopes() throws ServerException;
 
     /**
      * Gets the algorithms that the OAuth2 provider supports for signing OpenID tokens.
