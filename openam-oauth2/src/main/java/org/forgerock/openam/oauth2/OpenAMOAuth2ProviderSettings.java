@@ -607,36 +607,6 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     /**
      * {@inheritDoc}
      */
-    public Set<String> getSupportedScopes() throws ServerException {
-        try {
-            return getSetting(realm, OAuth2ProviderService.SUPPORTED_SCOPES);
-        } catch (SMSException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (SSOException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Set<String> getDefaultScopes() throws ServerException {
-        try {
-            return getSetting(realm, OAuth2ProviderService.DEFAULT_SCOPES);
-        } catch (SMSException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        } catch (SSOException e) {
-            logger.error(e.getMessage());
-            throw new ServerException(e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public Set<String> getSupportedIDTokenSigningAlgorithms() throws ServerException {
         try {
             return getSetting(realm, OAuth2ProviderService.ID_TOKEN_SIGNING_ALGORITHMS);

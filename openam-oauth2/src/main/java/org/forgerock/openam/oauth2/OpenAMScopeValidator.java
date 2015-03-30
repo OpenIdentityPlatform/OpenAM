@@ -16,8 +16,28 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.OPENID;
+import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.script.Bindings;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.security.AccessController;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.sso.SSOException;
@@ -32,27 +52,7 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
-import java.security.AccessController;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.script.Bindings;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -171,33 +171,24 @@ public class OpenAMScopeValidator implements ScopeValidator {
     public Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request)
             throws UnauthorizedClientException, NotFoundException {
 
+        Set<String> scopes = token.getScope();
         Map<String, Object> response = new HashMap<String, Object>();
+        AMIdentity id = identityManager.getResourceOwnerIdentity(token.getResourceOwnerId(), token.getRealm());
+
+        response.put(OAuth2Constants.JWTTokenParams.SUB, token.getResourceOwnerId());
+        response.put(OAuth2Constants.JWTTokenParams.UPDATED_AT, getUpdatedAt(token.getResourceOwnerId(),
+                token.getRealm(), request));
+
         Bindings scriptVariables = new SimpleBindings();
-        SSOToken ssoToken = getUsersSession(request);
-
-        if (token != null) {
-            Set<String> scopes = token.getScope();
-            AMIdentity id = identityManager.getResourceOwnerIdentity(token.getResourceOwnerId(), token.getRealm());
-
-            response.put(OAuth2Constants.JWTTokenParams.SUB, token.getResourceOwnerId());
-            response.put(OAuth2Constants.JWTTokenParams.UPDATED_AT, getUpdatedAt(token.getResourceOwnerId(),
-                    token.getRealm(), request));
-
-            scriptVariables.put("identity", id);
-            scriptVariables.put("scopes", scopes);
-        } else {
-            scriptVariables.put("identity", null);
-            scriptVariables.put("scopes", null);
-        }
-
         scriptVariables.put("logger", logger);
         scriptVariables.put("claims", response);
         scriptVariables.put("accessToken", token);
-        scriptVariables.put("session", ssoToken);
+        scriptVariables.put("session", getUsersSession(request));
+        scriptVariables.put("identity", id);
+        scriptVariables.put("scopes", scopes);
 
         try {
-            ScriptObject script = getOIDCClaimsExtensionScript(
-                    DNMapper.orgNameToRealmName(ssoToken.getProperty("Organization")));
+            ScriptObject script = getOIDCClaimsExtensionScript(token.getRealm());
             try {
                 return scriptEvaluator.evaluateScript(script, scriptVariables);
             } catch (ScriptException e) {
@@ -206,8 +197,6 @@ public class OpenAMScopeValidator implements ScopeValidator {
             }
         } catch (ServerException e) {
             //API does not allow ServerExceptions to be thrown!
-            throw new NotFoundException(e.getMessage());
-        } catch (SSOException e) {
             throw new NotFoundException(e.getMessage());
         }
     }

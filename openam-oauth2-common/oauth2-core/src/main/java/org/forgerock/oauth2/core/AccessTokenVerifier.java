@@ -16,6 +16,7 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.slf4j.Logger;

@@ -114,7 +114,7 @@ public class OpenIDConnectProviderDiscovery {
         final Set<Object> set = new HashSet<Object>();
         final Map<String, Object> objectMap = new HashMap<String, Object>();
         objectMap.put("rel", rel);
-        objectMap.put("href", deploymentUrl + "/oauth2");
+        objectMap.put("href", deploymentUrl);
         set.add(objectMap);
         response.put("links", set);
 

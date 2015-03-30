@@ -207,19 +207,15 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
                 opsId, atHash, cHash, acr, amr, realm);
         request.setSession(ops);
 
-        //See spec section 5.4. -
-        if (request.<String>getParameter("realm").equals("id_token")) {
-            try {
-                AccessToken accessToken = request.getToken(AccessToken.class);
-                Map<String, Object> userInfo = providerSettings.getUserInfo(accessToken, request);
+        try {
+            AccessToken accessToken = request.getToken(AccessToken.class);
+            Map<String, Object> userInfo = providerSettings.getUserInfo(accessToken, request);
 
-                for (Map.Entry<String, Object> claim : userInfo.entrySet()) {
-                    oidcToken.put(claim.getKey(), claim.getValue());
-                }
-
-            } catch (UnauthorizedClientException e) {
-                throw new InvalidClientException(e.getMessage());
+            for (Map.Entry<String, Object> claim : userInfo.entrySet()) {
+                oidcToken.put(claim.getKey(), claim.getValue());
             }
+        } catch (UnauthorizedClientException e) {
+            throw new InvalidClientException(e.getMessage());
         }
 
         return oidcToken;

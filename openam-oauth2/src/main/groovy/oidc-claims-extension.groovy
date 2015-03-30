@@ -31,30 +31,28 @@ import com.sun.identity.idm.IdRepoException
 // user session not guaranteed to be present
 boolean sessionPresent = session != null
 
+profileAttributeMap = [
+    "email": ["email": "mail"],
+    "address": ["address": "postaladdress"],
+    "phone": ["phone": "telephonenumber"],
+    "profile": [
+            "given_name": "givenname",
+            "zoneinfo": "preferredtimezone",
+            "family_name": "sn",
+            "locale": "preferredlocale",
+            "name": "cn"
+    ]
+]
+
 def fromSet = { claim, attr ->
     if (attr != null && attr.size() == 1){
         attr.iterator().next()
     } else if (attr != null && attr.size() > 1){
         attr
     } else if (logger.warningEnabled()) {
-        logger.warning("OpenAMScopeValidator.getUserInfo(): Got an empty result for claim=" + claim);
+        logger.warning("OpenAMScopeValidator.getUserInfo(): Got an empty result for scope=" + claim);
     }
 }
-
-attributeRetriever = { attribute, claim, identity -> fromSet(claim, identity.getAttribute(attribute))}
-
-profileAttributeMap = [
-        "email": ["email": attributeRetriever.curry("mail")],
-        "address": ["address": { claim, identity -> [ "formatted" : attributeRetriever("postaladdress", claim, identity) ] } ],
-        "phone": ["phone": attributeRetriever.curry("telephonenumber")],
-        "profile": [
-                "given_name": attributeRetriever.curry("givenname"),
-                "zoneinfo": attributeRetriever.curry("preferredtimezone"),
-                "family_name": attributeRetriever.curry("sn"),
-                "locale": attributeRetriever.curry("preferredlocale"),
-                "name": attributeRetriever.curry("cn")
-        ]
-]
 
 if (logger.messageEnabled()) {
     scopes.findAll { s -> !("openid".equals(s) || profileAttributeMap.containsKey(s)) }.each { s ->
@@ -64,9 +62,9 @@ if (logger.messageEnabled()) {
 
 scopes.findAll { s -> !"openid".equals(s) && profileAttributeMap.containsKey(s) }.inject(claims) { map, s ->
     attributes = profileAttributeMap.get(s)
-    map << attributes.collectEntries([:]) { claim, attributeMapper ->
+    map << attributes.collectEntries([:]) { claim, attribute ->
         try {
-            [ claim, attributeMapper(claim, identity) ]
+            [ claim,  fromSet(claim, identity.getAttribute(attribute)) ]
         } catch (IdRepoException e) {
             if (logger.warningEnabled()) {
                 logger.warning("OpenAMScopeValidator.getUserInfo(): Unable to retrieve attribute=" + attribute, e);

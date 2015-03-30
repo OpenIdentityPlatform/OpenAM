@@ -149,27 +149,26 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
             }
 
             List<String> scopes = input.get(SCOPES.getType()).asList(String.class);
-            if (scopes != null && !scopes.isEmpty()) {
-                if (!containsAllCaseInsensitive(providerSettings.getSupportedScopes(), scopes)) {
+            if (scopes != null) {
+                if (containsAllCaseInsensitive(providerSettings.getSupportedClaims(), scopes)) {
+                    if (!scopes.contains(OPENID_SCOPE)) {
+                        scopes = new ArrayList<String>(scopes);
+                        scopes.add(OPENID_SCOPE);
+                    }
+                    clientBuilder.setAllowedGrantScopes(scopes);
+                } else {
                     logger.error("Invalid scopes requested.");
                     throw new InvalidClientMetadata();
                 }
-            } else { //if nothing requested, fall back to provider defaults
-                scopes = new ArrayList<String>();
-                scopes.addAll(providerSettings.getDefaultScopes());
-            }
-
-            //regardless, we add openid
-            if (!scopes.contains(OPENID_SCOPE)) {
-                scopes = new ArrayList<String>(scopes);
+            } else {
+                scopes = new ArrayList<String>(1);
                 scopes.add(OPENID_SCOPE);
+                clientBuilder.setAllowedGrantScopes(scopes);
             }
-
-            clientBuilder.setAllowedGrantScopes(scopes);
 
             List<String> defaultScopes = input.get(DEFAULT_SCOPES.getType()).asList(String.class);
             if (defaultScopes != null) {
-                if (containsAllCaseInsensitive(providerSettings.getSupportedScopes(), defaultScopes)) {
+                if (containsAllCaseInsensitive(providerSettings.getSupportedClaims(), defaultScopes)) {
                     clientBuilder.setDefaultGrantScopes(defaultScopes);
                 } else {
                     throw new InvalidClientMetadata();

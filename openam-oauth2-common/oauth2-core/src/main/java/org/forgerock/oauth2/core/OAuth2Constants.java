@@ -802,6 +802,7 @@ public class OAuth2Constants {
         public static final String RESPONSE_TYPE_LIST = "forgerock-oauth2-provider-response-type-map-class";
         public static final String AUTHENITCATION_ATTRIBUTES = "forgerock-oauth2-provider-authentication-attributes";
         public static final String SAVED_CONSENT_ATTRIBUTE = "forgerock-oauth2-provider-saved-consent-attribute";
+        public static final String SUPPORTED_SCOPE = "forgerock-oauth2-provider-supported-scopes";
         public static final String OIDC_CLAIMS_EXTENSION_SCRIPT = "forgerock-oauth2-provider-oidc-claims-extension-script";
         public static final String OIDC_CLAIMS_EXTENSION_SCRIPT_TYPE = "forgerock-oauth2-provider-oidc-claims-extension-script-type";
         public static final String JKWS_URI = "forgerock-oauth2-provider-jkws-uri";
@@ -811,6 +812,7 @@ public class OAuth2Constants {
         public static final String SUBJECT_TYPES_SUPPORTED = "forgerock-oauth2-provider-subject-types-supported";
         public static final String ID_TOKEN_SIGNING_ALGORITHMS =
                 "forgerock-oauth2-provider-id-token-signing-algorithms-supported";
+        public static final String SUPPORTED_CLAIMS = "forgerock-oauth2-provider-supported-claims";
         public static final String KEYSTORE_ALIAS = "forgerock-oauth2-provider-keypair-name";
         public static final String OPEN_DYNAMIC_REGISTRATION_ALLOWED = "forgerock-oauth2-provider-allow-open-dynamic-registration";
         public static final String GENERATE_REGISTRATION_ACCESS_TOKENS = "forgerock-oauth2-provider-generate-registration-access-tokens";
@@ -822,10 +824,6 @@ public class OAuth2Constants {
         public static final String EMAIL_MAPPING = "org-forgerock-oidc-email-attribute-mapping";
         public static final String ADDRESS_MAPPING = "org-forgerock-oidc-address-attribute-mapping";
         public static final String PHONE_MAPPING = "org-forgerock-oidc-phone-attribute-mapping";
-
-        public static final String SUPPORTED_CLAIMS = "forgerock-oauth2-provider-supported-claims";
-        public static final String DEFAULT_SCOPES = "forgerock-oauth2-provider-default-scopes";
-        public static final String SUPPORTED_SCOPES = "forgerock-oauth2-provider-supported-scopes";
     }
 
     /**
@@ -899,7 +897,6 @@ public class OAuth2Constants {
         public static final String AMR = "amr";
         public static final String AT_HASH = "at_hash";
         public static final String C_HASH = "c_hash";
-        public static final String KEY_ID = "kid";
     }
 
     /**
