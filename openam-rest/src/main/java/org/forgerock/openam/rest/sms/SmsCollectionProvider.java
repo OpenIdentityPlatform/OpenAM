@@ -72,7 +72,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
 
     @Override
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handleAction(request, handler);
+        super.handleAction(context, request, handler);
     }
 
     /**

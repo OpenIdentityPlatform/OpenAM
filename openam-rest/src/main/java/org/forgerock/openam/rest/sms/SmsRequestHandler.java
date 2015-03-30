@@ -247,7 +247,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
                         new SmsJsonConverter(schema), schema, schemaType, new ArrayList<ServiceSchema>(schemaPath),
                         parentPath, true));
                 debug.message("Adding collection path {}", path);
-                serviceRoutes.add(router.addRoute(RoutingMode.EQUALS, path, handler));
+                serviceRoutes.add(router.addRoute(RoutingMode.STARTS_WITH, path, handler));
                 parentPath = path + "/{" + schemaName + "}";
             } else {
                 RequestHandler handler = singletonProviderFactory.create(

@@ -171,8 +171,8 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     }
 
     @Override
-    public void handleAction(ServerContext serverContext, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handleAction(request, handler);
+    public void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+        super.handleAction(context, request, handler);
     }
 
     /**

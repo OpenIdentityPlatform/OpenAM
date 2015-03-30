@@ -16,11 +16,25 @@
 
 package org.forgerock.openam.rest.sms;
 
+import static com.sun.identity.sm.AttributeSchema.Syntax.*;
+import static org.forgerock.json.fluent.JsonValue.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
+import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.NotFoundException;
@@ -30,10 +44,12 @@ import org.forgerock.json.resource.RouterContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
@@ -47,6 +63,7 @@ import com.sun.identity.sm.ServiceSchema;
  */
 abstract class SmsResourceProvider {
 
+    public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = Arrays.asList(NUMBER, DECIMAL, PERCENT, NUMBER_RANGE, DECIMAL_RANGE, DECIMAL_NUMBER);
     protected final String serviceName;
     protected final String serviceVersion;
     protected final List<ServiceSchema> subSchemaPath;
@@ -150,14 +167,99 @@ abstract class SmsResourceProvider {
         return schema.getName();
     }
 
-    protected void handleAction(ActionRequest request, ResultHandler<JsonValue> handler) {
+    protected void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
         if (request.getAction().equals("template")) {
-            Map attrs = schema.getAttributeDefaults();
-            JsonValue result = converter.toJson(attrs);
-            handler.handleResult(result);
+            handler.handleResult(createTemplate(context));
         } else {
             handler.handleError(new NotSupportedException("Action not supported: " + request.getAction()));
         }
+    }
+
+    private JsonValue createTemplate(ServerContext context) {
+        Map attrs = schema.getAttributeDefaults();
+        JsonValue result = converter.toJson(attrs);
+
+        Map<String, String> attributeSectionMap = getAttributeNameToSection(schema);
+        ResourceBundle i18n = ResourceBundle.getBundle(schema.getI18NFileName());
+        ResourceBundle console = ResourceBundle.getBundle("amConsole");
+        String serviceType = schema.getServiceType().getType();
+
+        String sectionOrder = console.getString("sections." + serviceName + "." + serviceType);
+        NumberFormat sectionFormat = new DecimalFormat("00");
+        List<String> sections = new ArrayList<String>();
+        if (StringUtils.isNotEmpty(sectionOrder)) {
+            sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
+        }
+
+        for (AttributeSchema attribute : (Set<AttributeSchema>)schema.getAttributeSchemas()) {
+            String i18NKey = attribute.getI18NKey();
+            if (i18NKey != null && i18NKey.length() > 0) {
+                String attributePath = attribute.getResourceName();
+                if (!sections.isEmpty()) {
+                    String section = attributeSectionMap.get(attribute.getName());
+                    String sectionLabel = "section.label." + serviceName + "." + serviceType + "." + section;
+                    attributePath = section + "/properties/" + attributePath;
+                    result.putPermissive(new JsonPointer("/_schema/properties/" + section + "/type"), "object");
+                    result.putPermissive(new JsonPointer("/_schema/properties/" + section + "/title"),
+                            console.getString(sectionLabel));
+                    result.putPermissive(new JsonPointer("/_schema/properties/" + section + "/order"),
+                            "z" + sectionFormat.format(sections.indexOf(section)));
+                }
+                addType(result, "/_schema/properties/" + attributePath, attribute);
+                result.addPermissive(new JsonPointer("/_schema/properties/" + attributePath + "/title"),
+                        i18n.getString(i18NKey));
+                result.addPermissive(new JsonPointer("/_schema/properties/" + attributePath + "/order"), i18NKey);
+            }
+        }
+
+        return result;
+    }
+
+    private void addType(JsonValue result, String pointer, AttributeSchema attribute) {
+        String type;
+        if (attribute.getType() == AttributeSchema.Type.LIST && (
+                attribute.getUIType() == AttributeSchema.UIType.GLOBALMAPLIST ||
+                attribute.getUIType() == AttributeSchema.UIType.MAPLIST)) {
+            type = "object";
+            result.addPermissive(new JsonPointer(pointer + "/patternProperties"),
+                    object(field(".*", object(field("type", "string")))));
+        } else if (attribute.getType() == AttributeSchema.Type.LIST) {
+            type = "array";
+            result.addPermissive(new JsonPointer(pointer + "/items"), object(field("type", "string")));
+        } else if (attribute.getSyntax() == BOOLEAN) {
+            type = "boolean";
+        } else if (NUMBER_SYNTAXES.contains(attribute.getSyntax())) {
+            type = "number";
+        } else {
+            type = "string";
+        }
+        result.addPermissive(new JsonPointer(pointer + "/type"), type);
+    }
+
+    protected HashMap<String, String> getAttributeNameToSection(ServiceSchema schema) {
+        HashMap<String, String> result = new HashMap<String, String>();
+
+        String serviceSectionFilename = schema.getServiceName() + ".section.properties";
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(serviceSectionFilename);
+
+        if (inputStream != null) {
+            String line;
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            try {
+                while ((line = reader.readLine()) != null) {
+                    if (!(line.matches("^\\#.*") || line.isEmpty())) {
+                        String[] attributeValue = line.split("=");
+                        final String sectionName = attributeValue[0];
+                        result.put(attributeValue[1], sectionName);
+                    }
+                }
+            } catch (IOException e) {
+                if (debug.errorEnabled()) {
+                    debug.error("Error reading section properties file", e);
+                }
+            }
+        }
+        return result;
     }
 
 }
