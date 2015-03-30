@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -706,6 +706,9 @@ public class IdentityServicesHandler extends HttpServlet {
             } catch (ObjectNotFound ex) {
                 // write out the proper ObjectNotFound exception.
                 // set the response error code
+                if(debug.messageEnabled()) {
+                    debug.message("An objecjNotFound exception has been caught; details: ", ex);
+                }
                 try {
                     mar.newInstance(ObjectNotFound.class).marshall(wrt, ex);
                     response.setStatus(401);
@@ -715,6 +718,9 @@ public class IdentityServicesHandler extends HttpServlet {
                 }
             } catch (GeneralFailure ex) {
                 // write out the proper security based exception..
+                if(debug.messageEnabled()) {
+                    debug.message("A generalFailure exception has been caught; details: ", ex);
+                }
                 try {
                     mar.newInstance(GeneralFailure.class).marshall(wrt, ex);
                     response.setStatus(500);
@@ -723,6 +729,9 @@ public class IdentityServicesHandler extends HttpServlet {
                     throw new ServletException(e);
                 }
             } catch (Throwable e) {
+                if(debug.messageEnabled()) {
+                    debug.message("An unknown exception has been caught; details: ", e);
+                }
                 try {
                     // something really went wrong so just give up..
                     mar.newInstance(Throwable.class).marshall(wrt, e);
