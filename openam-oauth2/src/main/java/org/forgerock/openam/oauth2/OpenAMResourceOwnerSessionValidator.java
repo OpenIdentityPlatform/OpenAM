@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.oauth2;
 
+import static org.forgerock.oauth2.core.Utils.*;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -25,6 +27,16 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.AccessController;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
@@ -46,16 +58,6 @@ import org.restlet.data.Form;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.ext.servlet.ServletUtils;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.AccessController;
-import java.util.Map;
-
-import static org.forgerock.oauth2.core.Utils.isEmpty;
 
 /**
  * Validates whether a resource owner has a current authenticated session.
@@ -115,6 +117,12 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                     final AMIdentity id = IdUtils.getIdentity(
                             AccessController.doPrivileged(AdminTokenAction.getInstance()),
                             token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
+
+                    final String acrValuesStr = request.getParameter(OAuth2Constants.Params.ACR_VALUES);
+                    if (acrValuesStr != null) {
+                        setCurrentAcr(token, request, acrValuesStr);
+                    }
+
                     return new OpenAMResourceOwner(token.getProperty("UserToken"), id);
                 } catch (SSOException e) {
                     logger.error("Error authenticating user against OpenAM: ", e);
@@ -136,6 +144,27 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
         } catch (URISyntaxException e) {
             throw new AccessDeniedException(e);
         }
+    }
+
+    /**
+     * If the user is already logged in when the OAuth2 request comes in with an acr_values parameter, we
+     * look to see if they've already matched one. If they have, we set the acr value on the request.
+     */
+    private void setCurrentAcr(SSOToken token, OAuth2Request request, String acrValuesStr)
+            throws NotFoundException, ServerException, SSOException {
+        String serviceUsed = token.getProperty("Service");
+        Set<String> acrValues = new HashSet<String>(Arrays.asList(acrValuesStr.split("\\s+")));
+        OAuth2ProviderSettings settings = providerSettingsFactory.get(request);
+        Map<String, AuthenticationMethod> acrMap = settings.getAcrMapping();
+        for (String acr : acrValues) {
+            if (acrMap.containsKey(acr)) {
+                if (serviceUsed.equals(acrMap.get(acr).getName())) {
+                    final Request req = request.getRequest();
+                    req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, acr);
+                }
+            }
+        }
+
     }
 
     private ResourceOwnerAuthenticationRequired authenticationRequired(OAuth2Request request)
