@@ -16,20 +16,35 @@
 
 package org.forgerock.openam.rest.sms;
 
+import static org.forgerock.openam.rest.sms.SmsRouteTree.*;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSNotificationManager;
+import com.sun.identity.sm.SMSObjectListener;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.guava.common.base.Function;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -48,19 +63,6 @@ import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSNotificationManager;
-import com.sun.identity.sm.SMSObjectListener;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
-
 /**
  * A CREST routing request handler that creates collection and singleton resource providers for
  * the SMS configuration services. Uses the {@link ServiceManager} to get a list of all registered
@@ -73,6 +75,12 @@ import com.sun.identity.sm.ServiceSchemaManager;
  */
 public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
 
+    private static final Function<String, Boolean> AUTHENTICATION_MODULE_HANDLES_FUNCTION = new Function<String, Boolean>() {
+        @Override
+        public Boolean apply(String serviceName) {
+            return AMAuthenticationManager.getAuthenticationServiceNames().contains(serviceName);
+        }
+    };
     private static final List<String> EXCLUDED_SERVICES = Arrays.asList(
             "iPlanetAMPolicyService", "RestSecurityTokenService");
     private static final String DEFAULT_VERSION = "1.0";
@@ -81,8 +89,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     private final SchemaType schemaType;
     private final Debug debug;
     private final Pattern schemaDnPattern;
-    private Map<String, Set<Route>> serviceRoutes;
-    private Router router;
+    private Map<String, Map<SmsRouteTree, Route>> serviceRoutes = new HashMap<String, Map<SmsRouteTree, Route>>();
+    private final SmsRouteTree routeTree;
 
     @Inject
     public SmsRequestHandler(@Assisted SchemaType type, SmsCollectionProviderFactory collectionProviderFactory,
@@ -94,6 +102,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         this.debug = debug;
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
+        routeTree = tree(branch("/authentication", leaf("/modules", AUTHENTICATION_MODULE_HANDLES_FUNCTION)));
 
         createServices();
         SMSNotificationManager.getInstance().registerCallbackHandler(this);
@@ -122,12 +131,12 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
                     break;
                 case SMSObjectListener.ADD:
                     if (!serviceRoutes.containsKey(svcName)) {
-                        serviceRoutes.put(svcName, addService(getServiceManager(), svcName, svcVersion, this.router));
+                        serviceRoutes.put(svcName, addService(getServiceManager(), svcName, svcVersion));
                     }
                     break;
                 case SMSObjectListener.MODIFY:
                     removeService(svcName);
-                    serviceRoutes.put(svcName, addService(getServiceManager(), svcName, svcVersion, this.router));
+                    serviceRoutes.put(svcName, addService(getServiceManager(), svcName, svcVersion));
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown modification type: " + type);
@@ -160,17 +169,15 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * @throws SSOException From downstream service manager layer.
      */
     private void createServices() throws SSOException, SMSException {
-        Router router = new Router();
-        Map<String, Set<Route>> serviceRoutes = new HashMap<String, Set<Route>>();
+        Map<String, Map<SmsRouteTree, Route>> serviceRoutes = new HashMap<String, Map<SmsRouteTree, Route>>();
         ServiceManager sm = getServiceManager();
         Set<String> serviceNames = sm.getServiceNames();
         for (String serviceName : serviceNames) {
-            Set<Route> routes = addService(sm, serviceName, DEFAULT_VERSION, router);
+            Map<SmsRouteTree, Route> routes = addService(sm, serviceName, DEFAULT_VERSION);
             if (routes != null) {
                 serviceRoutes.put(serviceName, routes);
             }
         }
-        this.router = router;
         this.serviceRoutes = serviceRoutes;
     }
 
@@ -178,8 +185,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * Remove routes for the service name.
      */
     private void removeService(String name) {
-        for (Route route : serviceRoutes.get(name)) {
-            router.removeRoute(route);
+        for (Map.Entry<SmsRouteTree, Route> routeEntry : serviceRoutes.get(name).entrySet()) {
+            routeEntry.getKey().removeRoute(routeEntry.getValue());
         }
         serviceRoutes.remove(name);
     }
@@ -192,12 +199,11 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * @param sm The ServiceManager instance to use.
      * @param serviceName The name of the service being added.
      * @param serviceVersion The version of the service being added.
-     * @param router The router for routes to be added to.
      * @return The routes that were configured.
      * @throws SMSException From downstream service manager layer.
      * @throws SSOException From downstream service manager layer.
      */
-    private Set<Route> addService(ServiceManager sm, String serviceName, String serviceVersion, Router router)
+    private Map<SmsRouteTree, Route> addService(ServiceManager sm, String serviceName, String serviceVersion)
             throws SMSException, SSOException {
         if (EXCLUDED_SERVICES.contains(serviceName)) {
             debug.message("Excluding service from REST SMS: {}", serviceName);
@@ -206,19 +212,19 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
 
         ServiceSchemaManager ssm = sm.getSchemaManager(serviceName, serviceVersion);
         String resourceName = ssm.getResourceName();
-        Set<Route> routes = new HashSet<Route>();
+        Map<SmsRouteTree, Route> routes = new HashMap<SmsRouteTree, Route>();
 
         if (schemaType == SchemaType.GLOBAL) {
             ServiceSchema globalSchema = ssm.getGlobalSchema();
             if (globalSchema != null) {
                 debug.message("Adding global schema REST SMS endpoints for service: {}", serviceName);
-                addPaths(resourceName, new ArrayList<ServiceSchema>(), globalSchema, router, routes);
+                addPaths(resourceName, new ArrayList<ServiceSchema>(), globalSchema, routes);
             }
         }
         ServiceSchema organizationSchema = ssm.getOrganizationSchema();
         if (organizationSchema != null) {
             debug.message("Adding realm schema REST SMS endpoints for service: {}", serviceName);
-            addPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, router, routes);
+            addPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, routes);
         }
         return routes;
     }
@@ -229,12 +235,11 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * @param schemaPath The path for schema that is built up as we navigate through the Schema and SubSchema
      *                   declarations for the service.
      * @param schema The Schema or SubSchema instance for this iteration of the method.
-     * @param router The router to add routes to.
      * @param serviceRoutes Routes added for the service are added to this set for later removal if needed.
      * @throws SMSException From downstream service manager layer.
      */
-    private void addPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema schema, Router router,
-            Set<Route> serviceRoutes) throws SMSException {
+    private void addPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema schema,
+            Map<SmsRouteTree, Route> serviceRoutes) throws SMSException {
         String schemaName = schema.getResourceName();
         String path = parentPath;
         // Top-level schemas don't have a name and we don't want them in our schema path
@@ -248,21 +253,28 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
                         new SmsJsonConverter(schema), schema, schemaType, new ArrayList<ServiceSchema>(schemaPath),
                         parentPath, true));
                 debug.message("Adding collection path {}", path);
-                serviceRoutes.add(router.addRoute(RoutingMode.STARTS_WITH, path, handler));
+                serviceRoutes.putAll(addRoute(schema, RoutingMode.STARTS_WITH, path, handler));
                 parentPath = path + "/{" + schemaName + "}";
             } else {
                 RequestHandler handler = singletonProviderFactory.create(
                          new SmsJsonConverter(schema), schema, schemaType, new ArrayList<ServiceSchema>(schemaPath),
                          parentPath, true);
                 debug.message("Adding singleton path {}", path);
-                router.addRoute(RoutingMode.EQUALS, path, handler);
+                serviceRoutes.putAll(addRoute(schema, RoutingMode.EQUALS, path, handler));
                 parentPath = path;
             }
         }
         for (String subSchema : (Set<String>) schema.getSubSchemaNames()) {
-            addPaths(parentPath, new ArrayList<ServiceSchema>(schemaPath), schema.getSubSchema(subSchema), router,
+            addPaths(parentPath, new ArrayList<ServiceSchema>(schemaPath), schema.getSubSchema(subSchema),
                     serviceRoutes);
         }
+    }
+
+    private Map<SmsRouteTree, Route> addRoute(ServiceSchema schema, RoutingMode mode, String path,
+            RequestHandler handler) {
+        SmsRouteTree tree = routeTree.handles(schema.getServiceName());
+        Route route = tree.addRoute(mode, path, handler);
+        return Collections.singletonMap(tree, route);
     }
 
     /**
@@ -277,65 +289,65 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     }
 
     /**
-     * Delegates the request to the internal {@link #router} for SMS requests.
+     * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
      */
     @Override
     public void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        router.handleAction(context, request, handler);
+        routeTree.handleAction(context, request, handler);
     }
 
     /**
-     * Delegates the request to the internal {@link #router} for SMS requests.
+     * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
      */
     @Override
     public void handleCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        router.handleCreate(context, request, handler);
+        routeTree.handleCreate(context, request, handler);
     }
 
     /**
-     * Delegates the request to the internal {@link #router} for SMS requests.
+     * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
      */
     @Override
     public void handleDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler) {
-        router.handleDelete(context, request, handler);
+        routeTree.handleDelete(context, request, handler);
     }
 
     /**
-     * Delegates the request to the internal {@link #router} for SMS requests.
+     * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
      */
     @Override
     public void handlePatch(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
-        router.handlePatch(context, request, handler);
+        routeTree.handlePatch(context, request, handler);
     }
 
     /**
-     * Delegates the request to the internal {@link #router} for SMS requests.
+     * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
      */
     @Override
     public void handleQuery(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-        router.handleQuery(context, request, handler);
+        routeTree.handleQuery(context, request, handler);
     }
 
     /**
-     * Delegates the request to the internal {@link #router} for SMS requests.
+     * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
      */
     @Override
     public void handleRead(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
-        router.handleRead(context, request, handler);
+        routeTree.handleRead(context, request, handler);
     }
 
     /**
-     * Delegates the request to the internal {@link #router} for SMS requests.
+     * Delegates the request to the internal {@link #routeTree} for SMS requests.
      * {@inheritDoc}
      */
     @Override
     public void handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
-        router.handleUpdate(context, request, handler);
+        routeTree.handleUpdate(context, request, handler);
     }
 }

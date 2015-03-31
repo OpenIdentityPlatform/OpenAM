@@ -27,9 +27,9 @@ your own identifying information:
 $Id: fmAuthSAE.xml,v 1.3 2008/06/25 05:51:13 qcheng Exp $
 
 -->
-
-
-
+<!--
+    Portions Copyright 2015 ForgeRock AS.
+-->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
     "jar://com/sun/identity/sm/sms.dtd">
@@ -38,14 +38,16 @@ $Id: fmAuthSAE.xml,v 1.3 2008/06/25 05:51:13 qcheng Exp $
         <Schema
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthSAEService"
             i18nFileName="fmAuthSAE"
-	    revisionNumber="10"
-            i18nKey="sunAMAuthSAEServiceDescription">
+	        revisionNumber="10"
+            i18nKey="sunAMAuthSAEServiceDescription"
+            resourceName="sae">
 	    
             <Organization>                  
 		<AttributeSchema name="sunAMAuthSAEAuthLevel"
                     type="single"
                     syntax="number"
-                    i18nKey="a500">
+                    i18nKey="a500"
+                    resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -54,7 +56,8 @@ $Id: fmAuthSAE.xml,v 1.3 2008/06/25 05:51:13 qcheng Exp $
     		    <AttributeSchema name="sunAMAuthSAEAuthLevel"
                         type="single"
                         syntax="number"
-                        i18nKey="a500">
+                        i18nKey="a500"
+                         resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>

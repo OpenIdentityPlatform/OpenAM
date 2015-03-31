@@ -2,7 +2,7 @@
 <!--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+    Copyright 2011-2015 ForgeRock AS.
     Copyright 2011 Cybernetica AS.
 
     The contents of this file are subject to the terms
@@ -39,59 +39,62 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthOAuthService"
             i18nFileName="amAuthOAuth"
             revisionNumber="1"
-            i18nKey="description">
+            i18nKey="description"
+            resourceName="oauth2">
 
             <Organization>
                 <AttributeSchema name="iplanet-am-auth-oauth-client-id"
-                                 type="single" syntax="string" i18nKey="a101">
+                                 type="single" syntax="string" i18nKey="a101" resourceName="clientId">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-client-secret"
-                                 type="single" syntax="password" i18nKey="a102">
+                                 type="single" syntax="password" i18nKey="a102" resourceName="clientSecret">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-auth-service"
-                                 type="single" syntax="string" i18nKey="a103">
+                                 type="single" syntax="string" i18nKey="a103"
+                                 resourceName="authenticationEndpointUrl">
                     <DefaultValues>
                         <Value>https://www.facebook.com/dialog/oauth</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-token-service"
-                                 type="single" syntax="string" i18nKey="a104">
+                                 type="single" syntax="string" i18nKey="a104" resourceName="accessTokenEndpointUrl">
                     <DefaultValues>
                         <Value>https://graph.facebook.com/oauth/access_token</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-user-profile-service"
-                                 type="single" syntax="string" i18nKey="a105">
+                                 type="single" syntax="string" i18nKey="a105" resourceName="userProfileServiceUrl">
                     <DefaultValues>
                         <Value>https://graph.facebook.com/me</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-scope"
-                                 type="single" syntax="string" i18nKey="a106">
+                                 type="single" syntax="string" i18nKey="a106" resourceName="scope">
                     <DefaultValues>
                         <Value>email,read_stream</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-user-profile-param"
-                                 type="single" syntax="string" i18nKey="a107">
+                                 type="single" syntax="string" i18nKey="a107"
+                                 resourceName="accessTokenParameterName">
                     <DefaultValues>
                         <Value>access_token</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-sso-proxy-url"
-                                 type="single" syntax="string" i18nKey="a108">
+                                 type="single" syntax="string" i18nKey="a108" resourceName="ssoProxyUrl">
                     <DefaultValues>
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/oauth2c/OAuthProxy.jsp</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-account-provider"
-                                 type="single" syntax="string" i18nKey="a108a">
+                                 type="single" syntax="string" i18nKey="a108a" resourceName="accountProviderClass">
                     <DefaultValues>
                         <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-account-mapper"
-                                 type="single" syntax="string" i18nKey="a109">
+                                 type="single" syntax="string" i18nKey="a109" resourceName="accountMapperClass">
                     <DefaultValues>
                         <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
                     </DefaultValues>
@@ -99,14 +102,15 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                 <AttributeSchema name="org-forgerock-auth-oauth-account-mapper-configuration"
                     type="list"
                     syntax="string"
-                    i18nKey="a110">
+                    i18nKey="a110"
+                    resourceName="accountMapperConfiguration">
                     <DefaultValues>
                         <Value>id=facebook-id</Value>
                         <Value>email=mail</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper"
-                                 type="list" syntax="string" i18nKey="a111">
+                                 type="list" syntax="string" i18nKey="a111" resourceName="attributeMappingClasses">
                     <DefaultValues>
                         <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
                     </DefaultValues>
@@ -114,7 +118,8 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                 <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper-configuration"
                     type="list"
                     syntax="string"
-                    i18nKey="a112">
+                    i18nKey="a112"
+                    resourceName="attributeMapperConfiguration">
                     <DefaultValues>
                         <Value>first_name=givenname</Value>
                         <Value>last_name=sn</Value>
@@ -127,7 +132,8 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-save-attributes-to-session-flag"
-                                 type="single" syntax="boolean" i18nKey="a115">
+                                 type="single" syntax="boolean" i18nKey="a115"
+                                 resourceName="saveAttributesInSession">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -137,13 +143,13 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-mail-attribute"
-                                 type="single" syntax="string" i18nKey="a118">
+                                 type="single" syntax="string" i18nKey="a118" resourceName="oauth2EmailAttribute">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-createaccount-flag"
-                                 type="single" syntax="boolean" i18nKey="a120">
+                                 type="single" syntax="boolean" i18nKey="a120" resourceName="createAccount">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -153,7 +159,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-prompt-password-flag"
-                                 type="single" syntax="boolean" i18nKey="a122">
+                                 type="single" syntax="boolean" i18nKey="a122" resourceName="promptForPassword">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -163,7 +169,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-map-to-anonymous-flag"
-                                 type="single" syntax="boolean" i18nKey="a124">
+                                 type="single" syntax="boolean" i18nKey="a124" resourceName="mapToAnonymousUser">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -173,19 +179,19 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-anonymous-user"
-                                 type="single" syntax="string" i18nKey="a126">
+                                 type="single" syntax="string" i18nKey="a126" resourceName="anonymousUserName">
                     <DefaultValues>
                         <Value>anonymous</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-logout-service-url"
-                                 type="single" syntax="string" i18nKey="a128">
+                                 type="single" syntax="string" i18nKey="a128" resourceName="oauth2LogoutServiceUrl">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-logout-behaviour"
-                                 type="single_choice" syntax="string" i18nKey="a130">
+                                 type="single_choice" syntax="string" i18nKey="a130" resourceName="logoutBehaviour">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="prompt">prompt</ChoiceValue>
                         <ChoiceValue i18nKey="logout">logout</ChoiceValue>
@@ -196,58 +202,60 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-email-gwy-impl"
-                                 type="single" syntax="string" i18nKey="a132">
+                                 type="single" syntax="string" i18nKey="a132" resourceName="mailGatewayClass">
                     <DefaultValues>
                         <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-smtp-hostname"
-                                 type="single" syntax="string" i18nKey="a134">
+                                 type="single" syntax="string" i18nKey="a134" resourceName="smtpHostName">
                     <DefaultValues>
                         <Value>localhost</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-smtp-port"
-                                 type="single" syntax="string" i18nKey="a136">
+                                 type="single" syntax="string" i18nKey="a136" resourceName="smtpHostPort">
                     <DefaultValues>
                         <Value>25</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-smtp-username"
-                                 type="single" syntax="string" i18nKey="a138">
+                                 type="single" syntax="string" i18nKey="a138" resourceName="smtpUsername">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-smtp-password"
-                                 type="single" syntax="password" i18nKey="a140">
+                                 type="single" syntax="password" i18nKey="a140" resourceName="smtpPassword">
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-smtp-ssl_enabled"
-                                 type="single" syntax="boolean" i18nKey="a142">
+                                 type="single" syntax="boolean" i18nKey="a142" resourceName="smtpSslEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
                     </BooleanValues>
                 </AttributeSchema>
                 <AttributeSchema name="org-forgerock-auth-oauth-smtp-email-from"
-                                 type="single" syntax="string" i18nKey="a144">
+                                 type="single" syntax="string" i18nKey="a144" resourceName="smtpFromAddress">
                     <DefaultValues>
                         <Value>info@forgerock.com</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oauth-auth-level"
                                  type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="a500">
+                                 rangeEnd="2147483647" i18nKey="a500" resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema name="openam-auth-openidconnect-issuer-name"
-                                 type="single" syntax="string" i18nKey="oidc.issuer_name">
+                                 type="single" syntax="string" i18nKey="oidc.issuer_name"
+                                 resourceName="openidConnectIssuer">
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
-                                 type="single_choice" syntax="string" i18nKey="oidc.crypto_context_type">
+                                 type="single_choice" syntax="string" i18nKey="oidc.crypto_context_type"
+                                 resourceName="openidConnectContextType">
                     <ChoiceValues>
                         <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
                         <ChoiceValue>jwk_url</ChoiceValue>
@@ -255,60 +263,63 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </ChoiceValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
-                                 type="single" syntax="string" i18nKey="oidc.crypto_context_value">
+                                 type="single" syntax="string" i18nKey="oidc.crypto_context_value"
+                                 resourceName="openidConnectContextValue">
                 </AttributeSchema>
 
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="iplanet-am-auth-oauth-client-id"
-                                     type="single" syntax="string" i18nKey="a101">
+                                     type="single" syntax="string" i18nKey="a101" resourceName="clientId">
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oauth-client-secret"
-                                     type="single" syntax="password" i18nKey="a102">
+                                     type="single" syntax="password" i18nKey="a102" resourceName="clientSecret">
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oauth-auth-service"
-                                     type="single" syntax="string" i18nKey="a103">
+                                     type="single" syntax="string" i18nKey="a103"
+                                     resourceName="authenticationEndpointUrl">
                         <DefaultValues>
                             <Value>https://www.facebook.com/dialog/oauth</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oauth-token-service"
-                                     type="single" syntax="string" i18nKey="a104">
+                                     type="single" syntax="string" i18nKey="a104" resourceName="accessTokenEndpointUrl">
                         <DefaultValues>
                             <Value>https://graph.facebook.com/oauth/access_token</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oauth-user-profile-service"
-                                     type="single" syntax="string" i18nKey="a105">
+                                     type="single" syntax="string" i18nKey="a105" resourceName="userProfileServiceUrl">
                         <DefaultValues>
                             <Value>https://graph.facebook.com/me</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oauth-scope"
-                                     type="single" syntax="string" i18nKey="a106">
+                                     type="single" syntax="string" i18nKey="a106" resourceName="scope">
                         <DefaultValues>
                             <Value>email,read_stream</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oauth-user-profile-param"
-                                     type="single" syntax="string" i18nKey="a107">
+                                     type="single" syntax="string" i18nKey="a107"
+                                     resourceName="accessTokenParameterName">
                         <DefaultValues>
                             <Value>access_token</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oauth-sso-proxy-url"
-                                     type="single" syntax="string" i18nKey="a108">
+                                     type="single" syntax="string" i18nKey="a108" resourceName="ssoProxyUrl">
                         <DefaultValues>
                             <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/oauth2c/OAuthProxy.jsp</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-account-provider"
-                                     type="single" syntax="string" i18nKey="a108a">
+                                     type="single" syntax="string" i18nKey="a108a" resourceName="accountProviderClass">
                         <DefaultValues>
                             <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-account-mapper"
-                                     type="single" syntax="string" i18nKey="a109">
+                                     type="single" syntax="string" i18nKey="a109" resourceName="accountMapperClass">
                         <DefaultValues>
                             <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
                         </DefaultValues>
@@ -316,14 +327,14 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     <AttributeSchema name="org-forgerock-auth-oauth-account-mapper-configuration"
                         type="list"
                         syntax="string"
-                        i18nKey="a110">
+                        resourceName="accountMapperConfiguration">
                         <DefaultValues>
                             <Value>id=facebook-id</Value>
                             <Value>email=mail</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper"
-                                     type="list" syntax="string" i18nKey="a111">
+                                     type="list" syntax="string" i18nKey="a111" resourceName="attributeMappingClasses">
                         <DefaultValues>
                             <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
                         </DefaultValues>
@@ -331,7 +342,8 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper-configuration"
                         type="list"
                         syntax="string"
-                        i18nKey="a112">
+                        i18nKey="a112"
+                        resourceName="attributeMapperConfiguration">
                         <DefaultValues>
                             <Value>first_name=givenname</Value>
                             <Value>last_name=sn</Value>
@@ -344,7 +356,8 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-save-attributes-to-session-flag"
-                                     type="single" syntax="boolean" i18nKey="a115">
+                                     type="single" syntax="boolean" i18nKey="a115"
+                                     resourceName="saveAttributesInSession">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -354,13 +367,13 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-mail-attribute"
-                                     type="single" syntax="string" i18nKey="a118">
+                                     type="single" syntax="string" i18nKey="a118" resourceName="oauth2EmailAttribute">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-createaccount-flag"
-                                     type="single" syntax="boolean" i18nKey="a120">
+                                     type="single" syntax="boolean" i18nKey="a120" resourceName="createAccount">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -370,7 +383,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-prompt-password-flag"
-                                     type="single" syntax="boolean" i18nKey="a122">
+                                     type="single" syntax="boolean" i18nKey="a122" resourceName="promptForPassword">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -380,7 +393,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-map-to-anonymous-flag"
-                                     type="single" syntax="boolean" i18nKey="a124">
+                                     type="single" syntax="boolean" i18nKey="a124" resourceName="mapToAnonymousUser">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -390,19 +403,19 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-anonymous-user"
-                                     type="single" syntax="string" i18nKey="a126">
+                                     type="single" syntax="string" i18nKey="a126" resourceName="anonymousUserName">
                         <DefaultValues>
                             <Value>anonymous</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-logout-service-url"
-                                     type="single" syntax="string" i18nKey="a128">
+                                     type="single" syntax="string" i18nKey="a128" resourceName="oauth2LogoutServiceUrl">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-logout-behaviour"
-                                     type="single_choice" syntax="string" i18nKey="a130">
+                                     type="single_choice" syntax="string" i18nKey="a130" resourceName="logoutBehaviour">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="prompt">prompt</ChoiceValue>
                             <ChoiceValue i18nKey="logout">logout</ChoiceValue>
@@ -413,57 +426,59 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-email-gwy-impl"
-                                     type="single" syntax="string" i18nKey="a132">
+                                     type="single" syntax="string" i18nKey="a132" resourceName="mailGatewayClass">
                         <DefaultValues>
                             <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-smtp-hostname"
-                                     type="single" syntax="string" i18nKey="a134">
+                                     type="single" syntax="string" i18nKey="a134" resourceName="smtpHostName">
                         <DefaultValues>
                             <Value>localhost</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-smtp-port"
-                                     type="single" syntax="string" i18nKey="a136">
+                                     type="single" syntax="string" i18nKey="a136" resourceName="smtpHostPort">
                         <DefaultValues>
                             <Value>25</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-smtp-username"
-                                     type="single" syntax="string" i18nKey="a138">
+                                     type="single" syntax="string" i18nKey="a138" resourceName="smtpUsername">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-smtp-password"
-                                     type="single" syntax="password" i18nKey="a140">
+                                     type="single" syntax="password" i18nKey="a140" resourceName="smtpPassword">
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-smtp-ssl_enabled"
-                                     type="single" syntax="boolean" i18nKey="a142">
+                                     type="single" syntax="boolean" i18nKey="a142" resourceName="smtpSslEnabled">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
                         </BooleanValues>
                     </AttributeSchema>
                     <AttributeSchema name="org-forgerock-auth-oauth-smtp-email-from"
-                                     type="single" syntax="string" i18nKey="a144">
+                                     type="single" syntax="string" i18nKey="a144" resourceName="smtpFromAddress">
                         <DefaultValues>
                             <Value>info@forgerock.com</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oauth-auth-level"
                                      type="single" syntax="number_range" rangeStart="0"
-                                     rangeEnd="2147483647" i18nKey="a500">
+                                     rangeEnd="2147483647" i18nKey="a500" resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-issuer-name"
-                                     type="single" syntax="string" i18nKey="oidc.issuer_name">
+                                     type="single" syntax="string" i18nKey="oidc.issuer_name"
+                                     resourceName="openidConnectIssuer">
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
-                                     type="single_choice" syntax="string" i18nKey="oidc.crypto_context_type">
+                                     type="single_choice" syntax="string" i18nKey="oidc.crypto_context_type"
+                                     resourceName="openidConnectContextType">
                         <ChoiceValues>
                             <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
                             <ChoiceValue>jwk_url</ChoiceValue>
@@ -471,7 +486,8 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                         </ChoiceValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
-                                     type="single" syntax="string" i18nKey="oidc.crypto_context_value">
+                                     type="single" syntax="string" i18nKey="oidc.crypto_context_value"
+                                     resourceName="openidConnectContextValue">
                     </AttributeSchema>
                 </SubSchema>
             </Organization>

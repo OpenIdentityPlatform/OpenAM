@@ -187,6 +187,9 @@ public class RestEndpoints {
         FluentRouter rootRealmRouter = new RealmBlackListingFluentRouter(rootRealmRouterDelegate, invalidRealmNames);
         FluentRealmRouter dynamicRealmRouter = rootRealmRouter.dynamically();
 
+        // ------------------
+        // Realm based routes
+        // ------------------
         //not protected
         dynamicRealmRouter.route("/dashboard")
                 .forVersion("1.0").to(DashboardResource.class);
@@ -265,6 +268,17 @@ public class RestEndpoints {
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(ResourceTypesResource.class);
 
+        dynamicRealmRouter.route("/scripts")
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(ScriptResource.class);
+
+        dynamicRealmRouter.route("/realm-config")
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.ORGANIZATION));
+
+        // ------------------
+        // Global routes
+        // ------------------
         rootRealmRouter.route("/decisioncombiners")
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(DecisionCombinersResource.class);
@@ -284,17 +298,6 @@ public class RestEndpoints {
         rootRealmRouter.route("/global-config")
                 .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
                 .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.GLOBAL));
-
-        dynamicRealmRouter.route("/scripts")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
-                .forVersion("1.0").to(ScriptResource.class);
-        dynamicRealmRouter.route("/realm-config")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
-                .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.ORGANIZATION));
-
-//        dynamicRealmRouter.route("/scripts")
-//                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
-//                .forVersion("1.0").to(ScriptResource.class);
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
         VersionBehaviourConfigListener.bindToServiceConfigManager(dynamicRealmRouter);

@@ -27,6 +27,9 @@
     $Id: amAuthNT.xml,v 1.4 2008/06/25 05:45:41 qcheng Exp $
 
 -->
+<!--
+    Portions Copyright 2015 ForgeRock AS.
+-->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -38,31 +41,36 @@
             serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthNTService"
             i18nFileName="amAuthNT"
             revisionNumber="40"
-            i18nKey="iplanet-am-auth-nt-service-description">
+            i18nKey="iplanet-am-auth-nt-service-description"
+            resourceName="windowsnt">
 
             <Organization>
                 <AttributeSchema name="iplanet-am-auth-nt-domain"
                     type="single"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="authenticationDomain">
                 </AttributeSchema>
 
                 <AttributeSchema name="iplanet-am-auth-nt-host"
                     type="single"
                     syntax="string"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="authenticationHost">
                 </AttributeSchema>
 
                 <AttributeSchema name="iplanet-am-auth-samba-config-file-name"
                     type="single"
                     syntax="string"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="sambaConfigurationFileName">
                 </AttributeSchema>
 
                 <AttributeSchema name="iplanet-am-auth-nt-auth-level"
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -71,25 +79,29 @@
                     <AttributeSchema name="iplanet-am-auth-nt-domain"
                         type="single"
                         syntax="string"
-                        i18nKey="a101">
+                        i18nKey="a101"
+                        resourceName="authenticationDomain">
                     </AttributeSchema>
     
                     <AttributeSchema name="iplanet-am-auth-nt-host"
                         type="single"
                         syntax="string"
-                        i18nKey="a102">
+                        i18nKey="a102"
+                        resourceName="authenticationHost">
                     </AttributeSchema>
     
                     <AttributeSchema name="iplanet-am-auth-samba-config-file-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a103">
+                        i18nKey="a103"
+                        resourceName="sambaConfigurationFileName">
                     </AttributeSchema>
     
                     <AttributeSchema name="iplanet-am-auth-nt-auth-level"
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                        i18nKey="a104">
+                        i18nKey="a104"
+                        resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>

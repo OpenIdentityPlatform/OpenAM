@@ -27,6 +27,9 @@
     $Id: amAuthHTTPBasic.xml,v 1.4 2008/06/25 05:45:41 qcheng Exp $
 
 -->
+<!--
+    Portions Copyright 2015 ForgeRock AS.
+-->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -38,13 +41,15 @@
             serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthHTTPBasicService"
             i18nFileName="amAuthHTTPBasic"
             revisionNumber="30"
-            i18nKey="iplanet-am-auth-http-basic-service-description">
+            i18nKey="iplanet-am-auth-http-basic-service-description"
+            resourceName="httpbasic">
             
             <Organization>
                 <AttributeSchema name="iplanet-am-auth-http-basic-module-configured"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="backendModuleName">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                             className=
@@ -54,7 +59,8 @@
                 <AttributeSchema name="iplanet-am-auth-httpbasic-auth-level"
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -63,7 +69,8 @@
                     <AttributeSchema name="iplanet-am-auth-http-basic-module-configured"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a101">
+                        i18nKey="a101"
+                        resourceName="backendModuleName">
                         <ChoiceValues>
                         <ChoiceValuesClassName
                             className=
@@ -73,7 +80,8 @@
                         <AttributeSchema name="iplanet-am-auth-httpbasic-auth-level"
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                        i18nKey="a102">
+                        i18nKey="a102"
+                        resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>

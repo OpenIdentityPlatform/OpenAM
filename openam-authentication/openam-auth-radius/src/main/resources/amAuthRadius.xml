@@ -28,7 +28,7 @@
 
 -->
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2015 ForgeRock AS.
 -->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -39,14 +39,16 @@
         <Schema
             serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthRadiusService"
             i18nFileName="amAuthRadius"
-	    revisionNumber="30"
-            i18nKey="iplanet-am-auth-radius-service-description">
+	        revisionNumber="30"
+            i18nKey="iplanet-am-auth-radius-service-description"
+            resourceName="radius">
 
             <Organization>
                 <AttributeSchema name="iplanet-am-auth-radius-server1"
                     type="list"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="primaryRadiusServers">
 		    <DefaultValues>
                         <Value>127.0.0.1</Value>
 		    </DefaultValues>
@@ -55,7 +57,8 @@
                 <AttributeSchema name="iplanet-am-auth-radius-server2"
                     type="list"
                     syntax="string"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="secondaryRadiusServers">
 		    <DefaultValues>
                         <Value>127.0.0.1</Value>
 		    </DefaultValues>
@@ -64,12 +67,14 @@
                 <AttributeSchema name="iplanet-am-auth-radius-secret"
                     type="single"
                     syntax="password"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="sharedSecret">
 		</AttributeSchema>
 	        <AttributeSchema name="iplanet-am-auth-radius-server-port"
                     type="single"
                     syntax="number"
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    resourceName="serverPortNumber">
 		    <DefaultValues>
                         <Value>1645</Value>
 		    </DefaultValues>
@@ -77,7 +82,8 @@
 	        <AttributeSchema name="iplanet-am-auth-radius-auth-level"
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                    i18nKey="a500">
+                    i18nKey="a500"
+                    resourceName="authenticationLevel">
 		    <DefaultValues>
                         <Value>0</Value>
 		    </DefaultValues>
@@ -85,7 +91,8 @@
 	        <AttributeSchema name="iplanet-am-auth-radius-timeout"
                     type="single"
                     syntax="number"
-                    i18nKey="a105">
+                    i18nKey="a105"
+                    resourceName="serverTimeout">
 		    <DefaultValues>
                         <Value>3</Value>
 		    </DefaultValues>
@@ -93,7 +100,8 @@
 	        <AttributeSchema name="openam-auth-radius-healthcheck-interval"
                     type="single"
                     syntax="number"
-                    i18nKey="a106">
+                    i18nKey="a106"
+                    resourceName="healthCheckInterval">
 		    <DefaultValues>
                         <Value>5</Value>
 		    </DefaultValues>
@@ -102,7 +110,8 @@
                     <AttributeSchema name="iplanet-am-auth-radius-server1"
                         type="list"
                         syntax="string"
-                        i18nKey="a101">
+                        i18nKey="a101"
+                        resourceName="primaryRadiusServers">
     		    <DefaultValues>
                             <Value>127.0.0.1</Value>
     		    </DefaultValues>
@@ -111,7 +120,8 @@
                     <AttributeSchema name="iplanet-am-auth-radius-server2"
                         type="list"
                         syntax="string"
-                        i18nKey="a102">
+                        i18nKey="a102"
+                        resourceName="secondaryRadiusServers">
     		    <DefaultValues>
                             <Value>127.0.0.1</Value>
     		    </DefaultValues>
@@ -120,12 +130,14 @@
                     <AttributeSchema name="iplanet-am-auth-radius-secret"
                         type="single"
                         syntax="password"
-                        i18nKey="a103">
+                        i18nKey="a103"
+                        resourceName="sharedSecret">
     		    </AttributeSchema>
     	            <AttributeSchema name="iplanet-am-auth-radius-server-port"
                         type="single"
                         syntax="number"
-                        i18nKey="a104">
+                        i18nKey="a104"
+                        resourceName="serverPortNumber">
     		    <DefaultValues>
                             <Value>1645</Value>
     		    </DefaultValues>
@@ -133,7 +145,8 @@
     	            <AttributeSchema name="iplanet-am-auth-radius-auth-level"
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                        i18nKey="a500">
+                        i18nKey="a500"
+                        resourceName="authenticationLevel">
     		    <DefaultValues>
                             <Value>0</Value>
     		    </DefaultValues>
@@ -141,7 +154,8 @@
     	            <AttributeSchema name="iplanet-am-auth-radius-timeout"
                         type="single"
                         syntax="number"
-                        i18nKey="a105">
+                        i18nKey="a105"
+                        resourceName="serverTimeout">
     		    <DefaultValues>
                             <Value>3</Value>
     		    </DefaultValues>
@@ -149,7 +163,8 @@
 	            <AttributeSchema name="openam-auth-radius-healthcheck-interval"
                         type="single"
                         syntax="number"
-                        i18nKey="a106">
+                        i18nKey="a106"
+                        resourceName="healthCheckInterval">
 	            <DefaultValues>
                         <Value>5</Value>
 		    </DefaultValues>

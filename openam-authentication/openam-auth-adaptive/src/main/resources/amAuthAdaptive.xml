@@ -22,6 +22,9 @@
   your own identifying information:
   "Portions Copyrighted [year] [name of copyright owner]"
 -->
+<!--
+  Portions Copyright 2015 ForgeRock AS.
+-->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
     "jar://com/sun/identity/sm/sms.dtd">
@@ -29,13 +32,15 @@
     <Service name="sunAMAuthAdaptiveService" version="1.0">
         <Schema serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthAdaptiveService"
 			i18nFileName="amAuthAdaptive" revisionNumber="1"
-			i18nKey="iplanet-am-auth-adaptive-service-description">
+			i18nKey="iplanet-am-auth-adaptive-service-description"
+                resourceName="adaptiverisk">
             <Organization>
                 <AttributeSchema name="openam-auth-adaptive-auth-level"
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a500">
+                i18nKey="a500"
+                resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -44,7 +49,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a502">
+                i18nKey="a502"
+                resourceName="riskThreshold">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -53,7 +59,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a503">
+                i18nKey="a503"
+                resourceName="failedAuthenticationCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -66,7 +73,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a505">
+                i18nKey="a505"
+                resourceName="failureScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -75,7 +83,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a506">
+                i18nKey="a506"
+                resourceName="invertFailureScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -88,7 +97,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a507">
+                i18nKey="a507"
+                resourceName="ipRangeCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -101,7 +111,8 @@
                 cosQualifier="default"
                 type="list"
                 syntax="string"
-                i18nKey="a508">
+                i18nKey="a508"
+                resourceName="ipRange">
                     <DefaultValues>
                         <Value>10.0.0.0/24</Value>
                     </DefaultValues>
@@ -110,7 +121,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a509">
+                i18nKey="a509"
+                resourceName="ipRangeScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -119,7 +131,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a510">
+                i18nKey="a510"
+                resourceName="invertIPRangeScoreEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -132,7 +145,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a511">
+                i18nKey="a511"
+                resourceName="ipHistoryCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -145,7 +159,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a512">
+                i18nKey="a512"
+                resourceName="ipHistoryCount">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>
@@ -154,7 +169,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a513">
+                i18nKey="a513"
+                resourceName="ipHistoryProfileAttribute">
                     <DefaultValues>
                         <Value>iphistory</Value>
                     </DefaultValues>
@@ -163,7 +179,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a514">
+                i18nKey="a514"
+                resourceName="saveSuccessfulIP">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -176,7 +193,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a515">
+                i18nKey="a515"
+                resourceName="ipHistoryScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -185,7 +203,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a516">
+                i18nKey="a516"
+                resourceName="invertIPHistoryScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -198,7 +217,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a517">
+                i18nKey="a517"
+                resourceName="knownCookieCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -211,7 +231,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a518">
+                i18nKey="a518"
+                resourceName="knownCookieName">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -220,7 +241,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a519">
+                i18nKey="a519"
+                resourceName="knownCookieValue">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -229,7 +251,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a520">
+                i18nKey="a520"
+                resourceName="createKnownCookieOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -242,7 +265,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a521">
+                i18nKey="a521"
+                resourceName="knownCookieScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -251,7 +275,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a522">
+                i18nKey="a522"
+                resourceName="invertKnownCookieScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -264,7 +289,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a534">
+                i18nKey="a534"
+                resourceName="deviceCookieCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -277,7 +303,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a535">
+                i18nKey="a535"
+                resourceName="deviceCookieName">
                     <DefaultValues>
                         <Value>Device</Value>
                     </DefaultValues>
@@ -286,7 +313,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a536">
+                i18nKey="a536"
+                resourceName="saveDeviceCookieValueOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -299,7 +327,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a537">
+                i18nKey="a537"
+                resourceName="deviceCookieScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -308,7 +337,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a538">
+                i18nKey="a538"
+                resourceName="invertDeviceCookieScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -321,7 +351,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a523">
+                i18nKey="a523"
+                resourceName="timeSinceLastLoginCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -334,7 +365,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a524">
+                i18nKey="a524"
+                resourceName="timeSinceLastLoginCookieName">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -343,7 +375,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a525">
+                i18nKey="a525"
+                resourceName="maxTimeSinceLastLogin">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -352,7 +385,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a526">
+                i18nKey="a526"
+                resourceName="saveLastLoginTimeOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -365,7 +399,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a527">
+                i18nKey="a527"
+                resourceName="timeSinceLastLoginScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -374,7 +409,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a528">
+                i18nKey="a528"
+                resourceName="invertTimeSinceLastLoginScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -387,7 +423,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a529">
+                i18nKey="a529"
+                resourceName="profileRiskAttributeCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -400,7 +437,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a530">
+                i18nKey="a530"
+                resourceName="profileRiskAttributeName">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -409,7 +447,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a531">
+                i18nKey="a531"
+                resourceName="profileRiskAttributeValue">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -418,7 +457,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a532">
+                i18nKey="a532"
+                resourceName="profileRiskAttributeScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -427,7 +467,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a533">
+                i18nKey="a533"
+                resourceName="invertProfileRiskAttributeScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -440,7 +481,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a539">
+                i18nKey="a539"
+                resourceName="geolocationCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -453,7 +495,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a540">
+                i18nKey="a540"
+                resourceName="geolocationDatabaseLocation">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -462,7 +505,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a541">
+                i18nKey="a541"
+                resourceName="geolocationValidCountryCodes">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -471,7 +515,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a542">
+                i18nKey="a542"
+                resourceName="geolocationScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -480,7 +525,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a543">
+                i18nKey="a543"
+                resourceName="invertGeolocationScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -493,7 +539,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a544">
+                i18nKey="a544"
+                resourceName="requestHeaderCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -506,7 +553,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a545">
+                i18nKey="a545"
+                resourceName="requestHeaderName">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -515,7 +563,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a546">
+                i18nKey="a546"
+                resourceName="requestHeaderValue">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -524,7 +573,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a547">
+                i18nKey="a547"
+                resourceName="requestHeaderScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -533,7 +583,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a548">
+                i18nKey="a548"
+                resourceName="invertRequestHeaderScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -548,7 +599,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a500">
+                i18nKey="a500"
+                resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -557,7 +609,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a502">
+                i18nKey="a502"
+                resourceName="riskThreshold">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -566,7 +619,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a503">
+                i18nKey="a503"
+                resourceName="failedAuthenticationCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -579,7 +633,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a505">
+                i18nKey="a505"
+                resourceName="failureScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -588,7 +643,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a506">
+                i18nKey="a506"
+                resourceName="invertFailureScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -601,7 +657,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a507">
+                i18nKey="a507"
+                resourceName="ipRangeCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -614,7 +671,8 @@
                 cosQualifier="default"
                 type="list"
                 syntax="string"
-                i18nKey="a508">
+                i18nKey="a508"
+                resourceName="ipRange">
                     <DefaultValues>
                         <Value>10.0.0.0/24</Value>
                     </DefaultValues>
@@ -623,7 +681,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a509">
+                i18nKey="a509"
+                resourceName="ipRangeScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -632,7 +691,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a510">
+                i18nKey="a510"
+                resourceName="invertIPRangeScoreEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -645,7 +705,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a511">
+                i18nKey="a511"
+                resourceName="ipHistoryCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -658,7 +719,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a512">
+                i18nKey="a512"
+                resourceName="ipHistoryCount">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>
@@ -667,7 +729,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a513">
+                i18nKey="a513"
+                resourceName="ipHistoryProfileAttribute">
                     <DefaultValues>
                         <Value>iphistory</Value>
                     </DefaultValues>
@@ -676,7 +739,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a514">
+                i18nKey="a514"
+                resourceName="saveSuccessfulIP">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -689,7 +753,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a515">
+                i18nKey="a515"
+                resourceName="ipHistoryScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -698,7 +763,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a516">
+                i18nKey="a516"
+                resourceName="invertIPHistoryScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -711,7 +777,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a517">
+                i18nKey="a517"
+                resourceName="knownCookieCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -724,7 +791,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a518">
+                i18nKey="a518"
+                resourceName="knownCookieName">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -733,7 +801,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a519">
+                i18nKey="a519"
+                resourceName="knownCookieValue">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -742,7 +811,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a520">
+                i18nKey="a520"
+                resourceName="createKnownCookieOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -755,7 +825,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a521">
+                i18nKey="a521"
+                resourceName="knownCookieScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -764,7 +835,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a522">
+                i18nKey="a522"
+                resourceName="invertKnownCookieScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -777,7 +849,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a534">
+                i18nKey="a534"
+                resourceName="deviceCookieCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -790,7 +863,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a535">
+                i18nKey="a535"
+                resourceName="deviceCookieName">
                     <DefaultValues>
                         <Value>Device</Value>
                     </DefaultValues>
@@ -799,7 +873,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a536">
+                i18nKey="a536"
+                resourceName="saveDeviceCookieValueOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -812,7 +887,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a537">
+                i18nKey="a537"
+                resourceName="deviceCookieScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -821,7 +897,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a538">
+                i18nKey="a538"
+                resourceName="invertDeviceCookieScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -834,7 +911,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a523">
+                i18nKey="a523"
+                resourceName="timeSinceLastLoginCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -847,7 +925,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a524">
+                i18nKey="a524"
+                resourceName="timeSinceLastLoginCookieName">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -856,7 +935,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a525">
+                i18nKey="a525"
+                resourceName="maxTimeSinceLastLogin">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -865,7 +945,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a526">
+                i18nKey="a526"
+                resourceName="saveLastLoginTimeOnSuccessfulLogin">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -878,7 +959,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a527">
+                i18nKey="a527"
+                resourceName="timeSinceLastLoginScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -887,7 +969,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a528">
+                i18nKey="a528"
+                resourceName="invertTimeSinceLastLoginScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -900,7 +983,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a529">
+                i18nKey="a529"
+                resourceName="profileRiskAttributeCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -913,7 +997,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a530">
+                i18nKey="a530"
+                resourceName="profileRiskAttributeName">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -922,7 +1007,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a531">
+                i18nKey="a531"
+                resourceName="profileRiskAttributeValue">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -931,7 +1017,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a532">
+                i18nKey="a532"
+                resourceName="profileRiskAttributeScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -940,7 +1027,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a533">
+                i18nKey="a533"
+                resourceName="invertProfileRiskAttributeScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -953,7 +1041,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a539">
+                i18nKey="a539"
+                resourceName="geolocationCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -966,7 +1055,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a540">
+                i18nKey="a540"
+                resourceName="geolocationDatabaseLocation">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -975,7 +1065,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a541">
+                i18nKey="a541"
+                resourceName="geolocationValidCountryCodes">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -984,7 +1075,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a542">
+                i18nKey="a542"
+                resourceName="geolocationScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -993,7 +1085,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a543">
+                i18nKey="a543"
+                resourceName="invertGeolocationScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -1002,11 +1095,12 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
-				<AttributeSchema name="openam-auth-adaptive-req-header-check"
+                <AttributeSchema name="openam-auth-adaptive-req-header-check"
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a544">
+                i18nKey="a544"
+                resourceName="requestHeaderCheckEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -1019,7 +1113,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a545">
+                i18nKey="a545"
+                resourceName="requestHeaderName">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -1028,7 +1123,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="string"
-                i18nKey="a546">
+                i18nKey="a546"
+                resourceName="requestHeaderValue">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -1037,7 +1133,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="number"
-                i18nKey="a547">
+                i18nKey="a547"
+                resourceName="requestHeaderScore">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -1046,7 +1143,8 @@
                 cosQualifier="default"
                 type="single"
                 syntax="boolean"
-                i18nKey="a548">
+                i18nKey="a548"
+                resourceName="invertRequestHeaderScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>

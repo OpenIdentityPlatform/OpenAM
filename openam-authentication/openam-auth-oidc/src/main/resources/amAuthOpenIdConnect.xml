@@ -1,7 +1,7 @@
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+    Copyright 2014-2015 ForgeRock AS.
 
     The contents of this file are subject to the terms of the Common Development and
     Distribution License (the License). You may not use this file except in compliance with the
@@ -23,7 +23,8 @@
         <Schema
                 serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthOpenIdConnectService"
                 i18nFileName="amAuthOpenIdConnect" revisionNumber="10"
-                i18nKey="openidconnect-service-description">
+                i18nKey="openidconnect-service-description"
+                resourceName="openidconnect">
 
             <Organization>
                 <AttributeSchema name="RequiredValueValidator"
@@ -35,21 +36,24 @@
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-header-name"
                                  type="single" syntax="string" i18nKey="header_name"
-                                 validator="RequiredValueValidator">
+                                 validator="RequiredValueValidator"
+                                 resourceName="idTokenHeaderName">
                     <DefaultValues>
                         <Value>oidc_id_token</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-issuer-name"
                                  type="single" syntax="string" i18nKey="issuer_name"
-                                 validator="RequiredValueValidator">
+                                 validator="RequiredValueValidator"
+                                 resourceName="idTokenIssuer">
                     <DefaultValues>
                         <Value>accounts.google.com</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
                                  type="single_choice" syntax="string" i18nKey="crypto_context_type"
-                                 validator="RequiredValueValidator">
+                                 validator="RequiredValueValidator"
+                                 resourceName="cryptoContextType">
                     <ChoiceValues>
                         <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
                         <ChoiceValue>jwk_url</ChoiceValue>
@@ -61,21 +65,24 @@
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
                                  type="single" syntax="string" i18nKey="crypto_context_value"
-                                 validator="RequiredValueValidator">
+                                 validator="RequiredValueValidator"
+                                 resourceName="cryptoContextValue">
                     <DefaultValues>
                         <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
                                  type="single" syntax="string" i18nKey="account_provider_class"
-                                 validator="RequiredValueValidator">
+                                 validator="RequiredValueValidator"
+                                 resourceName="accountProviderClass">
                     <DefaultValues>
                         <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
                                  type="single" syntax="string" i18nKey="princial_mapper_class"
-                                 validator="RequiredValueValidator">
+                                 validator="RequiredValueValidator"
+                                 resourceName="principalMapperClass">
                     <DefaultValues>
                         <Value>org.forgerock.openam.authentication.modules.oidc.JwtAttributeMapper</Value>
                     </DefaultValues>
@@ -85,7 +92,8 @@
                                  type="list"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="local_to_jwt_attr_mappings">
+                                 i18nKey="local_to_jwt_attr_mappings"
+                                 resourceName="ldapToJwtAttributeMappings">
                     <DefaultValues>
                         <Value>uid=sub</Value>
                         <Value>mail=email</Value>
@@ -96,7 +104,8 @@
                                  type="single"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="listed_audience_name">
+                                 i18nKey="listed_audience_name"
+                                 resourceName="audienceName">
                     <DefaultValues>
                         <Value>example</Value>
                     </DefaultValues>
@@ -106,7 +115,8 @@
                                  type="list"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="listed_authorized_parties">
+                                 i18nKey="listed_authorized_parties"
+                                 resourceName="acceptedAuthorizedParties">
                     <DefaultValues>
                         <Value>AuthorizedPartyExample</Value>
                         <Value>http://www.example.com/authorized/party</Value>
@@ -123,21 +133,24 @@
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-header-name"
                                      type="single" syntax="string" i18nKey="header_name"
-                                     validator="RequiredValueValidator">
+                                     validator="RequiredValueValidator"
+                                     resourceName="idTokenHeaderName">
                         <DefaultValues>
                             <Value>oidc_id_token</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-issuer-name"
                                      type="single" syntax="string" i18nKey="issuer_name"
-                                     validator="RequiredValueValidator">
+                                     validator="RequiredValueValidator"
+                                     resourceName="idTokenIssuer">
                         <DefaultValues>
                             <Value>accounts.google.com</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
                                      type="single_choice" syntax="string" i18nKey="crypto_context_type"
-                                     validator="RequiredValueValidator">
+                                     validator="RequiredValueValidator"
+                                     resourceName="cryptoContextType">
                         <ChoiceValues>
                             <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
                             <ChoiceValue>jwk_url</ChoiceValue>
@@ -149,21 +162,24 @@
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
                                      type="single" syntax="string" i18nKey="crypto_context_value"
-                                     validator="RequiredValueValidator">
+                                     validator="RequiredValueValidator"
+                                     resourceName="cryptoContextValue">
                         <DefaultValues>
                             <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
                                      type="single" syntax="string" i18nKey="principal_provider_class"
-                                     validator="RequiredValueValidator">
+                                     validator="RequiredValueValidator"
+                                     resourceName="accountProviderClass">
                         <DefaultValues>
                             <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
                                      type="single" syntax="string" i18nKey="principal_mapper_class"
-                                     validator="RequiredValueValidator">
+                                     validator="RequiredValueValidator"
+                                     resourceName="principalMapperClass">
                         <DefaultValues>
                             <Value>org.forgerock.openam.authentication.modules.oidc.JwtAttributeMapper</Value>
                         </DefaultValues>
@@ -173,7 +189,8 @@
                                      type="list"
                                      syntax="string"
                                      validator="RequiredValueValidator"
-                                     i18nKey="local_to_jwt_attr_mappings">
+                                     i18nKey="local_to_jwt_attr_mappings"
+                                     resourceName="attributeMappings">
                         <DefaultValues>
                             <Value>uid=sub</Value>
                             <Value>mail=email</Value>
@@ -184,7 +201,8 @@
                                      type="single"
                                      syntax="string"
                                      validator="RequiredValueValidator"
-                                     i18nKey="listed_audience_name">
+                                     i18nKey="listed_audience_name"
+                                     resourceName="audienceName">
                         <DefaultValues>
                             <Value>example</Value>
                         </DefaultValues>
@@ -194,7 +212,8 @@
                                      type="list"
                                      syntax="string"
                                      validator="RequiredValueValidator"
-                                     i18nKey="listed_authorized_parties">
+                                     i18nKey="listed_authorized_parties"
+                                     resourceName="acceptedAuthorizedParties">
                         <DefaultValues>
                             <Value>AuthorizedPartyExample</Value>
                             <Value>http://www.example.com/authorized/party</Value>

@@ -27,7 +27,7 @@
     $Id: amAuthWindowsDesktopSSO.xml,v 1.4 2008/06/25 05:45:41 qcheng Exp $
 
 
-    Portions Copyrighted 2011-2014 ForgeRock AS
+    Portions Copyrighted 2011-2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -40,33 +40,39 @@
             serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthWindowsDesktopSSOService"
             i18nFileName="amAuthWindowsDesktopSSO"
             revisionNumber="30"
-            i18nKey="iplanet-am-auth-windowsdesktopsso-service-description">
+            i18nKey="iplanet-am-auth-windowsdesktopsso-service-description"
+            resourceName="windowsdesktopsso">
 
             <Organization>
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-principal-name"
                     type="single"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="principalName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-keytab-file"
                     type="single"
                     syntax="string"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="keytabFileName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kerberos-realm"
                     type="single"
                     syntax="string"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="kerberosRealm">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kdc"
                     type="single"
                     syntax="string"
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    resourceName="kerberosServerName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-returnRealm"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a105">
+                    i18nKey="a105"
+                    resourceName="returnPrincipalWithDomainName">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -78,7 +84,8 @@
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-lookupUserInRealm"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a108">
+                        i18nKey="a108"
+                        resourceName="lookupUserInRealm">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -90,7 +97,8 @@
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-auth-level"
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                    i18nKey="a106">
+                    i18nKey="a106"
+                    resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -98,34 +106,40 @@
                 <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kerberos-realms-trusted"
                     type="list"
                     syntax="string"
-                    i18nKey="a107">
+                    i18nKey="a107"
+                    resourceName="trustedKerberosRealms">
                     <DefaultValues/>
                 </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-principal-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a101">
+                        i18nKey="a101"
+                        resourceName="principalName">
                     </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-keytab-file"
                         type="single"
                         syntax="string"
-                        i18nKey="a102">
+                        i18nKey="a102"
+                        resourceName="keytabFileName">
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kerberos-realm"
                         type="single"
                         syntax="string"
-                        i18nKey="a103">
+                        i18nKey="a103"
+                        resourceName="kerberosRealm">
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kdc"
                         type="single"
                         syntax="string"
-                        i18nKey="a104">
+                        i18nKey="a104"
+                        resourceName="kerberosServerName">
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-returnRealm"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a105">
+                        i18nKey="a105"
+                        resourceName="returnPrincipalWithDomainName">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -137,7 +151,8 @@
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-lookupUserInRealm"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a108">
+                        i18nKey="a108"
+                        resourceName="lookupUserInRealm">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -149,7 +164,8 @@
                     <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-auth-level"
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                        i18nKey="a106">
+                        i18nKey="a106"
+                        resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>
@@ -157,7 +173,8 @@
                     <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-kerberos-realms-trusted"
                         type="list"
                         syntax="string"
-                        i18nKey="a107">
+                        i18nKey="a107"
+                        resourceName="trustedKerberosRealms">
                         <DefaultValues/>
                     </AttributeSchema>                    
                 </SubSchema>

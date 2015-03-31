@@ -2,7 +2,7 @@
 <!--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright 2014 ForgeRock AS.
+    Copyright 2014-2015 ForgeRock AS.
 
     The contents of this file are subject to the terms of the Common Development and Distribution License (the License).
     You may not use this file except in compliance with the License.
@@ -27,13 +27,15 @@
                 serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthDeviceIdSaveService"
                 i18nFileName="amAuthDeviceIdSave"
                 revisionNumber="1"
-                i18nKey="iplanet-am-auth-device-id-save-service-description">
+                i18nKey="iplanet-am-auth-device-id-save-service-description"
+                resourceName="deviceidsave">
 
             <Organization>
                 <AttributeSchema name="iplanet-am-auth-device-id-save-auth-level"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                 i18nKey="a500">
+                                 i18nKey="a500"
+                                 resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -41,7 +43,8 @@
                 <AttributeSchema name="iplanet-am-auth-device-id-save-auto-store-profile"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a101">
+                                 i18nKey="a101"
+                                 resourceName="autoStoreProfiles">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -52,7 +55,7 @@
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-device-id-save-max-profiles-allowed"
                                 type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                i18nKey="a102">
+                                i18nKey="a102" resourceName="maxProfilesAllowed">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>
@@ -62,7 +65,8 @@
                     <AttributeSchema name="iplanet-am-auth-device-id-save-auth-level"
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     i18nKey="a500">
+                                     i18nKey="a500"
+                                     resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>
@@ -70,7 +74,8 @@
                     <AttributeSchema name="iplanet-am-auth-device-id-save-auto-store-profile"
                                      type="single"
                                      syntax="boolean"
-                                     i18nKey="a101">
+                                     i18nKey="a101"
+                                     resourceName="autoStoreProfiles">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -81,7 +86,7 @@
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-device-id-save-max-profiles-allowed"
                                      type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     i18nKey="a102">
+                                     i18nKey="a102" resourceName="maxProfilesAllowed">
                         <DefaultValues>
                             <Value>5</Value>
                         </DefaultValues>

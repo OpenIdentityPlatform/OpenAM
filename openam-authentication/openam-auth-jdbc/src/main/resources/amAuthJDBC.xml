@@ -27,6 +27,9 @@
     $Id: amAuthJDBC.xml,v 1.3 2008/06/25 05:45:41 qcheng Exp $
 
 -->
+<!--
+    Portions Copyright 2015 ForgeRock AS.
+-->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -37,13 +40,15 @@
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthJDBCService"
             i18nFileName="amAuthJDBC"
             revisionNumber="20"
-            i18nKey="sunAMAuthJDBCServiceDescription">
+            i18nKey="sunAMAuthJDBCServiceDescription"
+            resourceName="jdbc">
             
             <Organization>
                 <AttributeSchema name="sunAMAuthJDBCConnectionType"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a100">
+                    i18nKey="a100"
+                    resourceName="connectionType">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceJNDI">JNDI</ChoiceValue> 
                         <ChoiceValue i18nKey="choiceURL">JDBC</ChoiceValue>
@@ -55,7 +60,8 @@
                 <AttributeSchema name="sunAMAuthJDBCJndiName"
                     type="single"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="connectionPoolJndiName">
                     <DefaultValues>
                         <Value>java:comp/env/jdbc/samplePool</Value>
                     </DefaultValues>
@@ -63,7 +69,8 @@
                 <AttributeSchema name="sunAMAuthJDBCDriver"
                     type="single"
                     syntax="string"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="jdbcDriver">
                     <DefaultValues>
                         <Value>com.mysql.jdbc.Driver</Value>
                     </DefaultValues>
@@ -71,7 +78,8 @@
                 <AttributeSchema name="sunAMAuthJDBCUrl"
                     type="single"
                     syntax="string"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="jdbcUrl">
                     <DefaultValues>
                         <Value>jdbc:mysql://127.0.0.1:3306/test</Value>
                     </DefaultValues>
@@ -79,7 +87,8 @@
                 <AttributeSchema name="sunAMAuthJDBCDbuser"
                     type="single"
                     syntax="string"
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    resourceName="username">
                     <DefaultValues>
                         <Value>root</Value>
                     </DefaultValues>
@@ -87,7 +96,8 @@
                 <AttributeSchema name="sunAMAuthJDBCDbpassword"
                     type="single"
                     syntax="password"
-                    i18nKey="a105">
+                    i18nKey="a105"
+                    resourceName="password">
                     <DefaultValues>
                         <Value>password</Value>
                     </DefaultValues>
@@ -95,7 +105,8 @@
                 <AttributeSchema name="sunAMAuthJDBCPasswordColumn"
                     type="single"
                     syntax="string"
-                    i18nKey="a106">
+                    i18nKey="a106"
+                    resourceName="passwordColumn">
                     <DefaultValues>
                         <Value>PASSWORD_COLUMN</Value>
                     </DefaultValues>
@@ -103,7 +114,8 @@
                 <AttributeSchema name="sunAMAuthJDBCStatement"
                     type="single"
                     syntax="string"
-                    i18nKey="a107">
+                    i18nKey="a107"
+                    resourceName="passwordStatement">
                     <DefaultValues>
                         <Value>select PASSWORD_COLUMN from TABLE where USERNAME_COLUMN = ?</Value>
                     </DefaultValues>
@@ -111,7 +123,8 @@
                 <AttributeSchema name="sunAMAuthJDBCPasswordSyntaxTransformPlugin"
                     type="single"
                     syntax="string"
-                    i18nKey="a108">
+                    i18nKey="a108"
+                    resourceName="passwordTransformClass">
                     <DefaultValues>
                         <Value>com.sun.identity.authentication.modules.jdbc.ClearTextTransform</Value>
                     </DefaultValues>
@@ -119,7 +132,8 @@
                 <AttributeSchema name="sunAMAuthJDBCAuthLevel"
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                    i18nKey="a109">
+                    i18nKey="a109"
+                    resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -128,7 +142,8 @@
                     <AttributeSchema name="sunAMAuthJDBCConnectionType"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a100">
+                        i18nKey="a100"
+                        resourceName="connectionType">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="choiceJNDI">JNDI</ChoiceValue> 
                             <ChoiceValue i18nKey="choiceURL">JDBC</ChoiceValue>
@@ -140,7 +155,8 @@
                     <AttributeSchema name="sunAMAuthJDBCJndiName"
                         type="single"
                         syntax="string"
-                        i18nKey="a101">
+                        i18nKey="a101"
+                        resourceName="connectionPoolJndiName">
                         <DefaultValues>
                             <Value>java:comp/env/jdbc/samplePool</Value>
                         </DefaultValues>
@@ -148,7 +164,8 @@
                     <AttributeSchema name="sunAMAuthJDBCDriver"
                         type="single"
                         syntax="string"
-                        i18nKey="a102">
+                        i18nKey="a102"
+                        resourceName="jdbcDriver">
                         <DefaultValues>
                             <Value>com.mysql.jdbc.Driver</Value>
                         </DefaultValues>
@@ -156,7 +173,8 @@
                     <AttributeSchema name="sunAMAuthJDBCUrl"
                         type="single"
                         syntax="string"
-                        i18nKey="a103">
+                        i18nKey="a103"
+                        resourceName="jdbcUrl">
                         <DefaultValues>
                             <Value>jdbc:mysql://127.0.0.1:3306/test</Value>
                         </DefaultValues>
@@ -164,7 +182,8 @@
                     <AttributeSchema name="sunAMAuthJDBCDbuser"
                         type="single"
                         syntax="string"
-                        i18nKey="a104">
+                        i18nKey="a104"
+                        resourceName="username">
                         <DefaultValues>
                             <Value>root</Value>
                         </DefaultValues>
@@ -172,7 +191,8 @@
                     <AttributeSchema name="sunAMAuthJDBCDbpassword"
                         type="single"
                         syntax="password"
-                        i18nKey="a105">
+                        i18nKey="a105"
+                        resourceName="password">
                         <DefaultValues>
                             <Value>password</Value>
                         </DefaultValues>
@@ -180,7 +200,8 @@
                     <AttributeSchema name="sunAMAuthJDBCPasswordColumn"
                         type="single"
                         syntax="string"
-                        i18nKey="a106">
+                        i18nKey="a106"
+                        resourceName="passwordColumn">
                         <DefaultValues>
                             <Value>PASSWORD_COLUMN</Value>
                         </DefaultValues>
@@ -188,7 +209,8 @@
                     <AttributeSchema name="sunAMAuthJDBCStatement"
                         type="single"
                         syntax="string"
-                        i18nKey="a107">
+                        i18nKey="a107"
+                        resourceName="passwordStatement">
                         <DefaultValues>
                             <Value>select PASSWORD_COLUMN from TABLE where USERNAME_COLUMN = ?</Value>
                         </DefaultValues>
@@ -196,7 +218,8 @@
                     <AttributeSchema name="sunAMAuthJDBCPasswordSyntaxTransformPlugin"
                         type="single"
                         syntax="string"
-                        i18nKey="a108">
+                        i18nKey="a108"
+                        resourceName="passwordTransformClass">
                         <DefaultValues>
                             <Value>com.sun.identity.authentication.modules.jdbc.ClearTextTransform</Value>
                         </DefaultValues>
@@ -204,7 +227,8 @@
                         <AttributeSchema name="sunAMAuthJDBCAuthLevel"
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                        i18nKey="a109">
+                        i18nKey="a109"
+                        resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>

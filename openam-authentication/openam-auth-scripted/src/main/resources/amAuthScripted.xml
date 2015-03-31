@@ -12,7 +12,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
 -->
 <!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
 
@@ -22,45 +22,52 @@
             serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthScriptedService"
             i18nFileName="amAuthScripted"
             revisionNumber="1"
-            i18nKey="iplanet-am-auth-scripted-service-description">
+            i18nKey="iplanet-am-auth-scripted-service-description"
+            resourceName="scripted">
             <Global>
                 <AttributeSchema name="iplanet-am-auth-scripted-server-timeout"
                                  type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="g101">
+                                 rangeEnd="2147483647" i18nKey="g101"
+                                 resourceName="serverScriptTimeout">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-core-threads"
                                  type="single" syntax="number_range" rangeStart="1"
-                                 rangeEnd="2147483647" i18nKey="g102">
+                                 rangeEnd="2147483647" i18nKey="g102"
+                                 resourceName="threadPoolSize">
                     <DefaultValues>
                         <Value>10</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-max-threads"
                                  type="single" syntax="number_range" rangeStart="1"
-                                 rangeEnd="2147483647" i18nKey="g103">
+                                 rangeEnd="2147483647" i18nKey="g103"
+                                 resourceName="maximumThreadPoolSize">
                     <DefaultValues>
                         <Value>50</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-queue-size"
                                  type="single" syntax="number_range" rangeStart="-1"
-                                 rangeEnd="2147483647" i18nKey="g104">
+                                 rangeEnd="2147483647" i18nKey="g104"
+                                 resourceName="threadPoolQueueSize">
                     <DefaultValues>
                         <Value>10</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-idle-timeout"
                                  type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="g105">
+                                 rangeEnd="2147483647" i18nKey="g105"
+                                 resourceName="threadIdleTimeout">
                     <DefaultValues>
                         <Value>60</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-white-list"
-                                 type="list" syntax="string" i18nKey="g106">
+                                 type="list" syntax="string" i18nKey="g106"
+                                 resourceName="javaClassWhitelist">
                     <DefaultValues>
                         <Value>java.lang.Boolean</Value>
                         <Value>java.lang.Byte</Value>
@@ -95,7 +102,8 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-black-list"
-                                 type="list" syntax="string" i18nKey="g107">
+                                 type="list" syntax="string" i18nKey="g107"
+                                 resourceName="javaClassBlackList">
                     <DefaultValues>
                         <Value>java.security.AccessController</Value>
                         <Value>java.lang.Class</Value>
@@ -103,7 +111,8 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-use-security-manager"
-                                 type="single" syntax="boolean" i18nKey="g108">
+                                 type="single" syntax="boolean" i18nKey="g108"
+                                 resourceName="useSecurityManager">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -126,7 +135,8 @@
                 <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a101">
+                                 i18nKey="a101"
+                                 resourceName="clientScriptEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -139,7 +149,8 @@
                                  type="single"
                                  syntax="script"
                                  validator="no"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 resourceName="clientScript">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -147,7 +158,8 @@
                 <AttributeSchema name="iplanet-am-auth-scripted-script-type"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a103">
+                                 i18nKey="a103"
+                                 resourceName="serverScriptType">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
                         <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
@@ -160,7 +172,8 @@
                                  type="single"
                                  syntax="script"
                                  validator="ScriptValidator"
-                                 i18nKey="a104">
+                                 i18nKey="a104"
+                                 resourceName="serverScript">
                     <DefaultValues>
                         <Value>
                             var START_TIME = 9;  // 9am
@@ -202,7 +215,8 @@
                 <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                 i18nKey="a500">
+                                 i18nKey="a500"
+                                 resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -220,7 +234,8 @@
                     <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
                                      type="single"
                                      syntax="boolean"
-                                     i18nKey="a101">
+                                     i18nKey="a101"
+                                     resourceName="clientScriptEnabled">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -233,7 +248,8 @@
                                      type="single"
                                      syntax="script"
                                      validator="no"
-                                     i18nKey="a102">
+                                     i18nKey="a102"
+                                     resourceName="clientScript">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
@@ -241,7 +257,8 @@
                     <AttributeSchema name="iplanet-am-auth-scripted-script-type"
                                      type="single_choice"
                                      syntax="string"
-                                     i18nKey="a103">
+                                     i18nKey="a103"
+                                     resourceName="serverScriptType">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
                             <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
@@ -254,7 +271,8 @@
                                      type="single"
                                      syntax="script"
                                      validator="ScriptValidator"
-                                     i18nKey="a104">
+                                     i18nKey="a104"
+                                     resourceName="serverScript">
                         <DefaultValues>
                             <Value>
                                 var START_TIME = 9;  // 9am
@@ -296,7 +314,8 @@
                     <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     i18nKey="a500">
+                                     i18nKey="a500"
+                                     resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>1</Value>
                         </DefaultValues>

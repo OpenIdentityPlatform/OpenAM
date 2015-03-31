@@ -2,7 +2,7 @@
 <!--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+    Copyright 2011-2015 ForgeRock AS.
     Copyright 2011 Cybernetica AS.
 
     The contents of this file are subject to the terms
@@ -37,7 +37,8 @@
             serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthDeviceIdMatchService"
             i18nFileName="amAuthDeviceIdMatch"
             revisionNumber="1"
-            i18nKey="iplanet-am-auth-device-id-match-service-description">
+            i18nKey="iplanet-am-auth-device-id-match-service-description"
+            resourceName="deviceidmatch">
             <Organization>
                 <AttributeSchema name="ScriptValidator"
                                  type="validator"
@@ -50,7 +51,8 @@
                 <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a101">
+                                 i18nKey="a101"
+                                 resourceName="clientScriptEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -63,7 +65,8 @@
                                  type="single"
                                  syntax="script"
                                  validator="no"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 resourceName="clientScript">
                     <DefaultValues>
                         <Value>
                             ${inject.content.fontdetector}
@@ -74,7 +77,8 @@
                 <AttributeSchema name="iplanet-am-auth-scripted-script-type"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a103">
+                                 i18nKey="a103"
+                                 resourceName="serverScripType">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
                         <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
@@ -87,7 +91,8 @@
                                  type="single"
                                  syntax="script"
                                  validator="ScriptValidator"
-                                 i18nKey="a104">
+                                 i18nKey="a104"
+                                 resourceName="serverScript">
                     <DefaultValues>
                         <Value>
                             ${inject.content.server-js}
@@ -97,7 +102,8 @@
                 <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                 i18nKey="a500">
+                                 i18nKey="a500"
+                                 resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -115,7 +121,8 @@
                     <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a101">
+                                 i18nKey="a101"
+                                 resourceName="clientScriptEnabled">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -128,7 +135,8 @@
                                  type="single"
                                  syntax="script"
                                  validator="no"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 resourceName="clientScript">
                         <DefaultValues>
                             <Value>
                                 ${inject.content.fontdetector}
@@ -139,7 +147,8 @@
                     <AttributeSchema name="iplanet-am-auth-scripted-script-type"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a103">
+                                 i18nKey="a103"
+                                 resourceName="serverScriptType">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
                             <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
@@ -152,7 +161,8 @@
                                  type="single"
                                  syntax="script"
                                  validator="ScriptValidator"
-                                 i18nKey="a104">
+                                 i18nKey="a104"
+                                 resourceName="serverScript">
                         <DefaultValues>
                             <Value>
                                 ${inject.content.server-js}
@@ -162,7 +172,8 @@
                     <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                 i18nKey="a500">
+                                 i18nKey="a500"
+                                 resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>

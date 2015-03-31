@@ -4,6 +4,9 @@
     Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
     Use is subject to license terms.
 -->
+<!--
+	Portions Copyright 2015 ForgeRock AS.
+-->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -14,8 +17,9 @@
         <Schema
 	    serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthSecurIDService"
             i18nFileName="amAuthSecurID"
-	    revisionNumber="40"
-            i18nKey="iplanet-am-auth-securid-service-description">
+	    	revisionNumber="40"
+            i18nKey="iplanet-am-auth-securid-service-description"
+			resourceName="securid">
 
             <Organization>
 		<AttributeSchema name="iplanet-am-auth-securid-config-port"
@@ -39,7 +43,8 @@
 	        <AttributeSchema name="iplanet-am-auth-securid-server-config-path"
                     type="single"
                     syntax="string"
-                    i18nKey="a1">
+                    i18nKey="a1"
+					resourceName="serverConfigPath">
 		    <DefaultValues>
                         <Value>@BASE_DIR@/@SERVER_URI@/auth/ace/data</Value>
 		    </DefaultValues>
@@ -47,7 +52,8 @@
                 <AttributeSchema name="iplanet-am-auth-securid-auth-level"
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                    i18nKey="a900">
+                    i18nKey="a900"
+					resourceName="authenticationLevel">
 		    <DefaultValues>
                         <Value>0</Value>
 		    </DefaultValues>
@@ -74,7 +80,8 @@
     	            <AttributeSchema name="iplanet-am-auth-securid-server-config-path"
                         type="single"
                         syntax="string"
-                        i18nKey="a1">
+                        i18nKey="a1"
+						resourceName="serverConfigPath">
     		    <DefaultValues>
                             <Value>@BASE_DIR@/@SERVER_URI@/auth/ace/data</Value>
     		    </DefaultValues>
@@ -82,7 +89,8 @@
                     <AttributeSchema name="iplanet-am-auth-securid-auth-level"
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                        i18nKey="a900">
+                        i18nKey="a900"
+						resourceName="authenticationLevel">
     		    <DefaultValues>
                             <Value>0</Value>
     		    </DefaultValues>

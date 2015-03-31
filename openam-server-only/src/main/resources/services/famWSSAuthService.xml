@@ -27,6 +27,9 @@
     $Id: famWSSAuthService.xml,v 1.1 2008/10/30 18:24:04 mallas Exp $
 
 -->
+<!--
+    Portions Copyright 2015 ForgeRock AS.
+-->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -38,13 +41,15 @@
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthWSSAuthModuleService"
             i18nFileName="famWSSAuth"
             revisionNumber="10"
-            i18nKey="WSSAuth">
+            i18nKey="WSSAuth"
+            resourceName="wssauth">
             <Organization>
 
                 <AttributeSchema name="sunWebservicesUserSearchAttribute"
                     type="single"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="userSearchAttribute">
                     <DefaultValues>
                         <Value>uid</Value>
                     </DefaultValues>
@@ -53,13 +58,15 @@
                 <AttributeSchema name="sunWebServicesUserRealm"
                     type="single"
                     syntax="string"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="userSearchRealm">
                 </AttributeSchema>
 
                 <AttributeSchema name="sunWebservicesUserPasswordAttribute"
                     type="single"
                     syntax="string"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="userPasswordAttribute">
                     <DefaultValues>
                         <Value>userPassword</Value>
                     </DefaultValues>
@@ -68,7 +75,8 @@
                 <AttributeSchema name="sunWebservicesAuthenticationLevel"
                     type="single"
                     syntax="string"
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -78,7 +86,8 @@
                 <AttributeSchema name="sunWebservicesUserSearchAttribute"
                     type="single"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="userSearchAttribute">
                     <DefaultValues>
                         <Value>uid</Value>
                     </DefaultValues>
@@ -87,13 +96,15 @@
                 <AttributeSchema name="sunWebServicesUserRealm"
                     type="single"
                     syntax="string"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="userSearchRealm">
                 </AttributeSchema>
 
                 <AttributeSchema name="sunWebservicesUserPasswordAttribute"
                     type="single"
                     syntax="string"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="userPasswordAttribute">
                     <DefaultValues>
                         <Value>userPassword</Value>
                     </DefaultValues>
@@ -102,7 +113,8 @@
                 <AttributeSchema name="sunWebservicesAuthenticationLevel"
                     type="single"
                     syntax="string"
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>

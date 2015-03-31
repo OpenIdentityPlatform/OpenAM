@@ -4,7 +4,7 @@
 
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  
-  Copyright © 2012 ForgeRock Inc. All rights reserved.
+  Copyright 2012-2015 ForgeRock AS.
  
   The contents of this file are subject to the terms
   of the Common Development and Distribution License
@@ -37,14 +37,16 @@
                 serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthOATHService"
                 i18nFileName="amAuthOATH"
                 revisionNumber="1"
-                i18nKey="iPlanetAMAuthOATHServiceDescription">
+                i18nKey="iPlanetAMAuthOATHServiceDescription"
+                resourceName="oath">
 
             <Organization>
                 <AttributeSchema name="iplanet-am-auth-oath-auth-level"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a500">
+                                 i18nKey="a500"
+                                 resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -53,7 +55,8 @@
                                  type="single"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a501">
+                                 i18nKey="a501"
+                                 resourceName="passwordLength">
                     <DefaultValues>
                         <Value>6</Value>
                     </DefaultValues>
@@ -61,7 +64,8 @@
                 <AttributeSchema name="iplanet-am-auth-oath-min-secret-key-length"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a502">
+                                 i18nKey="a502"
+                                 resourceName="minimumSecretKeyLength">
                     <DefaultValues>
                         <Value>32</Value>
                     </DefaultValues>
@@ -70,7 +74,8 @@
                                  type="single"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a503">
+                                 i18nKey="a503"
+                                 resourceName="userProfileSecretKeyAttribute">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -79,7 +84,8 @@
                                  type="single_choice"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a504">
+                                 i18nKey="a504"
+                                 resourceName="oathAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="HOTP">HOTP</ChoiceValue>
                         <ChoiceValue i18nKey="TOTP">TOTP</ChoiceValue>
@@ -91,7 +97,8 @@
                 <AttributeSchema name="iplanet-am-auth-oath-hotp-window-size"
                                  type="single"
                                  syntax="number"
-                                 i18nKey="a505">
+                                 i18nKey="a505"
+                                 resourceName="hotpWindowSize">
                     <DefaultValues>
                         <Value>100</Value>
                     </DefaultValues>
@@ -99,7 +106,8 @@
                 <AttributeSchema name="iplanet-am-auth-oath-hotp-counter-attribute"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a506">
+                                 i18nKey="a506"
+                                 resourceName="userProfileHotpCounterAttribute">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -107,7 +115,8 @@
                 <AttributeSchema name="iplanet-am-auth-oath-add-checksum"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a507">
+                                 i18nKey="a507"
+                                 resourceName="addChecksumToOtpEnabled">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="true">True</ChoiceValue>
                         <ChoiceValue i18nKey="false">False</ChoiceValue>
@@ -119,7 +128,8 @@
                 <AttributeSchema name="iplanet-am-auth-oath-truncation-offset"
                                  type="single"
                                  syntax="number"
-                                 i18nKey="a508">
+                                 i18nKey="a508"
+                                 resourceName="truncationOffset">
                     <DefaultValues>
                         <Value>-1</Value>
                     </DefaultValues>
@@ -127,7 +137,8 @@
                 <AttributeSchema name="iplanet-am-auth-oath-size-of-time-step"
                                  type="single"
                                  syntax="number"
-                                 i18nKey="a509">
+                                 i18nKey="a509"
+                                 resourceName="totpTimeStepInterval">
                     <DefaultValues>
                         <Value>30</Value>
                     </DefaultValues>
@@ -135,7 +146,8 @@
                 <AttributeSchema name="iplanet-am-auth-oath-steps-in-window"
                                  type="single"
                                  syntax="number"
-                                 i18nKey="a510">
+                                 i18nKey="a510"
+                                 resourceName="totpTimeStepsInWindow">
                     <DefaultValues>
                         <Value>2</Value>
                     </DefaultValues>
@@ -143,7 +155,8 @@
                 <AttributeSchema name="iplanet-am-auth-oath-last-login-time-attribute-name"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a511">
+                                 i18nKey="a511"
+                                 resourceName="userProfileLastLoginAttribute">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -152,7 +165,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-auth-level"
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     i18nKey="a500">
+                                     i18nKey="a500"
+                                     resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>
@@ -160,7 +174,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-password-length"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="a501">
+                                     i18nKey="a501"
+                                     resourceName="passwordLength">
                         <DefaultValues>
                             <Value>6</Value>
                         </DefaultValues>
@@ -168,7 +183,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-min-secret-key-length"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="a502">
+                                     i18nKey="a502"
+                                     resourceName="minimumSecretKeyLength">
                         <DefaultValues>
                             <Value>32</Value>
                         </DefaultValues>
@@ -176,7 +192,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-secret-key-attribute"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="a503">
+                                     i18nKey="a503"
+                                     resourceName="userProfileSecretKeyAttribute">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
@@ -184,7 +201,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-algorithm"
                                      type="single_choice"
                                      syntax="string"
-                                     i18nKey="a504">
+                                     i18nKey="a504"
+                                     resourceName="oathAlgorithm">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="HOTP">HOTP</ChoiceValue>
                             <ChoiceValue i18nKey="TOTP">TOTP</ChoiceValue>
@@ -196,7 +214,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-hotp-window-size"
                                      type="single"
                                      syntax="number"
-                                     i18nKey="a505">
+                                     i18nKey="a505"
+                                     resourceName="hotpWindowSize">
                         <DefaultValues>
                             <Value>100</Value>
                         </DefaultValues>
@@ -204,7 +223,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-hotp-counter-attribute"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="a506">
+                                     i18nKey="a506"
+                                     resourceName="userProfileHotpCounterAttribute">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
@@ -212,7 +232,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-add-checksum"
                                      type="single_choice"
                                      syntax="string"
-                                     i18nKey="a507">
+                                     i18nKey="a507"
+                                     resourceName="addChecksumToOtpEnabled">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="true">True</ChoiceValue>
                             <ChoiceValue i18nKey="false">False</ChoiceValue>
@@ -224,7 +245,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-truncation-offset"
                                      type="single"
                                      syntax="number"
-                                     i18nKey="a508">
+                                     i18nKey="a508"
+                                     resourceName="truncationOffset">
                         <DefaultValues>
                             <Value>-1</Value>
                         </DefaultValues>
@@ -232,7 +254,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-size-of-time-step"
                                      type="single"
                                      syntax="number"
-                                     i18nKey="a509">
+                                     i18nKey="a509"
+                                     resourceName="totpTimeStepInterval">
                         <DefaultValues>
                             <Value>30</Value>
                         </DefaultValues>
@@ -240,7 +263,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-steps-in-window"
                                      type="single"
                                      syntax="number"
-                                     i18nKey="a510">
+                                     i18nKey="a510"
+                                     resourceName="totpTimeStepsInWindow">
                         <DefaultValues>
                             <Value>2</Value>
                         </DefaultValues>
@@ -248,7 +272,8 @@
                     <AttributeSchema name="iplanet-am-auth-oath-last-login-time-attribute-name"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="a511">
+                                     i18nKey="a511"
+                                     resourceName="userProfileLastLoginAttribute">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>

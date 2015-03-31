@@ -39,23 +39,27 @@
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthMSISDNService"
             i18nFileName="amAuthMSISDN"
             revisionNumber="30"
-            i18nKey="sunAMAuthMSISDNServiceDescription">
+            i18nKey="sunAMAuthMSISDNServiceDescription"
+            resourceName="msisdn">
 
             <Organization>
                 <AttributeSchema name="sunAMAuthMSISDNTrustedGatewayList"
                     type="list"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="trustedGatewayIPAddresses">
                     </AttributeSchema>
                 <AttributeSchema name="sunAMAuthMSISDNParameterNameList"
                     type="list"
                     syntax="string"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="msisdnParameterNames">
                     </AttributeSchema>
                 <AttributeSchema name="sunAMAuthMSISDNLdapProviderUrl"
                     type="list"
                     syntax="string"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="ldapProviderUrl">
                         <DefaultValues>
                                 <Value>@UM_DIRECTORY_SERVER@:@UM_DIRECTORY_PORT@</Value>
                         </DefaultValues>
@@ -63,7 +67,8 @@
                   <AttributeSchema name="sunAMAuthMSISDNBaseDn"
                     type="list"
                     syntax="dn"
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    resourceName="baseSearchDN">
                         <DefaultValues>
                                  <Value>@UM_NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -71,7 +76,8 @@
                 <AttributeSchema name="sunAMAuthMSISDNUserSearchAttribute"
                     type="single"
                     syntax="string"
-                    i18nKey="a105">
+                    i18nKey="a105"
+                    resourceName="userProfileMsisdnAttribute">
                     <DefaultValues>
                         <Value>sunIdentityMSISDNNumber</Value>
                     </DefaultValues>
@@ -79,7 +85,8 @@
                 <AttributeSchema name="sunAMAuthMSISDNPrincipalUser"
                     type="single"
                     syntax="string"
-                    i18nKey="a106">
+                    i18nKey="a106"
+                    resourceName="ldapUserBindDN">
                         <DefaultValues>
                          <Value>@UM_DS_DIRMGRDN@</Value>
                         </DefaultValues>
@@ -87,12 +94,14 @@
                 <AttributeSchema name="sunAMAuthMSISDNPrincipalPasswd"
                     type="single"
                     syntax="password"
-                    i18nKey="a107">
+                    i18nKey="a107"
+                    resourceName="ldapUserBindPassword">
                 </AttributeSchema>
                 <AttributeSchema name="sunAMAuthMSISDNUseSsl"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a108">
+                    i18nKey="a108"
+                    resourceName="ldapSslEnabled">
                         <DefaultValues>
                               <Value>false</Value>
                         </DefaultValues>
@@ -100,7 +109,8 @@
                 <AttributeSchema name="sunAMAuthMSISDNHeaderSearch"
                         type="multiple_choice"
                     syntax="string"
-                    i18nKey="a109">
+                    i18nKey="a109"
+                    resourceName="msisdnRequestSearchLocations">
                     <ChoiceValues>
                             <ChoiceValue i18nKey="SearchCookieHeader">searchCookie</ChoiceValue>
                           <ChoiceValue i18nKey="SearchRequestHeader">searchRequest</ChoiceValue>
@@ -115,7 +125,8 @@
                  <AttributeSchema name="sunAMAuthMSISDNUserNamingAttribute"
                     type="single"
                     syntax="string"
-                    i18nKey="a110">
+                    i18nKey="a110"
+                    resourceName="msisdnUserNamingAttribute">
                     <DefaultValues>
                         <Value>@USER_NAMING_ATTR@</Value>
                     </DefaultValues>
@@ -123,7 +134,8 @@
                 <AttributeSchema name="sunAMAuthMSISDNReturnUserDN"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a111">
+                    i18nKey="a111"
+                    resourceName="returnUserDN">
                     <DefaultValues>
                         <Value>true</Value>
                     </DefaultValues>
@@ -131,7 +143,8 @@
                 <AttributeSchema name="sunAMAuthMSISDNAuthLevel"
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                    i18nKey="a500">
+                    i18nKey="a500"
+                    resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -140,17 +153,20 @@
                     <AttributeSchema name="sunAMAuthMSISDNTrustedGatewayList"
                         type="list"
                         syntax="string"
-                        i18nKey="a101">
+                        i18nKey="a101"
+                        resourceName="trustedGatewayIPAddresses">
                         </AttributeSchema>
                     <AttributeSchema name="sunAMAuthMSISDNParameterNameList"
                         type="list"
                         syntax="string"
-                        i18nKey="a102">
+                        i18nKey="a102"
+                        resourceName="msisdnParameterNames">
                         </AttributeSchema>
                     <AttributeSchema name="sunAMAuthMSISDNLdapProviderUrl"
                         type="list"
                         syntax="string"
-                        i18nKey="a103">
+                        i18nKey="a103"
+                        resourceName="ldapProviderUrl">
                             <DefaultValues>
                                     <Value>@UM_DIRECTORY_SERVER@:@UM_DIRECTORY_PORT@</Value>
                             </DefaultValues>
@@ -158,7 +174,8 @@
                       <AttributeSchema name="sunAMAuthMSISDNBaseDn"
                         type="list"
                         syntax="dn"
-                        i18nKey="a104">
+                        i18nKey="a104"
+                        resourceName="baseSearchDN">
                             <DefaultValues>
                                      <Value>@UM_NORMALIZED_ORGBASE@</Value>
                             </DefaultValues>
@@ -166,7 +183,8 @@
                     <AttributeSchema name="sunAMAuthMSISDNUserSearchAttribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a105">
+                        i18nKey="a105"
+                        resourceName="userProfileMsisdnAttribute">
                         <DefaultValues>
                             <Value>sunIdentityMSISDNNumber</Value>
                         </DefaultValues>
@@ -174,7 +192,8 @@
                     <AttributeSchema name="sunAMAuthMSISDNPrincipalUser"
                         type="single"
                         syntax="string"
-                        i18nKey="a106">
+                        i18nKey="a106"
+                        resourceName="ldapUserBindDN">
                             <DefaultValues>
                              <Value>@UM_DS_DIRMGRDN@</Value>
                             </DefaultValues>
@@ -182,12 +201,14 @@
                     <AttributeSchema name="sunAMAuthMSISDNPrincipalPasswd"
                         type="single"
                         syntax="password"
-                        i18nKey="a107">
+                        i18nKey="a107"
+                        resourceName="ldapUserBindPassword">
                     </AttributeSchema>
                     <AttributeSchema name="sunAMAuthMSISDNUseSsl"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a108">
+                        i18nKey="a108"
+                        resourceName="ldapSslEnabled">
                             <DefaultValues>
                                   <Value>false</Value>
                             </DefaultValues>
@@ -195,7 +216,8 @@
                     <AttributeSchema name="sunAMAuthMSISDNHeaderSearch"
                             type="multiple_choice"
                         syntax="string"
-                        i18nKey="a109">
+                        i18nKey="a109"
+                        resourceName="msisdnRequestSearchLocations">
                         <ChoiceValues>
                                 <ChoiceValue i18nKey="SearchCookieHeader">searchCookie</ChoiceValue>
                               <ChoiceValue i18nKey="SearchRequestHeader">searchRequest</ChoiceValue>
@@ -210,7 +232,8 @@
                              <AttributeSchema name="sunAMAuthMSISDNUserNamingAttribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a110">
+                        i18nKey="a110"
+                        resourceName="msisdnUserNamingAttribute">
                         <DefaultValues>
                             <Value>@USER_NAMING_ATTR@</Value>
                         </DefaultValues>
@@ -218,7 +241,8 @@
                         <AttributeSchema name="sunAMAuthMSISDNReturnUserDN"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a111">
+                        i18nKey="a111"
+                        resourceName="returnUserDN">
                         <DefaultValues>
                             <Value>true</Value>
                         </DefaultValues>
@@ -226,7 +250,8 @@
                     <AttributeSchema name="sunAMAuthMSISDNAuthLevel"
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                        i18nKey="a500">
+                        i18nKey="a500"
+                        resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>

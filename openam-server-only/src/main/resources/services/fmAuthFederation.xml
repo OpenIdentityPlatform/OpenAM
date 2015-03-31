@@ -27,8 +27,9 @@ your own identifying information:
 $Id: fmAuthFederation.xml,v 1.2 2008/06/25 05:51:13 qcheng Exp $
 
 -->
-
-
+<!--
+    Portions Copyright 2015 ForgeRock AS.
+-->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -38,14 +39,16 @@ $Id: fmAuthFederation.xml,v 1.2 2008/06/25 05:51:13 qcheng Exp $
         <Schema
             serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthFederationService"
             i18nFileName="fmAuthFederationConfiguration"
-	    revisionNumber="20"
-            i18nKey="sunAMAuthFederationServiceDescription">
+	        revisionNumber="20"
+            i18nKey="sunAMAuthFederationServiceDescription"
+            resourceName="federation">
 	    
             <Organization>                  
 		<AttributeSchema name="sunAMAuthFederationAuthLevel"
                     type="single"
                     syntax="number"
-                    i18nKey="a500">
+                    i18nKey="a500"
+                    resourceName="authenticationLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -54,7 +57,8 @@ $Id: fmAuthFederation.xml,v 1.2 2008/06/25 05:51:13 qcheng Exp $
     		    <AttributeSchema name="sunAMAuthFederationAuthLevel"
                         type="single"
                         syntax="number"
-                        i18nKey="a500">
+                        i18nKey="a500"
+                        resourceName="authenticationLevel">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>

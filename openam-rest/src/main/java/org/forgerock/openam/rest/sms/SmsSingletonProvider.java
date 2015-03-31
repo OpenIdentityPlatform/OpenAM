@@ -198,7 +198,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
             ServiceConfig config = parentSubConfigFor(serverContext, scm);
             result = checkedInstanceSubConfig(resourceId, config);
         }
-        if (!result.exists()) {
+        if (result == null || !result.exists()) {
             throw new NotFoundException();
         }
         return result;
