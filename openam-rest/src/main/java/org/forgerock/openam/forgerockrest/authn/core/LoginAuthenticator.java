@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 /*
@@ -31,12 +31,14 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
+import org.forgerock.util.annotations.VisibleForTesting;
 
 /**
  * This class is responsible for starting or continuing a login process.
@@ -195,11 +197,12 @@ public class LoginAuthenticator {
      * @param ssoToken The user's current SSO Token ID for their session.
      * @param indexType The Authentication Index Type for the authentication requirements that must be met.
      * @param indexValue The Authentication Index value for the authentication requirements that must be met.
-     * @return Whether the user's current session meets the authentication requirements.
+     * @return Whether the user's current session needs to be upgraded to meet the authentication requirements.
      * @throws AuthLoginException If there is a problem determining whether a user's session needs upgrading.
      * @throws SSOException If there is a problem determining whether a user's session needs upgrading.
      */
-    private boolean checkSessionUpgrade(SSOToken ssoToken, AuthIndexType indexType, String indexValue)
+    @VisibleForTesting
+    boolean checkSessionUpgrade(SSOToken ssoToken, AuthIndexType indexType, String indexValue)
             throws AuthLoginException, SSOException {
 
         String value;
@@ -218,24 +221,18 @@ public class LoginAuthenticator {
             break;
         }
         case ROLE: {
-            value = ssoToken.getProperty("Role");
-            if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
-                upgrade = true;
-            }
+            final Set<String> roles = AMAuthUtils.getAuthenticatedRoles(ssoToken);
+            upgrade = !roles.contains(indexValue);
             break;
         }
         case SERVICE: {
-            value = ssoToken.getProperty("Service");
-            if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
-                upgrade = true;
-            }
+            final Set<String> services = AMAuthUtils.getAuthenticatedServices(ssoToken);
+            upgrade = !services.contains(indexValue);
             break;
         }
         case MODULE: {
-            value = ssoToken.getProperty("AuthType");
-            if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
-                upgrade = true;
-            }
+            final Set<String> modules = AMAuthUtils.getAuthenticatedSchemes(ssoToken);
+            upgrade = !modules.contains(indexValue);
             break;
         }
         case LEVEL: {
@@ -263,7 +260,8 @@ public class LoginAuthenticator {
         return upgrade;
     }
 
-    private boolean noMoreAuthenticationRequired(SSOToken ssoToken, LoginConfiguration loginConfiguration) throws AuthLoginException, SSOException {
+    private boolean noMoreAuthenticationRequired(SSOToken ssoToken, LoginConfiguration loginConfiguration)
+            throws AuthLoginException, SSOException {
         return ssoToken != null &&
                 !checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(), loginConfiguration.getIndexValue());
     }

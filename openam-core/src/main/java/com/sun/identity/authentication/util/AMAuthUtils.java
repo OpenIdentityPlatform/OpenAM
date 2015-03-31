@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.util;
 
@@ -105,7 +105,7 @@ public class AMAuthUtils {
      * @return Set containing String values representing Scheme names.
      * @throws SSOException if <code>token.getProperty()</code> fails.
      */
-    public static Set getAuthenticatedSchemes(SSOToken token)
+    public static Set<String> getAuthenticatedSchemes(SSOToken token)
     throws SSOException {
         return (parseData(token.getProperty(ISAuthConstants.AUTH_TYPE), false));
     }
@@ -117,7 +117,7 @@ public class AMAuthUtils {
      * @return Set containing String values representing Service names.
      * @throws SSOException if <code>token.getProperty()</code> fails.
      */
-    public static Set getAuthenticatedServices(SSOToken token)
+    public static Set<String> getAuthenticatedServices(SSOToken token)
     throws SSOException {
         return (parseData(token.getProperty(ISAuthConstants.SERVICE), false));
     }
@@ -129,9 +129,20 @@ public class AMAuthUtils {
      * @return Set containing String values representing levels.
      * @throws SSOException if <code>token.getProperty()</code> fails.
      */
-    public static Set getAuthenticatedLevels(SSOToken token)
+    public static Set<String> getAuthenticatedLevels(SSOToken token)
     throws SSOException {
         return (parseData(token.getProperty(ISAuthConstants.AUTH_LEVEL),false));
+    }
+
+    /**
+     * Returns the set of all authenticated roles.
+     *
+     * @param token valid user {@link SSOToken}
+     * @return Set containing the String role names.
+     * @throws SSOException if {@link SSOToken#getProperty(String)} fails.
+     */
+    public static Set<String> getAuthenticatedRoles(SSOToken token) throws SSOException {
+        return parseData(token.getProperty(ISAuthConstants.ROLE), false);
     }
     
     /**
@@ -176,7 +187,7 @@ public class AMAuthUtils {
         return (parseRealmData(token.getProperty(ISAuthConstants.AUTH_LEVEL),
             token.getProperty(ISAuthConstants.ORGANIZATION)));
     }
-    
+
     /**
      * Returns the given data in Realm qualified format.
      *
@@ -255,14 +266,14 @@ public class AMAuthUtils {
      * @return the set of all authenticated Realm names or Scheme names or
      * levels or Service names.
      */
-    private static Set parseData(String data, boolean realm) {
-        Set returnData = Collections.EMPTY_SET;
+    private static Set<String> parseData(String data, boolean realm) {
+        Set<String> returnData = Collections.emptySet();
         if (data != null && data.length() != 0) {
             StringTokenizer stz = new StringTokenizer(data,
             ISAuthConstants.PIPE_SEPARATOR);
-            returnData = new HashSet();
+            returnData = new HashSet<String>();
             while (stz.hasMoreTokens()) {
-                String nameValue = (String)stz.nextToken();
+                String nameValue = stz.nextToken();
                 int index = nameValue.indexOf(ISAuthConstants.COLON);
                 if ((index == -1) && (realm)){
                     continue;

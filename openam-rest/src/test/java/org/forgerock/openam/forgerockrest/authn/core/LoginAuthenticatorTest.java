@@ -11,10 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.core;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
@@ -22,12 +27,14 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,13 +43,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
 public class LoginAuthenticatorTest {
 
@@ -777,5 +777,74 @@ public class LoginAuthenticatorTest {
         //Then
         assertTrue(exceptionCaught);
         assertEquals(exception.getStatusCode(), 400);
+    }
+
+    @Test(dataProvider = "realmQualifiedModules")
+    public void shouldRecogniseRealmQualifiedModuleNamesForSessionUpgrade(String desiredModule,
+                                                                          String existingModules,
+                                                                          boolean upgradeExpected) throws Exception {
+        // Given
+        SSOToken mockSSOToken = mock(SSOToken.class);
+        given(mockSSOToken.getProperty(ISAuthConstants.AUTH_TYPE)).willReturn(existingModules);
+
+
+        // When
+        boolean result = loginAuthenticator.checkSessionUpgrade(mockSSOToken, AuthIndexType.MODULE, desiredModule);
+
+        // Then
+        assertThat(result).as("With desiredModule=%s and existingModules=%s, expected checkSessionUpgrade to be %s",
+                desiredModule, existingModules, upgradeExpected).isEqualTo(upgradeExpected);
+    }
+
+    @Test(dataProvider = "realmQualifiedModules") // Re-use module names as service names
+    public void shouldRecogniseRealmQualifiedServiceNamesForSessionUpgrade(String desiredService,
+                                                                           String existingServices,
+                                                                           boolean upgradeExpected) throws Exception {
+        // Given
+        SSOToken mockSSOToken = mock(SSOToken.class);
+        given(mockSSOToken.getProperty(ISAuthConstants.SERVICE)).willReturn(existingServices);
+
+
+        // When
+        boolean result = loginAuthenticator.checkSessionUpgrade(mockSSOToken, AuthIndexType.SERVICE, desiredService);
+
+        // Then
+        assertThat(result).as("With desiredService=%s and existingServices=%s, expected checkSessionUpgrade to be %s",
+                desiredService, existingServices, upgradeExpected).isEqualTo(upgradeExpected);
+
+    }
+
+    @Test(dataProvider = "realmQualifiedModules") // and as roles too, why not?
+    public void shouldRecogniseRealmQualifiedRoleNamesForSessionUpgrade(String desiredRole,
+                                                                        String existingRoles,
+                                                                        boolean upgradeExpected) throws Exception {
+        // Given
+        SSOToken mockSSOToken = mock(SSOToken.class);
+        given(mockSSOToken.getProperty(ISAuthConstants.ROLE)).willReturn(existingRoles);
+
+
+        // When
+        boolean result = loginAuthenticator.checkSessionUpgrade(mockSSOToken, AuthIndexType.ROLE, desiredRole);
+
+        // Then
+        assertThat(result).as("With desiredRole=%s and existingRoles=%s, expected checkSessionUpgrade to be %s",
+                desiredRole, existingRoles, upgradeExpected).isEqualTo(upgradeExpected);
+    }
+
+    @DataProvider
+    public Object[][] realmQualifiedModules() {
+        return new Object[][] {
+                { "LDAP", "/test:LDAP|DataStore", false },
+                { "LDAP", "DataStore|/test:LDAP", false },
+                { "LDAP", "LDAP|DataStore", false },
+                { "LDAP", "DataStore|LDAP", false },
+                { "LDAP", "LDAP", false },
+                { "LDAP", "/test:LDAP", false },
+                { "LDAP", "DataStore", true },
+                { "LDAP", "LDAP|/test:DataStore", false },
+                { "LDAP", "/test:DataStore", true },
+                { "LDAP", "", true },
+                { "LDAP", null, true }
+        };
     }
 }
