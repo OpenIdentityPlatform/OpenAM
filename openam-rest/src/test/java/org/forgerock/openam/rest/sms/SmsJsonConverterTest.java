@@ -17,14 +17,20 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.Condition;
+import org.assertj.core.data.MapEntry;
 import org.forgerock.json.fluent.JsonException;
+import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -171,7 +177,37 @@ public class SmsJsonConverterTest {
         JsonValue result = converter.toJson(mapRepresentation);
 
         //Then
-        assertThat(result.getObject()).isEqualTo(jsonRepresentation.getObject());
+        AssertJJsonValueAssert.AbstractJsonValueAssert asserter = AssertJJsonValueAssert.assertThat(result);
+        asserter.isObject()
+                .containsField(SECTION_1_NAME)
+                .containsField(STRING_VALUE_RESOURCE_NAME)
+                .containsField(INT_VALUE_NAME)
+                .containsField(BOOLEAN_VALUE_NAME)
+                .containsField(DECIMAL_VALUE_NAME)
+                .containsField(MAP_VALUE_NAME)
+                .containsField(ARRAY_VALUE_NAME);
+
+        asserter.isObject().hasObject(SECTION_1_NAME)
+                .contains(Assertions.entry(SECTION_1_STRING_VALUE_NAME, STRING_VALUE));
+
+        asserter.isObject().stringAt(STRING_VALUE_RESOURCE_NAME)
+                .isEqualTo(STRING_VALUE);
+
+        asserter.isObject().integerAt(INT_VALUE_NAME)
+                .isEqualTo(INT_VALUE);
+
+        asserter.isObject().booleanAt(BOOLEAN_VALUE_NAME)
+                .isEqualTo(BOOLEAN_VALUE);
+
+        asserter.isObject().doubleAt(DECIMAL_VALUE_NAME)
+                .isEqualTo(DOUBLE_VALUE);
+
+        asserter.hasArray(ARRAY_VALUE_NAME).isArray().stringAt("0").isEqualTo(ARRAY_STRING_1);
+        asserter.hasArray(ARRAY_VALUE_NAME).isArray().stringAt("1").isEqualTo(ARRAY_STRING_2);
+
+        asserter.hasObject(MAP_VALUE_NAME)
+                .contains(Assertions.entry(ATT_1_NAME, ATT_1_VAL))
+                .contains(Assertions.entry(ATT_2_NAME, ATT_2_VAL));
     }
 
     @Test(expectedExceptions = JsonException.class)
