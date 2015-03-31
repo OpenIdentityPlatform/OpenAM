@@ -122,7 +122,7 @@
 
         <commons.forgerock-util.version>1.4.0-SNAPSHOT</commons.forgerock-util.version>
         <commons.authfilter.version>1.5.1</commons.authfilter.version>
-        <forgerock.json.version>2.4.3-SNAPSHOT</forgerock.json.version>
+        <forgerock.json.version>2.5.0-SNAPSHOT</forgerock.json.version>
         <forgerock-ui.version>2.0.2-SNAPSHOT</forgerock-ui.version>
         <restlet.version>2.1.7</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -883,6 +883,12 @@
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-tokens</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>json-test</artifactId>
+                <version>${forgerock.json.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <!-- New RIA Client UI -->

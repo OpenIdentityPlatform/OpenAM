@@ -226,5 +226,9 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-test</artifactId>
+        </dependency>
     </dependencies>
 </project>

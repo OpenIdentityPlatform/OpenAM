@@ -56,7 +56,7 @@ import com.sun.identity.security.EncodeAction;
  */
 public class AttributeSchema {
     // Debug
-    private static Debug debug = SMSEntry.debug;
+    private Debug debug = Debug.getInstance("amSMS");
 
     // Instance variable
     ServiceSchemaManager ssm;

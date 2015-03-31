@@ -83,7 +83,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
     @Override
     public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
         JsonValue content = request.getContent();
-        Map<String, Object> attrs = converter.fromJson(content);
+        Map<String, Set<String>> attrs = converter.fromJson(content);
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
@@ -171,7 +171,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
     @Override
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request, ResultHandler<Resource> handler) {
         JsonValue content = request.getContent();
-        Map<String, Object> attrs = converter.fromJson(content);
+        Map<String, Set<String>> attrs = converter.fromJson(content);
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);

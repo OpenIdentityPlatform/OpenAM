@@ -20,6 +20,7 @@ import static org.forgerock.json.fluent.JsonValue.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -144,7 +145,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      */
     @Override
     public void handleCreate(ServerContext serverContext, CreateRequest createRequest, ResultHandler<Resource> handler) {
-        Map<String, Object> attrs = converter.fromJson(createRequest.getContent());
+        Map<String, Set<String>> attrs = converter.fromJson(createRequest.getContent());
         try {
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
             ServiceConfig config;

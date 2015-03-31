@@ -965,5 +965,5 @@ public class ServiceSchema {
                 IUMSConstants.SMS_SMSSchema_no_service_element, null));
     }
 
-    static Debug debug = Debug.getInstance("amSMS");
+    Debug debug = Debug.getInstance("amSMS");
 }
