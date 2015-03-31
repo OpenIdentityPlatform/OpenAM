@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 
+import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.mockito.Mockito;
 import org.testng.annotations.AfterClass;
@@ -67,6 +69,8 @@ public class TestGroupEvaluator {
     private AMIdentity user1;
     private AMIdentity group1;
     private ResourceTypeService resourceTypeService;
+    private ConstraintValidator constraintValidator;
+    private ApplicationServiceFactory applicationServiceFactory;
     
 
     @BeforeClass
@@ -76,6 +80,8 @@ public class TestGroupEvaluator {
         }
 
         resourceTypeService = Mockito.mock(ResourceTypeService.class);
+        constraintValidator = Mockito.mock(ConstraintValidator.class);
+        applicationServiceFactory = Mockito.mock(ApplicationServiceFactory.class);
         
         Application appl = new Application("/", APPL_NAME,
             ApplicationTypeManager.getAppplicationType(adminSubject,
@@ -88,7 +94,8 @@ public class TestGroupEvaluator {
         appl.setEntitlementCombiner(DenyOverride.class);
         ApplicationManager.saveApplication(adminSubject, "/", appl);
 
-        PrivilegeManager pm = new PolicyPrivilegeManager(resourceTypeService);
+        PrivilegeManager pm = new PolicyPrivilegeManager(
+                applicationServiceFactory, resourceTypeService, constraintValidator);
         pm.initialize("/", adminSubject);
         Map<String, Boolean> actions = new HashMap<String, Boolean>();
         actions.put("GET", Boolean.TRUE);
@@ -110,7 +117,8 @@ public class TestGroupEvaluator {
         if (!migrated) {
             return;
         }
-        PrivilegeManager pm = new PolicyPrivilegeManager(resourceTypeService);
+        PrivilegeManager pm = new PolicyPrivilegeManager(
+                applicationServiceFactory, resourceTypeService, constraintValidator);
         pm.initialize("/", SubjectUtils.createSubject(adminToken));
         pm.remove(PRIVILEGE1_NAME);
 

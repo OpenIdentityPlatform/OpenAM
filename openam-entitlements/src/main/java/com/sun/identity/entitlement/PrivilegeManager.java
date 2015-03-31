@@ -28,11 +28,15 @@
  */
 package com.sun.identity.entitlement;
 
-import com.sun.identity.entitlement.interfaces.ResourceName;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
+import org.forgerock.openam.entitlement.service.ApplicationService;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import javax.security.auth.Subject;
@@ -43,8 +47,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 /**
  * Class to manage entitlement privileges: to add, remove, modify privilege
@@ -63,6 +65,8 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     private Subject adminSubject;
 
     private final ResourceTypeService resourceTypeService;
+    private final ApplicationServiceFactory applicationServiceFactory;
+    private final ConstraintValidator validator;
 
     /**
      * Returns instance of configured <code>PrivilegeManager</code>
@@ -94,8 +98,10 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     /**
      * Constructor.
      */
-    public PrivilegeManager(final ResourceTypeService resourceTypeService) {
+    public PrivilegeManager(final ApplicationServiceFactory applicationServiceFactory, final ResourceTypeService resourceTypeService, final ConstraintValidator validator) {
+        this.applicationServiceFactory = applicationServiceFactory;
         this.resourceTypeService = resourceTypeService;
+        this.validator = validator;
     }
 
     /**
@@ -138,7 +144,7 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
      *         the policy instance
      *
      * @throws EntitlementException
-     *         should validation fail
+     *         should validator fail
      */
     protected void validate(Privilege privilege) throws EntitlementException {
         final String pName = privilege.getName();
@@ -153,82 +159,35 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
 
         privilege.validateSubject(privilege.getSubject());
 
+        ApplicationService applicationService = applicationServiceFactory.create(adminSubject, realm);
+        Application application = applicationService.getApplication(entitlement.getApplicationName());
+
+        if (application == null) {
+            throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, entitlement.getApplicationName());
+        }
+
+        if (!application.getResourceTypeUuids().contains(privilege.getResourceTypeUuid())) {
+            throw new EntitlementException(EntitlementException.POLICY_DEFINES_INVALID_RESOURCE_TYPE, privilege.getResourceTypeUuid());
+        }
+
         final ResourceType resourceType = resourceTypeService
-                .getResourceType(PrivilegeManager.superAdminSubject, realm, privilege.getResourceTypeUuid());
+                .getResourceType(superAdminSubject, realm, privilege.getResourceTypeUuid());
 
         if (resourceType == null) {
             throw new EntitlementException(
                     EntitlementException.NO_SUCH_RESOURCE_TYPE, privilege.getResourceTypeUuid(), realm);
         }
 
-        final Set<String> patterns = resourceType.getPatterns();
+        validator
+                .verifyActions(entitlement.getActionValues().keySet())
+                .against(resourceType)
+                .throwExceptionIfFailure();
 
-        final ResourceName resourceHandler = entitlement.getResourceComparator(adminSubject, realm);
-
-        for (String resource : entitlement.getResourceNames()) {
-            final String normalisedResource = resourceHandler.canonicalize(resource);
-            final ValidateResourceResult result = validateResourceNames(normalisedResource, patterns, resourceHandler);
-
-            if (!result.isValid()) {
-                throw new EntitlementException(EntitlementException.INVALID_RESOURCE, resource);
-            }
-        }
-    }
-
-    /**
-     * Validates the configured resource against the patterns defined in the resource type.
-     *
-     * @param resource
-     *         the resource
-     * @param patterns
-     *         the set of patterns
-     * @param comparator
-     *         the comparator responsible for doing the matching
-     *
-     * @return a validation result
-     *
-     * @throws EntitlementException
-     *         should validation fail
-     */
-    private ValidateResourceResult validateResourceNames(
-            final String resource, final Set<String> patterns, final ResourceName comparator)
-            throws EntitlementException {
-
-        if (comparator instanceof RegExResourceName) {
-            for (String pattern : patterns) {
-                final ResourceMatch rm = comparator.compare(pattern, resource, true);
-
-                if (rm.equals(ResourceMatch.EXACT_MATCH)
-                        || rm.equals(ResourceMatch.WILDCARD_MATCH)
-                        || rm.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
-                    // Valid match.
-                    return new ValidateResourceResult(ValidateResourceResult.VALID_CODE_VALID, "");
-                }
-            }
-        } else {
-            for (String pattern : patterns) {
-                ResourceMatch match = comparator.compare(comparator.canonicalize(pattern), resource, false);
-
-                if (match.equals(ResourceMatch.EXACT_MATCH)
-                        || match.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
-                    // Valid match.
-                    return new ValidateResourceResult(ValidateResourceResult.VALID_CODE_VALID, "");
-
-                } else {
-                    match = comparator.compare(resource, comparator.canonicalize(pattern), true);
-
-                    if (match.equals(ResourceMatch.WILDCARD_MATCH)) {
-                        // Valid match.
-                        return new ValidateResourceResult(ValidateResourceResult.VALID_CODE_VALID, "");
-                    }
-                }
-            }
-        }
-
-        // Match failed.
-        return new ValidateResourceResult(
-                ValidateResourceResult.VALID_CODE_DOES_NOT_MATCH_VALID_RESOURCES,
-                "resource.validation.does.not.match.valid.resources", resource);
+        validator
+                .verifyResources(entitlement.getResourceNames())
+                .using(entitlement.getResourceComparator(superAdminSubject, realm))
+                .against(resourceType)
+                .throwExceptionIfFailure();
     }
 
     /**
@@ -409,4 +368,5 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     public static boolean isNameValid(String target) {
         return PRIVILEGE_NAME_PATTERN.matcher(target).matches();
     }
+
 }

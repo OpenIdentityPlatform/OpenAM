@@ -74,6 +74,9 @@ public class EntitlementException extends Exception {
     public static final int REMOVE_RESOURCE_TYPE_FAIL = 232;
     public static final int MODIFY_RESOURCE_TYPE_FAIL = 233;
     public static final int RESOURCE_TYPE_REFERENCED = 234;
+    public static final int POLICY_DEFINES_INVALID_RESOURCE_TYPE = 235;
+    public static final int MISSING_RESOURCE_TYPE = 236;
+    public static final int INVALID_RESOURCE_TYPE = 237;
     public static final int APP_RETRIEVAL_ERROR = 248;
     public static final int MISSING_RESOURCE_TYPE_NAME = 249;
     public static final int NO_SUCH_REFERRAL_PRIVILEGE = 263;

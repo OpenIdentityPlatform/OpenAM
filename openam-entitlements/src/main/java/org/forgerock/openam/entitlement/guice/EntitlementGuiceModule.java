@@ -18,6 +18,8 @@ package org.forgerock.openam.entitlement.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
+import org.forgerock.openam.entitlement.constraints.ConstraintValidatorImpl;
 import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ApplicationServiceImpl;
@@ -36,6 +38,7 @@ public class EntitlementGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ResourceTypeService.class).to(ResourceTypeServiceImpl.class);
+        bind(ConstraintValidator.class).to(ConstraintValidatorImpl.class);
 
         install(new FactoryModuleBuilder()
                 .implement(ApplicationService.class, ApplicationServiceImpl.class)

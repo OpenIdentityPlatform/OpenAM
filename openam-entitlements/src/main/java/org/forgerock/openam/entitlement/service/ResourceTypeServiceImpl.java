@@ -149,6 +149,11 @@ public class ResourceTypeServiceImpl implements ResourceTypeService {
     }
 
     @Override
+    public boolean contains(Subject subject, String realm, String id) throws EntitlementException {
+        return configuration.containsUUID(subject, realm, id);
+    }
+
+    @Override
     public Set<ResourceType> getResourceTypes(QueryFilter<SmsAttribute> filter,
                                               Subject subject, String realm) throws EntitlementException {
         return configuration.getResourceTypes(filter, subject, realm);

@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.utils;
 
+import com.sun.identity.common.CaseInsensitiveHashSet;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Function;
 
@@ -29,7 +30,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.sun.identity.common.CaseInsensitiveHashSet;
 
 /**
  * A simple utility class to simplify interactions with collections.
@@ -368,6 +368,18 @@ public class CollectionUtils {
      */
     public static boolean isNotEmpty(final Collection<?> collection) {
         return collection != null && !collection.isEmpty();
+    }
+
+    /**
+     * Determines whether the collections is null or empty.
+     *
+     * @param collection
+     *         the collection
+     *
+     * @return whether the collection is null or empty
+     */
+    public static boolean isEmpty(Collection<?> collection) {
+        return collection == null || collection.isEmpty();
     }
 
 

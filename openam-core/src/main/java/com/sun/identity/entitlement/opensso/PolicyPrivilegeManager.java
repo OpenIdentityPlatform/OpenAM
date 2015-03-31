@@ -49,6 +49,8 @@ import com.sun.identity.policy.PolicyEvent;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
+import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import java.security.AccessController;
@@ -93,8 +95,10 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
      * Creates instance of <code>PolicyPrivilegeManager</code>
      */
     @Inject
-    public PolicyPrivilegeManager(final ResourceTypeService resourceTypeService) {
-        super(resourceTypeService);
+    public PolicyPrivilegeManager(ApplicationServiceFactory applicationServiceFactory,
+                                  ResourceTypeService resourceTypeService,
+                                  ConstraintValidator constraintValidator) {
+        super(applicationServiceFactory, resourceTypeService, constraintValidator);
     }
 
     /**

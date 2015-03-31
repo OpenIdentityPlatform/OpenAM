@@ -79,6 +79,23 @@ public interface ResourceTypeService {
     public ResourceType updateResourceType(Subject subject, ResourceType resourceType) throws EntitlementException;
 
     /**
+     * Determines whether the resource type Id represents a valid and present resource type.
+     *
+     * @param subject
+     *         the calling subject
+     * @param realm
+     *         the realm location for the resource type
+     * @param id
+     *         the resource type Id
+     *
+     * @return whether the resource type is valid
+     *
+     * @throws EntitlementException
+     *         should an error occur
+     */
+    boolean contains(Subject subject, String realm, String id) throws EntitlementException;
+
+    /**
      * Retrieves a set of resource types based on the passed query filter.
      *
      * @param filter

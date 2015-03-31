@@ -23,9 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ApplicationManager.java,v 1.11 2010/01/13 23:41:57 veiming Exp $
- */
-
-/*
+ *
  * Portions Copyrighted 2013-2015 ForgeRock AS
  */
 package com.sun.identity.entitlement;
@@ -33,6 +31,9 @@ package com.sun.identity.entitlement;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.entitlement.util.SearchFilter.Operator;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
 import static org.forgerock.openam.utils.StringUtils.*;
@@ -391,6 +392,21 @@ public final class ApplicationManager {
 
         if (isReferredApplication(realm, application)) {
             throw new EntitlementException(228);
+        }
+
+        Set<String> resourceTypeIds = application.getResourceTypeUuids();
+
+        if (CollectionUtils.isEmpty(resourceTypeIds)) {
+            throw new EntitlementException(EntitlementException.MISSING_RESOURCE_TYPE);
+        }
+
+        // When this class is refactored (AME-6287) this dependency should be injected.
+        ResourceTypeService resourceTypeService = InjectorHolder.getInstance(ResourceTypeService.class);
+
+        for (String resourceTypeId : resourceTypeIds) {
+            if (!resourceTypeService.contains(adminSubject, realm, resourceTypeId)) {
+                throw new EntitlementException(EntitlementException.INVALID_RESOURCE_TYPE, resourceTypeId);
+            }
         }
 
         Date date = new Date();
