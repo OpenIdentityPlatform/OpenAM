@@ -15,7 +15,7 @@
  */
 
 /*
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -248,6 +248,11 @@ public class AMKeyProvider implements KeyProvider {
         java.security.PublicKey pkey = null;
         try {
             X509Certificate cert = (X509Certificate) ks.getCertificate(keyAlias);
+            if (cert == null) {
+                logger.error("Unable to retrieve certificate with alias '" + keyAlias + "' from keystore " +
+                        "'" + this.keystoreFile + "'");
+                return null;
+            }
             pkey = cert.getPublicKey();
         } catch (KeyStoreException e) {
             logger.error("Unable to get public key:" + keyAlias, e);
