@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -56,7 +56,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
         render: function(args, callback) {
             this.data.urlParams = uiUtils.convertCurrentUrlToJSON().params;
             this.data.isStageOne = true;
-            if (this.data.urlParams) {
+            if(!_.isEmpty(this.data.urlParams)) {
                 this.data.isStageOne = false;
             }
             this.parentRender(function() {
@@ -112,7 +112,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             e.preventDefault();
             var loginUrlParams = cookieHelper.getCookie("loginUrlParams");
             cookieHelper.deleteCookie("loginUrlParams");
-            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : conf.globalData.auth.realm);
+            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "/" + conf.globalData.auth.subRealm);
         },
         customValidate: function () {
             if(validatorsManager.formValidated(this.$el.find("#passwordChange")) || validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {

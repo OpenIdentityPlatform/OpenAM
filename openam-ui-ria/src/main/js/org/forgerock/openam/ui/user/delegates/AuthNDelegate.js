@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,7 +27,6 @@
  */
 
 /*global document, $, define, _, window */
-
 define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
@@ -37,23 +36,19 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
-    "org/forgerock/commons/ui/common/components/Messages"
-], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router, i18nManager, sessionDelegate, messageManager) {
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router, i18nManager, sessionDelegate, messageManager, RealmHelper) {
 
-    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/authenticate"),
+    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/"),
         requirementList = [],
         knownAuth = {}; // to be used to keep track of the attributes associated with whatever requirementList contains
 
     obj.begin = function () {
-
         var url,
             args = {},
             tokenCookie,
             promise = $.Deferred();
-
-        if (configuration.globalData.auth.realm !== "/") {
-            args.realm = configuration.globalData.auth.realm;
-        }
 
         knownAuth = _.clone(configuration.globalData.auth);
 
@@ -67,7 +62,13 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
             args.sessionUpgradeSSOTokenId = tokenCookie;
         }
 
-        url = "?" + $.param(args);
+        url = RealmHelper.decorateURIWithSubRealm("__subrealm__/authenticate");
+
+        if(RealmHelper.getOverrideRealm()) {
+            args.realm = RealmHelper.getOverrideRealm();
+        }
+
+        url = url + "?" + $.param(args);
 
         obj.serviceCall({
                 type: "POST",
@@ -133,13 +134,16 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                     window.location.href = errorBody.detail.failureUrl;
                 }
 
-            };
+            },
+            url;
+
+        url = RealmHelper.decorateURIWithRealm("__subrealm__/authenticate");
 
             obj.serviceCall({
                 type: "POST",
                 headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
                 data: JSON.stringify(requirements),
-                url: "",
+                url: url,
                 errorsHandlers: {
                     "unauthorized": { status: "401"},
                     "timeout": { status: "408" },

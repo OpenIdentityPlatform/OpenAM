@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -34,8 +34,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
-    "org/forgerock/commons/ui/common/util/CookieHelper"
-], function (authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf, uiUtils, constants, sessionDelegate, cookieHelper) {
+    "org/forgerock/commons/ui/common/util/CookieHelper",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function (authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf, uiUtils, constants, sessionDelegate, cookieHelper, RealmHelper) {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function(params, successCallback, errorCallback) {
@@ -74,7 +75,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                                 viewManager.refresh();
                             } else {
                                 // TODO: If using a module chain with autologin the user is currently routed to the first login screen.
-                                location.href = '#login' + conf.globalData.auth.realm;
+                                var href = "#login",
+                                    realm = conf.globalData.auth.subRealm;
+                                if(realm) {
+                                    href += "/" + realm;
+                                }
+                                location.href = href;
                             }
                         }
                     },
@@ -92,8 +98,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     obj.getLoggedUser = function(successCallback, errorCallback) {
         try{
             userDelegate.getProfile(function(user) {
-                conf.globalData.auth.realm = user.userid.realm;
-                
+                conf.globalData.auth.subRealm = user.userid.realm.slice(1);
+
                 // keep track of the current realm as a future default value, following logout:
                 router.configuration.routes.login.defaults[0] = user.userid.realm;
                 
@@ -109,9 +115,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 // Try to remove any cookie that is lingering, as it is apparently no longer valid
                 obj.removeSessionCookie();
 
-                if (!conf.globalData.auth.realm) {
-                    conf.globalData.auth.realm = router.configuration.routes.login.defaults[0];
-                }
                 errorCallback();
             }, {"serverError": {status: "503"}, "unauthorized": {status: "401"}});
         } catch(e) {

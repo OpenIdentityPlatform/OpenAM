@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.resource;
@@ -87,11 +87,10 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
 
         boolean handled = getRealmFromURI(context, realmContext);
         if (!handled) {
-            handled = getRealmFromQueryString(context, realmContext);
-        }
-        if (!handled) {
             getRealmFromServerName(context, realmContext);
         }
+
+        getRealmFromQueryString(context, realmContext);
         return realmContext;
     }
 
@@ -107,18 +106,20 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
         return false;
     }
 
-    private boolean getRealmFromQueryString(ServerContext context, RealmContext realmContext)
+    private void getRealmFromQueryString(ServerContext context, RealmContext realmContext)
             throws BadRequestException {
+        if (realmContext.getOverrideRealm() != null) {
+            return;
+        }
         List<String> realm = context.asContext(HttpContext.class).getParameter("realm");
         if (realm == null || realm.size() != 1) {
-            return false;
+            return;
         }
-        String subRealm = validateRealm(realmContext.getResolvedRealm(), realm.get(0));
-        if (subRealm != null) {
-            realmContext.addSubRealm(subRealm, subRealm);
-            return true;
+        String validatedRealm = validateRealm("", realm.get(0));
+        if (validatedRealm != null) {
+            realmContext.setOverrideRealm(validatedRealm);
         } else {
-            return false;
+            throw new BadRequestException("Invalid realm, " + realm.get(0));
         }
     }
 

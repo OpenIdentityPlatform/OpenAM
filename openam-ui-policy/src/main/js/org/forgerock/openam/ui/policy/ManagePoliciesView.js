@@ -37,8 +37,9 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
     "org/forgerock/openam/ui/policy/PolicyDelegate",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/Configuration"
-], function (AbstractView, GenericGridView, uiUtils, router, policyDelegate, eventManager, constants, conf) {
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/RealmHelper"
+], function (AbstractView, GenericGridView, uiUtils, router, policyDelegate, eventManager, constants, conf, RealmHelper) {
     var ManagePoliciesView = AbstractView.extend({
         baseTemplate: 'templates/policy/BaseTemplate.html',
         template: "templates/policy/ManagePoliciesTemplate.html",
@@ -82,7 +83,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         getPolicyGridInitOptions: function () {
             var self = this;
             return {
-                url: '/' + constants.context + '/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/policies',
+                url: RealmHelper.decorateURLWithOverrideRealm('/' + constants.context + '/json/policies'),
                 colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified', 'Actions', 'Resources', 'Resource Attributes', 'Subject'],
                 colModel: [
 
@@ -126,7 +127,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         getRefGridInitOptions: function () {
             var self = this;
             return {
-                url: '/' + constants.context + '/json' + (this.data.realm === '/' ? '' : this.data.realm) + '/referrals',
+                url: RealmHelper.decorateURLWithOverrideRealm('/' + constants.context + '/json/referrals'),
                 colNames: ['', 'Name', 'Resources', 'Realms', 'Created', 'Last Modified', 'Created By', 'ModifiedBy'],
                 colModel: [
                     {name: 'iconChB',        width: 40,  sortable: false, formatter: this.refGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},

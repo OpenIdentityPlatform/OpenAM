@@ -16,12 +16,14 @@
 
 package org.forgerock.openam.rest.service;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.ConcurrentMap;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.router.RestRealmValidator;
-import org.forgerock.openam.utils.StringUtils;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -32,9 +34,6 @@ import org.restlet.routing.Route;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 import org.restlet.routing.TemplateRoute;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * A Restlet router which will route to service endpoints, dynamically handling realm URI parameters.
@@ -49,7 +48,6 @@ public class RestletRealmRouter extends Router {
 
     private final RestRealmValidator realmValidator;
     private final CoreWrapper coreWrapper;
-    private final Delegate delegate;
     private final TemplateRoute delegateRoute;
 
     /**
@@ -62,7 +60,7 @@ public class RestletRealmRouter extends Router {
         this.realmValidator = realmValidator;
         this.coreWrapper = coreWrapper;
 
-        delegate = new Delegate(this);
+        Delegate delegate = new Delegate(this);
         delegateRoute = createRoute("/{subrealm}", delegate, Template.MODE_STARTS_WITH);
         super.setDefaultRoute(delegateRoute);
     }
@@ -90,13 +88,9 @@ public class RestletRealmRouter extends Router {
         }
 
         if (next != delegateRoute) {
-            if (StringUtils.isEmpty((String) request.getAttributes().get("subrealm"))) {
-                String subrealm = getRealmFromQueryString(request);
-                if (realm == null) {
-                    realm = subrealm;
-                } else if (subrealm != null && !subrealm.isEmpty()) {
-                    realm += realm.endsWith("/") ? subrealm.substring(1) : subrealm;
-                }
+            String overrideRealm = getRealmFromQueryString(request);
+            if (overrideRealm != null) {
+                realm = overrideRealm;
             }
             request.getAttributes().put(REALM_URL, request.getResourceRef().getBaseRef().toString());
         }

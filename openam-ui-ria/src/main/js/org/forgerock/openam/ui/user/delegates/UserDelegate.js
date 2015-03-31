@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -32,9 +32,9 @@ define("UserDelegate", [
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/util/Mime",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, mime, realmHelper) {
+], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, mime, RealmHelper) {
 
-    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json");
+    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/");
 
     obj.getUserResourceName = function (user) {
         return user.resourceName;
@@ -42,7 +42,7 @@ define("UserDelegate", [
 
     obj.getUserById = function(id, realm, successCallback, errorCallback, errorsHandlers) {
 
-        var resourceName = realmHelper.cleanRealm(realm) + "/users/" + id;
+        var resourceName = RealmHelper.decorateURIWithRealm("__subrealm__/users/" + id);
 
         obj.serviceCall({
             url: resourceName,
@@ -77,9 +77,9 @@ define("UserDelegate", [
      * Checks if logged in and returns users id
      */
     obj.getProfile = function(successCallback, errorCallback, errorsHandlers) {
-        var realm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
+        var url = RealmHelper.decorateURIWithRealm("__subrealm__/users?_action=idFromSession");
         obj.serviceCall({
-            url: realm + "/users?_action=idFromSession",
+            url: url,
             data: "{}",
             type: "POST",
             headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
@@ -120,7 +120,12 @@ define("UserDelegate", [
     };
 
     obj.changePassword = function(oldUserData, postData, successCallback, errorCallback, errorsHandlers) {
-        return this.serviceCall({url: this.getUserResourceName(oldUserData) + "?_action=changePassword",
+        var url = this.getUserResourceName(oldUserData);
+        url += url.indexOf("?") === -1 ? "?" : "&";
+        url += "_action=changePassword";
+
+        return this.serviceCall({
+            url: url,
             data: JSON.stringify(postData),
             headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             type: "POST",
@@ -131,10 +136,8 @@ define("UserDelegate", [
     };
 
     obj.doAction = function(action, postData, successCallback, errorCallback, errorsHandlers) {
-        var realm = realmHelper.cleanRealm(configuration.globalData.auth.realm);
-
         return obj.serviceCall({
-            url: realm + "/users?_action=" + action,
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/users?_action=" + action),
             headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             data: JSON.stringify(postData),
             type: "POST",

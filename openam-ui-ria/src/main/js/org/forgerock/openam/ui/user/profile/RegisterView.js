@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -148,8 +148,8 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                 e.preventDefault();
             }
             var loginUrlParams = cookieHelper.getCookie("loginUrlParams");
-            cookieHelper.deleteCookie("loginUrlParams"); 
-            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : conf.globalData.auth.realm);
+            cookieHelper.deleteCookie("loginUrlParams");
+            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "/" + conf.globalData.auth.subRealm);
         },
         customValidate: function () {
             if(validatorsManager.formValidated(this.$el.find("#registration")) || validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {
@@ -163,5 +163,3 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
     
     return new RegisterView();
 });
-
-

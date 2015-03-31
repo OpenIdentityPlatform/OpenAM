@@ -13,6 +13,7 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.rest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
