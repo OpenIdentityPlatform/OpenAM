@@ -26,45 +26,46 @@
                 serviceHierarchy="/DSAMEConfig/ForgerockOAuth2ProviderService"
                 i18nFileName="OAuth2Provider"
                 revisionNumber="1"
-                i18nKey="forgerock-oauth2-provider-description">
+                i18nKey="forgerock-oauth2-provider-description"
+                resourceName="oauth-oidc">
             <Global>
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-script-server-timeout"
                                  type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="g101">
+                                 rangeEnd="2147483647" i18nKey="g101" resourceName="scriptServerTimeout">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-script-core-threads"
                                  type="single" syntax="number_range" rangeStart="1"
-                                 rangeEnd="2147483647" i18nKey="g102">
+                                 rangeEnd="2147483647" i18nKey="g102" resourceName="scriptCoreThreads">
                     <DefaultValues>
                         <Value>10</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-script-max-threads"
                                  type="single" syntax="number_range" rangeStart="1"
-                                 rangeEnd="2147483647" i18nKey="g103">
+                                 rangeEnd="2147483647" i18nKey="g103" resourceName="scriptMaxThreads">
                     <DefaultValues>
                         <Value>50</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-script-queue-size"
                                  type="single" syntax="number_range" rangeStart="-1"
-                                 rangeEnd="2147483647" i18nKey="g104">
+                                 rangeEnd="2147483647" i18nKey="g104" resourceName="scriptQueueSize">
                     <DefaultValues>
                         <Value>10</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-script-idle-timeout"
                                  type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="g105">
+                                 rangeEnd="2147483647" i18nKey="g105" resourceName="scriptIdleTimeout">
                     <DefaultValues>
                         <Value>60</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-script-white-list"
-                                 type="list" syntax="string" i18nKey="g106">
+                                 type="list" syntax="string" i18nKey="g106" resourceName="scriptWhiteList">
                     <DefaultValues>
                         <Value>java.lang.Boolean</Value>
                         <Value>java.lang.Byte</Value>
@@ -104,7 +105,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-script-black-list"
-                                 type="list" syntax="string" i18nKey="g107">
+                                 type="list" syntax="string" i18nKey="g107" resourceName="scriptBlackList">
                     <DefaultValues>
                         <Value>java.security.AccessController</Value>
                         <Value>java.lang.Class</Value>
@@ -112,7 +113,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-script-use-security-manager"
-                                 type="single" syntax="boolean" i18nKey="g108">
+                                 type="single" syntax="boolean" i18nKey="g108" resourceName="scriptUseSecurityManager">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -128,7 +129,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a100">
+                                 i18nKey="a100" resourceName="codeLifetime">
                     <DefaultValues>
                         <Value>10</Value>
                     </DefaultValues>
@@ -138,7 +139,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a101">
+                                 i18nKey="a101" resourceName="refreshTokenLifetime">
                     <DefaultValues>
                         <Value>600</Value>
                     </DefaultValues>
@@ -148,7 +149,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a102">
+                                 i18nKey="a102" resourceName="accessTokenLifetime">
                     <DefaultValues>
                         <Value>60</Value>
                     </DefaultValues>
@@ -157,7 +158,7 @@
                 <AttributeSchema name="forgerock-oauth2-provider-issue-refresh-token"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a103">
+                                 i18nKey="a103" resourceName="issueRefreshToken">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -170,7 +171,7 @@
                 <AttributeSchema name="forgerock-oauth2-provider-issue-refresh-token-on-refreshing-token"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a103a">
+                                 i18nKey="a103a" resourceName="issueRefreshTokenOnRefreshedToken">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -184,7 +185,7 @@
                                  type="single"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a104">
+                                 i18nKey="a104" resourceName="scopeImplementationClass">
                     <DefaultValues>
                         <Value>org.forgerock.openam.oauth2.OpenAMScopeValidator</Value>
                     </DefaultValues>
@@ -194,7 +195,8 @@
                                  type="single"
                                  syntax="script"
                                  validator="ScriptValidator"
-                                 i18nKey="a104aa">
+                                 i18nKey="a104aa"
+                                 resourceName="oidcClaimsScript">
                     <DefaultValues>
                         <Value>
                             ${inject.content.oidc-claims-extension-groovy}
@@ -205,7 +207,8 @@
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-claims-extension-script-type"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a104ab">
+                                 i18nKey="a104ab"
+                                 resourceName="oidcClaimsScriptType">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="scriptGroovyChoice">Groovy</ChoiceValue>
                         <ChoiceValue i18nKey="scriptJavaScriptChoice">JavaScript</ChoiceValue>
@@ -218,7 +221,8 @@
                 <AttributeSchema name="forgerock-oauth2-provider-response-type-map-class"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a105">
+                                 i18nKey="a105"
+                                 resourceName="responseTypeClasses">
                     <DefaultValues>
                         <Value>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</Value>
                         <Value>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</Value>
@@ -230,7 +234,8 @@
                         name="forgerock-oauth2-provider-authentication-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a106">
+                        i18nKey="a106"
+                        resourceName="authenticationAttributes">
                     <DefaultValues>
                         <Value>uid</Value>
                     </DefaultValues>
@@ -239,6 +244,7 @@
                 <AttributeSchema name="forgerock-oauth2-provider-saved-consent-attribute"
                                  type="single"
                                  syntax="string"
+                                 resourceName="savedConsentAttribute"
                                  i18nKey="a107">
                     <DefaultValues>
                         <Value></Value>
@@ -259,6 +265,7 @@
                         name="forgerock-oauth2-provider-jkws-uri"
                         type="single"
                         syntax="string"
+                        resourceName="jkwsURI"
                         i18nKey="a109">
                     <DefaultValues>
                         <Value></Value>
@@ -269,6 +276,7 @@
                         name="forgerock-oauth2-provider-subject-types-supported"
                         type="list"
                         syntax="string"
+                        resourceName="supportedSubjectTypes"
                         i18nKey="a110">
                     <DefaultValues>
                         <Value>public</Value>
@@ -279,6 +287,7 @@
                         name="forgerock-oauth2-provider-id-token-signing-algorithms-supported"
                         type="list"
                         syntax="string"
+                        resourceName="supportedIDTokenSigningAlgorithms"
                         i18nKey="a111">
                     <DefaultValues>
                         <Value>HS256</Value>
@@ -292,6 +301,7 @@
                         name="forgerock-oauth2-provider-supported-claims"
                         type="list"
                         syntax="string"
+                        resourceName="supportedClaims"
                         i18nKey="a112">
                     <DefaultValues>
                         <Value>openid</Value>
@@ -306,6 +316,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
+                                 resourceName="jwtTokenLifetime"
                                  i18nKey="a113">
                     <DefaultValues>
                         <Value>600</Value>
@@ -316,6 +327,7 @@
                                  type="single"
                                  syntax="string"
                                  validator="RequiredValueValidator"
+                                 resourceName="keypairName"
                                  i18nKey="a114">
                     <DefaultValues>
                         <Value>test</Value>
@@ -325,6 +337,7 @@
                 <AttributeSchema name="forgerock-oauth2-provider-allow-open-dynamic-registration"
                                  type="single"
                                  syntax="boolean"
+                                 resourceName="allowDynamicRegistration"
                                  i18nKey="a115">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -338,6 +351,7 @@
                 <AttributeSchema name="forgerock-oauth2-provider-generate-registration-access-tokens"
                                  type="single"
                                  syntax="boolean"
+                                 resourceName="generateRegistrationAccessTokens"
                                  i18nKey="a116">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -350,38 +364,40 @@
 
 
                 <AttributeSchema name="MapValueValidator"
-                type="validator"
-                syntax="string">
+                                 type="validator"
+                                 syntax="string">
                     <DefaultValues>
                         <Value>com.sun.identity.common.configuration.MapValueValidator</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema name="forgerock-oauth2-provider-loa-mapping"
-                type="list"
-                syntax="string"
-                uitype="maplist"
-                validator="MapValueValidator"
-                i18nKey="a117">
+                                 type="list"
+                                 syntax="string"
+                                 uitype="maplist"
+                                 validator="MapValueValidator"
+                                 resourceName="loaMapping"
+                                 i18nKey="a117">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                         className="com.sun.identity.authentication.service.ConfiguredAuthServices"/>
                     </ChoiceValues>
                 </AttributeSchema>
 
-                <AttributeSchema
-                name="forgerock-oauth2-provider-default-acr"
-                type="single"
-                syntax="string"
-                i18nKey="a118">
+                <AttributeSchema name="forgerock-oauth2-provider-default-acr"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="defaultACR"
+                                 i18nKey="a118">
                 </AttributeSchema>
 
                 <AttributeSchema name="forgerock-oauth2-provider-amr-mappings"
-                type="list"
-                syntax="string"
-                uitype="maplist"
-                validator="MapValueValidator"
-                i18nKey="a119">
+                                 type="list"
+                                 syntax="string"
+                                 uitype="maplist"
+                                 validator="MapValueValidator"
+                                 resourceName="amrMappings"
+                                 i18nKey="a119">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                         className="com.sun.identity.authentication.service.AllConfiguredModuleInstances"/>
@@ -392,6 +408,7 @@
                         name="forgerock-oauth2-provider-modified-attribute-name"
                         type="single"
                         syntax="string"
+                        resourceName="modifiedTimestampAttribute"
                         i18nKey="a120">
                     <DefaultValues>
                         <Value>modifyTimestamp</Value>
@@ -402,302 +419,13 @@
                         name="forgerock-oauth2-provider-created-attribute-name"
                         type="single"
                         syntax="string"
+                        resourceName="createdTimestampAttribute"
                         i18nKey="a121">
                     <DefaultValues>
                         <Value>createTimestamp</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
-                <SubSchema name="serverconfig" inheritance="multiple">
-
-                    <AttributeSchema name="forgerock-oauth2-provider-authorization-code-lifetime"
-                    type="single"
-                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                    validator="RequiredValueValidator"
-                    i18nKey="a100">
-                        <DefaultValues>
-                            <Value>10</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-refresh-token-lifetime"
-                                     type="single"
-                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a101">
-                        <DefaultValues>
-                            <Value>600</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-access-token-lifetime"
-                                     type="single"
-                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a102">
-                        <DefaultValues>
-                            <Value>60</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-issue-refresh-token"
-                                     type="single"
-                                     syntax="boolean"
-                                     i18nKey="a103">
-                        <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-issue-refresh-token-on-refreshing-token"
-                                     type="single"
-                                     syntax="boolean"
-                                     i18nKey="a103a">
-                        <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-scope-implementation-class"
-                                     type="single"
-                                     syntax="string"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a104">
-                        <DefaultValues>
-                            <Value>org.forgerock.openam.oauth2.OpenAMScopeValidator</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-oidc-claims-extension-script"
-                                     type="single"
-                                     syntax="script"
-                                     validator="ScriptValidator"
-                                     i18nKey="a106">
-                        <DefaultValues>
-                            <Value>
-                                ${inject.content.oidc-claims-extension-groovy}
-                            </Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-oidc-claims-extension-script-type"
-                                     type="single_choice"
-                                     syntax="string"
-                                     i18nKey="a107">
-                        <ChoiceValues>
-                            <ChoiceValue i18nKey="choice1">Groovy</ChoiceValue>
-                            <ChoiceValue i18nKey="choice2">JavaScript</ChoiceValue>
-                        </ChoiceValues>
-                        <DefaultValues>
-                            <Value>Groovy</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-response-type-map-class"
-                                     type="list"
-                                     syntax="string"
-                                     i18nKey="a105">
-                        <DefaultValues>
-                            <Value>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</Value>
-                            <Value>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</Value>
-                            <Value>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.IDTokenResponseType</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema
-                            name="forgerock-oauth2-provider-authentication-attributes"
-                            type="list"
-                            syntax="string"
-                            i18nKey="a106">
-                        <DefaultValues>
-                            <Value>uid</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-saved-consent-attribute"
-                                     type="single"
-                                     syntax="string"
-                                     i18nKey="a107">
-                        <DefaultValues>
-                            <Value></Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <!--
-                    <AttributeSchema
-                            name="forgerock-oauth2-provider-supported-scopes"
-                            type="list"
-                            syntax="string"
-                            i18nKey="a108">
-                        <DefaultValues>
-                            <Value>openid</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    -->
-                    <AttributeSchema
-                            name="forgerock-oauth2-provider-jkws-uri"
-                            type="single"
-                            syntax="string"
-                            i18nKey="a109">
-                        <DefaultValues>
-                            <Value></Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema
-                            name="forgerock-oauth2-provider-subject-types-supported"
-                            type="list"
-                            syntax="string"
-                            i18nKey="a110">
-                        <DefaultValues>
-                            <Value>public</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema
-                            name="forgerock-oauth2-provider-id-token-signing-algorithms-supported"
-                            type="list"
-                            syntax="string"
-                            i18nKey="a111">
-                        <DefaultValues>
-                            <Value>HS256</Value>
-                            <Value>HS384</Value>
-                            <Value>HS512</Value>
-                            <Value>RS256</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema
-                            name="forgerock-oauth2-provider-supported-claims"
-                            type="list"
-                            syntax="string"
-                            i18nKey="a112">
-                        <DefaultValues>
-                            <Value>openid</Value>
-                            <Value>profile</Value>
-                            <Value>email</Value>
-                            <Value>address</Value>
-                            <Value>phone</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-jwt-token-lifetime"
-                                     type="single"
-                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a113">
-                        <DefaultValues>
-                            <Value>600</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-keypair-name"
-                                     type="single"
-                                     syntax="string"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a114">
-                        <DefaultValues>
-                            <Value>test</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-allow-open-dynamic-registration"
-                                     type="single"
-                                     syntax="boolean"
-                                     i18nKey="a115">
-                        <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>false</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-generate-registration-access-tokens"
-                                     type="single"
-                                     syntax="boolean"
-                                     i18nKey="a116">
-                        <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-
-                    <AttributeSchema name="MapValueValidator"
-                    type="validator"
-                    syntax="string">
-                        <DefaultValues>
-                            <Value>com.sun.identity.common.configuration.MapValueValidator</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-loa-mapping"
-                    type="list"
-                    syntax="string"
-                    uitype="maplist"
-                    validator="MapValueValidator"
-                    i18nKey="a117">
-                        <ChoiceValues>
-                            <ChoiceValuesClassName
-                            className="com.sun.identity.authentication.service.ConfiguredAuthServices"/>
-                        </ChoiceValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema
-                    name="forgerock-oauth2-provider-default-acr"
-                    type="single"
-                    syntax="string"
-                    i18nKey="a118">
-                        <DefaultValues>
-                            <Value></Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="forgerock-oauth2-provider-amr-mappings"
-                    type="list"
-                    syntax="string"
-                    uitype="maplist"
-                    validator="MapValueValidator"
-                    i18nKey="a119">
-                        <ChoiceValues>
-                            <ChoiceValuesClassName
-                            className="com.sun.identity.authentication.service.AllConfiguredModuleInstances"/>
-                        </ChoiceValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema
-                            name="forgerock-oauth2-provider-modified-attribute-name"
-                            type="single"
-                            syntax="string"
-                            i18nKey="a120">
-                        <DefaultValues>
-                            <Value>modifyTimestamp</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema
-                            name="forgerock-oauth2-provider-created-attribute-name"
-                            type="single"
-                            syntax="string"
-                            i18nKey="a121">
-                        <DefaultValues>
-                            <Value>createTimestamp</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                </SubSchema>
             </Organization>
         </Schema>
     </Service>

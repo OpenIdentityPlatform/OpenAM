@@ -26,6 +26,7 @@
 
    $Id: fmMultiProtocol.xml,v 1.4 2008/06/25 05:51:14 qcheng Exp $                                                                                
 
+    Portions Copyrighted 2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -39,12 +40,14 @@
             i18nFileName="fmMultiFederationProtocol"
             revisionNumber="10"
             i18nKey="sunMultiFederationProtocol"
+            resourceName="federation/multi"
             propertiesViewBeanURL="">
             <Global>
                <AttributeSchema name="SingleLogoutHandlerList"
                    type="list"
                    syntax="string"
-                   i18nKey="a101">
+                   i18nKey="a101"
+                   resourceName="singleLogoutHandlerList">
                    <DefaultValues>
                        <Value>key=SAML2|class=com.sun.identity.multiprotocol.SAML2SingleLogoutHandler</Value>
                        <Value>key=IDFF|class=com.sun.identity.multiprotocol.IDFFSingleLogoutHandler</Value>

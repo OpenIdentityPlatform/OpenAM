@@ -26,6 +26,8 @@
                                                                                 
    $Id: famFederationCommon.xml,v 1.4 2010/01/08 22:41:43 exu Exp $
                                                                                 
+    Portions Copyrighted 2015 ForgeRock AS.
+
 -->
 
 
@@ -39,13 +41,15 @@
             serviceHierarchy="/DSAMEConfig/sunFAMFederationCommon"
             i18nFileName="famFederationCommon" 
             revisionNumber="30"
+            resourceName="federation/common"
             i18nKey="sunFAMFederationCommon">
 
             <Global> 
                 <AttributeSchema name="DatastoreClass"
                     type="single" 
                     syntax="string" 
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="datastoreClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.datastore.impl.IdRepoDataStoreProvider</Value>
                     </DefaultValues>
@@ -53,7 +57,8 @@
                 <AttributeSchema name="ConfigurationClass" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="configurationClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.configuration.impl.ConfigurationInstanceImpl</Value>
                     </DefaultValues>
@@ -61,7 +66,8 @@
                 <AttributeSchema name="LoggerClass" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="loggerClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.log.impl.LogProvider</Value>
                     </DefaultValues>
@@ -69,7 +75,8 @@
                 <AttributeSchema name="SessionProviderClass"
                     type="single" 
                     syntax="string" 
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    resourceName="sessionProviderClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.session.impl.FMSessionProvider</Value>
                     </DefaultValues>
@@ -77,7 +84,8 @@
                 <AttributeSchema name="MaxContentLength"
                     type="single" 
                     syntax="number" 
-                    i18nKey="a105">
+                    i18nKey="a105"
+                    resourceName="maxContentLength">
                     <DefaultValues>
                         <Value>20480</Value>
                     </DefaultValues>
@@ -85,7 +93,8 @@
                 <AttributeSchema name="PasswordDecoderClass" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="a110">
+                    i18nKey="a110"
+                    resourceName="passwordDecoderClass">
                     <DefaultValues>
                         <Value>com.sun.identity.saml.xmlsig.FMPasswordDecoder</Value>
                     </DefaultValues>
@@ -93,7 +102,8 @@
                 <AttributeSchema name="SignatureProviderClass" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="a111">
+                    i18nKey="a111"
+                    resourceName="signatureProviderClass">
                     <DefaultValues>
                         <Value>com.sun.identity.saml.xmlsig.AMSignatureProvider</Value>
                     </DefaultValues>
@@ -101,7 +111,8 @@
                 <AttributeSchema name="KeyProviderClass" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="a112">
+                    i18nKey="a112"
+                    resourceName="keyProviderClass">
                     <DefaultValues>
                         <Value>com.sun.identity.saml.xmlsig.JKSKeyProvider</Value>
                     </DefaultValues>
@@ -109,7 +120,8 @@
                 <AttributeSchema name="CheckCert" 
                     type="single_choice" 
                     syntax="string" 
-                    i18nKey="a113">
+                    i18nKey="a113"
+                    resourceName="certificateChecking">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="off">off</ChoiceValue>
                         <ChoiceValue i18nKey="on">on</ChoiceValue>
@@ -121,7 +133,8 @@
                 <AttributeSchema name="CannonicalizationAlgorithm" 
                     type="single_choice" 
                     syntax="string" 
-                    i18nKey="a114">
+                    i18nKey="a114"
+                    resourceName="canonicalizationAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="http://www.w3.org/2001/10/xml-exc-c14n#">http://www.w3.org/2001/10/xml-exc-c14n#</ChoiceValue>
                         <ChoiceValue i18nKey="http://www.w3.org/2001/10/xml-exc-c14n#WithComments">http://www.w3.org/2001/10/xml-exc-c14n#WithComments</ChoiceValue>
@@ -135,7 +148,8 @@
                 <AttributeSchema name="SignatureAlgorithm" 
                     type="single_choice" 
                     syntax="string" 
-                    i18nKey="a115">
+                    i18nKey="a115"
+                    resourceName="signatureAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#rsa-sha1">http://www.w3.org/2000/09/xmldsig#rsa-sha1</ChoiceValue>
                         <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#hmac-sha1">http://www.w3.org/2000/09/xmldsig#hmac-sha1</ChoiceValue>
@@ -158,7 +172,8 @@
                 <AttributeSchema name="TransformationAlgorithm" 
                     type="single_choice" 
                     syntax="string" 
-                    i18nKey="a116">
+                    i18nKey="a116"
+                    resourceName="transformationAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="http://www.w3.org/2001/10/xml-exc-c14n#">http://www.w3.org/2001/10/xml-exc-c14n#</ChoiceValue>
                         <ChoiceValue i18nKey="http://www.w3.org/2001/10/xml-exc-c14n#WithComments">http://www.w3.org/2001/10/xml-exc-c14n#WithComments</ChoiceValue>
@@ -180,7 +195,8 @@
                 <AttributeSchema name="SAMLErrorPageURL"
                     type="single"
                     syntax="string"
-                    i18nKey="a117">
+                    i18nKey="a117"
+                    resourceName="samlErrorPageUrl">
                     <DefaultValues>
                         <Value>/saml2/jsp/saml2error.jsp</Value>
                     </DefaultValues>
@@ -188,7 +204,8 @@
                 <AttributeSchema name="SAMLErrorPageHTTPBinding"
                     type="single"
                     syntax="string"
-                    i18nKey="a118">
+                    i18nKey="a118"
+                    resourceName="samlErrorPageHttpBinding">
                     <DefaultValues>
                         <Value>HTTP-POST</Value>
                     </DefaultValues>
@@ -196,7 +213,8 @@
                 <AttributeSchema name="MonAgentClass"
                     type="single"
                     syntax="string"
-                    i18nKey="a119">
+                    i18nKey="a119"
+                    resourceName="monitoringAgentClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.monitoring.impl.AgentProvider</Value>
                     </DefaultValues>
@@ -204,7 +222,8 @@
                 <AttributeSchema name="MonSAML1Class"
                     type="single"
                     syntax="string"
-                    i18nKey="a120">
+                    i18nKey="a120"
+                    resourceName="monitoringSaml1Class">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.monitoring.impl.FedMonSAML1SvcProvider</Value>
                     </DefaultValues>
@@ -212,7 +231,8 @@
                 <AttributeSchema name="MonSAML2Class"
                     type="single"
                     syntax="string"
-                    i18nKey="a121">
+                    i18nKey="a121"
+                    resourceName="monitoringSaml2Class">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.monitoring.impl.FedMonSAML2SvcProvider</Value>
                     </DefaultValues>
@@ -220,7 +240,8 @@
                 <AttributeSchema name="MonIDFFClass"
                     type="single"
                     syntax="string"
-                    i18nKey="a122">
+                    i18nKey="a122"
+                    resourceName="monitoringIdffClass">
                     <DefaultValues>
                         <Value>com.sun.identity.plugin.monitoring.impl.FedMonIDFFSvcProvider</Value>
                     </DefaultValues>

@@ -13,7 +13,7 @@
   ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
-  ~ Copyright 2014 ForgeRock AS.
+  ~ Copyright 2014-2015 ForgeRock AS.
   -->
 
 
@@ -25,7 +25,8 @@
     <Service name="socialAuthNService" version="1.0">
         <Schema serviceHierarchy="/DSAMEConfig/socialAuthNService"
                 i18nFileName="socialAuthN" revisionNumber="1"
-                i18nKey="forgerock-am-socialauthn-service-description">
+                i18nKey="forgerock-am-socialauthn-service-description"
+                resourceName="socialauthentication">
             <Organization>
                 <AttributeSchema name="MapValueValidator"
                                  type="validator"
@@ -39,11 +40,13 @@
                                  syntax="string"
                                  uitype="maplist"
                                  validator="MapValueValidator"
+                                 resourceName="displayNames"
                                  i18nKey="a101"/>
                 <AttributeSchema name="socialAuthNAuthChain"
                                  type="list"
                                  syntax="string"
                                  uitype="maplist"
+                                 resourceName="authenticationChains"
                                  validator="MapValueValidator"
                                  i18nKey="a102">
                     <ChoiceValues>
@@ -55,11 +58,13 @@
                                  type="list"
                                  syntax="string"
                                  uitype="maplist"
+                                 resourceName="icons"
                                  validator="MapValueValidator"
                                  i18nKey="a103"/>
                 <AttributeSchema name="socialAuthNEnabled"
                                  type="list"
                                  syntax="string"
+                                 resourceName="enabledKeys"
                                  i18nKey="a104"/>
             </Organization>
         </Schema>

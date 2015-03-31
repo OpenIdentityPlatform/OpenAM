@@ -26,10 +26,7 @@
   
    $Id: amSession.xml,v 1.6 2009/02/19 05:51:10 bhavnab Exp $
   
--->
-
-<!--
-  Portions Copyrighted 2011-2014 ForgeRock AS
+  Portions Copyrighted 2011-2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -42,6 +39,7 @@
                 serviceHierarchy="/DSAMEConfig/iPlanetAMSessionService"
                 i18nFileName="amSession"
                 revisionNumber="40"
+                resourceName="session"
                 i18nKey="iplanet-am-session-service-description">
             <Global>
                 <AttributeSchema name="serviceObjectClasses"
@@ -55,6 +53,7 @@
                 <AttributeSchema name="iplanet-am-session-enable-session-trimming"
                                  type="single_choice"
                                  syntax="string"
+                                 resourceName="enableSessionTrimming"
                                  i18nKey="a122">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
@@ -68,6 +67,7 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
+                                 resourceName="maxSessionListSize"
                                  i18nKey="a105">
                     <DefaultValues>
                         <Value>120</Value>
@@ -77,6 +77,7 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
+                                 resourceName="sessionListRetrievalTimeout"
                                  i18nKey="a106">
                     <DefaultValues>
                         <Value>5</Value>
@@ -85,6 +86,7 @@
                 <AttributeSchema name="iplanet-am-session-property-change-notification"
                                  type="single_choice"
                                  syntax="string"
+                                 resourceName="propertyChangeNotifications"
                                  i18nKey="a116">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceON">ON</ChoiceValue>
@@ -97,6 +99,7 @@
                 <AttributeSchema name="iplanet-am-session-deny-login-if-db-is-down"
                                  type="single_choice"
                                  syntax="string"
+                                 resourceName="denyLoginWhenRepoDown"
                                  i18nKey="a119c">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
@@ -109,6 +112,7 @@
                 <AttributeSchema name="iplanet-am-session-notification-property-list"
                                  type="list"
                                  syntax="string"
+                                 resourceName="notificationPropertyList"
                                  i18nKey="a120">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-session-enable-session-constraint"
@@ -138,6 +142,7 @@
                 <AttributeSchema name="iplanet-am-session-constraint-handler"
                                  type="single_choice"
                                  syntax="string"
+                                 resourceName="behaviourWhenQuotaExhausted"
                                  i18nKey="a119b">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceDenyAccess">org.forgerock.openam.session.service.DenyAccessAction
@@ -159,6 +164,7 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="0" rangeEnd="2147483647"
+                                 resourceName="quotaConstraintMaxWaitTime"
                                  i18nKey="a119">
                     <DefaultValues>
                         <Value>6000</Value>
@@ -167,6 +173,7 @@
                 <AttributeSchema name="iplanet-am-session-dnrestrictiononly"
                                  type="single"
                                  syntax="boolean"
+                                 resourceName="dnRestrictionOnly"
                                  i18nKey="a121b">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -179,12 +186,14 @@
                 <AttributeSchema name="openam-session-timeout-handler-list"
                                  type="list"
                                  syntax="string"
+                                 resourceName="timeoutHandlers"
                                  i18nKey="a123">
                 </AttributeSchema>
                 <AttributeSchema name="openam-session-stateless-signing-type"
                                  type="single_choice"
                                  listOrder="insertion"
                                  syntax="string"
+                                 resourceName="statelessSigningType"
                                  i18nKey="a124">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceNONE">NONE</ChoiceValue>
@@ -200,6 +209,7 @@
                 <AttributeSchema name="openam-session-stateless-signing-hmac-shared-secret"
                                  type="single"
                                  syntax="string"
+                                 resourceName="statelessSigningHmacSecret"
                                  i18nKey="a125">
                     <DefaultValues>
                         <Value>sharedsecret</Value>
@@ -208,6 +218,7 @@
                 <AttributeSchema name="openam-session-stateless-signing-rsa-certificate-alias"
                                  type="single"
                                  syntax="string"
+                                 resourceName="statelessSigningRsaCertAlias"
                                  i18nKey="a126">
                     <DefaultValues>
                         <Value>test</Value>
@@ -217,6 +228,7 @@
                                  type="single_choice"
                                  listOrder="insertion"
                                  syntax="string"
+                                 resourceName="statelessEncryptionType"
                                  i18nKey="a127">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceNONE">NONE</ChoiceValue>
@@ -229,6 +241,7 @@
                 <AttributeSchema name="openam-session-stateless-encryption-rsa-certificate-alias"
                                  type="single"
                                  syntax="string"
+                                 resourceName="statelessEncryptionRsaCertAlias"
                                  i18nKey="a128">
                     <DefaultValues>
                         <Value>test</Value>
@@ -238,6 +251,7 @@
                     <AttributeSchema name="iplanet-am-session-sfo-enabled"
                                      type="single"
                                      syntax="boolean"
+                                     resourceName="sfoEnabled"
                                      i18nKey="a121">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -250,6 +264,7 @@
                     <AttributeSchema name="iplanet-am-session-reduced-crosstalk-enabled"
                                      type="single"
                                      syntax="boolean"
+                                     resourceName="reducedCrosstalkEnabled"
                                      i18nKey="a121c.session.reduced.crosstalk.enabled">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -262,6 +277,7 @@
                     <AttributeSchema name="iplanet-am-session-logout-destroy-broadcast"
                                      type="single_choice"
                                      syntax="string"
+                                     resourceName="logoutBroadcastMode"
                                      i18nKey="a121d.session.destroy.logout.broadcast">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="choiceBroadcastOff">OFF</ChoiceValue>
@@ -276,6 +292,7 @@
                                      type="single"
                                      syntax="number_range"
                                      rangeStart="1" rangeEnd="2147483647"
+                                     resourceName="reducedCrosstalkPurgeDelay"
                                      i18nKey="a121e.session.reduced.crosstalk.purge.delay">
                         <DefaultValues>
                             <Value>1</Value>
@@ -353,6 +370,7 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
+                                 resourceName="maxSessionTime"
                                  i18nKey="a101">
                     <DefaultValues>
                         <Value>120</Value>
@@ -362,6 +380,7 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
+                                 resourceName="maxIdleTime"
                                  i18nKey="a102">
                     <DefaultValues>
                         <Value>30</Value>
@@ -371,6 +390,7 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="0" rangeEnd="2147483647"
+                                 resourceName="maxCachingTime"
                                  i18nKey="a103">
                     <DefaultValues>
                         <Value>3</Value>
@@ -380,6 +400,7 @@
                                  type="single"
                                  syntax="number_range"
                                  rangeStart="1" rangeEnd="2147483647"
+                                 resourceName="quotaLimit"
                                  i18nKey="a118">
                     <DefaultValues>
                         <Value>5</Value>

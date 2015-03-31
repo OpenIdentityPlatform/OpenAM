@@ -26,6 +26,7 @@
                                                                                 
    $Id: fmSAML2SOAPBinding.xml,v 1.3 2008/06/25 05:51:14 qcheng Exp $
                                                                                 
+    Portions Copyrighted 2015 ForgeRock AS.
 -->
 
 <!--
@@ -46,12 +47,14 @@
             i18nFileName="fmSAML2SOAPBindingConfiguration" 
             revisionNumber="10"
             i18nKey="sunfmSAML2SOAPBindingDescription"
+            resourceName="federation/saml2soapbinding"
             propertiesViewBeanURL="../service/SCSAML2SOAPBinding">
             <Global> 
                 <AttributeSchema name="sunSAML2RequestHandlerList" 
                     type="list" 
                     syntax="string" 
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="requestHandlers">
                 </AttributeSchema> 
             </Global>
         </Schema> 

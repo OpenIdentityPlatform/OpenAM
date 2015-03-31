@@ -3,7 +3,7 @@
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-   Copyright (c) 2012 ForgeRock Inc. All Rights Reserved
+   Copyright (c) 2012-2015 ForgeRock AS.
 
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
@@ -37,7 +37,8 @@
     <Service name="dashboardService" version="1.0">
         <Schema serviceHierarchy="/DSAMEConfig/dashboardService"
                 i18nFileName="dashboard" revisionNumber="1"
-                i18nKey="forgerock-am-dashboard-service-description">
+                i18nKey="forgerock-am-dashboard-service-description"
+                resourceName="dashboard">
             <Global>
                 <AttributeSchema name="serviceObjectClasses"
                                  type="list"
@@ -48,30 +49,36 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <SubSchema name="dashboardApp" inheritance="multiple">
+                <SubSchema name="dashboardApp" inheritance="multiple" resourceName="instances">
                     <AttributeSchema name="dashboardClassName"
                                      type="single"
                                      syntax="string"
+                                     resourceName="className"
                                      i18nKey="Dashboard Class Name"/>
                     <AttributeSchema name="dashboardName"
                                      type="single"
                                      syntax="string"
+                                     resourceName="name"
                                      i18nKey="Dashboard Name"/>
                     <AttributeSchema name="dashboardDisplayName"
                                      type="single"
                                      syntax="string"
+                                     resourceName="displayName"
                                      i18nKey="Dashboard Display Name"/>
                     <AttributeSchema name="dashboardIcon"
                                      type="single"
                                      syntax="string"
+                                     resourceName="icon"
                                      i18nKey="dashboard Icon"/>
                     <AttributeSchema name="dashboardLogin"
                                      type="single"
                                      syntax="string"
+                                     resourceName="login"
                                      i18nKey="Dashboard Login"/>
                     <AttributeSchema name="ICFIdentifier"
                                      type="single"
                                      syntax="string"
+                                     resourceName="icfIdentifier"
                                      i18nKey="ICF Identifier"/>
                 </SubSchema>
             </Global>

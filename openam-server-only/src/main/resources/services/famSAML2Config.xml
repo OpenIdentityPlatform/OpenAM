@@ -26,9 +26,7 @@
                                                                                 
    $Id: famSAML2Config.xml,v 1.8 2009/06/12 22:21:43 mallas Exp $
                                                                                 
--->
-<!--
-   Portions Copyrighted 2013 ForgeRock Inc
+   Portions Copyrighted 2013-2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration 
@@ -41,13 +39,15 @@
             serviceHierarchy="/DSAMEConfig/sunFAMSAML2Configuration"
             i18nFileName="famSAML2Configuration" 
             revisionNumber="20"
+            resourceName="saml2"
             i18nKey="sunFAMSAML2Configuration">
 
             <Global> 
                 <AttributeSchema name="CacheCleanupInterval"
                     type="single" 
                     syntax="number" 
-                    i18nKey="a100">
+                    i18nKey="a100"
+                    resourceName="cacheCleanupInterval">
                     <DefaultValues>
                         <Value>600</Value>
                     </DefaultValues>
@@ -55,7 +55,8 @@
                 <AttributeSchema name="NameIDInfoAttribute" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="nameIDInfoAttribute">
                     <DefaultValues>
                         <Value>sun-fm-saml2-nameid-info</Value>
                     </DefaultValues>
@@ -63,7 +64,8 @@
                 <AttributeSchema name="NameIDInfoKeyAttribute" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="nameIDInfoKeyAttribute">
                     <DefaultValues>
                         <Value>sun-fm-saml2-nameid-infokey</Value>
                     </DefaultValues>
@@ -71,7 +73,8 @@
                 <AttributeSchema name="IDPDiscoveryCookieDomain"
                     type="single" 
                     syntax="string" 
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="idpDiscoveryCookieDomain">
                     <DefaultValues>
                         <Value>@COOKIE_DOMAIN@</Value>
                     </DefaultValues>
@@ -79,7 +82,8 @@
                 <AttributeSchema name="IDPDiscoveryCookieType"
                     type="single_choice" 
                     syntax="string" 
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    resourceName="idpDiscoveryCookieType">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="PERSISTENT">PERSISTENT</ChoiceValue>
                         <ChoiceValue i18nKey="SESSION">SESSION</ChoiceValue>
@@ -91,7 +95,8 @@
                 <AttributeSchema name="IDPDiscoveryURLScheme"
                     type="single_choice" 
                     syntax="string" 
-                    i18nKey="a105">
+                    i18nKey="a105"
+                    resourceName="idpDiscoveryUrlSchema">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="http">http</ChoiceValue>
                         <ChoiceValue i18nKey="https">https</ChoiceValue>
@@ -103,7 +108,8 @@
                 <AttributeSchema name="XMLEncryptionClass" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="a106">
+                    i18nKey="a106"
+                    resourceName="xmlEncryptionClass">
                     <DefaultValues>
                         <Value>com.sun.identity.saml2.xmlenc.FMEncProvider</Value>
                     </DefaultValues>
@@ -111,7 +117,8 @@
                 <AttributeSchema name="EncryptedKeyInKeyInfo" 
                     type="single" 
                     syntax="boolean" 
-                    i18nKey="a107">
+                    i18nKey="a107"
+                    resourceName="encryptedKeyInKeyInfo">
                     <DefaultValues>
                         <Value>true</Value>
                     </DefaultValues>
@@ -119,7 +126,8 @@
                 <AttributeSchema name="XMLSigningClass" 
                     type="single" 
                     syntax="string" 
-                    i18nKey="a108">
+                    i18nKey="a108"
+                    resourceName="xmlSigningClass">
                     <DefaultValues>
                         <Value>com.sun.identity.saml2.xmlsig.FMSigProvider</Value>
                     </DefaultValues>
@@ -127,7 +135,8 @@
                 <AttributeSchema name="SigningCertValidation" 
                     type="single" 
                     syntax="boolean" 
-                    i18nKey="a109">
+                    i18nKey="a109"
+                    resourceName="signingCertValidation">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -135,7 +144,8 @@
                 <AttributeSchema name="CACertValidation" 
                     type="single" 
                     syntax="boolean" 
-                    i18nKey="a110">
+                    i18nKey="a110"
+                    resourceName="caCertValidation  ">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>

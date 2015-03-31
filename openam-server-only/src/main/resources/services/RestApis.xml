@@ -3,7 +3,7 @@
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+    Copyright (c) 2014-2015 ForgeRock AS.
 
     The contents of this file are subject to the terms of the Common Development and
     Distribution License (the License). You may not use this file except in compliance with the
@@ -28,7 +28,8 @@
                 serviceHierarchy="/DSAMEConfig/RestApisService"
                 i18nFileName="RestApis"
                 i18nKey="openam-rest-apis-service-description"
-                revisionNumber="1">
+                revisionNumber="1"
+                resourceName="rest">
 
             <Global>
                 <AttributeSchema name="openam-rest-apis-default-version"
@@ -36,6 +37,7 @@
                                  listOrder="insertion"
                                  syntax="string"
                                  any="display"
+                                 resourceName="defaultVersion"
                                  i18nKey="a101">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a101a">Latest</ChoiceValue>
@@ -50,6 +52,7 @@
                                  type="single"
                                  syntax="boolean"
                                  any="display"
+                                 resourceName="warningHeader"
                                  i18nKey="a102">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="a102a">Enabled</BooleanTrueValue>

@@ -26,6 +26,8 @@
   
    $Id: amClientDetection.xml,v 1.3 2008/06/25 05:45:41 qcheng Exp $
   
+    Portions Copyrighted 2015 ForgeRock AS.
+
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -37,6 +39,7 @@
         <Schema
             serviceHierarchy="/DSAMEConfig/iPlanetAMClientDetection"
             i18nFileName="amClientDetection"
+            resourceName="clientdetection"
             i18nKey="iplanet-am-client-detection-service-description">
              <Global>
                 <AttributeSchema name="serviceObjectClasses"
@@ -50,7 +53,8 @@
                 <AttributeSchema name="iplanet-am-client-detection-enabled"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="enabled">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -58,7 +62,8 @@
                 <AttributeSchema name="iplanet-am-client-detection-class"
                     type="single"
                     syntax="string"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="detectionClass">
                     <DefaultValues>
                         <Value>com.iplanet.services.cdm.ClientDetectionDefaultImpl</Value>
                     </DefaultValues>
@@ -76,7 +81,8 @@
                 <AttributeSchema name="iplanet-am-client-detection-default-client-type"
                     type="single"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="defaultClientType">
                     <DefaultValues>
                         <Value>genericHTML</Value>
                     </DefaultValues>

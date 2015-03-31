@@ -12,7 +12,7 @@
    Header, with the fields enclosed by brackets [] replaced by your own identifying
    information: "Portions copyright [year] [name of copyright owner]".
 
-   Copyright 2014 ForgeRock AS.
+   Copyright 2014-2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
@@ -21,11 +21,13 @@
     <Service name="validationService" version="1.0">
         <Schema serviceHierarchy="/DSAMEConfig/validationService"
                 i18nFileName="validationService" revisionNumber="1"
-                i18nKey="openam-validation-service-description">
+                i18nKey="openam-validation-service-description"
+                resourceName="validation">
             <Organization>
                 <AttributeSchema name="openam-auth-valid-goto-resources"
                                  type="list"
                                  syntax="string"
+                                 resourceName="validGotoDestinations"
                                  i18nKey="a100">
                 </AttributeSchema>
             </Organization>

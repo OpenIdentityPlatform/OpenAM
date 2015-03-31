@@ -26,6 +26,8 @@
   
    $Id: amG11NSettings.xml,v 1.2 2008/06/25 05:46:12 qcheng Exp $
   
+    Portions Copyrighted 2015 ForgeRock AS.
+
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -39,13 +41,15 @@
             i18nFileName="amG11NSettings"
             i18nKey="sun-identity-g11n-settings-service-description"
             propertiesViewBeanURL="../service/SMG11N"
+            resourceName="globalization"
             >
              <Global>
                 <AttributeSchema name="sun-identity-g11n-settings-locale-charset-mapping"
                     type="list"
                     syntax="string"
                     uitype="name_value_list"
-                    i18nKey="a100">
+                    i18nKey="a100"
+                    resourceName="charsetMappings">
                 <DefaultValues>
                 <Value>locale=en|charset=UTF-8;ISO-8859-1</Value>
                 <Value>locale=ja|charset=UTF-8;Shift_JIS;EUC-JP</Value>
@@ -76,7 +80,8 @@
                 <AttributeSchema name="sun-identity-g11n-settings-common-name-format"
                     type="list"
                     syntax="string"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="commonNameFormats">
                     <DefaultValues>
                     <Value>zh={sn}{givenname}</Value>
                     </DefaultValues>

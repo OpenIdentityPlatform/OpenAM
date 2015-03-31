@@ -26,6 +26,7 @@
                                                                                 
    $Id: famSTS.xml,v 1.20 2010/01/15 18:54:35 mrudul_uchil Exp $
                                                                                 
+    Portions Copyrighted 2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -39,12 +40,14 @@
             i18nFileName="famSTS"
             revisionNumber="10"
             i18nKey="sunSTS"
+            resourceName="sts"
             propertiesViewBeanURL="../service/SecurityTokenService">
             <Global>
                <AttributeSchema name="stsIssuer"
                    type="single"
                    syntax="string"
-                   i18nKey="a101">
+                   i18nKey="a101"
+                   resourceName="issuer">
                    <DefaultValues>
                        <Value>SunSTS</Value>
                    </DefaultValues>
@@ -52,7 +55,8 @@
                <AttributeSchema name="stsEndPoint"
                    type="single"
                    syntax="string"
-                   i18nKey="a102">
+                   i18nKey="a102"
+                   resourceName="endpoint">
                    <DefaultValues>
                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/sts</Value>
                    </DefaultValues>
@@ -76,7 +80,8 @@
                <AttributeSchema name="stsLifetime"
                    type="single"
                    syntax="number"
-                   i18nKey="a105">
+                   i18nKey="a105"
+                   resourceName="lifetime">
                    <DefaultValues>
                        <Value>300000</Value>
                    </DefaultValues>
@@ -92,7 +97,8 @@
                <AttributeSchema name="stsCertAlias"
                    type="single"
                    syntax="string"
-                   i18nKey="a107">
+                   i18nKey="a107"
+                   resourceName="certificateAlias">
                    <DefaultValues>
                        <Value>test</Value>
                    </DefaultValues>
@@ -100,7 +106,8 @@
                <AttributeSchema name="com.sun.identity.wss.sts.clientusertoken"
                    type="single"
                    syntax="string"
-                   i18nKey="a108">
+                   i18nKey="a108"
+                   resourceName="clientUserTokenClass">
                    <DefaultValues>
                        <Value>com.sun.identity.wss.sts.STSClientUserToken</Value>
                    </DefaultValues>
@@ -109,7 +116,8 @@
                    name="SecurityMech"
                    type="multiple_choice"
                    syntax="string"
-                   i18nKey="a109">
+                   i18nKey="a109"
+                   resourceName="securityMechanism">
                    <ChoiceValues>
                        <ChoiceValuesClassName
                            className="com.sun.identity.wss.security.ConfiguredWSPSecurityMech" />
@@ -122,7 +130,8 @@
                    name="isRequestSign"
                    type="single"
                    syntax="boolean"
-                   i18nKey="a110">
+                   i18nKey="a110"
+                   resourceName="isRequestSignatureVerified">
                    <BooleanValues>
                        <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
                        <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
@@ -135,7 +144,8 @@
                    name="isRequestHeaderEncrypt"
                    type="single"
                    syntax="boolean"
-                   i18nKey="a111">
+                   i18nKey="a111"
+                   resourceName="isRequestHeaderDecrypted">
                    <BooleanValues>
                        <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
                        <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
@@ -148,7 +158,8 @@
                    name="isRequestEncrypt"
                    type="single"
                    syntax="boolean"
-                   i18nKey="a112">
+                   i18nKey="a112"
+                   resourceName="isRequestDecrypted">
                    <BooleanValues>
                        <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
                        <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
@@ -161,7 +172,8 @@
                    name="isResponseSign"
                    type="single"
                    syntax="boolean"
-                   i18nKey="a113">
+                   i18nKey="a113"
+                   resourceName="isResponseSigned">
                    <BooleanValues>
                        <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
                        <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
@@ -174,7 +186,8 @@
                    name="isResponseEncrypt"
                    type="single"
                    syntax="boolean"
-                   i18nKey="a114">
+                   i18nKey="a114"
+                   resourceName="isResponseEncrypted">
                    <BooleanValues>
                        <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
                        <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
@@ -215,7 +228,8 @@
                     name="SigningRefType"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a118">
+                        i18nKey="a118"
+                        resourceName="signingReferenceType">
                         <ChoiceValues>
                              <ChoiceValue i18nKey="a201">DirectReference</ChoiceValue>
                              <ChoiceValue i18nKey="a202">KeyIdentifierRef</ChoiceValue>
@@ -230,7 +244,8 @@
                      name="EncryptionAlgorithm"
                      type="single_choice"
                      syntax="string"
-                     i18nKey="a119">
+                     i18nKey="a119"
+                     resourceName="encryptionAlgorithm">
                          <ChoiceValues>
                              <ChoiceValue i18nKey="a204">DESede</ChoiceValue>
                              <ChoiceValue i18nKey="a205">AES</ChoiceValue>
@@ -244,7 +259,8 @@
                      name="EncryptionStrength"
                      type="single_choice"
                      syntax="number"
-                     i18nKey="a120">
+                     i18nKey="a120"
+                     resourceName="encryptionStrength">
                      <ChoiceValues>
                          <ChoiceValue>0</ChoiceValue>
                          <ChoiceValue>112</ChoiceValue>
@@ -262,7 +278,8 @@
                <AttributeSchema name="trustedIssuers"
                    type="list"
                    syntax="string"
-                   i18nKey="a121">
+                   i18nKey="a121"
+                   resourceName="trustedIssuers">
                    <DefaultValues>
                        <Value>test:SunSTS</Value>
                    </DefaultValues>
@@ -271,14 +288,16 @@
                <AttributeSchema name="trustedIPAddresses"
                    type="list"
                    syntax="string"
-                   i18nKey="a122">
+                   i18nKey="a122"
+                   resourceName="trustedIpAddresses">
                </AttributeSchema>
 
                <AttributeSchema
                    name="UserCredential"
                    type="single"
                    syntax="string"
-                   i18nKey="a123">
+                   i18nKey="a123"
+                   resourceName="userCredential">
                    <DefaultValues>
                        <Value>UserName:test|UserPassword:test</Value>
                    </DefaultValues>
@@ -287,35 +306,40 @@
                <AttributeSchema name="KerberosDomainServer"
                    type="single"
                    syntax="string"
-                   i18nKey="a124">
+                   i18nKey="a124"
+                   resourceName="kerberosDomainServer">
                </AttributeSchema>
 
                <AttributeSchema
                     name="KerberosDomain"
                     type="single"
                     syntax="string"
-                    i18nKey="a125">
+                    i18nKey="a125"
+                    resourceName="kerberosDomain">
                </AttributeSchema>
 
                <AttributeSchema
                     name="KerberosServicePrincipal"
                     type="single"
                     syntax="string"
-                    i18nKey="a126">
+                    i18nKey="a126"
+                    resourceName="kerberosServicePrincipal">
                </AttributeSchema>
 
                <AttributeSchema
                     name="KerberosKeyTabFile"
                     type="single"
                     syntax="string"
-                    i18nKey="a127">
+                    i18nKey="a127"
+                    resourceName="kerberosKeyTabFile">
                </AttributeSchema>
 
                <AttributeSchema
                     name="isVerifyKrbSignature"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a128">
+                    i18nKey="a128"
+                    resourceName="isVerifyKerberosSignature">
                     <BooleanValues>
                          <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
                          <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
@@ -329,21 +353,24 @@
                      name="SAMLAttributeMapping"
                      type="list"
                      syntax="string"
-                     i18nKey="a129">                        
+                     i18nKey="a129"
+                     resourceName="samlAttributeMapping">
                </AttributeSchema>
 
                <AttributeSchema
                      name="NameIDMapper"
                      type="single"
                      syntax="string"
-                     i18nKey="a130">
+                     i18nKey="a130"
+                     resourceName="nameIdMapper">
                </AttributeSchema>
 
                <AttributeSchema
                      name="AttributeNamespace"
                      type="single"
                      syntax="string"
-                     i18nKey="a131">
+                     i18nKey="a131"
+                     resourceName="attributeNamespace">
                      <DefaultValues>
                          <Value>http://www.sun.com</Value>
                      </DefaultValues>
@@ -367,7 +394,8 @@
                      name="AuthenticationChain"
                      type="single_choice"
                      syntax="string"
-                     i18nKey="a133">
+                     i18nKey="a133"
+                     resourceName="authenticationChain">
                      <ChoiceValues>
                          <ChoiceValuesClassName className="com.sun.identity.authentication.service.ConfiguredAuthServices" />
                      </ChoiceValues>
@@ -380,7 +408,8 @@
                      name="DetectUserTokenReplay"
                      type="single"
                      syntax="boolean"
-                     i18nKey="a134">
+                     i18nKey="a134"
+                     resourceName="detectUserTokenReplay">
                      <BooleanValues>
                          <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
                          <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
@@ -394,7 +423,8 @@
                      name="DetectMessageReplay"
                      type="single"
                      syntax="boolean"
-                     i18nKey="a135">
+                     i18nKey="a135"
+                     resourceName="detectMessageReplay">
                      <BooleanValues>
                          <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
                          <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
@@ -407,7 +437,8 @@
                         name="SignedElements"
                         type="multiple_choice"
                         syntax="string"
-                        i18nKey="a136">
+                        i18nKey="a136"
+                        resourceName="signedElements">
                         <ChoiceValues>
                             <ChoiceValuesClassName
                             className="com.sun.identity.wss.security.ConfiguredSignedElements" />

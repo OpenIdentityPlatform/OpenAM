@@ -26,6 +26,7 @@
                                                                                 
    $Id: fmDisco.xml,v 1.6 2008/06/25 05:51:14 qcheng Exp $
                                                                                 
+    Portions Copyrighted 2015 ForgeRock AS.
 -->
 
 
@@ -53,7 +54,8 @@
                 <AttributeSchema name="sunIdentityServerDiscoProviderID"
                     type="single"
                     syntax="string"
-                    i18nKey="g101">
+                    i18nKey="g101"
+                    resourceName="providerID">
                     <DefaultValues>
                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/Liberty/disco</Value>
                     </DefaultValues>
@@ -61,7 +63,8 @@
                 <AttributeSchema name="sunIdentityServerDiscoSupportedAuthnMechs"
                     type="multiple_choice"
                     syntax="string"
-                    i18nKey="g102">
+                    i18nKey="g102"
+                    resourceName="supportedAuthnMechs">
                     <ChoiceValues>
                         <ChoiceValue>urn:liberty:security:2003-08:null:null</ChoiceValue>
                         <ChoiceValue>urn:liberty:security:2003-08:null:X509</ChoiceValue>
@@ -112,7 +115,8 @@
                 <AttributeSchema name="sunIdentityServerDiscoSupportedDirectives"
                     type="multiple_choice"
                     syntax="string"
-                    i18nKey="g103">
+                    i18nKey="g103"
+                    resourceName="supportedDirectives">
                     <ChoiceValues>
                         <ChoiceValue>AuthenticateRequester</ChoiceValue>
                         <ChoiceValue>AuthorizeRequester</ChoiceValue>
@@ -132,7 +136,8 @@
                     name="sunIdentityServerDiscoLookupNeedPolicyEval"
                     type="single"
                     syntax="boolean"
-                    i18nKey="g104">
+                    i18nKey="g104"
+                    resourceName="usePolicyForDiscoveryLookup">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -141,7 +146,8 @@
                     name="sunIdentityServerDiscoUpdateNeedPolicyEval"
                     type="single"
                     syntax="boolean"
-                    i18nKey="g105">
+                    i18nKey="g105"
+                    resourceName="usePolicyForDiscoveryUpdate">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -150,7 +156,8 @@
                     name="sunIdentityServerDiscoAuthorizer"
                     type="single"
                     syntax="string"
-                    i18nKey="g106">
+                    i18nKey="g106"
+                    resourceName="authorizer">
                     <DefaultValues>
                         <Value>@DISCO_AUTHORIZER@</Value>
                     </DefaultValues>
@@ -158,7 +165,8 @@
                 <AttributeSchema name="sunIdentityServerDiscoEntryHandler"
                     type="single"
                     syntax="string"
-                    i18nKey="g107">
+                    i18nKey="g107"
+                    resourceName="entryHandler">
                     <DefaultValues>
                         <Value>@DISCO_ENTRY_HANDLER@</Value>
                     </DefaultValues>
@@ -167,7 +175,8 @@
                     type="list"
                     syntax="string"
                     uitype="name_value_list"
-                    i18nKey="g108">
+                    i18nKey="g108"
+                    resourceName="idMapperClasses">
                     <DefaultValues>
                         <Value>providerid=@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/Liberty/disco|idmapper=com.sun.identity.liberty.ws.disco.plugins.Default64ResourceIDMapper</Value>
                     </DefaultValues>
@@ -175,7 +184,8 @@
                 <AttributeSchema name="sunIdentityServerDiscoOptionSecurityResponse"
                     type="single"
                     syntax="boolean"
-                    i18nKey="g109">
+                    i18nKey="g109"
+                    resourceName="authenticateResponseMessage">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -191,7 +201,8 @@
                 <AttributeSchema name="sunIdentityServerBootstrappingSessionContext"
                     type="single"
                     syntax="boolean"
-                    i18nKey="g202">
+                    i18nKey="g202"
+                    resourceName="bootstrappingSessionContextStatement">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -199,7 +210,8 @@
                 <AttributeSchema name="sunIdentityServerBootstrappingEncryptNIinSessionContext"
                     type="single"
                     syntax="boolean"
-                    i18nKey="g203">
+                    i18nKey="g203"
+                    resourceName="encryptNameIdentifierInBootstrapping">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -207,7 +219,8 @@
                 <AttributeSchema name="sunIdentityServerBootstrappingImpliedResource"
                     type="single"
                     syntax="boolean"
-                    i18nKey="g204">
+                    i18nKey="g204"
+                    resourceName="impliedResource">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -215,7 +228,8 @@
                 <AttributeSchema name="sunIdentityServerDiscoNameIdentifierMapper"
                     type="single"
                     syntax="string"
-                    i18nKey="g205">
+                    i18nKey="g205"
+                    resourceName="nameIdentifierMapperClass">
                     <DefaultValues>
                         <Value>com.sun.identity.liberty.ws.disco.plugins.IDFFNameIdentifierMapper</Value>
                     </DefaultValues>
@@ -223,7 +237,8 @@
                 <AttributeSchema name="sunIdentityServerGlobalDiscoEntryHandler"
                     type="single"
                     syntax="string"
-                    i18nKey="g206">
+                    i18nKey="g206"
+                    resourceName="globalEntryHandlerPluginClass">
                     <DefaultValues>
                         <Value>@DISCO_GLOBAL_ENTRY_HANDLER@</Value>
                     </DefaultValues>

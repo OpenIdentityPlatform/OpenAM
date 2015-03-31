@@ -56,7 +56,8 @@
                 <AttributeSchema name="iplanet-am-platform-locale"
                     type="single"
                     syntax="string"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="locale">
                     <DefaultValues>
                         <Value>@PLATFORM_LOCALE@</Value>
                     </DefaultValues>
@@ -64,14 +65,15 @@
                 <AttributeSchema name="iplanet-am-platform-cookie-domains"
                     type="list"
                     syntax="string"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="cookieDomains">
                     <DefaultValues>
                         <Value>@COOKIE_DOMAIN@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <SubSchema name="com-sun-identity-sites">
-                    <SubSchema name="site" inheritance="multiple">
-                        <SubSchema name="accesspoint">
+                    <SubSchema name="site" inheritance="multiple" resourceName="sites">
+                        <SubSchema name="accesspoint" resourceName="details">
                             <AttributeSchema name="primary-siteid" 
                                 type="single"
                                 syntax="string" />
@@ -90,10 +92,12 @@
                     <SubSchema name="server" inheritance="multiple" resourceName="servers">
                         <AttributeSchema name="serverid"
                             type="single"
-                            syntax="string" />
+                            syntax="string"
+                            resourceName="id"/>
                         <AttributeSchema name="parentsiteid"
                             type="single"
-                            syntax="string" />
+                            syntax="string"
+                            resourceName="siteId"/>
                         <AttributeSchema name="serverconfigxml"   
                             type="single"
                             syntax="string" />

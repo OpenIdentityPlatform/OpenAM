@@ -32,6 +32,7 @@
                 serviceHierarchy="/DSAMEConfig/ForgeRockRestSecurityService"
                 i18nFileName="RestSecurity"
                 revisionNumber="1"
+                resourceName="security"
                 i18nKey="forgerock-restSecurity-service-description">
 
             <Organization>
@@ -39,6 +40,7 @@
                                  type="single"
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
+                                 resourceName="twoFactorEnabled"
                                  i18nKey="a100">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -52,6 +54,7 @@
                                  type="single"
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
+                                 resourceName="twoFactorRequired"
                                  i18nKey="a100a">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -65,6 +68,7 @@
                                  type="single"
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
+                                 resourceName="selfRegistrationEnabled"
                                  i18nKey="a101">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -78,6 +82,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
+                                 resourceName="selfRegistrationTokenLifetime"
                                  i18nKey="a102">
                     <DefaultValues>
                         <Value>900</Value>
@@ -86,6 +91,7 @@
                 <AttributeSchema name="forgerockRESTSecuritySelfRegConfirmationUrl"
                                  type="single"
                                  syntax="url"
+                                 resourceName="selfRegistrationConfirmationUrl"
                                  i18nKey="a103">
                     <DefaultValues>
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/confirm.html</Value>
@@ -95,6 +101,7 @@
                                  type="single"
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
+                                 resourceName="forgotPasswordEnabled"
                                  i18nKey="a104">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -108,6 +115,7 @@
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
+                                 resourceName="forgotPasswordTokenLifetime"
                                  i18nKey="a105">
                     <DefaultValues>
                         <Value>900</Value>
@@ -116,6 +124,7 @@
                 <AttributeSchema name="forgerockRESTSecurityForgotPassConfirmationUrl"
                                  type="single"
                                  syntax="url"
+                                 resourceName="forgotPasswordConfirmationUrl"
                                  i18nKey="a106">
                     <DefaultValues>
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/confirm.html</Value>
@@ -124,6 +133,7 @@
                 <AttributeSchema name="forgerockRESTSecuritySuccessfulUserRegistrationDestination"
                                  type="single_choice"
                                  syntax="string"
+                                 resourceName="userRegisteredDestination"
                                  i18nKey="a107">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a107a">default</ChoiceValue>
@@ -135,9 +145,10 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockRESTSecurityProtectedUserAttributes" 
-                                type="list" 
-                                syntax="string" 
-                                i18nKey="a108"> 
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="protectedUserAttributes"
+                                 i18nKey="a108">
                 </AttributeSchema> 
             </Organization>
         </Schema>

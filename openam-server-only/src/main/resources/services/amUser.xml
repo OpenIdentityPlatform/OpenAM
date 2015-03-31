@@ -26,6 +26,8 @@
   
    $Id: amUser.xml,v 1.5 2009/01/13 06:50:17 mahesh_prasad_r Exp $
   
+    Portions Copyrighted 2015 ForgeRock AS.
+
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -38,6 +40,7 @@
             serviceHierarchy="/DSAMEConfig/iPlanetAMUserService"
             i18nFileName="amUser"
             i18nKey="iplanet-am-user-service-description"
+            resourceName="user"
 	    revisionNumber="50">
 	    <Global>
                 <AttributeSchema name="serviceObjectClasses"
@@ -61,6 +64,7 @@
                     type="single"
                     syntax="string"
                     any="display"
+                    resourceName="preferredTimezone"
                     i18nKey="d102">
 		</AttributeSchema>
 	        <AttributeSchema name="preferredlocale"
@@ -77,13 +81,15 @@
                     type="single"
                     syntax="dn"
                     any="display"
-                    i18nKey="d104">
+                    i18nKey="d104"
+                    resourceName="adminDNStartingView">
 		</AttributeSchema>
                 <AttributeSchema name="iplanet-am-user-login-status"
                     type="single_choice"
                     syntax="string"
                     any="display"
-                    i18nKey="d105">
+                    i18nKey="d105"
+                    resourceName="defaultUserStatus">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="u200">Active</ChoiceValue>
                         <ChoiceValue i18nKey="u201">Inactive</ChoiceValue>

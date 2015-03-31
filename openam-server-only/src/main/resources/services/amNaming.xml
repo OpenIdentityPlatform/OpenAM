@@ -26,6 +26,8 @@
   
    $Id: amNaming.xml,v 1.9 2008/06/25 05:46:12 qcheng Exp $
   
+    Portions Copyrighted 2015 ForgeRock AS.
+
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -38,7 +40,8 @@
             serviceHierarchy="/DSAMEConfig/iPlanetAMNamingService"
             i18nFileName="amNaming"
             revisionNumber="30"
-            i18nKey="iplanet-am-naming-service-description">
+            i18nKey="iplanet-am-naming-service-description"
+            resourceName="naming">
              <Global>
                 <AttributeSchema name="serviceObjectClasses"
                     type="list"
@@ -51,7 +54,8 @@
                 <AttributeSchema name="iplanet-am-naming-profile-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="profileUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/profileservice</Value>
                     </DefaultValues>
@@ -59,7 +63,8 @@
                 <AttributeSchema name="iplanet-am-naming-session-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="sessionUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/sessionservice</Value>
                     </DefaultValues>
@@ -67,7 +72,8 @@
                 <AttributeSchema name="iplanet-am-naming-logging-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="loggingUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/loggingservice</Value>
                     </DefaultValues>
@@ -75,7 +81,8 @@
                 <AttributeSchema name="iplanet-am-naming-policy-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a105">
+                    i18nKey="a105"
+                    resourceName="policyUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/policyservice</Value>
                     </DefaultValues>
@@ -83,7 +90,8 @@
                 <AttributeSchema name="iplanet-am-naming-auth-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a106">
+                    i18nKey="a106"
+                    resourceName="authUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/authservice</Value>
                     </DefaultValues>
@@ -91,7 +99,8 @@
                  <AttributeSchema name="iplanet-am-naming-samlawareservlet-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a107">
+                    i18nKey="a107"
+                    resourceName="samlAwareServletUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/SAMLAwareServlet</Value>
                     </DefaultValues>
@@ -99,7 +108,8 @@
                 <AttributeSchema name="iplanet-am-naming-samlsoapreceiver-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a108">
+                    i18nKey="a108"
+                    resourceName="samlSoapReceiverUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/SAMLSOAPReceiver</Value>
                     </DefaultValues>
@@ -107,7 +117,8 @@
                 <AttributeSchema name="iplanet-am-naming-samlpostservlet-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a109">
+                    i18nKey="a109"
+                    resourceName="samlPostServletUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/SAMLPOSTProfileServlet</Value>
                     </DefaultValues>
@@ -115,7 +126,8 @@
                 <AttributeSchema name="iplanet-am-naming-samlassertionmanager-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a110">
+                    i18nKey="a110"
+                    resourceName="samlAssertionManagerUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/AssertionManagerServlet/AssertionManagerIF</Value>
                     </DefaultValues>
@@ -124,7 +136,8 @@
                 <AttributeSchema name="iplanet-am-naming-jaxrpc-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a114">
+                    i18nKey="a114"
+                    resourceName="jaxrpcUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/jaxrpc/</Value>
                     </DefaultValues>
@@ -133,7 +146,8 @@
                 <AttributeSchema name="sun-naming-idsvcs-jaxws-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a115">
+                    i18nKey="a115"
+                    resourceName="jaxwsUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/identityservices/</Value>
                     </DefaultValues>
@@ -142,7 +156,8 @@
                 <AttributeSchema name="sun-naming-idsvcs-rest-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a116">
+                    i18nKey="a116"
+                    resourceName="idsvcsRestUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/identity/</Value>
                     </DefaultValues>
@@ -151,7 +166,8 @@
                 <AttributeSchema name="iplanet-am-naming-fsassertionmanager-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a111">
+                    i18nKey="a111"
+                    resourceName="federationAssertionManagerUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/FSAssertionManagerServlet/FSAssertionManagerIF</Value>
                     </DefaultValues>
@@ -159,7 +175,8 @@
                 <AttributeSchema name="iplanet-am-naming-securitytokenmanager-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a113">
+                    i18nKey="a113"
+                    resourceName="securityTokenManagerUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/SecurityTokenManagerServlet/SecurityTokenManagerIF</Value>
                     </DefaultValues>
@@ -167,7 +184,8 @@
                 <AttributeSchema name="sun-naming-sts-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a117">
+                    i18nKey="a117"
+                    resourceName="stsUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/sts</Value>
                     </DefaultValues>
@@ -175,7 +193,8 @@
                 <AttributeSchema name="sun-naming-sts-mex-url"
                     type="single"
                     syntax="url"
-                    i18nKey="a118">
+                    i18nKey="a118"
+                    resourceName="stsMexUrl">
                     <DefaultValues>
                         <Value>%protocol://%host:%port%uri/sts/mex</Value>
                     </DefaultValues>

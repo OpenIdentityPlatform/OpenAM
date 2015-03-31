@@ -73,7 +73,8 @@ import com.sun.identity.sm.ServiceSchemaManager;
  */
 public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
 
-    private static final List<String> EXCLUDED_SERVICES = Arrays.asList();
+    private static final List<String> EXCLUDED_SERVICES = Arrays.asList(
+            "iPlanetAMPolicyService", "RestSecurityTokenService");
     private static final String DEFAULT_VERSION = "1.0";
     private final SmsCollectionProviderFactory collectionProviderFactory;
     private final SmsSingletonProviderFactory singletonProviderFactory;

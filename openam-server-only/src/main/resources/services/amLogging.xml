@@ -26,7 +26,7 @@
 
     $Id: amLogging.xml,v 1.11 2008/10/10 22:14:25 bigfatrat Exp $
 
-    Portions Copyrighted 2011-2014 ForgeRock AS
+    Portions Copyrighted 2011-2015 ForgeRock AS.
     Portions Copyrighted 2013 Cybernetica AS
     Portions Copyrighted 2014 Nomura Research Institute, Ltd
 -->
@@ -37,6 +37,7 @@
         <Schema serviceHierarchy="/DSAMEConfig/iPlanetAMLoggingService"
             i18nFileName="amLogging"
             revisionNumber="50"
+            resourceName="logging"
             i18nKey="iplanet-am-logging-service-description">
             <Global>
                 <AttributeSchema name="serviceObjectClasses"
@@ -50,7 +51,8 @@
                 <AttributeSchema name="openam-logging-file-rotation-enabled"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="rotationEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nNo">false</BooleanFalseValue>
@@ -63,7 +65,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
-                    i18nKey="a102">
+                    i18nKey="a102"
+                    resourceName="maxFileSize">
                     <DefaultValues>
                         <Value>100000000</Value>
                     </DefaultValues>
@@ -72,7 +75,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
-                    i18nKey="a103">
+                    i18nKey="a103"
+                    resourceName="numberHistoryFiles">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -80,7 +84,8 @@
                 <AttributeSchema name="openam-logging-file-prefix"
                     type="single"
                     syntax="string"
-                    i18nKey="a1031">
+                    i18nKey="a1031"
+                    resourceName="prefix">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -88,7 +93,8 @@
                 <AttributeSchema name="openam-logging-file-suffix"
                     type="single"
                     syntax="string"
-                    i18nKey="a1032">
+                    i18nKey="a1032"
+                    resourceName="suffix">
                     <DefaultValues>
                         <Value>-MM.dd.yy-kk.mm</Value>
                     </DefaultValues>
@@ -97,7 +103,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="-1" rangeEnd="2147483647"
-                    i18nKey="a1033">
+                    i18nKey="a1033"
+                    resourceName="rotationInterval">
                     <DefaultValues>
                         <Value>-1</Value>
                     </DefaultValues>
@@ -105,7 +112,8 @@
                 <AttributeSchema name="iplanet-am-logging-location"
                     type="single"
                     syntax="string"
-                    i18nKey="a104">
+                    i18nKey="a104"
+                    resourceName="location">
                     <DefaultValues>
                         <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
                     </DefaultValues>
@@ -113,7 +121,8 @@
                 <AttributeSchema name="logstatus"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a1041">
+                    i18nKey="a1041"
+                    resourceName="status">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceACTIVE">ACTIVE</ChoiceValue>
                         <ChoiceValue i18nKey="choiceINACTIVE">INACTIVE</ChoiceValue>
@@ -137,7 +146,8 @@
                 <AttributeSchema name="iplanet-am-logging-type"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a105">
+                    i18nKey="a105"
+                    resourceName="type">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceFile">File</ChoiceValue>
                         <ChoiceValue i18nKey="choiceDB">DB</ChoiceValue>
@@ -158,7 +168,8 @@
                 <AttributeSchema name="iplanet-am-logging-secure-certificate-store"
                     type="single"
                     syntax="string"
-                    i18nKey="a1162">
+                    i18nKey="a1162"
+                    resourceName="certificateStore">
                     <DefaultValues>
                         <Value>%BASE_DIR%/%SERVER_URI%/Logger.jks</Value>
                     </DefaultValues>
@@ -166,7 +177,8 @@
                 <AttributeSchema name="iplanet-am-logging-db-user"
                     type="single"
                     syntax="string"
-                    i18nKey="a107">
+                    i18nKey="a107"
+                    resourceName="user">
                     <DefaultValues>
                         <Value>dbuser</Value>
                     </DefaultValues>
@@ -286,12 +298,14 @@
                 <AttributeSchema name="iplanet-am-logging-db-password"
                     type="single"
                     syntax="password"
-                    i18nKey="a108">
+                    i18nKey="a108"
+                    resourceName="password">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-logging-db-driver"
                     type="single"
                     syntax="string"
-                    i18nKey="a109">
+                    i18nKey="a109"
+                    resourceName="driver">
                     <DefaultValues>
                         <Value>oracle.jdbc.driver.OracleDriver</Value>
                     </DefaultValues>
@@ -323,7 +337,8 @@
                 <AttributeSchema name="iplanet-am-logging-logfields"
                     type="multiple_choice"
                     syntax="string"
-                    i18nKey="a111">
+                    i18nKey="a111"
+                    resourceName="fields">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceDOM">Domain</ChoiceValue>
                         <ChoiceValue i18nKey="choiceLOGINID">LoginID</ChoiceValue>
@@ -353,7 +368,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
-                    i18nKey="a114">
+                    i18nKey="a114"
+                    resourceName="verifyPeriod">
                     <DefaultValues>
                         <Value>3600</Value>
                     </DefaultValues>
@@ -362,7 +378,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
-                    i18nKey="a115">
+                    i18nKey="a115"
+                    resourceName="signaturePeriod">
                     <DefaultValues>
                         <Value>900</Value>
                     </DefaultValues>
@@ -370,7 +387,8 @@
                 <AttributeSchema name="iplanet-am-logging-security-status"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a116">
+                    i18nKey="a116"
+                    resourceName="security">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceON">ON</ChoiceValue>
                         <ChoiceValue i18nKey="choiceOFF">OFF</ChoiceValue>
@@ -382,7 +400,8 @@
                 <AttributeSchema name="iplanet-am-logging-secure-signing-algorithm"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a1161">
+                    i18nKey="a1161"
+                    resourceName="signingAlgorithm">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceMD2withRSA">MD2withRSA</ChoiceValue>
                         <ChoiceValue i18nKey="choiceMD5withRSA">MD5withRSA</ChoiceValue>
@@ -413,7 +432,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
-                    i18nKey="a117">
+                    i18nKey="a117"
+                    resourceName="maxRecords">
                     <DefaultValues>
                         <Value>500</Value>
                     </DefaultValues>
@@ -422,7 +442,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
-                    i18nKey="a119">
+                    i18nKey="a119"
+                    resourceName="bufferSize">
                     <DefaultValues>
                         <Value>25</Value>
                     </DefaultValues>
@@ -431,7 +452,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
-                    i18nKey="a1191">
+                    i18nKey="a1191"
+                    resourceName="databaseFailureMemoryBufferSize">
                     <DefaultValues>
                         <Value>2</Value>
                     </DefaultValues>
@@ -440,7 +462,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
-                    i18nKey="a120">
+                    i18nKey="a120"
+                    resourceName="bufferTime">
                     <DefaultValues>
                         <Value>60</Value>
                     </DefaultValues>
@@ -448,7 +471,8 @@
                 <AttributeSchema name="iplanet-am-logging-time-buffering-status"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a121">
+                    i18nKey="a121"
+                    resourceName="buffering">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceON">ON</ChoiceValue>
                         <ChoiceValue i18nKey="choiceOFF">OFF</ChoiceValue>
@@ -461,7 +485,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
-                    i18nKey="a118">
+                    i18nKey="a118"
+                    resourceName="filesPerKeystore">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>
@@ -494,7 +519,8 @@
                     type="single_choice"
                     listOrder="insertion"
                     syntax="string"
-                    i18nKey="a130">
+                    i18nKey="a130"
+                    resourceName="jdkLoggingLevel">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceLOGOFF">OFF</ChoiceValue>
                         <ChoiceValue i18nKey="choiceLOGSEVERE">SEVERE</ChoiceValue>
@@ -544,7 +570,8 @@
                 <AttributeSchema name="iplanet-am-logging-syslog-host"
                     type="single"
                     syntax="string"
-                    i18nKey="a1101">
+                    i18nKey="a1101"
+                    resourceName="host">
                     <DefaultValues>
                         <Value>localhost</Value>
                     </DefaultValues>
@@ -553,7 +580,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="1" rangeEnd="65535"
-                    i18nKey="a1102">
+                    i18nKey="a1102"
+                    resourceName="port">
                     <DefaultValues>
                         <Value>514</Value>
                     </DefaultValues>
@@ -561,7 +589,8 @@
                 <AttributeSchema name="iplanet-am-logging-syslog-protocol"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a1103">
+                    i18nKey="a1103"
+                    resourceName="protocol">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choiceUDP">UDP</ChoiceValue>
                         <ChoiceValue i18nKey="choiceTCP">TCP</ChoiceValue>
@@ -573,7 +602,8 @@
                 <AttributeSchema name="iplanet-am-logging-syslog-facility"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a1104">
+                    i18nKey="a1104"
+                    resourceName="facility">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choicekern">kern</ChoiceValue>
                         <ChoiceValue i18nKey="choiceuser">user</ChoiceValue>
@@ -604,7 +634,8 @@
                     type="single"
                     syntax="number_range"
                     rangeStart="1" rangeEnd="2147483647"
-                    i18nKey="a1105">
+                    i18nKey="a1105"
+                    resourceName="timeout">
                     <DefaultValues>
                         <Value>30</Value>
                     </DefaultValues>

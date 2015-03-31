@@ -28,9 +28,10 @@
 
             <Organization>
                 <AttributeSchema name="base-url-source"
-                                 type="single_choice"
-                                 syntax="string"
-                                 i18nKey="a101">
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a101"
+                        resourceName="source">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a101a">FIXED_VALUE</ChoiceValue>
                         <ChoiceValue i18nKey="a101b">FORWARDED_HEADER</ChoiceValue>
@@ -45,16 +46,19 @@
                 <AttributeSchema name="base-url-fixed-value"
                                  type="single"
                                  syntax="string"
+                                 resourceName="fixedValue"
                                  i18nKey="a102">
                 </AttributeSchema>
                 <AttributeSchema name="base-url-extension-class"
                                  type="single"
                                  syntax="string"
+                                 resourceName="extensionClassName"
                                  i18nKey="a103">
                 </AttributeSchema>
                 <AttributeSchema name="base-url-context-path"
                                  type="single"
                                  syntax="string"
+                                 resourceName="contextPath"
                                  i18nKey="a104">
                     <DefaultValues>
                         <Value>/@SERVER_URI@</Value>
