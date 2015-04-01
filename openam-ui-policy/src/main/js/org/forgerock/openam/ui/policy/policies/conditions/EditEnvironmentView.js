@@ -51,6 +51,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
         i18n: {
             'condition': { 'key': 'policy.conditionTypes.', 'title': '.title', 'props': '.props.' }
         },
+        SCRIPT_RESOURCE: 'Script',
 
         render: function (schema, callback, element, itemID, itemData) {
             var self = this;
@@ -187,6 +188,9 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
                 new TimeZoneAttr().render({itemData: itemData}, itemDataEl);
 
                 this.$el.find(attributesSelector).wrapAll(attributesWrapper);
+            } else if (schema.title === self.SCRIPT_RESOURCE) {
+                // FIXME will change title, i18nKey after scripted condition endpoint iplemented
+                new ArrayAttr().render({itemData: itemData, hiddenData: undefined, data: itemData.scripts, title: 'scripts', i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + 'scripts', dataSource: 'scripts'}, itemDataEl);
             } else {
                 attributesWrapper = '<div class="no-float"></div>';
 

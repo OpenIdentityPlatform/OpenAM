@@ -195,6 +195,13 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
         });
     };
 
+    obj.getDataByType = function (type) {
+        return obj.serviceCall({
+            url: RealmHelper.decorateURLWithOverrideRealm("/" + type + "?_queryFilter=true"),
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+        });
+    };
+
     obj.getAllRealms = function () {
         return obj.serviceCall({
             url: RealmHelper.decorateURLWithOverrideRealm("/realms?_queryFilter=true"),

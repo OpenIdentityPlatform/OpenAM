@@ -36,7 +36,9 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
     var ConditionAttrArrayView = ConditionAttrBaseView.extend({
         template: 'templates/policy/policies/conditions/ConditionAttrArray.html',
         MIN_QUERY_LENGTH: 1,
+        SCRIPT_TYPE: 'scripts', // FIXME: update after support script conditions
         IDENTITY_PLACEHOLDER: 'policy.subjectTypes.Identity.placeholder',
+        SCRIPT_PLACEHOLDER: 'policy.conditionTypes.Script.placeholder',
 
         render: function (data, element, callback) {
             this.initBasic(data, element, 'field-float-selectize data-obj');
@@ -55,31 +57,49 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
                     type = $item.parent().find('label')[0].dataset.title;
                     options = {};
 
-                    // special case for items with added data sets. Currently this is only "Identity"
+                    // special case for items with added data sets.
                     if (item.dataset && item.dataset.source) {
-                        _.extend(options, {
-                            placeholder: $.t(view.IDENTITY_PLACEHOLDER),
-                            create: false,
-                            sortField: 'value',
-                            load: function (query, callback) {
-                                if (query.length < view.MIN_QUERY_LENGTH) {
-                                    return callback();
+                        if (type === view.SCRIPT_TYPE) {
+                            _.extend(options, {
+                                placeholder: $.t(view.SCRIPT_PLACEHOLDER),
+                                create: false,
+                                preload: true,
+                                sortField: 'value',
+                                load: function (query, callback) {
+                                    view.loadFromDataSource.call(this, item, callback);
+                                },
+                                onChange: function (value) {
+                                    title = this.$input.parent().find('label')[0].dataset.title;
+                                    itemData = view.data.itemData;
+                                    itemData[title] = value ? value : [];
                                 }
-                                view.queryIdentities.call(this, item, query, callback);
-                            },
-                            onItemAdd: function (item) {
-                                view.getUniversalId(item, type);
-                            },
+                            });
+                        } else {
+                            // Currently this is only "Identity"
+                            _.extend(options, {
+                                placeholder: $.t(view.IDENTITY_PLACEHOLDER),
+                                create: false,
+                                sortField: 'value',
+                                load: function (query, callback) {
+                                    if (query.length < view.MIN_QUERY_LENGTH) {
+                                        return callback();
+                                    }
+                                    view.queryIdentities.call(this, item, query, callback);
+                                },
+                                onItemAdd: function (item) {
+                                    view.getUniversalId(item, type);
+                                },
 
-                            onItemRemove: function (item) {
-                                var universalid = _.findKey(view.data.hiddenData[type], function (obj) {
-                                    return obj === item;
-                                });
+                                onItemRemove: function (item) {
+                                    var universalid = _.findKey(view.data.hiddenData[type], function (obj) {
+                                        return obj === item;
+                                    });
 
-                                view.data.itemData.subjectValues = _.without(view.data.itemData.subjectValues, universalid);
-                                delete view.data.hiddenData[type][universalid];
-                            }
-                        });
+                                    view.data.itemData.subjectValues = _.without(view.data.itemData.subjectValues, universalid);
+                                    delete view.data.hiddenData[type][universalid];
+                                }
+                            });
+                        }
                     } else {
                         _.extend(options, {
                             delimiter: ',',
@@ -132,6 +152,20 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
                 self.data.itemData.subjectValues = _.union(self.data.itemData.subjectValues, subject.universalid);
                 self.data.hiddenData[type][subject.universalid[0]] = item;
             });
+        },
+
+        loadFromDataSource: function(item, callback) {
+            var selectize = this;
+            policyDelegate.getDataByType(item.dataset.source)
+                .done(function (data) {
+                    _.each(data.result, function (value) {
+                        selectize.addOption({value: value.name, text: value.name});
+                    });
+                    callback(data.result);
+                }).error(function (e) {
+                    console.error('error', e);
+                    callback();
+                });
         }
     });
 

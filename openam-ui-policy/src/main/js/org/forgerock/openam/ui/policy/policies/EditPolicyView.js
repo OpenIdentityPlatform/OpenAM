@@ -54,7 +54,6 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
         validationFields: ["name", "resources"],
 
         render: function (args, callback) {
-
             var self = this,
                 data = self.data,
                 appName =                   args[0],
@@ -101,6 +100,9 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
 
                 data.options.availableEnvironments = _.findByValues(allEnvironments[0].result, 'title', app[0].conditions);
                 data.options.availableSubjects =     _.findByValues(allSubjects[0].result, 'title', app[0].subjects);
+
+                // FIXME. temporary code until not added support of script condition type on sever side
+                data.options.availableEnvironments.push({title: 'Script', logical: false, config: {type: "object", properties: {scripts: { items: { type: "string"}, type: "array"} } } });
 
                 availableResourceTypes = _.filter(resourceTypes[0].result, function (item) {
                     return _.contains(app[0].resourceTypeUuids, item.uuid);
