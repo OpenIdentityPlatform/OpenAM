@@ -172,8 +172,13 @@ public class ServicesDefaultValues {
             map.put(SetupConstants.UM_DIRECTORY_PORT,
                 UserIdRepo.getPort(userRepo));
             String s = (String) userRepo.get(SetupConstants.USER_STORE_SSL);
-            String ssl = ((s != null) && s.equals("SSL")) ? "true" : "false";
-            map.put(SetupConstants.UM_SSL, ssl);
+            final String isSecure = ((s != null) && s.equals("SSL")) ? "true" : "false";
+            map.put(SetupConstants.UM_SSL, isSecure);
+            if (Boolean.parseBoolean(isSecure)) {
+                map.put(SetupConstants.LDAP_CONNECTION_MODE_TAG, SetupConstants.LDAP_CONNECTION_MODE_LDAPS);
+            } else {
+                map.put(SetupConstants.LDAP_CONNECTION_MODE_TAG, SetupConstants.LDAP_CONNECTION_MODE_LDAP);
+            }
             umRootSuffix =(String)userRepo.get(
                 SetupConstants.USER_STORE_ROOT_SUFFIX);
         } else {
@@ -186,6 +191,7 @@ public class ServicesDefaultValues {
             map.put(SetupConstants.UM_DIRECTORY_PORT,
                 map.get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_PORT));
             map.put(SetupConstants.UM_SSL, "false");
+            map.put(SetupConstants.LDAP_CONNECTION_MODE_TAG, SetupConstants.LDAP_CONNECTION_MODE_LDAP);
             umRootSuffix = (String)map.get(
                 SetupConstants.CONFIG_VAR_ROOT_SUFFIX);
         }

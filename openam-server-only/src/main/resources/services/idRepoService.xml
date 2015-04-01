@@ -294,12 +294,17 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
-                        type="single"
-                        syntax="boolean"
-                        i18nKey="a2007">
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a20071">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
+                            <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
+                            <ChoiceValue i18nKey="a20074">StartTLS</ChoiceValue>
+                        </ChoiceValues>
                         <DefaultValues>
-                            <Value>false</Value>
+                            <Value>LDAP</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -843,12 +848,17 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
-                        type="single"
-                        syntax="boolean"
-                        i18nKey="a2007">
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a20071">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
+                            <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
+                            <ChoiceValue i18nKey="a20074">StartTLS</ChoiceValue>
+                        </ChoiceValues>
                         <DefaultValues>
-                            <Value>false</Value>
+                            <Value>LDAP</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1496,12 +1506,17 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
-                        type="single"
-                        syntax="boolean"
-                        i18nKey="a2007">
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a20071">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
+                            <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
+                            <ChoiceValue i18nKey="a20074">StartTLS</ChoiceValue>
+                        </ChoiceValues>
                         <DefaultValues>
-                            <Value>false</Value>
+                            <Value>LDAP</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2015,12 +2030,17 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
-                        type="single"
-                        syntax="boolean"
-                        i18nKey="a2007">
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a20071">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
+                            <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
+                            <ChoiceValue i18nKey="a20074">StartTLS</ChoiceValue>
+                        </ChoiceValues>
                         <DefaultValues>
-                            <Value>false</Value>
+                            <Value>LDAP</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2542,12 +2562,17 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
-                        type="single"
-                        syntax="boolean"
-                        i18nKey="a2007">
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a20071">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
+                            <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
+                            <ChoiceValue i18nKey="a20074">StartTLS</ChoiceValue>
+                        </ChoiceValues>
                         <DefaultValues>
-                            <Value>false</Value>
+                            <Value>LDAP</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3049,12 +3074,17 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
-                        type="single"
-                        syntax="boolean"
-                        i18nKey="a2007">
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a20071">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
+                            <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
+                            <ChoiceValue i18nKey="a20074">StartTLS</ChoiceValue>
+                        </ChoiceValues>
                         <DefaultValues>
-                            <Value>false</Value>
+                            <Value>LDAP</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

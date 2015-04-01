@@ -55,7 +55,10 @@ public class UpgradeIdRepoSubConfigs extends AbstractUpgradeStep {
     private static final String OLD_IDREPO_CLASS = "com.sun.identity.idm.plugins.ldapv3.LDAPv3Repo";
     private static final String NEW_IDREPO_CLASS = "org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo";
     private static final String PSEARCH_FILTER = "sun-idrepo-ldapv3-config-psearch-filter";
+    private static final String OLD_CONNECTION_MODE = "sun-idrepo-ldapv3-config-ssl-enabled";
+    private static final String NEW_CONNECTION_MODE = "sun-idrepo-ldapv3-config-connection-mode";
     private final Map<String, Set<String>> repos = new HashMap<String, Set<String>>();
+    private final Map<String, Map<String, String>> oldConnectionModeRepos = new HashMap<String, Map<String, String>>();
 
     @Inject
     public UpgradeIdRepoSubConfigs(final PrivilegedAction<SSOToken> adminTokenAction,
@@ -86,7 +89,9 @@ public class UpgradeIdRepoSubConfigs extends AbstractUpgradeStep {
                             if (repoConfig != null) {
                                 Map<String, Set<String>> attributes = repoConfig.getAttributes();
                                 String className = CollectionHelper.getMapAttr(attributes, IdConstants.ID_REPO);
-                                if (OLD_IDREPO_CLASS.equals(className) || getModifiedFilter(attributes) != null) {
+                                String sslMode = getModifiedConnectionMode(attributes);
+                                if (OLD_IDREPO_CLASS.equals(className) || getModifiedFilter(attributes) != null ||
+                                        sslMode != null) {
                                     if (DEBUG.messageEnabled()) {
                                         DEBUG.message("Discovered IdRepo: " + subConfig + " in realm: " + realm);
                                     }
@@ -96,6 +101,17 @@ public class UpgradeIdRepoSubConfigs extends AbstractUpgradeStep {
                                     }
                                     values.add(subConfig);
                                     repos.put(realm, values);
+                                    
+                                    if (sslMode != null) {
+                                        Map<String, String> sslModes = oldConnectionModeRepos.get(realm);
+                                        if (sslModes == null){ 
+                                            sslModes = new HashMap<String, String>();
+                                        }
+                                        if (sslModes.get(subConfig) == null) {
+                                            sslModes.put(subConfig, sslMode);
+                                            oldConnectionModeRepos.put(realm, sslModes);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -117,16 +133,32 @@ public class UpgradeIdRepoSubConfigs extends AbstractUpgradeStep {
                 for (String subConfig : entry.getValue()) {
                     UpgradeProgress.reportStart("upgrade.data.store.start", subConfig);
                     Map<String, Set<String>> newValues = new HashMap<String, Set<String>>(2);
-                    newValues.put(IdConstants.ID_REPO, asSet(NEW_IDREPO_CLASS));
                     ServiceConfig sc = ocm.getServiceConfig(IdConstants.REPO_SERVICE);
                     ServiceConfig repoConfig = sc.getSubConfig(subConfig);
-                    String newFilter = getModifiedFilter(repoConfig.getAttributes());
+                    Map<String, Set<String>> attributes = repoConfig.getAttributes();
+                    
+                    String className = CollectionHelper.getMapAttr(attributes, IdConstants.ID_REPO);
+                    if (OLD_IDREPO_CLASS.equals(className)) {
+                        newValues.put(IdConstants.ID_REPO, asSet(NEW_IDREPO_CLASS));
+                    }
+                    
+                    String newFilter = getModifiedFilter(attributes);
                     if (newFilter != null) {
                         if (DEBUG.messageEnabled()) {
                             DEBUG.message("Upgrading psearch filter for datastore: " + subConfig
                                     + " to: " + newFilter);
                         }
                         newValues.put(PSEARCH_FILTER, asSet(newFilter));
+                    }
+                    
+                    Map<String, String> sslModes = oldConnectionModeRepos.get(realm);
+                    String sslMode = (sslModes == null) ? null : sslModes.get(subConfig);
+                    if (sslMode != null) {
+                        if (DEBUG.messageEnabled()) {
+                            DEBUG.message("Upgrading connection mode for datastore: " + subConfig
+                                    + " to: " + sslMode);
+                        }
+                        newValues.put(NEW_CONNECTION_MODE, asSet(sslMode));
                     }
                     //There is no need to remove the obsolete attributes here, because once we set an attribute, the SMS
                     //framework will automagically remove those that do not adhere to the schema.
@@ -146,6 +178,18 @@ public class UpgradeIdRepoSubConfigs extends AbstractUpgradeStep {
         if (pFilter.contains("(!(ou:dn:=services))") && !pFilter.contains("(!(ou:dn:=tokens))")) {
             return Filter.and(Filter.valueOf(pFilter), Filter.not(Filter.extensible(null, "ou", "tokens", true)))
                     .toString();
+        }
+        return null;
+    }
+
+    private String getModifiedConnectionMode(Map<String, Set<String>> attrs) {
+        String sslMode = CollectionHelper.getMapAttr(attrs, OLD_CONNECTION_MODE);
+        if (sslMode != null) {
+            if (Boolean.parseBoolean(sslMode)) {
+                return "LDAPS";
+            } else {
+                return "LDAP";
+            }
         }
         return null;
     }
