@@ -26,8 +26,8 @@
 
     $Id: amPolicyConfig.xml,v 1.9 2009/05/05 18:53:03 mrudul_uchil Exp $
 
+    Portions Copyrighted 2014-2015 ForgeRock AS.
 -->
-<!-- Portions Copyrighted 2014 ForgeRock, AS. -->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -39,7 +39,8 @@
             serviceHierarchy="/DSAMEConfig/iPlanetAMPolicyConfigService"
             i18nFileName="amPolicyConfig"
             revisionNumber="60"
-            i18nKey="iplanet-am-policy-config-service-description">
+            i18nKey="iplanet-am-policy-config-service-description"
+            resourceName="policyconfiguration">
             <Global>
                 <AttributeSchema name="serviceObjectClasses"
                     type="list"
@@ -50,21 +51,23 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-config-resource-comparator"
-		    type="list"
+		            type="list"
                     syntax="string"
-		    validator="ResourceComparatorValidator"
-		    i18nKey="a100">
-		    <DefaultValues>
-			<Value>serviceType=iPlanetAMWebAgentService|class=com.sun.identity.policy.plugins.HttpURLResourceName|wildcard=*|oneLevelWildcard=-*-|delimiter=/|caseSensitive=false</Value>
-			<Value>serviceType=sunIdentityServerDiscoveryService|class=com.sun.identity.policy.plugins.PrefixResourceName|wildcard=*|oneLevelWildcard=-*-|delimiter=;|caseSensitive=false</Value>
+		            validator="ResourceComparatorValidator"
+		            i18nKey="a100"
+                    resourceName="resourceComparators">
+		            <DefaultValues>
+                        <Value>serviceType=iPlanetAMWebAgentService|class=com.sun.identity.policy.plugins.HttpURLResourceName|wildcard=*|oneLevelWildcard=-*-|delimiter=/|caseSensitive=false</Value>
+                        <Value>serviceType=sunIdentityServerDiscoveryService|class=com.sun.identity.policy.plugins.PrefixResourceName|wildcard=*|oneLevelWildcard=-*-|delimiter=;|caseSensitive=false</Value>
                     </DefaultValues>
 		</AttributeSchema>
 
                 <AttributeSchema name="iplanet-am-policy-config-continue-evaluation-on-deny-decision"
-		    type="single"
+		            type="single"
                     syntax="boolean"
                     uitype="radio"
-		    i18nKey="a100a">
+		            i18nKey="a100a"
+                    resourceName="continueEvaluationOnDeny">
 		    <BooleanValues>
 			<BooleanTrueValue i18nKey="a100b">true</BooleanTrueValue>
 			<BooleanFalseValue i18nKey="a100c">false</BooleanFalseValue>
@@ -75,10 +78,11 @@
 		</AttributeSchema>
 
                 <AttributeSchema name="sun-am-policy-config-org-alias-mapped-resources-enabled" 
-		    type="single"
+		            type="single"
                     syntax="boolean"
                     uitype="radio"
-		    i18nKey="a100e">
+        		    i18nKey="a100e"
+                    resourceName="realmAliasReferrals">
 		    <BooleanValues>
 			<BooleanTrueValue i18nKey="a100b">true</BooleanTrueValue>
 			<BooleanFalseValue i18nKey="a100c">false</BooleanFalseValue>
@@ -109,6 +113,7 @@
                 <AttributeSchema name="openam-referrals-enabled"
                                  type="single"
                                  syntax="boolean"
+                                 resourceName="referralsEnabled"
                                  i18nKey="a100f">
                     <DefaultValues>
                         <Value>false</Value>
@@ -120,7 +125,8 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-server"
                     type="list"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="ldapServer">
 		    <DefaultValues>
 			<Value>@UM_DIRECTORY_SERVER@:@UM_DIRECTORY_PORT@</Value>
 		    </DefaultValues>
@@ -136,7 +142,8 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-users-base-dn"
                     type="single"
                     syntax="string"
-                    i18nKey="a1021">
+                    i18nKey="a1021"
+                    resourceName="usersBaseDn">
                     <DefaultValues>
                         <Value>@UM_NORMALIZED_ORGBASE@</Value>
                     </DefaultValues>
@@ -144,7 +151,8 @@
                 <AttributeSchema name="iplanet-am-policy-config-is-roles-base-dn"
                     type="single"
                     syntax="string"
-                    i18nKey="a1022">
+                    i18nKey="a1022"
+                    resourceName="rolesBaseDn">
                     <DefaultValues>
                         <Value>@UM_NORMALIZED_ORGBASE@</Value>
                     </DefaultValues>
@@ -152,28 +160,31 @@
                 <AttributeSchema name="iplanet-am-policy-config-ldap-bind-dn"
 		    type="single"
                     syntax="string"
-		    i18nKey="a103">
+		    i18nKey="a103"
+                        resourceName="bindDn">
 		    <DefaultValues>
                         <Value>@UM_DS_DIRMGRDN@</Value>
                     </DefaultValues>
 		</AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-config-ldap-bind-password"
-		    type="single"
+		            type="single"
                     syntax="password"
-		    i18nKey="a104">
+		            i18nKey="a104"
+                    resourceName="bindPassword">
 		</AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-config-ldap-organizations-search-filter"
-		    type="single"
+		            type="single"
                     syntax="xml"
-		    i18nKey="a105">
+		            i18nKey="a105"
+                    resourceName="realmSearchFilter">
 		    <DefaultValues>
                         <Value>(objectclass=@ORG_OBJECT_CLASS@)</Value>
                     </DefaultValues>
 		</AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-config-ldap-organizations-search-scope"
-		    type="single_choice"
+		            type="single_choice"
                     syntax="string"
-		    i18nKey="">
+		            i18nKey="">
 		    <ChoiceValues>
                         <ChoiceValue i18nKey="a126">SCOPE_BASE</ChoiceValue>
                         <ChoiceValue i18nKey="a127">SCOPE_ONE</ChoiceValue>
@@ -184,9 +195,9 @@
                     </DefaultValues>
 		</AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-config-ldap-groups-search-filter"
-		    type="single"
+		            type="single"
                     syntax="xml"
-		    i18nKey="">
+                    i18nKey="">
 		    <DefaultValues>
                         <Value>(objectclass=groupOfUniqueNames)</Value>
                     </DefaultValues>
@@ -205,17 +216,19 @@
                     </DefaultValues>
 		</AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-config-ldap-users-search-filter"
-		    type="single"
+		            type="single"
                     syntax="xml"
-		    i18nKey="a109">
+		            i18nKey="a109"
+                    resourceName="usersSearchFilter">
 		    <DefaultValues>
                         <Value>(objectclass=@USER_OBJECT_CLASS@)</Value>
                     </DefaultValues>
 		</AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-config-ldap-users-search-scope"
-		    type="single_choice"
+		            type="single_choice"
                     syntax="string"
-		    i18nKey="a110">
+		            i18nKey="a110"
+                    resourceName="usersSearchScope">
 		    <ChoiceValues>
                         <ChoiceValue i18nKey="a126">SCOPE_BASE</ChoiceValue>
                         <ChoiceValue i18nKey="a127">SCOPE_ONE</ChoiceValue>
@@ -249,7 +262,8 @@
                 <AttributeSchema name="iplanet-am-policy-config-is-roles-search-scope"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a1121">
+                    i18nKey="a1121"
+                    resourceName="rolesSearchScope">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="a126">SCOPE_BASE</ChoiceValue>
                         <ChoiceValue i18nKey="a127">SCOPE_ONE</ChoiceValue>
@@ -276,17 +290,18 @@
                     </DefaultValues>
 		</AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-config-ldap-users-search-attribute"
-		    type="single"
+		            type="single"
                     syntax="string"
-		    i18nKey="a115">
+		            i18nKey="a115"
+                    resourceName="usersSearchAttribute">
 		    <DefaultValues>
                         <Value>@USER_NAMING_ATTR@</Value>
                     </DefaultValues>
 		</AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-config-ldap-roles-search-attribute"
-		    type="single"
+		            type="single"
                     syntax="string"
-		    i18nKey="">
+		            i18nKey="">
 		    <DefaultValues>
                         <Value>cn</Value>
                     </DefaultValues>
@@ -294,7 +309,8 @@
                 <AttributeSchema name="iplanet-am-policy-config-search-limit"
                     type="single"
                     syntax="number"
-                    i18nKey="a117">
+                    i18nKey="a117"
+                    resourceName="maximumSearchResults">
                     <DefaultValues>
                         <Value>100</Value>
                     </DefaultValues>
@@ -302,15 +318,17 @@
                 <AttributeSchema name="iplanet-am-policy-config-search-timeout"
                     type="single"
                     syntax="number"
-                    i18nKey="a118">
+                    i18nKey="a118"
+                    resourceName="searchTimeout">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-config-ldap-ssl-enabled"
-		    type="single"
+		            type="single"
                     syntax="boolean"
-		    i18nKey="a119">
+		            i18nKey="a119"
+                    resourceName="sslEnabled">
 		    <DefaultValues>
 			<Value>@UM_SSL@</Value>
 		    </DefaultValues>
@@ -318,7 +336,8 @@
                 <AttributeSchema name="iplanet-am-policy-config-connection_pool_min_size"
                     type="single"
                     syntax="number"
-                    i18nKey="a120">
+                    i18nKey="a120"
+                    resourceName="connectionPoolMinimumSize">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -326,7 +345,8 @@
                 <AttributeSchema name="iplanet-am-policy-config-connection_pool_max_size"
                     type="single"
                     syntax="number"
-                    i18nKey="a121">
+                    i18nKey="a121"
+                    resourceName="connectionPoolMaximumSize">
                     <DefaultValues>
                         <Value>10</Value>
                     </DefaultValues>
@@ -419,7 +439,8 @@
                 <AttributeSchema name="iplanet-am-policy-config-subjects-result-ttl" 
                     type="single"
                     syntax="number"
-                    i18nKey="a125">
+                    i18nKey="a125"
+                    resourceName="subjectsResultTTL">
                     <DefaultValues>
                         <Value>10</Value>
                     </DefaultValues>
@@ -427,7 +448,8 @@
                 <AttributeSchema name="iplanet-am-policy-config-user-alias-enabled"
                     type="single"
                     syntax="boolean"
-                    i18nKey="a150">
+                    i18nKey="a150"
+                    resourceName="userAliasEnabled">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>

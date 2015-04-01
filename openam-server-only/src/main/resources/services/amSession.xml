@@ -247,7 +247,7 @@
                         <Value>test</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <SubSchema name="Site" inheritance="multiple" i18nKey="site">
+                <SubSchema name="Site" inheritance="multiple" i18nKey="site" resourceName="site">
                     <AttributeSchema name="iplanet-am-session-sfo-enabled"
                                      type="single"
                                      syntax="boolean"

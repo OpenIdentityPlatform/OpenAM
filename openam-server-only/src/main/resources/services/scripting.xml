@@ -23,7 +23,8 @@
         <Schema serviceHierarchy="/DSAMEConfig/ScriptingService"
                 i18nFileName="scripting"
                 revisionNumber="1"
-                i18nKey="description">
+                i18nKey="description"
+                resourceName="scripting">
             <Organization>
                 <SubSchema name="scriptConfigurations" inheritance="multiple">
                     <SubSchema name="scriptConfiguration" inheritance="multiple">

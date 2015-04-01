@@ -23,6 +23,7 @@ import javax.inject.Named;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
@@ -75,34 +77,77 @@ import org.forgerock.json.resource.UpdateRequest;
  */
 public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
 
+    private static final Function<String, Boolean> AUTHENTICATION_HANDLES_FUNCTION = new Function<String, Boolean>() {
+        @Override
+        public Boolean apply(String serviceName) {
+            return ISAuthConstants.AUTH_SERVICE_NAME.equals(serviceName);
+        }
+    };
+
     private static final Function<String, Boolean> AUTHENTICATION_MODULE_HANDLES_FUNCTION = new Function<String, Boolean>() {
         @Override
         public Boolean apply(String serviceName) {
             return AMAuthenticationManager.getAuthenticationServiceNames().contains(serviceName);
         }
     };
-    private static final List<String> EXCLUDED_SERVICES = Arrays.asList(
-            "iPlanetAMPolicyService", "RestSecurityTokenService");
+
+    private static final Function<String, Boolean> FEDERATION_HANDLES_FUNCTION = new Function<String, Boolean>() {
+        private final List<String> FEDERATION_SERVICES = Arrays.asList(
+                "sunFMIDFFMetadataService",
+                "sunFMCOTConfigService",
+                "sunFMSAML2MetadataService",
+                "sunFMWSFederationMetadataService"
+        );
+        @Override
+        public Boolean apply(String serviceName) {
+            return FEDERATION_SERVICES.contains(serviceName);
+        }
+    };
+
+    /**
+     * Services are all the services not handled by other handlers for specific service schema types.
+     */
+    private static final Function<String, Boolean> SERVICES_HANDLES_FUNCTION = new Function<String, Boolean>() {
+        private final List<Function<String, Boolean>> ALREADY_HANDLED = Arrays.asList(
+                AUTHENTICATION_HANDLES_FUNCTION, AUTHENTICATION_MODULE_HANDLES_FUNCTION, FEDERATION_HANDLES_FUNCTION
+        );
+        @Override
+        public Boolean apply(String serviceName) {
+            for (Function<String, Boolean> handled : ALREADY_HANDLED) {
+                if (handled.apply(serviceName)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    };
+
     private static final String DEFAULT_VERSION = "1.0";
     private final SmsCollectionProviderFactory collectionProviderFactory;
     private final SmsSingletonProviderFactory singletonProviderFactory;
     private final SchemaType schemaType;
     private final Debug debug;
     private final Pattern schemaDnPattern;
+    private final Collection<String> excludedServices;
     private Map<String, Map<SmsRouteTree, Route>> serviceRoutes = new HashMap<String, Map<SmsRouteTree, Route>>();
     private final SmsRouteTree routeTree;
 
     @Inject
     public SmsRequestHandler(@Assisted SchemaType type, SmsCollectionProviderFactory collectionProviderFactory,
-            SmsSingletonProviderFactory singletonProviderFactory, @Named("frRest") Debug debug)
+            SmsSingletonProviderFactory singletonProviderFactory, @Named("frRest") Debug debug,
+            @Named("excludedServices") Collection<String> excludedServices)
             throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
         this.singletonProviderFactory = singletonProviderFactory;
         this.debug = debug;
+        this.excludedServices = excludedServices;
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
-        routeTree = tree(branch("/authentication", leaf("/modules", AUTHENTICATION_MODULE_HANDLES_FUNCTION)));
+        routeTree = tree(
+                branch("/authentication", leaf("/modules", AUTHENTICATION_MODULE_HANDLES_FUNCTION)),
+                leaf("/services", SERVICES_HANDLES_FUNCTION)
+        );
 
         createServices();
         SMSNotificationManager.getInstance().registerCallbackHandler(this);
@@ -205,7 +250,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      */
     private Map<SmsRouteTree, Route> addService(ServiceManager sm, String serviceName, String serviceVersion)
             throws SMSException, SSOException {
-        if (EXCLUDED_SERVICES.contains(serviceName)) {
+        if (excludedServices.contains(serviceName)) {
             debug.message("Excluding service from REST SMS: {}", serviceName);
             return null;
         }
