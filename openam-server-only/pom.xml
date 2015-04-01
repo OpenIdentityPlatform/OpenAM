@@ -217,6 +217,9 @@
                         <nonFilteredFileExtension>war</nonFilteredFileExtension>
                         <nonFilteredFileExtension>zip</nonFilteredFileExtension>
                         <nonFilteredFileExtension>7z</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>woff</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
                         <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
                     </nonFilteredFileExtensions>
                     <webResources>
