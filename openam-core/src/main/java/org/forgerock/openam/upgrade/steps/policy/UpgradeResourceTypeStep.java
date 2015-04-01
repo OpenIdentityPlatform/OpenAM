@@ -182,8 +182,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
 
             for (ResourceTypeState state : entry.getValue()) {
                 if (state.applicationNeedsResourceType) {
-                    ResourceType resourceType = createResourceType(state.actions, state.patterns, state.appName, realm);
-                    state.resourceTypeName = resourceType.getName();
+                    ResourceType resourceType = createResourceType(state, realm);
                     upgradeApplication(ec, state.appName, resourceType.getUUID());
                 }
 
@@ -252,17 +251,15 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
 
     /**
      * Create the resource type for the given application if a suitable resource type does not already exist.
-     * @param actions The actions that are currently associated with the application.
-     * @param patterns The resources that are currently associated with the application.
-     * @param appName The name of the application with which the resource type is associated.
+     * @param state The state object that contains the various parameters for creating the resource type.
      * @param realm The realm in which the application and resource type resides.
      * @return The resource type if it could be created or {@code null} if it could not.
      * @throws UpgradeException If the application types could not be read.
      */
-    private ResourceType createResourceType(Set<String> actions, Set<String> patterns, String appName, String realm)
+    private ResourceType createResourceType(ResourceTypeState state, String realm)
             throws UpgradeException {
 
-        final Set<QueryFilter<SmsAttribute>> actionFilters = transformSet(actions,
+        final Set<QueryFilter<SmsAttribute>> actionFilters = transformSet(state.actions,
                 new Function<String, QueryFilter<SmsAttribute>, NeverThrowsException>() {
 
             @Override
@@ -270,7 +267,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
                 return QueryFilter.equalTo(ResourceTypeSmsAttributes.ACTIONS, value);
             }
         });
-        final Set<QueryFilter<SmsAttribute>> patternFilters = transformSet(patterns,
+        final Set<QueryFilter<SmsAttribute>> patternFilters = transformSet(state.patterns,
                 new Function<String, QueryFilter<SmsAttribute>, NeverThrowsException>() {
 
             @Override
@@ -285,7 +282,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
                     QueryFilter.and(QueryFilter.and(actionFilters), QueryFilter.and(patternFilters)),
                     getAdminSubject(), realm);
         } catch (EntitlementException e) {
-            throw new UpgradeException("Failed to retrieve resource type for " + appName, e);
+            throw new UpgradeException("Failed to retrieve resource type for " + state.appName, e);
         }
 
         if (!resourceTypes.isEmpty()) {
@@ -293,13 +290,14 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
             return resourceTypes.iterator().next();
         }
 
-        ResourceType resourceType = ResourceType.builder(appName + RESOURCES_TYPE_NAME_SUFFIX, realm)
-                .addActions(getActions(actions))
-                .addPatterns(patterns)
-                .setDescription(RESOURCE_TYPE_DESCRIPTION + appName)
+        ResourceType resourceType = ResourceType.builder(state.appName + RESOURCES_TYPE_NAME_SUFFIX, realm)
+                .addActions(getActions(state.actions))
+                .addPatterns(state.patterns)
+                .setDescription(RESOURCE_TYPE_DESCRIPTION + state.appName)
                 .generateUUID()
                 .build();
         saveResourceType(resourceType);
+        state.resourceTypeName = resourceType.getName();
 
         return resourceType;
     }

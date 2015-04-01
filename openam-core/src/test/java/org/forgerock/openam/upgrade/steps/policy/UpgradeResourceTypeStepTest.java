@@ -197,7 +197,6 @@ public class UpgradeResourceTypeStepTest {
 
         // then
         assertEquals(detailedReport.contains("MyApplication"), true);
-        assertEquals(detailedReport.contains("MyApplicationResourceType"), true);
         assertEquals(detailedReport.contains("PolicyWithoutResourceTypeOne"), true);
         assertEquals(detailedReport.contains("PolicyWithoutResourceTypeTwo"), true);
         assertEquals(detailedReport.contains("PolicyWithoutResourceTypeThree"), true);
