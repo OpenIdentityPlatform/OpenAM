@@ -29,8 +29,10 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
@@ -49,6 +51,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -156,7 +159,7 @@ public class SoapSamlTokenProvider implements TokenProvider {
     /**
      * @see org.apache.cxf.sts.token.provider.TokenProvider
      * Note that I got rid of realm support as defined by the CXF-STS. See
-     * org.apache.cxf.sts.token.provider.SAMLTokenProvider#canHandleToken for details on the realm support.
+     * @see org.apache.cxf.sts.token.provider.SAMLTokenProvider#canHandleToken for details on the realm support.
      */
     @Override
     public boolean canHandleToken(String tokenType) {
@@ -166,7 +169,7 @@ public class SoapSamlTokenProvider implements TokenProvider {
     /**
      * @see org.apache.cxf.sts.token.provider.TokenProvider
      * Note that I got rid of realm support as defined by the CXF-STS. See
-     * org.apache.cxf.sts.token.provider.SAMLTokenProvider#canHandleToken for details on the realm support.
+     * @see org.apache.cxf.sts.token.provider.SAMLTokenProvider#canHandleToken for details on the realm support.
      */
     @Override
     public boolean canHandleToken(String tokenType, String realm) {
@@ -219,11 +222,14 @@ public class SoapSamlTokenProvider implements TokenProvider {
         }
     }
 
-    /*
-    The TokenGenerationService needs to the SAML2SubjectConfirmation as a parameter. This method will return the appropriate
-    SubjectConfirmation value, depending upon the KeyType specified in the RST invocation, and also the OnBehalfOf value.
+    /**
+     *
+     * @param tokenProviderParameters The TokenProviderParameters corresponding the the RST invocation.
+     * @return the SAM2SubjectConfirmation instance corresponding to teh KeyType specified in the RST invocation, considering
+     * the OnBehalfOf/ActAs element, if present.
+     * @throws AMSTSRuntimeException if an appropriate SubjectConfirmation value cannot be obtained.
      */
-    private SAML2SubjectConfirmation determineSubjectConfirmation(TokenProviderParameters tokenProviderParameters)  {
+    private SAML2SubjectConfirmation determineSubjectConfirmation(TokenProviderParameters tokenProviderParameters) throws AMSTSRuntimeException {
         String keyType = tokenProviderParameters.getKeyRequirements().getKeyType();
         if (STSConstants.BEARER_KEY_KEYTYPE.equals(keyType)) {
             return SAML2SubjectConfirmation.BEARER;
@@ -255,10 +261,14 @@ public class SoapSamlTokenProvider implements TokenProvider {
         }
     }
 
-    /*
-    Will return the ProofTokenState necessary for HoK assertions.
+    /**
+     *
+     * @param tokenProviderParameters The TokenProviderParameters corresponding to the RST invocation
+     * @return The ProofTokenState necessary for HoK assertions.
+     * @throws AMSTSRuntimeException if the ProofTokenState cannot be obtained from the request, or the X509Certificate
+     * state cannot be successfully constructed.
      */
-    private ProofTokenState getProofTokenState(TokenProviderParameters tokenProviderParameters) {
+    private ProofTokenState getProofTokenState(TokenProviderParameters tokenProviderParameters) throws AMSTSRuntimeException {
         ReceivedKey receivedKey = tokenProviderParameters.getKeyRequirements().getReceivedKey();
         X509Certificate certificate = receivedKey.getX509Cert();
         if (certificate == null) {
@@ -277,23 +287,24 @@ public class SoapSamlTokenProvider implements TokenProvider {
         }
     }
 
-    /*
-    This method must return the AuthnContextClassRef, a set of values defined in SAML2, included in the assertion generated
-    by the TokenGenerationService, which specify the authentication performed as part of issuing the assertion. Essentially
-    this value tells the relying party how the assertion subject was authenticated.
-
-    A SAML2 assertion will be generated under two circumstances:
-    1. as part of token transformation defined in the validate operation
-    2. as part of an issue operation
-
-    For case #1, the type of the validated token must be determined - accessed via the TokenRequirements in the TokenProviderParameters
-    For case #2, I imagine that it is possible to obtain the validated token from the Security-Policy enforcing interceptors
-    traversed during the Issue operation invocation.
-
-    Firstly, I have to determine what invocation I am dealing with - presumably this is possible by looking at the
-    tokens in the TokenRequirements.
+    /**
+     *
+     * @param tokenProviderParameters The TokenProviderParameters instance corresponding to the RST invocation.
+     * @return The AuthnContextClassRef, a value defined in SAML2, included in the assertion generated by the
+     * TokenGenerationService, which specifies the authentication performed as part of issuing the assertion. This value
+     * tells the relying party how the assertion subject was authenticated.
+     * @throws org.forgerock.openam.sts.AMSTSRuntimeException if the AuthnContextClassRef cannot be obtained
      */
-    private String getAuthnContextClassRef(TokenProviderParameters tokenProviderParameters) {
+    private String getAuthnContextClassRef(TokenProviderParameters tokenProviderParameters) throws AMSTSRuntimeException {
+        /*
+            A SAML2 assertion will be generated under two circumstances:
+            1. as part of token transformation defined in the validate operation
+            2. as part of an issue operation
+
+            For case #1, the type of the validated token must be determined - accessed via the TokenRequirements in the TokenProviderParameters
+            For case #2, I imagine that it is possible to obtain the validated token from the Security-Policy enforcing interceptors
+            traversed during the Issue operation invocation.
+        */
         TokenRequirements tokenRequirements = tokenProviderParameters.getTokenRequirements();
         if (tokenRequirements.getRenewTarget() != null) {
             return getAuthnContextClassRefForReceivedToken(tokenRequirements.getRenewTarget());
@@ -301,8 +312,8 @@ public class SoapSamlTokenProvider implements TokenProvider {
             return getAuthnContextClassRefForReceivedToken(tokenRequirements.getValidateTarget());
         } else if (tokenRequirements.getCancelTarget() != null) {
             /*
-            Should not enter this block, as Cancel operation was never bound in the STSEndpoint. Log an throw an exception
-            if this occurs, as it is unexpected.
+                Should not enter this block, as Cancel operation was never bound in the STSEndpoint. Log an throw an exception
+                if this occurs, as it is unexpected.
              */
             String message = "Unexpected state in SoapSamlTokenProvider: TokenProviderParameters has a non-null cancelTarget " +
                     "in the TokenRequirments. A cancel operation is not bound, so this state is unexpected!";
@@ -310,9 +321,9 @@ public class SoapSamlTokenProvider implements TokenProvider {
             throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR, message);
         } else {
             /*
-            Here we must be dealing with an Issue operation, so I need to obtain the token validated by the SecurityPolicy
-            bindings protecting the issue operation, or from the ActAs/OnBehalfOf token, if present. The ActAs/OnBehalfOf
-            token has precedence, as it is the identity of this token for which an assertion will be generated.
+                Here we must be dealing with an Issue operation, so I need to obtain the token validated by the SecurityPolicy
+                bindings protecting the issue operation, or from the ActAs/OnBehalfOf token, if present. The ActAs/OnBehalfOf
+                token has precedence, as it is the identity of this token for which an assertion will be generated.
              */
             if ((tokenProviderParameters.getTokenRequirements().getOnBehalfOf() != null) ||
                     (tokenProviderParameters.getTokenRequirements().getActAs() != null)) {
@@ -339,15 +350,13 @@ public class SoapSamlTokenProvider implements TokenProvider {
         return authnContextMapper.getAuthnContext(tokenType, tokenElement);
     }
 
-    /*
-    This examination does not have to be exhaustive, as this method is only called in a delegated context, and can only return
-    token types which we validate. Will return null if no TokenType could be determined.
-    See org.apache.cxf.sts.request.RequestParser#parseTokenElements for details on how this token is parsed - but it looks
-    like only an element will be set straight out of the RST payload.
-
-    This may well be refactored when we migrate to the 2.x version of wss4j.
-     */
     private TokenType parseTokenTypeFromDelegatedReceivedToken(ReceivedToken receivedToken) {
+        /*
+            This examination does not have to be exhaustive, as this method is only called in a delegated context, and can only return
+            token types which we validate. Will return null if no TokenType could be determined.
+            See org.apache.cxf.sts.request.RequestParser#parseTokenElements for details on how this token is parsed - but it looks
+            like only an element will be set straight out of the RST payload.
+        */
         if (receivedToken.isUsernameToken()) {
             return TokenType.USERNAME;
         } else if (receivedToken.isBinarySecurityToken()) {
@@ -372,12 +381,11 @@ public class SoapSamlTokenProvider implements TokenProvider {
         }
     }
 
-    /*
-    See org.apache.cxf.sts.request.RequestParser#parseTokenElements for details on how ActAs/OnBehalfOf token elements
-    are parsed - an element will be set straight out of the RST payload. This may change during the wss4j 2.x migration.
-
-     */
     private Element getDelegatedReceivedTokenElement(ReceivedToken receivedToken) {
+        /*
+            See org.apache.cxf.sts.request.RequestParser#parseTokenElements for details on how ActAs/OnBehalfOf token elements
+            are parsed - an element will be set straight out of the RST payload.
+         */
         if (receivedToken.isDOMElement()) {
             return (Element) receivedToken.getToken();
         } else {
@@ -388,26 +396,26 @@ public class SoapSamlTokenProvider implements TokenProvider {
         }
     }
 
-    /*
-     Approach to obtain the token state from the SecurityPolicy binding traversal yield detailed in question in forums here:
-            http://cxf.547215.n5.nabble.com/Accessing-SecurityPolicy-SupportingToken-in-STS-TokenProvider-td5746242.html
-     */
     private String getAuthnContextFromSecurityPolicyBindings(TokenProviderParameters tokenProviderParameters) {
+        /*
+             Approach to obtain the token state from the SecurityPolicy binding traversal yield detailed in question in forums here:
+             http://cxf.547215.n5.nabble.com/Accessing-SecurityPolicy-SupportingToken-in-STS-TokenProvider-td5746242.html
+         */
         final List<WSHandlerResult> handlerResults =
                 CastUtils.cast((List<?>)
                         tokenProviderParameters.getWebServiceContext().getMessageContext().get(WSHandlerConstants.RECV_RESULTS));
-            /*
+        /*
             Note that the code referenced in the forum link above
             (https://git-wip-us.apache.org/repos/asf?p=cxf.git;a=blob_plain;f=services/sts/sts-core/src/main/java/org/apache/cxf/sts/request/RequestParser.java;hb=HEAD)
             seems to be doing about the same thing (obtaining a token element), but does not do any sanity checking on the
             number of handlerResults or engineResults - it just processes and returns the first element encountered. I will
             do the same, but log a warning if additional elements encountered.
-             */
+         */
         if (handlerResults != null && handlerResults.size() > 0) {
             final WSHandlerResult handlerResult = handlerResults.get(0);
             if (handlerResults.size() > 1) {
                 logger.warn("WSHanderResults obtained from the MessageContext in SoapSamlTokenProvider#getAuthnContextClassRef > 1:"
-                        + handlerResults.size() + "; The results: " + handlerResults);
+                        + handlerResults.size() + "; The results: " + getWSHandlerResultsDebug(handlerResults));
             }
             final List<WSSecurityEngineResult> engineResults = handlerResult.getResults();
 
@@ -415,7 +423,9 @@ public class SoapSamlTokenProvider implements TokenProvider {
                 final Element supportingTokenElement = parseSupportingTokenElementFromWSSecurityEngineResult(engineResult);
                 if (supportingTokenElement != null) {
                     final TokenType tokenType = parseTokenTypeFromWSSecurityEngineResult(engineResult);
-                    return authnContextMapper.getAuthnContext(tokenType, supportingTokenElement);
+                    if (tokenType != null) {
+                        return authnContextMapper.getAuthnContext(tokenType, supportingTokenElement);
+                    }
                 }
             }
             throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR, "No WSHandlerResult instances to " +
@@ -426,22 +436,40 @@ public class SoapSamlTokenProvider implements TokenProvider {
                     "from the WSHandlerResult as necessary to inspect to obtain the input token validated by " +
                     "SecurityPolicy bindings in SoapSamlTokenProvider#getAuthnContextClassRef");
         }
-
     }
 
     /*
-    There are multiple WSSecurityEngineResult instances (5) generated for a successful invocation of e.g. a UNT
-    over the asymmetric binding: two for the client's cert (one as a BinarySecurityToken representation of the client's
-    cert, and one with more generic information about this cert), one for the server's cert, one for a timestamp, and
-    one for the UNT ProtectionToken. The non-BinarySecurityToken representations of a x509 cert do not have a token-element
-    entry, but e.g. the timestamp does. The question is what can be used to identify the WSSecurityEngine result corresponding
-    to the actual identity-asserting SupportingToken asserted by the caller, rather than the various tokens which
-    serve to protect this identity token.
-
-    Note that this method will return null unless it can obtain an Element corresponding to the the SupportingToken asserting
-    the client's identity.
+    No toString on WSHandlerResult, so this method will be called to provide debugging information
      */
+    private String getWSHandlerResultsDebug(List<WSHandlerResult> handlerResults) {
+        StringBuilder builder = new StringBuilder();
+        for (WSHandlerResult result : handlerResults) {
+            builder.append("WSHandlerResults for actor " ).append(result.getActor()).append('\n');
+            List<WSSecurityEngineResult> securityEngineResults = result.getResults();
+            if (securityEngineResults != null) {
+                for (WSSecurityEngineResult securityEngineResult : securityEngineResults) {
+                    builder.append('\t').append(securityEngineResult).append('\n');
+                }
+            } else {
+                builder.append("Null WSSecurityEngineResult list.");
+            }
+        }
+        return builder.toString();
+    }
+
     private Element parseSupportingTokenElementFromWSSecurityEngineResult(WSSecurityEngineResult engineResult) {
+    /*
+        There are multiple WSSecurityEngineResult instances (5) generated for a successful invocation of e.g. a UNT
+        over the asymmetric binding: two for the client's cert (one as a BinarySecurityToken representation of the client's
+        cert, and one with more generic information about this cert), one for the server's cert, one for a timestamp, and
+        one for the UNT ProtectionToken. The non-BinarySecurityToken representations of a x509 cert do not have a token-element
+        entry, but e.g. the timestamp does. The question is what can be used to identify the WSSecurityEngine result corresponding
+        to the actual identity-asserting SupportingToken asserted by the caller, rather than the various tokens which
+        serve to protect this identity token.
+
+        Note that this method will return null unless it can obtain an Element corresponding to the the SupportingToken asserting
+        the client's identity.
+    */
         final Element tokenElement =
                 (Element) engineResult.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
         if (tokenElement != null) {
@@ -461,9 +489,6 @@ public class SoapSamlTokenProvider implements TokenProvider {
         return null;
     }
 
-    /*
-    TODO: if we are doing OpenAM-based transformations, what would this input token type look like?
-     */
     private TokenType parseTokenTypeFromWSSecurityEngineResult(WSSecurityEngineResult engineResult) {
         if ((engineResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE) != null) ||
                 (engineResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES) != null)) {
@@ -472,6 +497,10 @@ public class SoapSamlTokenProvider implements TokenProvider {
             return TokenType.USERNAME;
         } else if (engineResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION) != null) {
             return TokenType.SAML2;
+        } else if ((engineResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN) != null) &&
+                (engineResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN) instanceof BinarySecurity) &&
+                AMSTSConstants.AM_SESSION_TOKEN_ASSERTION_BST_VALUE_TYPE.equals(((BinarySecurity)engineResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN)).getValueType())) {
+            return TokenType.OPENAM;
         } else {
             throw new AMSTSRuntimeException(ResourceException.BAD_REQUEST,
                     "Unknown token type validated by ws-SecurityPolicy interceptors or passed as transform input token type: " +
@@ -481,12 +510,12 @@ public class SoapSamlTokenProvider implements TokenProvider {
 
     private String getAuthnContextClassRefForReceivedToken(ReceivedToken receivedToken) {
         /*
-        The set of input tokens we support is currently limited to:
-         1. UNTs
-         2. OpenAM tokens - will be represented as a DOM Element
+            The set of input tokens we support is currently limited to:
+                1. UNTs
+            2. OpenAM tokens - will be represented as a DOM Element
 
-         When we support X509 Certificates, a new branch has to be added here. Not sure whether a X509Cert is represented
-         as a JAXBElement or a DOM Element. See ReceivedToken for details.
+            When we support X509 Certificates, a new branch has to be added here. Not sure whether a X509Cert is represented
+            as a JAXBElement or a DOM Element. See ReceivedToken for details.
          */
         if (receivedToken.isUsernameToken()) {
             if (receivedToken.getToken() instanceof UsernameToken) {
@@ -530,12 +559,12 @@ public class SoapSamlTokenProvider implements TokenProvider {
         }
     }
 
-    /*
-    Throw TokenCreationException as threadLocalAMTokenCache.getAMToken throws a TokenCreationException. Let caller above
-    map that to an AMSTSRuntimeException.
-     */
     private String getAssertion(String authnContextClassRef, SAML2SubjectConfirmation subjectConfirmation,
                                 ProofTokenState proofTokenState) throws TokenCreationException {
+        /*
+            Throw TokenCreationException as threadLocalAMTokenCache.getAMToken throws a TokenCreationException. Let caller above
+            map that to an AMSTSRuntimeException.
+        */
         String consumptionToken = null;
         try {
             consumptionToken = getTokenGenerationServiceConsumptionToken();

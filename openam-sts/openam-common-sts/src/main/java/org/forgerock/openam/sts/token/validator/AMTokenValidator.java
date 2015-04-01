@@ -70,7 +70,7 @@ public class AMTokenValidator implements TokenValidator {
         Object token = validateTarget.getToken();
         if (token instanceof Element) {
             Element tokenElement = (Element)token;
-            return AMSTSConstants.AM_SESSION_ID_ELEMENT_NAME.equals(tokenElement.getLocalName());
+            return AMSTSConstants.AM_SESSION_TOKEN_ELEMENT_NAME.equals(tokenElement.getLocalName());
         }
         return false;
     }
@@ -102,7 +102,7 @@ public class AMTokenValidator implements TokenValidator {
         Object token = receivedToken.getToken();
         if (token instanceof Element) {
             Element tokenElement = (Element)token;
-            if (AMSTSConstants.AM_SESSION_ID_ELEMENT_NAME.equals(tokenElement.getLocalName())) {
+            if (AMSTSConstants.AM_SESSION_TOKEN_ELEMENT_NAME.equals(tokenElement.getLocalName())) {
                 return ((Element)token).getFirstChild().getNodeValue();
             } else {
                 try {

@@ -16,9 +16,16 @@
 
 package org.forgerock.openam.sts.soap.bootstrap;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
+import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.soap.policy.am.OpenAMSessionTokenServerAssertionBuilder;
+import org.forgerock.openam.sts.soap.policy.am.OpenAMSessionTokenServerInterceptorProvider;
 import org.forgerock.openam.sts.soap.publish.SoapSTSInstancePublisher;
 import org.slf4j.Logger;
 
@@ -41,6 +48,7 @@ public class SoapSTSLifecycleImpl implements SoapSTSLifecycle {
     private final ScheduledExecutorService scheduledExecutorService;
     private final SoapSTSAgentConfigAccess soapSTSAgentConfigAccess;
     private final SoapSTSInstancePublisher soapSTSInstancePublisher;
+    private final OpenAMSessionTokenServerInterceptorProvider openAMSessionTokenServerInterceptorProvider;
     private ScheduledFuture<?> agentConfigAccessFuture;
     private volatile boolean configObtained;
     private final Logger logger;
@@ -49,19 +57,47 @@ public class SoapSTSLifecycleImpl implements SoapSTSLifecycle {
     SoapSTSLifecycleImpl(ScheduledExecutorService scheduledExecutorService,
                          SoapSTSAgentConfigAccess soapSTSAgentConfigAccess,
                          SoapSTSInstancePublisher soapSTSInstancePublisher,
+                         OpenAMSessionTokenServerInterceptorProvider openAMSessionTokenServerInterceptorProvider,
                          Logger logger) {
         this.scheduledExecutorService = scheduledExecutorService;
         this.soapSTSAgentConfigAccess = soapSTSAgentConfigAccess;
         this.soapSTSInstancePublisher = soapSTSInstancePublisher;
+        this.openAMSessionTokenServerInterceptorProvider = openAMSessionTokenServerInterceptorProvider;
         this.logger = logger;
     }
 
     @Override
     public void startup() {
+        registerCustomPolicyInterceptors();
         agentConfigAccessFuture =
                 scheduledExecutorService.scheduleAtFixedRate(
                         new AgentConfigAccessRunnable(), AGENT_CONFIG_POLL_INITIAL_WAIT, AGENT_CONFIG_POLL_INTERVAL, TimeUnit.SECONDS);
 
+    }
+
+    /*
+    This method will register the OpenAMSessionToken AssertionBuilder and InterceptorProvider instances with the cxf
+    Bus, so that any OpenAMSessionToken SecurityPolicy bindings in any of the published soap-sts instances can be
+    supported. Note that this registration is global to all soap-sts instances published in this realm, as the AssertionBuilderRegistry
+    and the PolicyInterceptorProviderRegistry are global to a cxf Bus, and thus to a cxf deployment. This does not cause
+    problems however, as the OpenAM session validation which is consumed as part of realizing this interceptor context
+    is specific only to a realm, and each soap-sts deployment is realm specific (as it corresponds to a soap-sts-agent,
+    which is also realm-specific.) Note, however, if we wanted to support OpenID Connect ID tokens, then a global
+    interceptor would have to be registered which would ultimately consult sts-instance-specific state corresponding to the
+    authN context which would validate this OIDC id token, and the key used to look-up this instance-specific
+    state from the global interceptor would be the last url constituent of the soap-sts invocation (including any realm
+    elements), as this is the soap-sts-instance identifier.
+     */
+    private void registerCustomPolicyInterceptors() {
+        final boolean createIfNecessary = false;
+        final Bus bus = BusFactory.getDefaultBus(createIfNecessary);
+        final PolicyInterceptorProviderRegistry policyInterceptorProviderRegistry =
+                bus.getExtension(PolicyInterceptorProviderRegistry.class);
+        policyInterceptorProviderRegistry.register(openAMSessionTokenServerInterceptorProvider);
+
+        AssertionBuilderRegistry assertionBuilderRegistry = bus.getExtension(AssertionBuilderRegistry.class);
+        assertionBuilderRegistry.registerBuilder(AMSTSConstants.AM_SESSION_TOKEN_ASSERTION_QNAME,
+                new OpenAMSessionTokenServerAssertionBuilder());
     }
 
     @Override

@@ -18,7 +18,6 @@ package org.forgerock.openam.sts.token;
 
 import javax.inject.Inject;
 import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.message.Message;

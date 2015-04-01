@@ -1874,11 +1874,6 @@
                 <artifactId>cxf-rt-ws-security</artifactId>
                 <version>${cxf.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.ws.security</groupId>
-                <artifactId>wss4j</artifactId>
-                <version>${wss4j.version}</version>
-            </dependency>
 
             <!-- Test dependency -->
             <dependency>

@@ -32,6 +32,7 @@ import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentCredentialsAccess;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentCredentialsAccessImpl;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSLifecycle;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSLifecycleImpl;
+import org.forgerock.openam.sts.soap.policy.am.OpenAMSessionTokenServerInterceptorProvider;
 import org.forgerock.openam.sts.soap.publish.PublishServiceConsumer;
 import org.forgerock.openam.sts.soap.publish.PublishServiceConsumerImpl;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
@@ -42,8 +43,12 @@ import org.forgerock.openam.sts.soap.publish.SoapSTSInstanceLifecycleManager;
 import org.forgerock.openam.sts.soap.publish.SoapSTSInstanceLifecycleManagerImpl;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
+import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
+import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
+import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
+import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +62,7 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Defines the guice bindings needed by the soap-sts 'framework' - i.e. the elements need to exposed published soap-sts
  * instances as web-services. Also defines bindings common to all soap-sts instances - i.e. version strings, and rest target
- * endpoints. It is a PrivateModule as the guice Injecotr created for each soap-sts instance will be a child of the Injector
+ * endpoints. It is a PrivateModule as the Tuice Injector created for each soap-sts instance will be a child of the Injector
  * created by this module, and only some of the global bindings should be exposed to the child Injector.
  */
 public class SoapSTSModule extends PrivateModule {
@@ -67,12 +72,14 @@ public class SoapSTSModule extends PrivateModule {
     file with @Named annotations corresponding to the keys - and the values defined below are used in the @Named annotations
     governing these bindings.
      */
-    public static final String OPENAM_HOME_SERVER_PROPERTY_KEY = "openam_home_server";
+    //Note that the PrincipalFromSessionImpl expects the OpenAM Server url to be bound under the AMSTSConstants.AM_DEPLOYMENT_URL.
+    //If the key in the config store changes, then this mismatch must be managed manually.
+    public static final String OPENAM_HOME_SERVER_PROPERTY_KEY = AMSTSConstants.AM_DEPLOYMENT_URL;
     public static final String AM_SESSION_COOKIE_NAME_PROPERTY_KEY = AMSTSConstants.AM_SESSION_COOKIE_NAME;
     public static final String SOAP_STS_AGENT_USERNAME_PROPERTY_KEY = "soap_sts_agent_username";
     public static final String SOAP_STS_AGENT_PASSWORD_PROPERTY_KEY = "soap_sts_agent_password";
     public static final String SOAP_STS_AGENT_ENCRYPTION_KEY_PROPERTY_KEY = "soap_sts_agent_encryption_key";
-    public static final String AGENT_REALM = "agent_realm";
+    public static final String AGENT_REALM = AMSTSConstants.REALM;
 
     @Override
     protected void configure() {
@@ -109,6 +116,23 @@ public class SoapSTSModule extends PrivateModule {
         SoapSTSModule.AM_SESSION_COOKIE_NAME_PROPERTY_KEY value.
          */
         expose(Key.get(String.class, Names.named(SoapSTSModule.AM_SESSION_COOKIE_NAME_PROPERTY_KEY)));
+
+        /*
+        Bind the InterceptorProvider which will provide the Interceptor instances to handle any soap-sts invocations
+        protected by the OpenAMSessionToken binding. Needed by the SoapSTSLifecycleImpl, to register the custom
+        OpenAMServerToken Interceptors with cxf.
+         */
+        bind(OpenAMSessionTokenServerInterceptorProvider.class);
+
+        /*
+        Bind the dependencies of the OpenAMSessionTokenServerInterceptorProvider - PrincipalFromSession and the
+        ThreadLocalTokenCache. Expose the ThreadLocalAMTokenCache, and PrincipalFromSession, as these classes will be
+        needed by the injectors corresponding to soap-sts instances.
+         */
+        bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class).in(Scopes.SINGLETON);
+        expose(ThreadLocalAMTokenCache.class);
+        bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class).in(Scopes.SINGLETON);
+        expose(PrincipalFromSession.class);
     }
 
     @Provides

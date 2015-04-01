@@ -33,6 +33,7 @@ import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
+import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.soap.token.provider.SoapSamlTokenProvider;
 import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapper;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
@@ -60,6 +61,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
     private final XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller;
     private final Provider<AMSessionInvalidator> amSessionInvalidatorProvider;
     private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
+    private final SoapSTSInstanceConfig soapSTSInstanceConfig;
     private final Logger logger;
 
     /**
@@ -79,6 +81,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
             XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller,
             Provider<AMSessionInvalidator> amSessionInvalidatorProvider,
             SoapSTSAccessTokenProvider soapSTSAccessTokenProvider,
+            SoapSTSInstanceConfig soapSTSInstanceConfig,
             Logger logger) {
         this.wssUsernameTokenValidatorProvider = wssUsernameTokenValidatorProvider;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
@@ -91,6 +94,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
         this.amSessionTokenXmlMarshaller = amSessionTokenXmlMarshaller;
         this.amSessionInvalidatorProvider = amSessionInvalidatorProvider;
         this.soapSTSAccessTokenProvider = soapSTSAccessTokenProvider;
+        this.soapSTSInstanceConfig = soapSTSInstanceConfig;
         this.logger = logger;
     }
     /**
@@ -166,12 +170,14 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
                 "getTokenProviderForTransformOperation. OutputTokenType: " + outputTokenType);
     }
 
-
+    /*
+    This method is called to constitute the ISSUE operation.
+     */
     public TokenProvider getTokenProviderForType(TokenType tokenType) throws STSInitializationException {
         if (TokenType.SAML2.equals(tokenType)) {
             return  SoapSamlTokenProvider.builder()
                     .tokenGenerationServiceConsumer(tokenGenerationServiceConsumer)
-                    .amSessionInvalidator(amSessionInvalidatorProvider.get())
+                    .amSessionInvalidator(getAMSessionInvalidator(tokenType))
                     .threadLocalAMTokenCache(threadLocalAMTokenCache)
                     .stsInstanceId(stsInstanceId)
                     .realm(realm)
@@ -186,6 +192,23 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
             throw new STSInitializationException(ResourceException.BAD_REQUEST,
                     "In TokenOperationFactory, unknown TokenType provided to obtain TokenProvider: "
                     + tokenType);
+        }
+    }
+
+    /*
+    Called to determine whether a non-null AMSessionInvalidator should be set in the SoapSamlTokenProvider. Will
+    examine the TokenTransformConfig associated with the ISSUE operation to make this determination. TODO.
+    For now, I will simply examine the wsdl file to see if it references an OpenAMSession SecurityPolicy.
+     */
+    private AMSessionInvalidator getAMSessionInvalidator(TokenType outputTokenType) throws STSInitializationException {
+        if (TokenType.SAML2.equals(outputTokenType)) {
+            return "sts_am.wsdl".equals(soapSTSInstanceConfig.getDeploymentConfig().getWsdlLocation()) ? null :
+                    amSessionInvalidatorProvider.get();
+        } else {
+            //we are only supporting issuing SAML tokens at this point.
+            throw new STSInitializationException(ResourceException.BAD_REQUEST,
+                    "In TokenOperationFactory, unknown TokenType provided to obtain TokenProvider: "
+                            + outputTokenType);
         }
     }
 

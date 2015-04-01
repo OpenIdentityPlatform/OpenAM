@@ -68,7 +68,7 @@ public class OpenAMSessionTokenMarshaller implements JsonMarshaller<OpenAMSessio
     }
 
     public OpenAMSessionToken fromXml(Element element) throws TokenMarshalException {
-        if (AMSTSConstants.AM_SESSION_ID_ELEMENT_NAMESPACE.equals(element.getNamespaceURI())) {
+        if (AMSTSConstants.AM_SESSION_TOKEN_ELEMENT_NAMESPACE.equals(element.getNamespaceURI())) {
             final String sessionId = element.getFirstChild().getTextContent();
             if ((sessionId == null) || sessionId.isEmpty()) {
                 throw new TokenMarshalException(ResourceException.BAD_REQUEST,
@@ -99,8 +99,8 @@ public class OpenAMSessionTokenMarshaller implements JsonMarshaller<OpenAMSessio
         } catch (ParserConfigurationException e) {
             throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
         }
-        Element rootElement = document.createElementNS(AMSTSConstants.AM_SESSION_ID_ELEMENT_NAMESPACE,
-                AMSTSConstants.AM_SESSION_ID_ELEMENT_NAME);
+        Element rootElement = document.createElementNS(AMSTSConstants.AM_SESSION_TOKEN_ELEMENT_NAMESPACE,
+                AMSTSConstants.AM_SESSION_TOKEN_ELEMENT_NAME);
         rootElement.setTextContent(sessionId);
         /*
         For custom tokens, the cxf.ws.security.trust.STSClient class expects to find a KeyIdentifier element

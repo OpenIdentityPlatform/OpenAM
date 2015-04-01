@@ -38,7 +38,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.validate.SignatureTrustValidator;
+import org.apache.ws.security.validate.NoOpValidator;
 import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
@@ -54,10 +54,9 @@ import org.forgerock.openam.sts.soap.token.config.TokenOperationFactory;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactoryImpl;
 import org.forgerock.openam.sts.soap.token.config.TokenValidateOperationProvider;
 import org.forgerock.openam.sts.soap.token.delegation.TokenDelegationHandlersProvider;
+import org.forgerock.openam.sts.soap.token.validator.wss.BinarySecurityTokenValidator;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
-import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
@@ -68,8 +67,6 @@ import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
-import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
-import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
@@ -107,7 +104,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
     }
 
     public void configure() {
-        bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class).in(Scopes.SINGLETON);
         bind(AMTokenParser.class).to(AMTokenParserImpl.class);
 
         //we want only one instance of the TokenStore shared among all token operations
@@ -136,7 +132,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
         bind(ValidateOperation.class).toProvider(TokenValidateOperationProvider.class);
         //TODO: don't bind renewal - probably won't renew tokens
 //        bind(RenewOperation.class).toProvider(TokenRenewOperationProvider.class);
-        bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class);
 
         //bind the class defining the core STS functionality - necessary for its dependencies to be injected
         bind(SecurityTokenServiceProvider.class).to(STSEndpoint.class);
@@ -208,7 +203,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Named(AMSTSConstants.STS_WEB_SERVICE_PROPERTIES)
     @Inject
     Map<String, Object> getProperties(Provider<UsernameTokenValidator> usernameTokenValidatorProvider,
-                                      Provider<SignatureTrustValidator> signatureTrustValidatorProvider,
                                       Logger logger) throws WSSecurityException {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.CALLBACK_HANDLER, new SoapSTSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
@@ -221,19 +215,29 @@ public class SoapSTSInstanceModule extends AbstractModule {
         properties.put("faultStackTraceEnabled", "true");
         properties.put("exceptionMessageCauseEnabled", "true");
 
-        /*
-        Plug-in the validator for Username Tokens and Certificate Tokens. These classes will be called to enforce SecurityPolicy bindings which specify
-          UsernameTokens and X509Certificates.
-          Removing the AMCertificateTokenValidator, as the AM Cert auth won't satisfy authenticating a user with a cert.
-          See https://docs.google.com/a/forgerock.com/document/d/1qo2T19ooyCqhEo9Zh1GJibVb2iBRzzBGFFsYF9FIBU8/edit?usp=sharing
-          for full details.
-          TODO: it should also be configurable, on an STS-by-STS basis, which token-validators are plugged-into the SecurityPolicy
-          enforcement - perhaps this should be determined by the SecurityPolicy binding associated with the STS deployment.
-         */
-        properties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, usernameTokenValidatorProvider.get());
-        properties.put(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR, signatureTrustValidatorProvider.get());
-
+        processSecurityPolicyTokenValidatorConfiguration(properties, usernameTokenValidatorProvider);
         return properties;
+    }
+
+    /*
+     This method will plug-in the set of TokenValidator for the SupportingTokens specified in the SecurityPolicy bindings
+     specified for this sts instance. These configurations are achieved by plugging-in object instances corresponding to
+     specific keys in the webServicesProperties map.
+     TODO: determine the specific set of validators to be plugged-in depending upon the security policy bindings, especially
+     in the context of a custom .wsdl file. Support for a custom .wsdl file seems to require explicit specification of the
+     SupportingToken type in the SecurityPolicy bindings. For now, just hard-code.
+     */
+    private void processSecurityPolicyTokenValidatorConfiguration(Map<String, Object> webServiceProperties,
+                                                                  Provider<UsernameTokenValidator> usernameTokenValidatorProvider) {
+        webServiceProperties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, usernameTokenValidatorProvider.get());
+        /*
+            Signed tokens, like x509 and SAML2 assertions, are validated, by default, by a SignatureTrustValidator, which
+            determines whether the singing party has trusted entry in the keystore. Because all authN is delegated to
+            OpenAM, the NoOpValidator will be plugged-in as the signature validator.
+         */
+        webServiceProperties.put(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR, new NoOpValidator());
+        //TODO: inject via a provider, once things understood/working.
+//        webServiceProperties.put(SecurityConstants.BST_TOKEN_VALIDATOR, new BinarySecurityTokenValidator());
     }
 
     private Properties getEncryptionProperties() {
@@ -293,14 +297,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
             Logger logger) {
         return new UsernameTokenValidator(logger, authenticationHandler);
 
-    }
-
-    /*
-    TODO: when to plug-in the SoapCertificateTokenValidator, which integrates x509 token authN into OpenAM?
-     */
-    @Provides
-    SignatureTrustValidator getSignatureTrustValidator() {
-        return new SignatureTrustValidator();
     }
 
     @Provides
@@ -407,7 +403,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
     }
 
     /*
-    Required by the TokenDelegationHandlersProvider.
+    Required by the TokenDelegationHandlersProvider, and by the TokenOperationFactoryImpl.
      */
     @Provides
     SoapSTSInstanceConfig getStsInstanceConfig() {

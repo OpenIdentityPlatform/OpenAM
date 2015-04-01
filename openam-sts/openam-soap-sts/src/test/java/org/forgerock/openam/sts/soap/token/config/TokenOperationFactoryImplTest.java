@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.soap.token.config;
 
+import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -37,6 +38,8 @@ import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
+import org.forgerock.openam.sts.soap.config.user.SoapDeploymentConfig;
+import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.soap.token.provider.SoapSamlTokenProvider;
 import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapper;
 import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapperImpl;
@@ -238,6 +241,16 @@ public class TokenOperationFactoryImplTest {
         @Singleton
         AMSTSConstants.STSType getSTSType() {
             return AMSTSConstants.STSType.REST;
+        }
+
+        @Provides
+        @Singleton
+        SoapSTSInstanceConfig getStsInstanceConfig() {
+            SoapSTSInstanceConfig mockInstanceConfig = mock(SoapSTSInstanceConfig.class);
+            SoapDeploymentConfig mockDeploymentConfig = mock(SoapDeploymentConfig.class);
+            when(mockInstanceConfig.getDeploymentConfig()).thenReturn(mockDeploymentConfig);
+            when(mockDeploymentConfig.getWsdlLocation()).thenReturn("am_ut.wsdl");
+            return mockInstanceConfig;
         }
     }
 

@@ -47,6 +47,15 @@ public class AMSTSConstants {
     public static final QName SYMMETRIC_ENDORSING_CERT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "symmetric_endorsing_cert_sts_service");
     public static final QName SYMMETRIC_ENDORSING_CERT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "symmetric_endorsing_cert_sts_service_port");
 
+    public static final QName SYMMETRIC_AM_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "symmetric_am_sts_service");
+    public static final QName SYMMETRIC_AM_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "symmetric_am_sts_service_port");
+    public static final QName ASYMMETRIC_AM_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "asymmetric_am_sts_service");
+    public static final QName ASYMMETRIC_AM_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "asymmetric_am_sts_service_port");
+    public static final QName TRANSPORT_AM_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "transport_am_sts_service");
+    public static final QName TRANSPORT_AM_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "transport_am_sts_service_port");
+    public static final QName UNPROTECTED_AM_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "unprotected_am_sts_service");
+    public static final QName UNPROTECTED_AM_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "unprotected_am_sts_service_port");
+
     /*
     These constants define some strings which are used to specify the type of STS instance to publish. This is
     a simple specification used only when consuming the STS-instance-publishing web-service in integration tests.
@@ -90,14 +99,28 @@ public class AMSTSConstants {
     public static final String AM_TOKEN_TYPE = "http://forgerock.org/token/type/OpenAM";
 
     /*
-    The name of the DOM Element and json field used to communicate a OpenAM session identifier in the SecurityToken
+    The name of the DOM Element and json field used to communicate a OpenAM session identifier in the SecurityToken.
+    This will also be used as the local name in the soap-sts wsdl files which define the Policy for an OpenAMSessionToken
+    SecurityPolicy.
      */
-    public static final String AM_SESSION_ID_ELEMENT_NAME="openamsessionid";
+    public static final String AM_SESSION_TOKEN_ELEMENT_NAME="OpenAMSessionToken";
 
     /*
-    The namespace of the DOM Element used to communicate a OpenAM session identifier in the SecurityToken
+    The namespace of the DOM Element used to communicate a OpenAM session identifier in the SecurityToken.
+    This will also be used as the namespace in the soap-sts wsdl files which define the Policy for an OpenAMSessionToken
+    SecurityPolicy.
      */
-    public static final String AM_SESSION_ID_ELEMENT_NAMESPACE="http://forgerock.org/token/type/OpenAM/openamsessionid";
+    public static final String AM_SESSION_TOKEN_ELEMENT_NAMESPACE="http://schemas.forgerock.org/ws/securitypolicy";
+
+    /*
+    QName of the OpenAMSessionToken - needed in the soap-sts to create custom Assertions and the corresponding PolicyInterceptors.
+     */
+    public static final QName AM_SESSION_TOKEN_ASSERTION_QNAME = new QName(AM_SESSION_TOKEN_ELEMENT_NAMESPACE, AM_SESSION_TOKEN_ELEMENT_NAME);
+
+    /*
+    ValueType in the BinarySecurityToken containing the OpenAMSessionToken
+     */
+    public static final String AM_SESSION_TOKEN_ASSERTION_BST_VALUE_TYPE = AM_SESSION_TOKEN_ELEMENT_NAMESPACE + "#" + AM_SESSION_TOKEN_ELEMENT_NAME;
 
     /*
     Used in conjunction with a @Named annotation to inject the realm string.
