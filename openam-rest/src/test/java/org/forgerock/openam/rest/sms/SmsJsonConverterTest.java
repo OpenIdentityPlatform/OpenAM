@@ -202,8 +202,7 @@ public class SmsJsonConverterTest {
         asserter.isObject().doubleAt(DECIMAL_VALUE_NAME)
                 .isEqualTo(DOUBLE_VALUE);
 
-        asserter.hasArray(ARRAY_VALUE_NAME).isArray().stringAt("0").isEqualTo(ARRAY_STRING_1);
-        asserter.hasArray(ARRAY_VALUE_NAME).isArray().stringAt("1").isEqualTo(ARRAY_STRING_2);
+        asserter.hasArray(ARRAY_VALUE_NAME).isArray().containsOnly(ARRAY_STRING_1, ARRAY_STRING_2);
 
         asserter.hasObject(MAP_VALUE_NAME)
                 .contains(Assertions.entry(ATT_1_NAME, ATT_1_VAL))
