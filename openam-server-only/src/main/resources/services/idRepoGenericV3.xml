@@ -24,6 +24,8 @@
    "Portions Copyrighted [year] [name of copyright owner]"
   
    $Id: idRepoGenericV3.xml,v 1.6 2009/10/27 05:39:38 hengming Exp $
+
+   Portions Copyrighted 2015 ForgeRock AS.
   
 -->
 
@@ -53,8 +55,8 @@
             <Value>@UM_CONFIG_ROOT_SUFFIX@</Value>
           </AttributeValuePair>
           <AttributeValuePair>
-            <Attribute name="sun-idrepo-ldapv3-config-ssl-enabled"/>
-            <Value>@UM_SSL@</Value>
+             <Attribute name="sun-idrepo-ldapv3-config-connection-mode"/>
+             <Value>@LDAP_CONNECTION_MODE@</Value>
           </AttributeValuePair>
           <AttributeValuePair>
              <Attribute name="sun-idrepo-ldapv3-config-psearchbase"/>
