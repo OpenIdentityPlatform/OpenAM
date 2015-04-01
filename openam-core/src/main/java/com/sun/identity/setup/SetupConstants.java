@@ -717,4 +717,19 @@ public interface SetupConstants {
      * Name of the config param file
      */
     static final String CONFIG_PARAM_FILE = "/.configParam";
+
+    /**
+     * LDAP connection mode tag used in amAuthAD/amAuthLDAP and idRepo service
+     */
+    static final String LDAP_CONNECTION_MODE_TAG = "LDAP_CONNECTION_MODE";
+
+    /**
+     * Plain LDAP to be used for LDAP connection mode in amAuthAD/amAuthLDAP and idRepo service
+     */
+    static final String LDAP_CONNECTION_MODE_LDAP = "LDAP";
+
+    /**
+     * SSL LDAP to be used for LDAP connection mode in amAuthAD/amAuthLDAP and idRepo service
+     */
+    static final String LDAP_CONNECTION_MODE_LDAPS = "LDAPS";
 }
