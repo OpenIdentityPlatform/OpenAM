@@ -20,6 +20,7 @@ import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
+import static org.forgerock.openam.utils.CollectionUtils.transformSet;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -35,6 +36,8 @@ import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.configuration.ResourceTypeSmsAttributes;
+import org.forgerock.openam.entitlement.configuration.SmsAttribute;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
@@ -45,6 +48,9 @@ import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.promise.Function;
+import org.forgerock.util.promise.NeverThrowsException;
+import org.forgerock.util.query.QueryFilter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -90,7 +96,9 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
         private boolean applicationNeedsResourceType = false;
         private boolean policiesNeedsResourceType = false;
         private String appName;
-        private ResourceType resourceType;
+        private String resourceTypeName;
+        private Set<String> actions;
+        private Set<String> patterns;
         private Set<String> policyNames;
     }
     private final Map<String, Set<ResourceTypeState>> resourceTypeStatePerRealm;
@@ -122,7 +130,6 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
         DEBUG.message("Initialising the upgrade step for adding resource types to the entitlement model");
         populateDefaultApplications();
 
-        final ServiceConfig appTypesConfig = getApplicationTypesConfig();
         final Set<String> realms = getRealmNamesFromParent();
 
         for (String realm : realms) {
@@ -139,7 +146,8 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
                 state.appName = appName;
                 if (applicationEligibleForUpgrade(realm, appName, appData)) {
                     state.applicationNeedsResourceType = true;
-                    state.resourceType = createResourceType(appTypesConfig, appData, appName, realm);
+                    state.actions = appData.get(CONFIG_ACTIONS);
+                    state.patterns = appData.get(CONFIG_RESOURCES);
                     upgradeableApplicationCount += 1;
                 }
                 state.policyNames = policiesEligibleForUpgrade(appName, realm);
@@ -174,8 +182,9 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
 
             for (ResourceTypeState state : entry.getValue()) {
                 if (state.applicationNeedsResourceType) {
-                    saveResourceType(state.resourceType);
-                    upgradeApplication(ec, state.appName, state.resourceType.getUUID());
+                    ResourceType resourceType = createResourceType(state.actions, state.patterns, state.appName, realm);
+                    state.resourceTypeName = resourceType.getName();
+                    upgradeApplication(ec, state.appName, resourceType.getUUID());
                 }
 
                 if (state.policiesNeedsResourceType) {
@@ -242,40 +251,57 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
     }
 
     /**
-     * Create the resource type for the given application. The
-     * @param appTypesConfig The global application type configuration.
-     * @param appData The application date from which the resource type data will be derived.
+     * Create the resource type for the given application if a suitable resource type does not already exist.
+     * @param actions The actions that are currently associated with the application.
+     * @param patterns The resources that are currently associated with the application.
      * @param appName The name of the application with which the resource type is associated.
      * @param realm The realm in which the application and resource type resides.
      * @return The resource type if it could be created or {@code null} if it could not.
      * @throws UpgradeException If the application types could not be read.
      */
-    private ResourceType createResourceType(ServiceConfig appTypesConfig, Map<String, Set<String>> appData,
-                                            String appName, String realm) throws UpgradeException {
+    private ResourceType createResourceType(Set<String> actions, Set<String> patterns, String appName, String realm)
+            throws UpgradeException {
 
-        final ServiceConfig appTypeConfig;
+        final Set<QueryFilter<SmsAttribute>> actionFilters = transformSet(actions,
+                new Function<String, QueryFilter<SmsAttribute>, NeverThrowsException>() {
+
+            @Override
+            public QueryFilter<SmsAttribute> apply (String value){
+                return QueryFilter.equalTo(ResourceTypeSmsAttributes.ACTIONS, value);
+            }
+        });
+        final Set<QueryFilter<SmsAttribute>> patternFilters = transformSet(patterns,
+                new Function<String, QueryFilter<SmsAttribute>, NeverThrowsException>() {
+
+            @Override
+            public QueryFilter<SmsAttribute> apply (String value){
+                return QueryFilter.equalTo(ResourceTypeSmsAttributes.PATTERNS, value);
+            }
+        });
+
+        final Set<ResourceType> resourceTypes;
         try {
-            appTypeConfig = appTypesConfig.getSubConfig(getAttribute(appData, APPLICATION_TYPE));
-        } catch (SSOException e) {
-            throw new UpgradeException("Failed to retrieve application types for " + appName, e);
-        } catch (SMSException e) {
-            throw new UpgradeException("Failed to retrieve application types " + appName, e);
+            resourceTypes = resourceTypeService.getResourceTypes(
+                    QueryFilter.and(QueryFilter.and(actionFilters), QueryFilter.and(patternFilters)),
+                    getAdminSubject(), realm);
+        } catch (EntitlementException e) {
+            throw new UpgradeException("Failed to retrieve resource type for " + appName, e);
         }
 
-        if (appTypeConfig == null) {
-            return null;
+        if (!resourceTypes.isEmpty()) {
+            // Some matching resource types have been found, return the first one.
+            return resourceTypes.iterator().next();
         }
-        final Map<String, Set<String>> appTypeData = appTypeConfig.getAttributes();
-        final Map<String, Boolean> actionsToAdd = new HashMap<String, Boolean>();
-        actionsToAdd.putAll(getActions(appData));
-        actionsToAdd.putAll(getActions(appTypeData));
-        final Set<String> patterns = appData.get(CONFIG_RESOURCES);
-        return ResourceType.builder(appName + RESOURCES_TYPE_NAME_SUFFIX, realm)
-                .addActions(actionsToAdd)
+
+        ResourceType resourceType = ResourceType.builder(appName + RESOURCES_TYPE_NAME_SUFFIX, realm)
+                .addActions(getActions(actions))
                 .addPatterns(patterns)
                 .setDescription(RESOURCE_TYPE_DESCRIPTION + appName)
                 .generateUUID()
                 .build();
+        saveResourceType(resourceType);
+
+        return resourceType;
     }
 
     /**
@@ -388,16 +414,6 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
         }
     }
 
-    private ServiceConfig getApplicationTypesConfig() throws UpgradeException {
-        try {
-            return configManager.getGlobalConfig(null).getSubConfig(APPLICATION_TYPES);
-        } catch (SSOException e) {
-            throw new UpgradeException("Failed to retrieve global application types", e);
-        } catch (SMSException e) {
-            throw new UpgradeException("Failed to retrieve global application types", e);
-        }
-    }
-
     /**
      * The parent method is final and can't be mocked out for testing, which is why this one was introduced.
      * @return The set of realm names available in OpenAM.
@@ -450,7 +466,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
                 policyBuilder.append(INDENT).append(realmName).append(": ").append(entry.getKey()).append(delimiter);
                 for (ResourceTypeState state : entry.getValue()) {
                     if (state.applicationNeedsResourceType) {
-                        resourceTypeBuilder.append(INDENT).append(INDENT).append(state.resourceType.getName())
+                        resourceTypeBuilder.append(INDENT).append(INDENT).append(state.resourceTypeName)
                                 .append(delimiter);
                         appsBuilder.append(INDENT).append(INDENT).append(state.appName).append(delimiter);
                     }
