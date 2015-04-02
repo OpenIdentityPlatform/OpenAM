@@ -35,7 +35,7 @@ define([
     "./util/BackgridUtils",
     "./util/URLHelper",
 
-    "./models/Script",
+    "./models/ScriptModel",
     "./views/ScriptListView",
     "./views/EditScriptView"
 ]);

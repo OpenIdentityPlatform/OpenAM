@@ -26,7 +26,7 @@
 
 define("org/forgerock/openam/ui/editor/views/EditScriptView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/editor/models/Script",
+    "org/forgerock/openam/ui/editor/models/ScriptModel",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager"
 ], function (AbstractView, Script, Constants, EventManager) {
@@ -155,7 +155,7 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             if (syncRequired && uuid) {
                 // edit existing script
                 this.stopListening(this.model);
-                this.model = new Script( { uuid: uuid} );
+                this.model = new Script( { _id: uuid} );
                 this.listenTo(this.model, 'sync', this.onModelSync);
                 this.listenTo(this.model, 'error', this.onModelError);
                 this.model.fetch();

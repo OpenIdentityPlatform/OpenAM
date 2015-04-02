@@ -32,8 +32,9 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Router",
     "backgrid",
-    "org/forgerock/openam/ui/editor/util/BackgridUtils"
-], function (AbstractView, conf, eventManager, uiUtils, constants, router, Backgrid, BackgridUtils) {
+    "org/forgerock/openam/ui/editor/util/BackgridUtils",
+    "org/forgerock/openam/ui/editor/models/ScriptModel"
+], function (AbstractView, conf, eventManager, uiUtils, constants, router, Backgrid, BackgridUtils, Script) {
 
     var ScriptListView = AbstractView.extend({
         template: "templates/editor/views/ScriptListTemplate.html",
@@ -50,6 +51,7 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
 
             Scripts = Backbone.PageableCollection.extend({
                 url: "/" + constants.context + "/json" + realm + "/scripts",
+                model: Script,
                 queryParams: {
                     _queryFilter: BackgridUtils.queryFilter,
                     pageSize: null,  // todo implement pagination
@@ -72,7 +74,7 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
                     cell: BackgridUtils.UriExtCell,
                     headerCell: BackgridUtils.FilterHeaderCell,
                     href: function (rawValue, formattedValue, model) {
-                        return "#edit/" + model.get('uuid');
+                        return "#edit/" + model.get('_id');
                     },
                     editable: false
                 },
