@@ -24,9 +24,7 @@
 
    $Id: Version.jsp,v 1.1 2009/08/05 20:15:51 veiming Exp $
 
---%>
-<%--
-   Portions Copyrighted 2011 ForgeRock AS
+   Portions Copyrighted 2011-2015 ForgeRock AS.
 --%>
 
 <%@ page language="java" %>
@@ -82,7 +80,7 @@
 <title><%=windowTitle %></title>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="Copyright" content="Copyright &copy; 2010-2012 by ForgeRock, Inc. All Rights Reserved.">
+  <meta name="Copyright" content="Copyright &copy; 2010-2015, ForgeRock AS. All Rights Reserved.">
   <cc:stylesheet />
 </head>
 

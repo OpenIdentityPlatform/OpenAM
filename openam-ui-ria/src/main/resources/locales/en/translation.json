@@ -216,7 +216,7 @@
             "submit" : "Submit",
             "actions" : "Actions",
             "complete" : "Complete",
-            "copyright" : "Copyright &copy; 2010-14 ForgeRock AS, all rights reserved.",
+            "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
             "deleteSelected" : "Delete Selected",
