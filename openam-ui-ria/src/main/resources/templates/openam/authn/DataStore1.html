@@ -41,7 +41,6 @@
 
             {{#if socialImplementations}}
                 <div class="authn">
-                    <div class="authn-border"></div>
                     <span class="authn-header">or login with:</span>
                     {{#each socialImplementations}}
                         <a href="#login/{{../../auth.subRealm}}&service={{authnChain}}" title="{{displayName}}" ><span><img src="{{iconPath}}" /></span></a>

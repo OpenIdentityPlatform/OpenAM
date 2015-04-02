@@ -27,6 +27,7 @@
 define([
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/policy/login/LoginHelper",
@@ -46,7 +47,7 @@ define([
     "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypePatternsView",
     "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypeActionsView",
     "org/forgerock/openam/ui/policy/resourcetypes/ManageResourceTypesView"
-], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolicyView, manageAppsView, policyListView, actionsView, ResponseAttrsStaticView, responseAttrsUserView, policyResourcesView, createdResourcesView,
+], function (eventManager, constants, RealmHelper, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolicyView, manageAppsView, policyListView, actionsView, ResponseAttrsStaticView, responseAttrsUserView, policyResourcesView, createdResourcesView,
              StripedList, editResourceTypeView, resTypePatternsView, resTypeActionsView, manageResTypesView) {
     return {
         executeAll: function (server) {

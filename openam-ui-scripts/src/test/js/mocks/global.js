@@ -37,12 +37,14 @@ define([
     "text!css/backgrid/backgrid.min.less",
     "text!css/backgrid/backgrid-paginator.min.css",
     "text!css/backgrid/backgrid-filter.min.css",
-    "text!css/common/variables.less",
+    "text!css/common/forgerock-variables.less",
     "text!css/common/common.less",
     "text!css/editor/main.less",
     "text!templates/common/DefaultBaseTemplate.html",
     "text!templates/common/NavigationTemplate.html",
-    "text!templates/common/FooterTemplate.html"
+    "text!templates/common/FooterTemplate.html",
+    "text!templates/common/LoginBaseTemplate.html",
+    "text!templates/common/404.html"
 ], function () {
 
     /* an unfortunate need to duplicate the file names here, but I haven't
@@ -61,12 +63,14 @@ define([
             "css/backgrid/backgrid.min.less",
             "css/backgrid/backgrid-paginator.min.css",
             "css/backgrid/backgrid-filter.min.css",
-            "css/common/variables.less",
+            "css/common/forgerock-variables.less",
             "css/common/common.less",
             "css/editor/main.less",
             "templates/common/DefaultBaseTemplate.html",
             "templates/common/NavigationTemplate.html",
-            "templates/common/FooterTemplate.html"
+            "templates/common/FooterTemplate.html",
+            "templates/common/LoginBaseTemplate.html",
+            "templates/common/404.html"
         ],
         deps = arguments;
 
