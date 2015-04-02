@@ -24,9 +24,7 @@
 
    $Id: PWResetQuestion.jsp,v 1.5 2008/08/28 06:41:11 mahesh_prasad_r Exp $
 
---%>
-<%--
-   Portions Copyrighted 2011-2013 ForgeRock AS
+   Portions Copyrighted 2011-2015 ForgeRock AS.
    Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -118,7 +116,7 @@
         </div>
         <div class="footer alt-color">
             <div class="grid_6 suffix_3">
-                <p>Copyright &copy; 2008-2013, ForgeRock AS. <br/>All Rights Reserved. Use of this software is subject to the
+                <p>Copyright &copy; 2008-2015, ForgeRock AS. <br/>All Rights Reserved. Use of this software is subject to the
                     terms and conditions of the ForgeRock&trade; License and Subscription Agreement.</p>
             </div>
         </div>

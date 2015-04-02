@@ -233,7 +233,7 @@
             "done" : "Done",
             "ok" : "OK",
             "working" : "Working...",
-            "copyright" : "Copyright &copy; 2010-15 ForgeRock AS, all rights reserved.",
+            "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
             "deleteSelected" : "Delete Selected",
