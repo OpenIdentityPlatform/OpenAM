@@ -40,7 +40,9 @@ define("org/forgerock/openam/ui/dashboard/OAuthTokensView", [
                 OAuthTokensDelegate.getOAuthTokens()
                     .then(function (data) {
                             self.data.tokens = data.result;
-                            self.parentRender();
+                            self.parentRender(function(){
+                                self.$el.find('[data-toggle="tooltip"]').tooltip();    
+                            });
                     });
             },
 

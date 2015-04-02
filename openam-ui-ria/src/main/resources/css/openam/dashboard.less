@@ -16,41 +16,6 @@
  */
 
 
- #dashboard > div {
-     margin-bottom: 40px;
- }
-
- #trustedDevices, #oAuthTokens {
-
-     table {
-         border-collapse: collapse;
-         width:100%;
-     }
-
-     table, th {
-         border: 1px solid #ccc;
-         padding: 10px 0;
-     }
-
-     th {
-         background-color:#ddd;
-         &:last-child{  width:120px;  }
-     }
-
-     td {
-         border-left: 1px solid #ccc;
-         padding: 10px;
-         &:last-child{ text-align:center; }
-     }
-
-     tr {
-         &:nth-child(odd){  background-color:#eee; }
-         &:nth-child(even){ background-color:#fff; }
-         &:hover{ background-color:#ffe; }
-     }
-
- }
-
 .authn {
     width: 100%;
     display: table;
@@ -62,12 +27,37 @@
     }
 
     img {
-        width: 45px;
-        height: 41px;
+        width: 50px;
+        height: 50px;
     }
 
     .authn-header {
         width: 100%;
         padding: 0 0 15px 0;
+    }
+}
+
+
+.collapse-title {
+    font-size: 18px;
+    letter-spacing: 0px;
+}
+
+
+
+.panel-body {
+    padding: 5px 20px;    
+}
+
+.table {
+    border-bottom: 1px solid #ddd;
+}
+
+a .appImage {
+    padding-right:5px;
+    
+    img {
+        width: 50px;
+        height: 50px;
     }
 }

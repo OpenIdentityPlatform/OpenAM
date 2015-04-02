@@ -40,7 +40,9 @@ define("org/forgerock/openam/ui/dashboard/TrustedDevicesView", [
             TrustedDevicesDelegate.getTrustedDevices()
                 .then(function (data) {
                     self.data.devices = data.result;
-                    self.parentRender();
+                    self.parentRender(function() {
+                        self.$el.find('[data-toggle="tooltip"]').tooltip();    
+                    });
                 });
         },
 
