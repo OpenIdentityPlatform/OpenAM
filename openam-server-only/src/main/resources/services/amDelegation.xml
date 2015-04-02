@@ -405,6 +405,26 @@
                             <Value>MODIFY</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
+                    <SubConfiguration name="ResourceTypeResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/resourcetypes/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ResourceTypeResourceModify" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/resourcetypes/modify</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
                     <SubConfiguration name="ApplicationTypesResourceRead" id="Permission">
                         <AttributeValuePair>
                             <Attribute name="resource" />
@@ -529,6 +549,8 @@
                             <Value>ReferralsResourceModify</Value>
                             <Value>ApplicationResourceRead</Value>
                             <Value>ApplicationResourceModify</Value>
+                            <Value>ResourceTypeResourceRead</Value>
+                            <Value>ResourceTypeResourceModify</Value>
                             <Value>ApplicationTypesResourceRead</Value>
                             <Value>SubjectTypesResourceRead</Value>
                             <Value>ConditionTypesResourceRead</Value>
@@ -586,6 +608,18 @@
                         <AttributeValuePair>
                             <Attribute name="listOfPermissions" />
                             <Value>ApplicationResourceModify</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ResourceTypeReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ResourceTypeResourceRead</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ResourceTypeModifyAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ResourceTypeResourceModify</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="ApplicationTypesReadAccess" id="Privilege">
