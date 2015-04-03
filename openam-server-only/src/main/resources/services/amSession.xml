@@ -247,6 +247,47 @@
                         <Value>test</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-enable-session-blacklisting"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a129">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-blacklist-cache-size"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="0"
+                                 rangeEnd="2147483647"
+                                 i18nKey="a130">
+                    <DefaultValues>
+                        <Value>10000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-blacklist-poll-interval"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="0"
+                                 rangeEnd="2147483647"
+                                 i18nKey="a131">
+                    <DefaultValues>
+                        <Value>60</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-session-stateless-blacklist-purge-delay"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="0" rangeEnd="2147483647"
+                                 i18nKey="a132">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="Site" inheritance="multiple" i18nKey="site" resourceName="site">
                     <AttributeSchema name="iplanet-am-session-sfo-enabled"
                                      type="single"

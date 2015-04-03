@@ -224,6 +224,14 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-tokens</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-bloomfilter-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-bloomfilter-monitoring</artifactId>
+        </dependency>
 
         <!-- LDAP APIs -->
         <dependency>

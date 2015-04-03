@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -89,6 +89,7 @@ import org.forgerock.openam.monitoring.session.FORGEROCK_OPENAM_SESSION_MIB;
 import org.forgerock.openam.monitoring.session.FORGEROCK_OPENAM_SESSION_MIBImpl;
 import org.forgerock.openam.monitoring.session.InternalSessions;
 import org.forgerock.openam.monitoring.session.RemoteSessions;
+import org.forgerock.openam.monitoring.session.StatelessSessions;
 
 
 /**
@@ -1072,6 +1073,10 @@ public class Agent {
 
     public static RemoteSessions getRemoteSessionsMBean() {
         return forgerockSessionMib == null ? null : forgerockSessionMib.getRemoteSessions();
+    }
+
+    public static StatelessSessions getStatelessSessionsMBean() {
+        return  forgerockSessionMib == null ? null : forgerockSessionMib.getStatelessSessions();
     }
 
     /**

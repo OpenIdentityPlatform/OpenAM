@@ -349,6 +349,19 @@ public final class SSOProviderImpl implements SSOProvider {
         }
     }
 
+    @Override
+    public void logout(final SSOToken token) throws SSOException {
+        try {
+            Session session = sessionCache.getSession(new SessionID(token.getTokenID().toString()));
+            session.logout();
+        } catch (SessionException e) {
+            if (debug.messageEnabled()) {
+                debug.message("Logout: ", e);
+            }
+            throw new SSOException(e);
+        }
+    }
+
     /**
      * Validate the IP address of the client with the IP stored in Session.
      *

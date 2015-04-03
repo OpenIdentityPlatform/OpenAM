@@ -25,6 +25,7 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
+import org.forgerock.util.Reject;
 
 /**
  * The <code>StatelessSession</code> class represents a stateless session. It is a simple overridden version of
@@ -33,10 +34,14 @@ import com.iplanet.dpro.session.share.SessionInfo;
 public class StatelessSession extends Session {
     public static final String RESTRICTED_TOKENS_UNSUPPORTED = SessionBundle.getString("restrictedTokensUnsupported");
 
+    private final String stableId;
+
     public StatelessSession(SessionID sid, SessionInfo sessionInfo) throws SessionException {
         super(sid);
         this.sessionIsLocal = false;
         update(sessionInfo);
+        Reject.ifNull(sessionInfo.getSecret());
+        this.stableId = sessionInfo.getSecret();
     }
 
     @Override
@@ -54,4 +59,8 @@ public class StatelessSession extends Session {
         throw new UnsupportedOperationException(RESTRICTED_TOKENS_UNSUPPORTED);
     }
 
+    @Override
+    public String getStableStorageID() {
+        return stableId;
+    }
 }

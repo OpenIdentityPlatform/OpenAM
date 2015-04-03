@@ -29,6 +29,8 @@
 
 package com.iplanet.dpro.session;
 
+import static org.forgerock.openam.session.SessionConstants.*;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.ThreadPoolException;
 import com.iplanet.dpro.session.operations.RemoteSessionOperationStrategy;
@@ -72,9 +74,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.forgerock.openam.session.SessionConstants.*;
 
 /**
  * The <code>Session</code> class represents a session. It contains session
@@ -590,6 +591,18 @@ public class Session extends GeneralTaskRunnable {
             refresh(false);
         }
         return sessionTimeLeft;
+    }
+
+    /**
+     * The time (in milliseconds from the UTC epoch) until this session can be removed from a session blacklist. This
+     * is guaranteed to be some time after the session has expired.
+     *
+     * @param purgeDelayMs the additional delay (in milliseconds) before purging the session.
+     * @return the at which the session expires (if it has not already) plus the purge delay.
+     * @throws SessionException if the session has already expired or an error occurs.
+     */
+    public long getBlacklistExpiryTime(long purgeDelayMs) throws SessionException {
+        return TimeUnit.SECONDS.toMillis(getTimeLeft()) + purgeDelayMs + System.currentTimeMillis();
     }
 
     /**
@@ -1142,8 +1155,8 @@ public class Session extends GeneralTaskRunnable {
         try {
             if (sessionDebug.messageEnabled()) {
                 sessionDebug.message("Session."
-                    + "processSessionResponseException: exception received"
-                    + " from server:"+sres.getException());
+                        + "processSessionResponseException: exception received"
+                        + " from server:" + sres.getException());
             }
             // Check if this exception was thrown due to Session Time out or not
             // If yes then set the private variable timedOutAt to the current
@@ -1309,6 +1322,15 @@ public class Session extends GeneralTaskRunnable {
 
     Object getContext() {
         return context;
+    }
+
+    /**
+     * Returns a stable ID that can be used as a unique identifier when storing this session.
+     *
+     * @return a unique stable storage id.
+     */
+    public String getStableStorageID() {
+        return sessionID.getExtension(SessionID.STORAGE_KEY);
     }
 
 }

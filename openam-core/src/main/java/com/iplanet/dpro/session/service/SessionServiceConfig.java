@@ -29,6 +29,7 @@
 
 package com.iplanet.dpro.session.service;
 
+import static com.iplanet.dpro.session.service.SessionConstants.*;
 import static com.sun.identity.shared.Constants.*;
 import static org.forgerock.openam.cts.api.CoreTokenConstants.*;
 
@@ -172,6 +173,12 @@ public class SessionServiceConfig {
         private final int maxSessionListSize;
         private final int maxWaitTimeForConstraint; // in milli-seconds
 
+        private final boolean sessionBlacklistEnabled;
+        private final int sessionBlacklistCacheSize;
+        private final long sessionBlacklistPollIntervalSeconds;
+        private final long sessionBlacklistPurgeDelayMinutes;
+
+
         private HotSwappableSessionServiceConfig(ServiceSchemaManager ssm) throws SMSException {
             ServiceSchema schema = ssm.getGlobalSchema();
             Map attrs = schema.getAttributeDefaults();
@@ -187,6 +194,14 @@ public class SessionServiceConfig {
             denyLoginIfDBIsDown = loadDenyLoginIfDBIsDownServiceSchemaSetting(attrs);
             constraintHandler = loadConstraintHandlerServiceSchemaSetting(attrs);
             maxWaitTimeForConstraint = loadMaxWaitTimeForConstraintHandlerServiceSchemaSetting(attrs);
+
+            sessionBlacklistEnabled = CollectionHelper.getBooleanMapAttr(attrs, SESSION_BLACKLIST_ENABLED_ATTR, false);
+            sessionBlacklistCacheSize = CollectionHelper.getIntMapAttr(attrs, SESSION_BLACKLIST_CACHE_SIZE_ATTR, 0,
+                    sessionDebug);
+            sessionBlacklistPollIntervalSeconds = CollectionHelper.getLongMapAttr(attrs,
+                    SESSION_BLACKLIST_POLL_INTERVAL_ATTR, 60, sessionDebug);
+            sessionBlacklistPurgeDelayMinutes = CollectionHelper.getLongMapAttr(attrs,
+                    SESSION_BLACKLIST_PURGE_DELAY_ATTR, 1, sessionDebug);
         }
 
         public boolean isSendPropertyNotification(String key) {
@@ -694,6 +709,43 @@ public class SessionServiceConfig {
      */
     public long getSessionFailoverClusterStateCheckPeriod() {
         return sessionFailoverClusterStateCheckPeriod;
+    }
+
+    /**
+     * Whether session blacklisting is enabled for stateless session logout.
+     *
+     * Defaults to false.
+     */
+    public boolean isSessionBlacklistingEnabled() {
+        return hotSwappableSessionServiceConfig.sessionBlacklistEnabled;
+    }
+
+    /**
+     * Maximum number of blacklisted sessions to cache in memory on each server. Beyond this number, sessions will be
+     * evicted from memory (but kept in the CTS) in a least-recently used (LRU) strategy.
+     *
+     * Defaults to 10000.
+     */
+    public int getSessionBlacklistCacheSize() {
+        return hotSwappableSessionServiceConfig.sessionBlacklistCacheSize;
+    }
+
+    /**
+     * The interval at which to poll for changes to the session blacklist. May be 0 to indicate polling is disabled.
+     *
+     * @param unit the desired time unit for the poll interval.
+     */
+    public long getSessionBlacklistPollInterval(TimeUnit unit) {
+        return unit.convert(hotSwappableSessionServiceConfig.sessionBlacklistPollIntervalSeconds, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Amount of time to keep sessions in the blacklist beyond their expiry time to account for clock skew.
+     *
+     * @param unit the desired time unit for the purge delay.
+     */
+    public long getSessionBlacklistPurgeDelay(TimeUnit unit) {
+        return unit.convert(hotSwappableSessionServiceConfig.sessionBlacklistPurgeDelayMinutes, TimeUnit.MINUTES);
     }
 
     /**

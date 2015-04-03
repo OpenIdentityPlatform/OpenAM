@@ -11,29 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
-
-package org.forgerock.openam.tokens;
 
 /**
- * Responsible for defining the available token types in the Core Token Service.
- *
- * If new tokens are added, this enum must be updated via APPENDING to the end of the enum list.
- *
- * Existing operations MUST STAY in the order they are defined. This is validated by TokenTypeTest.
+ * Implementation of session blacklisting for logging out stateless (client-side) sessions.
  */
-public enum TokenType {
-
-    SESSION,
-    SAML2,
-    OAUTH,
-    REST,
-    GENERIC,
-    RESOURCE_SET,
-    PERMISSION_TICKET,
-    REQUESTING_PARTY,
-    UMA_AUDIT_ENTRY,
-    SESSION_BLACKLIST
-
-}
+package org.forgerock.openam.session.blacklist;

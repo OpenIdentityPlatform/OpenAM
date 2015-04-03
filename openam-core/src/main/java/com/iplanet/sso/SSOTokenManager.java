@@ -564,6 +564,17 @@ public class SSOTokenManager {
     }
 
     /**
+     * Logs out of any OpenAM session associated with the token without destroying the token itself.
+     *
+     * @param token the token to log out.
+     * @throws SSOException if an error occurs.
+     * @since 13.0.0
+     */
+    public void logout(SSOToken token) throws SSOException {
+        getProvider(token).logout(token);
+    }
+
+    /**
      * Helper function to ensure that JWT based checks are only applied in server mode.
      * @param object Non null HttpServletRequest, SessionID or TokenID in String format.
      * @return True if the object contained a JWT.

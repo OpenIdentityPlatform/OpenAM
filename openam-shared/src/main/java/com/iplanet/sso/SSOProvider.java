@@ -24,7 +24,7 @@
  *
  * $Id: SSOProvider.java,v 1.2 2008/06/25 05:41:42 qcheng Exp $
  *
- * Portions copyright 2014 ForgeRock AS.
+ * Portions copyright 2014-2015 ForgeRock AS.
  */
 
 package com.iplanet.sso;
@@ -165,6 +165,14 @@ public interface SSOProvider {
      */
     public void destroyToken(SSOToken destroyer, SSOToken destroyed)
             throws SSOException;
+
+    /**
+     * Logs out of the session underlying this SSOToken.
+     *
+     * @param token the sso token to log out.
+     * @throws SSOException if an error occurs during logout.
+     */
+    public void logout(SSOToken token) throws SSOException;
 
     /**
      * Returns valid Sessions.

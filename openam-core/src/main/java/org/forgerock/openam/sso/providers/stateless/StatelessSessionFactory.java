@@ -22,11 +22,8 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionServiceConfig;
-import com.iplanet.dpro.session.share.SessionEncodeURL;
 import com.iplanet.dpro.session.share.SessionInfo;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.CookieUtils;
 import org.forgerock.openam.session.stateless.cache.StatelessJWTCache;
 import org.forgerock.openam.utils.StringUtils;
 
@@ -44,7 +41,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class StatelessSessionFactory {
 
-    private static final String cookieName = CookieUtils.getAmCookieName();
     private static final Debug debug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
     // Injected
@@ -78,8 +74,7 @@ public class StatelessSessionFactory {
      * @throws SessionException If there was any expected error.
      */
     public boolean containsJwt(HttpServletRequest request) throws SessionException {
-        String tokenId = tokenIdFromRequest(request);
-        return isValidJwt(tokenId);
+        return containsJwt(new SessionID(request));
     }
 
     /**
@@ -89,7 +84,7 @@ public class StatelessSessionFactory {
      * @return {@code true} if the token contains a client-side session JWT.
      */
     public boolean containsJwt(String tokenId) {
-        return isValidJwt(tokenId);
+        return containsJwt(new SessionID(tokenId));
     }
 
     /**
@@ -113,9 +108,7 @@ public class StatelessSessionFactory {
      * @throws SessionException
      */
     public StatelessSession generate(String tokenId) throws SessionException {
-        final SessionID sessionID = new SessionID(tokenId);
-        SessionInfo sessionInfo = getSessionInfo(sessionID);
-        return new StatelessSession(sessionID, sessionInfo);
+        return generate(new SessionID(tokenId));
     }
 
     /**
@@ -166,9 +159,6 @@ public class StatelessSessionFactory {
     public StatelessSession generate(InternalSession internalSession) throws SessionException {
         SessionInfo sessionInfo = internalSession.toSessionInfo(false);
 
-        sessionInfo.setSessionID(null);
-        sessionInfo.setSecret(java.util.UUID.randomUUID().toString());
-
         sessionInfo.getProperties().put(
                 org.forgerock.openam.session.SessionConstants.SESSION_HANDLE_PROP,
                 internalSession.getSessionHandle());
@@ -182,7 +172,8 @@ public class StatelessSessionFactory {
      * @throws SessionException If anything unexpected failed.
      */
     public StatelessSession generate(SessionID sessionID) throws SessionException {
-        return generate(sessionID.toString());
+        SessionInfo sessionInfo = getSessionInfo(sessionID);
+        return new StatelessSession(sessionID, sessionInfo);
     }
 
     /**
@@ -217,53 +208,6 @@ public class StatelessSessionFactory {
             debug.message("Failed to validate JWT {0}", tokenId, e);
             return false;
         }
-    }
-
-    /**
-     * Extracts the TokenID from a HttpServletRequest.
-     *
-     * Note: The following logic was taken from SessionID ctor taking HttpServletRequest (line 117)
-     *
-     * @param request Non null.
-     * @return TokenID if the Cookie Name is defined in system properties, and either the
-     * request is a forward request or simply contains the appropriate cookie.
-     */
-    private static String tokenIdFromRequest(HttpServletRequest request) {
-        String cookieValue;
-        String tokenId = null;
-
-        if (cookieName != null) {
-            // check if this is a forward from authentication service case.
-            // if yes, find Session ID in the request URL first, otherwise
-            // find Session ID in the cookie first
-            String isForward = (String) request.getAttribute(Constants.FORWARD_PARAM);
-            debug.message("SessionID(HttpServletRequest) : is forward = {0}", isForward);
-            if ((isForward != null) && isForward.equals(Constants.FORWARD_YES_VALUE)) {
-                String realReqSid = SessionEncodeURL.getSidFromURL(request);
-                if (realReqSid != null) {
-                    tokenId = realReqSid;
-                } else {
-                    cookieValue = CookieUtils.getCookieValueFromReq(request, cookieName);
-                    if (cookieValue != null) {
-                        tokenId = cookieValue;
-                    }
-                }
-            } else {
-                cookieValue = CookieUtils.getCookieValueFromReq(request, cookieName);
-
-                // if no cookie found in the request then check if the URL has it.
-                if (cookieValue == null) {
-                    String realReqSid = SessionEncodeURL.getSidFromURL(request);
-                    if (realReqSid != null) {
-                        tokenId = realReqSid;
-                    }
-                } else {
-                    tokenId = cookieValue;
-                }
-            }
-        }
-
-        return tokenId;
     }
 
     /**

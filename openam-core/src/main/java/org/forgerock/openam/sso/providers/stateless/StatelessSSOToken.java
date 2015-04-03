@@ -42,6 +42,7 @@ import com.iplanet.sso.providers.dpro.SSOSessionListener;
 import com.iplanet.sso.providers.dpro.SSOTokenIDImpl;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionURL;
 import org.forgerock.openam.utils.StringUtils;
 
@@ -66,9 +67,10 @@ final class StatelessSSOToken implements SSOToken {
     /**
      * Confirms that the SSOToken is valid by checking its required JWT values.
      */
-    public boolean isValid() {
+    public boolean isValid(boolean reset) {
         try {
-            return !session.isTimedOut();
+            final int state = session.getState(reset);
+            return (state == SessionConstants.VALID || state == SessionConstants.INACTIVE) && !session.isTimedOut();
         } catch (SessionException e) {
             return false;
         }
@@ -239,6 +241,10 @@ final class StatelessSSOToken implements SSOToken {
     public String dereferenceRestrictedTokenID(SSOToken requester, String restrictedId) throws SSOException {
         DEBUG.warning("Unsupported request to dereference restricted token for StatelessSSOToken");
         throw new UnsupportedOperationException(StatelessSession.RESTRICTED_TOKENS_UNSUPPORTED);
+    }
+
+    StatelessSession getSession() {
+        return session;
     }
 
     @Override

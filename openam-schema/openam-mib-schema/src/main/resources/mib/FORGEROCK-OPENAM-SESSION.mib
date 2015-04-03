@@ -1,5 +1,4 @@
 --
---  Copyright 2014 ForgeRock AS.
 --  The contents of this file are subject to the terms of the Common Development and
 --  Distribution License (the License). You may not use this file except in compliance with the
 --  License.
@@ -12,10 +11,8 @@
 --  Header, with the fields enclosed by brackets [] replaced by your own identifying
 --  information: "Portions copyright [year] [name of copyright owner]".
 --
-
+--  Copyright 2014-2015 ForgeRock AS.
 --
--- MIB for Policy Monitoring
--- Copyright (c) 2014, ForgeRock AS, All Rights Reserved.
 --
 
 FORGEROCK-OPENAM-SESSION-MIB DEFINITIONS ::= BEGIN
@@ -180,5 +177,47 @@ averageCTSSetPropertyTime  	OBJECT-TYPE
     DESCRIPTION     "Average time it takes to set a property on a CTS session"
     DEFVAL    		{ 0 }
     ::= { ctsSessions 5 }
+
+statelessSessions OBJECT IDENTIFIER ::= { sessionMonitoring 4 }
+
+sumStatelessSessions  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Total number of stateless sessions (unused)"
+    DEFVAL    		{ 0 }
+    ::= { statelessSessions 1 }
+
+averageStatelessRefreshTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to refresh a stateless session"
+    DEFVAL    		{ 0 }
+    ::= { statelessSessions 2 }
+
+averageStatelessLogoutTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to logout a stateless session"
+    DEFVAL    		{ 0 }
+    ::= { statelessSessions 3 }
+
+averageStatelessDestroyTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to destroy a stateless session"
+    DEFVAL    		{ 0 }
+    ::= { statelessSessions 4 }
+
+averageStatelessSetPropertyTime  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average time it takes to set a property on a stateless session"
+    DEFVAL    		{ 0 }
+    ::= { statelessSessions 5 }
 
 END

@@ -35,7 +35,7 @@ public class LeastRecentlyUsed<T, V> extends LinkedHashMap<T, V> {
     }
 
     @Override
-    protected boolean removeEldestEntry(Map.Entry entry) {
+    protected boolean removeEldestEntry(Map.Entry<T, V> entry) {
         return size() > maxSize;
     }
 }

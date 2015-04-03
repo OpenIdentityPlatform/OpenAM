@@ -21,9 +21,7 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.operations.SessionOperations;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import org.forgerock.openam.sso.providers.stateless.StatelessSSOProvider;
+import org.forgerock.openam.session.blacklist.SessionBlacklist;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 
 import javax.inject.Inject;
@@ -35,37 +33,35 @@ import javax.inject.Inject;
  */
 public class StatelessOperations implements SessionOperations {
     private final SessionOperations localOperations;
-    private final StatelessSSOProvider ssoProvider;
     private final SessionService sessionService;
     private final StatelessSessionFactory statelessSessionFactory;
-
-    /*
-     * TODO: remove references to local operations once last vestiges of session table have been exorcised
-     */
+    private final SessionBlacklist sessionBlacklist;
 
     @Inject
-    public StatelessOperations(final LocalOperations localOperations, final StatelessSSOProvider provider, SessionService sessionService, StatelessSessionFactory statelessSessionFactory) {
+    public StatelessOperations(final LocalOperations localOperations,
+                               final SessionService sessionService,
+                               final StatelessSessionFactory statelessSessionFactory,
+                               final SessionBlacklist sessionBlacklist) {
         this.localOperations = localOperations;
-        this.ssoProvider = provider;
         this.sessionService = sessionService;
         this.statelessSessionFactory = statelessSessionFactory;
+        this.sessionBlacklist = sessionBlacklist;
     }
 
     @Override
     public SessionInfo refresh(final Session session, final boolean reset) throws SessionException {
-        // TODO: handle last access time updates...
         return statelessSessionFactory.getSessionInfo(session.getID());
     }
 
     @Override
     public void logout(final Session session) throws SessionException {
-        destroySSOToken(session);
+        sessionBlacklist.blacklist(session);
     }
 
     @Override
     public void destroy(final Session requester, final Session session) throws SessionException {
         sessionService.checkPermissionToDestroySession(requester, session.getID());
-        destroySSOToken(session);
+        sessionBlacklist.blacklist(session);
     }
 
     @Override
@@ -73,12 +69,4 @@ public class StatelessOperations implements SessionOperations {
         localOperations.setProperty(session, name, value);
     }
 
-    private void destroySSOToken(final Session sessionToDestroy) throws SessionException {
-        try {
-            final SSOToken ssoToken = ssoProvider.createSSOToken(sessionToDestroy.getID().toString());
-            ssoProvider.destroyToken(ssoToken);
-        } catch (SSOException e) {
-            throw new SessionException(e);
-        }
-    }
 }

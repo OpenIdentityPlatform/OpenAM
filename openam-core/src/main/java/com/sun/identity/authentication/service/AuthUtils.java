@@ -2126,16 +2126,15 @@ public class AuthUtils extends AuthClientUtils {
             
             if ((token != null) && isTokenValid) {
                 AuthD.getAuth().logLogout(token);
-                Session session = sessionCache.getSession(new SessionID(token.getTokenID().toString()));
-                session.logout();
-                
+                SSOTokenManager.getInstance().logout(token);
+
                 if (utilDebug.messageEnabled()) {
                     utilDebug.message("AuthUtils.logout: logout successful.");
                 }
             }
-        } catch (SessionException se) {
+        } catch (SSOException se) {
             if (utilDebug.warningEnabled()) {
-                utilDebug.warning("AuthUtils.logout: SessionException"
+                utilDebug.warning("AuthUtils.logout: SSOException"
                     + " checking validity of SSO Token", se);
             }
         }

@@ -22,19 +22,21 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOTokenEvent;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenListener;
 import com.iplanet.sso.providers.dpro.SSOPrincipal;
 import com.iplanet.sso.providers.dpro.SSOSessionListener;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import org.forgerock.openam.session.SessionConstants;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.net.InetAddress;
@@ -56,8 +58,36 @@ public class StatelessSSOTokenTest {
     @Test
     public void shouldBeInvalidIfTimedOut() throws Exception {
         given(mockSession.isTimedOut()).willReturn(true);
+        given(mockSession.getState(false)).willReturn(SessionConstants.VALID);
 
-        assertFalse(statelessSSOToken.isValid());
+        assertFalse(statelessSSOToken.isValid(false));
+    }
+    
+    @Test(dataProvider = "sessionStates")
+    public void shouldBeInvalidIfNotValidOrInactive(int state) throws Exception {
+        // Given
+        given(mockSession.isTimedOut()).willReturn(false);
+        given(mockSession.getState(false)).willReturn(state);
+
+        // When
+        boolean result = statelessSSOToken.isValid(false);
+
+        // Then
+        if (state == SessionConstants.INACTIVE || state == SessionConstants.VALID) {
+            assertTrue(result, "Token should be valid in state: " + state);
+        } else {
+            assertFalse(result, "Token should NOT be valid in state: " + state);
+        }
+    }
+    
+    @DataProvider
+    public Object[][] sessionStates() {
+        return new Object[][] {
+                { SessionConstants.VALID },
+                { SessionConstants.INACTIVE },
+                { SessionConstants.INVALID },
+                { SessionConstants.DESTROYED }
+        };
     }
 
     @Test

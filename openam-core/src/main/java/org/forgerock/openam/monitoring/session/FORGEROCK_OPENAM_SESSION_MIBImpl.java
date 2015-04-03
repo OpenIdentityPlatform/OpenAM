@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.monitoring.session;
 
@@ -31,6 +31,7 @@ public class FORGEROCK_OPENAM_SESSION_MIBImpl extends FORGEROCK_OPENAM_SESSION_M
     private CtsSessions ctsSessions;
     private InternalSessions internalSessions;
     private RemoteSessions remoteSessions;
+    private StatelessSessions statelessSessions;
 
 
     /**
@@ -130,6 +131,20 @@ public class FORGEROCK_OPENAM_SESSION_MIBImpl extends FORGEROCK_OPENAM_SESSION_M
 
     public RemoteSessions getRemoteSessions() {
         return remoteSessions;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected StatelessSessions createStatelessSessionsMBean(String groupName, String groupOid,
+                                                             ObjectName groupObjname, MBeanServer server) {
+        statelessSessions = new StatelessSessionsImpl(this, InjectorHolder.getInstance(SessionMonitoringStore.class));
+
+        return statelessSessions;
+    }
+
+    public StatelessSessions getStatelessSessions() {
+        return statelessSessions;
     }
 
 }

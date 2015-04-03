@@ -30,6 +30,7 @@ import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionServerConfig;
 import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.service.SessionServiceConfig;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.sso.SSOException;
@@ -60,6 +61,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -107,6 +109,11 @@ import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
+import org.forgerock.openam.session.blacklist.BloomFilterSessionBlacklist;
+import org.forgerock.openam.session.blacklist.CTSSessionBlacklist;
+import org.forgerock.openam.session.blacklist.CachingSessionBlacklist;
+import org.forgerock.openam.session.blacklist.NoOpSessionBlacklist;
+import org.forgerock.openam.session.blacklist.SessionBlacklist;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionCookies;
@@ -485,6 +492,30 @@ public class CoreGuiceModule extends AbstractModule {
     @Provides @Named(SessionConstants.PRIMARY_SERVER_URL) @Inject @Singleton
     String getPrimaryServerURL(SessionServerConfig serverConfig) {
         return serverConfig.getPrimaryServerURL().toString();
+    }
+
+    @Provides @Singleton @Inject
+    public static SessionBlacklist getSessionBlacklist(final CTSSessionBlacklist ctsBlacklist,
+                                                       final SessionServiceConfig serviceConfig) {
+
+        if (!serviceConfig.isSessionBlacklistingEnabled()) {
+            return NoOpSessionBlacklist.INSTANCE;
+        }
+
+        final long purgeDelayMs = serviceConfig.getSessionBlacklistPurgeDelay(TimeUnit.MILLISECONDS);
+        final int cacheSize = serviceConfig.getSessionBlacklistCacheSize();
+        final long pollIntervalMs = serviceConfig.getSessionBlacklistPollInterval(TimeUnit.MILLISECONDS);
+
+        SessionBlacklist blacklist = ctsBlacklist;
+        if (cacheSize > 0) {
+            blacklist = new CachingSessionBlacklist(blacklist, cacheSize, purgeDelayMs);
+        }
+
+        if (pollIntervalMs > 0) {
+            blacklist = new BloomFilterSessionBlacklist(blacklist, serviceConfig);
+        }
+
+        return blacklist;
     }
 
     /**

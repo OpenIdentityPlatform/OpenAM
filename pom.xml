@@ -121,6 +121,7 @@
         <opendj.sdk.version>2.6.10</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.4.0-SNAPSHOT</commons.forgerock-util.version>
+        <forgerock.bloomfilter.version>1.0.0-SNAPSHOT</forgerock.bloomfilter.version>
         <commons.authfilter.version>1.5.1</commons.authfilter.version>
         <forgerock.json.version>2.5.0-SNAPSHOT</forgerock.json.version>
         <forgerock-ui.version>2.0.2-SNAPSHOT</forgerock-ui.version>
@@ -1675,6 +1676,16 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-bloomfilter-core</artifactId>
+                <version>${forgerock.bloomfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-bloomfilter-monitoring</artifactId>
+                <version>${forgerock.bloomfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-auth-filter-common</artifactId>
                 <version>${commons.authfilter.version}</version>
             </dependency>
@@ -1989,8 +2000,7 @@
                 <!-- License: legal/CC-Public-Domain.txt -->
                 <groupId>org.hdrhistogram</groupId>
                 <artifactId>HdrHistogram</artifactId>
-                <version>2.0.3</version>
-                <scope>test</scope>
+                <version>2.1.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
