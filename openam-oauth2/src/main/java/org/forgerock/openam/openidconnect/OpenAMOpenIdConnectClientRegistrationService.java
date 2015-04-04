@@ -11,13 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-15 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.openidconnect;
 
 import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.*;
 
+import com.sun.identity.shared.validation.URLValidator;
+import com.sun.identity.shared.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,6 +52,7 @@ import org.forgerock.openidconnect.ClientBuilder;
 import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationService;
 import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
+import org.forgerock.openidconnect.exceptions.InvalidRedirectUri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +77,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final AccessTokenVerifier tokenVerifier;
     private final TokenStore tokenStore;
+    private final URLValidator urlValidator;
 
     /**
      * Constructs a new OpenAMOpenIdConnectClientRegistrationService.
@@ -80,22 +85,25 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      * @param clientDAO An instance of the ClientDAO.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param tokenVerifier An instance of the AccessTokenVerifier.
+     * @param tokenStore An instance of the TokenStore.
+     * @param urlValidator An instance of the URLValidator.
      */
     @Inject
     OpenAMOpenIdConnectClientRegistrationService(ClientDAO clientDAO,
                                                  OAuth2ProviderSettingsFactory providerSettingsFactory,
-                                                 AccessTokenVerifier tokenVerifier, TokenStore tokenStore) {
+                                                 AccessTokenVerifier tokenVerifier, TokenStore tokenStore, URLValidator urlValidator) {
         this.clientDAO = clientDAO;
         this.providerSettingsFactory = providerSettingsFactory;
         this.tokenVerifier = tokenVerifier;
         this.tokenStore = tokenStore;
+        this.urlValidator = urlValidator;
     }
 
     /**
      * {@inheritDoc}
      */
     public JsonValue createRegistration(String accessToken, String deploymentUrl, OAuth2Request request)
-            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException,
+            throws InvalidRedirectUri, InvalidClientMetadata, ServerException, UnsupportedResponseTypeException,
             AccessDeniedException, NotFoundException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
@@ -145,7 +153,20 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
             }
 
             if (input.get(REDIRECT_URIS.getType()).asList() != null) {
-                clientBuilder.setRedirectionURIs(input.get(REDIRECT_URIS.getType()).asList(String.class));
+                List<String> redirectUris = input.get(REDIRECT_URIS.getType()).asList(String.class);
+                boolean isValidUris = true;
+                for (String redirectUri : redirectUris) {
+                    try {
+                        urlValidator.validate(redirectUri);
+                    } catch (ValidationException e) {
+                        isValidUris = false;
+                        logger.error("The redirectUri: " + redirectUri + " is invalid.");
+                    }
+                }
+                if (!isValidUris) {
+                    throw new InvalidRedirectUri();
+                }
+                clientBuilder.setRedirectionURIs(redirectUris);
             }
 
             List<String> scopes = input.get(SCOPES.getType()).asList(String.class);

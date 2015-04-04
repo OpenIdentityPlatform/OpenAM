@@ -11,7 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openidconnect;
@@ -25,6 +26,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
+import org.forgerock.openidconnect.exceptions.InvalidRedirectUri;
 
 /**
  * Service for registering OpenId Connect clients.
@@ -37,17 +39,18 @@ public interface OpenIdConnectClientRegistrationService {
      * Creates an OpenId Connect client registration in the OAuth2 provider.
      *
      * @param accessToken The access token for making the registration call.
-     * @param deploymentURL THe deployment url of the OAuth2 provider.
+     * @param deploymentURL The deployment url of the OAuth2 provider.
      * @param request The OAuth2 request.
      * @return JsonValue representation of the client registration.
-     * @throws InvalidClientMetadata
+     * @throws InvalidRedirectUri If redirect urls are invalid.
+     * @throws InvalidClientMetadata If client metadata is invalid.
      * @throws ServerException If any internal server error occurs.
      * @throws UnsupportedResponseTypeException If the requested response type is not supported by either the client
      *          or the OAuth2 provider.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     JsonValue createRegistration(String accessToken, String deploymentURL, OAuth2Request request)
-            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException, NotFoundException;
+            throws InvalidRedirectUri, InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException, NotFoundException;
 
     /**
      * Gets an OpenId Connect client registration from the OAuth2 provider.

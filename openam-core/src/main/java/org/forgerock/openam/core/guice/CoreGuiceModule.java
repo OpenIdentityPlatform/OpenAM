@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.core.guice;
@@ -49,6 +50,7 @@ import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.stats.Stats;
+import com.sun.identity.shared.validation.URLValidator;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSEntry;
@@ -149,6 +151,7 @@ public class CoreGuiceModule extends AbstractModule {
         bind(IndexChangeManager.class).to(IndexChangeManagerImpl.class).in(Singleton.class);
         bind(IndexChangeMonitor.class).to(IndexChangeMonitorImpl.class).in(Singleton.class);
         bind(IndexTreeService.class).to(IndexTreeServiceImpl.class).in(Singleton.class);
+        bind(URLValidator.class).toInstance(URLValidator.getInstance());
 
         bind(new TypeLiteral<TokenAdapter<JsonValue>>(){})
                 .annotatedWith(Names.named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER))
