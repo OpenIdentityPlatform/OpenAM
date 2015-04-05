@@ -216,7 +216,7 @@ public class StatelessSessionFactory {
      * @return Null if there was no JWT present, otherwise a valid JWT.
      */
     public static String getJWTFromSessionID(SessionID sessionID) {
-        if (sessionID == null) {
+        if (sessionID == null || sessionID.toString().isEmpty()) {
             return null;
         }
         String tail = sessionID.getTail();
