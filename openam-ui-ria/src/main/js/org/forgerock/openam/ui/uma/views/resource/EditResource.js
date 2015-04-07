@@ -62,12 +62,12 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                 message: $.t("uma.resources.show.revokeAllMessage"),
                 closable: false,
                 buttons: [{
-                    id: "btn-ok",
+                    id: "btnOk",
                     label: $.t("common.form.ok"),
                     cssClass: "btn-primary btn-danger",
                     action: function(dialog) {
                         dialog.enableButtons(false);
-                        dialog.getButton("btn-ok").text($.t("common.form.working"));
+                        dialog.getButton("btnOk").text($.t("common.form.working"));
                         self.model.get('policy').destroy().done(function (response) {
                             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllPoliciesSuccess");
                             self.render();

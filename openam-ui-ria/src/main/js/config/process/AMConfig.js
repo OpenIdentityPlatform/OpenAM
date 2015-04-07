@@ -89,6 +89,7 @@ define("config/process/AMConfig", [
             }
         },
         {
+
             startEvent: Constants.EVENT_SHOW_CONFIRM_PASSWORD_DIALOG,
             description: "",
             dependencies: [
@@ -97,7 +98,18 @@ define("config/process/AMConfig", [
             processDescription: function(event, ConfirmPasswordDialog) {
                 ConfirmPasswordDialog.show();
             }
+        },
+        {
+            startEvent: Constants.EVENT_SHOW_CHANGE_SECURITY_DIALOG,
+            override: true,
+            dependencies: [
+                "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog"
+            ],
+            processDescription: function(event, ChangeSecurityDataDialog) {
+                ChangeSecurityDataDialog.show();
+            }
         }
+
     ];
     return obj;
 });

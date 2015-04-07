@@ -28,11 +28,11 @@ define("org/forgerock/openam/ui/dashboard/MyApplicationsView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/dashboard/MyApplicationsDelegate"
 ], function(AbstractView, MyApplicationsDelegate) {
-    
+
     var Applications = AbstractView.extend({
         template: "templates/openam/MyApplicationsTemplate.html",
         noBaseTemplate: true,
-        element: '#myApplications',
+        element: '#myApplicationsSection',
         render: function() {
 
             var self = this;
@@ -48,5 +48,3 @@ define("org/forgerock/openam/ui/dashboard/MyApplicationsView", [
 
     return new Applications();
 });
-
-

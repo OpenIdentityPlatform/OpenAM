@@ -140,7 +140,7 @@ define("config/AppConfiguration", [
                                 "i18nKey": "common.user.profile"
                             }, {
                                 "id": "changePasswordLink",
-                                "href": "#profile/change_security_data/",
+                                "event" : constants.EVENT_SHOW_CHANGE_SECURITY_DIALOG,
                                 "i18nKey": "common.user.changePassword"
                             }, {
                                 "id": "logoutLink",

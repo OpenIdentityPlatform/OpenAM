@@ -1,4 +1,4 @@
-<div id="myApplications" class="panel panel-default panel-collapse">
+<div id="myApplications" class="panel panel-default">
     <div class="panel-heading" role="tab" id="myAppsCollapseHeading">
         <h4 class="panel-title collapse-title">
             <a data-toggle="collapse" href="#myAppsCollapse" aria-expanded="true" aria-controls="myAppsCollapseHeading" class="">{{t "openam.apps.header"}}</a>
@@ -6,15 +6,15 @@
     </div>
     <div id="myAppsCollapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="myAppsCollapse" aria-expanded="true">
         <div class="panel-body">
+            {{#if apps}}
             <ul id="myApplicationsList" class="list-group">
-                {{#if apps}}
-                    {{#each apps}}
+                {{#each apps}}
                 <li id="myApplication_{{@index}}" class="list-group-item"><a href="{{dashboardLogin}}"><span class="appImage"><img src="{{dashboardIcon}}"></span>{{dashboardName}}</a></li>
-                    {{/each}}
-                {{else}}
-                {{t "openam.apps.noneFound"}}
-                {{/if}}
+                {{/each}}        
             </ul>
+            {{else}}
+            {{t "openam.apps.noneFound"}}
+            {{/if}}
         </div>
     </div>
 </div>

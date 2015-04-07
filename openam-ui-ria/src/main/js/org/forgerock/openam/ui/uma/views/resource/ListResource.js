@@ -52,12 +52,12 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                 message: $.t("uma.resources.show.revokeAllResourcesMessage"),
                 closable: false,
                 buttons: [{
-                    id: "btn-ok",
+                    id: "btnOk",
                     label: $.t("common.form.ok"),
                     cssClass: "btn-primary btn-danger",
                     action: function(dialog) {
                         dialog.enableButtons(false);
-                        dialog.getButton("btn-ok").text($.t("common.form.working"));
+                        dialog.getButton("btnOk").text($.t("common.form.working"));
                         UMADelegate.revokeAllResources().done(function() {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllResourcesSuccess");
                         }).fail(function(error) {

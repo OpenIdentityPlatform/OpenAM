@@ -1,10 +1,9 @@
 <form id="passwordChange" action="" class="form-horitzontal" method="post" onsubmit="return false" autocomplete="off">
     <fieldset class="fieldset">
-        <div class="col-md-5">
-          <div class="form-group has-feedback has-success">
+        <div class="col-md-12">
+          <div class="form-group has-feedback">
               <label for="currentPassword">{{t "common.user.oldPassword"}}</label>
               <input  id="currentPassword" class="form-control" type="password" name="currentPassword" value="" data-validator="required" pattern=".{8,}" data-validator-event="keyup change" required autofocus />
-              <span class="error form-control-feedback"><i class="fa validation-icon"></i></span>
           </div>
 
           <span class="help-block">{{t "templates.user.ChangeSecurityDataDialogTemplate.enterNewPasswordToChange"}}</span>
@@ -18,17 +17,19 @@
               <label for="confirm">{{t "common.user.confirmPassword"}}</label>
               <input id="confirm" class="form-control" type="password" name="passwordConfirm" value="" data-validator="passwordConfirm" data-validator-event="keyup change" required/>
           </div>
+
+
+          <div class="validationRules well" data-for-validator="password passwordConfirm">
+              <div class="field-rule">
+                  <span class="error"><i class="fa validation-icon"></i></span><span data-for-validator="minLength">{{t "common.form.validation.atLeast8Characters"}}</span>
+              </div>
+
+              <div class="field-rule">
+                  <span class="error"><i class="fa validation-icon"></i></span><span data-for-validator="passwordConfirm">{{t "common.form.validation.confirmationMatchesPassword"}}</span>
+              </div>
+          </div>
+
         </div>
 
-        <div class="col-md-6 validationRules well" data-for-validator="password passwordConfirm">
-            <div class="field-rule">
-                <span class="error"><i class="fa validation-icon"></i></span>
-                <span data-for-validator="minLength">{{t "common.form.validation.atLeast8Characters"}}</span>
-            </div>
-
-            <div class="field-rule">
-                <span class="error"><i class="fa validation-icon"></i></span><span data-for-validator="passwordConfirm">{{t "common.form.validation.confirmationMatchesPassword"}}</span>
-            </div>
-        </div>
     </fieldset>
 </form>
